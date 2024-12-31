@@ -1,0 +1,19 @@
+name: FlectonePulse
+version: '${version}'
+main: net.flectone.pulse.FlectonePulsePlugin
+api-version: '1.16'
+prefix: ${prefix}
+authors: [TheFaser]
+description: ${description}
+website: ${website}
+folia-supported: true
+softdepend:
+  - PlaceholderAPI
+  - LuckPerms
+  - Vault
+  - voicechat
+  - PlasmoVoice
+  - SuperVanish
+  - PremiumVanish
+  - SkinsRestorer
+  - InteractiveChat

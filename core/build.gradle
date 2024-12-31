@@ -1,0 +1,23 @@
+dependencies {
+    compileOnly "com.alessiodp.libby:libby-bukkit:$libby_version"
+    compileOnly "net.elytrium:serializer:$elytrium_serializer_version"
+    compileOnly "com.zaxxer:HikariCP:$HikariCP_version"
+    compileOnly "org.xerial:sqlite-jdbc:$sqlite_jdbc_version"
+    compileOnly "net.kyori:adventure-text-serializer-legacy:$adventure_api"
+    compileOnly "net.kyori:adventure-text-minimessage:$adventure_api"
+    compileOnly "net.kyori:adventure-text-serializer-gson:$adventure_api"
+    compileOnly "net.kyori:adventure-text-serializer-plain:$adventure_api"
+    compileOnly "com.github.retrooper:packetevents-spigot:$packetevents_spigot_version"
+    compileOnly "io.netty:netty-all:$netty_all_version"
+    compileOnly "commons-lang:commons-lang:$commons_lang_version"
+}
+
+buildConfig {
+    className("BuildConfig")
+    packageName("net.flectone.pulse")
+    rootProject.ext.properties.findAll { key, value ->
+        !key.contains('.')
+    }.each { key, value ->
+        buildConfigField(String, key.toString().toUpperCase(), value);
+    }
+}

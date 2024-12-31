@@ -1,0 +1,8 @@
+name: FlectonePulseBungeecord
+version: ${version}
+main: net.flectone.pulse.FlectonePulseBungeecord
+api-version: 1.16
+prefix: ${prefix}
+author: ${author}
+description: ${description}
+website: ${website}

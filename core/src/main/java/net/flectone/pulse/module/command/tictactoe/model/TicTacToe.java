@@ -1,0 +1,219 @@
+package net.flectone.pulse.module.command.tictactoe.model;
+
+import lombok.Getter;
+import lombok.Setter;
+import net.flectone.pulse.model.FPlayer;
+
+import java.util.*;
+
+@Getter
+public class TicTacToe {
+
+    private static final int FIRST_VALUE = 1;
+    private static final int SECOND_VALUE = 2;
+    private static final int REMOVE_MULTIPLIER = -1;
+    private static final int WIN_OFFSET = 5;
+
+    private final Map<Integer, Queue<String>> movesMap = new HashMap<>();
+
+    private final int id;
+    private final boolean hard;
+    private final int[][] field = new int[3][3];
+
+    private final int firstPlayer;
+    private final int secondPlayer;
+
+    @Setter
+    private int nextPlayer;
+    private int[] winningTrio = null;
+
+    @Setter
+    private boolean ended;
+    private boolean created;
+
+    public TicTacToe(int id, int firstPlayer, int secondPlayer, boolean hard) {
+        this.id = id;
+        this.hard = hard;
+
+        movesMap.put(firstPlayer, new LinkedList<>());
+        this.firstPlayer = firstPlayer;
+
+        movesMap.put(secondPlayer, new LinkedList<>());
+        this.secondPlayer = secondPlayer;
+
+        nextPlayer = secondPlayer;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder()
+                .append(id)
+                .append(",")
+                .append(nextPlayer)
+                .append(",");
+
+        for (int[] row : field) {
+            for (int column : row) {
+                stringBuilder.append(column).append("-");
+            }
+            stringBuilder.append(",");
+        }
+
+        stringBuilder.append(ended ? 1 : 0);
+
+        return stringBuilder.toString();
+    }
+
+    public String build(String formatField,
+                        String first,
+                        String firstRemove,
+                        String firstWin,
+                        String second,
+                        String secondRemove,
+                        String secondWin,
+                        String empty) {
+
+        if (winningTrio != null) {
+            for (int i = 1; i < winningTrio.length; i = i + 2) {
+                int row = winningTrio[i-1];
+                int column = winningTrio[i];
+                field[row][column] = Math.abs(field[row][column]) + WIN_OFFSET;
+            }
+        }
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                formatField = formatField.replaceFirst("\\[#]", switch (field[i][j]) {
+                    case FIRST_VALUE -> first;
+                    case FIRST_VALUE * REMOVE_MULTIPLIER -> firstRemove;
+                    case FIRST_VALUE + WIN_OFFSET -> firstWin;
+                    case SECOND_VALUE -> second;
+                    case SECOND_VALUE * REMOVE_MULTIPLIER -> secondRemove;
+                    case SECOND_VALUE + WIN_OFFSET -> secondWin;
+                    default -> empty.replace("<move>", i + "-" + j);
+                });
+            }
+        }
+
+        return formatField;
+    }
+
+    public boolean isWin() {
+        return winningTrio != null;
+    }
+
+    public void checkWinningTrio() {
+        for (int row = 0; row < 3; row++) {
+            if (field[row][0] != 0 && Math.abs(field[row][0]) == Math.abs(field[row][1]) && Math.abs(field[row][1]) == Math.abs(field[row][2])) {
+                winningTrio = new int[]{row, 0, row, 1, row, 2};
+                return;
+            }
+        }
+
+        for (int column = 0; column < 3; column++) {
+            if (field[0][column] != 0 && Math.abs(field[0][column]) == Math.abs(field[1][column]) && Math.abs(field[1][column]) == Math.abs(field[2][column])) {
+                winningTrio = new int[]{0, column, 1, column, 2, column};
+                return;
+            }
+        }
+
+        if (field[0][0] != 0 && Math.abs(field[0][0]) == Math.abs(field[1][1]) && Math.abs(field[1][1]) == Math.abs(field[2][2])) {
+            winningTrio =  new int[]{0, 0, 1, 1, 2, 2};
+            return;
+        }
+
+        if (field[0][2] != 0 && Math.abs(field[0][2]) == Math.abs(field[1][1]) && Math.abs(field[1][1]) == Math.abs(field[2][0])) {
+            winningTrio = new int[]{0, 2, 1, 1, 2, 0};
+        }
+    }
+
+    public boolean isDraw() {
+        for (int row = 0; row < 3; row++) {
+            for (int column = 0; column < 3; column++) {
+                if (field[row][column] == 0) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public boolean contains(FPlayer fPlayer) {
+        return movesMap.containsKey(fPlayer.getId());
+    }
+
+    public void setNextPlayer() {
+        nextPlayer = nextPlayer == firstPlayer ? secondPlayer : firstPlayer;
+    }
+
+    public boolean move(FPlayer fPlayer, String move) {
+        if (nextPlayer != fPlayer.getId()) {
+            return false;
+        }
+
+        Queue<String> moves = movesMap.get(fPlayer.getId());
+        if (movesMap.values().stream().allMatch(Collection::isEmpty) && (move == null || move.equals("create"))) {
+            setNextPlayer();
+            created = true;
+            return true;
+        }
+
+        int[] rowColumn = parseMove(move);
+        if (rowColumn == null) return false;
+
+        int row = rowColumn[0];
+        int column = rowColumn[1];
+
+        if (field[row][column] != 0) {
+            return false;
+        }
+
+        moves.add(move);
+        movesMap.put(fPlayer.getId(), moves);
+
+        int currentPlayerValue = FIRST_VALUE == fPlayer.getId()
+                ? FIRST_VALUE
+                : SECOND_VALUE;
+
+        field[row][column] = currentPlayerValue;
+
+        checkWinningTrio();
+        setNextPlayer();
+
+        if (isHard() && moves.size() > 2) {
+            removeMove(moves, currentPlayerValue);
+        }
+
+        return true;
+    }
+
+    private void removeMove(Queue<String> moves, int currentPlayerValue) {
+        if (moves.size() > 3) {
+            String move = moves.poll();
+
+            int[] rowColumn = parseMove(move);
+            if (rowColumn == null) return;
+
+            field[rowColumn[0]][rowColumn[1]] = 0;
+        }
+
+        String nextRemove = moves.peek();
+        if (nextRemove == null) return;
+
+        int[] rowColumn = parseMove(nextRemove);
+        if (rowColumn == null) return;
+
+        field[rowColumn[0]][rowColumn[1]] = REMOVE_MULTIPLIER * currentPlayerValue;
+    }
+
+    private int[] parseMove(String move) {
+        try {
+            String[] stringMove = move.split("-");
+
+            return new int[]{Integer.parseInt(stringMove[0]), Integer.parseInt(stringMove[1])};
+        } catch (NumberFormatException ignored) {}
+
+        return null;
+    }
+}

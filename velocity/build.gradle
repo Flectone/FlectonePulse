@@ -1,0 +1,27 @@
+repositories {
+    mavenCentral()
+    maven {
+        name = "papermc-repo"
+        url = "https://repo.papermc.io/repository/maven-public/"
+    }
+}
+
+dependencies {
+    compileOnly "com.velocitypowered:velocity-api:$velocity_version"
+    annotationProcessor "com.velocitypowered:velocity-api:$velocity_version"
+
+    implementation(project(":core"))
+}
+
+task("generateTemplates") {
+
+}
+
+java {
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
+}
+
+shadowJar {
+
+}

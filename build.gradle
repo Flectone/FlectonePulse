@@ -1,0 +1,103 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'com.github.gmazzo.buildconfig' version '5.3.5'
+}
+
+jar.enabled = false
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'com.github.gmazzo.buildconfig'
+
+    if (!project.name.is("fabric")) {
+        apply plugin: 'com.github.johnrengelman.shadow'
+
+        java {
+            sourceCompatibility = java_version
+            targetCompatibility = java_version
+        }
+
+        shadowJar {
+            minimize()
+            archiveFileName = "FlectonePulse-" + project.name + "-" + project_version + ".jar"
+        }
+    }
+
+    group = "net.flectone.pulse." + project.name
+    project.buildDir(new File(rootProject.projectDir, "build/" + project.name))
+
+    repositories {
+        mavenCentral()
+
+        maven {
+            url = 'https://jitpack.io'
+        }
+
+        maven {
+            name = "spigotmc-repo"
+            url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/groups/public/"
+        }
+
+        maven {
+            name = "aikar"
+            url = "https://repo.aikar.co/content/groups/aikar/"
+        }
+
+        maven {
+            url = "https://repo.codemc.io/repository/maven-releases/"
+        }
+
+        maven {
+            url = 'https://repo.minebench.de'
+        }
+
+        maven {
+            url = "https://s01.oss.sonatype.org/content/repositories/snapshots"
+        }
+
+        maven {
+            url = "https://libraries.minecraft.net"
+        }
+
+        maven {
+            url = "https://maven.evokegames.gg/snapshots"
+        }
+
+        maven {
+            url = "https://maven.maxhenkel.de/repository/public"
+        }
+
+        maven {
+            url = "https://repo.extendedclip.com/content/repositories/placeholderapi/"
+        }
+
+        maven {
+            url = "https://repo.plasmoverse.com/releases"
+        }
+
+        maven {
+            url = "https://repo.plasmoverse.com/snapshots"
+        }
+
+        maven {
+            url = "https://repo.loohpjames.com/repository"
+        }
+    }
+
+    dependencies {
+        compileOnly "org.jetbrains:annotations:$jetbrains_annotations_version"
+
+        compileOnly "org.projectlombok:lombok:$lombok_version"
+        annotationProcessor "org.projectlombok:lombok:$lombok_version"
+
+        compileOnly "com.google.inject:guice:$guice_version"
+        compileOnly "net.kyori:adventure-api:$adventure_api"
+        compileOnly "org.apache.logging.log4j:log4j-core:$log4j_core_version"
+    }
+}
+
