@@ -8,6 +8,7 @@ import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.format.color.ColorModule;
 import net.flectone.pulse.module.message.format.emoji.EmojiModule;
@@ -132,11 +133,12 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
 
     public TagResolver pingTag(FEntity sender, FEntity fReceiver) {
         if (checkModulePredicates(sender)) return TagResolver.empty();
+        if (!(sender instanceof FPlayer fPlayer)) return TagResolver.empty();
         if (!permissionUtil.has(sender, permission.getTags().get(TagType.PING))) return TagResolver.empty();
 
         return TagResolver.resolver("ping", (argumentQueue, context) -> {
 
-            String string = resolveLocalization(fReceiver).getTags().get(TagType.PING).replace("<ping>", String.valueOf(fPlayerManager.get(sender)));
+            String string = resolveLocalization(fReceiver).getTags().get(TagType.PING).replace("<ping>", String.valueOf(fPlayerManager.getPing(fPlayer)));
 
             Component component = componentUtil.builder(sender, fReceiver, string).build();
 
