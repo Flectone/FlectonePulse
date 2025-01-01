@@ -67,7 +67,13 @@ public class FlectonePulsePlugin extends JavaPlugin implements FlectonePulse {
 
     @Override
     public void onEnable() {
-        injector = Guice.createInjector(new PluginInjector(this, this, fLogger));
+        try {
+            injector = Guice.createInjector(new PluginInjector(this, this, fLogger));
+        } catch (Exception e) {
+            fLogger.warning(e);
+            Bukkit.getPluginManager().disablePlugin(this);
+        }
+
 
         fLogger.logPluginInfo();
 
