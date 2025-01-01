@@ -77,7 +77,6 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
         integration = fileManager.getIntegration().getDiscord();
     }
 
-    @Async
     public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> discordString) {
         String integrationChannel = integration.getMessageChannel().get(messageTag);
         if (integrationChannel == null) return;

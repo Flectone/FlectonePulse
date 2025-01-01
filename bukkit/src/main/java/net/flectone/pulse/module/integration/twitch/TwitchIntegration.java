@@ -93,7 +93,6 @@ public class TwitchIntegration implements FIntegration {
         fLogger.info("Twitch integration enabled");
     }
 
-    @Async
     public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> twitchString) {
         List<String> channels = integration.getMessageChannel().get(messageTag);
         if (channels == null) return;

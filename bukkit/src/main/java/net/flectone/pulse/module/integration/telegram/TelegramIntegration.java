@@ -65,7 +65,6 @@ public class TelegramIntegration implements FIntegration {
         }
     }
 
-    @Async
     public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> telegramString) {
         List<String> channels = integration.getMessageChannel().get(messageTag);
         if (channels == null) return;

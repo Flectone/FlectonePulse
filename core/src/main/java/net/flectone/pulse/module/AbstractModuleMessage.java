@@ -9,6 +9,7 @@ import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ProxyManager;
+import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.PlatformSender;
@@ -50,6 +51,9 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
 
     @Inject
     private PlatformSender platformSender;
+
+    @Inject
+    private ThreadManager threadManager;
 
     @Getter
     private FCooldown cooldown;
@@ -405,7 +409,7 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
                     .replace("<final_message>", finalMessage)
                     .replace("<final_clear_message>", finalMessage.replaceAll("[\\p{C}\\p{So}\\x{E0100}-\\x{E01EF}]+", ""));
 
-            integrationModule.sendMessage(fPlayer, tag, interfaceReplaceString);
+            threadManager.runAsync(() -> integrationModule.sendMessage(fPlayer, tag, interfaceReplaceString));
         }
 
         private String resolveString(FPlayer fPlayer, BiFunction<FPlayer, M, String> stringResolver) {
