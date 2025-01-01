@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ListenerManager;
@@ -53,6 +54,9 @@ public class WorldModule extends AbstractModule {
         return message.isEnable();
     }
 
+    @Inject
+    private FLogger fLogger;
+
     @Async
     public void update(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
@@ -61,7 +65,7 @@ public class WorldModule extends AbstractModule {
                 ? message.getValues().get(fPlayerManager.getWorldEnvironment(fPlayer))
                 : message.getValues().get(fPlayerManager.getWorldName(fPlayer));
 
-        if (worldPrefix.equalsIgnoreCase(fPlayer.getWorldPrefix())) return;
+        if (worldPrefix != null && worldPrefix.equalsIgnoreCase(fPlayer.getWorldPrefix())) return;
 
         fPlayer.setWorldPrefix(worldPrefix);
         threadManager.runDatabase(database -> database.updateFPlayer(fPlayer));
