@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -27,15 +28,18 @@ import java.util.function.UnaryOperator;
 public class BukkitIntegrationModule extends IntegrationModule {
 
     private final ServerUtil serverUtil;
+    private final FLogger fLogger;
     private final Injector injector;
 
     @Inject
     public BukkitIntegrationModule(FileManager fileManager,
                                    ServerUtil serverUtil,
+                                   FLogger fLogger,
                                    Injector injector) {
         super(fileManager);
 
         this.serverUtil = serverUtil;
+        this.fLogger = fLogger;
         this.injector = injector;
     }
 
@@ -73,8 +77,12 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
         if (serverUtil.hasProject("PlasmoVoice")) {
             try {
+                Class.forName("su.plo.voice.api.server.event.audio.source.ServerSourceCreatedEvent");
+
                 addChildren(PlasmoVoiceModule.class);
-            } catch (NoClassDefFoundError ignored) {}
+            } catch (ClassNotFoundException e) {
+                fLogger.warning("Update PlasmoVoice to the latest version");
+            }
         }
 
         addChildren(DiscordModule.class);
