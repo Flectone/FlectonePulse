@@ -3,11 +3,13 @@ package net.flectone.pulse.platform.proxy;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import lombok.experimental.UtilityClass;
 import net.flectone.pulse.util.MessageTag;
 
+@UtilityClass
 public class Proxy {
 
-    public static ByteArrayDataOutput create(byte[] data) {
+    public ByteArrayDataOutput create(byte[] data) {
         ByteArrayDataInput input = ByteStreams.newDataInput(data);
 
         String tag = input.readUTF();
