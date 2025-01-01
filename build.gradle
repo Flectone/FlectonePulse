@@ -24,6 +24,12 @@ subprojects {
         }
     }
 
+    compileJava.options.encoding = 'UTF-8'
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+    }
+
     group = "net.flectone.pulse." + project.name
     project.buildDir(new File(rootProject.projectDir, "build/" + project.name))
 
