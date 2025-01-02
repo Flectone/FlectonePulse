@@ -27,18 +27,18 @@ import java.util.function.UnaryOperator;
 @Singleton
 public class BukkitIntegrationModule extends IntegrationModule {
 
-    private final ServerUtil serverUtil;
     private final FLogger fLogger;
     private final Injector injector;
 
     @Inject
+    private ServerUtil serverUtil;
+
+    @Inject
     public BukkitIntegrationModule(FileManager fileManager,
-                                   ServerUtil serverUtil,
                                    FLogger fLogger,
                                    Injector injector) {
         super(fileManager);
 
-        this.serverUtil = serverUtil;
         this.fLogger = fLogger;
         this.injector = injector;
     }

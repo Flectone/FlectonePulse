@@ -7,6 +7,9 @@ import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import net.flectone.pulse.manager.FPlayerManager;
+import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
@@ -34,10 +37,16 @@ public class BukkitServerUtil implements ServerUtil {
     }
 
     private final Plugin plugin;
+    private final FPlayerManager fPlayerManager;
+    private final IntegrationModule integrationModule;
 
     @Inject
-    public BukkitServerUtil(Plugin plugin) {
+    public BukkitServerUtil(Plugin plugin,
+                            FPlayerManager fPlayerManager,
+                            IntegrationModule integrationModule) {
         this.plugin = plugin;
+        this.fPlayerManager = fPlayerManager;
+        this.integrationModule = integrationModule;
     }
 
     @Override
@@ -111,7 +120,11 @@ public class BukkitServerUtil implements ServerUtil {
 
     @Override
     public int getOnlineCount() {
-        return Bukkit.getOnlinePlayers().size();
+        return (int) fPlayerManager.getFPlayers().stream()
+                .filter(FPlayer::isOnline)
+                .filter(fPlayer -> !fPlayer.isUnknown())
+                .filter(fPlayer -> !integrationModule.isVanished(fPlayer))
+                .count();
     }
 
     @Override

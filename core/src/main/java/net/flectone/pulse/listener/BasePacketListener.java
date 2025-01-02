@@ -61,7 +61,7 @@ public class BasePacketListener extends AbstractPacketListener {
         threadManager.runDatabase(database -> {
             FPlayer fPlayer = fPlayerManager.put(database, uuid, entityId, name, ip);
 
-            joinModule.send(fPlayer);
+            joinModule.send(fPlayer, true);
             greetingModule.send(fPlayer);
             mailModule.send(fPlayer);
         });

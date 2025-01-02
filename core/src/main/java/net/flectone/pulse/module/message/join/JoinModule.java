@@ -25,6 +25,7 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
 
     private final ListenerManager listenerManager;
     private final FPlayerManager fPlayerManager;
+    private final IntegrationModule integrationModule;
 
     @Inject
     public JoinModule(FileManager fileManager,
@@ -35,6 +36,7 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
 
         this.listenerManager = listenerManager;
         this.fPlayerManager = fPlayerManager;
+        this.integrationModule =  integrationModule;
 
         message = fileManager.getMessage().getJoin();
         permission = fileManager.getPermission().getMessage().getJoin();
@@ -57,8 +59,9 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
     }
 
     @Async
-    public void send(FPlayer fPlayer) {
+    public void send(FPlayer fPlayer, boolean checkVanish) {
         if (checkModulePredicates(fPlayer)) return;
+        if (checkVanish && integrationModule.isVanished(fPlayer)) return;
 
         boolean hasPlayedBefore = fPlayerManager.hasPlayedBefore(fPlayer);
 
