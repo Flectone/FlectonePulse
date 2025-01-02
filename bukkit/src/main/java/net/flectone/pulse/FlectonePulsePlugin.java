@@ -74,7 +74,6 @@ public class FlectonePulsePlugin extends JavaPlugin implements FlectonePulse {
             Bukkit.getPluginManager().disablePlugin(this);
         }
 
-
         fLogger.logPluginInfo();
 
         // test
