@@ -40,8 +40,6 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
 
         message = fileManager.getMessage().getJoin();
         permission = fileManager.getPermission().getMessage().getJoin();
-
-        addPredicate(integrationModule::isVanished);
     }
 
     @Override
