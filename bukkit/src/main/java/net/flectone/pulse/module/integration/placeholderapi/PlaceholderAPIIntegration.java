@@ -25,16 +25,16 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     private final Message.Format.Color color;
 
     private final FPlayerManager fPlayerManager;
-    private final ServerUtil bukkitUtil;
+    private final ServerUtil serverUtil;
     private final FLogger fLogger;
 
     @Inject
     public PlaceholderAPIIntegration(FPlayerManager fPlayerManager,
                                      FileManager fileManager,
-                                     ServerUtil bukkitUtil,
+                                     ServerUtil serverUtil,
                                      FLogger fLogger) {
         this.fPlayerManager = fPlayerManager;
-        this.bukkitUtil = bukkitUtil;
+        this.serverUtil = serverUtil;
         this.fLogger = fLogger;
 
         color = fileManager.getMessage().getFormat().getColor();
@@ -89,6 +89,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             case "online" -> String.valueOf(Bukkit.getOnlinePlayers().size());
             case "tps" -> bukkitUtil.getTPS();
             case "online" -> String.valueOf(serverUtil.getOnlineCount());
+            case "tps" -> serverUtil.getTPS();
             default -> null;
         };
     }
