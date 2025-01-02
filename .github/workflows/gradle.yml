@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -28,7 +28,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: FlectonePulse-bukkit
-        path: build/bukkit
+        path: build/bukkit/libs
         if-no-files-found: warn
 
     - name: Build Velocity
@@ -38,7 +38,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: FlectonePulse-velocity
-        path: build/velocity
+        path: build/velocity/libs
         if-no-files-found: warn
 
     - name: Build Bungeecord
@@ -48,7 +48,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: FlectonePulse-bungeecord
-        path: build/bungeecord
+        path: build/bungeecord/libs
         if-no-files-found: warn
 
 
