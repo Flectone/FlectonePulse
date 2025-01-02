@@ -88,6 +88,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             case "ping" -> String.valueOf(player.getPing());
             case "online" -> String.valueOf(Bukkit.getOnlinePlayers().size());
             case "tps" -> bukkitUtil.getTPS();
+            case "online" -> String.valueOf(serverUtil.getOnlineCount());
             default -> null;
         };
     }
