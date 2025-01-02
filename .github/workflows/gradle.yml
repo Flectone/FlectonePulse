@@ -19,13 +19,10 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+        cache: gradle
 
     - name: Build Bukkit
       run: ./gradlew bukkit:shadowJar
-      with:
-        distribution: temurin
-        java-version: 17
-        cache: gradle
 
     - name: Publish Bukkit artifact
       uses: actions/upload-artifact@v4
@@ -36,10 +33,6 @@ jobs:
 
     - name: Build Velocity
       run: ./gradlew velocity:shadowJar
-      with:
-        distribution: temurin
-        java-version: 17
-        cache: gradle
 
     - name: Publish Velocity artifact
       uses: actions/upload-artifact@v4
@@ -50,10 +43,6 @@ jobs:
 
     - name: Build Bungeecord
       run: ./gradlew bungeecord:shadowJar
-      with:
-        distribution: temurin
-        java-version: 17
-        cache: gradle
 
     - name: Publish Bungeecord artifact
       uses: actions/upload-artifact@v4
