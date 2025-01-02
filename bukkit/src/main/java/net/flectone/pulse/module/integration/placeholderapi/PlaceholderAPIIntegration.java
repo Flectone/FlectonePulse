@@ -80,9 +80,9 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
         }
 
         return switch (params) {
-            case "world_prefix" -> fPlayer.getWorldPrefix() == null ? "" : fPlayer.getWorldPrefix();
-            case "stream_prefix" -> fPlayer.getStreamPrefix() == null ? "" : fPlayer.getStreamPrefix();
-            case "afk_suffix" -> fPlayer.getAfkSuffix() == null ? "" : fPlayer.getAfkSuffix();
+            case "world_prefix" -> fPlayer.getWorldPrefix();
+            case "stream_prefix" -> fPlayer.getStreamPrefix();
+            case "afk_suffix" -> fPlayer.getAfkSuffix();
             case "player" -> fPlayer.getName();
             case "ip" -> fPlayer.getIp();
             case "ping" -> String.valueOf(player.getPing());
