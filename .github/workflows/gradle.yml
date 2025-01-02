@@ -29,7 +29,7 @@ jobs:
       with:
         name: FlectonePulse
         path: |
-          FlectonePulse/build/bukkit
-          FlectonePulse/build/bungeecord
-          FlectonePulse/build/velocity
+          build/bukkit/libs/*.jar
+          build/bungeecord/libs/*.jar
+          build/velocity/libs/*.jar
 
