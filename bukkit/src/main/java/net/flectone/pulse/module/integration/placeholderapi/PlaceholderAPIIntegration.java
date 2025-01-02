@@ -85,9 +85,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             case "afk_suffix" -> fPlayer.getAfkSuffix();
             case "player" -> fPlayer.getName();
             case "ip" -> fPlayer.getIp();
-            case "ping" -> String.valueOf(player.getPing());
-            case "online" -> String.valueOf(Bukkit.getOnlinePlayers().size());
-            case "tps" -> bukkitUtil.getTPS();
+            case "ping" -> String.valueOf(fPlayerManager.getPing(fPlayer));
             case "online" -> String.valueOf(serverUtil.getOnlineCount());
             case "tps" -> serverUtil.getTPS();
             default -> null;
