@@ -23,6 +23,9 @@ jobs:
     - name: Build Bukkit
       run: ./gradlew bukkit:shadowJar
 
+    - name: Cache
+      uses: actions/cache@v4
+
     - name: Publish Bukkit artifact
       uses: actions/upload-artifact@v4
       with:
