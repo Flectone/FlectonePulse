@@ -6,6 +6,7 @@ import lombok.Getter;
 import net.flectone.pulse.file.Config;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.file.model.Sound;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ProxyManager;
@@ -59,19 +60,19 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
     private FCooldown cooldown;
 
     @Getter
-    private FSound sound;
+    private Sound sound;
 
     public AbstractModuleMessage(Function<Localization, M> messageFunction) {
         this.messageResolver = messageFunction;
     }
 
-    public FSound createSound(Config.Sound sound, Permission.IPermission permission) {
-        if (permission == null) return null;
+    public Sound createSound(Sound sound, Permission.IPermission permission) {
+        this.sound = sound;
 
-        this.sound = new FSound(sound, permission.getName());
         registerPermission(permission);
+        sound.setPermission(permission.getName());
 
-        return this.sound;
+        return sound;
     }
 
     public void playSound(FPlayer fPlayer) {
@@ -206,7 +207,7 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
         private FPlayer fReceiver = FPlayer.UNKNOWN;
         private MessageTag tag = null;
         private Integer range;
-        private FSound sound = null;
+        private Sound sound = null;
         private Predicate<FPlayer> builderFilter = player -> true;
         private Consumer<ByteArrayDataOutput> proxyOutput = null;
         private UnaryOperator<String> integrationString = null;
@@ -311,7 +312,7 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
             return this;
         }
 
-        public Builder sound(FSound sound) {
+        public Builder sound(Sound sound) {
             this.sound = sound;
             return this;
         }
@@ -378,6 +379,7 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
                 }
 
                 platformSender.sendMessage(fReceiver, finalComponent);
+                platformSender.sendBoosBar(fReceiver, finalComponent);
 
                 if (sound != null) {
                     fPlayerManager.playSound(sound, fReceiver);

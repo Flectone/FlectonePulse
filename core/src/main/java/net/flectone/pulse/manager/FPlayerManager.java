@@ -4,9 +4,9 @@ import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.google.inject.Inject;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.file.Config;
+import net.flectone.pulse.file.model.Sound;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.FSound;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -62,8 +62,8 @@ public abstract class FPlayerManager {
     public abstract double distance(FPlayer first, FPlayer second);
     public abstract GameMode getGamemode(FPlayer fPlayer);
     public abstract boolean hasPlayedBefore(FPlayer fPlayer);
-    public abstract void playSound(FSound fSound, FPlayer fPlayer);
-    public abstract void playSound(FSound fSound, FPlayer fPlayer, Object location);
+    public abstract void playSound(Sound fSound, FPlayer fPlayer);
+    public abstract void playSound(Sound fSound, FPlayer fPlayer, Object location);
     public abstract void kick(FPlayer fPlayer, Component reason);
     public abstract void loadOnlinePlayers();
 

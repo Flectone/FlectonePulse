@@ -8,9 +8,9 @@ import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.database.Database;
+import net.flectone.pulse.file.model.Sound;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.FSound;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.command.stream.StreamModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -26,7 +26,10 @@ import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.command.CommandSender;
@@ -188,33 +191,33 @@ public class BukkitFPlayerManager extends FPlayerManager {
 
     @Sync
     @Override
-    public void playSound(FSound fSound, FPlayer fPlayer) {
-        if (fSound == null) return;
-        if (!fSound.isEnable()) return;
+    public void playSound(Sound sound, FPlayer fPlayer) {
+        if (sound == null) return;
+        if (!sound.isEnable()) return;
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;
-        if (!player.hasPermission(fSound.getPermission())) return;
+        if (!player.hasPermission(sound.getPermission())) return;
 
-        player.playSound(player.getLocation(), Sound.valueOf(fSound.getSound()), fSound.getVolume(), fSound.getPitch());
+        player.playSound(player.getLocation(), org.bukkit.Sound.valueOf(sound.getType()), sound.getVolume(), sound.getPitch());
     }
 
     @Sync
     @Override
-    public void playSound(FSound fSound, FPlayer fPlayer, Object location) {
-        if (fSound == null) return;
-        if (!fSound.isEnable()) return;
+    public void playSound(Sound sound, FPlayer fPlayer, Object location) {
+        if (sound == null) return;
+        if (!sound.isEnable()) return;
         if (!(location instanceof Location bukkitLocation)) return;
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;
-        if (!player.hasPermission(fSound.getPermission())) return;
+        if (!player.hasPermission(sound.getPermission())) return;
 
 
         World world = bukkitLocation.getWorld();
         if (world == null) return;
 
-        world.playSound(bukkitLocation, Sound.valueOf(fSound.getSound()), fSound.getVolume(), fSound.getPitch());
+        world.playSound(bukkitLocation, org.bukkit.Sound.valueOf(sound.getType()), sound.getVolume(), sound.getPitch());
     }
 
     @Sync

@@ -6,11 +6,11 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.file.model.Sound;
 import net.flectone.pulse.manager.BukkitListenerManager;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.FSound;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.contact.knock.listener.KnockListener;
 import org.bukkit.Location;
@@ -28,7 +28,7 @@ public class KnockModule extends AbstractModuleMessage<Localization.Message.Cont
     private final Message.Contact.Knock message;
     private final Permission.Message.Contact.Knock permission;
 
-    private final Map<String, FSound> BLOCK_SOUND = new HashMap<>();
+    private final Map<String, Sound> BLOCK_SOUND = new HashMap<>();
 
     private final BukkitListenerManager bukkitListenerManager;
     private final FPlayerManager fPlayerManager;
@@ -54,8 +54,8 @@ public class KnockModule extends AbstractModuleMessage<Localization.Message.Cont
         BLOCK_SOUND.clear();
         message.getTypes().forEach((key, value) -> {
             Permission.PermissionEntry soundPermission = permission.getTypes().get(key);
-            registerPermission(soundPermission);
-            BLOCK_SOUND.put(key, new FSound(value, soundPermission.getName()));
+
+            BLOCK_SOUND.put(key, createSound(value, soundPermission));
         });
 
         createCooldown(message.getCooldown(), permission.getCooldownBypass());

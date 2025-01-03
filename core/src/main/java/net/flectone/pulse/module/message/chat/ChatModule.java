@@ -4,11 +4,11 @@ import com.google.inject.Inject;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.file.model.Sound;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FCooldown;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.FSound;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.util.PermissionUtil;
 
@@ -18,7 +18,7 @@ import java.util.Map;
 public abstract class ChatModule extends AbstractModuleMessage<Localization.Message.Chat> {
 
     protected final Map<String, FCooldown> cooldownMap = new HashMap<>();
-    protected final Map<String, FSound> soundMap = new HashMap<>();
+    protected final Map<String, Sound> soundMap = new HashMap<>();
 
     protected final Message.Chat message;
     protected final Permission.Message.Chat permission;

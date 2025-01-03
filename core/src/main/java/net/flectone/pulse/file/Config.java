@@ -112,14 +112,6 @@ public final class Config extends FileSerializable {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static final class Sound implements IEnable {
-        private boolean enable = false;
-        private String type = "BLOCK_NOTE_BLOCK_BELL:1:1";
-    }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static final class Cooldown implements IEnable {
         private boolean enable = false;
         private int duration = 60;

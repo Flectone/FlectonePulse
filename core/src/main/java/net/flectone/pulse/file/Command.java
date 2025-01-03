@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
+import net.flectone.pulse.file.model.Sound;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.Range;
 
@@ -131,7 +132,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("afk"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -140,7 +141,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("ball"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -151,7 +152,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("ban", "tempban"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -160,7 +161,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int perPage = 4;
         private List<String> aliases = new ArrayList<>(List.of("banlist"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -177,7 +178,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("broadcast"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -185,7 +186,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("chatcolor"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -232,7 +233,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         };
 
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
 
         @Getter
         @NoArgsConstructor
@@ -248,7 +249,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("clearchat"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -256,7 +257,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("clearmail"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -266,7 +267,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("coin"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -277,7 +278,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int max = 6;
         private List<String> aliases = new ArrayList<>(List.of("dice"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -286,7 +287,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("do"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -299,7 +300,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
             }
         };
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -308,7 +309,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean suggestOfflinePlayers = true;
         private List<String> aliases = new ArrayList<>(List.of("geolocate"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -317,7 +318,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("helper"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -326,7 +327,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean suggestOfflinePlayers = true;
         private List<String> aliases = new ArrayList<>(List.of("ignore"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -335,7 +336,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int perPage = 4;
         private List<String> aliases = new ArrayList<>(List.of("ignorelist"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -344,7 +345,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("kick"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -352,7 +353,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("mail"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -362,7 +363,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         public boolean turnedOn;
         private List<String> aliases = new ArrayList<>(List.of("maintenance"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -370,7 +371,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = false;
         private List<String> aliases = new ArrayList<>(List.of("mark"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -379,7 +380,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("me"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -389,7 +390,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("mute"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -398,7 +399,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int perPage = 4;
         private List<String> aliases = new ArrayList<>(List.of("mutelist"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -408,7 +409,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("online"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -420,7 +421,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int maxTime = 60000;
         private List<String> aliases = new ArrayList<>(List.of("poll"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -433,7 +434,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
             }
         };
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -453,7 +454,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
             }
         };
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -461,7 +462,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = false;
         private List<String> aliases = new ArrayList<>(List.of("spit"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -476,7 +477,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
             }
         };
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -485,7 +486,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("stream"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound(true, "BLOCK_NOTE_BLOCK_BELL:1:1");
+        private Sound sound = new Sound(true, 1f, 1f, "BLOCK_NOTE_BLOCK_BELL");
     }
 
     @Getter
@@ -514,7 +515,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
             }
         };
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -532,7 +533,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
             }
         };
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -545,7 +546,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
             }
         };
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -554,7 +555,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("translateto"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -566,7 +567,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int good = 50;
         private List<String> aliases = new ArrayList<>(List.of("try"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -579,7 +580,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
             }
         };
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -587,7 +588,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("unmute"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -595,7 +596,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("unwarn"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -612,7 +613,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
             }
         };
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -621,6 +622,6 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int perPage = 4;
         private List<String> aliases = new ArrayList<>(List.of("warnlist"));
         private Config.Cooldown cooldown = new Config.Cooldown();
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 }

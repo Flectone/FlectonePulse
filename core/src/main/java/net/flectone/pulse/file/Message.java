@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
+import net.flectone.pulse.file.model.Sound;
 import net.flectone.pulse.module.message.format.world.WorldMode;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
 import net.flectone.pulse.util.Range;
@@ -101,7 +102,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         private boolean grant = true;
         private boolean revoke = true;
         private int range = Range.SERVER;
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -114,7 +115,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         private boolean enable = false;
         private boolean random = true;
         private Config.Ticker ticker = new Config.Ticker(9000);
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -159,7 +160,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private int priority = 0;
             private String trigger = "";
             private Config.Cooldown cooldown = new Config.Cooldown();
-            private Config.Sound sound = new Config.Sound();
+            private Sound sound = new Sound();
 
             public Type(String trigger, boolean nullRecipient, boolean cancel, int range, int priority) {
                 this.trigger = trigger;
@@ -174,7 +175,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     @Getter
     public static final class Clear implements ISubMessage, Config.IEnable {
         private boolean enable = true;
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -210,10 +211,10 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         public static final class Knock implements ISubContactMessage, Config.IEnable {
             private boolean enable = false;
             private Config.Cooldown cooldown = new Config.Cooldown();
-            private Map<String, Config.Sound> types = new LinkedHashMap<>(){
+            private Map<String, Sound> types = new LinkedHashMap<>(){
                 {
-                    put("GLASS", new Config.Sound(true, "BLOCK_GLASS_PLACE:1:1"));
-                    put("DOOR", new Config.Sound(true, "BLOCK_WOOD_PLACE:1:1"));
+                    put("GLASS", new Sound(true, 1f, 1f, "BLOCK_GLASS_PLACE"));
+                    put("DOOR", new Sound(true, 1f, 1f, "BLOCK_WOOD_PLACE"));
                 }
             };
         }
@@ -228,14 +229,14 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private String item = "WOODEN_SWORD";
             private String entity = "MAGMA_CUBE";
             private Config.Cooldown cooldown = new Config.Cooldown();
-            private Config.Sound sound = new Config.Sound();
+            private Sound sound = new Sound();
         }
 
         @Getter
         public static final class Rightclick implements ISubContactMessage, Config.IEnable {
             private boolean enable = true;
             private Config.Cooldown cooldown = new Config.Cooldown();
-            private Config.Sound sound = new Config.Sound();
+            private Sound sound = new Sound();
         }
 
         @Getter
@@ -244,7 +245,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private boolean dropDye = true;
             private String block = "ANVIL";
             private Config.Cooldown cooldown = new Config.Cooldown();
-            private Config.Sound sound = new Config.Sound();
+            private Sound sound = new Sound();
         }
 
         @Getter
@@ -253,7 +254,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private boolean message = true;
             private String item = "WHITE_DYE";
             private Config.Cooldown cooldown = new Config.Cooldown(true, 60);
-            private Config.Sound sound = new Config.Sound(true, "ENTITY_LLAMA_SPIT:0.3:1");
+            private Sound sound = new Sound(true, 0.3f, 1f, "ENTITY_LLAMA_SPIT");
         }
 
         @Getter
@@ -262,7 +263,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private boolean dropDye = true;
             private String block = "GRINDSTONE";
             private Config.Cooldown cooldown = new Config.Cooldown();
-            private Config.Sound sound = new Config.Sound();
+            private Sound sound = new Sound();
         }
     }
 
@@ -270,19 +271,19 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     public static final class Death implements ISubMessage, Config.IEnable {
         private boolean enable = true;
         private int range = Range.SERVER;
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
     public static final class Deop implements ISubMessage, Config.IEnable {
         private boolean enable = true;
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
     public static final class Enchant implements ISubMessage, Config.IEnable {
         private boolean enable = true;
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -411,7 +412,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         public static final class Mention implements ISubFormatMessage, Config.IEnable {
             private boolean enable = true;
             private String trigger = "@";
-            private Config.Sound sound = new Config.Sound(true, "ENTITY_EXPERIENCE_ORB_PICKUP:0.1:0.1");
+            private Sound sound = new Sound(true, 0.1f, 0.1f, "ENTITY_EXPERIENCE_ORB_PICKUP");
         }
 
         @Getter
@@ -428,7 +429,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             public static final class Caps implements ISubModerationFormatMessage, Config.IEnable {
                 private boolean enable = false;
                 private double trigger = 0.7;
-                private Config.Sound sound = new Config.Sound();
+                private Sound sound = new Sound();
             }
 
             @Getter
@@ -438,7 +439,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
                         "((у|[нз]а|(хитро|не)?вз?[ыьъ]|с[ьъ]|(и|ра)[зс]ъ?|(о[тб]|под)[ьъ]?|(.\\B)+?[оаеи])?-?([её]б(?!о[рй])|и[пб][ае][тц]).*?|(н[иеа]|([дп]|верт)о|ра[зс]|з?а|с(ме)?|о(т|дно)?|апч)?-?ху([яйиеёю]|ли(?!ган)).*?|(в[зы]|(три|два|четыре)жды|(н|сук)а)?-?бл(я(?!(х|ш[кн]|мб)[ауеыио]).*?|[еэ][дт]ь?)|(ра[сз]|[зн]а|[со]|вы?|п(ере|р[оие]|од)|и[зс]ъ?|[ао]т)?п[иеё]зд.*?|(за)?п[ие]д[аое]?р([оа]м|(ас)?(ну.*?|и(ли)?[нщктл]ь?)?|(о(ч[еи])?|ас)?к(ой)|юг)[ауеы]?|манд([ауеыи](л(и[сзщ])?[ауеиы])?|ой|[ао]вошь?(е?к[ауе])?|юк(ов|[ауи])?)|муд([яаио].*?|е?н([ьюия]|ей))|мля([тд]ь)?|лять|([нз]а|по|пи)х|м[ао]л[ао]фь([яию]|[еёо]й))(?=[\\s,.:;\"']|$)",
                         "(([уyu]|[нзnz3][аa]|(хитро|не)?[вvwb][зz3]?[ыьъi]|[сsc][ьъ']|(и|[рpr][аa4])[зсzs]ъ?|([оo0][тбtb6]|[пp][оo0][дd9])[ьъ']?|(.\\B)+?[оаеиeo])?-?([еёe][бb6](?!о[рй])|и[пб][ае][тц]).*?|([нn][иеаaie]|([дпdp]|[вv][еe3][рpr][тt])[оo0]|[рpr][аa][зсzc3]|[з3z]?[аa]|с(ме)?|[оo0]([тt]|дно)?|апч)?-?[хxh][уuy]([яйиеёюuie]|ли(?!ган)).*?|([вvw][зы3z]|(три|два|четыре)жды|(н|[сc][уuy][кk])[аa])?-?[бb6][лl]([яy](?!(х|ш[кн]|мб)[ауеыио]).*?|[еэe][дтdt][ь']?)|([рp][аa][сзc3z]|[знzn][аa]|[соsc]|[вv][ыi]?|[пp]([еe][рpr][еe]|[рrp][оиioеe]|[оo0][дd])|и[зс]ъ?|[аоao][тt])?[пpn][иеёieu][зz3][дd9].*?|([зz3][аa])?[пp][иеieu][дd][аоеaoe]?[рrp](ну.*?|[оаoa][мm]|([аa][сcs])?([иiu]([лl][иiu])?[нщктлtlsn]ь?)?|([оo](ч[еиei])?|[аa][сcs])?[кk]([оo]й)?|[юu][гg])[ауеыauyei]?|[мm][аa][нnh][дd]([ауеыayueiи]([лl]([иi][сзc3щ])?[ауеыauyei])?|[оo][йi]|[аоao][вvwb][оo](ш|sh)[ь']?([e]?[кk][ауеayue])?|юк(ов|[ауи])?)|[мm][уuy][дd6]([яyаиоaiuo0].*?|[еe]?[нhn]([ьюия'uiya]|ей))|мля([тд]ь)?|лять|([нз]а|по|пи)х|м[ао]л[ао]фь([яию]|[её]й))(?=[\\s,.:;\"']|$)")
                 );
-                private Config.Sound sound = new Config.Sound();
+                private Sound sound = new Sound();
             }
 
         }
@@ -477,13 +478,13 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     @Getter
     public static final class Gamemode implements ISubMessage, Config.IEnable {
         private boolean enable = true;
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
     public static final class Greeting implements ISubMessage, Config.IEnable {
         private boolean enable = false;
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -491,7 +492,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         private boolean enable = true;
         private boolean first = true;
         private int range = Range.SERVER;
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
@@ -523,38 +524,38 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     @Getter
     public static final class Op implements ISubMessage, Config.IEnable {
         private boolean enable = true;
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
     public static final class Quit implements ISubMessage, Config.IEnable {
         private boolean enable = true;
         private int range = Range.SERVER;
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
     public static final class Seed implements ISubMessage, Config.IEnable {
         private boolean enable = true;
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
     public static final class Setblock implements ISubMessage, Config.IEnable {
         private boolean enable = true;
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
     public static final class Sign implements ISubMessage, Config.IEnable {
         private boolean enable = true;
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
     public static final class Spawnpoint implements ISubMessage, Config.IEnable {
         private boolean enable = true;
-        private Config.Sound sound = new Config.Sound();
+        private Sound sound = new Sound();
     }
 
     @Getter
