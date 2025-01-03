@@ -5,6 +5,7 @@ import net.elytrium.serializer.SerializerConfig;
 import net.elytrium.serializer.annotations.Transient;
 import net.elytrium.serializer.custom.ClassSerializer;
 import net.elytrium.serializer.language.object.YamlSerializable;
+import net.flectone.pulse.file.model.Cooldown;
 import net.flectone.pulse.file.model.Sound;
 
 import java.nio.file.Path;
@@ -59,6 +60,32 @@ public abstract class FileSerializable extends YamlSerializable {
                     }
 
                     return new Sound(true, floatVolume, floatPitch, stringType);
+                }
+            })
+            .registerSerializer(new ClassSerializer<Cooldown, Map<String, Object>>() {
+
+                @Override
+                public Map<String, Object> serialize(Cooldown cooldown) {
+                    Map<String, Object> map = new LinkedHashMap<>();
+
+                    map.put("enable", cooldown.isEnable());
+
+                    if (cooldown.isEnable()) {
+                        map.put("duration", cooldown.getDuration());
+                    }
+
+                    return map;
+                }
+
+                @Override
+                public Cooldown deserialize(Map<String, Object> map) {
+                    boolean isEnable = Boolean.parseBoolean(String.valueOf(map.get("enable")));
+                    if (!isEnable) return new Cooldown();
+
+                    Object duration = map.get("duration");
+                    long longDuration = duration == null ? 60L : Long.parseLong(String.valueOf(duration));
+
+                    return new Cooldown(true, longDuration);
                 }
             })
             .build();

@@ -108,12 +108,4 @@ public final class Config extends FileSerializable {
             this.period = period;
         }
     }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static final class Cooldown implements IEnable {
-        private boolean enable = false;
-        private int duration = 60;
-    }
 }

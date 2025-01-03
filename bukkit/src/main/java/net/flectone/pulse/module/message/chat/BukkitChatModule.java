@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
+import net.flectone.pulse.file.model.Cooldown;
 import net.flectone.pulse.manager.BukkitListenerManager;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
@@ -99,7 +100,11 @@ public class BukkitChatModule extends ChatModule {
         String chatName = configChatEntry.get().getKey();
 
         if (cooldownMap.containsKey(chatName)) {
-            if (cooldownMap.get(chatName).isCooldowned(fPlayer, permissionUtil)) {
+            Cooldown cooldown = cooldownMap.get(chatName);
+            if (cooldown != null
+                    && cooldown.isEnable()
+                    && !permissionUtil.has(fPlayer, cooldown.getPermissionBypass())
+                    && cooldown.isCooldown(fPlayer.getUuid())) {
                 long timeLeft = cooldownMap.get(chatName).getTimeLeft(fPlayer);
 
                 builder(fPlayer)

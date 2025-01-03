@@ -3,15 +3,17 @@ package net.flectone.pulse.module;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.inject.Inject;
 import lombok.Getter;
-import net.flectone.pulse.file.Config;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.file.model.Cooldown;
 import net.flectone.pulse.file.model.Sound;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ProxyManager;
 import net.flectone.pulse.manager.ThreadManager;
-import net.flectone.pulse.model.*;
+import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.PlatformSender;
 import net.flectone.pulse.util.*;
@@ -57,7 +59,7 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
     private ThreadManager threadManager;
 
     @Getter
-    private FCooldown cooldown;
+    private Cooldown cooldown;
 
     @Getter
     private Sound sound;
@@ -69,8 +71,10 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
     public Sound createSound(Sound sound, Permission.IPermission permission) {
         this.sound = sound;
 
-        registerPermission(permission);
-        sound.setPermission(permission.getName());
+        if (permission != null) {
+            registerPermission(permission);
+            sound.setPermission(permission.getName());
+        }
 
         return sound;
     }
@@ -79,11 +83,13 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
         fPlayerManager.playSound(sound, fPlayer);
     }
 
-    public FCooldown createCooldown(Config.Cooldown cooldown, Permission.IPermission permission) {
-        if (permission == null) return null;
+    public Cooldown createCooldown(Cooldown cooldown, Permission.IPermission permission) {
+        this.cooldown = cooldown;
 
-        this.cooldown = new FCooldown(cooldown, permission.getName());
-        registerPermission(permission);
+        if (permission != null) {
+            registerPermission(permission);
+            cooldown.setPermissionBypass(permission.getName());
+        }
 
         return this.cooldown;
     }
@@ -106,8 +112,10 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
 
     public boolean checkCooldown(FEntity entity) {
         if (getCooldown() == null) return false;
+        if (!getCooldown().isEnable()) return false;
         if (!(entity instanceof FPlayer fPlayer)) return false;
-        if (!getCooldown().isCooldowned(fPlayer, permissionUtil)) return false;
+        if (permissionUtil.has(fPlayer, getCooldown().getPermissionBypass())) return false;
+        if (!getCooldown().isCooldown(fPlayer.getUuid())) return false;
 
         long timeLeft = getCooldown().getTimeLeft(fPlayer);
 

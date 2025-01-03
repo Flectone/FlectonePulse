@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
+import net.flectone.pulse.file.model.Cooldown;
 import net.flectone.pulse.file.model.Sound;
 import net.flectone.pulse.module.message.format.world.WorldMode;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
@@ -159,7 +160,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private int range = 0;
             private int priority = 0;
             private String trigger = "";
-            private Config.Cooldown cooldown = new Config.Cooldown();
+            private Cooldown cooldown = new Cooldown();
             private Sound sound = new Sound();
 
             public Type(String trigger, boolean nullRecipient, boolean cancel, int range, int priority) {
@@ -210,7 +211,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         @Getter
         public static final class Knock implements ISubContactMessage, Config.IEnable {
             private boolean enable = false;
-            private Config.Cooldown cooldown = new Config.Cooldown();
+            private Cooldown cooldown = new Cooldown();
             private Map<String, Sound> types = new LinkedHashMap<>(){
                 {
                     put("GLASS", new Sound(true, 1f, 1f, "BLOCK_GLASS_PLACE"));
@@ -228,14 +229,14 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private int duration = 60;
             private String item = "WOODEN_SWORD";
             private String entity = "MAGMA_CUBE";
-            private Config.Cooldown cooldown = new Config.Cooldown();
+            private Cooldown cooldown = new Cooldown();
             private Sound sound = new Sound();
         }
 
         @Getter
         public static final class Rightclick implements ISubContactMessage, Config.IEnable {
             private boolean enable = true;
-            private Config.Cooldown cooldown = new Config.Cooldown();
+            private Cooldown cooldown = new Cooldown();
             private Sound sound = new Sound();
         }
 
@@ -244,7 +245,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private boolean enable = false;
             private boolean dropDye = true;
             private String block = "ANVIL";
-            private Config.Cooldown cooldown = new Config.Cooldown();
+            private Cooldown cooldown = new Cooldown();
             private Sound sound = new Sound();
         }
 
@@ -253,7 +254,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private boolean enable = false;
             private boolean message = true;
             private String item = "WHITE_DYE";
-            private Config.Cooldown cooldown = new Config.Cooldown(true, 60);
+            private Cooldown cooldown = new Cooldown(true, 60);
             private Sound sound = new Sound(true, 0.3f, 1f, "ENTITY_LLAMA_SPIT");
         }
 
@@ -262,7 +263,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private boolean enable = false;
             private boolean dropDye = true;
             private String block = "GRINDSTONE";
-            private Config.Cooldown cooldown = new Config.Cooldown();
+            private Cooldown cooldown = new Cooldown();
             private Sound sound = new Sound();
         }
     }
