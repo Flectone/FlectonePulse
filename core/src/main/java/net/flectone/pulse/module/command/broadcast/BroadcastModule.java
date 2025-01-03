@@ -43,6 +43,7 @@ public abstract class BroadcastModule extends AbstractModuleCommand<Localization
 
         builder(fPlayer)
                 .range(command.getRange())
+                .destination(command.getDestination())
                 .tag(MessageTag.COMMAND_BROADCAST)
                 .format(Localization.Command.Broadcast::getFormat)
                 .message((fResolver, s) -> message)

@@ -73,10 +73,12 @@ public abstract class HelperModule extends AbstractModuleCommand<Localization.Co
         String message = commandUtil.getString(0, arguments);
 
         builder(fPlayer)
+                .destination(command.getDestination())
                 .format(Localization.Command.Helper::getPlayer)
                 .sendBuilt();
 
         builder(fPlayer)
+                .destination(command.getDestination())
                 .range(command.getRange())
                 .filter(filter)
                 .tag(MessageTag.COMMAND_HELPER)

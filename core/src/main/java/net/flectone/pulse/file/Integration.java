@@ -3,6 +3,7 @@ package net.flectone.pulse.file;
 import lombok.Getter;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
+import net.flectone.pulse.file.model.Destination;
 import net.flectone.pulse.util.MessageTag;
 
 import java.io.File;
@@ -74,6 +75,7 @@ public final class Integration extends FileSerializable implements IModule.IInte
                 put(MessageTag.CHAT, "");
             }
         };
+        private Destination destination = new Destination();
 
         @Getter
         public static final class Presence {
@@ -144,6 +146,7 @@ public final class Integration extends FileSerializable implements IModule.IInte
                 put(MessageTag.CHAT, new ArrayList<>());
             }
         };
+        private Destination destination = new Destination();
     }
 
     @Getter
@@ -160,6 +163,7 @@ public final class Integration extends FileSerializable implements IModule.IInte
         private Map<String, List<String>> followChannel = new LinkedHashMap<>(Map.of(
                 "faseri4ka", List.of("stream start https://twitch.tv/faseri4ka")
         ));
+        private Destination destination = new Destination();
     }
 
     @Getter

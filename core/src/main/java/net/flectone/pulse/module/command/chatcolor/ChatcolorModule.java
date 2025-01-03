@@ -154,6 +154,7 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
             }
 
             builder(fPlayer)
+                    .destination(command.getDestination())
                     .format((fResolver, s) -> s.getFormat())
                     .sound(getSound())
                     .sendBuilt();

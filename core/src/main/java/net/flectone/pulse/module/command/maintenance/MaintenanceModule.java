@@ -99,6 +99,7 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         }
 
         builder(fPlayer)
+                .destination(command.getDestination())
                 .format(s -> turned ? s.getFormatTrue() : s.getFormatFalse())
                 .sendBuilt();
 

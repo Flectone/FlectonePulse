@@ -71,6 +71,7 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
         kick(fPlayer, fTarget, reason);
 
         builder(fPlayer)
+                .destination(command.getDestination())
                 .range(command.getRange())
                 .tag(MessageTag.COMMAND_KICK)
                 .format(replaceTarget(fTarget.getName()))

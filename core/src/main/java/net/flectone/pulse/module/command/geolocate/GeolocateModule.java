@@ -67,6 +67,7 @@ public abstract class GeolocateModule extends AbstractModuleCommand<Localization
         }
 
         builder(fTarget)
+                .destination(command.getDestination())
                 .receiver(fPlayer)
                 .format(s -> s.getFormat()
                         .replace("<country>", request.get(1))

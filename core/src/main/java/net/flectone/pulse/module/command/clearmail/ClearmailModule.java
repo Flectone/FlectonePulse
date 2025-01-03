@@ -59,6 +59,7 @@ public abstract class ClearmailModule extends AbstractModuleCommand<Localization
         database.removeMail(optionalMail.get());
 
         builder(fReceiver)
+                .destination(command.getDestination())
                 .receiver(fPlayer)
                 .format(s -> s.getFormat().replaceFirst("<id>", String.valueOf(mailID)))
                 .message(optionalMail.get().message())

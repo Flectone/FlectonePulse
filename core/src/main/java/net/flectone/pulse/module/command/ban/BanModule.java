@@ -131,6 +131,7 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
 
             builder(fPlayer)
                     .range(command.getRange())
+                    .destination(command.getDestination())
                     .tag(MessageTag.COMMAND_BAN)
                     .format(replaceTarget(fTarget.getName(), time))
                     .message(s -> getTypeLocalization(s, time).getReasons().getConstant(reason))

@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration.twitch.listener;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import net.flectone.pulse.file.Integration;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ThreadManager;
@@ -15,6 +16,7 @@ import java.util.List;
 @Singleton
 public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
 
+    @Getter
     private final Integration.Twitch integration;
 
     private final ThreadManager threadManager;
@@ -42,6 +44,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
         String message = event.getMessage();
         threadManager.runAsync(() -> builder(FPlayer.UNKNOWN)
                 .range(Range.PROXY)
+                .destination(integration.getDestination())
                 .filter(fPlayer -> fPlayer.is(FPlayer.Setting.TWITCH))
                 .tag(MessageTag.FROM_TWITCH_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft()

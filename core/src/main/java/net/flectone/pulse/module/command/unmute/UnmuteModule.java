@@ -103,6 +103,7 @@ public abstract class UnmuteModule extends AbstractModuleCommand<Localization.Co
         if (checkModulePredicates(moderator)) return;
 
         builder(fTarget)
+                .destination(command.getDestination())
                 .format(Localization.Command.Unmute::getFormat)
                 .sound(getSound())
                 .sendBuilt();
@@ -111,6 +112,7 @@ public abstract class UnmuteModule extends AbstractModuleCommand<Localization.Co
         if (!(moderator instanceof FPlayer fPlayer)) return;
 
         builder(fTarget)
+                .destination(command.getDestination())
                 .receiver(fPlayer)
                 .format(Localization.Command.Unmute::getFormat)
                 .sound(getSound())

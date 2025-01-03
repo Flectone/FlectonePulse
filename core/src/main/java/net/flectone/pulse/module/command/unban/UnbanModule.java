@@ -82,6 +82,7 @@ public abstract class UnbanModule extends AbstractModuleCommand<Localization.Com
             }
 
             builder(fTarget)
+                    .destination(command.getDestination())
                     .receiver(fPlayer)
                     .format(Localization.Command.Unban::getFormat)
                     .sound(getSound())

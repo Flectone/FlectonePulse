@@ -80,6 +80,7 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
             if (!fPlayer.is(FPlayer.Setting.AFK)) return;
 
             builder(fPlayer)
+                    .destination(message.getDestination())
                     .format(s -> isAfk
                             ? s.getFormatFalse().getLocal()
                             : s.getFormatTrue().getLocal()
@@ -94,6 +95,7 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
 
         builder(fPlayer)
                 .range(range)
+                .destination(message.getDestination())
                 .tag(MessageTag.AFK)
                 .filter(fReceiver -> fReceiver.is(FPlayer.Setting.AFK))
                 .format(s -> isAfk

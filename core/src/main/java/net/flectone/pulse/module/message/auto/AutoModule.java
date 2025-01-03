@@ -51,11 +51,12 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
         if (checkModulePredicates(fPlayer)) return;
         if (!fPlayer.is(FPlayer.Setting.AUTO)) return;
 
-        String message = nextMessage(fPlayer, this.message.isRandom(), resolveLocalization(fPlayer).getValues());
-        if (message == null) return;
+        String format = nextMessage(fPlayer, message.isRandom(), resolveLocalization(fPlayer).getValues());
+        if (format == null) return;
 
         builder(fPlayer)
-                .format(message)
+                .destination(message.getDestination())
+                .format(format)
                 .sound(getSound())
                 .sendBuilt();
     }

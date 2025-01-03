@@ -70,6 +70,7 @@ public class DeopModule extends AbstractModuleMessage<Localization.Message.Deop>
             FPlayer fTarget = database.getFPlayer(target);
 
             builder(fTarget)
+                    .destination(message.getDestination())
                     .receiver(fPlayer)
                     .format(Localization.Message.Deop::getFormat)
                     .sound(getSound())

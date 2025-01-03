@@ -68,6 +68,7 @@ public class ClearModule extends AbstractModuleMessage<Localization.Message.Clea
         }
 
         builder(fTarget)
+                .destination(message.getDestination())
                 .receiver(fPlayer)
                 .format(s -> (count == null ? s.getSingle() : s.getMultiple().replace("<count>", count))
                         .replace("<number>", number)

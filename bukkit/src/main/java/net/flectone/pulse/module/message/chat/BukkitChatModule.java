@@ -147,6 +147,7 @@ public class BukkitChatModule extends ChatModule {
 
             builder(fPlayer)
                     .tag(MessageTag.CHAT)
+                    .destination(playerChat.getDestination())
                     .range(chatRange)
                     .filter(filter)
                     .format(message -> message.getTypes().get(chatName))
@@ -209,6 +210,7 @@ public class BukkitChatModule extends ChatModule {
         });
 
         builder(fPlayer)
+                .destination(playerChat.getDestination())
                 .filter(filter)
                 .format(s -> s.getTypes().get(playerChatName))
                 .message(string)

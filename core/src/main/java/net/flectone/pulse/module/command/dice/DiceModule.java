@@ -63,6 +63,7 @@ public abstract class DiceModule extends AbstractModuleCommand<Localization.Comm
 
         builder(fPlayer)
                 .range(command.getRange())
+                .destination(command.getDestination())
                 .tag(MessageTag.COMMAND_DICE)
                 .format(replaceResult(cubes))
                 .proxy(output -> output.writeUTF(gson.toJson(cubes)))

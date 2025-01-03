@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.contact.afk;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.manager.BukkitListenerManager;
@@ -24,6 +25,7 @@ import java.util.UUID;
 @Singleton
 public class BukkitAfkModule extends AfkModule {
 
+    @Getter
     private final Message.Contact.Afk message;
 
     private final Map<UUID, Pair<Integer, Vector>> PLAYER_BLOCK = new HashMap<>();

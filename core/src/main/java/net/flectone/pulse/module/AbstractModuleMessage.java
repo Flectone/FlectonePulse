@@ -6,6 +6,7 @@ import lombok.Getter;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.file.model.Cooldown;
+import net.flectone.pulse.file.model.Destination;
 import net.flectone.pulse.file.model.Sound;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
@@ -149,7 +150,6 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
     }
 
     public boolean sendDisableMessage(FEntity fPlayer, @NotNull FEntity fReceiver, DisableAction action) {
-
         Localization.Command.Chatsetting.Disable localization = fileManager.getLocalization(fReceiver).getCommand().getChatsetting().getDisable();
 
         String string = switch (action) {
@@ -215,6 +215,7 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
         private FPlayer fReceiver = FPlayer.UNKNOWN;
         private MessageTag tag = null;
         private Integer range;
+        private Destination destination = new Destination();
         private Sound sound = null;
         private Predicate<FPlayer> builderFilter = player -> true;
         private Consumer<ByteArrayDataOutput> proxyOutput = null;
@@ -247,6 +248,11 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
 
         public Builder range(int range) {
             this.range = range;
+            return this;
+        }
+
+        public Builder destination(Destination destination) {
+            this.destination = destination;
             return this;
         }
 
@@ -386,8 +392,7 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
                     );
                 }
 
-                platformSender.sendMessage(fReceiver, finalComponent);
-                platformSender.sendBoosBar(fReceiver, finalComponent);
+                platformSender.send(destination, fReceiver, finalComponent);
 
                 if (sound != null) {
                     fPlayerManager.playSound(sound, fReceiver);

@@ -53,6 +53,7 @@ public abstract class TryModule extends AbstractModuleCommand<Localization.Comma
 
         builder(fPlayer)
                 .range(command.getRange())
+                .destination(command.getDestination())
                 .tag(MessageTag.COMMAND_TRY)
                 .format(replacePercent(random))
                 .message((fResolver, s)  -> message)

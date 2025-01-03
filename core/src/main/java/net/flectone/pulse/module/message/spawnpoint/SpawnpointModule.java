@@ -67,6 +67,7 @@ public class SpawnpointModule extends AbstractModuleMessage<Localization.Message
         }
 
         builder(fTarget)
+                .destination(message.getDestination())
                 .receiver(fPlayer)
                 .format(s -> (count == null ? s.getSingle() : s.getMultiple().replace("<count>", count))
                         .replace("<x>", x)

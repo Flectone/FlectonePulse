@@ -6,9 +6,14 @@ import net.elytrium.serializer.annotations.Transient;
 import net.elytrium.serializer.custom.ClassSerializer;
 import net.elytrium.serializer.language.object.YamlSerializable;
 import net.flectone.pulse.file.model.Cooldown;
+import net.flectone.pulse.file.model.Destination;
 import net.flectone.pulse.file.model.Sound;
+import net.flectone.pulse.util.TimeUtil;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.title.Title;
 
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -86,6 +91,106 @@ public abstract class FileSerializable extends YamlSerializable {
                     long longDuration = duration == null ? 60L : Long.parseLong(String.valueOf(duration));
 
                     return new Cooldown(true, longDuration);
+                }
+            })
+            .registerSerializer(new ClassSerializer<Destination, Map<String, Object>>() {
+
+                @Override
+                public Map<String, Object> serialize(Destination destination) {
+                    Map<String, Object> map = new LinkedHashMap<>();
+
+                    map.put("type", destination.getType());
+
+                    switch (destination.getType()) {
+                        case TITLE, SUBTITLE -> {
+                            Title.Times times = destination.getTimes();
+
+                            Map<String, Object> timesMap = new LinkedHashMap<>();
+                            timesMap.put("fade-in", times.fadeIn().toMillis() / TimeUtil.MULTIPLIER);
+                            timesMap.put("stay", times.stay().toMillis() / TimeUtil.MULTIPLIER);
+                            timesMap.put("fade-out", times.fadeOut().toMillis() / TimeUtil.MULTIPLIER);
+
+                            map.put("times",  timesMap);
+                        }
+                        case BOSS_BAR -> {
+                            map.put("duration", destination.getDuration());
+                            map.put("health", destination.getHealth());
+                            map.put("overlay", destination.getOverlay());
+                            map.put("color", destination.getColor());
+                            map.put("play-boos-music", destination.getFlags().contains(BossBar.Flag.PLAY_BOSS_MUSIC));
+                            map.put("create-world-fog", destination.getFlags().contains(BossBar.Flag.CREATE_WORLD_FOG));
+                            map.put("darken-screen", destination.getFlags().contains(BossBar.Flag.DARKEN_SCREEN));
+                        }
+                    }
+
+                    return map;
+                }
+
+                @Override
+                public Destination deserialize(Map<String, Object> map) {
+                    Destination.Type type = Destination.Type.valueOf(String.valueOf(map.get("type")));
+
+                    return switch (type) {
+                        case TITLE, SUBTITLE -> {
+                            Object times = map.get("times");
+
+                            if (times == null) {
+                                yield new Destination(type);
+                            }
+
+                            Map<String, Object> timesMap = (LinkedHashMap<String, Object>) times;
+
+                            Object fadeIn = timesMap.get("fade-in");
+                            long longFadeIn = fadeIn == null ? 20 : Long.parseLong(String.valueOf(fadeIn));
+
+                            Object stay = timesMap.get("stay");
+                            long longStay = stay == null ? 100 : Long.parseLong(String.valueOf(stay));
+
+                            Object fadeOut = timesMap.get("fade-out");
+                            long longFadeOut = fadeOut == null ? 20 : Long.parseLong(String.valueOf(fadeOut));
+
+                            Title.Times titleTimes = Title.Times.times(
+                                    Duration.ofMillis(longFadeIn * TimeUtil.MULTIPLIER),
+                                    Duration.ofMillis(longStay * TimeUtil.MULTIPLIER),
+                                    Duration.ofMillis(longFadeOut * TimeUtil.MULTIPLIER)
+                            );
+
+                            yield new Destination(type, titleTimes);
+                        }
+                        case BOSS_BAR -> {
+                            Object duration = map.get("duration");
+                            long longDuration = duration == null ? 100 : Long.parseLong(String.valueOf(duration));
+
+                            Object health = map.get("health");
+                            float floatHealth = health == null ? 1f : Float.parseFloat(String.valueOf(health));
+
+                            Object overlay = map.get("overlay");
+                            BossBar.Overlay bossBarOverlay = overlay == null ? BossBar.Overlay.PROGRESS : BossBar.Overlay.valueOf(String.valueOf(overlay));
+
+                            Object color = map.get("color");
+                            BossBar.Color bossBarColor = color == null ? BossBar.Color.BLUE : BossBar.Color.valueOf(String.valueOf(color));
+
+                            Object playBossMusic = map.get("play-boss-music");
+                            boolean booleanPlayBossMusic = playBossMusic != null && Boolean.parseBoolean(String.valueOf(playBossMusic));
+
+                            Object createWorldFog = map.get("create-world-fog");
+                            boolean booleanCreateWorldFog = createWorldFog != null && Boolean.parseBoolean(String.valueOf(createWorldFog));
+
+                            Object darkenScreen = map.get("darken-screen");
+                            boolean booleanDarkenScreen = darkenScreen != null && Boolean.parseBoolean(String.valueOf(darkenScreen));
+
+                            yield new Destination(type,
+                                    longDuration,
+                                    floatHealth,
+                                    bossBarOverlay,
+                                    bossBarColor,
+                                    booleanPlayBossMusic,
+                                    booleanCreateWorldFog,
+                                    booleanDarkenScreen
+                            );
+                        }
+                        default -> new Destination(type);
+                    };
                 }
             })
             .build();

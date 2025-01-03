@@ -75,6 +75,7 @@ public abstract class StreamModule extends AbstractModuleCommand<Localization.Co
 
             builder(fPlayer)
                     .range(command.getRange())
+                    .destination(command.getDestination())
                     .tag(MessageTag.COMMAND_STREAM)
                     .format(replaceUrls(rawString))
                     .proxy(output -> output.writeUTF(rawString))
@@ -84,6 +85,7 @@ public abstract class StreamModule extends AbstractModuleCommand<Localization.Co
 
         } else {
             builder(fPlayer)
+                    .destination(command.getDestination())
                     .format(Localization.Command.Stream::getFormatEnd)
                     .sendBuilt();
         }

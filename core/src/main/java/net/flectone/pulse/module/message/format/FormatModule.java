@@ -87,6 +87,7 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
         tagResolverMap.put(TagType.SELECTOR, StandardTags.selector());
         tagResolverMap.put(TagType.SCORE, StandardTags.score());
         tagResolverMap.put(TagType.NBT, StandardTags.nbt());
+        // TODO: add shadowcolor
 
         addChildren(ColorModule.class);
         addChildren(EmojiModule.class);

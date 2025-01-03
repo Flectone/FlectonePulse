@@ -44,6 +44,7 @@ public abstract class SpyModule extends AbstractModuleCommand<Localization.Comma
         threadManager.runDatabase(database -> database.updateFPlayer(fPlayer));
 
         builder(fPlayer)
+                .destination(command.getDestination())
                 .format(s -> fPlayer.is(FPlayer.Setting.SPY) ? s.getFormatTrue() : s.getFormatFalse())
                 .sound(getSound())
                 .sendBuilt();
@@ -54,6 +55,7 @@ public abstract class SpyModule extends AbstractModuleCommand<Localization.Comma
 
         builder(fPlayer)
                 .range(command.getRange())
+                .destination(command.getDestination())
                 .filter(fReceiver -> !fPlayer.equals(fReceiver))
                 .filter(fReceiver -> permissionUtil.has(fReceiver, getModulePermission()))
                 .filter(fReceiver -> fReceiver.is(FPlayer.Setting.SPY))

@@ -82,6 +82,7 @@ public abstract class UnwarnModule extends AbstractModuleCommand<Localization.Co
             }
 
             builder(fTarget)
+                    .destination(command.getDestination())
                     .receiver(fPlayer)
                     .format(Localization.Command.Unwarn::getFormat)
                     .sound(getSound())

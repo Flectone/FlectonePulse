@@ -90,6 +90,7 @@ public abstract class MuteModule extends AbstractModuleCommand<Localization.Comm
 
             builder(fPlayer)
                     .range(command.getRange())
+                    .destination(command.getDestination())
                     .tag(MessageTag.COMMAND_MUTE)
                     .format(replaceTarget(fTarget.getName(), time))
                     .message((fReceiver, s) -> s.getReasons().getConstant(reason))

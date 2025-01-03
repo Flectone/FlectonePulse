@@ -84,6 +84,7 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
 
         builder(fTarget)
                 .range(message.getRange())
+                .destination(message.getDestination())
                 .tag(MessageTag.ADVANCEMENT)
                 .format(s -> convert(s, advancement))
                 .tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fResolver, advancement)})

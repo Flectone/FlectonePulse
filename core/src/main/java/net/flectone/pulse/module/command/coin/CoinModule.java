@@ -44,6 +44,7 @@ public abstract class CoinModule extends AbstractModuleCommand<Localization.Comm
 
         builder(fPlayer)
                 .range(command.getRange())
+                .destination(command.getDestination())
                 .tag(MessageTag.COMMAND_COIN)
                 .format(replaceResult(percent))
                 .proxy(output -> output.writeInt(percent))

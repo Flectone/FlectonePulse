@@ -87,6 +87,7 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
         if (mail == null) return;
 
         builder(fReceiver)
+                .destination(command.getDestination())
                 .receiver(fPlayer)
                 .format(s -> s.getSender().replaceFirst("<id>", String.valueOf(mail.id())))
                 .message(string)

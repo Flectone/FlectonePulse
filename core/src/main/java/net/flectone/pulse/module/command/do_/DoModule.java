@@ -42,6 +42,7 @@ public abstract class DoModule extends AbstractModuleCommand<Localization.Comman
 
         builder(fPlayer)
                 .range(command.getRange())
+                .destination(command.getDestination())
                 .tag(MessageTag.COMMAND_DO)
                 .format(Localization.Command.Do::getFormat)
                 .message(message)

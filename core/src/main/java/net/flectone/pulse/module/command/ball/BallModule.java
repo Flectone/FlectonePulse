@@ -51,6 +51,7 @@ public abstract class BallModule extends AbstractModuleCommand<Localization.Comm
 
         builder(fPlayer)
                 .range(command.getRange())
+                .destination(command.getDestination())
                 .tag(MessageTag.COMMAND_BALL)
                 .format(replaceAnswer(answer))
                 .message(string)

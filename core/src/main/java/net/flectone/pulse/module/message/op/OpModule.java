@@ -71,6 +71,7 @@ public class OpModule extends AbstractModuleMessage<Localization.Message.Op> {
             if (fTarget.isUnknown()) return;
 
             builder(fTarget)
+                    .destination(message.getDestination())
                     .receiver(fPlayer)
                     .format(Localization.Message.Op::getFormat)
                     .sound(getSound())

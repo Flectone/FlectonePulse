@@ -58,6 +58,7 @@ public class SetblockModule extends AbstractModuleMessage<Localization.Message.S
         if (checkModulePredicates(fPlayer)) return;
 
         builder(fPlayer)
+                .destination(message.getDestination())
                 .receiver(fPlayer)
                 .format(s -> s.getFormat()
                         .replace("<x>", x)

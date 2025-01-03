@@ -65,10 +65,12 @@ public abstract class ClearchatModule extends AbstractModuleCommand<Localization
 
     private void clearChat(FPlayer fPlayer) {
         builder(fPlayer)
+                .destination(command.getDestination())
                 .format("<br> ".repeat(100))
                 .sendBuilt();
 
         builder(fPlayer)
+                .destination(command.getDestination())
                 .format(Localization.Command.Clearchat::getFormat)
                 .sound(getSound())
                 .sendBuilt();

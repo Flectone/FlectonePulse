@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.telegram.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import net.flectone.pulse.file.Integration;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ThreadManager;
@@ -16,6 +17,7 @@ import java.util.List;
 @Singleton
 public class MessageListener extends EventListener {
 
+    @Getter
     private final Integration.Telegram integration;
 
     private final ThreadManager threadManager;
@@ -62,6 +64,7 @@ public class MessageListener extends EventListener {
 
         threadManager.runAsync(() -> builder(FPlayer.UNKNOWN)
                 .range(Range.PROXY)
+                .destination(integration.getDestination())
                 .filter(fPlayer -> fPlayer.is(FPlayer.Setting.TELEGRAM))
                 .tag(MessageTag.FROM_TELEGRAM_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft()

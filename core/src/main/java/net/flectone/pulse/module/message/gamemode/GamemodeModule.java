@@ -63,6 +63,7 @@ public class GamemodeModule extends AbstractModuleMessage<Localization.Message.G
 
         // for sender
         builder(fTarget)
+                .destination(message.getDestination())
                 .receiver(fPlayer)
                 .format(s -> getString(key, isSelf ? s.getSelf() : s.getOther()))
                 .sound(getSound())
@@ -71,6 +72,7 @@ public class GamemodeModule extends AbstractModuleMessage<Localization.Message.G
         // for receiver
         if (!isSelf) {
             builder(fTarget)
+                    .destination(message.getDestination())
                     .format(s -> getString(key, s.getSelf()))
                     .sound(getSound())
                     .sendBuilt();

@@ -3,15 +3,13 @@ package net.flectone.pulse.file.model;
 import lombok.Getter;
 import lombok.Setter;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.util.TimeUtil;
 
 import java.util.HashMap;
 import java.util.UUID;
 
 @Getter
 public class Cooldown {
-
-    // 1s = 20ticks -> 20ticks * 50 = 1000ms -> 1s = 1000ms
-    private static final long MULTIPLIER = 50L;
 
     private final HashMap<UUID, Long> PLAYER_DURATION = new HashMap<>();
 
@@ -38,7 +36,7 @@ public class Cooldown {
         Long time = PLAYER_DURATION.get(uuid);
 
         if (time == null || currentTime >= time) {
-            PLAYER_DURATION.put(uuid, currentTime + duration * MULTIPLIER);
+            PLAYER_DURATION.put(uuid, currentTime + duration * TimeUtil.MULTIPLIER);
             return false;
         }
 

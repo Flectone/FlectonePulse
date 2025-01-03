@@ -13,6 +13,9 @@ import java.text.SimpleDateFormat;
 @Singleton
 public class TimeUtil {
 
+    // 1s = 20ticks -> 20ticks * 50 = 1000ms -> 1s = 1000ms
+    public static final long MULTIPLIER = 50L;
+
     private final Format DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private final FileManager fileManager;

@@ -47,6 +47,7 @@ public abstract class FlectonepulseModule extends AbstractModuleCommand<Localiza
                 flectonePulse.reload();
 
                 builder(fPlayer)
+                        .destination(command.getDestination())
                         .format(Localization.Command.Flectonepulse::getFormatTrue)
                         .sound(getSound())
                         .sendBuilt();
@@ -55,6 +56,7 @@ public abstract class FlectonepulseModule extends AbstractModuleCommand<Localiza
                 fLogger.warning(e);
 
                 builder(fPlayer)
+                        .destination(command.getDestination())
                         .format(Localization.Command.Flectonepulse::getFormatFalse)
                         .sendBuilt();
             }

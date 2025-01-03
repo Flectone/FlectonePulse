@@ -125,6 +125,7 @@ public abstract class TellModule extends AbstractModuleCommand<Localization.Comm
 
     public void send(FEntity fPlayer, FPlayer fReceiver, BiFunction<FPlayer, Localization.Command.Tell, String> format, String string) {
         builder(fPlayer)
+                .destination(command.getDestination())
                 .receiver(fReceiver)
                 .format(format)
                 .message(string)

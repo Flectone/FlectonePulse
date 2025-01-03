@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.quit;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
@@ -17,6 +18,7 @@ import net.flectone.pulse.util.MessageTag;
 @Singleton
 public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit> {
 
+    @Getter
     private final Message.Quit message;
     private final Permission.Message.Quit permission;
 
@@ -57,6 +59,7 @@ public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit>
 
         builder(fPlayer)
                 .tag(MessageTag.QUIT)
+                .destination(message.getDestination())
                 .range(message.getRange())
                 .filter(fReceiver -> fReceiver.is(FPlayer.Setting.QUIT))
                 .format(Localization.Message.Quit::getFormat)

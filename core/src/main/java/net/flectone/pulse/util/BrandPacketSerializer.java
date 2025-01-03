@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.brand.util;
+package net.flectone.pulse.util;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -10,6 +10,8 @@ import java.lang.reflect.InvocationTargetException;
 
 @Singleton
 public class BrandPacketSerializer {
+
+    public static final String MINECRAFT_BRAND = "minecraft:brand";
 
     private final Class<?> packetDataSerializer;
 

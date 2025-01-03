@@ -105,6 +105,7 @@ public class SpitModule extends AbstractModuleMessage<Localization.Message.Conta
 
         builder(fPlayer)
                 .receiver(fReceiver)
+                .destination(message.getDestination())
                 .format(Localization.Message.Contact.Spit::getFormat)
                 .sound(getSound())
                 .sendBuilt();

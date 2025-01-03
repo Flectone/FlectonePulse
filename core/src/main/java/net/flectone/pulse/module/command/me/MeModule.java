@@ -42,6 +42,7 @@ public abstract class MeModule extends AbstractModuleCommand<Localization.Comman
 
         builder(fPlayer)
                 .tag(MessageTag.COMMAND_ME)
+                .destination(command.getDestination())
                 .range(command.getRange())
                 .format((fResolver, s) -> s.getFormat())
                 .message((fResolver, s) -> string)

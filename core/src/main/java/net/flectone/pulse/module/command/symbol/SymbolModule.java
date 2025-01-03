@@ -37,6 +37,7 @@ public abstract class SymbolModule extends AbstractModuleCommand<Localization.Co
         String string = commandUtil.getString(1, arguments);
 
         builder(fPlayer)
+                .destination(command.getDestination())
                 .format(s -> s.getFormat().replace("<message>", string))
                 .message(string)
                 .sound(getSound())

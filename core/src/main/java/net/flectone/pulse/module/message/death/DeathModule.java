@@ -87,6 +87,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
 
         if (!death.isPlayer()) {
             builder(fTarget)
+                    .destination(message.getDestination())
                     .receiver(fReceiver)
                     .format(s -> s.getTypes().get(death.getKey()))
                     .tagResolvers(fResolver -> new TagResolver[]{killerTag(fResolver, death.getKiller()), byItemTag(death.getItem())})
@@ -99,6 +100,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
 
         builder(fTarget)
                 .range(message.getRange())
+                .destination(message.getDestination())
                 .tag(MessageTag.DEATH)
                 .format(s -> s.getTypes().get(death.getKey()))
                 .tagResolvers(fResolver -> new TagResolver[]{killerTag(fResolver, death.getKiller()), byItemTag(death.getItem())})

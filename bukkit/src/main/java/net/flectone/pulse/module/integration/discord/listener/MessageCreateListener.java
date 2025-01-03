@@ -6,6 +6,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Attachment;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
+import lombok.Getter;
 import net.flectone.pulse.file.Integration;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ThreadManager;
@@ -17,6 +18,7 @@ import reactor.core.publisher.Mono;
 @Singleton
 public class MessageCreateListener extends EventListener<MessageCreateEvent> {
 
+    @Getter
     private final Integration.Discord integration;
 
     private final ThreadManager threadManager;
@@ -62,6 +64,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
         String finalMessage = message;
         threadManager.runAsync(() -> builder(FPlayer.UNKNOWN)
                 .range(Range.PROXY)
+                .destination(integration.getDestination())
                 .filter(fPlayer -> fPlayer.is(FPlayer.Setting.DISCORD))
                 .tag(MessageTag.FROM_DISCORD_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft().replace("<name>", nickname))

@@ -58,6 +58,7 @@ public class SeedModule extends AbstractModuleMessage<Localization.Message.Seed>
         if (checkModulePredicates(fPlayer)) return;
 
         builder(fPlayer)
+                .destination(message.getDestination())
                 .receiver(fPlayer)
                 .format(s -> s.getFormat().replace("<seed>", seed))
                 .sound(getSound())

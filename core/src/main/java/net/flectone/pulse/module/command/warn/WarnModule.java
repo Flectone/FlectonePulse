@@ -83,6 +83,7 @@ public abstract class WarnModule extends AbstractModuleCommand<Localization.Comm
 
             builder(fPlayer)
                     .range(command.getRange())
+                    .destination(command.getDestination())
                     .tag(MessageTag.COMMAND_WARN)
                     .format(replaceTarget(fTarget.getName(), time))
                     .message((fResolver, s) -> s.getReasons().getConstant(reason))

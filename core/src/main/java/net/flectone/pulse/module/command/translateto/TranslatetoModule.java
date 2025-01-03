@@ -61,6 +61,7 @@ public abstract class TranslatetoModule extends AbstractModuleCommand<Localizati
 
         builder(fPlayer)
                 .range(command.getRange())
+                .destination(command.getDestination())
                 .tag(MessageTag.COMMAND_TRANSLATETO)
                 .format(replaceLanguage(targetLang))
                 .message(translated)

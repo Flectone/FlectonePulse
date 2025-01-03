@@ -6,6 +6,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.platform.PlatformSender;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -33,6 +34,14 @@ public class BukkitSender extends PlatformSender {
         if (player == null) return;
 
         audience.player(player).sendMessage(component);
+    }
+
+    @Override
+    public void sendTitle(FPlayer fPlayer, Title.Times times, Component title, Component subTitle) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        if (player == null) return;
+
+        audience.player(player).showTitle(Title.title(title, subTitle, times));
     }
 
     @Override

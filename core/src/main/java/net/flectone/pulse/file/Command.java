@@ -7,6 +7,7 @@ import lombok.Setter;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.file.model.Cooldown;
+import net.flectone.pulse.file.model.Destination;
 import net.flectone.pulse.file.model.Sound;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.Range;
@@ -141,6 +142,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("ball"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -152,6 +154,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean showConnectionAttempts = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("ban", "tempban"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -166,18 +169,11 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class GUI {
-        private boolean enable = false;
-        private int size = 45;
-        private String previousMaterial = "RED_STAINED_GLASS_PANE";
-        private String nextMaterial = "GREEN_STAINED_GLASS_PANE";
-    }
-
-    @Getter
     public static final class Broadcast implements ISubCommand, Config.IEnable {
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("broadcast"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -186,6 +182,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     public static final class Chatcolor implements ISubCommand, Config.IEnable {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("chatcolor"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -249,6 +246,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     public static final class Clearchat implements ISubCommand, Config.IEnable {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("clearchat"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -257,6 +255,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     public static final class Clearmail implements ISubCommand, Config.IEnable {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("clearmail"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -267,6 +266,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean draw = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("coin"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -278,6 +278,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int min = 1;
         private int max = 6;
         private List<String> aliases = new ArrayList<>(List.of("dice"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -287,6 +288,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("do"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -300,6 +302,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
                 add("fp");
             }
         };
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -309,6 +312,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
         private List<String> aliases = new ArrayList<>(List.of("geolocate"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -318,6 +322,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("helper"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -327,6 +332,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
         private List<String> aliases = new ArrayList<>(List.of("ignore"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -336,6 +342,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private int perPage = 4;
         private List<String> aliases = new ArrayList<>(List.of("ignorelist"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -345,6 +352,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("kick"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -353,6 +361,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     public static final class Mail implements ISubCommand, Config.IEnable {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("mail"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -363,6 +372,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         @Setter
         public boolean turnedOn;
         private List<String> aliases = new ArrayList<>(List.of("maintenance"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -380,6 +390,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("me"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -390,6 +401,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean suggestOfflinePlayers = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("mute"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -409,6 +421,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean suggestOfflinePlayers = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("online"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -477,6 +490,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
                 put("action", List.of("anvil", "book", "sign", "chat"));
             }
         };
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -486,6 +500,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("stream"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound(true, 1f, 1f, "BLOCK_NOTE_BLOCK_BELL");
     }
@@ -515,6 +530,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
                 put("transport", "⛟ ⛴ ⛵ ✈ ⛩ ⛪ ⛫ ⛰ ⛱ ⛲ ⛳ ⛽ \uD83D\uDDFB \uD83D\uDDFC \uD83D\uDDFD \uD83D\uDDFE \uD83D\uDDFF \uD83D\uDE80 \uD83D\uDE81 \uD83D\uDE82 \uD83D\uDE83 \uD83D\uDE84 \uD83D\uDE85 \uD83D\uDE86 \uD83D\uDE87 \uD83D\uDE88 \uD83D\uDE89 \uD83D\uDE8A \uD83D\uDEF2 \uD83D\uDE8B \uD83D\uDE8C \uD83D\uDE8D \uD83D\uDE8E \uD83D\uDE8F \uD83D\uDE90 \uD83D\uDE91 \uD83D\uDE92 \uD83D\uDEF1 \uD83D\uDE93 \uD83D\uDE94 \uD83D\uDE95 \uD83D\uDE96 \uD83D\uDE97 \uD83D\uDEFB \uD83D\uDE98 \uD83D\uDE99 \uD83D\uDE9A \uD83D\uDE9B \uD83D\uDE9C \uD83D\uDE9D \uD83D\uDE9E \uD83D\uDE9F \uD83D\uDEA0 \uD83D\uDEA1 \uD83D\uDEA2 \uD83D\uDEF3 \uD83D\uDEA3 \uD83D\uDEA4 \uD83D\uDEF6 \uD83D\uDEE5 \uD83D\uDEE6 \uD83D\uDEE7 \uD83D\uDEE8 \uD83D\uDEE9 \uD83D\uDEEA \uD83D\uDEEB \uD83D\uDEEC \uD83D\uDEF0 \uD83D\uDEF4 \uD83D\uDEF5 \uD83D\uDEF9 \uD83D\uDEFC \uD83D\uDEFA \uD83D\uDEF7 \uD83E\uDDBC \uD83E\uDDBD \uD83D\uDEF8 \uD83D\uDED2 \uD83D\uDEA5 \uD83D\uDEA6 \uD83D\uDEA7 \uD83D\uDEA8 \uD83C\uDFD7 \uD83C\uDFD8 \uD83C\uDFD9 \uD83C\uDFDA \uD83C\uDFDB \uD83C\uDFDF \uD83C\uDFE0 \uD83C\uDFE1 \uD83C\uDFE2 \uD83C\uDFE3 \uD83C\uDFE4 \uD83C\uDFE5 \uD83C\uDFE6 \uD83C\uDFE7 \uD83C\uDFE8 \uD83C\uDFE9 \uD83C\uDFEA \uD83C\uDFEB \uD83C\uDFEC \uD83C\uDFED \uD83C\uDFEE \uD83C\uDFEF \uD83C\uDFF0 \uD83D\uDD4B \uD83D\uDD4C \uD83D\uDD4D \uD83D\uDED0 \uD83D\uDED3 \uD83D\uDED4 \uD83D\uDED5 \uD83D\uDED6 \uD83D\uDEB2 \uD83D\uDEB3 \uD83D\uDEB4 \uD83D\uDEB5 \uD83D\uDEB6 \uD83D\uDEB7 \uD83D\uDEB8 \uD83D\uDEAA \uD83E\uDE91 \uD83E\uDE9F \uD83E\uDE9C \uD83E\uDE9D \uD83E\uDE9E \uD83D\uDEBB \uD83D\uDEBD \uD83D\uDEBE \uD83D\uDEBF \uD83D\uDEC0 \uD83D\uDEC1 \uD83D\uDEC2 \uD83D\uDEC3 \uD83D\uDEC4 \uD83D\uDEC5 \uD83D\uDECB \uD83D\uDECC \uD83D\uDECF \uD83D\uDED7 \uD83D\uDEDD \uD83D\uDEDE \uD83D\uDEDF \uD83D\uDEE3 \uD83D\uDEE4");
             }
         };
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -533,6 +549,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
                 add("m");
             }
         };
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -555,6 +572,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("translateto"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -567,6 +585,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int max = 100;
         private int good = 50;
         private List<String> aliases = new ArrayList<>(List.of("try"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -580,6 +599,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
                 add("pardon");
             }
         };
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -588,6 +608,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     public static final class Unmute implements ISubCommand, Config.IEnable {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("unmute"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -596,6 +617,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     public static final class Unwarn implements ISubCommand, Config.IEnable {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("unwarn"));
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -613,6 +635,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
                 put(5, "ban <target>");
             }
         };
+        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }

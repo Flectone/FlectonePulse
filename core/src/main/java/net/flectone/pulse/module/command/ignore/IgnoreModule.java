@@ -83,6 +83,7 @@ public abstract class IgnoreModule extends AbstractModuleCommand<Localization.Co
             }
 
             builder(fIgnored)
+                    .destination(command.getDestination())
                     .receiver(fPlayer)
                     .format(s -> ignore.isEmpty() ? s.getFormatTrue() : s.getFormatFalse())
                     .sound(getSound())

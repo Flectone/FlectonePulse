@@ -12,8 +12,6 @@ import net.flectone.pulse.manager.ListenerManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.contact.rightclick.listener.RightclickPacketListener;
-import net.flectone.pulse.platform.PlatformSender;
-import net.flectone.pulse.util.ComponentUtil;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -25,22 +23,16 @@ public class RightclickModule extends AbstractModuleMessage<Localization.Message
     private final Message.Contact.Rightclick message;
     private final Permission.Message.Contact.Rightclick permission;
 
-    private final PlatformSender platformSender;
     private final FPlayerManager fPlayerManager;
     private final ListenerManager listenerManager;
-    private final ComponentUtil componentUtil;
 
     @Inject
     public RightclickModule(FileManager fileManager,
-                            PlatformSender platformSender,
                             FPlayerManager fPlayerManager,
-                            ListenerManager listenerManager,
-                            ComponentUtil componentUtil) {
+                            ListenerManager listenerManager) {
         super(localization -> localization.getMessage().getContact().getRightclick());
-        this.platformSender = platformSender;
         this.fPlayerManager = fPlayerManager;
         this.listenerManager = listenerManager;
-        this.componentUtil = componentUtil;
 
         message = fileManager.getMessage().getContact().getRightclick();
         permission = fileManager.getPermission().getMessage().getContact().getRightclick();
@@ -76,7 +68,11 @@ public class RightclickModule extends AbstractModuleMessage<Localization.Message
 
         if (optionalFTarget.isEmpty()) return;
 
-        platformSender.sendActionBar(fPlayer, componentUtil.builder(optionalFTarget.get(), fPlayer, resolveLocalization(fPlayer).getFormat()).build());
-        playSound(fPlayer);
+        builder(optionalFTarget.get())
+                .receiver(fPlayer)
+                .format(Localization.Message.Contact.Rightclick::getFormat)
+                .destination(message.getDestination())
+                .sound(getSound())
+                .sendBuilt();
     }
 }

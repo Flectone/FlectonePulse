@@ -107,6 +107,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     meModule.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(meModule.getCommand().getDestination())
                             .format((fResolver, s) -> s.getFormat())
                             .message((fResolver, s) -> message)
                             .sound(meModule.getSound())
@@ -122,6 +123,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     ballModule.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(ballModule.getCommand().getDestination())
                             .format(ballModule.replaceAnswer(answer))
                             .message((fResolver, s) -> string)
                             .sound(ballModule.getSound())
@@ -139,6 +141,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     banModule.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(banModule.getCommand().getDestination())
                             .format(banModule.replaceTarget(fTarget.getName(), ban.getRemainingTime()))
                             .message((fResolver, s) -> banModule.getTypeLocalization(s, ban.getRemainingTime()).getReasons().getConstant(ban.getReason()))
                             .sound(banModule.getSound())
@@ -153,6 +156,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     broadcastModule.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(broadcastModule.getCommand().getDestination())
                             .format((fResolver, s) -> s.getFormat())
                             .message((fResolver, s) -> message)
                             .sound(broadcastModule.getSound())
@@ -169,6 +173,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     coinModule.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(coinModule.getCommand().getDestination())
                             .format(coinModule.replaceResult(percent))
                             .sound(coinModule.getSound())
                             .sendBuilt();
@@ -182,6 +187,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     diceModule.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(diceModule.getCommand().getDestination())
                             .format(diceModule.replaceResult(cubes))
                             .sound(diceModule.getSound())
                             .sendBuilt();
@@ -195,6 +201,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     doModule.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(doModule.getCommand().getDestination())
                             .format((fResolver, s) -> s.getFormat())
                             .message((fResolver, s) -> message)
                             .sound(doModule.getSound())
@@ -207,6 +214,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                     String message = input.readUTF();
 
                     helperModule.builder(fEntity)
+                            .destination(helperModule.getCommand().getDestination())
                             .filter(helperModule.getFilterSee())
                             .format((fResolver, s) -> s.getGlobal())
                             .message((fResolver, s) -> message)
@@ -222,6 +230,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     muteModule.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(muteModule.getCommand().getDestination())
                             .format(muteModule.replaceTarget(fTarget.getName(), mute.getRemainingTime()))
                             .message((fResolver, s) -> s.getReasons().getConstant(mute.getReason()))
                             .sound(muteModule.getSound())
@@ -262,6 +271,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                     SpyModule spyModule = injector.getInstance(SpyModule.class);
                     spyModule.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(spyModule.getCommand().getDestination())
                             .filter(fReceiver -> !fEntity.equals(fReceiver)
                                     && !spyModule.checkModulePredicates(fReceiver)
                                     && fReceiver.is(FPlayer.Setting.SPY)
@@ -278,6 +288,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                     String message = input.readUTF();
                     streamModule.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(streamModule.getCommand().getDestination())
                             .format(streamModule.replaceUrls(message))
                             .sendBuilt();
                 }
@@ -305,6 +316,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     translatetoModule.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(translatetoModule.getCommand().getDestination())
                             .format(translatetoModule.replaceLanguage(targetLang))
                             .message((fResolver, s) -> message)
                             .sound(translatetoModule.getSound())
@@ -319,6 +331,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     tryModule.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(tryModule.getCommand().getDestination())
                             .tag(MessageTag.COMMAND_TRY)
                             .format(tryModule.replacePercent(value))
                             .message((fResolver, s) -> message)
@@ -334,6 +347,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     warnModule.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(warnModule.getCommand().getDestination())
                             .format(warnModule.replaceTarget(fTarget.getName(), warn.getRemainingTime()))
                             .message((fResolver, s) -> s.getReasons().getConstant(warn.getReason()))
                             .sound(warnModule.getSound())
@@ -350,6 +364,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     kickModule.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(kickModule.getCommand().getDestination())
                             .format(kickModule.replaceTarget(fTarget.getName()))
                             .message((fResolver, s) -> s.getReasons().getConstant(reason))
                             .sound(kickModule.getSound())
@@ -415,6 +430,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                     MessageCreateListener messageCreateListener = injector.getInstance(MessageCreateListener.class);
                     messageCreateListener.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(messageCreateListener.getIntegration().getDestination())
                             .format((fResolver, s) -> s.getForMinecraft().replace("<name>", nickname))
                             .message((fResolver, s) -> string)
                             .sound(messageCreateListener.getSound())
@@ -428,6 +444,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                     ChannelMessageListener channelMessageListener = injector.getInstance(ChannelMessageListener.class);
                     channelMessageListener.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(channelMessageListener.getIntegration().getDestination())
                             .tag(MessageTag.FROM_TWITCH_TO_MINECRAFT)
                             .format((fResolver, s) -> s.getForMinecraft()
                                     .replace("<name>", nickname)
@@ -445,6 +462,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                     MessageListener messageListener = injector.getInstance(MessageListener.class);
                     messageListener.builder(fEntity)
                             .range(Range.PROXY)
+                            .destination(messageListener.getIntegration().getDestination())
                             .tag(MessageTag.FROM_DISCORD_TO_MINECRAFT)
                             .format((fResolver, s) -> s.getForMinecraft()
                                     .replace("<name>", author)
@@ -462,6 +480,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     advancementModule.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(advancementModule.getMessage().getDestination())
                             .tag(MessageTag.ADVANCEMENT)
                             .format((fResolver, s) -> advancementModule.convert(s, advancement))
                             .tagResolvers(fResolver -> new TagResolver[]{advancementModule.advancementTag(fEntity, fResolver, advancement)})
@@ -476,6 +495,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     deathModule.builder(fEntity)
                             .range(Range.SERVER)
+                            .destination(deathModule.getMessage().getDestination())
                             .tag(MessageTag.DEATH)
                             .format((fResolver, s) -> s.getTypes().get(death.getKey()))
                             .tagResolvers(fResolver -> new TagResolver[]{deathModule.killerTag(fResolver, death.getKiller()), deathModule.byItemTag(death.getItem())})
@@ -490,6 +510,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     joinModule.builder(fEntity)
                             .tag(MessageTag.JOIN)
+                            .destination(joinModule.getMessage().getDestination())
                             .range(Range.SERVER)
                             .filter(fReceiver -> fReceiver.is(FPlayer.Setting.JOIN))
                             .format(s -> hasPlayedBefore || !joinModule.getMessage().isFirst() ? s.getFormat() : s.getFormatFirstTime())
@@ -502,6 +523,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     quitModule.builder(fEntity)
                             .tag(MessageTag.QUIT)
+                            .destination(quitModule.getMessage().getDestination())
                             .range(Range.SERVER)
                             .filter(fReceiver -> fReceiver.is(FPlayer.Setting.QUIT))
                             .format(Localization.Message.Quit::getFormat)
@@ -516,6 +538,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     afkModule.builder(fEntity)
                             .tag(MessageTag.AFK)
+                            .destination(afkModule.getMessage().getDestination())
                             .filter(fReceiver -> fReceiver.is(FPlayer.Setting.AFK))
                             .format(s -> isAfk
                                     ? s.getFormatFalse().getGlobal()
