@@ -43,7 +43,7 @@ public class HeaderModule extends AbstractModuleListMessage<Localization.Message
     public void send(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String format = nextMessage(fPlayer, message.isRandom(), resolveLocalization(fPlayer).getValues());
+        String format = nextListMessage(fPlayer, message.isRandom(), resolveLocalization(fPlayer).getLists());
         if (format == null) return;
 
         builder(fPlayer)

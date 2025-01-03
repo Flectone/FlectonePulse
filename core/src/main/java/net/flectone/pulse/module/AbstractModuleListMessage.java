@@ -22,6 +22,14 @@ public abstract class AbstractModuleListMessage<M extends Localization.ILocaliza
     }
 
     @Nullable
+    protected String nextListMessage(FPlayer fPlayer, boolean random, List<List<String>> values) {
+        return nextMessage(fPlayer, random, values.stream()
+                .map(strings -> String.join("<br>", strings))
+                .toList()
+        );
+    }
+
+    @Nullable
     protected String nextMessage(FPlayer fPlayer, boolean random, List<String> messages) {
         if (messages.isEmpty()) return null;
 

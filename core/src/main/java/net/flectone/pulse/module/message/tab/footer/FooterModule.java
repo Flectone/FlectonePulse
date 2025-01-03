@@ -6,9 +6,9 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleListMessage;
 import net.flectone.pulse.module.message.tab.footer.ticker.FooterTicker;
 
@@ -43,7 +43,7 @@ public class FooterModule extends AbstractModuleListMessage<Localization.Message
     public void send(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String format = nextMessage(fPlayer, message.isRandom(), resolveLocalization(fPlayer).getValues());
+        String format = nextListMessage(fPlayer, message.isRandom(), resolveLocalization(fPlayer).getLists());
         if (format == null) return;
 
         builder(fPlayer)
