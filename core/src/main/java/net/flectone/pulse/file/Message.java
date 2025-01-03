@@ -2,11 +2,8 @@ package net.flectone.pulse.file;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.elytrium.serializer.SerializerConfig;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
-import net.elytrium.serializer.annotations.Transient;
-import net.elytrium.serializer.language.object.YamlSerializable;
 import net.flectone.pulse.module.message.format.world.WorldMode;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
 import net.flectone.pulse.util.Range;
@@ -38,20 +35,10 @@ import java.util.regex.Pattern;
         at = Comment.At.PREPEND
 )
 @Getter
-public final class Message extends YamlSerializable implements IModule.IMessage {
-
-    private static final SerializerConfig CONFIG = new SerializerConfig
-            .Builder()
-            .setBackupOnErrors(true)
-            .build();
-
-    @Transient
-    private final Path path;
+public final class Message extends FileSerializable implements IModule.IMessage {
 
     public Message(Path pluginPath) {
-        super(CONFIG);
-
-        this.path = Paths.get(pluginPath + File.separator + "message.yml");
+        super(Paths.get(pluginPath + File.separator + "message.yml"));
     }
 
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/message/")})

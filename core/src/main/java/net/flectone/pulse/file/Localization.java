@@ -3,11 +3,8 @@ package net.flectone.pulse.file;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.elytrium.serializer.SerializerConfig;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
-import net.elytrium.serializer.annotations.Transient;
-import net.elytrium.serializer.language.object.YamlSerializable;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.TagType;
@@ -34,20 +31,10 @@ import java.util.*;
         at = Comment.At.PREPEND
 )
 @Getter
-public final class Localization extends YamlSerializable implements IModule {
-
-    private static final SerializerConfig CONFIG = new SerializerConfig
-            .Builder()
-            .setBackupOnErrors(true)
-            .build();
-
-    @Transient
-    private final Path path;
+public final class Localization extends FileSerializable implements IModule {
 
     public Localization(Path pluginPath, String language) {
-        super(CONFIG);
-
-        this.path = Paths.get(pluginPath + File.separator + "localizations" + File.separator + language + ".yml");
+        super(Paths.get(pluginPath + File.separator + "localizations" + File.separator + language + ".yml"));
 
         if (language.equalsIgnoreCase("ru_ru")) {
             initRU_RU();

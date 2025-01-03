@@ -4,11 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.elytrium.serializer.SerializerConfig;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
-import net.elytrium.serializer.annotations.Transient;
-import net.elytrium.serializer.language.object.YamlSerializable;
 import net.flectone.pulse.BuildConfig;
 
 import java.io.File;
@@ -34,20 +31,10 @@ import java.util.List;
         at = Comment.At.PREPEND
 )
 @Getter
-public final class Config extends YamlSerializable {
-
-    private static final SerializerConfig CONFIG = new SerializerConfig
-            .Builder()
-            .setBackupOnErrors(true)
-            .build();
-
-    @Transient
-    private final Path path;
+public final class Config extends FileSerializable {
 
     public Config(Path pluginPath) {
-        super(CONFIG);
-
-        this.path = Paths.get(pluginPath + File.separator + "config.yml");
+        super(Paths.get(pluginPath + File.separator + "config.yml"));
     }
 
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/config/")})

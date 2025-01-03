@@ -4,11 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.elytrium.serializer.SerializerConfig;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
-import net.elytrium.serializer.annotations.Transient;
-import net.elytrium.serializer.language.object.YamlSerializable;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.Range;
 
@@ -37,20 +34,10 @@ import java.util.Map;
         at = Comment.At.PREPEND
 )
 @Getter
-public final class Command extends YamlSerializable implements IModule.ICommand {
-
-    private static final SerializerConfig CONFIG = new SerializerConfig
-            .Builder()
-            .setBackupOnErrors(true)
-            .build();
-
-    @Transient
-    private final Path path;
+public final class Command extends FileSerializable implements IModule.ICommand {
 
     public Command(Path pluginPath) {
-        super(CONFIG);
-
-        this.path = Paths.get(pluginPath + File.separator + "command.yml");
+        super(Paths.get(pluginPath + File.separator + "command.yml"));
     }
 
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/command/")})

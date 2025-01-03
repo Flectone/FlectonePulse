@@ -1,11 +1,8 @@
 package net.flectone.pulse.file;
 
 import lombok.Getter;
-import net.elytrium.serializer.SerializerConfig;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
-import net.elytrium.serializer.annotations.Transient;
-import net.elytrium.serializer.language.object.YamlSerializable;
 import net.flectone.pulse.util.MessageTag;
 
 import java.io.File;
@@ -33,20 +30,10 @@ import java.util.Map;
         at = Comment.At.PREPEND
 )
 @Getter
-public final class Integration extends YamlSerializable implements IModule.IIntegration {
-
-    private static final SerializerConfig CONFIG = new SerializerConfig
-            .Builder()
-            .setBackupOnErrors(true)
-            .build();
-
-    @Transient
-    private final Path path;
+public final class Integration extends FileSerializable implements IModule.IIntegration {
 
     public Integration(Path pluginPath) {
-        super(CONFIG);
-
-        this.path = Paths.get(pluginPath + File.separator + "integration.yml");
+        super(Paths.get(pluginPath + File.separator + "integration.yml"));
     }
 
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/integration/")})

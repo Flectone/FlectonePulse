@@ -3,11 +3,8 @@ package net.flectone.pulse.file;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.elytrium.serializer.SerializerConfig;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
-import net.elytrium.serializer.annotations.Transient;
-import net.elytrium.serializer.language.object.YamlSerializable;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.TagType;
 
@@ -34,19 +31,10 @@ import java.util.Map;
         at = Comment.At.PREPEND
 )
 @Getter
-public final class Permission extends YamlSerializable implements IModule {
-
-    private static final SerializerConfig CONFIG = new SerializerConfig.Builder()
-            .setBackupOnErrors(true)
-            .build();
-
-    @Transient
-    private final Path path;
+public final class Permission extends FileSerializable implements IModule {
 
     public Permission(Path pluginPath) {
-        super(CONFIG);
-
-        this.path = Paths.get(pluginPath + File.separator + "permission.yml");
+        super(Paths.get(pluginPath + File.separator + "permission.yml"));
     }
 
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/permission/")})
