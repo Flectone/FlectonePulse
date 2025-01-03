@@ -1,8 +1,7 @@
-package net.flectone.pulse.file.model;
+package net.flectone.pulse.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.TimeUtil;
 
 import java.util.HashMap;

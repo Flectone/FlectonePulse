@@ -4,7 +4,7 @@ import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.google.inject.Inject;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.file.Config;
-import net.flectone.pulse.file.model.Sound;
+import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;

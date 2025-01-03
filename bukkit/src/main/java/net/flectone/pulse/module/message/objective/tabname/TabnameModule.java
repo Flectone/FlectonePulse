@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.file.model.Ticker;
+import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;

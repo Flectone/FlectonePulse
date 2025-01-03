@@ -3,7 +3,7 @@ package net.flectone.pulse.platform;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBossBar;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPluginMessage;
 import com.google.inject.Inject;
-import net.flectone.pulse.file.model.Destination;
+import net.flectone.pulse.model.Destination;
 import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.BrandPacketSerializer;

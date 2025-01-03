@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
-import net.flectone.pulse.file.model.Cooldown;
+import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.manager.BukkitListenerManager;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;

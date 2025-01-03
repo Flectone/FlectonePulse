@@ -6,7 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.file.model.Sound;
+import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.manager.BukkitListenerManager;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;

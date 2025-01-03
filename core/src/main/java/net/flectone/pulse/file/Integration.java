@@ -3,8 +3,8 @@ package net.flectone.pulse.file;
 import lombok.Getter;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
-import net.flectone.pulse.file.model.Destination;
-import net.flectone.pulse.file.model.Ticker;
+import net.flectone.pulse.model.Destination;
+import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.util.MessageTag;
 
 import java.io.File;

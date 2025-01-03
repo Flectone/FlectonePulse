@@ -8,7 +8,7 @@ import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.database.Database;
-import net.flectone.pulse.file.model.Sound;
+import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;

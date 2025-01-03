@@ -1,4 +1,4 @@
-package net.flectone.pulse.file.model;
+package net.flectone.pulse.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
