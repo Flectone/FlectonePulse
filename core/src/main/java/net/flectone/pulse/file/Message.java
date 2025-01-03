@@ -341,6 +341,8 @@ public final class Message extends FileSerializable implements IModule.IMessage 
                 put(TagType.SELECTOR, new KyoriTag());
                 put(TagType.SCORE, new KyoriTag());
                 put(TagType.NBT, new KyoriTag());
+                put(TagType.PRIDE, new KyoriTag());
+                put(TagType.SHADOW_COLOR, new KyoriTag());
             }
         };
 

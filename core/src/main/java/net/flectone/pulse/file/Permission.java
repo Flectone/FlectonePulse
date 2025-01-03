@@ -892,6 +892,8 @@ public final class Permission extends FileSerializable implements IModule {
                     put(TagType.SELECTOR, new PermissionEntry("flectonepulse.module.message.format.selector", Type.OP));
                     put(TagType.SCORE, new PermissionEntry("flectonepulse.module.message.format.score", Type.OP));
                     put(TagType.NBT, new PermissionEntry("flectonepulse.module.message.format.nbt", Type.OP));
+                    put(TagType.PRIDE, new PermissionEntry("flectonepulse.module.message.format.pride", Type.OP));
+                    put(TagType.SHADOW_COLOR, new PermissionEntry("flectonepulse.module.message.format.shadow_color", Type.OP));
                 }
             };
 

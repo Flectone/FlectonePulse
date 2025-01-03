@@ -70,24 +70,27 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
 
         registerPermission(permission.getAll());
 
-        tagResolverMap.put(TagType.HOVER, StandardTags.hoverEvent());
-        tagResolverMap.put(TagType.CLICK, StandardTags.clickEvent());
-        tagResolverMap.put(TagType.COLOR, StandardTags.color());
-        tagResolverMap.put(TagType.KEYBIND, StandardTags.keybind());
-        tagResolverMap.put(TagType.TRANSLATABLE, StandardTags.translatable());
-        tagResolverMap.put(TagType.TRANSLATABLE_FALLBACK, StandardTags.translatableFallback());
-        tagResolverMap.put(TagType.INSERTION, StandardTags.insertion());
-        tagResolverMap.put(TagType.FONT, StandardTags.font());
-        tagResolverMap.put(TagType.DECORATION, StandardTags.decorations());
-        tagResolverMap.put(TagType.GRADIENT, StandardTags.gradient());
-        tagResolverMap.put(TagType.RAINBOW, StandardTags.rainbow());
-        tagResolverMap.put(TagType.RESET, StandardTags.reset());
-        tagResolverMap.put(TagType.NEWLINE, StandardTags.newline());
-        tagResolverMap.put(TagType.TRANSITION, StandardTags.transition());
-        tagResolverMap.put(TagType.SELECTOR, StandardTags.selector());
-        tagResolverMap.put(TagType.SCORE, StandardTags.score());
-        tagResolverMap.put(TagType.NBT, StandardTags.nbt());
-        // TODO: add shadowcolor
+        try {
+            tagResolverMap.put(TagType.HOVER, StandardTags.hoverEvent());
+            tagResolverMap.put(TagType.CLICK, StandardTags.clickEvent());
+            tagResolverMap.put(TagType.COLOR, StandardTags.color());
+            tagResolverMap.put(TagType.KEYBIND, StandardTags.keybind());
+            tagResolverMap.put(TagType.TRANSLATABLE, StandardTags.translatable());
+            tagResolverMap.put(TagType.TRANSLATABLE_FALLBACK, StandardTags.translatableFallback());
+            tagResolverMap.put(TagType.INSERTION, StandardTags.insertion());
+            tagResolverMap.put(TagType.FONT, StandardTags.font());
+            tagResolverMap.put(TagType.DECORATION, StandardTags.decorations());
+            tagResolverMap.put(TagType.GRADIENT, StandardTags.gradient());
+            tagResolverMap.put(TagType.RAINBOW, StandardTags.rainbow());
+            tagResolverMap.put(TagType.RESET, StandardTags.reset());
+            tagResolverMap.put(TagType.NEWLINE, StandardTags.newline());
+            tagResolverMap.put(TagType.TRANSITION, StandardTags.transition());
+            tagResolverMap.put(TagType.SELECTOR, StandardTags.selector());
+            tagResolverMap.put(TagType.SCORE, StandardTags.score());
+            tagResolverMap.put(TagType.NBT, StandardTags.nbt());
+            tagResolverMap.put(TagType.PRIDE, StandardTags.pride());
+            tagResolverMap.put(TagType.SHADOW_COLOR, StandardTags.shadowColor());
+        } catch (NoSuchMethodError ignored) {}
 
         addChildren(ColorModule.class);
         addChildren(EmojiModule.class);

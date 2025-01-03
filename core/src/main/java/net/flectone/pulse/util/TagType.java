@@ -32,5 +32,7 @@ public enum TagType {
     TRANSITION,
     SELECTOR,
     SCORE,
-    NBT
+    NBT,
+    PRIDE,
+    SHADOW_COLOR
 }
