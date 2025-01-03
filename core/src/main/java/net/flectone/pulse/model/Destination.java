@@ -67,7 +67,6 @@ public class Destination {
         BOSS_BAR,
         BRAND,
         CHAT,
-        SCOREBOARD,
         TITLE,
         SUBTITLE,
         TAB_HEADER,
