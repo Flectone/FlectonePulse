@@ -27,7 +27,6 @@ import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.discord.listener.MessageCreateListener;
-import net.flectone.pulse.module.integration.discord.ticker.DiscordTicker;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.MessageTag;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -56,9 +55,6 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
     private DiscordClient discordClient;
     private GatewayDiscordClient gateway;
     private long clientID;
-
-    @Inject
-    private DiscordTicker discordTicker;
 
     @Inject
     public DiscordIntegration(FileManager fileManager,
@@ -260,7 +256,8 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
 
         if (channelInfo.isEnable()) {
             if (channelInfo.getTicker().isEnable()) {
-                discordTicker.runTaskTimerAsync(channelInfo.getTicker().getPeriod(), channelInfo.getTicker().getPeriod());
+                long period = channelInfo.getTicker().getPeriod();
+                threadManager.runAsyncTimer(this::updateChannelInfo, period, period);
                 updateChannelInfo();
             }
         }
