@@ -91,6 +91,7 @@ public interface IModule {
         IObjectiveMessage getObjective();
         ISubMessage getOp();
         ISubMessage getQuit();
+        ISubMessage getScoreboard();
         ISubMessage getSeed();
         ISubMessage getSetblock();
         ISubMessage getSign();

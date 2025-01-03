@@ -513,6 +513,28 @@ public final class Localization extends FileSerializable implements IModule {
 
         message.op.format = "<fcolor:1>\uD83E\uDD16 <display_name> назначен оператором сервера";
 
+        message.scoreboard.values.clear();
+        message.scoreboard.values.addAll(new LinkedList<>(){
+            {
+                push(new LinkedList<>(){
+                    {
+                        push(" ");
+                        push("<fcolor:1>Пинг <ping>");
+                        push(" ");
+                        push("<fcolor:1>FlectonePulse");
+                    }
+                });
+                push(new LinkedList<>(){
+                    {
+                        push(" ");
+                        push("<fcolor:2>ТПС <tps>");
+                        push(" ");
+                        push("<fcolor:2>FlectonePulse");
+                    }
+                });
+            }
+        });
+
         message.seed.format = "<fcolor:1>\uD83C\uDF10 Ключ генератора: [<fcolor:2><hover:show_text:'<fcolor:2>Нажми, чтобы скопировать в буфер обмена'><click:copy_to_clipboard:<seed>><seed></click></fcolor:2>]";
 
         message.setblock.format = "<fcolor:1>⏹ Изменён блок в точке <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2>";
@@ -1372,6 +1394,8 @@ public final class Localization extends FileSerializable implements IModule {
 
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/en_us/message/op/")})
         private Op op = new Op();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/en_us/message/scoreboard/")})
+        private Scoreboard scoreboard = new Scoreboard();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/en_us/message/quit/")})
         private Quit quit = new Quit();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/en_us/message/seed/")})
@@ -1390,7 +1414,6 @@ public final class Localization extends FileSerializable implements IModule {
         private Status status = new Status();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/en_us/message/tab/")})
         private Tab tab = new Tab();
-
 
         @Getter
         public static final class Advancement implements ISubMessage, ILocalization {
@@ -1789,6 +1812,30 @@ public final class Localization extends FileSerializable implements IModule {
         @Getter
         public static final class Op implements ISubMessage, ILocalization {
             private String format = "<fcolor:1>🤖 Made <display_name> a server operator";
+        }
+
+        @Getter
+        public static final class Scoreboard implements ISubMessage, ILocalization {
+            private List<List<String>> values = new LinkedList<>(){
+                {
+                    push(new LinkedList<>(){
+                        {
+                            push(" ");
+                            push("<fcolor:1>Ping <ping>");
+                            push(" ");
+                            push("<fcolor:1>FlectonePulse");
+                        }
+                    });
+                    push(new LinkedList<>(){
+                        {
+                            push(" ");
+                            push("<fcolor:2>TPS <tps>");
+                            push(" ");
+                            push("<fcolor:2>FlectonePulse");
+                        }
+                    });
+                }
+            };
         }
 
         @Getter

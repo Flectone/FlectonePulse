@@ -86,6 +86,8 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     private Op op = new Op();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/message/quit/")})
     private Quit quit = new Quit();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/message/scoreboard/")})
+    private Scoreboard scoreboard = new Scoreboard();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/message/seed/")})
     private Seed seed = new Seed();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/message/setblock/")})
@@ -551,6 +553,13 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         private int range = Range.SERVER;
         private Destination destination = new Destination();
         private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Scoreboard implements ISubMessage, Config.IEnable {
+        private boolean enable = false;
+        private boolean random = true;
+        private Ticker ticker = new Ticker(true, 100);
     }
 
     @Getter

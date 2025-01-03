@@ -657,6 +657,8 @@ public final class Permission extends FileSerializable implements IModule {
         private Op op = new Op();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/permission/message/quit/")})
         private Quit quit = new Quit();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/permission/message/scoreboard/")})
+        private Scoreboard scoreboard = new Scoreboard();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/permission/message/seed/")})
         private Seed seed = new Seed();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/permission/message/setblock/")})
@@ -1043,6 +1045,12 @@ public final class Permission extends FileSerializable implements IModule {
             private String name = "flectonepulse.module.message.quit";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.quit.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Scoreboard implements ISubMessage, IPermission {
+            private String name = "flectonepulse.module.message.scoreboard";
+            private Type type = Type.TRUE;
         }
 
         @Getter

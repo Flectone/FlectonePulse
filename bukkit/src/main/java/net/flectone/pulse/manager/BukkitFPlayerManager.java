@@ -21,6 +21,7 @@ import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
 import net.flectone.pulse.module.message.objective.belowname.BelownameModule;
 import net.flectone.pulse.module.message.objective.tabname.TabnameModule;
+import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
@@ -66,6 +67,9 @@ public class BukkitFPlayerManager extends FPlayerManager {
 
     @Inject
     private TabnameModule tabnameModule;
+
+    @Inject
+    private ScoreboardModule scoreboardModule;
 
     @Inject
     private PlayerlistnameModule playerListNameModule;
@@ -150,6 +154,7 @@ public class BukkitFPlayerManager extends FPlayerManager {
         belowNameModule.add(fPlayer);
         tabnameModule.add(fPlayer);
         playerListNameModule.update();
+        scoreboardModule.send(fPlayer);
         footerModule.send(fPlayer);
         headerModule.send(fPlayer);
         brandModule.send(fPlayer);

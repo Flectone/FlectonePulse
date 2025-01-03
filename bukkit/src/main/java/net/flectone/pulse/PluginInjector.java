@@ -116,6 +116,8 @@ import net.flectone.pulse.module.message.format.name.BukkitNameModule;
 import net.flectone.pulse.module.message.format.name.NameModule;
 import net.flectone.pulse.module.message.objective.BukkitObjectiveModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
+import net.flectone.pulse.module.message.scoreboard.BukkitScoreboardModule;
+import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.sign.BukkitSignModule;
 import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.platform.PlatformDependency;
@@ -173,6 +175,7 @@ public class PluginInjector extends AbstractModule {
         bind(NameModule.class).to(BukkitNameModule.class);
         bind(FormatModule.class).to(BukkitFormatModule.class);
         bind(ObjectiveModule.class).to(BukkitObjectiveModule.class);
+        bind(ScoreboardModule.class).to(BukkitScoreboardModule.class);
         bind(AnvilModule.class).to(BukkitAnvilModule.class);
         bind(BookModule.class).to(BukkitBookModule.class);
         bind(AfkModule.class).to(BukkitAfkModule.class);

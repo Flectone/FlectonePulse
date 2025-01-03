@@ -25,6 +25,7 @@ import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.op.OpModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
+import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.seed.SeedModule;
 import net.flectone.pulse.module.message.setblock.SetblockModule;
 import net.flectone.pulse.module.message.sign.SignModule;
@@ -67,6 +68,7 @@ public class MessageModule extends AbstractModule {
         addChildren(ObjectiveModule.class);
         addChildren(OpModule.class);
         addChildren(QuitModule.class);
+        addChildren(ScoreboardModule.class);
         addChildren(SeedModule.class);
         addChildren(SetblockModule.class);
         addChildren(SignModule.class);
