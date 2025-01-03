@@ -4,10 +4,10 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPl
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.file.Config;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.file.model.Ticker;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
@@ -49,7 +49,7 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
     public void reload() {
         registerModulePermission(permission);
 
-        Config.Ticker ticker = message.getTicker();
+        Ticker ticker = message.getTicker();
         if (ticker.isEnable()) {
             playerListNameTicker.runTaskTimerAsync(ticker.getPeriod(), ticker.getPeriod());
         }

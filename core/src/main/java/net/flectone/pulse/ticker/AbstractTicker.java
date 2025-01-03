@@ -32,7 +32,7 @@ public abstract class AbstractTicker {
         this.runnable = runnable;
     }
 
-    public void runTaskTimerAsync(int delay, int period) {
+    public void runTaskTimerAsync(long delay, long period) {
         if (consumer != null) {
             threadManager.runAsyncTimer(() -> fPlayerManager.getFPlayers().forEach(consumer), delay, period);
         }

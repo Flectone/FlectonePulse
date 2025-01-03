@@ -7,6 +7,7 @@ import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.file.model.Cooldown;
 import net.flectone.pulse.file.model.Destination;
 import net.flectone.pulse.file.model.Sound;
+import net.flectone.pulse.file.model.Ticker;
 import net.flectone.pulse.module.message.format.world.WorldMode;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
 import net.flectone.pulse.util.Range;
@@ -118,7 +119,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         private boolean enable = false;
         private boolean random = true;
         private Destination destination = new Destination();
-        private Config.Ticker ticker = new Config.Ticker(9000);
+        private Ticker ticker = new Ticker(true, 9000);
         private Sound sound = new Sound();
     }
 
@@ -132,7 +133,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         private boolean enable = true;
         private boolean random = true;
         private Destination destination = new Destination(Destination.Type.BRAND);
-        private Config.Ticker ticker = new Config.Ticker(100);
+        private Ticker ticker = new Ticker(true, 100);
     }
 
     @Getter
@@ -212,7 +213,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private int delay = 3000;
             private List<String> ignore = new ArrayList<>(List.of("afk"));
             private Destination destination = new Destination();
-            private Config.Ticker ticker = new Config.Ticker(20);
+            private Ticker ticker = new Ticker(true, 20);
         }
 
         @Getter
@@ -525,14 +526,14 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         public static final class Belowname implements ISubObjectiveMessage {
             private boolean enable = false;
             private ObjectiveMode mode = ObjectiveMode.PING;
-            private Config.Ticker ticker = new Config.Ticker(100);
+            private Ticker ticker = new Ticker(true, 100);
         }
 
         @Getter
         public static final class Tabname implements ISubObjectiveMessage {
             private boolean enable = false;
             private ObjectiveMode mode = ObjectiveMode.PING;
-            private Config.Ticker ticker = new Config.Ticker(100);
+            private Ticker ticker = new Ticker(true, 100);
         }
 
     }
@@ -645,7 +646,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private boolean enable = true;
             private boolean random = true;
             private Destination destination = new Destination(Destination.Type.TAB_FOOTER);
-            private Config.Ticker ticker = new Config.Ticker(100);
+            private Ticker ticker = new Ticker(true, 100);
         }
 
         @Getter
@@ -653,13 +654,13 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private boolean enable = true;
             private boolean random = true;
             private Destination destination = new Destination(Destination.Type.TAB_HEADER);
-            private Config.Ticker ticker = new Config.Ticker(100);
+            private Ticker ticker = new Ticker(true, 100);
         }
 
         @Getter
         public static final class Playerlistname implements ISubTabMessage, Config.IEnable {
             private boolean enable = true;
-            private Config.Ticker ticker = new Config.Ticker(100);
+            private Ticker ticker = new Ticker(true, 100);
         }
     }
 }

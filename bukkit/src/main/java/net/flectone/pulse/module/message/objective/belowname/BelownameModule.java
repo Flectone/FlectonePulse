@@ -3,9 +3,9 @@ package net.flectone.pulse.module.message.objective.belowname;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.file.Config;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.file.model.Ticker;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
@@ -53,7 +53,7 @@ public class BelownameModule extends AbstractModule {
         scoreboardObjective = objectiveManager.create("belowNameObjective");
         objectiveManager.display(ObjectiveDisplaySlot.belowName(), scoreboardObjective);
 
-        Config.Ticker ticker = message.getTicker();
+        Ticker ticker = message.getTicker();
         if (ticker.isEnable()) {
             belowNameTicker.runTaskTimerAsync(ticker.getPeriod(), ticker.getPeriod());
         }

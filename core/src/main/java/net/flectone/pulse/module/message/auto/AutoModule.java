@@ -3,10 +3,10 @@ package net.flectone.pulse.module.message.auto;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.file.Config;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.file.model.Ticker;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleListMessage;
@@ -35,7 +35,7 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
 
         createSound(message.getSound(), permission.getSound());
 
-        Config.Ticker ticker = message.getTicker();
+        Ticker ticker = message.getTicker();
         if (ticker.isEnable()) {
             autoTicker.runTaskTimerAsync(ticker.getPeriod(), ticker.getPeriod());
         }

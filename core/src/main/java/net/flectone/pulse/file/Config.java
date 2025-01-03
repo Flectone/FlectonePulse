@@ -1,8 +1,6 @@
 package net.flectone.pulse.file;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
@@ -95,17 +93,5 @@ public final class Config extends FileSerializable {
 
     public interface IEnable {
         boolean isEnable();
-    }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static final class Ticker implements IEnable {
-        private boolean enable = true;
-        private int period = -1;
-
-        public Ticker(int period) {
-            this.period = period;
-        }
     }
 }

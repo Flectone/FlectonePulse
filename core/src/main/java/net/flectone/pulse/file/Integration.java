@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.file.model.Destination;
+import net.flectone.pulse.file.model.Ticker;
 import net.flectone.pulse.util.MessageTag;
 
 import java.io.File;
@@ -96,7 +97,7 @@ public final class Integration extends FileSerializable implements IModule.IInte
         @Getter
         public static final class ChannelInfo {
             private boolean enable = false;
-            private Config.Ticker ticker = new Config.Ticker(1200);
+            private Ticker ticker = new Ticker(true, 1200);
         }
     }
 

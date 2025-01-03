@@ -3,9 +3,9 @@ package net.flectone.pulse.module.message.objective.tabname;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.file.Config;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.file.model.Ticker;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
@@ -53,7 +53,7 @@ public class TabnameModule extends AbstractModule {
         scoreboardObjective = objectiveManager.create("playerListObjective");
         objectiveManager.display(ObjectiveDisplaySlot.playerList(), scoreboardObjective);
 
-        Config.Ticker ticker = config.getTicker();
+        Ticker ticker = config.getTicker();
         if (ticker.isEnable()) {
             tabnameTicker.runTaskTimerAsync(ticker.getPeriod(), ticker.getPeriod());
         }

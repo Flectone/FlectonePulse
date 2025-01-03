@@ -8,6 +8,7 @@ import net.elytrium.serializer.language.object.YamlSerializable;
 import net.flectone.pulse.file.model.Cooldown;
 import net.flectone.pulse.file.model.Destination;
 import net.flectone.pulse.file.model.Sound;
+import net.flectone.pulse.file.model.Ticker;
 import net.flectone.pulse.util.TimeUtil;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.title.Title;
@@ -91,6 +92,32 @@ public abstract class FileSerializable extends YamlSerializable {
                     long longDuration = duration == null ? 60L : Long.parseLong(String.valueOf(duration));
 
                     return new Cooldown(true, longDuration);
+                }
+            })
+            .registerSerializer(new ClassSerializer<Ticker, Map<String, Object>>() {
+
+                @Override
+                public Map<String, Object> serialize(Ticker ticker) {
+                    Map<String, Object> map = new LinkedHashMap<>();
+
+                    map.put("enable", ticker.isEnable());
+
+                    if (ticker.isEnable()) {
+                        map.put("period", ticker.getPeriod());
+                    }
+
+                    return map;
+                }
+
+                @Override
+                public Ticker deserialize(Map<String, Object> map) {
+                    boolean isEnable = Boolean.parseBoolean(String.valueOf(map.get("enable")));
+                    if (!isEnable) return new Ticker();
+
+                    Object period = map.get("period");
+                    long longPeriod = period == null ? 100L : Long.parseLong(String.valueOf(period));
+
+                    return new Ticker(true, longPeriod);
                 }
             })
             .registerSerializer(new ClassSerializer<Destination, Map<String, Object>>() {
