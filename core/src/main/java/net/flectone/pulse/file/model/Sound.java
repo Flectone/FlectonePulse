@@ -2,10 +2,9 @@ package net.flectone.pulse.file.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.flectone.pulse.file.Config;
 
 @Getter
-public class Sound implements Config.IEnable {
+public class Sound {
 
     private final boolean enable;
     private final float volume;
