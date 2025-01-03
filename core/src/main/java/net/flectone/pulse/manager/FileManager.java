@@ -9,6 +9,8 @@ import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.file.*;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.util.TagType;
+import net.flectone.pulse.util.VersionUtil;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -25,6 +27,9 @@ public class FileManager {
     private final Map<String, Localization> localizationMap = new HashMap<>();
 
     private final Path pluginPath;
+
+    @Inject
+    private VersionUtil versionUtil;
 
     @Getter
     private final Command command;
@@ -78,9 +83,13 @@ public class FileManager {
         config.reload(config.getPath());
         config.setLanguage(config.getLanguage());
 
-        if (!config.getVersion().equals(BuildConfig.PROJECT_VERSION)) {
+        String configVersion = config.getVersion();
+
+        if (!configVersion.equals(BuildConfig.PROJECT_VERSION)) {
             config.setVersion(BuildConfig.PROJECT_VERSION);
             config.save(config.getPath());
+
+            upgradeIfNewerThanV_0_1_0(configVersion);
         }
 
         command.reload(command.getPath());
@@ -112,5 +121,21 @@ public class FileManager {
         Localization localization = new Localization(pluginPath, language);
         localization.reload(localization.getPath());
         localizationMap.put(language, localization);
+    }
+
+    public void upgradeIfNewerThanV_0_1_0(String version) {
+        if (versionUtil.isOlderThan("0.1.0", version)) return;
+
+        Map<TagType, Permission.PermissionEntry> permissionMap = permission.getMessage().getFormat().getTags();
+        if (permissionMap.containsKey(TagType.PRIDE)) return;
+
+        permissionMap.put(TagType.PRIDE, new Permission.PermissionEntry("flectonepulse.module.message.format.pride", Permission.Type.OP));
+        permissionMap.put(TagType.SHADOW_COLOR, new Permission.PermissionEntry("flectonepulse.module.message.format.shadow_color", Permission.Type.OP));
+
+        Map<TagType, Message.Format.Tag> messageMap = message.getFormat().getTags();
+        messageMap.put(TagType.PRIDE, new Message.Format.KyoriTag());
+        messageMap.put(TagType.SHADOW_COLOR, new Message.Format.KyoriTag());
+
+        save();
     }
 }
