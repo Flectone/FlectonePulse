@@ -79,7 +79,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             return fPlayer.getColors().getOrDefault(number, color.getValues().get(number));
         }
 
-        return switch (params) {
+        String placeholder = switch (params) {
             case "world_prefix" -> fPlayer.getWorldPrefix();
             case "stream_prefix" -> fPlayer.getStreamPrefix();
             case "afk_suffix" -> fPlayer.getAfkSuffix();
@@ -90,6 +90,8 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             case "tps" -> serverUtil.getTPS();
             default -> null;
         };
+
+        return placeholder == null ? "" : placeholder;
     }
 
     public String setPlaceholders(FEntity sender, FEntity fReceiver, String message) {
