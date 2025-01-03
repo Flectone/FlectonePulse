@@ -61,16 +61,16 @@ public class ColorUtil {
         legacyAdventureMap.put("&E", "<yellow>");
         legacyAdventureMap.put("&f", "<white>");
         legacyAdventureMap.put("&F", "<white>");
-        legacyAdventureMap.put("&k", "<obfuscated>");
-        legacyAdventureMap.put("&K", "<obfuscated>");
-        legacyAdventureMap.put("&l", "<bold>");
-        legacyAdventureMap.put("&L", "<bold>");
-        legacyAdventureMap.put("&m", "<strikethrough>");
-        legacyAdventureMap.put("&M", "<strikethrough>");
-        legacyAdventureMap.put("&n", "<underline>");
-        legacyAdventureMap.put("&N", "<underline>");
-        legacyAdventureMap.put("&o", "<italic>");
-        legacyAdventureMap.put("&O", "<italic>");
+        legacyAdventureMap.put("&k", "<obf>");
+        legacyAdventureMap.put("&K", "<obf>");
+        legacyAdventureMap.put("&l", "<b>");
+        legacyAdventureMap.put("&L", "<b>");
+        legacyAdventureMap.put("&m", "<st>");
+        legacyAdventureMap.put("&M", "<st>");
+        legacyAdventureMap.put("&n", "<u>");
+        legacyAdventureMap.put("&N", "<u>");
+        legacyAdventureMap.put("&o", "<i>");
+        legacyAdventureMap.put("&O", "<i>");
         legacyAdventureMap.put("&r", "<reset>");
         legacyAdventureMap.put("&R", "<reset>");
 
