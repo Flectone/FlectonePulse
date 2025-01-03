@@ -554,11 +554,25 @@ public final class Localization extends FileSerializable implements IModule {
 
         message.status.players.full = "<color:#ff7171>Сервер полон";
 
-        message.tab.footer.values.clear();
-        message.tab.footer.values.addAll(List.of(
-                "<br><fcolor:1><fcolor:1>Привет <fcolor:2><player></fcolor:2>!<br>",
-                "<br><fcolor:1>ТПС <tps>, Онлайн <online><br>"
-        ));
+        message.tab.footer.lists.clear();
+        message.tab.footer.lists.addAll(new LinkedList<>(){
+            {
+                push(new LinkedList<>(){
+                    {
+                        push(" ");
+                        push("<fcolor:1>Привет <fcolor:2><player></fcolor:2>!");
+                        push(" ");
+                    }
+                });
+                push(new LinkedList<>(){
+                    {
+                        push(" ");
+                        push("<fcolor:1>ТПС <tps>, Онлайн <online>");
+                        push(" ");
+                    }
+                });
+            }
+        });
     }
 
 
@@ -1921,20 +1935,44 @@ public final class Localization extends FileSerializable implements IModule {
 
             @Getter
             public static final class Footer implements ISubTabMessage, ILocalization {
-                private List<String> values = new LinkedList<>(){
+                private List<List<String>> lists = new LinkedList<>(){
                     {
-                        push("<br><fcolor:1>Hello <fcolor:2><player></fcolor:2>!<br>");
-                        push("<br><fcolor:1>TPS <tps>, Online <online><br>");
+                        push(new LinkedList<>(){
+                            {
+                                push(" ");
+                                push("<fcolor:1>Hello <fcolor:2><player></fcolor:2>!");
+                                push(" ");
+                            }
+                        });
+                        push(new LinkedList<>(){
+                            {
+                                push(" ");
+                                push("<fcolor:1>TPS <tps>, Online <online");
+                                push(" ");
+                            }
+                        });
                     }
                 };
             }
 
             @Getter
             public static final class Header implements ISubTabMessage, ILocalization {
-                private List<String> values = new LinkedList<>(){
+                private List<List<String>> lists = new LinkedList<>(){
                     {
-                        push("<br><fcolor:1>❤<br>");
-                        push("<br><fcolor:1>\uD83D\uDC7E<br>");
+                        push(new LinkedList<>(){
+                            {
+                                push(" ");
+                                push("<fcolor:1>❤");
+                                push(" ");
+                            }
+                        });
+                        push(new LinkedList<>(){
+                            {
+                                push(" ");
+                                push("<fcolor:1>\uD83D\uDC7E");
+                                push(" ");
+                            }
+                        });
                     }
                 };
             }
@@ -1955,15 +1993,6 @@ public final class Localization extends FileSerializable implements IModule {
         private String header;
         private String line;
         private String footer;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public static final class GUI {
-        private String header;
-        private List<String> line;
-        private List<String> previous;
-        private List<String> next;
     }
 
     public static class ReasonMap extends LinkedHashMap<String, String> {
