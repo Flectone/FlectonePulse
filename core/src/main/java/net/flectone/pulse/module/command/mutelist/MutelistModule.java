@@ -158,6 +158,8 @@ public abstract class MutelistModule extends AbstractModuleCommand<Localization.
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
+        getCommand().getAliases().forEach(commandUtil::unregister);
+
         createCommand();
     }
 

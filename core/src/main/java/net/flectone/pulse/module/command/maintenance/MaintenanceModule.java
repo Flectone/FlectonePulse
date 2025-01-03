@@ -202,6 +202,8 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
 
         icon = fileUtil.convertIcon(file);
 
+        getCommand().getAliases().forEach(commandUtil::unregister);
+
         createCommand();
     }
 

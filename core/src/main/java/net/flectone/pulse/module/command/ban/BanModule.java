@@ -217,10 +217,7 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
 
         listenerManager.register(BanPacketListener.class);
 
-        if (command.getAliases().contains("ban")) {
-            commandUtil.unregister("ban");
-        }
-
+        getCommand().getAliases().forEach(commandUtil::unregister);
 
         createCommand();
     }

@@ -169,6 +169,8 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
 
         registerPermission(permission.getOther());
 
+        getCommand().getAliases().forEach(commandUtil::unregister);
+
         createCommand();
     }
 

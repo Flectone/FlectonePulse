@@ -61,6 +61,8 @@ public abstract class ReplyModule extends AbstractModuleCommand<Localization.Com
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
+        getCommand().getAliases().forEach(commandUtil::unregister);
+
         createCommand();
     }
 

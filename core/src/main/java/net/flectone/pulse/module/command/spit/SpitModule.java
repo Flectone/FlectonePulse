@@ -48,6 +48,8 @@ public abstract class SpitModule extends AbstractModuleCommand<Localization.Comm
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
+        getCommand().getAliases().forEach(commandUtil::unregister);
+
         createCommand();
     }
 

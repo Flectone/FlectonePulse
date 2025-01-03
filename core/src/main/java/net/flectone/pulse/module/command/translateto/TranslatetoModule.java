@@ -115,6 +115,8 @@ public abstract class TranslatetoModule extends AbstractModuleCommand<Localizati
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
+        getCommand().getAliases().forEach(commandUtil::unregister);
+
         createCommand();
     }
 

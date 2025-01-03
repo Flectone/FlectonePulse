@@ -35,8 +35,6 @@ public class BukkitTellModule extends TellModule {
         String promptPlayer = getPrompt().getPlayer();
         String promptMessage = getPrompt().getMessage();
 
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
         new FCommand(name)
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())

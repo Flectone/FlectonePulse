@@ -3,6 +3,7 @@ package net.flectone.pulse.util;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPIBukkit;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.CustomArgument;
@@ -43,6 +44,7 @@ public class BukkitCommandUtil extends CommandUtil {
     @Override
     public void unregister(String command) {
         CommandAPI.unregister(command);
+        CommandAPIBukkit.unregister(command, true, true);
     }
 
     @Sync

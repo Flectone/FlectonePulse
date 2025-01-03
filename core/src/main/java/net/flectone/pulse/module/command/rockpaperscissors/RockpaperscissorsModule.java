@@ -240,6 +240,8 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
+        getCommand().getAliases().forEach(commandUtil::unregister);
+
         createCommand();
     }
 

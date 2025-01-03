@@ -101,6 +101,8 @@ public abstract class HelperModule extends AbstractModuleCommand<Localization.Co
 
         registerPermission(permission.getSee());
 
+        getCommand().getAliases().forEach(commandUtil::unregister);
+
         createCommand();
     }
 

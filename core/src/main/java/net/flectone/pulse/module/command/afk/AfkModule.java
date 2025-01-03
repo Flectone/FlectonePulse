@@ -49,6 +49,8 @@ public abstract class AfkModule extends AbstractModuleCommand<Localization.Comma
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
+        getCommand().getAliases().forEach(commandUtil::unregister);
+
         createCommand();
     }
 

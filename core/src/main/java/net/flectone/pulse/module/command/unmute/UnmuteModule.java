@@ -124,6 +124,8 @@ public abstract class UnmuteModule extends AbstractModuleCommand<Localization.Co
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
+        getCommand().getAliases().forEach(commandUtil::unregister);
+
         createCommand();
     }
 

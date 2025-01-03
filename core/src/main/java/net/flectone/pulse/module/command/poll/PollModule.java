@@ -227,6 +227,8 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
 
         registerPermission(permission.getCreate());
 
+        getCommand().getAliases().forEach(commandUtil::unregister);
+
         createCommand();
     }
 

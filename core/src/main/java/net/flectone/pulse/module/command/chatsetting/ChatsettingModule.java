@@ -131,6 +131,8 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
 
         permission.getSettings().values().forEach(this::registerPermission);
 
+        getCommand().getAliases().forEach(commandUtil::unregister);
+
         createCommand();
     }
 

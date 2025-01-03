@@ -96,9 +96,7 @@ public abstract class UnbanModule extends AbstractModuleCommand<Localization.Com
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        if (command.getAliases().contains("pardon")) {
-            commandUtil.unregister("pardon");
-        }
+        getCommand().getAliases().forEach(commandUtil::unregister);
 
         createCommand();
     }
