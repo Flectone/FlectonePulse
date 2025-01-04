@@ -9,8 +9,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSp
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import lombok.Getter;
 import net.flectone.pulse.manager.FPlayerManager;
-import net.flectone.pulse.util.RandomUtil;
 import net.flectone.pulse.model.FPacketEntity;
+import net.flectone.pulse.util.RandomUtil;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;

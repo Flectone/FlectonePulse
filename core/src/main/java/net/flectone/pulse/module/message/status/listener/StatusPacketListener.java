@@ -5,8 +5,8 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.file.Command;
-import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.listener.AbstractPacketListener;
+import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.message.status.StatusModule;
 
 @Singleton

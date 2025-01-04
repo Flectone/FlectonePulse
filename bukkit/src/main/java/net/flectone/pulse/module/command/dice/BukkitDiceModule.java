@@ -4,9 +4,9 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.IntegerArgument;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.FCommand;
+import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.RandomUtil;
 
 @Singleton

@@ -8,11 +8,11 @@ import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.logger.FLogger;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.FCommand;
+import net.flectone.pulse.util.CommandUtil;
 import org.bukkit.entity.Player;
 
 import java.sql.SQLException;

@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.file.Integration;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.util.PermissionUtil;
-import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.util.PermissionUtil;
 
 @Singleton
 public class PlaceholderAPIModule extends AbstractModule {

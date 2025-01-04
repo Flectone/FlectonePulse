@@ -6,9 +6,9 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleListMessage;
 import net.flectone.pulse.module.message.brand.ticker.BrandTicker;
 

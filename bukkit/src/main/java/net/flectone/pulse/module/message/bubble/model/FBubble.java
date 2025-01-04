@@ -9,9 +9,9 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import lombok.Getter;
+import net.flectone.pulse.model.FPacketEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.RandomUtil;
-import net.flectone.pulse.model.FPacketEntity;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

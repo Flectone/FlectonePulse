@@ -4,11 +4,11 @@ import com.google.inject.Inject;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.model.Cooldown;
-import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.util.PermissionUtil;
 

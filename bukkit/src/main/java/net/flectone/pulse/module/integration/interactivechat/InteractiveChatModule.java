@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.file.Integration;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 

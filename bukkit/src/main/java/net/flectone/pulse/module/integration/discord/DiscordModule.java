@@ -3,17 +3,17 @@ package net.flectone.pulse.module.integration.discord;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import net.flectone.pulse.FlectonePulsePlugin;
 import net.flectone.pulse.BuildConfig;
+import net.flectone.pulse.FlectonePulsePlugin;
 import net.flectone.pulse.file.Integration;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.PlatformDependency;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.module.AbstractModule;
 
 import java.util.function.UnaryOperator;
 

@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.util.PermissionUtil;
 import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.util.PermissionUtil;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -5,8 +5,8 @@ import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServer
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.listener.AbstractPacketListener;
+import net.flectone.pulse.logger.FLogger;
 import net.kyori.adventure.text.Component;
 
 @Singleton

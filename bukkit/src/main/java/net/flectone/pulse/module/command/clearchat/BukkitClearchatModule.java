@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
-import net.flectone.pulse.util.BukkitCommandUtil;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.FCommand;
+import net.flectone.pulse.util.BukkitCommandUtil;
 
 @Singleton
 public class BukkitClearchatModule extends ClearchatModule {

@@ -7,11 +7,11 @@ import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.logger.FLogger;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.platform.PlatformSender;
+import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.TimeUtil;
 

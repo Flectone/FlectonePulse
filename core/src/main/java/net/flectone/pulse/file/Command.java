@@ -8,8 +8,8 @@ import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.model.Destination;
-import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.util.Range;
 
 import java.io.File;
