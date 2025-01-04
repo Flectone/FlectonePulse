@@ -53,7 +53,7 @@ public abstract class OnlineModule extends AbstractModuleCommand<Localization.Co
         builder(targetFPlayer)
                 .destination(command.getDestination())
                 .receiver(fPlayer)
-                .format(getResolver(fPlayer, targetFPlayer, commandUtil.getString(0, arguments)))
+                .format(getResolver(fPlayer, targetFPlayer, commandUtil.getLiteral(0, arguments)))
                 .sound(getSound())
                 .sendBuilt();
     }
