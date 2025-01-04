@@ -11,6 +11,7 @@ public abstract class CommandUtil {
     public abstract void dispatch(String command);
 
     public abstract Optional<Object> getOptional(int index, Object arguments);
+    public abstract String getLiteral(int index, Object arguments);
     public abstract String getString(int index, Object arguments);
     public abstract String getFull(Object arguments);
     public abstract Integer getInteger(int index, Object arguments);
