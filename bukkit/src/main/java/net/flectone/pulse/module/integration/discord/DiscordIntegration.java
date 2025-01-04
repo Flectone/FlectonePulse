@@ -254,12 +254,10 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
 
         Integration.Discord.ChannelInfo channelInfo = integration.getChannelInfo();
 
-        if (channelInfo.isEnable()) {
-            if (channelInfo.getTicker().isEnable()) {
-                long period = channelInfo.getTicker().getPeriod();
-                threadManager.runAsyncTimer(this::updateChannelInfo, period, period);
-                updateChannelInfo();
-            }
+        if (channelInfo.isEnable() && channelInfo.getTicker().isEnable()) {
+            long period = channelInfo.getTicker().getPeriod();
+            threadManager.runAsyncTimer(this::updateChannelInfo, period, period);
+            updateChannelInfo();
         }
 
         if (!integration.getMessageChannel().isEmpty()) {
