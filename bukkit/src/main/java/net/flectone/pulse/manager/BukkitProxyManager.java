@@ -53,6 +53,8 @@ public class BukkitProxyManager extends ProxyManager {
     @Override
     public boolean sendMessage(FEntity sender, MessageTag tag, Consumer<ByteArrayDataOutput> outputConsumer) {
         if (!isEnabledProxy()) return false;
+        if (tag == null) return false;
+        if (outputConsumer == null) return false;
 
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
 
