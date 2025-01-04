@@ -63,6 +63,19 @@ public class BukkitCommandUtil extends CommandUtil {
     }
 
     @Override
+    public String getText(int index, Object arguments) {
+        String string = getString(index, arguments);
+        if (string.isEmpty()) return "";
+
+        if (string.startsWith("\"") && string.endsWith("\"")
+                || string.startsWith("'") && string.endsWith("'")) {
+            return string.substring(1, string.length() - 1);
+        }
+
+        return string;
+    }
+
+    @Override
     public String getFull(Object arguments) {
         if (arguments instanceof CommandArguments commandArguments) {
             return commandArguments.fullInput();

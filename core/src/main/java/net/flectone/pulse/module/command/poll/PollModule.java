@@ -89,7 +89,8 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
 
         Integer time = commandUtil.getInteger(0, arguments);
         boolean multipleVote = commandUtil.getBoolean(1, arguments);
-        String title = commandUtil.getString(2, arguments);
+        String title = commandUtil.getText(2, arguments);
+
         Map<String, String> answerSet = ((Map<String, String>) commandUtil.getOptional(3, arguments).get());
 
         Poll poll = new Poll(command.getLastId(), answerSet.size(), multipleVote);
