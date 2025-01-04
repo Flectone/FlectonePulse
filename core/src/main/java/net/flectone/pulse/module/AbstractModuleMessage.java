@@ -331,19 +331,11 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
         }
 
         public List<FPlayer> build() {
-            if (tag != null) {
+            sendToIntegrations();
 
-                if (integrationString != null) {
-                    sendToIntegrations();
-                }
-
-                if (proxyOutput != null && range == Range.PROXY) {
-                    // proxy sent message for all servers
-                    if (proxyManager.sendMessage(fPlayer, tag, proxyOutput)) {
-                        return new ArrayList<>();
-                    }
-                }
-
+            // proxy sent message for all servers
+            if (sendToProxy()) {
+                return new ArrayList<>();
             }
 
             return fPlayerManager.getFPlayersWithConsole().stream()
@@ -395,7 +387,11 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
             });
         }
 
-        private void sendToIntegrations() {
+        public void sendToIntegrations() {
+            if (tag == null) return;
+            if (integrationString == null) return;
+            if (range != Range.SERVER && range != Range.PROXY) return;
+
             Component component = componentUtil.builder(fPlayer, FPlayer.UNKNOWN, resolveString(FPlayer.UNKNOWN, format))
                     .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(FPlayer.UNKNOWN))
                     .build();
@@ -420,6 +416,14 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
                     .replace("<final_clear_message>", finalMessage.replaceAll("[\\p{C}\\p{So}\\x{E0100}-\\x{E01EF}]+", ""));
 
             threadManager.runAsync(() -> integrationModule.sendMessage(fPlayer, tag, interfaceReplaceString));
+        }
+
+        public boolean sendToProxy() {
+            if (tag == null) return false;
+            if (proxyOutput == null) return false;
+            if (range != Range.PROXY) return false;
+
+            return proxyManager.sendMessage(fPlayer, tag, proxyOutput);
         }
 
         private String resolveString(FPlayer fPlayer, BiFunction<FPlayer, M, String> stringResolver) {
