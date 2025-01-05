@@ -38,30 +38,30 @@ public final class Integration extends FileSerializable implements IModule.IInte
         super(Paths.get(pluginPath + File.separator + "integration.yml"));
     }
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/integration/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/")})
     private boolean enable = true;
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/integration/discord/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/discord/")})
     private Discord discord = new Discord();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/integration/interactivechat/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/interactivechat/")})
     private Interactivechat interactivechat = new Interactivechat();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/integration/luckperms/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/luckperms/")})
     private Luckperms luckperms = new Luckperms();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/integration/placeholderapi/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/placeholderapi/")})
     private Placeholderapi placeholderapi = new Placeholderapi();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/integration/plasmovoice/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/plasmovoice/")})
     private Plasmovoice plasmovoice = new Plasmovoice();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/integration/simplevoice/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/simplevoice/")})
     private Simplevoice simplevoice = new Simplevoice();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/integration/skinsrestorer/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/skinsrestorer/")})
     private Skinsrestorer skinsrestorer = new Skinsrestorer();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/integration/supervanish/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/supervanish/")})
     private Supervanish supervanish = new Supervanish();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/integration/telegram/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/telegram/")})
     private Telegram telegram = new Telegram();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/integration/twitch/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/twitch/")})
     private Twitch twitch = new Twitch();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/integration/vault/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/vault/")})
     private Vault vault = new Vault();
 
     @Getter

@@ -35,7 +35,7 @@ public final class Config extends FileSerializable {
         super(Paths.get(pluginPath + File.separator + "config.yml"));
     }
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/config/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/config/")})
     private String console = "Console";
     @Setter
     private String version = BuildConfig.PROJECT_VERSION;
@@ -53,10 +53,10 @@ public final class Config extends FileSerializable {
             "OkHttp TaskRunner"
     ));
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/config#database")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/config#database")})
     private Database database = new Database();
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/en/config#module")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/config#module")})
     private Module module = new Module();
 
     @Getter
