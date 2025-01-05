@@ -342,7 +342,6 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean enable = true;
         private int perPage = 4;
         private List<String> aliases = new ArrayList<>(List.of("ignorelist"));
-        private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
