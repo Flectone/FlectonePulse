@@ -582,7 +582,6 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     public static final class Sign implements ISubMessage, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
-        private Sound sound = new Sound();
     }
 
     @Getter
