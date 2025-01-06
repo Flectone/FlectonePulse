@@ -1,9 +1,8 @@
-package net.flectone.pulse.platform.bukkit;
+package net.flectone.pulse.platform;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.platform.PlatformSender;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;

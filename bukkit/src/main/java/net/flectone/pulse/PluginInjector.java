@@ -7,6 +7,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
+import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.database.Database;
@@ -122,12 +123,10 @@ import net.flectone.pulse.module.message.sign.BukkitSignModule;
 import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.platform.PlatformDependency;
 import net.flectone.pulse.platform.PlatformSender;
-import net.flectone.pulse.platform.bukkit.BukkitSender;
-import net.flectone.pulse.platform.paper.PaperSender;
+import net.flectone.pulse.platform.BukkitSender;
 import net.flectone.pulse.util.*;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableException;
 import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary;
@@ -227,7 +226,7 @@ public class PluginInjector extends AbstractModule {
         bind(WarnlistModule.class).to(BukkitWarnlistModule.class);
 
         bind(PlatformDependency.class).toInstance(instance.getDependencyResolver());
-        bind(PlatformSender.class).to(BukkitServerUtil.IS_PAPER ? PaperSender.class : BukkitSender.class).asEagerSingleton();
+        bind(PlatformSender.class).to(BukkitSender.class).asEagerSingleton();
         bind(Gson.class).toInstance(GsonComponentSerializer.gson().serializer());
 
         bind(FlectonePulse.class).toInstance(instance);
