@@ -1947,7 +1947,7 @@ public final class Localization extends FileSerializable implements IModule {
                         push(new LinkedList<>(){
                             {
                                 push(" ");
-                                push("<fcolor:1>TPS <tps>, Online <online");
+                                push("<fcolor:1>TPS <tps>, Online <online>");
                                 push(" ");
                             }
                         });
