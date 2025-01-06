@@ -1,7 +1,6 @@
 dependencies {
     implementation "com.alessiodp.libby:libby-bukkit:$libby_version"
-    implementation "org.bstats:bstats-bukkit:$bstats_version"
-
+    compileOnly "org.bstats:bstats-bukkit:$bstats_version"
     compileOnly "com.github.Anon8281:UniversalScheduler:$UniversalScheduler_version"
     compileOnly "dev.jorel:commandapi-bukkit-shade:$commandapi_bukkit_version"
     compileOnly "dev.jorel:commandapi-bukkit-shade-mojang-mapped:$commandapi_bukkit_version"
