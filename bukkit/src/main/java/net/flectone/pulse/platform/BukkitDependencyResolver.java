@@ -11,9 +11,9 @@ import net.flectone.pulse.util.BukkitServerUtil;
 import org.bukkit.plugin.Plugin;
 
 @Singleton
-public class BukkitDependency extends PlatformDependency {
+public class BukkitDependencyResolver extends DependencyResolver {
 
-    public BukkitDependency(Plugin plugin, FLogger fLogger) {
+    public BukkitDependencyResolver(Plugin plugin, FLogger fLogger) {
         super(new BukkitLibraryManager(plugin, "libraries", new JDKLogAdapter(fLogger)));
     }
 

@@ -9,14 +9,14 @@ import net.flectone.pulse.BuildConfig;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class PlatformDependency {
+public abstract class DependencyResolver {
 
     protected final List<Library> libraries = new ArrayList<>();
 
     @Getter
     private final LibraryManager libraryManager;
 
-    public PlatformDependency(LibraryManager libraryManager) {
+    public DependencyResolver(LibraryManager libraryManager) {
         this.libraryManager = libraryManager;
     }
 

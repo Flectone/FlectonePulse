@@ -121,8 +121,8 @@ import net.flectone.pulse.module.message.scoreboard.BukkitScoreboardModule;
 import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.sign.BukkitSignModule;
 import net.flectone.pulse.module.message.sign.SignModule;
-import net.flectone.pulse.platform.PlatformDependency;
-import net.flectone.pulse.platform.PlatformSender;
+import net.flectone.pulse.platform.DependencyResolver;
+import net.flectone.pulse.platform.Sender;
 import net.flectone.pulse.platform.BukkitSender;
 import net.flectone.pulse.util.*;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -139,13 +139,13 @@ import java.io.InputStream;
 import java.nio.file.Path;
 
 @Singleton
-public class PluginInjector extends AbstractModule {
+public class BukkitInjector extends AbstractModule {
 
-    private final FlectonePulsePlugin instance;
+    private final BukkitFlectonePulse instance;
     private final Plugin plugin;
     private final FLogger fLogger;
 
-    public PluginInjector(FlectonePulsePlugin instance,
+    public BukkitInjector(BukkitFlectonePulse instance,
                           Plugin plugin,
                           FLogger fLogger) {
         this.instance = instance;
@@ -225,12 +225,12 @@ public class PluginInjector extends AbstractModule {
         bind(WarnModule.class).to(BukkitWarnModule.class);
         bind(WarnlistModule.class).to(BukkitWarnlistModule.class);
 
-        bind(PlatformDependency.class).toInstance(instance.getDependencyResolver());
-        bind(PlatformSender.class).to(BukkitSender.class).asEagerSingleton();
+        bind(DependencyResolver.class).toInstance(instance.getDependencyResolver());
+        bind(Sender.class).to(BukkitSender.class).asEagerSingleton();
         bind(Gson.class).toInstance(GsonComponentSerializer.gson().serializer());
 
         bind(FlectonePulse.class).toInstance(instance);
-        bind(FlectonePulsePlugin.class).toInstance(instance);
+        bind(BukkitFlectonePulse.class).toInstance(instance);
         bind(FlectonePulseAPI.class).asEagerSingleton();
         bind(Plugin.class).toInstance(plugin);
         bind(FLogger.class).toInstance(fLogger);
@@ -285,5 +285,18 @@ public class PluginInjector extends AbstractModule {
         }
 
         bind(ModuleManager.class).asEagerSingleton();
+
+//        try {
+//            Package[] packs = Package.getPackages();
+//
+//            Arrays.stream(packs)
+//                    .map(Package::getName)
+//                    .filter(string -> string.contains("net.flectone.pulse.library"))
+//                    .sorted()
+//                    .forEach(fLogger::warning);
+//
+//        } catch (Exception e) {
+//            fLogger.warning(e);
+//        }
     }
 }

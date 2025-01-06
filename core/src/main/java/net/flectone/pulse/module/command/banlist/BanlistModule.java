@@ -9,7 +9,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.platform.PlatformSender;
+import net.flectone.pulse.platform.Sender;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.TimeUtil;
@@ -30,20 +30,20 @@ public abstract class BanlistModule extends AbstractModuleCommand<Localization.C
     private final CommandUtil commandUtil;
     private final ComponentUtil componentUtil;
     private final TimeUtil timeUtil;
-    private final PlatformSender platformSender;
+    private final Sender sender;
 
     public BanlistModule(FileManager fileManager,
                          CommandUtil commandUtil,
                          ComponentUtil componentUtil,
                          TimeUtil timeUtil,
-                         PlatformSender platformSender) {
+                         Sender sender) {
         super(localization -> localization.getCommand().getBanlist(), null);
 
         this.fileManager = fileManager;
         this.commandUtil = commandUtil;
         this.componentUtil = componentUtil;
         this.timeUtil = timeUtil;
-        this.platformSender = platformSender;
+        this.sender = sender;
 
         command = fileManager.getCommand().getBanlist();
         permission = fileManager.getPermission().getCommand().getBanlist();
@@ -149,7 +149,7 @@ public abstract class BanlistModule extends AbstractModuleCommand<Localization.C
 
         component = component.append(componentUtil.builder(fPlayer, footer).build());
 
-        platformSender.sendMessage(fPlayer, component);
+        sender.sendMessage(fPlayer, component);
 
         playSound(fPlayer);
     }

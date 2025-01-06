@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.FlectonePulsePlugin;
+import net.flectone.pulse.BukkitFlectonePulse;
 import net.flectone.pulse.file.Integration;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.logger.FLogger;
@@ -12,7 +12,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.platform.PlatformDependency;
+import net.flectone.pulse.platform.DependencyResolver;
 import net.flectone.pulse.util.MessageTag;
 
 import java.util.function.UnaryOperator;
@@ -23,7 +23,7 @@ public class DiscordModule extends AbstractModule {
     private final Integration.Discord integration;
     private final Permission.Integration.Discord permission;
 
-    private final FlectonePulsePlugin flectonePulsePlugin;
+    private final BukkitFlectonePulse bukkitFlectonePulse;
     private final Injector injector;
     private final FLogger fLogger;
 
@@ -31,10 +31,10 @@ public class DiscordModule extends AbstractModule {
 
     @Inject
     public DiscordModule(FileManager fileManager,
-                         FlectonePulsePlugin flectonePulsePlugin,
+                         BukkitFlectonePulse bukkitFlectonePulse,
                          Injector injector,
                          FLogger fLogger) {
-        this.flectonePulsePlugin = flectonePulsePlugin;
+        this.bukkitFlectonePulse = bukkitFlectonePulse;
         this.injector = injector;
         this.fLogger = fLogger;
 
@@ -69,16 +69,16 @@ public class DiscordModule extends AbstractModule {
 
     public void loadLibraries() {
         if (isLoaded) return;
-        PlatformDependency platformDependency = flectonePulsePlugin.getDependencyResolver();
-        platformDependency.getLibraryManager().loadLibrary(platformDependency.buildLibrary(
+        DependencyResolver dependencyResolver = bukkitFlectonePulse.getDependencyResolver();
+        dependencyResolver.getLibraryManager().loadLibrary(dependencyResolver.buildLibrary(
                 "com.discord4j", "discord4j-core", BuildConfig.DISCORD4J_VERSION, true, null, null)
                 .build()
         );
-        platformDependency.getLibraryManager().loadLibrary(platformDependency.buildLibrary(
+        dependencyResolver.getLibraryManager().loadLibrary(dependencyResolver.buildLibrary(
                 "io.netty", "netty-resolver-dns", "5.0.0.Alpha2", true, null, null)
                 .build()
         );
-        platformDependency.getLibraryManager().loadLibrary(platformDependency.buildLibrary(
+        dependencyResolver.getLibraryManager().loadLibrary(dependencyResolver.buildLibrary(
                 "com.discord4j", "discord4j-common", "3.3.0-RC1", true, null, null)
                 .build()
         );

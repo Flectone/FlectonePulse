@@ -10,7 +10,7 @@ import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.command.FCommand;
-import net.flectone.pulse.platform.PlatformSender;
+import net.flectone.pulse.platform.Sender;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.TimeUtil;
@@ -30,10 +30,10 @@ public class BukkitWarnlistModule extends WarnlistModule {
                                 ComponentUtil componentUtil,
                                 CommandUtil commandUtil,
                                 TimeUtil timeUtil,
-                                PlatformSender platformSender,
+                                Sender sender,
                                 Database database,
                                 FLogger fLogger) {
-        super(fileManager, componentUtil, commandUtil, timeUtil, platformSender);
+        super(fileManager, componentUtil, commandUtil, timeUtil, sender);
 
         this.database = database;
         this.fLogger = fLogger;

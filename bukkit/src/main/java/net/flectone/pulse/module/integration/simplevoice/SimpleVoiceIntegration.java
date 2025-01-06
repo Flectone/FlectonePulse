@@ -15,7 +15,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.platform.PlatformSender;
+import net.flectone.pulse.platform.Sender;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.TimeUtil;
 
@@ -26,7 +26,7 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
 
     private final FileManager fileManager;
     private final FPlayerManager fPlayerManager;
-    private final PlatformSender platformSender;
+    private final Sender sender;
     private final ComponentUtil componentUtil;
     private final TimeUtil timeUtil;
     private final FLogger fLogger;
@@ -34,13 +34,13 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
     @Inject
     public SimpleVoiceIntegration(FileManager fileManager,
                                   FPlayerManager fPlayerManager,
-                                  PlatformSender platformSender,
+                                  Sender sender,
                                   ComponentUtil componentUtil,
                                   TimeUtil timeUtil,
                                   FLogger fLogger) {
         this.fileManager = fileManager;
         this.fPlayerManager = fPlayerManager;
-        this.platformSender = platformSender;
+        this.sender = sender;
         this.componentUtil = componentUtil;
         this.timeUtil = timeUtil;
         this.fLogger = fLogger;
@@ -100,6 +100,6 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
         String formatPlayer = localization.getPlayer()
                 .replace("<message>", localization.getReasons().getConstant(mute.getReason()));
 
-        platformSender.sendActionBar(fPlayer, componentUtil.builder(fPlayer, timeUtil.format(fPlayer, mute.getRemainingTime(), formatPlayer)).build());
+        sender.sendActionBar(fPlayer, componentUtil.builder(fPlayer, timeUtil.format(fPlayer, mute.getRemainingTime(), formatPlayer)).build());
     }
 }

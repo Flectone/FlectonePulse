@@ -1,6 +1,6 @@
 name: FlectonePulse
 version: '${version}'
-main: net.flectone.pulse.FlectonePulsePlugin
+main: net.flectone.pulse.BukkitFlectonePulse
 api-version: '1.16'
 prefix: ${prefix}
 authors: [TheFaser]

@@ -9,7 +9,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
-import net.flectone.pulse.platform.PlatformSender;
+import net.flectone.pulse.platform.Sender;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.TimeUtil;
@@ -25,19 +25,19 @@ public abstract class IgnorelistModule extends AbstractModuleCommand<Localizatio
     @Getter
     private final Permission.Command.Ignorelist permission;
 
-    private final PlatformSender platformSender;
+    private final Sender sender;
     private final ComponentUtil componentUtil;
     private final CommandUtil commandUtil;
     private final TimeUtil timeUtil;
 
     public IgnorelistModule(FileManager fileManager,
-                            PlatformSender platformSender,
+                            Sender sender,
                             ComponentUtil componentUtil,
                             CommandUtil commandUtil,
                             TimeUtil timeUtil) {
         super(localization -> localization.getCommand().getIgnorelist(), null);
 
-        this.platformSender = platformSender;
+        this.sender = sender;
         this.componentUtil = componentUtil;
         this.commandUtil = commandUtil;
         this.timeUtil = timeUtil;
@@ -107,7 +107,7 @@ public abstract class IgnorelistModule extends AbstractModuleCommand<Localizatio
 
         component = component.append(componentUtil.builder(fPlayer, footer).build());
 
-        platformSender.sendMessage(fPlayer, component);
+        sender.sendMessage(fPlayer, component);
 
         playSound(fPlayer);
     }

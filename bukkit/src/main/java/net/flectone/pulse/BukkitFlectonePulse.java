@@ -16,8 +16,8 @@ import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.message.bubble.manager.BubbleManager;
 import net.flectone.pulse.module.message.contact.mark.manager.MarkManager;
-import net.flectone.pulse.platform.PlatformDependency;
-import net.flectone.pulse.platform.BukkitDependency;
+import net.flectone.pulse.platform.DependencyResolver;
+import net.flectone.pulse.platform.BukkitDependencyResolver;
 import net.flectone.pulse.util.MetricsUtil;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
@@ -30,13 +30,13 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Singleton
-public class FlectonePulsePlugin extends JavaPlugin implements FlectonePulse {
+public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
     private FLogger fLogger;
     private Injector injector;
 
     @Getter
-    private PlatformDependency dependencyResolver;
+    private DependencyResolver dependencyResolver;
 
     @Override
     public void onLoad() {
@@ -45,7 +45,7 @@ public class FlectonePulsePlugin extends JavaPlugin implements FlectonePulse {
         fLogger.enableFilter();
         fLogger.logEnabling();
 
-        dependencyResolver = new BukkitDependency(this, fLogger);
+        dependencyResolver = new BukkitDependencyResolver(this, fLogger);
 
         dependencyResolver.loadLibraries();
         dependencyResolver.resolveDependencies();
@@ -65,7 +65,7 @@ public class FlectonePulsePlugin extends JavaPlugin implements FlectonePulse {
     @Override
     public void onEnable() {
         try {
-            injector = Guice.createInjector(new PluginInjector(this, this, fLogger));
+            injector = Guice.createInjector(new BukkitInjector(this, this, fLogger));
         } catch (Exception e) {
             fLogger.warning(e);
             Bukkit.getPluginManager().disablePlugin(this);

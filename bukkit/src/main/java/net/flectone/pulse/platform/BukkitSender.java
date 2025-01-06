@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 @Singleton
-public class BukkitSender extends PlatformSender {
+public class BukkitSender extends Sender {
 
     private final BukkitAudiences audience;
 

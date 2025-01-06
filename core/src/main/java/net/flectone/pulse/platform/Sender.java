@@ -14,7 +14,7 @@ import net.kyori.adventure.title.Title;
 
 import java.util.UUID;
 
-public abstract class PlatformSender {
+public abstract class Sender {
 
     public abstract void sendMessage(FPlayer fPlayer, Component component);
 
