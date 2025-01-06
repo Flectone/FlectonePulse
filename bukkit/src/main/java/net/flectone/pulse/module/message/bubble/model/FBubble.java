@@ -1,5 +1,7 @@
 package net.flectone.pulse.module.message.bubble.model;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
@@ -90,8 +92,15 @@ public class FBubble extends FPacketEntity {
             metadataList.add(new EntityData(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(text)));
             // custom name visible
             metadataList.add(new EntityData(3, EntityDataTypes.BOOLEAN, true));
+
             // radius
-            metadataList.add(new EntityData(8, EntityDataTypes.FLOAT, (float) 0));
+            int radiusIndex = 8;
+
+            if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
+                radiusIndex = 7;
+            }
+
+            metadataList.add(new EntityData(radiusIndex, EntityDataTypes.FLOAT, 0f));
         }
 
         sendPacketToViewers(new WrapperPlayServerEntityMetadata(id, metadataList));
