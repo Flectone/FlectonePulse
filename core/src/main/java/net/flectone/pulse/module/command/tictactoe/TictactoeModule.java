@@ -147,7 +147,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
 
             if (!ticTacToe.move(fPlayer, move)) {
                 builder(fPlayer)
-                        .format(Localization.Command.Tictactoe::getFormatMove)
+                        .format(Localization.Command.Tictactoe::getWrongMove)
                         .sendBuilt();
                 return;
             }
