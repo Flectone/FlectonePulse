@@ -17,9 +17,7 @@ import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.message.bubble.manager.BubbleManager;
 import net.flectone.pulse.module.message.contact.mark.manager.MarkManager;
 import net.flectone.pulse.platform.PlatformDependency;
-import net.flectone.pulse.platform.bukkit.BukkitDependency;
-import net.flectone.pulse.platform.paper.PaperDependency;
-import net.flectone.pulse.util.BukkitServerUtil;
+import net.flectone.pulse.platform.BukkitDependency;
 import net.flectone.pulse.util.MetricsUtil;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
@@ -47,9 +45,7 @@ public class FlectonePulsePlugin extends JavaPlugin implements FlectonePulse {
         fLogger.enableFilter();
         fLogger.logEnabling();
 
-        dependencyResolver = BukkitServerUtil.IS_PAPER
-                ? new PaperDependency(this, fLogger)
-                : new BukkitDependency(this, fLogger);
+        dependencyResolver = new BukkitDependency(this, fLogger);
 
         dependencyResolver.loadLibraries();
         dependencyResolver.resolveDependencies();
@@ -59,6 +55,7 @@ public class FlectonePulsePlugin extends JavaPlugin implements FlectonePulse {
                 .reEncodeByDefault(false)
                 .checkForUpdates(false)
                 .debug(false);
+
         PacketEvents.getAPI().load();
 
         CommandAPI.onLoad(new CommandAPIBukkitConfig(this)

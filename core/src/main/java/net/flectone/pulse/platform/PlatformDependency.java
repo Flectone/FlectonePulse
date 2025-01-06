@@ -34,16 +34,23 @@ public abstract class PlatformDependency {
     }
 
     public void loadLibraries() {
-        addDependency("com.google.inject", "guice", BuildConfig.GUICE_VERSION);
-        addDependency("net.elytrium", "serializer", BuildConfig.ELYTRIUM_SERIALIZER_VERSION);
-    }
 
-    public void addDependency(String groupId, String artifactId, String version) {
-        addDependency(groupId, artifactId, version, true, null, null);
-    }
+        addDependency(Library.builder()
+                .groupId("com{}google{}inject")
+                .artifactId("guice")
+                .version(BuildConfig.GUICE_VERSION)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
 
-    public void addDependency(String groupId, String artifactId, String version, boolean resolveTransitive, String toRelocate, String relocatedPackage) {
-        addDependency(buildLibrary(groupId, artifactId, version, resolveTransitive, toRelocate, relocatedPackage).build());
+        addDependency(Library.builder()
+                .groupId("net{}elytrium")
+                .artifactId("serializer")
+                .version(BuildConfig.ELYTRIUM_SERIALIZER_VERSION)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
     }
 
     public void addDependency(Library library) {
