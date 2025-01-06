@@ -2,6 +2,7 @@ package net.flectone.pulse.platform;
 
 import com.alessiodp.libby.Library;
 import com.alessiodp.libby.LibraryManager;
+import com.alessiodp.libby.relocation.Relocation;
 import lombok.Getter;
 import net.flectone.pulse.BuildConfig;
 
@@ -40,6 +41,15 @@ public abstract class PlatformDependency {
                 .artifactId("guice")
                 .version(BuildConfig.GUICE_VERSION)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                                .pattern("com{}google{}inject")
+                                .relocatedPattern("net.flectone.pulse.library.guice")
+                                .build()
+                ).relocate(Relocation.builder()
+                                .pattern("com{}google{}common")
+                                .relocatedPattern("net.flectone.pulse.library.guava")
+                                .build()
+                )
                 .build()
         );
 
@@ -48,6 +58,11 @@ public abstract class PlatformDependency {
                 .artifactId("serializer")
                 .version(BuildConfig.ELYTRIUM_SERIALIZER_VERSION)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}elytrium{}serializer")
+                        .relocatedPattern("net.flectone.pulse.library.elytrium")
+                        .build()
+                )
                 .build()
         );
 

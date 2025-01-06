@@ -33,8 +33,13 @@ dependencies {
 }
 
 shadowJar {
-    relocate("com.alessiodp.libby", "net.flectone.pulse.library.libby")
     relocate("org.bstats", "net.flectone.pulse.library.bstats")
+
+    relocate("com.github.Anon8281", "net.flectone.pulse.library.universalscheduler")
+    relocate("com.zaxxer", "net.flectone.pulse.library.database")
+    relocate("dev.jorel", "net.flectone.pulse.library.commandapi")
+
+    relocate("net.megavex.scoreboardlibrary", "net.flectone.pulse.library.scoreboardlibrary")
 }
 
 processResources {

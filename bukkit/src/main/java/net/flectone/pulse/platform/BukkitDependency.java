@@ -3,6 +3,7 @@ package net.flectone.pulse.platform;
 import com.alessiodp.libby.BukkitLibraryManager;
 import com.alessiodp.libby.Library;
 import com.alessiodp.libby.logging.adapters.JDKLogAdapter;
+import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.logger.FLogger;
@@ -21,10 +22,26 @@ public class BukkitDependency extends PlatformDependency {
         super.loadLibraries();
 
         addDependency(Library.builder()
+                .groupId("org{}bstats")
+                .artifactId("bstats-bukkit")
+                .version(BuildConfig.BSTATS_VERSION)
+                .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("org{}bstats")
+                        .relocatedPattern("net.flectone.pulse.library.bstats")
+                        .build())
+                .build()
+        );
+
+        addDependency(Library.builder()
                 .groupId("net{}kyori")
                 .artifactId("adventure-api")
                 .version(BuildConfig.ADVENTURE_API)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
                 .build()
         );
 
@@ -33,6 +50,10 @@ public class BukkitDependency extends PlatformDependency {
                 .artifactId("adventure-text-minimessage")
                 .version(BuildConfig.ADVENTURE_API)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
                 .build()
         );
 
@@ -41,6 +62,10 @@ public class BukkitDependency extends PlatformDependency {
                 .artifactId("adventure-text-serializer-plain")
                 .version(BuildConfig.ADVENTURE_API)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
                 .build()
         );
 
@@ -49,6 +74,10 @@ public class BukkitDependency extends PlatformDependency {
                 .artifactId("adventure-text-serializer-legacy")
                 .version(BuildConfig.ADVENTURE_API)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
                 .build()
         );
 
@@ -57,6 +86,10 @@ public class BukkitDependency extends PlatformDependency {
                 .artifactId("adventure-nbt")
                 .version(BuildConfig.ADVENTURE_API)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
                 .build()
         );
 
@@ -65,6 +98,10 @@ public class BukkitDependency extends PlatformDependency {
                 .artifactId("adventure-platform-bukkit")
                 .version(BuildConfig.ADVENTURE_PLATFORM_BUKKIT_VERSION)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
                 .build()
         );
 
@@ -73,6 +110,18 @@ public class BukkitDependency extends PlatformDependency {
                 .artifactId("packetevents-spigot")
                 .version(BuildConfig.PACKETEVENTS_SPIGOT_VERSION)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("com{}github{}retrooper")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
+                .relocate(Relocation.builder()
+                        .pattern("io{}github{}retrooper{}packetevents")
+                        .relocatedPattern("net.flectone.pulse.library.packetevents.impl")
+                        .build())
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
                 .build()
         );
 
@@ -81,6 +130,22 @@ public class BukkitDependency extends PlatformDependency {
                 .artifactId("scoreboard-library-api")
                 .version(BuildConfig.SCOREBOARD_LIBRARY_API_VERSION)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}megavex")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
+                .relocate(Relocation.builder()
+                        .pattern("com{}github{}retrooper")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
+                .relocate(Relocation.builder()
+                        .pattern("io{}github{}retrooper{}packetevents")
+                        .relocatedPattern("net.flectone.pulse.library.packetevents.impl")
+                        .build())
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
                 .build()
         );
 
@@ -89,6 +154,22 @@ public class BukkitDependency extends PlatformDependency {
                 .artifactId("scoreboard-library-implementation")
                 .version(BuildConfig.SCOREBOARD_LIBRARY_API_VERSION)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}megavex")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
+                .relocate(Relocation.builder()
+                        .pattern("com{}github{}retrooper")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
+                .relocate(Relocation.builder()
+                        .pattern("io{}github{}retrooper{}packetevents")
+                        .relocatedPattern("net.flectone.pulse.library.packetevents.impl")
+                        .build())
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
                 .build()
         );
 
@@ -97,6 +178,22 @@ public class BukkitDependency extends PlatformDependency {
                 .artifactId("scoreboard-library-packetevents")
                 .version(BuildConfig.SCOREBOARD_LIBRARY_API_VERSION)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}megavex")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
+                .relocate(Relocation.builder()
+                        .pattern("com{}github{}retrooper")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
+                .relocate(Relocation.builder()
+                        .pattern("io{}github{}retrooper{}packetevents")
+                        .relocatedPattern("net.flectone.pulse.library.packetevents.impl")
+                        .build())
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
                 .build()
         );
 
@@ -105,6 +202,11 @@ public class BukkitDependency extends PlatformDependency {
                 .artifactId("UniversalScheduler")
                 .version(BuildConfig.UNIVERSALSCHEDULER_VERSION)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("com{}github{}Anon8281")
+                        .relocatedPattern("net.flectone.pulse.library.universalscheduler")
+                        .build()
+                )
                 .build()
         );
 
@@ -113,6 +215,11 @@ public class BukkitDependency extends PlatformDependency {
                 .artifactId("HikariCP")
                 .version(BuildConfig.HIKARICP_VERSION)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("com{}zaxxer")
+                        .relocatedPattern("net.flectone.pulse.library.database")
+                        .build()
+                )
                 .build()
         );
 
@@ -128,6 +235,11 @@ public class BukkitDependency extends PlatformDependency {
                 .artifactId(commandApiArtifact)
                 .version(BuildConfig.COMMANDAPI_BUKKIT_VERSION)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("dev{}jorel")
+                        .relocatedPattern("net.flectone.pulse.library.commandapi")
+                        .build()
+                )
                 .build()
         );
     }
