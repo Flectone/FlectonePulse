@@ -45,7 +45,7 @@ public abstract class PlatformSender {
     private PacketEventsUtil packetEventsUtil;
 
     @Inject
-    private BrandPacketSerializer brandPacketSerializer;
+    private BrandPacketSerializer packetSerializer;
 
     @Inject
     private ThreadManager threadManager;
@@ -71,11 +71,11 @@ public abstract class PlatformSender {
     }
 
     public void sendBrand(FPlayer fPlayer, Component component) {
-        String message = LegacyComponentSerializer.legacySection().serialize(component);
+        String message = LegacyComponentSerializer.legacySection().serialize(component) + "§r";
 
-        byte[] data = brandPacketSerializer.serialize(message + "§r");
-        if (data == null) return;
-
-        packetEventsUtil.sendPacket(fPlayer, new WrapperPlayServerPluginMessage(BrandPacketSerializer.MINECRAFT_BRAND, data));
+        packetEventsUtil.sendPacket(fPlayer,
+                new WrapperPlayServerPluginMessage(BrandPacketSerializer.MINECRAFT_BRAND, packetSerializer.serialize(message))
+        );
     }
+
 }
