@@ -1,8 +1,6 @@
 package net.flectone.pulse.module.message.setblock.listener;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.AbstractPacketListener;
@@ -26,11 +24,9 @@ public class SetblockPacketListener extends AbstractPacketListener {
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.isCancelled()) return;
-        if (event.getPacketType() != PacketType.Play.Server.SYSTEM_CHAT_MESSAGE) return;
 
-        WrapperPlayServerSystemChatMessage wrapper = new WrapperPlayServerSystemChatMessage(event);
-        Component component = wrapper.getMessage();
-        if (!(component instanceof TranslatableComponent translatableComponent)) return;
+        TranslatableComponent translatableComponent = getTranslatableComponent(event);
+        if (translatableComponent == null) return;
 
         String key = translatableComponent.key();
         if (cancelMessageNotDelivered(event, key)) return;

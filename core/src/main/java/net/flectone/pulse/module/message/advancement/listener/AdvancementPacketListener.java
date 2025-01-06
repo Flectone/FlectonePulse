@@ -1,11 +1,10 @@
 package net.flectone.pulse.module.message.advancement.listener;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.AbstractPacketListener;
+import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
 import net.flectone.pulse.module.message.advancement.model.Advancement;
 import net.kyori.adventure.text.Component;
@@ -27,15 +26,15 @@ public class AdvancementPacketListener extends AbstractPacketListener {
         this.advancementModule = advancementModule;
     }
 
+    @Inject
+    private FLogger fLogger;
+
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.isCancelled()) return;
-        if (event.getPacketType() != PacketType.Play.Server.SYSTEM_CHAT_MESSAGE) return;
 
-        WrapperPlayServerSystemChatMessage wrapper = new WrapperPlayServerSystemChatMessage(event);
-        Component component = wrapper.getMessage();
-
-        if (!(component instanceof TranslatableComponent translatableComponent)) return;
+        TranslatableComponent translatableComponent = getTranslatableComponent(event);
+        if (translatableComponent == null) return;
         if (!advancementModule.isEnable()) return;
 
         String key = translatableComponent.key();
