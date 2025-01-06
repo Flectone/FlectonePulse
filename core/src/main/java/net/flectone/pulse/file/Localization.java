@@ -299,8 +299,6 @@ public final class Localization extends FileSerializable implements IModule {
         command.tictactoe.formatWin = "<color:#98FB98><player> выйграл</color:#98FB98>";
         command.tictactoe.formatDraw = "<color:#98FB98>Ничья \uD83D\uDC6C</color:#98FB98>";
         command.tictactoe.symbol.empty = "<hover:show_text:\"<fcolor:1>Ход <move>\"><click:run_command:\"/tictactoe %d <move>\">☐</click></hover>";
-        command.tictactoe.symbol.first = "<fcolor:2>☑</fcolor:2>";
-        command.tictactoe.symbol.second = "<fcolor:2>☒</fcolor:2>";
 
         command.maintenance.already = "<color:#ff7171><b>⁉</b> Технические работы уже идут";
         command.maintenance.not = "<color:#ff7171><b>⁉</b> Технические работы не идут";
