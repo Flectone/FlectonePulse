@@ -130,7 +130,7 @@ public class StatusModule extends AbstractModule {
     private JsonElement getVersionJson(FPlayer fPlayer) {
         String version = versionModule.get(fPlayer);
         if (version == null) {
-            version = String.valueOf(PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion());
+            version = String.valueOf(PacketEvents.getAPI().getServerManager().getVersion().getReleaseName());
         }
 
         JsonObject jsonObject = new JsonObject();
