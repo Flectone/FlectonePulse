@@ -73,14 +73,6 @@ public class TicTacToe {
                         String secondWin,
                         String empty) {
 
-        if (winningTrio != null) {
-            for (int i = 1; i < winningTrio.length; i = i + 2) {
-                int row = winningTrio[i-1];
-                int column = winningTrio[i];
-                field[row][column] = Math.abs(field[row][column]) + WIN_OFFSET;
-            }
-        }
-
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 formatField = formatField.replaceFirst("\\[#]", switch (field[i][j]) {
@@ -106,24 +98,31 @@ public class TicTacToe {
         for (int row = 0; row < 3; row++) {
             if (field[row][0] != 0 && Math.abs(field[row][0]) == Math.abs(field[row][1]) && Math.abs(field[row][1]) == Math.abs(field[row][2])) {
                 winningTrio = new int[]{row, 0, row, 1, row, 2};
-                return;
+                break;
             }
         }
 
         for (int column = 0; column < 3; column++) {
             if (field[0][column] != 0 && Math.abs(field[0][column]) == Math.abs(field[1][column]) && Math.abs(field[1][column]) == Math.abs(field[2][column])) {
                 winningTrio = new int[]{0, column, 1, column, 2, column};
-                return;
+                break;
             }
         }
 
         if (field[0][0] != 0 && Math.abs(field[0][0]) == Math.abs(field[1][1]) && Math.abs(field[1][1]) == Math.abs(field[2][2])) {
             winningTrio =  new int[]{0, 0, 1, 1, 2, 2};
-            return;
         }
 
         if (field[0][2] != 0 && Math.abs(field[0][2]) == Math.abs(field[1][1]) && Math.abs(field[1][1]) == Math.abs(field[2][0])) {
             winningTrio = new int[]{0, 2, 1, 1, 2, 0};
+        }
+
+        if (winningTrio != null) {
+            for (int i = 1; i < winningTrio.length; i = i + 2) {
+                int row = winningTrio[i-1];
+                int column = winningTrio[i];
+                field[row][column] = Math.abs(field[row][column]) + WIN_OFFSET;
+            }
         }
     }
 
@@ -178,12 +177,12 @@ public class TicTacToe {
 
         field[row][column] = currentPlayerValue;
 
-        checkWinningTrio();
-        setNextPlayer();
-
         if (isHard() && moves.size() > 2) {
             removeMove(moves, currentPlayerValue);
         }
+
+        checkWinningTrio();
+        setNextPlayer();
 
         return true;
     }
