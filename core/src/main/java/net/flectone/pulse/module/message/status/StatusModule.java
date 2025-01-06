@@ -123,11 +123,12 @@ public class StatusModule extends AbstractModule {
     }
 
     private JsonElement getVersionJson(FPlayer fPlayer) {
-        JsonObject jsonObject = new JsonObject();
-
         String version = versionModule.get(fPlayer);
-        version = version == null ? bukkitUtil.getVersion() : version;
+        if (version == null) {
+            version = String.valueOf(PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion());
+        }
 
+        JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("name", version);
 
         int protocol = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
@@ -148,8 +149,7 @@ public class StatusModule extends AbstractModule {
 
     private String getFavicon(FPlayer fPlayer) {
         String icon = iconModule.next(fPlayer);
-        icon = icon == null ? bukkitUtil.getIcon() : icon;
-        return "data:image/png;base64," + icon;
+        return icon == null ? null : "data:image/png;base64," + icon;
     }
 
     private JsonElement getPlayersJson(FPlayer fPlayer) {
