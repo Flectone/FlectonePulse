@@ -24,11 +24,3 @@ processResources {
         expand props
     }
 }
-
-task("wrapper") {
-
-}
-
-task("prepareKotlinBuildScriptModel") {
-
-}
