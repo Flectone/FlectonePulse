@@ -10,7 +10,6 @@ import net.flectone.pulse.file.*;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.TagType;
-import net.flectone.pulse.util.VersionUtil;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -27,9 +26,6 @@ public class FileManager {
     private final Map<String, Localization> localizationMap = new HashMap<>();
 
     private final Path pluginPath;
-
-    @Inject
-    private VersionUtil versionUtil;
 
     @Getter
     private final Command command;
@@ -124,7 +120,7 @@ public class FileManager {
     }
 
     public void upgradeIfNewerThanV_0_1_0(String version) {
-        if (versionUtil.isOlderThan("0.1.0", version)) return;
+        if (isOlderThan("0.1.0", version)) return;
 
         Map<TagType, Permission.PermissionEntry> permissionMap = permission.getMessage().getFormat().getTags();
         if (permissionMap.containsKey(TagType.PRIDE)) return;
@@ -137,5 +133,24 @@ public class FileManager {
         messageMap.put(TagType.SHADOW_COLOR, new Message.Format.KyoriTag());
 
         save();
+    }
+
+    public boolean isOlderThan(String first, String second) {
+        String[] subFirst = first.split("\\.");
+        if (subFirst.length != 3) return false;
+
+        String[] subSecond = second.split("\\.");
+        if (subSecond.length != 3) return true;
+
+        for (int i = 0; i < 3; i++) {
+            int intFirst = Integer.parseInt(subFirst[i]);
+            int intSecond = Integer.parseInt(subSecond[i]);
+
+            if (intFirst < intSecond) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
