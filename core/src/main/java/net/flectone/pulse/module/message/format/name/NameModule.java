@@ -99,7 +99,10 @@ public abstract class NameModule extends AbstractModuleMessage<Localization.Mess
                 }
 
                 String displayName = resolveLocalization(fReceiver).getDisplay();
-                return Tag.preProcessParsed(integrationModule.setPlaceholders(sender, fReceiver, displayName, false));
+                Component name = componentUtil.builder(sender, fReceiver, displayName)
+                        .build();
+
+                return Tag.inserting(name);
             }
 
             return Tag.preProcessParsed(resolveLocalization(fReceiver).getEntity()
