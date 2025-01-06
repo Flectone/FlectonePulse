@@ -15,8 +15,6 @@ import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.util.CachedServerIcon;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.regex.Matcher;
@@ -97,20 +95,6 @@ public class BukkitServerUtil implements ServerUtil {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("text", Bukkit.getServer().getMotd());
         return jsonObject;
-    }
-
-    @Override
-    public String getVersion() {
-        return Bukkit.getMinecraftVersion();
-    }
-
-    @NotNull
-    @Override
-    public String getIcon() {
-        CachedServerIcon serverIcon = Bukkit.getServerIcon();
-        return serverIcon == null
-                ? ""
-                : serverIcon.getData() == null ? "" : serverIcon.getData();
     }
 
     @Override

@@ -116,7 +116,12 @@ public class StatusModule extends AbstractModule {
         responseJson.add("version", getVersionJson(fPlayer));
         responseJson.add("players", getPlayersJson(fPlayer));
         responseJson.add("description", getDescriptionJson(fPlayer));
-        responseJson.addProperty("favicon", getFavicon(fPlayer));
+
+        String favicon = getFavicon(fPlayer);
+        if (favicon != null) {
+            responseJson.addProperty("favicon", favicon);
+        }
+
         responseJson.addProperty("enforcesSecureChat", false);
 
         user.sendPacket(new WrapperStatusServerResponse(responseJson));
