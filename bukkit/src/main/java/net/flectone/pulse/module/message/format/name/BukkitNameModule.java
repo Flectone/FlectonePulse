@@ -48,6 +48,7 @@ public class BukkitNameModule extends NameModule {
     @Override
     public void add(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
+        if (!message.isTeam()) return;
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;
@@ -81,6 +82,7 @@ public class BukkitNameModule extends NameModule {
     @Override
     public void remove(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
+        if (!message.isTeam()) return;
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;

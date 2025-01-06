@@ -465,6 +465,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         @Getter
         public static final class Name implements ISubFormatMessage, Config.IEnable {
             private boolean enable = true;
+            private boolean team = false;
             private boolean visible = false;
             private String color = "<white>";
         }
