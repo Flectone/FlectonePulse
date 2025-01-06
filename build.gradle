@@ -19,7 +19,6 @@ subprojects {
         }
 
         shadowJar {
-            minimize()
             archiveFileName = "FlectonePulse-" + project.name + "-" + project_version + ".jar"
         }
     }
