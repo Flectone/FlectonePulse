@@ -13,15 +13,9 @@ dependencies {
     implementation(project(":core"))
 }
 
-task("generateTemplates") {
-
-}
+tasks.register('generateTemplates') {}
 
 java {
-    sourceCompatibility = "${java_version}"
-    targetCompatibility = "${java_version}"
-}
-
-shadowJar {
-
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
 }
