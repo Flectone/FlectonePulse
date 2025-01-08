@@ -102,7 +102,7 @@ public abstract class NameModule extends AbstractModuleMessage<Localization.Mess
                 Component name = componentUtil.builder(sender, fReceiver, displayName)
                         .build();
 
-                return Tag.inserting(name);
+                return Tag.selfClosingInserting(name);
             }
 
             return Tag.preProcessParsed(resolveLocalization(fReceiver).getEntity()
