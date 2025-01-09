@@ -32,20 +32,16 @@ public class LuckPermsIntegration implements FIntegration {
     }
 
     public boolean hasPermission(FPlayer fPlayer, String permission) {
-        if (luckPerms == null) return false;
+        User user = loadUser(fPlayer);
+        if (user == null) return false;
 
-        UserManager userManager = luckPerms.getUserManager();
-        CompletableFuture<User> userFuture = userManager.loadUser(fPlayer.getUuid());
-
-        return userFuture.join().getCachedData().getPermissionData().checkPermission(permission).asBoolean();
+        return user.getCachedData().getPermissionData().checkPermission(permission).asBoolean();
     }
 
     public int getGroupWeight(FPlayer fPlayer) {
-        if (luckPerms == null) return 0;
-
-        UserManager userManager = luckPerms.getUserManager();
-        User user = userManager.getUser(fPlayer.getUuid());
+        User user = loadUser(fPlayer);
         if (user == null) return 0;
+
         String groupName = user.getPrimaryGroup();
 
         Group group = luckPerms.getGroupManager().getGroup(groupName);
@@ -55,15 +51,26 @@ public class LuckPermsIntegration implements FIntegration {
     }
 
     public String getPrefix(FPlayer fPlayer) {
-        User user = luckPerms.getUserManager().getUser(fPlayer.getUuid());
+        User user = loadUser(fPlayer);
         if (user == null) return null;
+
         return user.getCachedData().getMetaData().getPrefix();
     }
 
     public String getSuffix(FPlayer fPlayer) {
-        User user = luckPerms.getUserManager().getUser(fPlayer.getUuid());
+        User user = loadUser(fPlayer);
         if (user == null) return null;
+
         return user.getCachedData().getMetaData().getSuffix();
+    }
+
+    private User loadUser(FPlayer fPlayer) {
+        if (luckPerms == null) return null;
+
+        UserManager userManager = luckPerms.getUserManager();
+        CompletableFuture<User> userFuture = userManager.loadUser(fPlayer.getUuid());
+
+        return userFuture.join();
     }
 
 }
