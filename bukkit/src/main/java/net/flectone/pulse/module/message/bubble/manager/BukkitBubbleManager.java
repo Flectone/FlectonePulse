@@ -111,38 +111,42 @@ public class BukkitBubbleManager implements BubbleManager {
 
         long duration = calculateDuration(message, messageBubble);
 
-        player.getWorld().getPlayers().forEach(receiver -> {
-            FPlayer fReceiver = fPlayerManager.get(receiver);
-            if (fReceiver.isIgnored(fPlayer)) return;
+        player.getWorld().getPlayers()
+                .stream()
+                .filter(receiver -> receiver.canSee(player))
+                .filter(receiver -> receiver.getLocation().distance(player.getLocation()) <= 100.0)
+                .forEach(receiver -> {
+                    FPlayer fReceiver = fPlayerManager.get(receiver);
+                    if (fReceiver.isIgnored(fPlayer)) return;
 
-            Component component = componentUtil.builder(fPlayer, fReceiver, localizationBubble.getFormat())
-                    .build()
-                    .replaceText(TextReplacementConfig.builder().match("<message>").replacement(
-                            componentUtil.builder(fPlayer, fReceiver, message)
-                                    .userMessage(true)
-                                    .build()
-                            )
+                    Component component = componentUtil.builder(fPlayer, fReceiver, localizationBubble.getFormat())
                             .build()
+                            .replaceText(TextReplacementConfig.builder().match("<message>").replacement(
+                                                    componentUtil.builder(fPlayer, fReceiver, message)
+                                                            .userMessage(true)
+                                                            .build()
+                                            )
+                                            .build()
+                            );
+
+                    if (isTextDisplay) {
+                        teleport(new ArrayDeque<>(List.of(
+                                new FBubble(duration, height, fPlayer, fReceiver),
+                                new FBubble(duration, lineWidth, fPlayer, fReceiver, component)
+                        )));
+                        return;
+                    }
+
+                    teleport(
+                            divideText(component, lineWidth / 4)
+                                    .stream()
+                                    .map(string -> {
+                                        Component componentString = LegacyComponentSerializer.legacySection().deserialize(string).style(component.style());
+                                        return new FBubble(duration, fPlayer, fReceiver, componentString);
+                                    })
+                                    .collect(Collectors.toCollection(ArrayDeque::new))
                     );
-
-            if (isTextDisplay) {
-                teleport(new ArrayDeque<>(List.of(
-                        new FBubble(duration, height, fPlayer, fReceiver),
-                        new FBubble(duration, lineWidth, fPlayer, fReceiver, component)
-                )));
-                return;
-            }
-
-            teleport(
-                    divideText(component, lineWidth / 4)
-                    .stream()
-                    .map(string -> {
-                        Component componentString = LegacyComponentSerializer.legacySection().deserialize(string).style(component.style());
-                        return new FBubble(duration, fPlayer, fReceiver, componentString);
-                    })
-                    .collect(Collectors.toCollection(ArrayDeque::new))
-            );
-        });
+                });
 
         return duration;
     }
