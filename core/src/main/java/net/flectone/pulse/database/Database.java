@@ -33,11 +33,9 @@ public abstract class Database {
     protected String SQL_GET_VALID_MODERATIONS_WITH_PLAYER_AND_TYPE = "SELECT * FROM `moderation` WHERE `player` = ? AND `type` = ? AND `valid` = '1' AND (`time` = '-1' OR `time` > ?)";
     protected String SQL_GET_PLAYER_WITH_NAME = "SELECT DISTINCT * FROM `player` WHERE UPPER(`name`) LIKE UPPER(?)";
     protected String SQL_GET_MAILS_WITH_RECEIVER = "SELECT * FROM `mail` WHERE `receiver` = ?";
-    protected String SQL_GET_MAILS_WITH_SENDER = "SELECT * FROM `mail` WHERE `sender` = ?";
     protected String SQL_GET_MODERATIONS_WITH_PLAYER_AND_TYPE = "SELECT * FROM `moderation` WHERE `player` = ? AND `type` = ?";
     protected String SQL_GET_PLAYER_WITH_UUID = "SELECT DISTINCT * FROM `player` WHERE `uuid` = ?";
     protected String SQL_GET_PLAYER_WITH_ID = "SELECT DISTINCT * FROM `player` WHERE `id` = ?";
-    protected String SQL_GET_VALID_MODERATIONS_WITH_ID_AND_TYPE_AND_TIME =  "SELECT * FROM `moderation` WHERE `player` = ? AND `type` = ? AND `valid` = '1' AND (`time` = '-1' OR `time` > ?)";
     protected String SQL_GET_PLAYER_COLORS = "SELECT * FROM `player_color` LEFT JOIN `color` ON `player_color`.`color` = `color`.`id` WHERE `player_color`.`player` = ?";
     protected String SQL_GET_IGNORES_WITH_INITIATOR = "SELECT * FROM `ignore` WHERE `initiator` = ?";
     protected String SQL_GET_IGNORE_WITH_INITIATOR_AND_TARGET = "SELECT * FROM `ignore` WHERE `initiator` = ? AND `target` = ?";
@@ -46,7 +44,6 @@ public abstract class Database {
             "`online` = ?, `uuid` = ?, `name` = ?, `ip` = ?, `chat` = ?, " +
             "`locale` = ?, `world_prefix` = ?, `stream_prefix` = ?, " +
             "`afk_suffix` = ?, `setting` = ? WHERE `id` = ?";
-    protected String SQL_UPDATE_PLAYER_ONLINE = "UPDATE player SET online = ?";
 
     protected String SQL_INSERT_OR_IGNORE_FPLAYER = "INSERT IGNORE INTO `player` (`id`, `uuid`, `name`) VALUES (?, ?, ?)";
 
