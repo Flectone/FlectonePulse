@@ -8,7 +8,6 @@ import net.flectone.pulse.database.Database;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.command.stream.StreamModule;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.brand.BrandModule;
 import net.flectone.pulse.module.message.contact.afk.BukkitAfkModule;
 import net.flectone.pulse.module.message.format.name.BukkitNameModule;
@@ -20,6 +19,7 @@ import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
+import net.flectone.pulse.util.ComponentUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
@@ -40,41 +40,18 @@ public class BukkitFPlayerManager extends FPlayerManager {
 
     private final ThreadManager threadManager;
 
-    @Inject
-    private WorldModule worldModule;
-
-    @Inject
-    private BukkitAfkModule afkModule;
-
-    @Inject
-    private StreamModule streamModule;
-
-    @Inject
-    private BukkitNameModule nameModule;
-
-    @Inject
-    private BelownameModule belowNameModule;
-
-    @Inject
-    private TabnameModule tabnameModule;
-
-    @Inject
-    private ScoreboardModule scoreboardModule;
-
-    @Inject
-    private PlayerlistnameModule playerListNameModule;
-
-    @Inject
-    private FooterModule footerModule;
-
-    @Inject
-    private HeaderModule headerModule;
-
-    @Inject
-    private BrandModule brandModule;
-
-    @Inject
-    private IntegrationModule integrationModule;
+    @Inject private WorldModule worldModule;
+    @Inject private BukkitAfkModule afkModule;
+    @Inject private StreamModule streamModule;
+    @Inject private BukkitNameModule nameModule;
+    @Inject private BelownameModule belowNameModule;
+    @Inject private TabnameModule tabnameModule;
+    @Inject private ScoreboardModule scoreboardModule;
+    @Inject private PlayerlistnameModule playerListNameModule;
+    @Inject private FooterModule footerModule;
+    @Inject private HeaderModule headerModule;
+    @Inject private BrandModule brandModule;
+    @Inject private ComponentUtil componentUtil;
 
     @Inject
     public BukkitFPlayerManager(FileManager fileManager,
@@ -263,10 +240,15 @@ public class BukkitFPlayerManager extends FPlayerManager {
 
     @Override
     public Component getPlayerListHeader(FPlayer fPlayer) {
+        String header = headerModule.getCurrentMessage(fPlayer);
+        if (header != null) {
+            return componentUtil.builder(fPlayer, header).build();
+        }
+
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return Component.empty();
 
-        String header = player.getPlayerListHeader();
+        header = player.getPlayerListHeader();
         if (header == null) return Component.empty();
 
         return LegacyComponentSerializer.legacySection().deserialize(header);
@@ -274,10 +256,15 @@ public class BukkitFPlayerManager extends FPlayerManager {
 
     @Override
     public Component getPlayerListFooter(FPlayer fPlayer) {
+        String footer = footerModule.getCurrentMessage(fPlayer);
+        if (footer != null) {
+            return componentUtil.builder(fPlayer, footer).build();
+        }
+
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return Component.empty();
 
-        String footer = player.getPlayerListFooter();
+        footer = player.getPlayerListFooter();
         if (footer == null) return Component.empty();
 
         return LegacyComponentSerializer.legacySection().deserialize(footer);
