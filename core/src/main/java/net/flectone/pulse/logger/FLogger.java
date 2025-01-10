@@ -78,23 +78,9 @@ public class FLogger extends Logger {
         logConsumer.accept(logRecord);
     }
 
-    public void logPluginInfo() {
-        PLUGIN_INFO.forEach(string -> {
-            string = string.replace("<version>", BuildConfig.PROJECT_VERSION);
-            info(string);
-        });
-    }
-
     @Override
     public void info(String msg) {
-        LogRecord logRecord = new LogRecord(Level.INFO, msg);
-        logRecord.setLoggerName("");
-        log(logRecord);
-    }
-
-    public void info(Component component) {
-        String message = PlainTextComponentSerializer.plainText().serialize(component);
-        info(message);
+        log(buildLogRecord(Level.INFO, msg));
     }
 
     public void logEnabling() {
@@ -119,6 +105,17 @@ public class FLogger extends Logger {
 
     public void logReloaded() {
         info("FlectonePulse v" + BuildConfig.PROJECT_VERSION + " reloaded");
+    }
+
+    public void logPluginInfo() {
+        PLUGIN_INFO.forEach(string -> {
+            string = string.replace("<version>", BuildConfig.PROJECT_VERSION);
+            info(string);
+        });
+    }
+
+    public void info(Component component) {
+        info(PlainTextComponentSerializer.plainText().serialize(component));
     }
 
     public void warning(Exception e) {
@@ -185,5 +182,11 @@ public class FLogger extends Logger {
                 warningTree(child, indentLevel + 1);
             }
         }
+    }
+
+    private LogRecord buildLogRecord(Level level, String message) {
+        LogRecord logRecord = new LogRecord(level, message);
+        logRecord.setLoggerName("");
+        return logRecord;
     }
 }
