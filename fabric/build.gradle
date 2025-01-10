@@ -6,58 +6,54 @@ base {
 	archivesName = "FlectonePulse-" + project.name + "-" + project_version
 }
 
-repositories {
-	maven { url = uri("https://repo.codemc.io/repository/maven-releases/") }
-
-	maven { url = uri("https://repo.codemc.io/repository/maven-snapshots/") }
-}
-
 configurations {
 	includedJars
 }
 
+
+repositories {
+	// Add repositories to retrieve artifacts from in here.
+	// You should only use this when depending on other mods because
+	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
+	// for more information about repositories.
+}
+
 dependencies {
 	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-
-	modCompileOnly "net.fabricmc:fabric-loader:${project.loader_version}"
+	minecraft "com.mojang:minecraft:${minecraft_version}"
+	mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modCompileOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 
-	modCompileOnly("com.github.retrooper:packetevents-fabric:$packetevents_spigot_version")
-	modImplementation include("net.kyori:adventure-api:4.17.0")
+	modImplementation include("net.kyori:adventure-api:$adventure_api")
 	modImplementation include("net.kyori:adventure-text-minimessage:$adventure_api")
+	modImplementation include("com.github.retrooper:packetevents-fabric:$packetevents_spigot_version")
 
-	compileOnly "net.elytrium:serializer:$elytrium_serializer_version"
-	compileOnly('org.slf4j:slf4j-api:2.1.0-alpha1')
-	compileOnly("com.alessiodp.libby:libby-fabric:$libby_version")
+	modImplementation includedJars("net.elytrium:serializer:$elytrium_serializer_version")
+	modImplementation includedJars("com.alessiodp.libby:libby-fabric:$libby_version")
+	modImplementation includedJars("org.slf4j:slf4j-api:2.1.0-alpha1")
 	compileOnly(project(":core"))
 
-	includedJars 'org.slf4j:slf4j-api:2.1.0-alpha1'
-	includedJars "com.alessiodp.libby:libby-fabric:$libby_version"
 	includedJars(project(":core"))
 }
 
 processResources {
 	inputs.property "version", "$project_version"
 	inputs.property "description", "$project_description"
-	inputs.property "minecraft_version", project.minecraft_version
-	inputs.property "loader_version", project.loader_version
-	filteringCharset "UTF-8"
 
 	filesMatching("fabric.mod.json") {
 		expand "version": "$project_version",
-				"description": "$project_description",
-				"minecraft_version": project.minecraft_version,
-				"loader_version": project.loader_version
+				"description": "$project_description"
 	}
 }
 
 jar {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
 	from configurations.includedJars.collect {
 		it.isDirectory() ? it : zipTree(it)
 	}
 }
-

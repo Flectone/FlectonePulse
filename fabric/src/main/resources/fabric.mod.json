@@ -16,16 +16,14 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"net.flectone.pulse.FlectonePulseFabric"
+			"net.flectone.pulse.FabricFlectonePulse"
 		]
 	},
-	"mixins": [
-		"flectonepulse.mixins.json"
-	],
+	"mixins": [],
 	"depends": {
-		"fabricloader": ">=0.16.9",
-		"minecraft": ">=1.21.4",
-		"java": ">=21",
+		"fabricloader": ">=0.16.10",
+		"minecraft": ">=1.16.5",
+		"java": ">=16",
 		"fabric": "*"
 	},
 	"suggests": {
