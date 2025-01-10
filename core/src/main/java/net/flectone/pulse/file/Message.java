@@ -1,5 +1,7 @@
 package net.flectone.pulse.file;
 
+import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
+import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.elytrium.serializer.annotations.Comment;
@@ -224,8 +226,8 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private Cooldown cooldown = new Cooldown();
             private Map<String, Sound> types = new LinkedHashMap<>(){
                 {
-                    put("GLASS", new Sound(true, 1f, 1f, "BLOCK_GLASS_PLACE"));
-                    put("DOOR", new Sound(true, 1f, 1f, "BLOCK_WOOD_PLACE"));
+                    put("GLASS", new Sound(true, 1f, 1f, SoundCategory.BLOCK.name(), Sounds.BLOCK_GLASS_PLACE.getName().toString()));
+                    put("DOOR", new Sound(true, 1f, 1f, SoundCategory.BLOCK.name(), Sounds.BLOCK_WOOD_PLACE.getName().toString()));
                 }
             };
         }
@@ -267,7 +269,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private String item = "WHITE_DYE";
             private Destination destination = new Destination(Destination.Type.ACTION_BAR);
             private Cooldown cooldown = new Cooldown(true, 60);
-            private Sound sound = new Sound(true, 0.3f, 1f, "ENTITY_LLAMA_SPIT");
+            private Sound sound = new Sound(true, 0.3f, 1f, SoundCategory.HOSTILE.name(), Sounds.ENTITY_LLAMA_SPIT.getName().toString());
         }
 
         @Getter
@@ -430,7 +432,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         public static final class Mention implements ISubFormatMessage, Config.IEnable {
             private boolean enable = true;
             private String trigger = "@";
-            private Sound sound = new Sound(true, 0.1f, 0.1f, "ENTITY_EXPERIENCE_ORB_PICKUP");
+            private Sound sound = new Sound(true, 0.1f, 0.1f, SoundCategory.NEUTRAL.name(), Sounds.ENTITY_EXPERIENCE_ORB_PICKUP.getName().toString());
         }
 
         @Getter

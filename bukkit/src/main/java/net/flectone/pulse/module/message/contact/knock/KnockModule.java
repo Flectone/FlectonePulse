@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.message.contact.knock;
 
+import com.github.retrooper.packetevents.util.Vector3i;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
@@ -7,12 +8,12 @@ import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.BukkitListenerManager;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.contact.knock.listener.KnockListener;
+import net.flectone.pulse.platform.SoundPlayer;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventPriority;
@@ -31,15 +32,15 @@ public class KnockModule extends AbstractModuleMessage<Localization.Message.Cont
     private final Map<String, Sound> BLOCK_SOUND = new HashMap<>();
 
     private final BukkitListenerManager bukkitListenerManager;
-    private final FPlayerManager fPlayerManager;
+    private final SoundPlayer soundPlayer;
 
     @Inject
     public KnockModule(FileManager fileManager,
                        BukkitListenerManager bukkitListenerManager,
-                       FPlayerManager fPlayerManager) {
+                       SoundPlayer soundPlayer) {
         super(localization -> localization.getMessage().getContact());
         this.bukkitListenerManager = bukkitListenerManager;
-        this.fPlayerManager = fPlayerManager;
+        this.soundPlayer = soundPlayer;
 
         message = fileManager.getMessage().getContact().getKnock();
         permission = fileManager.getPermission().getMessage().getContact().getKnock();
@@ -77,6 +78,6 @@ public class KnockModule extends AbstractModuleMessage<Localization.Message.Cont
 
         if (blockKey.isEmpty()) return;
 
-        fPlayerManager.playSound(BLOCK_SOUND.get(blockKey.get()), fPlayer, location);
+        soundPlayer.play(BLOCK_SOUND.get(blockKey.get()), fPlayer, new Vector3i(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
     }
 }

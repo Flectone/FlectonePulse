@@ -1,5 +1,7 @@
 package net.flectone.pulse.file;
 
+import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
+import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -501,7 +503,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private List<String> aliases = new ArrayList<>(List.of("stream"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
-        private Sound sound = new Sound(true, 1f, 1f, "BLOCK_NOTE_BLOCK_BELL");
+        private Sound sound = new Sound(true, 1f, 1f, SoundCategory.BLOCK.name(), Sounds.BLOCK_NOTE_BLOCK_BELL.getName().toString());
     }
 
     @Getter

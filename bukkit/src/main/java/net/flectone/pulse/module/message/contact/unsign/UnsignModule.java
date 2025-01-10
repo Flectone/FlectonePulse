@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.message.contact.unsign;
 
+import com.github.retrooper.packetevents.util.Vector3i;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
@@ -7,11 +8,11 @@ import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.BukkitListenerManager;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.contact.unsign.listener.UnsignListener;
+import net.flectone.pulse.platform.SoundPlayer;
 import net.flectone.pulse.util.DyeUtil;
 import net.flectone.pulse.util.ItemUtil;
 import net.flectone.pulse.util.Pair;
@@ -39,19 +40,19 @@ public class UnsignModule extends AbstractModuleMessage<Localization.Message.Con
     private final BukkitListenerManager bukkitListenerManager;
     private final ItemUtil itemUtil;
     private final DyeUtil dyeUtil;
-    private final FPlayerManager fPlayerManager;
+    private final SoundPlayer soundPlayer;
 
     @Inject
     public UnsignModule(FileManager fileManager,
                         BukkitListenerManager bukkitListenerManager,
                         ItemUtil itemUtil,
                         DyeUtil dyeUtil,
-                        FPlayerManager fPlayerManager) {
+                        SoundPlayer soundPlayer) {
         super(localization -> localization.getMessage().getContact());
         this.bukkitListenerManager = bukkitListenerManager;
         this.itemUtil = itemUtil;
         this.dyeUtil = dyeUtil;
-        this.fPlayerManager = fPlayerManager;
+        this.soundPlayer = soundPlayer;
 
         message = fileManager.getMessage().getContact().getUnsign();
         permission = fileManager.getPermission().getMessage().getContact().getUnsign();
@@ -137,6 +138,7 @@ public class UnsignModule extends AbstractModuleMessage<Localization.Message.Con
             itemUtil.dropItem(dropLocation, new ItemStack(Material.valueOf(itemDye)));
         }
 
-        fPlayerManager.playSound(getSound(), fPlayer, clickedBlock.getLocation());
+        Location location = clickedBlock.getLocation();
+        soundPlayer.play(getSound(), fPlayer, new Vector3i(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
     }
 }

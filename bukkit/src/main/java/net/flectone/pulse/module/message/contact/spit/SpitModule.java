@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.message.contact.spit;
 
+import com.github.retrooper.packetevents.util.Vector3i;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
@@ -9,11 +10,11 @@ import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.BukkitListenerManager;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.contact.spit.listener.SpitListener;
+import net.flectone.pulse.platform.SoundPlayer;
 import net.flectone.pulse.util.PermissionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -35,19 +36,19 @@ public class SpitModule extends AbstractModuleMessage<Localization.Message.Conta
     private final String SPIT_NAME = "SPIT_NAME";
 
     private final BukkitListenerManager bukkitListenerManager;
-    private final FPlayerManager fPlayerManager;
+    private final SoundPlayer soundPlayer;
     private final PermissionUtil permissionUtil;
 
     @Inject
     public SpitModule(FileManager fileManager,
                       BukkitListenerManager bukkitListenerManager,
                       PermissionUtil permissionUtil,
-                      FPlayerManager fPlayerManager) {
+                      SoundPlayer soundPlayer) {
         super(localization -> localization.getMessage().getContact().getSpit());
 
         this.bukkitListenerManager = bukkitListenerManager;
         this.permissionUtil = permissionUtil;
-        this.fPlayerManager = fPlayerManager;
+        this.soundPlayer = soundPlayer;
 
         message = fileManager.getMessage().getContact().getSpit();
         permission = fileManager.getPermission().getMessage().getContact().getSpit();
@@ -75,7 +76,6 @@ public class SpitModule extends AbstractModuleMessage<Localization.Message.Conta
         if (checkModulePredicates(fPlayer)) return;
 
         spit(fPlayer);
-        fPlayerManager.playSound(getSound(), fPlayer, location);
     }
 
     @Sync
@@ -94,6 +94,8 @@ public class SpitModule extends AbstractModuleMessage<Localization.Message.Conta
         spit.setShooter(player);
         spit.setCustomNameVisible(false);
         spit.setCustomName(SPIT_NAME);
+
+        soundPlayer.play(getSound(), fPlayer, new Vector3i(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
     }
 
     @Async
@@ -107,7 +109,7 @@ public class SpitModule extends AbstractModuleMessage<Localization.Message.Conta
                 .receiver(fReceiver)
                 .destination(message.getDestination())
                 .format(Localization.Message.Contact.Spit::getFormat)
-                .sound(getSound())
+                .sound(null)
                 .sendBuilt();
     }
 }
