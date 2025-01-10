@@ -1,23 +1,16 @@
 package net.flectone.pulse.model;
 
 import lombok.Getter;
-import net.kyori.adventure.bossbar.BossBar;
-import net.kyori.adventure.title.Title;
-
-import java.time.Duration;
-import java.util.EnumSet;
 
 @Getter
 public class Destination {
 
     private final Type type;
 
-    // BOOS_BAR
-    private final EnumSet<BossBar.Flag> flags = EnumSet.noneOf(BossBar.Flag.class);
-    private BossBar.Overlay overlay = BossBar.Overlay.PROGRESS;
-    private BossBar.Color color = BossBar.Color.BLUE;
-    private long duration = 100;
-    private float health = 1f;
+    private BossBar bossBar = new BossBar(100, 1f,
+            net.kyori.adventure.bossbar.BossBar.Overlay.PROGRESS,
+            net.kyori.adventure.bossbar.BossBar.Color.BLUE
+    );
 
     // TITLE, SUBTITLE
     private Title.Times times = Title.Times.times(Duration.ofSeconds(1), Duration.ofSeconds(5), Duration.ofSeconds(1));

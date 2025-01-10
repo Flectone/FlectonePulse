@@ -5,16 +5,10 @@ import net.elytrium.serializer.SerializerConfig;
 import net.elytrium.serializer.annotations.Transient;
 import net.elytrium.serializer.custom.ClassSerializer;
 import net.elytrium.serializer.language.object.YamlSerializable;
-import net.flectone.pulse.model.Cooldown;
-import net.flectone.pulse.model.Destination;
-import net.flectone.pulse.model.Sound;
-import net.flectone.pulse.model.Ticker;
-import net.flectone.pulse.util.TimeUtil;
+import net.flectone.pulse.model.*;
 import net.kyori.adventure.bossbar.BossBar;
-import net.kyori.adventure.title.Title;
 
 import java.nio.file.Path;
-import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -140,13 +134,15 @@ public abstract class FileSerializable extends YamlSerializable {
                             map.put("times",  timesMap);
                         }
                         case BOSS_BAR -> {
-                            map.put("duration", destination.getDuration());
-                            map.put("health", destination.getHealth());
-                            map.put("overlay", destination.getOverlay());
-                            map.put("color", destination.getColor());
-                            map.put("play-boos-music", destination.getFlags().contains(BossBar.Flag.PLAY_BOSS_MUSIC));
-                            map.put("create-world-fog", destination.getFlags().contains(BossBar.Flag.CREATE_WORLD_FOG));
-                            map.put("darken-screen", destination.getFlags().contains(BossBar.Flag.DARKEN_SCREEN));
+                            net.flectone.pulse.model.BossBar bossBar = destination.getBossBar();
+
+                            map.put("duration", bossBar.getDuration());
+                            map.put("health", bossBar.getHealth());
+                            map.put("overlay", bossBar.getOverlay());
+                            map.put("color", bossBar.getColor());
+                            map.put("play-boos-music", bossBar.getFlags().contains(BossBar.Flag.PLAY_BOSS_MUSIC));
+                            map.put("create-world-fog", bossBar.getFlags().contains(BossBar.Flag.CREATE_WORLD_FOG));
+                            map.put("darken-screen", bossBar.getFlags().contains(BossBar.Flag.DARKEN_SCREEN));
                         }
                     }
 
@@ -197,24 +193,29 @@ public abstract class FileSerializable extends YamlSerializable {
                             Object color = map.get("color");
                             BossBar.Color bossBarColor = color == null ? BossBar.Color.BLUE : BossBar.Color.valueOf(String.valueOf(color));
 
+                            net.flectone.pulse.model.BossBar bossBar = new net.flectone.pulse.model.BossBar(longDuration, floatHealth, bossBarOverlay, bossBarColor);
+
                             Object playBossMusic = map.get("play-boss-music");
-                            boolean booleanPlayBossMusic = playBossMusic != null && Boolean.parseBoolean(String.valueOf(playBossMusic));
+                            if (playBossMusic != null && Boolean.parseBoolean(String.valueOf(playBossMusic))) {
+                                bossBar.addFlag(BossBar.Flag.PLAY_BOSS_MUSIC);
+                            }
 
                             Object createWorldFog = map.get("create-world-fog");
-                            boolean booleanCreateWorldFog = createWorldFog != null && Boolean.parseBoolean(String.valueOf(createWorldFog));
+                            if (createWorldFog != null && Boolean.parseBoolean(String.valueOf(createWorldFog))) {
+                                bossBar.addFlag(BossBar.Flag.CREATE_WORLD_FOG);
+                            }
 
                             Object darkenScreen = map.get("darken-screen");
-                            boolean booleanDarkenScreen = darkenScreen != null && Boolean.parseBoolean(String.valueOf(darkenScreen));
+                            if (darkenScreen != null && Boolean.parseBoolean(String.valueOf(darkenScreen))) {
+                                bossBar.addFlag(BossBar.Flag.DARKEN_SCREEN);
+                            }
 
-                            yield new Destination(type,
+                            yield new Destination(type, new net.flectone.pulse.model.BossBar(
                                     longDuration,
                                     floatHealth,
                                     bossBarOverlay,
-                                    bossBarColor,
-                                    booleanPlayBossMusic,
-                                    booleanCreateWorldFog,
-                                    booleanDarkenScreen
-                            );
+                                    bossBarColor
+                            ));
                         }
                         default -> new Destination(type);
                     };
