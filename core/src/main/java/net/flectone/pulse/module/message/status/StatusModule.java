@@ -25,7 +25,6 @@ import net.flectone.pulse.module.message.status.motd.MOTDModule;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
 import net.flectone.pulse.module.message.status.version.VersionModule;
 import net.flectone.pulse.util.ComponentUtil;
-import net.flectone.pulse.util.PermissionUtil;
 import net.flectone.pulse.util.ServerUtil;
 
 import java.sql.SQLException;
@@ -90,9 +89,6 @@ public class StatusModule extends AbstractModule {
 
         listenerManager.register(StatusPacketListener.class);
     }
-
-    @Inject
-    private PermissionUtil permissionUtil;
 
     @Override
     public boolean isConfigEnable() {
