@@ -10,7 +10,7 @@ import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.command.FCommand;
-import net.flectone.pulse.platform.Sender;
+import net.flectone.pulse.platform.MessageSender;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.TimeUtil;
@@ -30,10 +30,10 @@ public class BukkitBanlistModule extends BanlistModule {
                                CommandUtil commandUtil,
                                ComponentUtil componentUtil,
                                TimeUtil timeUtil,
-                               Sender sender,
+                               MessageSender messageSender,
                                Database database,
                                FLogger fLogger) {
-        super(fileManager, commandUtil, componentUtil, timeUtil, sender);
+        super(fileManager, commandUtil, componentUtil, timeUtil, messageSender);
 
         this.database = database;
         this.fLogger = fLogger;

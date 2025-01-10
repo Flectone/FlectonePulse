@@ -122,8 +122,6 @@ import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.sign.BukkitSignModule;
 import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.platform.DependencyResolver;
-import net.flectone.pulse.platform.Sender;
-import net.flectone.pulse.platform.BukkitSender;
 import net.flectone.pulse.util.*;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -226,7 +224,6 @@ public class BukkitInjector extends AbstractModule {
         bind(WarnlistModule.class).to(BukkitWarnlistModule.class);
 
         bind(DependencyResolver.class).toInstance(instance.getDependencyResolver());
-        bind(Sender.class).to(BukkitSender.class).asEagerSingleton();
         bind(Gson.class).toInstance(GsonComponentSerializer.gson().serializer());
 
         bind(FlectonePulse.class).toInstance(instance);

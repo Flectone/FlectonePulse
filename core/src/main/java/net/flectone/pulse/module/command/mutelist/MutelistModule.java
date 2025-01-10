@@ -9,7 +9,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.platform.Sender;
+import net.flectone.pulse.platform.MessageSender;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.TimeUtil;
@@ -30,20 +30,20 @@ public abstract class MutelistModule extends AbstractModuleCommand<Localization.
     private final ComponentUtil componentUtil;
     private final TimeUtil timeUtil;
     private final CommandUtil commandUtil;
-    private final Sender sender;
+    private final MessageSender messageSender;
 
     public MutelistModule(FileManager fileManager,
                           ComponentUtil componentUtil,
                           TimeUtil timeUtil,
                           CommandUtil commandUtil,
-                          Sender sender) {
+                          MessageSender messageSender) {
         super(localization -> localization.getCommand().getMutelist(), null);
 
         this.fileManager = fileManager;
         this.componentUtil = componentUtil;
         this.timeUtil = timeUtil;
         this.commandUtil = commandUtil;
-        this.sender = sender;
+        this.messageSender = messageSender;
 
         command = fileManager.getCommand().getMutelist();
         permission = fileManager.getPermission().getCommand().getMutelist();
@@ -146,7 +146,7 @@ public abstract class MutelistModule extends AbstractModuleCommand<Localization.
 
         component = component.append(componentUtil.builder(fPlayer, footer).build());
 
-        sender.sendMessage(fPlayer, component);
+        messageSender.sendMessage(fPlayer, component);
 
         playSound(fPlayer);
     }

@@ -11,7 +11,7 @@ import net.flectone.pulse.manager.ProxyManager;
 import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.platform.Sender;
+import net.flectone.pulse.platform.MessageSender;
 import net.flectone.pulse.util.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
@@ -49,7 +49,7 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
     private IntegrationModule integrationModule;
 
     @Inject
-    private Sender sender;
+    private MessageSender messageSender;
 
     @Inject
     private ThreadManager threadManager;
@@ -379,7 +379,7 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
                     );
                 }
 
-                sender.send(destination, fReceiver, finalComponent);
+                messageSender.send(destination, fReceiver, finalComponent);
 
                 if (sound != null) {
                     fPlayerManager.playSound(sound, fReceiver);

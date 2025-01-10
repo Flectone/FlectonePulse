@@ -57,6 +57,8 @@ public abstract class FPlayerManager {
     public abstract String getWorldName(FPlayer fPlayer);
     public abstract String getWorldEnvironment(FPlayer fPlayer);
     public abstract Object getItem(@NotNull UUID uuid);
+    public abstract Component getPlayerListHeader(FPlayer fPlayer);
+    public abstract Component getPlayerListFooter(FPlayer fPlayer);
     public abstract int getObjectiveScore(UUID uuid, ObjectiveMode objectiveValueType);
     public abstract int getPing(FPlayer fPlayer);
     public abstract double distance(FPlayer first, FPlayer second);

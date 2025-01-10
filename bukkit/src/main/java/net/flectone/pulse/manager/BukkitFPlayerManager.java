@@ -341,6 +341,28 @@ public class BukkitFPlayerManager extends FPlayerManager {
     }
 
     @Override
+    public Component getPlayerListHeader(FPlayer fPlayer) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        if (player == null) return Component.empty();
+
+        String header = player.getPlayerListHeader();
+        if (header == null) return Component.empty();
+
+        return LegacyComponentSerializer.legacySection().deserialize(header);
+    }
+
+    @Override
+    public Component getPlayerListFooter(FPlayer fPlayer) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        if (player == null) return Component.empty();
+
+        String footer = player.getPlayerListFooter();
+        if (footer == null) return Component.empty();
+
+        return LegacyComponentSerializer.legacySection().deserialize(footer);
+    }
+
+    @Override
     public void loadOnlinePlayers() {
         threadManager.runDatabase(database -> {
             for (Player player : Bukkit.getOnlinePlayers()) {

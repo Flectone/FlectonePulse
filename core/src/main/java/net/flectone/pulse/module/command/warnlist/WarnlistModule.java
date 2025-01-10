@@ -10,7 +10,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.platform.Sender;
+import net.flectone.pulse.platform.MessageSender;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.TimeUtil;
@@ -31,20 +31,20 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
     private final ComponentUtil componentUtil;
     private final CommandUtil commandUtil;
     private final TimeUtil timeUtil;
-    private final Sender sender;
+    private final MessageSender messageSender;
 
     @Inject
     public WarnlistModule(FileManager fileManager,
                           ComponentUtil componentUtil,
                           CommandUtil commandUtil,
                           TimeUtil timeUtil,
-                          Sender sender) {
+                          MessageSender messageSender) {
         super(localization -> localization.getCommand().getWarnlist(), null);
 
         this.fileManager = fileManager;
         this.componentUtil = componentUtil;
         this.timeUtil = timeUtil;
-        this.sender = sender;
+        this.messageSender = messageSender;
         this.commandUtil = commandUtil;
 
         command = fileManager.getCommand().getWarnlist();
@@ -147,7 +147,7 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
 
         component = component.append(componentUtil.builder(fPlayer, footer).build());
 
-        sender.sendMessage(fPlayer, component);
+        messageSender.sendMessage(fPlayer, component);
 
         playSound(fPlayer);
     }
