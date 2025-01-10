@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.message.sign;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
@@ -11,7 +12,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
-public abstract class SignModule extends AbstractModule {
+@Singleton
+public class SignModule extends AbstractModule {
 
     private final Message.Sign message;
     private final Permission.Message.Sign permission;
