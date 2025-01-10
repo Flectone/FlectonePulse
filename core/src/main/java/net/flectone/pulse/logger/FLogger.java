@@ -132,11 +132,11 @@ public class FLogger extends Logger {
         }
     }
 
-    public void warningComponent(Component component) {
-        warningComponent(component, 0);
+    public void warningTree(Component component) {
+        warningTree(component, 0);
     }
 
-    private void warningComponent(Component component, int indentLevel) {
+    private void warningTree(Component component, int indentLevel) {
         String indent = "| ".repeat(indentLevel);
 
         warning(indent + "|- Component: " + component.getClass().getSimpleName());
@@ -146,7 +146,7 @@ public class FLogger extends Logger {
             warning(indent + "|= Arguments:");
             for (TranslationArgument arg : translatable.arguments()) {
                 if (arg.value() instanceof Component argComp) {
-                    warningComponent(argComp, indentLevel + 1);
+                    warningTree(argComp, indentLevel + 1);
                 } else {
                     warning(indent + "| " + arg.value());
                 }
@@ -182,7 +182,7 @@ public class FLogger extends Logger {
         if (!component.children().isEmpty()) {
             warning(indent + "| Children from : " + component);
             for (Component child : component.children()) {
-                warningComponent(child, indentLevel + 1);
+                warningTree(child, indentLevel + 1);
             }
         }
     }
