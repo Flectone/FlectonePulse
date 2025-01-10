@@ -63,6 +63,8 @@ public abstract class Database {
             "ON DUPLICATE KEY UPDATE " +
             "`name` = VALUES(`name`)";
 
+    @Inject private FLogger fLogger;
+    @Inject private DatabaseThread databaseThread;
 
     public abstract void connect() throws SQLException, IOException;
     public abstract void disconnect();
@@ -70,12 +72,6 @@ public abstract class Database {
     public abstract Connection getConnection() throws SQLException;
 
     public abstract void init() throws SQLException;
-
-    @Inject
-    protected FLogger fLogger;
-
-    @Inject
-    private DatabaseThread databaseThread;
 
     public void execute(Runnable runnable) {
         databaseThread.execute(runnable);

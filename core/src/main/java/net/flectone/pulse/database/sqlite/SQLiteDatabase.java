@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.file.Config;
+import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,15 +25,18 @@ public class SQLiteDatabase extends Database {
 
     private final Path pluginPath;
     private final InputStream SQLFile;
+    private final FLogger fLogger;
 
     private String connectionURL;
 
     @Inject
     public SQLiteDatabase(FileManager fileManager,
                           @Named("pluginPath") Path pluginPath,
-                          @Named("SQLFile") InputStream SQLFile) {
+                          @Named("SQLFile") InputStream SQLFile,
+                          FLogger fLogger) {
         this.pluginPath = pluginPath;
         this.SQLFile = SQLFile;
+        this.fLogger = fLogger;
 
         config = fileManager.getConfig().getDatabase();
 

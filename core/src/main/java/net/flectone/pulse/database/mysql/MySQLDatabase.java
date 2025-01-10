@@ -9,6 +9,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.file.Config;
+import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,15 +22,17 @@ import java.sql.SQLException;
 public class MySQLDatabase extends Database {
 
     private final Config.Database config;
-
     private final InputStream SQLFile;
+    private final FLogger fLogger;
 
     private HikariDataSource dataSource;
 
     @Inject
     public MySQLDatabase(FileManager fileManager,
-                         @Named("SQLFile") InputStream SQLFile) {
+                         @Named("SQLFile") InputStream SQLFile,
+                         FLogger fLogger) {
         this.SQLFile = SQLFile;
+        this.fLogger = fLogger;
 
         config = fileManager.getConfig().getDatabase();
     }
