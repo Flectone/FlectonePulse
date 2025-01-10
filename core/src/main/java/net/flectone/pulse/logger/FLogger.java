@@ -122,11 +122,14 @@ public class FLogger extends Logger {
     }
 
     public void warning(Exception e) {
-        e.printStackTrace();
         int lineNumber = e.getStackTrace()[0].getLineNumber();
         String className = e.getStackTrace()[0].getClassName();
 
-        warnConsumer.accept("[" + className + ":" + lineNumber + "] "  + e.getLocalizedMessage());
+        log(buildLogRecord(Level.WARNING, "[" + className + ":" + lineNumber + "] "  + e.getLocalizedMessage()));
+
+        for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+            log(buildLogRecord(Level.WARNING, "\tat " + stackTraceElement));
+        }
     }
 
     public void warningComponent(Component component) {
