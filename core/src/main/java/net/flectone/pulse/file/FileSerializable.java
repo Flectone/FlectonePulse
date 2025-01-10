@@ -1,5 +1,7 @@
 package net.flectone.pulse.file;
 
+import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
+import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import lombok.Getter;
 import net.elytrium.serializer.SerializerConfig;
 import net.elytrium.serializer.annotations.Transient;
@@ -29,7 +31,8 @@ public abstract class FileSerializable extends YamlSerializable {
                     if (sound.isEnable()) {
                         map.put("volume", sound.getVolume());
                         map.put("pitch", sound.getPitch());
-                        map.put("type", sound.getType());
+                        map.put("category", sound.getCategory());
+                        map.put("name", sound.getName());
                     }
 
                     return map;
@@ -46,20 +49,13 @@ public abstract class FileSerializable extends YamlSerializable {
                     Object pitch = map.get("pitch");
                     float floatPitch = pitch == null ? 1f : Float.parseFloat(String.valueOf(pitch));
 
-                    Object type = map.get("type");
-                    String stringType = "BLOCK_NOTE_BLOCK_BELL";
-                    if (type != null) {
-                        stringType = String.valueOf(type);
+                    Object category = map.get("category");
+                    String stringCategory = category == null ? SoundCategory.BLOCK.name() : String.valueOf(category);
 
-                        // older version check (0.1.0 and older)
-                        // type:volume:pitch
-                        String[] legacySound = stringType.split(":");
-                        if (legacySound.length > 1) {
-                            stringType = legacySound[0];
-                        }
-                    }
+                    Object name = map.get("name");
+                    String stringName = name == null ? Sounds.BLOCK_NOTE_BLOCK_BELL.getName().toString(): String.valueOf(name);
 
-                    return new Sound(true, floatVolume, floatPitch, stringType);
+                    return new Sound(true, floatVolume, floatPitch, stringCategory, stringName);
                 }
             })
             .registerSerializer(new ClassSerializer<Cooldown, Map<String, Object>>() {
