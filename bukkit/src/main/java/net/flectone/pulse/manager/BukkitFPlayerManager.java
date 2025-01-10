@@ -1,17 +1,12 @@
 package net.flectone.pulse.manager;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.database.Database;
-import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
-import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.module.command.stream.StreamModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.brand.BrandModule;
@@ -28,9 +23,7 @@ import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.command.CommandSender;
@@ -44,9 +37,6 @@ import java.util.UUID;
 
 @Singleton
 public class BukkitFPlayerManager extends FPlayerManager {
-
-    private final String WEBSITE_AVATAR_URL = "https://mc-heads.net/avatar/<skin>/8.png";
-    private final String WEBSITE_BODY_URL = "https://mc-heads.net/player/<skin>/16";
 
     private final ThreadManager threadManager;
 
@@ -192,75 +182,6 @@ public class BukkitFPlayerManager extends FPlayerManager {
         if (player == null) return false;
 
         return player.hasPlayedBefore();
-    }
-
-    @Sync
-    @Override
-    public void playSound(Sound sound, FPlayer fPlayer) {
-        if (sound == null) return;
-        if (!sound.isEnable()) return;
-
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
-        if (player == null) return;
-        if (!player.hasPermission(sound.getPermission())) return;
-
-        player.playSound(player.getLocation(), org.bukkit.Sound.valueOf(sound.getType()), sound.getVolume(), sound.getPitch());
-    }
-
-    @Sync
-    @Override
-    public void playSound(Sound sound, FPlayer fPlayer, Object location) {
-        if (sound == null) return;
-        if (!sound.isEnable()) return;
-        if (!(location instanceof Location bukkitLocation)) return;
-
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
-        if (player == null) return;
-        if (!player.hasPermission(sound.getPermission())) return;
-
-
-        World world = bukkitLocation.getWorld();
-        if (world == null) return;
-
-        world.playSound(bukkitLocation, org.bukkit.Sound.valueOf(sound.getType()), sound.getVolume(), sound.getPitch());
-    }
-
-    @Sync
-    @Override
-    public void kick(FPlayer fPlayer, Component reason) {
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
-        if (player == null) return;
-
-        player.kickPlayer(LegacyComponentSerializer.legacySection().serialize(reason));
-    }
-
-    @Override
-    public String getSortedName(@NotNull FPlayer fPlayer) {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_17)) {
-            return fPlayer.getName();
-        }
-
-        int weight = integrationModule.getGroupWeight(fPlayer);
-
-        String paddedRank = String.format("%010d", Integer.MAX_VALUE - weight);
-        String paddedName = String.format("%-16s", fPlayer.getName());
-        return paddedRank + paddedName;
-    }
-
-    @Override
-    public String getSkin(FEntity sender) {
-        String replacement = integrationModule.getTextureUrl(sender);
-        return replacement == null ? sender.getUuid().toString() : replacement;
-    }
-
-    @Override
-    public String getAvatarURL(FEntity sender) {
-        return WEBSITE_AVATAR_URL.replace("<skin>", getSkin(sender));
-    }
-
-    @Override
-    public String getBodyURL(FEntity sender) {
-        return WEBSITE_BODY_URL.replace("<skin>", getSkin(sender));
     }
 
     @Override
