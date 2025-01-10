@@ -13,8 +13,7 @@ import org.bukkit.permissions.PermissionDefault;
 @Singleton
 public class BukkitPermissionUtil extends PermissionUtil {
 
-    @Inject
-    private IntegrationModule integrationModule;
+    @Inject private IntegrationModule integrationModule;
 
     @Inject
     public BukkitPermissionUtil() {}

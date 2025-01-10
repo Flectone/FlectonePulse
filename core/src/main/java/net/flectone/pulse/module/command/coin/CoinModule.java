@@ -15,10 +15,8 @@ import java.util.function.Function;
 
 public abstract class CoinModule extends AbstractModuleCommand<Localization.Command.Coin> {
 
-    @Getter
-    private final Command.Coin command;
-    @Getter
-    private final Permission.Command.Coin permission;
+    @Getter private final Command.Coin command;
+    @Getter private final Permission.Command.Coin permission;
 
     private final RandomUtil randomUtil;
 

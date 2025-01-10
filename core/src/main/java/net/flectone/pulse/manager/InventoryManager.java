@@ -21,8 +21,7 @@ public abstract class InventoryManager {
 
     private final Map<UUID, Inventory> inventoryMap = new ConcurrentHashMap<>();
 
-    @Inject
-    private PacketEventsUtil packetEventsUtil;
+    @Inject private PacketEventsUtil packetEventsUtil;
 
     public InventoryManager() {
 

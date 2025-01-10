@@ -23,8 +23,7 @@ public abstract class ChatModule extends AbstractModuleMessage<Localization.Mess
     protected final Message.Chat message;
     protected final Permission.Message.Chat permission;
 
-    @Inject
-    private PermissionUtil permissionUtil;
+    @Inject private PermissionUtil permissionUtil;
 
     @Inject
     public ChatModule(FileManager fileManager) {

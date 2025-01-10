@@ -23,12 +23,10 @@ public class TicTacToe {
     private final int firstPlayer;
     private final int secondPlayer;
 
-    @Setter
-    private int nextPlayer;
+    @Setter private int nextPlayer;
     private int[] winningTrio = null;
 
-    @Setter
-    private boolean ended;
+    @Setter private boolean ended;
     private boolean created;
 
     public TicTacToe(int id, int firstPlayer, int secondPlayer, boolean hard) {

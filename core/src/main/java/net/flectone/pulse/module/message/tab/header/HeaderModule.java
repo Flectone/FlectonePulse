@@ -20,8 +20,7 @@ public class HeaderModule extends AbstractModuleListMessage<Localization.Message
     private final Message.Tab.Header message;
     private final Permission.Message.Tab.Header permission;
 
-    @Inject
-    private HeaderTicker headerTicker;
+    @Inject private HeaderTicker headerTicker;
 
     @Inject
     public HeaderModule(FileManager fileManager) {

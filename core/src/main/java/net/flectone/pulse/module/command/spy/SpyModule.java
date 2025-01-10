@@ -15,10 +15,8 @@ import java.util.function.Function;
 
 public abstract class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
-    @Getter
-    private final Command.Spy command;
-    @Getter
-    private final Permission.Command.Spy permission;
+    @Getter private final Command.Spy command;
+    @Getter private final Permission.Command.Spy permission;
 
     private final ThreadManager threadManager;
     private final PermissionUtil permissionUtil;

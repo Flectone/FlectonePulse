@@ -22,10 +22,8 @@ import java.util.Optional;
 
 public abstract class WarnlistModule extends AbstractModuleCommand<Localization.Command.Warnlist> {
 
-    @Getter
-    private final Command.Warnlist command;
-    @Getter
-    private final Permission.Command.Warnlist permission;
+    @Getter private final Command.Warnlist command;
+    @Getter private final Permission.Command.Warnlist permission;
 
     private final FileManager fileManager;
     private final ComponentUtil componentUtil;

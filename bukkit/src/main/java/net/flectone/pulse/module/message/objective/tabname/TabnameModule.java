@@ -30,8 +30,7 @@ public class TabnameModule extends AbstractModule {
     private ObjectiveMode objectiveValueType;
     private ScoreboardObjective scoreboardObjective;
 
-    @Inject
-    private TabnameTicker tabnameTicker;
+    @Inject private TabnameTicker tabnameTicker;
 
     @Inject
     public TabnameModule(FileManager fileManager,

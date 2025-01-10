@@ -16,10 +16,8 @@ import java.util.function.BiFunction;
 
 public abstract class OnlineModule extends AbstractModuleCommand<Localization.Command.Online> {
 
-    @Getter
-    private final Command.Online command;
-    @Getter
-    private final Permission.Command.Online permission;
+    @Getter private final Command.Online command;
+    @Getter private final Permission.Command.Online permission;
 
     private final CommandUtil commandUtil;
 

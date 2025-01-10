@@ -26,10 +26,8 @@ import java.util.function.BiFunction;
 
 public abstract class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
-    @Getter
-    private final Command.Ban command;
-    @Getter
-    private final Permission.Command.Ban permission;
+    @Getter private final Command.Ban command;
+    @Getter private final Permission.Command.Ban permission;
 
     private final Database database;
     private final ThreadManager threadManager;

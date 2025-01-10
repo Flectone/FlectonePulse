@@ -32,8 +32,7 @@ import java.util.UUID;
 @Singleton
 public class DeathModule extends AbstractModuleMessage<Localization.Message.Death> {
 
-    @Getter
-    private final Message.Death message;
+    @Getter private final Message.Death message;
     private final Permission.Message.Death permission;
 
     private final ComponentUtil componentUtil;

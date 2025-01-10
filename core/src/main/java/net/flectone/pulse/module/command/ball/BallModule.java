@@ -17,10 +17,8 @@ import java.util.function.Function;
 
 public abstract class BallModule extends AbstractModuleCommand<Localization.Command.Ball> {
 
-    @Getter
-    private final Command.Ball command;
-    @Getter
-    private final Permission.Command.Ball permission;
+    @Getter private final Command.Ball command;
+    @Getter private final Permission.Command.Ball permission;
 
     private final RandomUtil randomUtil;
     private final CommandUtil commandUtil;

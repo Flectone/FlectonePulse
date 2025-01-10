@@ -15,8 +15,7 @@ public abstract class ProxyManager {
     private final Config config;
     private final FLogger fLogger;
 
-    @Getter
-    private String channel;
+    @Getter private String channel;
 
     public ProxyManager(FileManager fileManager,
                         FLogger fLogger) {

@@ -30,8 +30,7 @@ import java.util.UUID;
 @Singleton
 public class AdvancementModule extends AbstractModuleMessage<Localization.Message.Advancement> {
 
-    @Getter
-    private final Message.Advancement message;
+    @Getter private final Message.Advancement message;
     private final Permission.Message.Advancement permission;
 
     private final FPlayerManager fPlayerManager;

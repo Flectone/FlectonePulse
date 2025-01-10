@@ -20,10 +20,8 @@ import java.util.function.Function;
 
 public abstract class DiceModule extends AbstractModuleCommand<Localization.Command.Dice> {
 
-    @Getter
-    private final Command.Dice command;
-    @Getter
-    private final Permission.Command.Dice permission;
+    @Getter private final Command.Dice command;
+    @Getter private final Permission.Command.Dice permission;
 
     private final CommandUtil commandUtil;
     private final RandomUtil randomUtil;

@@ -20,8 +20,7 @@ public class FooterModule extends AbstractModuleListMessage<Localization.Message
     private final Message.Tab.Footer message;
     private final Permission.Message.Tab.Footer permission;
 
-    @Inject
-    private FooterTicker footerTicker;
+    @Inject private FooterTicker footerTicker;
 
     @Inject
     public FooterModule(FileManager fileManager) {

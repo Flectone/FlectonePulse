@@ -22,10 +22,8 @@ import java.util.Optional;
 
 public abstract class MailModule extends AbstractModuleCommand<Localization.Command.Mail> {
 
-    @Getter
-    private final Command.Mail command;
-    @Getter
-    private final Permission.Command.Mail permission;
+    @Getter private final Command.Mail command;
+    @Getter private final Permission.Command.Mail permission;
 
     private final TellModule tellModule;
     private final ThreadManager threadManager;

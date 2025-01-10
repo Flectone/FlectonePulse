@@ -21,8 +21,7 @@ import java.util.Map;
 @Singleton
 public class ColorModule extends AbstractModule {
 
-    @Getter
-    private final Message.Format.Color message;
+    @Getter private final Message.Format.Color message;
     private final Permission.Message.Format.Color permission;
 
     @Inject

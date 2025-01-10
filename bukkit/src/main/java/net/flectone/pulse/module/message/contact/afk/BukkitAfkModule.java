@@ -25,10 +25,9 @@ import java.util.UUID;
 @Singleton
 public class BukkitAfkModule extends AfkModule {
 
-    @Getter
-    private final Message.Contact.Afk message;
-
     private final Map<UUID, Pair<Integer, Vector>> PLAYER_BLOCK = new HashMap<>();
+
+    @Getter private final Message.Contact.Afk message;
 
     private final ThreadManager threadManager;
     private final BukkitListenerManager bukkitListenerManager;

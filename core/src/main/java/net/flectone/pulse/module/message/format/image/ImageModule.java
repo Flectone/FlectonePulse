@@ -34,8 +34,7 @@ public class ImageModule extends AbstractModule {
 
     private final ThreadManager threadManager;
 
-    @Inject
-    private ComponentUtil componentUtil;
+    @Inject private ComponentUtil componentUtil;
 
     @Inject
     public ImageModule(FileManager fileManager,

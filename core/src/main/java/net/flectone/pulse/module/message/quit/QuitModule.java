@@ -18,8 +18,7 @@ import net.flectone.pulse.util.MessageTag;
 @Singleton
 public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit> {
 
-    @Getter
-    private final Message.Quit message;
+    @Getter private final Message.Quit message;
     private final Permission.Message.Quit permission;
 
     private final ListenerManager listenerManager;

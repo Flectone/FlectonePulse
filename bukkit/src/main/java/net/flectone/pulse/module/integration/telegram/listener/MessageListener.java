@@ -17,8 +17,7 @@ import java.util.List;
 @Singleton
 public class MessageListener extends EventListener {
 
-    @Getter
-    private final Integration.Telegram integration;
+    @Getter private final Integration.Telegram integration;
 
     private final ThreadManager threadManager;
 

@@ -28,12 +28,10 @@ import org.jetbrains.annotations.NotNull;
 @Singleton
 public class SpitModule extends AbstractModuleMessage<Localization.Message.Contact.Spit> {
 
-    @Getter
-    private final Message.Contact.Spit message;
+    @Getter private final Message.Contact.Spit message;
     private final Permission.Message.Contact.Spit permission;
 
-    @Getter
-    private final String SPIT_NAME = "SPIT_NAME";
+    @Getter private final String SPIT_NAME = "SPIT_NAME";
 
     private final BukkitListenerManager bukkitListenerManager;
     private final SoundPlayer soundPlayer;

@@ -23,8 +23,7 @@ public class BukkitProxyManager extends ProxyManager {
     private final Plugin plugin;
     private final Gson gson;
 
-    @Inject
-    private BukkitProxyListener proxyListener;
+    @Inject private BukkitProxyListener proxyListener;
 
     @Inject
     public BukkitProxyManager(FileManager fileManager,

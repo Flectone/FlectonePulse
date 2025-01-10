@@ -17,10 +17,8 @@ import java.util.Optional;
 
 public abstract class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ignore> {
 
-    @Getter
-    private final Command.Ignore command;
-    @Getter
-    private final Permission.Command.Ignore permission;
+    @Getter private final Command.Ignore command;
+    @Getter private final Permission.Command.Ignore permission;
 
     private final ThreadManager threadManager;
     private final CommandUtil commandUtil;

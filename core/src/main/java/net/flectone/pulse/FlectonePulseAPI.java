@@ -8,8 +8,7 @@ import lombok.Getter;
 @Singleton
 public class FlectonePulseAPI  {
 
-    @Getter
-    private static FlectonePulse instance;
+    @Getter private static FlectonePulse instance;
 
     @Inject
     public FlectonePulseAPI(FlectonePulse instance) {

@@ -27,8 +27,7 @@ import java.util.UUID;
 @Singleton
 public class PlayersModule extends AbstractModuleMessage<Localization.Message.Status.Players> {
 
-    @Getter
-    private final Message.Status.Players message;
+    @Getter private final Message.Status.Players message;
     private final Permission.Message.Status.Players permission;
 
     private final ListenerManager listenerManager;

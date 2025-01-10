@@ -4,7 +4,6 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.AbstractPacketListener;
-import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
 import net.flectone.pulse.module.message.advancement.model.Advancement;
 import net.kyori.adventure.text.Component;
@@ -25,9 +24,6 @@ public class AdvancementPacketListener extends AbstractPacketListener {
     public AdvancementPacketListener(AdvancementModule advancementModule) {
         this.advancementModule = advancementModule;
     }
-
-    @Inject
-    private FLogger fLogger;
 
     @Override
     public void onPacketSend(PacketSendEvent event) {

@@ -20,8 +20,7 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
     private final Message.Auto message;
     private final Permission.Message.Auto permission;
 
-    @Inject
-    private AutoTicker autoTicker;
+    @Inject private AutoTicker autoTicker;
 
     @Inject
     public AutoModule(FileManager fileManager) {

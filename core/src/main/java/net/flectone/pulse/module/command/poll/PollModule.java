@@ -29,10 +29,8 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
 
     private final HashMap<Integer, Poll> pollMap = new HashMap<>();
 
-    @Getter
-    private final Command.Poll command;
-    @Getter
-    private final Permission.Command.Poll permission;
+    @Getter private final Command.Poll command;
+    @Getter private final Permission.Command.Poll permission;
 
     private final FileManager fileManager;
     private final ProxyManager proxyManager;

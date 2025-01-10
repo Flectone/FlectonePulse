@@ -20,10 +20,8 @@ import java.util.List;
 
 public abstract class IgnorelistModule extends AbstractModuleCommand<Localization.Command.Ignorelist> {
 
-    @Getter
-    private final Command.Ignorelist command;
-    @Getter
-    private final Permission.Command.Ignorelist permission;
+    @Getter private final Command.Ignorelist command;
+    @Getter private final Permission.Command.Ignorelist permission;
 
     private final MessageSender messageSender;
     private final ComponentUtil componentUtil;

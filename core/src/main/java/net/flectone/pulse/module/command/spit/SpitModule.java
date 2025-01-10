@@ -12,10 +12,8 @@ import java.util.function.Consumer;
 
 public abstract class SpitModule extends AbstractModuleCommand<Localization.Command> {
 
-    @Getter
-    private final Command.Spit command;
-    @Getter
-    private final Permission.Command.Spit permission;
+    @Getter private final Command.Spit command;
+    @Getter private final Permission.Command.Spit permission;
 
     private final Consumer<FPlayer> spitConsumer;
 

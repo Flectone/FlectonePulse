@@ -24,10 +24,8 @@ import java.util.function.Function;
 
 public abstract class StreamModule extends AbstractModuleCommand<Localization.Command.Stream> {
 
-    @Getter
-    private final Command.Stream command;
-    @Getter
-    private final Permission.Command.Stream permission;
+    @Getter private final Command.Stream command;
+    @Getter private final Permission.Command.Stream permission;
 
     private final ThreadManager threadManager;
     private final CommandUtil commandUtil;

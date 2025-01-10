@@ -14,8 +14,7 @@ public abstract class FPacketEntity {
 
     protected int id;
     protected UUID uuid;
-    @Setter
-    protected boolean alive;
+    @Setter protected boolean alive;
 
     protected List<FPlayer> viewers = new ArrayList<>();
 

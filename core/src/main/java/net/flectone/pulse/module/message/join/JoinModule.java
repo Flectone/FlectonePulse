@@ -19,8 +19,7 @@ import net.flectone.pulse.util.MessageTag;
 @Singleton
 public class JoinModule extends AbstractModuleMessage<Localization.Message.Join> {
 
-    @Getter
-    private final Message.Join message;
+    @Getter private final Message.Join message;
     private final Permission.Message.Join permission;
 
     private final ListenerManager listenerManager;

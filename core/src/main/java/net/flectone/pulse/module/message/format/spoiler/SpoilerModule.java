@@ -21,8 +21,7 @@ public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Fo
     private final Message.Format.Spoiler message;
     private final Permission.Message.Format.Spoiler permission;
 
-    @Inject
-    private ComponentUtil componentUtil;
+    @Inject private ComponentUtil componentUtil;
 
     @Inject
     public SpoilerModule(FileManager fileManager) {

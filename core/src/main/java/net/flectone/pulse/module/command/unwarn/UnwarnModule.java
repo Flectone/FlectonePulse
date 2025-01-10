@@ -16,10 +16,8 @@ import java.util.List;
 
 public abstract class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unwarn> {
 
-    @Getter
-    private final Command.Unwarn command;
-    @Getter
-    private final Permission.Command.Unwarn permission;
+    @Getter private final Command.Unwarn command;
+    @Getter private final Permission.Command.Unwarn permission;
 
     private final ThreadManager threadManager;
     private final CommandUtil commandUtil;

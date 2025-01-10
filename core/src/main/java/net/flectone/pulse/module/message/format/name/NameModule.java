@@ -24,8 +24,7 @@ public abstract class NameModule extends AbstractModuleMessage<Localization.Mess
 
     private final IntegrationModule integrationModule;
 
-    @Inject
-    private ComponentUtil componentUtil;
+    @Inject private ComponentUtil componentUtil;
 
     public NameModule(FileManager fileManager,
                       IntegrationModule integrationModule) {

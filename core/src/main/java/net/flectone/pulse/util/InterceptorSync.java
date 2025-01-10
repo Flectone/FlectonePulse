@@ -15,11 +15,8 @@ import java.util.concurrent.CompletableFuture;
 @Singleton
 public class InterceptorSync implements MethodInterceptor {
 
-    @Inject
-    private ThreadManager threadManager;
-
-    @Inject
-    private FLogger fLogger;
+    @Inject private ThreadManager threadManager;
+    @Inject private FLogger fLogger;
 
     @Override
     public Object invoke(final MethodInvocation invocation) throws Throwable {

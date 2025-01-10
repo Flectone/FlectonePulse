@@ -13,8 +13,7 @@ import net.flectone.pulse.module.AbstractModuleMessage;
 @Singleton
 public class VersionModule extends AbstractModuleMessage<Localization.Message.Status.Version> {
 
-    @Getter
-    private final Message.Status.Version message;
+    @Getter private final Message.Status.Version message;
     private final Permission.Message.Status.Version permission;
 
     @Inject

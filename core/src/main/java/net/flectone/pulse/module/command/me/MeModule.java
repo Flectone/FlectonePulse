@@ -13,10 +13,8 @@ import net.flectone.pulse.util.MessageTag;
 
 public abstract class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
 
-    @Getter
-    private final Command.Me command;
-    @Getter
-    private final Permission.Command.Me permission;
+    @Getter private final Command.Me command;
+    @Getter private final Permission.Command.Me permission;
 
     private final CommandUtil commandUtil;
 

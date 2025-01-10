@@ -22,10 +22,8 @@ import java.util.function.BiFunction;
 
 public abstract class WarnModule extends AbstractModuleCommand<Localization.Command.Warn> {
 
-    @Getter
-    private final Command.Warn command;
-    @Getter
-    private final Permission.Command.Warn permission;
+    @Getter private final Command.Warn command;
+    @Getter private final Permission.Command.Warn permission;
 
     private final ThreadManager threadManager;
     private final TimeUtil timeUtil;

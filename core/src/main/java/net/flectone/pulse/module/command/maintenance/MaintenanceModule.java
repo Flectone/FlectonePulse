@@ -28,10 +28,8 @@ import java.util.UUID;
 
 public abstract class MaintenanceModule extends AbstractModuleCommand<Localization.Command.Maintenance> {
 
-    @Getter
-    private final Command.Maintenance command;
-    @Getter
-    private final Permission.Command.Maintenance permission;
+    @Getter private final Command.Maintenance command;
+    @Getter private final Permission.Command.Maintenance permission;
 
     private final FileManager fileManager;
     private final FPlayerManager fPlayerManager;

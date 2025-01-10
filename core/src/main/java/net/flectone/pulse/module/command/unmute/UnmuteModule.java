@@ -20,11 +20,8 @@ import java.util.List;
 
 public abstract class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unmute> {
 
-    @Getter
-    private final Command.Unmute command;
-
-    @Getter
-    private final Permission.Command.Unmute permission;
+    @Getter private final Command.Unmute command;
+    @Getter private final Permission.Command.Unmute permission;
 
     private final ThreadManager threadManager;
     private final ProxyManager proxyManager;

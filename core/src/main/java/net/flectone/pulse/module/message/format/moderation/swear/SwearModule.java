@@ -23,8 +23,7 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
 
     private final PermissionUtil permissionUtil;
 
-    @Inject
-    private ComponentUtil componentUtil;
+    @Inject private ComponentUtil componentUtil;
 
     @Inject
     public SwearModule(FileManager fileManager,

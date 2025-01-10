@@ -22,10 +22,8 @@ import java.util.function.Function;
 
 public abstract class TranslatetoModule extends AbstractModuleCommand<Localization.Command.Translateto> {
 
-    @Getter
-    private final Command.Translateto command;
-    @Getter
-    private final Permission.Command.Translateto permission;
+    @Getter private final Command.Translateto command;
+    @Getter private final Permission.Command.Translateto permission;
 
     private final CommandUtil commandUtil;
 

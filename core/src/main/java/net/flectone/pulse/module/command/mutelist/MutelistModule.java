@@ -21,10 +21,8 @@ import java.util.Optional;
 
 public abstract class MutelistModule extends AbstractModuleCommand<Localization.Command.Mutelist> {
 
-    @Getter
-    private final Command.Mutelist command;
-    @Getter
-    private final Permission.Command.Mutelist permission;
+    @Getter private final Command.Mutelist command;
+    @Getter private final Permission.Command.Mutelist permission;
 
     private final FileManager fileManager;
     private final ComponentUtil componentUtil;

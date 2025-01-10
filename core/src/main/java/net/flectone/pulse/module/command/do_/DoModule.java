@@ -13,10 +13,8 @@ import net.flectone.pulse.util.MessageTag;
 
 public abstract class DoModule extends AbstractModuleCommand<Localization.Command.Do> {
 
-    @Getter
-    private final Command.Do command;
-    @Getter
-    private final Permission.Command.Do permission;
+    @Getter private final Command.Do command;
+    @Getter private final Permission.Command.Do permission;
 
     private final CommandUtil commandUtil;
 

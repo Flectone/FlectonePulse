@@ -16,8 +16,7 @@ import java.util.List;
 @Singleton
 public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
 
-    @Getter
-    private final Integration.Twitch integration;
+    @Getter private final Integration.Twitch integration;
 
     private final ThreadManager threadManager;
 

@@ -25,10 +25,8 @@ import java.util.function.BiFunction;
 
 public abstract class TictactoeModule extends AbstractModuleCommand<Localization.Command.Tictactoe> {
 
-    @Getter
-    private final Command.Tictactoe command;
-    @Getter
-    private final Permission.Command.Tictactoe permission;
+    @Getter private final Command.Tictactoe command;
+    @Getter private final Permission.Command.Tictactoe permission;
 
     private final TictactoeManager tictactoeManager;
     private final ThreadManager threadManager;

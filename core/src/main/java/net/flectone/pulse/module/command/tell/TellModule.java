@@ -26,10 +26,8 @@ public abstract class TellModule extends AbstractModuleCommand<Localization.Comm
 
     private final HashMap<UUID, String> senderReceiverMap = new HashMap<>();
 
-    @Getter
-    private final Command.Tell command;
-    @Getter
-    private final Permission.Command.Tell permission;
+    @Getter private final Command.Tell command;
+    @Getter private final Permission.Command.Tell permission;
 
     private final ThreadManager threadManager;
     private final FPlayerManager fPlayerManager;

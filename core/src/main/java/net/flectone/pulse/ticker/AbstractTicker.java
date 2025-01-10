@@ -9,13 +9,10 @@ import java.util.function.Consumer;
 
 public abstract class AbstractTicker {
 
-    @Inject
-    private ThreadManager threadManager;
-
-    @Inject
-    private FPlayerManager fPlayerManager;
-
     private final Consumer<FPlayer> consumer;
+
+    @Inject private ThreadManager threadManager;
+    @Inject private FPlayerManager fPlayerManager;
 
     public AbstractTicker(Consumer<FPlayer> consumer) {
         this.consumer = consumer;

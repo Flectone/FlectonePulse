@@ -13,10 +13,8 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 
 public abstract class FlectonepulseModule extends AbstractModuleCommand<Localization.Command.Flectonepulse> {
 
-    @Getter
-    private final Command.Flectonepulse command;
-    @Getter
-    private final Permission.Command.Flectonepulse permission;
+    @Getter private final Command.Flectonepulse command;
+    @Getter private final Permission.Command.Flectonepulse permission;
 
     private final FlectonePulse flectonePulse;
     private final ThreadManager threadManager;

@@ -22,12 +22,9 @@ import java.util.Map;
 
 public abstract class ChatcolorModule extends AbstractModuleCommand<Localization.Command.Chatcolor> {
 
-    @Getter
-    private final Message.Format.Color color;
-    @Getter
-    private final Command.Chatcolor command;
-    @Getter
-    private final Permission.Command.Chatcolor permission;
+    @Getter private final Message.Format.Color color;
+    @Getter private final Command.Chatcolor command;
+    @Getter private final Permission.Command.Chatcolor permission;
 
     private final ThreadManager threadManager;
     private final FPlayerManager fPlayerManager;

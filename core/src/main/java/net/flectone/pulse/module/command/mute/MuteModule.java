@@ -21,10 +21,8 @@ import java.util.function.BiFunction;
 
 public abstract class MuteModule extends AbstractModuleCommand<Localization.Command.Mute> {
 
-    @Getter
-    private final Command.Mute command;
-    @Getter
-    private final Permission.Command.Mute permission;
+    @Getter private final Command.Mute command;
+    @Getter private final Permission.Command.Mute permission;
 
     private final ThreadManager threadManager;
     private final FPlayerManager fPlayerManager;

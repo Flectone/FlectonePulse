@@ -16,10 +16,8 @@ import java.util.Optional;
 
 public abstract class ClearchatModule extends AbstractModuleCommand<Localization.Command.Clearchat> {
 
-    @Getter
-    private final Command.Clearchat command;
-    @Getter
-    private final Permission.Command.Clearchat permission;
+    @Getter private final Command.Clearchat command;
+    @Getter private final Permission.Command.Clearchat permission;
 
     private final FPlayerManager fPlayerManager;
     private final CommandUtil commandUtil;

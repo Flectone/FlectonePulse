@@ -21,10 +21,8 @@ import java.util.Optional;
 
 public abstract class BanlistModule extends AbstractModuleCommand<Localization.Command.Banlist> {
 
-    @Getter
-    private final Command.Banlist command;
-    @Getter
-    private final Permission.Command.Banlist permission;
+    @Getter private final Command.Banlist command;
+    @Getter private final Permission.Command.Banlist permission;
 
     private final FileManager fileManager;
     private final CommandUtil commandUtil;

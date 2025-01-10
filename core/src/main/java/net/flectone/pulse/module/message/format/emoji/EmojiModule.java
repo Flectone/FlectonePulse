@@ -21,8 +21,7 @@ public class EmojiModule extends AbstractModule {
     private final Message.Format.Emoji message;
     private final Permission.Message.Format.Emoji permission;
 
-    @Inject
-    private ComponentUtil componentUtil;
+    @Inject private ComponentUtil componentUtil;
 
     @Inject
     public EmojiModule(FileManager fileManager) {

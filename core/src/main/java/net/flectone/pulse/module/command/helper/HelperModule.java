@@ -21,10 +21,8 @@ import java.util.function.Predicate;
 
 public abstract class HelperModule extends AbstractModuleCommand<Localization.Command.Helper> {
 
-    @Getter
-    private final Command.Helper command;
-    @Getter
-    private final Permission.Command.Helper permission;
+    @Getter private final Command.Helper command;
+    @Getter private final Permission.Command.Helper permission;
 
     private final FPlayerManager fPlayerManager;
     private final ProxyManager proxyManager;

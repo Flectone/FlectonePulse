@@ -23,10 +23,8 @@ import java.util.Set;
 public abstract class ChatsettingModule extends AbstractModuleCommand<Localization.Command.Chatsetting> {
 
     private final Message.Chat chat;
-    @Getter
-    private final Command.Chatsetting command;
-    @Getter
-    private final Permission.Command.Chatsetting permission;
+    @Getter private final Command.Chatsetting command;
+    @Getter private final Permission.Command.Chatsetting permission;
 
     private final ThreadManager threadManager;
     private final ComponentUtil componentUtil;

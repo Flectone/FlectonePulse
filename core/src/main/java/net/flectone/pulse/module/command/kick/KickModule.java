@@ -23,10 +23,8 @@ import java.util.function.Function;
 
 public abstract class KickModule extends AbstractModuleCommand<Localization.Command.Kick> {
 
-    @Getter
-    private final Command.Kick command;
-    @Getter
-    private final Permission.Command.Kick permission;
+    @Getter private final Command.Kick command;
+    @Getter private final Permission.Command.Kick permission;
 
     private final FPlayerManager fPlayerManager;
     private final CommandUtil commandUtil;

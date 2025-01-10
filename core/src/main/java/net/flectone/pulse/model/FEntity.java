@@ -15,8 +15,7 @@ public class FEntity {
     private final UUID uuid;
     private final String type;
 
-    @Setter
-    private int entityId = -1;
+    @Setter private int entityId = -1;
 
     public FEntity(String name, UUID uuid, String type) {
         this.name = name == null ? UNKNOWN_NAME : name;

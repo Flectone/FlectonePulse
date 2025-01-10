@@ -18,8 +18,7 @@ import reactor.core.publisher.Mono;
 @Singleton
 public class MessageCreateListener extends EventListener<MessageCreateEvent> {
 
-    @Getter
-    private final Integration.Discord integration;
+    @Getter private final Integration.Discord integration;
 
     private final ThreadManager threadManager;
 

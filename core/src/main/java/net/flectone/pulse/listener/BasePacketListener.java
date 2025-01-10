@@ -26,20 +26,11 @@ public class BasePacketListener extends AbstractPacketListener {
     private final FPlayerManager fPlayerManager;
     private final ThreadManager threadManager;
 
-    @Inject
-    private QuitModule quitModule;
-
-    @Inject
-    private JoinModule joinModule;
-
-    @Inject
-    private GreetingModule greetingModule;
-
-    @Inject
-    private MailModule mailModule;
-
-    @Inject
-    private BubbleManager bubbleManager;
+    @Inject private QuitModule quitModule;
+    @Inject private JoinModule joinModule;
+    @Inject private GreetingModule greetingModule;
+    @Inject private MailModule mailModule;
+    @Inject private BubbleManager bubbleManager;
 
     @Inject
     public BasePacketListener(FPlayerManager fPlayerManager,

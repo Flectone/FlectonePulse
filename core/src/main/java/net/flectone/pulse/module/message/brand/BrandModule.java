@@ -20,8 +20,7 @@ public class BrandModule extends AbstractModuleListMessage<Localization.Message.
     private final Message.Brand message;
     private final Permission.Message.Brand permission;
 
-    @Inject
-    private BrandTicker brandTicker;
+    @Inject private BrandTicker brandTicker;
 
     @Inject
     public BrandModule(FileManager fileManager) {

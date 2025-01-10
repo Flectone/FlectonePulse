@@ -22,8 +22,7 @@ public class Inventory {
     private final List<Consumer<Inventory>> closeConsumerList = new ArrayList<>();
     private final WrapperPlayServerOpenWindow wrapperWindow;
 
-    @Setter
-    private WrapperPlayServerWindowItems wrapperItems;
+    @Setter private WrapperPlayServerWindowItems wrapperItems;
 
     public Inventory(int size,
                      Map<Integer, BiConsumer<ItemStack, Inventory>> clickConsumerMap,

@@ -12,8 +12,7 @@ public class Sound {
     private final String category;
     private final String name;
 
-    @Setter
-    private String permission = "";
+    @Setter private String permission = "";
 
     public Sound(boolean enable, float volume, float pitch, String category, String name) {
         this.enable = enable;

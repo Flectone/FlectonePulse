@@ -13,10 +13,8 @@ import java.util.function.BiConsumer;
 
 public abstract class MarkModule extends AbstractModuleCommand<Localization.Command> {
 
-    @Getter
-    private final Command.Mark command;
-    @Getter
-    private final Permission.Command.Mark permission;
+    @Getter private final Command.Mark command;
+    @Getter private final Permission.Command.Mark permission;
 
     private final BiConsumer<FPlayer, String> markConsumer;
     private final CommandUtil commandUtil;

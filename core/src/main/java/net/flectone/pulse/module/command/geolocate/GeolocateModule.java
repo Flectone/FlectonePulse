@@ -23,10 +23,8 @@ public abstract class GeolocateModule extends AbstractModuleCommand<Localization
 
     private final String HTTP_URL = "http://ip-api.com/line/<ip>?fields=17031449";
 
-    @Getter
-    private final Command.Geolocate command;
-    @Getter
-    private final Permission.Command.Geolocate permission;
+    @Getter private final Command.Geolocate command;
+    @Getter private final Permission.Command.Geolocate permission;
 
     private final CommandUtil commandUtil;
 

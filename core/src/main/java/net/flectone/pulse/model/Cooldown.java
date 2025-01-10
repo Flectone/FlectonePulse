@@ -15,8 +15,7 @@ public class Cooldown {
     private final boolean enable;
     private final long duration;
 
-    @Setter
-    private String permissionBypass = "";
+    @Setter private String permissionBypass = "";
 
     public Cooldown(boolean enable, long duration) {
         this.enable = enable;

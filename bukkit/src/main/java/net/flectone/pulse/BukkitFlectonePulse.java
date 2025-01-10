@@ -35,8 +35,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
     private FLogger fLogger;
     private Injector injector;
 
-    @Getter
-    private DependencyResolver dependencyResolver;
+    @Getter private DependencyResolver dependencyResolver;
 
     @Override
     public void onLoad() {

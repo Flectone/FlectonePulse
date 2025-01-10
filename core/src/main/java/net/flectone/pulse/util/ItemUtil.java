@@ -9,10 +9,17 @@ import java.util.List;
 public interface ItemUtil {
 
     Component translatableComponent(Object item);
+
     HoverEvent<?> hoverEvent(Object item);
+
     void decreaseItemAmount(Object item, Runnable replaceItem);
+
     void dropItem(Object location, Object itemStack);
+
     void removeSignIndex(Object itemMeta);
+
     void setSignIndex(Object itemMeta, int[] signIndexes);
+
     Pair<Integer, int[]> findSignIndex(Object itemMeta, List<String> itemLore, FPlayer fPlayer);
+
 }

@@ -30,8 +30,7 @@ public class BukkitIntegrationModule extends IntegrationModule {
     private final FLogger fLogger;
     private final Injector injector;
 
-    @Inject
-    private ServerUtil serverUtil;
+    @Inject private ServerUtil serverUtil;
 
     @Inject
     public BukkitIntegrationModule(FileManager fileManager,

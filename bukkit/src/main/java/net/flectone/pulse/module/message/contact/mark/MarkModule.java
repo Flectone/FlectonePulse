@@ -26,8 +26,7 @@ import org.jetbrains.annotations.NotNull;
 @Singleton
 public class MarkModule extends AbstractModuleMessage<Localization.Message.Contact> {
 
-    @Getter
-    private final Message.Contact.Mark message;
+    @Getter private final Message.Contact.Mark message;
     private final Permission.Message.Contact.Mark permission;
 
     private final MarkManager markManager;

@@ -13,10 +13,8 @@ import net.flectone.pulse.util.DisableAction;
 
 public abstract class ReplyModule extends AbstractModuleCommand<Localization.Command.Reply> {
 
-    @Getter
-    private final Command.Reply command;
-    @Getter
-    private final Permission.Command.Reply permission;
+    @Getter private final Command.Reply command;
+    @Getter private final Permission.Command.Reply permission;
 
     private final TellModule tellModule;
     private final CommandUtil commandUtil;

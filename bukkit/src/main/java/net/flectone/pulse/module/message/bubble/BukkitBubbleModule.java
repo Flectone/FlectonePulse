@@ -18,8 +18,7 @@ public class BukkitBubbleModule extends BubbleModule {
     private final BukkitBubbleManager bubbleManager;
     private final BukkitListenerManager bukkitListenerManager;
 
-    @Inject
-    private BukkitChatModule chatModule;
+    @Inject private BukkitChatModule chatModule;
 
     @Inject
     public BukkitBubbleModule(FileManager fileManager,

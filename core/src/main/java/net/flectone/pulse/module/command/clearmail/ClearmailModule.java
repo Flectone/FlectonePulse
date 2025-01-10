@@ -17,10 +17,8 @@ import java.util.Optional;
 
 public abstract class ClearmailModule extends AbstractModuleCommand<Localization.Command.Clearmail> {
 
-    @Getter
-    private final Command.Clearmail command;
-    @Getter
-    private final Permission.Command.Clearmail permission;
+    @Getter private final Command.Clearmail command;
+    @Getter private final Permission.Command.Clearmail permission;
 
     private final CommandUtil commandUtil;
 

@@ -26,11 +26,8 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
 
     private final ThreadManager threadManager;
 
-    @Inject
-    private IntegrationModule integrationModule;
-
-    @Inject
-    private AfkTicker afkTicker;
+    @Inject private IntegrationModule integrationModule;
+    @Inject private AfkTicker afkTicker;
 
     public AfkModule(FileManager fileManager,
                      ThreadManager threadManager) {

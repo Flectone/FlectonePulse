@@ -35,44 +35,19 @@ public class ComponentUtil {
     private final PermissionUtil permissionUtil;
     private final MiniMessage miniMessage;
 
-    @Inject
-    private IntegrationModule integrationModule;
-
-    @Inject
-    private ColorModule colorModule;
-
-    @Inject
-    private EmojiModule emojiModule;
-
-    @Inject
-    private SpoilerModule spoilerModule;
-
-    @Inject
-    private FormatModule formatModule;
-
-    @Inject
-    private MentionModule mentionModule;
-
-    @Inject
-    private CapsModule capsModule;
-
-    @Inject
-    private SwearModule swearModule;
-
-    @Inject
-    private ImageModule imageModule;
-
-    @Inject
-    private WorldModule worldModule;
-
-    @Inject
-    private AfkModule afkModule;
-
-    @Inject
-    private StreamModule streamModule;
-
-    @Inject
-    private NameModule nameModule;
+    @Inject private IntegrationModule integrationModule;
+    @Inject private ColorModule colorModule;
+    @Inject private EmojiModule emojiModule;
+    @Inject private SpoilerModule spoilerModule;
+    @Inject private FormatModule formatModule;
+    @Inject private MentionModule mentionModule;
+    @Inject private CapsModule capsModule;
+    @Inject private SwearModule swearModule;
+    @Inject private ImageModule imageModule;
+    @Inject private WorldModule worldModule;
+    @Inject private AfkModule afkModule;
+    @Inject private StreamModule streamModule;
+    @Inject private NameModule nameModule;
 
     @Inject
     public ComponentUtil(ColorUtil colorUtil,

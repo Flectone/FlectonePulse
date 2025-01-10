@@ -22,20 +22,11 @@ public abstract class AbstractModuleCommand<M extends Localization.ILocalization
 
     private final Predicate<FPlayer> commandPredicate;
 
-    @Inject
-    private FPlayerManager fPlayerManager;
-
-    @Inject
-    protected CommandUtil commandUtil;
-
-    @Inject
-    private FileManager fileManager;
-
-    @Inject
-    private FLogger fLogger;
-
-    @Inject
-    private Database database;
+    @Inject private FPlayerManager fPlayerManager;
+    @Inject protected CommandUtil commandUtil;
+    @Inject private FileManager fileManager;
+    @Inject private FLogger fLogger;
+    @Inject private Database database;
 
     public AbstractModuleCommand(Function<Localization, M> messageFunction, Predicate<FPlayer> commandPredicate) {
         super(messageFunction);

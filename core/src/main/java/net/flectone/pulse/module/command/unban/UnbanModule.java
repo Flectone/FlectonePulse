@@ -16,10 +16,8 @@ import java.util.List;
 
 public abstract class UnbanModule extends AbstractModuleCommand<Localization.Command.Unban> {
 
-    @Getter
-    private final Command.Unban command;
-    @Getter
-    private final Permission.Command.Unban permission;
+    @Getter private final Command.Unban command;
+    @Getter private final Permission.Command.Unban permission;
 
     private final ThreadManager threadManager;
     private final CommandUtil commandUtil;

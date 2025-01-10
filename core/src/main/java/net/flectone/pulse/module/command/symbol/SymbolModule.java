@@ -11,10 +11,8 @@ import net.flectone.pulse.util.CommandUtil;
 
 public abstract class SymbolModule extends AbstractModuleCommand<Localization.Command.Symbol> {
 
-    @Getter
-    private final Command.Symbol command;
-    @Getter
-    private final Permission.Command.Symbol permission;
+    @Getter private final Command.Symbol command;
+    @Getter private final Permission.Command.Symbol permission;
 
     private final CommandUtil commandUtil;
 

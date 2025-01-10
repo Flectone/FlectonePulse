@@ -13,10 +13,8 @@ import net.flectone.pulse.util.MessageTag;
 
 public abstract class BroadcastModule extends AbstractModuleCommand<Localization.Command.Broadcast> {
 
-    @Getter
-    private final Command.Broadcast command;
-    @Getter
-    private final Permission.Command.Broadcast permission;
+    @Getter private final Command.Broadcast command;
+    @Getter private final Permission.Command.Broadcast permission;
 
     private final CommandUtil commandUtil;
 

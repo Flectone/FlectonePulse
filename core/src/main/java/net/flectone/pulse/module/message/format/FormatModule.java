@@ -31,20 +31,17 @@ import java.util.Map;
 
 public abstract class FormatModule extends AbstractModuleMessage<Localization.Message.Format> {
 
-    @Getter
-    private final Map<TagType, TagResolver> tagResolverMap = new HashMap<>();
+    @Getter private final Map<TagType, TagResolver> tagResolverMap = new HashMap<>();
 
     private final Message.Format message;
-    @Getter
-    private final Permission.Message.Format permission;
+    @Getter private final Permission.Message.Format permission;
 
     private final ServerUtil serverUtil;
     private final FPlayerManager fPlayerManager;
     private final PermissionUtil permissionUtil;
     private final ItemUtil itemUtil;
 
-    @Inject
-    private ComponentUtil componentUtil;
+    @Inject private ComponentUtil componentUtil;
 
     public FormatModule(FileManager fileManager,
                         ServerUtil serverUtil,

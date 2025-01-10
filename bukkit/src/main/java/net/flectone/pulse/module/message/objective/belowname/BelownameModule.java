@@ -30,8 +30,7 @@ public class BelownameModule extends AbstractModule {
     private ObjectiveMode objectiveValueType;
     private ScoreboardObjective scoreboardObjective;
 
-    @Inject
-    private BelownameTicker belowNameTicker;
+    @Inject private BelownameTicker belowNameTicker;
 
     @Inject
     public BelownameModule(FileManager fileManager,

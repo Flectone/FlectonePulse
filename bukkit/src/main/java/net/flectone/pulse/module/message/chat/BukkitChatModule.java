@@ -40,8 +40,7 @@ public class BukkitChatModule extends ChatModule {
     private final IntegrationModule integrationModule;
     private final TimeUtil timeUtil;
 
-    @Inject
-    private BukkitBubbleModule bubbleModule;
+    @Inject private BukkitBubbleModule bubbleModule;
 
     @Inject
     public BukkitChatModule(FileManager fileManager,

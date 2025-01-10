@@ -30,8 +30,7 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
     private final ComponentUtil componentUtil;
     private final PacketEventsUtil packetEventsUtil;
 
-    @Inject
-    private PlayerlistnameTicker playerListNameTicker;
+    @Inject private PlayerlistnameTicker playerListNameTicker;
 
     @Inject
     public PlayerlistnameModule(FPlayerManager fPlayerManager,

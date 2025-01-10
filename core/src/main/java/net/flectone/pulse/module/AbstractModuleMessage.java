@@ -28,41 +28,19 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
 
     private final Function<Localization, M> messageResolver;
 
-    @Inject
-    private FPlayerManager fPlayerManager;
+    @Inject private FPlayerManager fPlayerManager;
+    @Inject private PermissionUtil permissionUtil;
+    @Inject private FileManager fileManager;
+    @Inject private ComponentUtil componentUtil;
+    @Inject private TimeUtil timeUtil;
+    @Inject private ProxyManager proxyManager;
+    @Inject private IntegrationModule integrationModule;
+    @Inject private MessageSender messageSender;
+    @Inject private SoundPlayer soundPlayer;
+    @Inject private ThreadManager threadManager;
 
-    @Inject
-    private PermissionUtil permissionUtil;
-
-    @Inject
-    private FileManager fileManager;
-
-    @Inject
-    private ComponentUtil componentUtil;
-
-    @Inject
-    private TimeUtil timeUtil;
-
-    @Inject
-    private ProxyManager proxyManager;
-
-    @Inject
-    private IntegrationModule integrationModule;
-
-    @Inject
-    private MessageSender messageSender;
-
-    @Inject
-    private SoundPlayer soundPlayer;
-
-    @Inject
-    private ThreadManager threadManager;
-
-    @Getter
-    private Cooldown cooldown;
-
-    @Getter
-    private Sound sound;
+    @Getter private Cooldown cooldown;
+    @Getter private Sound sound;
 
     public AbstractModuleMessage(Function<Localization, M> messageFunction) {
         this.messageResolver = messageFunction;

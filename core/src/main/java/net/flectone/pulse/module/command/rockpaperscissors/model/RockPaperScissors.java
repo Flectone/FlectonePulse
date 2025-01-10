@@ -12,8 +12,7 @@ public class RockPaperScissors {
     private final UUID receiver;
     private final UUID id;
 
-    @Setter
-    private String senderMove;
+    @Setter private String senderMove;
 
     public RockPaperScissors(UUID sender, UUID receiver) {
         this(UUID.randomUUID(), sender, receiver);

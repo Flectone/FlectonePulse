@@ -21,22 +21,16 @@ import java.util.Set;
 @Singleton
 public class FileManager {
 
-    @Getter
-    private final Set<String> languages = Set.of("ru_ru", "en_us");
+    @Getter private final Set<String> languages = Set.of("ru_ru", "en_us");
     private final Map<String, Localization> localizationMap = new HashMap<>();
 
     private final Path projectPath;
 
-    @Getter
-    private final Command command;
-    @Getter
-    private final Config config;
-    @Getter
-    private final Integration integration;
-    @Getter
-    private final Message message;
-    @Getter
-    private final Permission permission;
+    @Getter private final Command command;
+    @Getter private final Config config;
+    @Getter private final Integration integration;
+    @Getter private final Message message;
+    @Getter private final Permission permission;
 
     private Localization defaultLocalization;
 

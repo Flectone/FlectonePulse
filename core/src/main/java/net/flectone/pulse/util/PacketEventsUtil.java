@@ -16,9 +16,7 @@ public class PacketEventsUtil {
     private final PacketEventsAPI<?> packetEvents = PacketEvents.getAPI();
 
     @Inject
-    public PacketEventsUtil() {
-
-    }
+    public PacketEventsUtil() {}
 
     public User getUser(UUID uuid) {
         Object channel = packetEvents.getProtocolManager().getChannel(uuid);

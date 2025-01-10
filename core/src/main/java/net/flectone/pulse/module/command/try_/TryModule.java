@@ -16,10 +16,8 @@ import java.util.function.Function;
 
 public abstract class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
 
-    @Getter
-    private final Command.Try command;
-    @Getter
-    private final Permission.Command.Try permission;
+    @Getter private final Command.Try command;
+    @Getter private final Permission.Command.Try permission;
 
     private final RandomUtil randomUtil;
     private final CommandUtil commandUtil;

@@ -26,10 +26,8 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
 
     private final Map<UUID, RockPaperScissors> gameMap = new HashMap<>();
 
-    @Getter
-    private final Command.Rockpaperscissors command;
-    @Getter
-    private final Permission.Command.Rockpaperscissors permission;
+    @Getter private final Command.Rockpaperscissors command;
+    @Getter private final Permission.Command.Rockpaperscissors permission;
 
     private final ProxyManager proxyManager;
     private final Database database;

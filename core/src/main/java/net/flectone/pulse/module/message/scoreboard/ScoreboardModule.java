@@ -13,12 +13,10 @@ import net.flectone.pulse.module.message.scoreboard.ticker.ScoreboardTicker;
 
 public abstract class ScoreboardModule extends AbstractModuleListMessage<Localization.Message.Scoreboard> {
 
-    @Getter
-    private final Message.Scoreboard message;
+    @Getter private final Message.Scoreboard message;
     private final Permission.Message.Scoreboard permission;
 
-    @Inject
-    private ScoreboardTicker scoreboardTicker;
+    @Inject private ScoreboardTicker scoreboardTicker;
 
     public ScoreboardModule(FileManager fileManager) {
         super(localization -> localization.getMessage().getScoreboard());
