@@ -14,23 +14,34 @@ public abstract class AbstractModuleListMessage<M extends Localization.ILocaliza
 
     private final HashMap<Integer, Integer> PLAYER_INDEX = new HashMap<>();
 
-    @Inject
-    private RandomUtil randomUtil;
+    @Inject private RandomUtil randomUtil;
 
     public AbstractModuleListMessage(Function<Localization, M> messageFunction) {
         super(messageFunction);
     }
 
-    @Nullable
-    protected String nextListMessage(FPlayer fPlayer, boolean random, List<List<String>> values) {
-        return nextMessage(fPlayer, random, values.stream()
+    public abstract List<String> getAvailableMessages(FPlayer fPlayer);
+
+    public List<String> joinMultiList(List<List<String>> values) {
+        return values.stream()
                 .map(strings -> String.join("<br>", strings))
-                .toList()
-        );
+                .toList();
     }
 
     @Nullable
-    protected String nextMessage(FPlayer fPlayer, boolean random, List<String> messages) {
+    public String getCurrentMessage(FPlayer fPlayer) {
+        List<String> messages = getAvailableMessages(fPlayer);
+        if (messages.isEmpty()) return null;
+
+        int fPlayerID = fPlayer.getId();
+        int playerIndex = PLAYER_INDEX.getOrDefault(fPlayerID, 0) % messages.size();
+
+        return messages.get(playerIndex);
+    }
+
+    @Nullable
+    public String getNextMessage(FPlayer fPlayer, boolean random) {
+        List<String> messages = getAvailableMessages(fPlayer);
         if (messages.isEmpty()) return null;
 
         int fPlayerID = fPlayer.getId();

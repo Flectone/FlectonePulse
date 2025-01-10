@@ -12,6 +12,8 @@ import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleListMessage;
 import net.flectone.pulse.module.message.tab.header.ticker.HeaderTicker;
 
+import java.util.List;
+
 @Singleton
 public class HeaderModule extends AbstractModuleListMessage<Localization.Message.Tab.Header> {
 
@@ -43,7 +45,7 @@ public class HeaderModule extends AbstractModuleListMessage<Localization.Message
     public void send(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String format = nextListMessage(fPlayer, message.isRandom(), resolveLocalization(fPlayer).getLists());
+        String format = getNextMessage(fPlayer, message.isRandom());
         if (format == null) return;
 
         builder(fPlayer)
@@ -55,5 +57,10 @@ public class HeaderModule extends AbstractModuleListMessage<Localization.Message
     @Override
     public boolean isConfigEnable() {
         return message.isEnable();
+    }
+
+    @Override
+    public List<String> getAvailableMessages(FPlayer fPlayer) {
+        return joinMultiList(resolveLocalization(fPlayer).getLists());
     }
 }

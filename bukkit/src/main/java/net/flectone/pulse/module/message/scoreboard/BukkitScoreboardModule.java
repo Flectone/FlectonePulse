@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -41,7 +42,7 @@ public class BukkitScoreboardModule extends ScoreboardModule {
         Sidebar sidebar = getNewSidebar(fPlayer);
         if (sidebar == null) return;
 
-        String format = nextListMessage(fPlayer, getMessage().isRandom(), resolveLocalization(fPlayer).getValues());
+        String format = getNextMessage(fPlayer, getMessage().isRandom());
         if (format == null) return;
 
         String[] formats = format.split("<br>");
@@ -68,5 +69,11 @@ public class BukkitScoreboardModule extends ScoreboardModule {
 
         sidebarMap.put(fPlayer.getUuid(), sidebar);
         return sidebar;
+    }
+
+
+    @Override
+    public List<String> getAvailableMessages(FPlayer fPlayer) {
+        return joinMultiList(resolveLocalization(fPlayer).getValues());
     }
 }

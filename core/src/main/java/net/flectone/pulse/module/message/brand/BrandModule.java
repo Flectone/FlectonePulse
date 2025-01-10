@@ -12,6 +12,8 @@ import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleListMessage;
 import net.flectone.pulse.module.message.brand.ticker.BrandTicker;
 
+import java.util.List;
+
 @Singleton
 public class BrandModule extends AbstractModuleListMessage<Localization.Message.Brand> {
 
@@ -48,12 +50,17 @@ public class BrandModule extends AbstractModuleListMessage<Localization.Message.
     public void send(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String format = nextMessage(fPlayer, this.message.isRandom(), resolveLocalization(fPlayer).getValues());
+        String format = getNextMessage(fPlayer, this.message.isRandom());
         if (format == null) return;
 
         builder(fPlayer)
                 .destination(message.getDestination())
                 .format(format)
                 .sendBuilt();
+    }
+
+    @Override
+    public List<String> getAvailableMessages(FPlayer fPlayer) {
+        return resolveLocalization(fPlayer).getValues();
     }
 }

@@ -11,6 +11,8 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleListMessage;
 import net.flectone.pulse.util.ComponentUtil;
 
+import java.util.List;
+
 @Singleton
 public class MOTDModule extends AbstractModuleListMessage<Localization.Message.Status.MOTD> {
 
@@ -39,7 +41,7 @@ public class MOTDModule extends AbstractModuleListMessage<Localization.Message.S
     public JsonElement next(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return null;
 
-        String message = nextMessage(fPlayer, this.message.isRandom(), resolveLocalization(fPlayer).getValues());
+        String message = getNextMessage(fPlayer, this.message.isRandom());
         if (message == null) return null;
 
         return componentUtil.builder(fPlayer, message).serializeToTree();
@@ -48,5 +50,10 @@ public class MOTDModule extends AbstractModuleListMessage<Localization.Message.S
     @Override
     public boolean isConfigEnable() {
         return message.isEnable();
+    }
+
+    @Override
+    public List<String> getAvailableMessages(FPlayer fPlayer) {
+        return resolveLocalization(fPlayer).getValues();
     }
 }

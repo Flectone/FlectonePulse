@@ -12,6 +12,8 @@ import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleListMessage;
 import net.flectone.pulse.module.message.auto.ticker.AutoTicker;
 
+import java.util.List;
+
 @Singleton
 public class AutoModule extends AbstractModuleListMessage<Localization.Message.Auto> {
 
@@ -51,7 +53,7 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
         if (checkModulePredicates(fPlayer)) return;
         if (!fPlayer.is(FPlayer.Setting.AUTO)) return;
 
-        String format = nextMessage(fPlayer, message.isRandom(), resolveLocalization(fPlayer).getValues());
+        String format = getNextMessage(fPlayer, message.isRandom());
         if (format == null) return;
 
         builder(fPlayer)
@@ -59,5 +61,10 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
                 .format(format)
                 .sound(getSound())
                 .sendBuilt();
+    }
+
+    @Override
+    public List<String> getAvailableMessages(FPlayer fPlayer) {
+        return resolveLocalization(fPlayer).getValues();
     }
 }
