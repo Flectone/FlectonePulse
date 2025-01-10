@@ -51,8 +51,10 @@ public class BasePacketListener extends AbstractPacketListener {
     @Override
     public void onUserLogin(UserLoginEvent event) {
         User user = event.getUser();
+        if (user == null) return;
 
         UUID uuid = user.getUUID();
+        if (uuid == null) return;
 
         int entityId = user.getEntityId();
         String name = user.getName();
