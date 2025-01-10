@@ -10,6 +10,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -96,6 +97,11 @@ public class FLogger extends Logger {
         LogRecord logRecord = new LogRecord(Level.INFO, msg);
         logRecord.setLoggerName("");
         log(logRecord);
+    }
+
+    public void info(Component component) {
+        String message = PlainTextComponentSerializer.plainText().serialize(component);
+        info(message);
     }
 
     public void logEnabling() {
