@@ -40,7 +40,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
     @Override
     public void onLoad() {
-        fLogger = new FLogger(this.getLogger(), null, null, null);
+        fLogger = new FLogger(this.getLogger(), null);
 
         fLogger.enableFilter();
         fLogger.logEnabling();

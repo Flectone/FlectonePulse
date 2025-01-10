@@ -36,15 +36,10 @@ public class FLogger extends Logger {
     );
 
     private final Consumer<LogRecord> logConsumer;
-    private final Consumer<String> infoConsumer;
-    private final Consumer<String> warnConsumer;
 
     private FFilter fFilter;
 
-    public FLogger(Logger logger,
-                   Consumer<LogRecord> logConsumer,
-                   Consumer<String> infoConsumer,
-                   Consumer<String> warnConsumer) {
+    public FLogger(Logger logger, Consumer<LogRecord> logConsumer) {
         super("", null);
 
         if (logger != null) {
@@ -54,8 +49,6 @@ public class FLogger extends Logger {
         }
 
         this.logConsumer = logConsumer == null ? super::log : logConsumer;
-        this.infoConsumer = infoConsumer == null ? super::info : infoConsumer;
-        this.warnConsumer = warnConsumer == null ? super::warning : warnConsumer;
     }
 
     public void enableFilter() {
