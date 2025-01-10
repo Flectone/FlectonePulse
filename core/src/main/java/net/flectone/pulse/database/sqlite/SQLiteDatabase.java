@@ -23,7 +23,7 @@ public class SQLiteDatabase extends Database {
 
     private final Config.Database config;
 
-    private final Path pluginPath;
+    private final Path projectPath;
     private final InputStream SQLFile;
     private final FLogger fLogger;
 
@@ -31,10 +31,10 @@ public class SQLiteDatabase extends Database {
 
     @Inject
     public SQLiteDatabase(FileManager fileManager,
-                          @Named("pluginPath") Path pluginPath,
+                          @Named("projectPath") Path projectPath,
                           @Named("SQLFile") InputStream SQLFile,
                           FLogger fLogger) {
-        this.pluginPath = pluginPath;
+        this.projectPath = projectPath;
         this.SQLFile = SQLFile;
         this.fLogger = fLogger;
 
@@ -53,7 +53,7 @@ public class SQLiteDatabase extends Database {
     public void connect() throws SQLException, IOException {
         connectionURL = new StringBuilder()
                 .append("jdbc:sqlite:")
-                .append(pluginPath.toString())
+                .append(projectPath.toString())
                 .append(File.separator)
                 .append(config.getName())
                 .append(".db")

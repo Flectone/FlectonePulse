@@ -189,7 +189,7 @@ public class FabricInjector extends AbstractModule {
 
         Path projectPath = FabricLoader.getInstance().getConfigDir().resolve(modId);
 
-        bind(Path.class).annotatedWith(Names.named("pluginPath")).toInstance(projectPath);
+        bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
 //        bind(NamespacedKey.class).annotatedWith(Names.named("flectonepulseSign")).toInstance(new NamespacedKey(plugin, "flectonepulse.sign"));
 
         FileManager fileManager = new FileManager(projectPath);

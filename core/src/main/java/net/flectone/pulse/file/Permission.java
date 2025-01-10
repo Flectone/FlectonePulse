@@ -8,9 +8,7 @@ import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.TagType;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -33,8 +31,8 @@ import java.util.Map;
 @Getter
 public final class Permission extends FileSerializable implements IModule {
 
-    public Permission(Path pluginPath) {
-        super(Paths.get(pluginPath + File.separator + "permission.yml"));
+    public Permission(Path projectPath) {
+        super(projectPath.resolve("permission.yml"));
     }
 
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/")})

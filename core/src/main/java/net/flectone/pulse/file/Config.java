@@ -6,9 +6,7 @@ import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.BuildConfig;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +29,8 @@ import java.util.List;
 @Getter
 public final class Config extends FileSerializable {
 
-    public Config(Path pluginPath) {
-        super(Paths.get(pluginPath + File.separator + "config.yml"));
+    public Config(Path projectPath) {
+        super(projectPath.resolve("config.yml"));
     }
 
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/config/")})

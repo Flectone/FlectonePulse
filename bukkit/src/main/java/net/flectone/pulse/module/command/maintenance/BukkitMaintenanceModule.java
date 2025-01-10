@@ -25,13 +25,13 @@ public class BukkitMaintenanceModule extends MaintenanceModule {
                                    PermissionUtil permissionUtil,
                                    ListenerManager listenerManager,
                                    Database database,
-                                   @Named("pluginPath") Path pluginPath,
+                                   @Named("projectPath") Path projectPath,
                                    FileUtil fileUtil,
                                    CommandUtil commandUtil,
                                    ComponentUtil componentUtil,
                                    PacketEventsUtil packetEventsUtil,
                                    FLogger fLogger) {
-        super(fileManager, fPlayerManager, permissionUtil, listenerManager, database, pluginPath, fileUtil, commandUtil, componentUtil, packetEventsUtil, fLogger);
+        super(fileManager, fPlayerManager, permissionUtil, listenerManager, database, projectPath, fileUtil, commandUtil, componentUtil, packetEventsUtil, fLogger);
 
         this.fileManager = fileManager;
     }

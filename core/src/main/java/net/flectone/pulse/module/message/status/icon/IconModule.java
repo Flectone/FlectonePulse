@@ -14,7 +14,6 @@ import net.flectone.pulse.util.RandomUtil;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,10 +33,10 @@ public class IconModule extends AbstractModule {
 
     @Inject
     public IconModule(FileManager fileManager,
-                      @Named("pluginPath") Path pluginPath,
+                      @Named("projectPath") Path projectPath,
                       RandomUtil randomUtil,
                       FileUtil fileUtil) {
-        this.iconPath = Paths.get(pluginPath.toString(), "images");
+        this.iconPath = projectPath.resolve("images");
         this.fileUtil = fileUtil;
         this.randomUtil = randomUtil;
 

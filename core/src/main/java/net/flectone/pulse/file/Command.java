@@ -14,9 +14,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.util.Range;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -41,8 +39,8 @@ import java.util.Map;
 @Getter
 public final class Command extends FileSerializable implements IModule.ICommand {
 
-    public Command(Path pluginPath) {
-        super(Paths.get(pluginPath + File.separator + "command.yml"));
+    public Command(Path projectPath) {
+        super(projectPath.resolve("command.yml"));
     }
 
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/")})

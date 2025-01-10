@@ -7,9 +7,7 @@ import net.flectone.pulse.model.Destination;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.util.MessageTag;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,8 +32,8 @@ import java.util.Map;
 @Getter
 public final class Integration extends FileSerializable implements IModule.IIntegration {
 
-    public Integration(Path pluginPath) {
-        super(Paths.get(pluginPath + File.separator + "integration.yml"));
+    public Integration(Path projectPath) {
+        super(projectPath.resolve("integration.yml"));
     }
 
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/")})

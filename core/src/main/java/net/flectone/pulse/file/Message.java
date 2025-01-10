@@ -15,9 +15,7 @@ import net.flectone.pulse.module.message.objective.ObjectiveMode;
 import net.flectone.pulse.util.Range;
 import net.flectone.pulse.util.TagType;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -43,8 +41,8 @@ import java.util.regex.Pattern;
 @Getter
 public final class Message extends FileSerializable implements IModule.IMessage {
 
-    public Message(Path pluginPath) {
-        super(Paths.get(pluginPath + File.separator + "message.yml"));
+    public Message(Path projectPath) {
+        super(projectPath.resolve("message.yml"));
     }
 
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/")})

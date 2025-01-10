@@ -25,7 +25,7 @@ public class FileManager {
     private final Set<String> languages = Set.of("ru_ru", "en_us");
     private final Map<String, Localization> localizationMap = new HashMap<>();
 
-    private final Path pluginPath;
+    private final Path projectPath;
 
     @Getter
     private final Command command;
@@ -41,22 +41,22 @@ public class FileManager {
     private Localization defaultLocalization;
 
     @Inject
-    public FileManager(@Named("pluginPath") Path pluginPath) {
-        this.pluginPath = pluginPath;
+    public FileManager(@Named("projectPath") Path projectPath) {
+        this.projectPath = projectPath;
 
-        command = new Command(pluginPath);
+        command = new Command(projectPath);
         command.reload(command.getPath());
 
-        config = new Config(pluginPath);
+        config = new Config(projectPath);
         config.reload(config.getPath());
 
-        integration = new Integration(pluginPath);
+        integration = new Integration(projectPath);
         integration.reload(integration.getPath());
 
-        message = new Message(pluginPath);
+        message = new Message(projectPath);
         message.reload(message.getPath());
 
-        permission = new Permission(pluginPath);
+        permission = new Permission(projectPath);
         permission.reload(permission.getPath());
 
         reloadLanguages();
@@ -114,7 +114,7 @@ public class FileManager {
     }
 
     private void loadLanguage(String language) {
-        Localization localization = new Localization(pluginPath, language);
+        Localization localization = new Localization(projectPath, language);
         localization.reload(localization.getPath());
         localizationMap.put(language, localization);
     }

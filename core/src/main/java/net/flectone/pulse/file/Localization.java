@@ -9,7 +9,6 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.TagType;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -33,8 +32,8 @@ import java.util.*;
 @Getter
 public final class Localization extends FileSerializable implements IModule {
 
-    public Localization(Path pluginPath, String language) {
-        super(Paths.get(pluginPath + File.separator + "localizations" + File.separator + language + ".yml"));
+    public Localization(Path projectPath, String language) {
+        super(Paths.get(projectPath.toString(), "localizations", language + ".yml"));
 
         if (language.equalsIgnoreCase("ru_ru")) {
             initRU_RU();

@@ -263,12 +263,12 @@ public class BukkitInjector extends AbstractModule {
         bind(TeamManager.class).toInstance(scoreboardLibrary.createTeamManager());
         bind(BukkitFPlayerManager.class).asEagerSingleton();
 
-        Path pluginPath = plugin.getDataFolder().toPath();
+        Path projectPath = plugin.getDataFolder().toPath();
 
-        bind(Path.class).annotatedWith(Names.named("pluginPath")).toInstance(pluginPath);
+        bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
         bind(NamespacedKey.class).annotatedWith(Names.named("flectonepulseSign")).toInstance(new NamespacedKey(plugin, "flectonepulse.sign"));
 
-        FileManager fileManager = new FileManager(pluginPath);
+        FileManager fileManager = new FileManager(projectPath);
         fileManager.reload();
 
         bind(FileManager.class).toInstance(fileManager);

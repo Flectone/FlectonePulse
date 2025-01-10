@@ -23,7 +23,6 @@ import net.kyori.adventure.text.Component;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -53,7 +52,7 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
                              PermissionUtil permissionUtil,
                              ListenerManager listenerManager,
                              Database database,
-                             Path pluginPath,
+                             Path projectPath,
                              FileUtil fileUtil,
                              CommandUtil commandUtil,
                              ComponentUtil componentUtil,
@@ -67,7 +66,7 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         this.commandUtil = commandUtil;
         this.listenerManager = listenerManager;
         this.database = database;
-        this.iconPath = Paths.get(pluginPath.toString(), "images");
+        this.iconPath = projectPath.resolve("images");
         this.fileUtil = fileUtil;
         this.componentUtil = componentUtil;
         this.packetEventsUtil = packetEventsUtil;
