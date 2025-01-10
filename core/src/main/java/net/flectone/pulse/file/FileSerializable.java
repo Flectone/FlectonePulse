@@ -124,12 +124,12 @@ public abstract class FileSerializable extends YamlSerializable {
 
                     switch (destination.getType()) {
                         case TITLE, SUBTITLE -> {
-                            Title.Times times = destination.getTimes();
+                            Times times = destination.getTimes();
 
                             Map<String, Object> timesMap = new LinkedHashMap<>();
-                            timesMap.put("fade-in", times.fadeIn().toMillis() / TimeUtil.MULTIPLIER);
-                            timesMap.put("stay", times.stay().toMillis() / TimeUtil.MULTIPLIER);
-                            timesMap.put("fade-out", times.fadeOut().toMillis() / TimeUtil.MULTIPLIER);
+                            timesMap.put("fade-in", times.fadeInTicks());
+                            timesMap.put("stayTicks", times.stayTicks());
+                            timesMap.put("fade-out", times.fadeOutTicks());
 
                             map.put("times",  timesMap);
                         }
@@ -164,19 +164,15 @@ public abstract class FileSerializable extends YamlSerializable {
                             Map<String, Object> timesMap = (LinkedHashMap<String, Object>) times;
 
                             Object fadeIn = timesMap.get("fade-in");
-                            long longFadeIn = fadeIn == null ? 20 : Long.parseLong(String.valueOf(fadeIn));
+                            int fadeInTicks = fadeIn == null ? 20 : Integer.parseInt(String.valueOf(fadeIn));
 
                             Object stay = timesMap.get("stay");
-                            long longStay = stay == null ? 100 : Long.parseLong(String.valueOf(stay));
+                            int stayTicks = stay == null ? 100 : Integer.parseInt(String.valueOf(stay));
 
                             Object fadeOut = timesMap.get("fade-out");
-                            long longFadeOut = fadeOut == null ? 20 : Long.parseLong(String.valueOf(fadeOut));
+                            int fadeOutTicks = fadeOut == null ? 20 : Integer.parseInt(String.valueOf(fadeOut));
 
-                            Title.Times titleTimes = Title.Times.times(
-                                    Duration.ofMillis(longFadeIn * TimeUtil.MULTIPLIER),
-                                    Duration.ofMillis(longStay * TimeUtil.MULTIPLIER),
-                                    Duration.ofMillis(longFadeOut * TimeUtil.MULTIPLIER)
-                            );
+                            Times titleTimes = new Times(fadeInTicks, stayTicks, fadeOutTicks);
 
                             yield new Destination(type, titleTimes);
                         }
