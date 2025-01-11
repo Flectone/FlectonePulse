@@ -8,7 +8,6 @@ import lombok.SneakyThrows;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.file.Integration;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -40,25 +39,300 @@ public class TwitchModule extends AbstractModule {
         addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.is(FPlayer.Setting.TWITCH));
     }
 
-    @Inject
-    private FLogger fLogger;
-
     @Override
     public void reload() {
         registerModulePermission(permission);
+
+        loadLibraries();
+
+        disconnect();
+
+        injector.getInstance(TwitchIntegration.class).hook();
+    }
+
+    private void loadLibraries() {
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}philippheuer{}credentialmanager")
+                .artifactId("credentialmanager")
+                .version("0.3.1")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}philippheuer{}events4j")
+                .artifactId("events4j-core")
+                .version("0.12.2")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}philippheuer{}events4j")
+                .artifactId("events4j-handler-simple")
+                .version("0.12.2")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
 
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("com{}github{}twitch4j")
                 .artifactId("twitch4j")
                 .version(BuildConfig.TWITCH4J_VERSION)
-                .resolveTransitiveDependencies(true)
-                .url("https://mvnrepository.com/artifact/com.github.twitch4j/twitch4j")
                 .build()
         );
 
-        disconnect();
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}twitch4j")
+                .artifactId("twitch4j-chat")
+                .version(BuildConfig.TWITCH4J_VERSION)
+                .build()
+        );
 
-        injector.getInstance(TwitchIntegration.class).hook();
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}twitch4j")
+                .artifactId("twitch4j-auth")
+                .version(BuildConfig.TWITCH4J_VERSION)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}twitch4j")
+                .artifactId("twitch4j-common")
+                .version(BuildConfig.TWITCH4J_VERSION)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}twitch4j")
+                .artifactId("twitch4j-client-websocket")
+                .version(BuildConfig.TWITCH4J_VERSION)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}twitch4j")
+                .artifactId("twitch4j-util")
+                .version(BuildConfig.TWITCH4J_VERSION)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}twitch4j")
+                .artifactId("twitch4j-eventsub-common")
+                .version(BuildConfig.TWITCH4J_VERSION)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}twitch4j")
+                .artifactId("twitch4j-eventsub-websocket")
+                .version(BuildConfig.TWITCH4J_VERSION)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}twitch4j")
+                .artifactId("twitch4j-extensions")
+                .version(BuildConfig.TWITCH4J_VERSION)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}twitch4j")
+                .artifactId("twitch4j-graphql")
+                .version(BuildConfig.TWITCH4J_VERSION)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}twitch4j")
+                .artifactId("twitch4j-helix")
+                .version(BuildConfig.TWITCH4J_VERSION)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}twitch4j")
+                .artifactId("twitch4j-kraken")
+                .version(BuildConfig.TWITCH4J_VERSION)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}twitch4j")
+                .artifactId("twitch4j-messaginginterface")
+                .version(BuildConfig.TWITCH4J_VERSION)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}twitch4j")
+                .artifactId("twitch4j-pubsub")
+                .version(BuildConfig.TWITCH4J_VERSION)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}twitch4j")
+                .artifactId("twitch4j-util")
+                .version(BuildConfig.TWITCH4J_VERSION)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}neovisionaries")
+                .artifactId("nv-websocket-client")
+                .version("2.14")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}bucket4j")
+                .artifactId("bucket4j_jdk8-core")
+                .version("8.10.1")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("org{}slf4j")
+                .artifactId("slf4j-api")
+                .version("2.1.0-alpha1")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("io{}github{}openfeign")
+                .artifactId("feign-slf4j")
+                .version("13.4")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("io{}github{}openfeign")
+                .artifactId("feign-okhttp")
+                .version("13.4")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("io{}github{}openfeign")
+                .artifactId("feign-jackson")
+                .version("13.4")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("io{}github{}openfeign")
+                .artifactId("feign-hystrix")
+                .version("13.4")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}fasterxml{}jackson{}core")
+                .artifactId("jackson-core")
+                .version("2.18.0-rc1")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}fasterxml{}jackson{}core")
+                .artifactId("jackson-databind")
+                .version("2.18.0-rc1")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}fasterxml{}jackson{}core")
+                .artifactId("jackson-annotations")
+                .version("2.18.0-rc1")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}fasterxml{}jackson{}datatype")
+                .artifactId("jackson-datatype-jsr310")
+                .version("2.18.0-rc1")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}github{}tony19")
+                .artifactId("named-regexp")
+                .version("1.0.0")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("org{}jetbrains")
+                .artifactId("annotations")
+                .version("24.1.0")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}netflix{}hystrix")
+                .artifactId("hystrix-core")
+                .version("1.5.18")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}squareup{}okhttp3")
+                .artifactId("okhttp")
+                .version("5.0.0-alpha.14")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("commons-configuration")
+                .artifactId("commons-configuration")
+                .version("1.10")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("commons-io")
+                .artifactId("commons-io")
+                .version("2.17.0")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("io{}github{}xanthic{}cache")
+                .artifactId("cache-provider-caffeine")
+                .version("0.6.1")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("org{}apache{}commons")
+                .artifactId("commons-lang3")
+                .version("3.17.0")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
     }
 
     @Override

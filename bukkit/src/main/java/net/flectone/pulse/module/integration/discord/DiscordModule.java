@@ -16,34 +16,10 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.LibraryResolver;
 import net.flectone.pulse.util.MessageTag;
 
-import java.util.List;
 import java.util.function.UnaryOperator;
 
 @Singleton
 public class DiscordModule extends AbstractModule {
-
-    private final List<Library> libraries = List.of(
-            Library.builder()
-                    .groupId("com{}discord4j")
-                    .artifactId("discord4j-core")
-                    .version(BuildConfig.DISCORD4J_VERSION)
-                    .resolveTransitiveDependencies(true)
-                    .build(),
-
-            Library.builder()
-                    .groupId("io{}netty")
-                    .artifactId("netty-resolver-dns")
-                    .version("5.0.0.Alpha2")
-                    .resolveTransitiveDependencies(true)
-                    .build(),
-
-            Library.builder()
-                    .groupId("com{}discord4j")
-                    .artifactId("discord4j-common")
-                    .version("3.3.0-RC1")
-                    .resolveTransitiveDependencies(true)
-                    .build()
-    );
 
     private final Integration.Discord integration;
     private final Permission.Integration.Discord permission;
@@ -71,7 +47,7 @@ public class DiscordModule extends AbstractModule {
     public void reload() {
         registerModulePermission(permission);
 
-        libraryResolver.loadLibraries(libraries);
+        loadLibraries();
 
         DiscordIntegration discordIntegration = injector.getInstance(DiscordIntegration.class);
         discordIntegration.setEnable(isEnable());
@@ -81,6 +57,32 @@ public class DiscordModule extends AbstractModule {
         } catch (Exception e) {
             fLogger.warning(e);
         }
+    }
+
+    private void loadLibraries() {
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}discord4j")
+                .artifactId("discord4j-core")
+                .version(BuildConfig.DISCORD4J_VERSION)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("io{}netty")
+                .artifactId("netty-resolver-dns")
+                .version("5.0.0.Alpha2")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}discord4j")
+                .artifactId("discord4j-common")
+                .version("3.3.0-RC1")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
     }
 
     @Override

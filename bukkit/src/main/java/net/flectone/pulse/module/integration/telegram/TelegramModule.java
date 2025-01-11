@@ -15,34 +15,10 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.LibraryResolver;
 import net.flectone.pulse.util.MessageTag;
 
-import java.util.List;
 import java.util.function.UnaryOperator;
 
 @Singleton
 public class TelegramModule extends AbstractModule {
-
-    private final List<Library> libraries = List.of(
-            Library.builder()
-                    .groupId("org{}telegram")
-                    .artifactId("telegrambots-longpolling")
-                    .version(BuildConfig.TELEGRAMBOTS_VERSION)
-                    .resolveTransitiveDependencies(true)
-                    .build(),
-
-            Library.builder()
-                    .groupId("org{}telegram")
-                    .artifactId("telegrambots-client")
-                    .version(BuildConfig.TELEGRAMBOTS_VERSION)
-                    .resolveTransitiveDependencies(true)
-                    .build(),
-
-            Library.builder()
-                    .groupId("com{}squareup{}okhttp3")
-                    .artifactId("okhttp")
-                    .version("5.0.0-alpha.14")
-                    .resolveTransitiveDependencies(true)
-                    .build()
-    );
 
     private final Integration.Telegram integration;
     private final Permission.Integration.Telegram permission;
@@ -67,18 +43,43 @@ public class TelegramModule extends AbstractModule {
     public void reload() {
         registerModulePermission(permission);
 
-        libraryResolver.loadLibraries(libraries);
+        loadLibraries();
 
         disconnect();
 
         injector.getInstance(TelegramIntegration.class).hook();
     }
 
+    private void loadLibraries() {
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("org{}telegram")
+                .artifactId("telegrambots-longpolling")
+                .version(BuildConfig.TELEGRAMBOTS_VERSION)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("org{}telegram")
+                .artifactId("telegrambots-client")
+                .version(BuildConfig.TELEGRAMBOTS_VERSION)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        libraryResolver.loadLibrary(Library.builder()
+                .groupId("com{}squareup{}okhttp3")
+                .artifactId("okhttp")
+                .version("5.0.0-alpha.14")
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+    }
+
     @Override
     public boolean isConfigEnable() {
         return integration.isEnable();
     }
-
 
     public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> telegramString) {
         if (checkModulePredicates(sender)) return;
