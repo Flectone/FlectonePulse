@@ -39,16 +39,20 @@ public class FLogger extends Logger {
 
     private FFilter fFilter;
 
-    public FLogger(Logger logger, Consumer<LogRecord> logConsumer) {
+    public FLogger(Consumer<LogRecord> logConsumer) {
         super("", null);
 
-        if (logger != null) {
-            setParent(logger);
-            this.setLevel(Level.ALL);
-            logger.setLevel(Level.OFF);
-        }
+        this.logConsumer = logConsumer;
+    }
 
-        this.logConsumer = logConsumer == null ? super::log : logConsumer;
+    public FLogger(Logger logger) {
+        super("", null);
+
+        logger.setLevel(Level.OFF);
+        setParent(logger);
+        setLevel(Level.ALL);
+
+        logConsumer = super::log;
     }
 
     public void enableFilter() {

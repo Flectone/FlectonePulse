@@ -34,7 +34,7 @@ public class FlectonePulseVelocity implements FlectonePulse {
 
     @Subscribe
     public void onProxyInitializeEvent(ProxyInitializeEvent event) {
-        fLogger = new FLogger(null, s -> logger.info(s.getMessage()));
+        fLogger = new FLogger(logRecord -> logger.info(logRecord.getMessage()));
         fLogger.logEnabling();
 
         proxyServer.getChannelRegistrar().register(IDENTIFIER);
