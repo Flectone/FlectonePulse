@@ -121,7 +121,7 @@ import net.flectone.pulse.module.message.scoreboard.BukkitScoreboardModule;
 import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.sign.BukkitSignModule;
 import net.flectone.pulse.module.message.sign.SignModule;
-import net.flectone.pulse.platform.DependencyResolver;
+import net.flectone.pulse.platform.LibraryResolver;
 import net.flectone.pulse.util.*;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -141,13 +141,16 @@ public class BukkitInjector extends AbstractModule {
 
     private final BukkitFlectonePulse instance;
     private final Plugin plugin;
+    private final LibraryResolver libraryResolver;
     private final FLogger fLogger;
 
     public BukkitInjector(BukkitFlectonePulse instance,
                           Plugin plugin,
+                          LibraryResolver libraryResolver,
                           FLogger fLogger) {
         this.instance = instance;
         this.plugin = plugin;
+        this.libraryResolver = libraryResolver;
         this.fLogger = fLogger;
     }
 
@@ -223,7 +226,7 @@ public class BukkitInjector extends AbstractModule {
         bind(WarnModule.class).to(BukkitWarnModule.class);
         bind(WarnlistModule.class).to(BukkitWarnlistModule.class);
 
-        bind(DependencyResolver.class).toInstance(instance.getDependencyResolver());
+        bind(LibraryResolver.class).toInstance(libraryResolver);
         bind(Gson.class).toInstance(GsonComponentSerializer.gson().serializer());
 
         bind(FlectonePulse.class).toInstance(instance);

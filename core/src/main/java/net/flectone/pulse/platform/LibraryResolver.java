@@ -9,18 +9,33 @@ import net.flectone.pulse.BuildConfig;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class DependencyResolver {
+public abstract class LibraryResolver {
 
-    protected final List<Library> libraries = new ArrayList<>();
+    private final List<Library> libraries = new ArrayList<>();
 
-    @Getter
-    private final LibraryManager libraryManager;
+    @Getter private final LibraryManager libraryManager;
 
-    public DependencyResolver(LibraryManager libraryManager) {
+    public LibraryResolver(LibraryManager libraryManager) {
         this.libraryManager = libraryManager;
     }
 
-    public void resolveDependencies() {
+    public void addLibrary(Library library) {
+        libraries.add(library);
+    }
+
+    public void loadLibrary(Library library) {
+        libraryManager.loadLibrary(library);
+    }
+
+    public void loadLibraries(List<Library> libraries) {
+        libraries.forEach(this::loadLibrary);
+    }
+
+    public void loadLibraries() {
+        loadLibraries(libraries);
+    }
+
+    public void resolveRepositories() {
         libraryManager.addMavenCentral();
         libraryManager.addJitPack();
         libraryManager.addJCenter();
@@ -30,13 +45,11 @@ public abstract class DependencyResolver {
         libraryManager.addRepository("https://repo.minebench.de");
         libraryManager.addRepository("https://s01.oss.sonatype.org/content/repositories/snapshots");
         libraryManager.addRepository("https://repo.codemc.io/repository/maven-releases");
-
-        libraries.forEach(libraryManager::loadLibrary);
     }
 
-    public void loadLibraries() {
+    public void addLibraries() {
 
-        addDependency(Library.builder()
+        addLibrary(Library.builder()
                 .groupId("com{}google{}inject")
                 .artifactId("guice")
                 .version(BuildConfig.GUICE_VERSION)
@@ -53,7 +66,7 @@ public abstract class DependencyResolver {
                 .build()
         );
 
-        addDependency(Library.builder()
+        addLibrary(Library.builder()
                 .groupId("net{}elytrium")
                 .artifactId("serializer")
                 .version(BuildConfig.ELYTRIUM_SERIALIZER_VERSION)
@@ -66,23 +79,5 @@ public abstract class DependencyResolver {
                 .build()
         );
 
-    }
-
-    public void addDependency(Library library) {
-        libraries.add(library);
-    }
-
-    public Library.Builder buildLibrary(String groupId, String artifactId, String version, boolean resolveTransitiveDependencies, String toRelocate, String relocatedPackage) {
-        Library.Builder builder = Library.builder()
-                .groupId(groupId.replace(".", "{}"))
-                .artifactId(artifactId)
-                .version(version)
-                .resolveTransitiveDependencies(resolveTransitiveDependencies);
-
-        if (toRelocate != null && relocatedPackage != null) {
-            builder.relocate(toRelocate.replace(".", "{}"), relocatedPackage.replace(".", "{}"));
-        }
-
-        return builder;
     }
 }

@@ -7,7 +7,6 @@ import com.google.inject.Singleton;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
-import lombok.Getter;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.*;
@@ -16,8 +15,8 @@ import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.message.bubble.manager.BubbleManager;
 import net.flectone.pulse.module.message.contact.mark.manager.MarkManager;
-import net.flectone.pulse.platform.DependencyResolver;
-import net.flectone.pulse.platform.BukkitDependencyResolver;
+import net.flectone.pulse.platform.BukkitLibraryResolver;
+import net.flectone.pulse.platform.LibraryResolver;
 import net.flectone.pulse.util.MetricsUtil;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
@@ -33,9 +32,8 @@ import java.util.stream.Collectors;
 public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
     private FLogger fLogger;
+    private LibraryResolver libraryResolver;
     private Injector injector;
-
-    @Getter private DependencyResolver dependencyResolver;
 
     @Override
     public void onLoad() {
@@ -44,10 +42,11 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         fLogger.enableFilter();
         fLogger.logEnabling();
 
-        dependencyResolver = new BukkitDependencyResolver(this, fLogger);
+        libraryResolver = new BukkitLibraryResolver(this, fLogger);
 
-        dependencyResolver.loadLibraries();
-        dependencyResolver.resolveDependencies();
+        libraryResolver.addLibraries();
+        libraryResolver.resolveRepositories();
+        libraryResolver.loadLibraries();
 
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
         PacketEvents.getAPI().getSettings()
@@ -64,7 +63,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
     @Override
     public void onEnable() {
         try {
-            injector = Guice.createInjector(new BukkitInjector(this, this, fLogger));
+            injector = Guice.createInjector(new BukkitInjector(this, this, libraryResolver, fLogger));
         } catch (Exception e) {
             fLogger.warning(e);
             Bukkit.getPluginManager().disablePlugin(this);
