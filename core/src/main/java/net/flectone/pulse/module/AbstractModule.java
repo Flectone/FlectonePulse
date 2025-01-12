@@ -1,5 +1,6 @@
 package net.flectone.pulse.module;
 
+import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import net.flectone.pulse.file.Permission;
@@ -16,7 +17,7 @@ public abstract class AbstractModule {
     private final Set<Class<? extends AbstractModule>> children = new HashSet<>();
     private final Set<Predicate<FEntity>> predicates = new HashSet<>();
 
-    private PermissionUtil permissionUtil;
+    @Inject private PermissionUtil permissionUtil;
     private String modulePermission;
 
     @Setter private boolean enable;
