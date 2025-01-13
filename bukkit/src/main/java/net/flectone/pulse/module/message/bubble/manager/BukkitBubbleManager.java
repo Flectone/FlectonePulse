@@ -107,14 +107,14 @@ public class BukkitBubbleManager implements BubbleManager {
         boolean isTextDisplay = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4) && messageBubble.isNewSystem();
 
         int lineWidth = messageBubble.getLineWidth();
+        double distance = messageBubble.getDistance();
         float height = messageBubble.getHeight();
-
         long duration = calculateDuration(message, messageBubble);
 
         player.getWorld().getPlayers()
                 .stream()
                 .filter(receiver -> receiver.canSee(player))
-                .filter(receiver -> receiver.getLocation().distance(player.getLocation()) <= 100.0)
+                .filter(receiver -> receiver.getLocation().distance(player.getLocation()) <= distance)
                 .forEach(receiver -> {
                     FPlayer fReceiver = fPlayerManager.get(receiver);
                     if (fReceiver.isIgnored(fPlayer)) return;

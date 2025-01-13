@@ -142,6 +142,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     public static final class Bubble implements ISubMessage, Config.IEnable {
         private boolean enable = true;
         private boolean newSystem = true;
+        private double distance = 30.0;
         private int lineWidth = 200;
         private double readSpeed = 100.0;
         private double handicapChars = 10.0;
