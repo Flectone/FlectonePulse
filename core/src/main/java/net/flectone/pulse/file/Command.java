@@ -592,6 +592,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     @Getter
     public static final class Unban implements ISubCommand, Config.IEnable {
         private boolean enable = true;
+        private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(){
             {
                 add("unban");
@@ -606,6 +607,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     @Getter
     public static final class Unmute implements ISubCommand, Config.IEnable {
         private boolean enable = true;
+        private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("unmute"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
@@ -615,6 +617,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     @Getter
     public static final class Unwarn implements ISubCommand, Config.IEnable {
         private boolean enable = true;
+        private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("unwarn"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();

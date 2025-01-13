@@ -10,6 +10,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.util.CommandUtil;
+import net.flectone.pulse.util.MessageTag;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,9 +81,13 @@ public abstract class UnbanModule extends AbstractModuleCommand<Localization.Com
             }
 
             builder(fTarget)
+                    .tag(MessageTag.COMMAND_UNBAN)
                     .destination(command.getDestination())
-                    .receiver(fPlayer)
+                    .range(command.getRange())
+                    .filter(filter -> filter.is(FPlayer.Setting.BAN))
                     .format(Localization.Command.Unban::getFormat)
+                    .proxy()
+                    .integration()
                     .sound(getSound())
                     .sendBuilt();
         });

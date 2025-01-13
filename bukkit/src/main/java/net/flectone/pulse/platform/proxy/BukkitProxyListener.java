@@ -35,7 +35,9 @@ import net.flectone.pulse.module.command.tictactoe.manager.TictactoeManager;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.module.command.translateto.TranslatetoModule;
 import net.flectone.pulse.module.command.try_.TryModule;
+import net.flectone.pulse.module.command.unban.UnbanModule;
 import net.flectone.pulse.module.command.unmute.UnmuteModule;
+import net.flectone.pulse.module.command.unwarn.UnwarnModule;
 import net.flectone.pulse.module.command.warn.WarnModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.integration.discord.listener.MessageCreateListener;
@@ -238,13 +240,41 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     muteModule.sendForTarget(fEntity, fTarget, mute);
                 }
+                case COMMAND_UNBAN -> {
+                    UnbanModule unbanModule = injector.getInstance(UnbanModule.class);
+                    if (!unbanModule.isEnable()) return;
+
+                    unbanModule.builder(fEntity)
+                            .destination(unbanModule.getCommand().getDestination())
+                            .range(Range.SERVER)
+                            .filter(filter -> filter.is(FPlayer.Setting.BAN))
+                            .format(Localization.Command.Unban::getFormat)
+                            .sound(unbanModule.getCommand().getSound())
+                            .sendBuilt();
+                }
                 case COMMAND_UNMUTE -> {
                     UnmuteModule unmuteModule = injector.getInstance(UnmuteModule.class);
-                    if (unmuteModule.checkModulePredicates(fEntity)) return;
+                    if (!unmuteModule.isEnable()) return;
 
-                    FPlayer fTarget = gson.fromJson(input.readUTF(), FPlayer.class);
+                    unmuteModule.builder(fEntity)
+                            .destination(unmuteModule.getCommand().getDestination())
+                            .range(Range.SERVER)
+                            .filter(filter -> filter.is(FPlayer.Setting.MUTE))
+                            .format(Localization.Command.Unmute::getFormat)
+                            .sound(unmuteModule.getCommand().getSound())
+                            .sendBuilt();
+                }
+                case COMMAND_UNWARN -> {
+                    UnwarnModule unwarnModule = injector.getInstance(UnwarnModule.class);
+                    if (!unwarnModule.isEnable()) return;
 
-                    unmuteModule.unmute(fEntity, fTarget);
+                    unwarnModule.builder(fEntity)
+                            .destination(unwarnModule.getCommand().getDestination())
+                            .range(Range.SERVER)
+                            .filter(filter -> filter.is(FPlayer.Setting.WARN))
+                            .format(Localization.Command.Unwarn::getFormat)
+                            .sound(unwarnModule.getCommand().getSound())
+                            .sendBuilt();
                 }
                 case COMMAND_POLL_VOTE -> injector.getInstance(PollModule.class).vote(fEntity, input.readInt(), input.readInt());
                 case COMMAND_POLL_CREATE_MESSAGE -> {

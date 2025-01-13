@@ -28,7 +28,7 @@ public class Proxy {
 
         switch (proxyMessageTag) {
             case COMMAND_ME, COMMAND_BROADCAST, COMMAND_DO, COMMAND_HELPER, COMMAND_CHATCOLOR,
-                 COMMAND_STREAM, DEATH, ADVANCEMENT, COMMAND_DICE, COMMAND_UNMUTE -> output.writeUTF(input.readUTF());
+                 COMMAND_STREAM, DEATH, ADVANCEMENT, COMMAND_DICE -> output.writeUTF(input.readUTF());
 
             case COMMAND_BALL, COMMAND_TRY -> {
                 output.writeInt(input.readInt());
