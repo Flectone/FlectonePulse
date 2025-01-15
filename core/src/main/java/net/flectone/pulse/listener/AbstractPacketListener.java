@@ -22,9 +22,7 @@ public abstract class AbstractPacketListener implements PacketListener {
         if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
             WrapperPlayServerChatMessage wrapper = new WrapperPlayServerChatMessage(event);
             component = wrapper.getMessage().getChatContent();
-        }
-
-        if (event.getPacketType() == PacketType.Play.Server.SYSTEM_CHAT_MESSAGE) {
+        } else if (event.getPacketType() == PacketType.Play.Server.SYSTEM_CHAT_MESSAGE) {
             WrapperPlayServerSystemChatMessage wrapper = new WrapperPlayServerSystemChatMessage(event);
             component = wrapper.getMessage();
         }
