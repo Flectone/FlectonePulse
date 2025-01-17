@@ -5,6 +5,7 @@ import lombok.Getter;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
@@ -22,16 +23,19 @@ public abstract class UnmuteModule extends AbstractModuleCommand<Localization.Co
     @Getter private final Permission.Command.Unmute permission;
 
     private final ThreadManager threadManager;
+    private final FPlayerManager fPlayerManager;
     private final CommandUtil commandUtil;
     private final Gson gson;
 
     public UnmuteModule(FileManager fileManager,
                         ThreadManager threadManager,
+                        FPlayerManager fPlayerManager,
                         CommandUtil commandUtil,
                         Gson gson) {
         super(localization -> localization.getCommand().getUnmute(), null);
 
         this.threadManager = threadManager;
+        this.fPlayerManager = fPlayerManager;
         this.commandUtil = commandUtil;
         this.gson = gson;
 
@@ -84,12 +88,16 @@ public abstract class UnmuteModule extends AbstractModuleCommand<Localization.Co
                 database.setInvalidModeration(mute);
             }
 
+            if (!fPlayerManager.get(fTarget.getUuid()).isUnknown()) {
+                fPlayerManager.get(fTarget.getUuid()).updateMutes(database.getValidModerations(Moderation.Type.MUTE));
+            }
+
             builder(fTarget)
                     .tag(MessageTag.COMMAND_UNMUTE)
                     .destination(command.getDestination())
                     .range(command.getRange())
                     .filter(filter -> filter.is(FPlayer.Setting.MUTE))
-                    .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
+                    .format(unmute -> unmute.getFormat().replace("<moderator>", fPlayer.getName()))
                     .proxy(output -> output.writeUTF(gson.toJson(fPlayer)))
                     .integration(s -> s.replace("<moderator>", fPlayer.getName()))
                     .sound(getSound())

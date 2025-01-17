@@ -10,10 +10,11 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.unwarn.UnwarnModule;
 import net.flectone.pulse.platform.MessageSender;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
-import net.flectone.pulse.util.TimeUtil;
+import net.flectone.pulse.util.ModerationUtil;
 import net.kyori.adventure.text.Component;
 
 import java.sql.SQLException;
@@ -25,23 +26,24 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
     @Getter private final Command.Warnlist command;
     @Getter private final Permission.Command.Warnlist permission;
 
-    private final FileManager fileManager;
+    private final UnwarnModule unwarnModule;
     private final ComponentUtil componentUtil;
     private final CommandUtil commandUtil;
-    private final TimeUtil timeUtil;
+    private final ModerationUtil moderationUtil;
     private final MessageSender messageSender;
 
     @Inject
     public WarnlistModule(FileManager fileManager,
+                          UnwarnModule unwarnModule,
                           ComponentUtil componentUtil,
                           CommandUtil commandUtil,
-                          TimeUtil timeUtil,
+                          ModerationUtil moderationUtil,
                           MessageSender messageSender) {
         super(localization -> localization.getCommand().getWarnlist(), null);
 
-        this.fileManager = fileManager;
+        this.unwarnModule = unwarnModule;
         this.componentUtil = componentUtil;
-        this.timeUtil = timeUtil;
+        this.moderationUtil = moderationUtil;
         this.messageSender = messageSender;
         this.commandUtil = commandUtil;
 
@@ -118,18 +120,12 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
                 .build()
                 .append(Component.newline());
 
-        Localization.ReasonMap constantReasons = fileManager.getLocalization(fPlayer).getCommand().getWarn().getReasons();
-
         for (Moderation moderation : finalModerationList) {
 
             FPlayer fTarget = database.getFPlayer(moderation.getPlayer());
-            String line = localizationType.getLine()
-                    .replace("<command>", "/unwarn <player> <id>")
-                    .replace("<player>", fTarget.getName())
-                    .replace("<id>", String.valueOf(moderation.getId()))
-                    .replace("<reason>", constantReasons.getConstant(moderation.getReason()))
-                    .replace("<date>", timeUtil.formatDate(moderation.getDate()))
-                    .replace("<time>", timeUtil.format(fPlayer, moderation.getOriginalTime()));
+
+            String line = localizationType.getLine().replace("<command>", "/" + unwarnModule.getName(unwarnModule.getCommand()) + " <player> <id>");
+            line = moderationUtil.replacePlaceholders(line, fPlayer, moderation);
 
             component = component
                     .append(componentUtil.builder(fTarget, fPlayer, line).build())

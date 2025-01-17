@@ -8,6 +8,7 @@ import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.Moderation;
@@ -27,11 +28,12 @@ public class BukkitUnmuteModule extends UnmuteModule {
     @Inject
     public BukkitUnmuteModule(FileManager fileManager,
                               ThreadManager threadManager,
+                              FPlayerManager fPlayerManager,
                               CommandUtil commandUtil,
                               Gson gson,
                               Database database,
                               FLogger fLogger){
-        super(fileManager, threadManager, commandUtil, gson);
+        super(fileManager, threadManager, fPlayerManager, commandUtil, gson);
 
         this.database = database;
         this.fLogger = fLogger;

@@ -10,10 +10,11 @@ import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.command.FCommand;
+import net.flectone.pulse.module.command.unmute.UnmuteModule;
 import net.flectone.pulse.platform.MessageSender;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
-import net.flectone.pulse.util.TimeUtil;
+import net.flectone.pulse.util.ModerationUtil;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -27,13 +28,14 @@ public class BukkitMutelistModule extends MutelistModule {
 
     @Inject
     public BukkitMutelistModule(FileManager fileManager,
+                                UnmuteModule unmuteModule,
                                 ComponentUtil componentUtil,
-                                TimeUtil timeUtil,
                                 CommandUtil commandUtil,
+                                ModerationUtil moderationUtil,
                                 MessageSender messageSender,
                                 Database database,
                                 FLogger fLogger) {
-        super(fileManager, componentUtil, timeUtil, commandUtil, messageSender);
+        super(fileManager, unmuteModule, componentUtil, commandUtil, moderationUtil, messageSender);
 
         this.database = database;
         this.fLogger = fLogger;

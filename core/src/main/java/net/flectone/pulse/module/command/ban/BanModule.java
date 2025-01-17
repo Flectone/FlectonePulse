@@ -37,7 +37,7 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
     private final CommandUtil commandUtil;
     private final ComponentUtil componentUtil;
     private final PacketEventsUtil packetEventsUtil;
-    private final TimeUtil timeUtil;
+    private final ModerationUtil moderationUtil;
     private final FLogger fLogger;
     private final Gson gson;
 
@@ -50,7 +50,7 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
                      CommandUtil commandUtil,
                      ComponentUtil componentUtil,
                      PacketEventsUtil packetEventsUtil,
-                     TimeUtil timeUtil,
+                     ModerationUtil moderationUtil,
                      FLogger fLogger,
                      Gson gson) {
         super(localization -> localization.getCommand().getBan(), fPlayer -> fPlayer.is(FPlayer.Setting.BAN));
@@ -63,7 +63,7 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
         this.commandUtil = commandUtil;
         this.componentUtil = componentUtil;
         this.packetEventsUtil = packetEventsUtil;
-        this.timeUtil = timeUtil;
+        this.moderationUtil = moderationUtil;
         this.fLogger = fLogger;
         this.gson = gson;
 
@@ -127,32 +127,27 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
 
             kick(fPlayer, fTarget, ban);
 
-            builder(fPlayer)
+            builder(fTarget)
                     .range(command.getRange())
                     .destination(command.getDestination())
                     .tag(MessageTag.COMMAND_BAN)
-                    .format(replaceTarget(fTarget.getName(), time))
-                    .message(s -> getTypeLocalization(s, time).getReasons().getConstant(reason))
+                    .format(buildFormat(ban))
                     .proxy(output -> {
-                        output.writeUTF(gson.toJson(fTarget));
+                        output.writeUTF(gson.toJson(fPlayer));
                         output.writeUTF(gson.toJson(ban));
                     })
-                    .integration(s -> s
-                            .replace("<reason>", getTypeLocalization(resolveLocalization(), time).getReasons().getConstant(reason))
-                            .replace("<target>", fTarget.getName())
-                            .replace("<time>", timeUtil.format(FPlayer.UNKNOWN, time))
-                    )
+                    .integration(s -> moderationUtil.replacePlaceholders(s, FPlayer.UNKNOWN, ban))
                     .sound(getSound())
                     .sendBuilt();
         });
     }
 
-    public Localization.Command.Ban.Type getTypeLocalization(Localization.Command.Ban message, long time) {
-        return time == -1 ? message.getPermanent() : message.getTemporarily();
-    }
+    public BiFunction<FPlayer, Localization.Command.Ban, String> buildFormat(Moderation ban) {
+        return (fReceiver, message) -> {
+            String format = message.getServer();
 
-    public BiFunction<FPlayer, Localization.Command.Ban, String> replaceTarget(String target, long time) {
-        return (fReceiver, message) -> timeUtil.format(fReceiver, time, getTypeLocalization(message, time).getGlobal().replace("<target>", target));
+            return moderationUtil.replacePlaceholders(format, fReceiver, ban);
+        };
     }
 
     public void kick(FEntity fModerator, FPlayer fTarget, Moderation ban) {
@@ -162,10 +157,8 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
         threadManager.runAsync(database -> {
             Localization.Command.Ban localization = resolveLocalization(fTarget);
 
-            String formatPlayer = timeUtil.format(fTarget, ban.getRemainingTime(), getTypeLocalization(localization, ban.getTime()).getPlayer()
-                    .replace("<message>", getTypeLocalization(localization, ban.getTime()).getReasons().getConstant(ban.getReason()))
-                    .replace("<moderator>", fModerator.getName())
-            );
+            String formatPlayer = localization.getPerson();
+            formatPlayer = moderationUtil.replacePlaceholders(formatPlayer, fTarget, ban);
 
             fPlayerManager.kick(fTarget, componentUtil.builder(fModerator, fTarget, formatPlayer).build());
         });
@@ -180,13 +173,10 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
             for (Moderation ban : database.getValidModerations(fPlayer, Moderation.Type.BAN)) {
                 FPlayer fModerator = database.getFPlayer(ban.getModerator());
 
-                Localization.Command.Ban.Type localization = getTypeLocalization(resolveLocalization(fPlayer), ban.getTime());
+                Localization.Command.Ban localization = resolveLocalization();
 
-                String formatPlayer = localization.getPlayer();
-                formatPlayer = timeUtil.format(fPlayer, ban.getRemainingTime(), formatPlayer
-                        .replace("<message>", getTypeLocalization(resolveLocalization(), ban.getTime()).getReasons().getConstant(ban.getReason()))
-                        .replace("<moderator>", fModerator.getName())
-                );
+                String formatPlayer = localization.getPerson();
+                formatPlayer =  moderationUtil.replacePlaceholders(formatPlayer, fPlayer, ban);
 
                 Component reason = componentUtil.builder(fModerator, fPlayer, formatPlayer).build();
                 packetEventsUtil.sendPacket(channel, new WrapperLoginServerDisconnect(reason));
@@ -194,11 +184,12 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
                 if (!command.isShowConnectionAttempts()) return;
 
                 builder(fPlayer)
+                        .range(Range.SERVER)
                         .filter(filter -> permissionUtil.has(filter, getModulePermission()))
-                        .format((fReceiver, message) -> timeUtil.format(fReceiver, ban.getRemainingTime(), getTypeLocalization(message, ban.getTime()).getConnectionAttempt()
-                                .replace("<message>", getTypeLocalization(resolveLocalization(), ban.getTime()).getReasons().getConstant(ban.getReason()))
-                                .replace("<target>", fPlayer.getName())
-                        ))
+                        .format((fReceiver, message) -> {
+                            String format = message.getConnectionAttempt();
+                            return moderationUtil.replacePlaceholders(format, fReceiver, ban);
+                        })
                         .sendBuilt();
             }
 

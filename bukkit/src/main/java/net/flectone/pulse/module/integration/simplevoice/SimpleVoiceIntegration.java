@@ -8,41 +8,33 @@ import de.maxhenkel.voicechat.api.events.EntitySoundPacketEvent;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
-import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.MessageSender;
 import net.flectone.pulse.util.ComponentUtil;
-import net.flectone.pulse.util.TimeUtil;
-
-import java.util.Optional;
+import net.flectone.pulse.util.ModerationUtil;
 
 @Singleton
 public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
 
-    private final FileManager fileManager;
     private final FPlayerManager fPlayerManager;
     private final MessageSender messageSender;
     private final ComponentUtil componentUtil;
-    private final TimeUtil timeUtil;
+    private final ModerationUtil moderationUtil;
     private final FLogger fLogger;
 
     @Inject
-    public SimpleVoiceIntegration(FileManager fileManager,
-                                  FPlayerManager fPlayerManager,
+    public SimpleVoiceIntegration(FPlayerManager fPlayerManager,
                                   MessageSender messageSender,
                                   ComponentUtil componentUtil,
-                                  TimeUtil timeUtil,
+                                  ModerationUtil moderationUtil,
                                   FLogger fLogger) {
-        this.fileManager = fileManager;
         this.fPlayerManager = fPlayerManager;
         this.messageSender = messageSender;
         this.componentUtil = componentUtil;
-        this.timeUtil = timeUtil;
+        this.moderationUtil = moderationUtil;
         this.fLogger = fLogger;
     }
 
@@ -83,23 +75,12 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
         Player player = event.getSenderConnection().getPlayer();
 
         FPlayer fPlayer = fPlayerManager.get(player.getUuid());
-
-        Optional<Moderation> optionalModeration = fPlayer.getMutes()
-                .stream()
-                .filter(moderation -> !moderation.isExpired() && moderation.isValid())
-                .findFirst();
-
-        if (optionalModeration.isEmpty()) return;
+        if (!fPlayer.isMuted()) return;
 
         event.cancel();
 
-        Moderation mute = optionalModeration.get();
+        String message = moderationUtil.buildMuteMessage(fPlayer);
 
-        Localization.Command.Mute localization = fileManager.getLocalization(fPlayer).getCommand().getMute();
-
-        String formatPlayer = localization.getPlayer()
-                .replace("<message>", localization.getReasons().getConstant(mute.getReason()));
-
-        messageSender.sendActionBar(fPlayer, componentUtil.builder(fPlayer, timeUtil.format(fPlayer, mute.getRemainingTime(), formatPlayer)).build());
+        messageSender.sendActionBar(fPlayer, componentUtil.builder(fPlayer, message).build());
     }
 }

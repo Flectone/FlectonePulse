@@ -3,16 +3,13 @@ package net.flectone.pulse.module.integration.plasmovoice;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
-import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.MessageSender;
 import net.flectone.pulse.util.ComponentUtil;
-import net.flectone.pulse.util.TimeUtil;
+import net.flectone.pulse.util.ModerationUtil;
 import su.plo.voice.api.addon.AddonInitializer;
 import su.plo.voice.api.addon.AddonLoaderScope;
 import su.plo.voice.api.addon.annotation.Addon;
@@ -23,32 +20,28 @@ import su.plo.voice.api.server.event.connection.UdpPacketReceivedEvent;
 import su.plo.voice.proto.data.audio.source.PlayerSourceInfo;
 import su.plo.voice.proto.packets.udp.serverbound.PlayerAudioPacket;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Singleton
 @Addon(id = "flectonepulse", scope = AddonLoaderScope.SERVER, version = BuildConfig.PROJECT_VERSION, authors = BuildConfig.PROJECT_AUTHOR)
 public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
 
-    private final FileManager fileManager;
     private final FPlayerManager fPlayerManager;
     private final MessageSender messageSender;
     private final ComponentUtil componentUtil;
-    private final TimeUtil timeUtil;
+    private final ModerationUtil moderationUtil;
     private final FLogger fLogger;
 
     @Inject
-    public PlasmoVoiceIntegration(FileManager fileManager,
-                                  FPlayerManager fPlayerManager,
+    public PlasmoVoiceIntegration(FPlayerManager fPlayerManager,
                                   MessageSender messageSender,
                                   ComponentUtil componentUtil,
-                                  TimeUtil timeUtil,
+                                  ModerationUtil moderationUtil,
                                   FLogger fLogger) {
-        this.fileManager = fileManager;
         this.fPlayerManager = fPlayerManager;
         this.messageSender = messageSender;
         this.componentUtil = componentUtil;
-        this.timeUtil = timeUtil;
+        this.moderationUtil = moderationUtil;
         this.fLogger = fLogger;
     }
 
@@ -81,23 +74,13 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
 
         FPlayer fPlayer = fPlayerManager.get(senderUUID);
 
-        Optional<Moderation> optionalModeration = fPlayer.getMutes()
-                .stream()
-                .filter(moderation -> !moderation.isExpired() && moderation.isValid())
-                .findFirst();
-
-        if (optionalModeration.isEmpty()) return;
+        if (!fPlayer.isMuted()) return;
 
         event.setCancelled(true);
 
-        Localization.Command.Mute localization = fileManager.getLocalization(fPlayer).getCommand().getMute();
+        String message = moderationUtil.buildMuteMessage(fPlayer);
 
-        Moderation mute = optionalModeration.get();
-
-        String formatPlayer = localization.getPlayer()
-                .replace("<message>", localization.getReasons().getConstant(mute.getReason()));
-
-        messageSender.sendActionBar(fPlayer, componentUtil.builder(fPlayer, timeUtil.format(fPlayer, mute.getRemainingTime(), formatPlayer)).build());
+        messageSender.sendActionBar(fPlayer, componentUtil.builder(fPlayer, message).build());
     }
 
     @Override

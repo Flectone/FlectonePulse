@@ -9,10 +9,11 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.unban.UnbanModule;
 import net.flectone.pulse.platform.MessageSender;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
-import net.flectone.pulse.util.TimeUtil;
+import net.flectone.pulse.util.ModerationUtil;
 import net.kyori.adventure.text.Component;
 
 import java.sql.SQLException;
@@ -24,23 +25,24 @@ public abstract class BanlistModule extends AbstractModuleCommand<Localization.C
     @Getter private final Command.Banlist command;
     @Getter private final Permission.Command.Banlist permission;
 
-    private final FileManager fileManager;
+    private final UnbanModule unbanModule;
     private final CommandUtil commandUtil;
     private final ComponentUtil componentUtil;
-    private final TimeUtil timeUtil;
+    private final ModerationUtil moderationUtil;
     private final MessageSender messageSender;
 
     public BanlistModule(FileManager fileManager,
+                         UnbanModule unbanModule,
                          CommandUtil commandUtil,
                          ComponentUtil componentUtil,
-                         TimeUtil timeUtil,
+                         ModerationUtil moderationUtil,
                          MessageSender messageSender) {
         super(localization -> localization.getCommand().getBanlist(), null);
 
-        this.fileManager = fileManager;
+        this.unbanModule = unbanModule;
         this.commandUtil = commandUtil;
         this.componentUtil = componentUtil;
-        this.timeUtil = timeUtil;
+        this.moderationUtil = moderationUtil;
         this.messageSender = messageSender;
 
         command = fileManager.getCommand().getBanlist();
@@ -115,23 +117,10 @@ public abstract class BanlistModule extends AbstractModuleCommand<Localization.C
                 .append(Component.newline());
 
         for (Moderation moderation : finalModerationList) {
-
-            Localization.Command.Ban localizationBan = fileManager.getLocalization(fPlayer).getCommand().getBan();
-            Localization.ReasonMap constantReasons = moderation.getTime() == -1
-                    ? localizationBan.getPermanent().getReasons()
-                    : localizationBan.getTemporarily().getReasons();
-
             FPlayer fTarget = database.getFPlayer(moderation.getPlayer());
-            String line = localizationType.getLine()
-                    .replace("<command>", "/unban <player> <id>")
-                    .replace("<player>", fTarget.getName())
-                    .replace("<id>", String.valueOf(moderation.getId()))
-                    .replace("<reason>", constantReasons.getConstant(moderation.getReason()))
-                    .replace("<date>", timeUtil.formatDate(moderation.getDate()))
-                    .replace("<time>", moderation.isPermanent()
-                            ? localization.getPermanentName()
-                            : timeUtil.format(fPlayer, moderation.getOriginalTime())
-                    );
+
+            String line = localizationType.getLine().replace("<command>", "/" + unbanModule.getName(unbanModule.getCommand()) + " <player> <id>");
+            line = moderationUtil.replacePlaceholders(line, fPlayer, moderation);
 
             component = component
                     .append(componentUtil.builder(fTarget, fPlayer, line).build())

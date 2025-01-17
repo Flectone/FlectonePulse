@@ -33,6 +33,7 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
     @Inject private FileManager fileManager;
     @Inject private ComponentUtil componentUtil;
     @Inject private TimeUtil timeUtil;
+    @Inject private ModerationUtil moderationUtil;
     @Inject private ProxyManager proxyManager;
     @Inject private IntegrationModule integrationModule;
     @Inject private MessageSender messageSender;
@@ -108,17 +109,10 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
 
     public boolean checkMute(@NotNull FEntity entity) {
         if (!(entity instanceof FPlayer fPlayer)) return false;
-        if (fPlayer.getMute().isEmpty()) return false;
-
-        Moderation mute = fPlayer.getMute().get();
-
-        Localization.Command.Mute localization = fileManager.getLocalization(fPlayer).getCommand().getMute();
-
-        String formatPlayer = localization.getPlayer()
-                .replace("<message>", localization.getReasons().getConstant(mute.getReason()));
+        if (!fPlayer.isMuted()) return false;
 
         builder(fPlayer)
-                .format(s -> timeUtil.format(fPlayer, mute.getRemainingTime(), formatPlayer))
+                .format(s -> moderationUtil.buildMuteMessage(fPlayer))
                 .sendBuilt();
 
         return true;

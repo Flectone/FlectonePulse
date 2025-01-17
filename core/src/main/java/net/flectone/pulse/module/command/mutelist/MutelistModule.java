@@ -9,10 +9,11 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.unmute.UnmuteModule;
 import net.flectone.pulse.platform.MessageSender;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
-import net.flectone.pulse.util.TimeUtil;
+import net.flectone.pulse.util.ModerationUtil;
 import net.kyori.adventure.text.Component;
 
 import java.sql.SQLException;
@@ -24,23 +25,24 @@ public abstract class MutelistModule extends AbstractModuleCommand<Localization.
     @Getter private final Command.Mutelist command;
     @Getter private final Permission.Command.Mutelist permission;
 
-    private final FileManager fileManager;
+    private final UnmuteModule unmuteModule;
     private final ComponentUtil componentUtil;
-    private final TimeUtil timeUtil;
     private final CommandUtil commandUtil;
+    private final ModerationUtil moderationUtil;
     private final MessageSender messageSender;
 
     public MutelistModule(FileManager fileManager,
+                          UnmuteModule unmuteModule,
                           ComponentUtil componentUtil,
-                          TimeUtil timeUtil,
                           CommandUtil commandUtil,
+                          ModerationUtil moderationUtil,
                           MessageSender messageSender) {
         super(localization -> localization.getCommand().getMutelist(), null);
 
-        this.fileManager = fileManager;
+        this.unmuteModule = unmuteModule;
         this.componentUtil = componentUtil;
-        this.timeUtil = timeUtil;
         this.commandUtil = commandUtil;
+        this.moderationUtil = moderationUtil;
         this.messageSender = messageSender;
 
         command = fileManager.getCommand().getMutelist();
@@ -119,16 +121,10 @@ public abstract class MutelistModule extends AbstractModuleCommand<Localization.
 
         for (Moderation moderation : finalModerationList) {
 
-            Localization.ReasonMap constantReasons = fileManager.getLocalization(fPlayer).getCommand().getMute().getReasons();
-
             FPlayer fTarget = database.getFPlayer(moderation.getPlayer());
-            String line = localizationType.getLine()
-                    .replace("<command>", "/unmute <player> <id>")
-                    .replace("<player>", fTarget.getName())
-                    .replace("<id>", String.valueOf(moderation.getId()))
-                    .replace("<reason>", constantReasons.getConstant(moderation.getReason()))
-                    .replace("<date>", timeUtil.formatDate(moderation.getDate()))
-                    .replace("<time>", timeUtil.format(fPlayer, moderation.getOriginalTime()));
+
+            String line = localizationType.getLine().replace("<command>", "/" + unmuteModule.getName(unmuteModule.getCommand()) + " <player> <id>");
+            line = moderationUtil.replacePlaceholders(line, fPlayer, moderation);
 
             component = component
                     .append(componentUtil.builder(fTarget, fPlayer, line).build())

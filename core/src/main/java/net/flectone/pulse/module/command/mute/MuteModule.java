@@ -14,9 +14,8 @@ import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.TimeUtil;
+import net.flectone.pulse.util.ModerationUtil;
 
-import java.sql.SQLException;
 import java.util.function.BiFunction;
 
 public abstract class MuteModule extends AbstractModuleCommand<Localization.Command.Mute> {
@@ -27,21 +26,21 @@ public abstract class MuteModule extends AbstractModuleCommand<Localization.Comm
     private final ThreadManager threadManager;
     private final FPlayerManager fPlayerManager;
     private final CommandUtil commandUtil;
-    private final TimeUtil timeUtil;
+    private final ModerationUtil moderationUtil;
     private final Gson gson;
 
     public MuteModule(FileManager fileManager,
                       ThreadManager threadManager,
                       FPlayerManager fPlayerManager,
                       CommandUtil commandUtil,
-                      TimeUtil timeUtil,
+                      ModerationUtil moderationUtil,
                       Gson gson) {
         super(localization -> localization.getCommand().getMute(), fPlayer -> fPlayer.is(FPlayer.Setting.MUTE));
 
         this.threadManager = threadManager;
         this.fPlayerManager = fPlayerManager;
         this.commandUtil = commandUtil;
-        this.timeUtil = timeUtil;
+        this.moderationUtil = moderationUtil;
         this.gson = gson;
 
         command = fileManager.getCommand().getMute();
@@ -81,36 +80,38 @@ public abstract class MuteModule extends AbstractModuleCommand<Localization.Comm
             if (mute == null) return;
 
             if (!fPlayerManager.get(fTarget.getUuid()).isUnknown()) {
-                fPlayerManager.get(fTarget.getUuid()).getMutes().add(mute);
+                fPlayerManager.get(fTarget.getUuid()).updateMutes(database.getValidModerations(Moderation.Type.MUTE));
             }
 
-            sendForTarget(fPlayer, fTarget, mute);
-
-            builder(fPlayer)
+            builder(fTarget)
                     .range(command.getRange())
                     .destination(command.getDestination())
                     .tag(MessageTag.COMMAND_MUTE)
-                    .format(replaceTarget(fTarget.getName(), time))
-                    .message((fReceiver, s) -> s.getReasons().getConstant(reason))
+                    .format(buildFormat(mute))
                     .proxy(output -> {
-                        output.writeUTF(gson.toJson(fTarget));
+                        output.writeUTF(gson.toJson(fPlayer));
                         output.writeUTF(gson.toJson(mute));
                     })
-                    .integration(s -> s
-                            .replace("<reason>", resolveLocalization().getReasons().getConstant(reason))
-                            .replace("<target>", fTarget.getName())
-                            .replace("<time>", timeUtil.format(null, time))
-                    )
+                    .integration(s -> moderationUtil.replacePlaceholders(s, FPlayer.UNKNOWN, mute))
                     .sound(getSound())
                     .sendBuilt();
+
+            sendForTarget(fPlayer, fTarget, mute);
         });
     }
 
-    public BiFunction<FPlayer, Localization.Command.Mute, String> replaceTarget(String target, long time) {
-        return (fReceiver, message) -> timeUtil.format(fReceiver, time, message.getGlobal().replace("<target>", target));
+    public BiFunction<FPlayer, Localization.Command.Mute, String> buildFormat(Moderation mute) {
+        return (fReceiver, message) -> moderationUtil.replacePlaceholders(message.getServer(), fReceiver, mute);
     }
 
-    public abstract void sendForTarget(FEntity fPlayer, FPlayer fTarget, Moderation mute) throws SQLException;
+    public void sendForTarget(FEntity fModerator, FPlayer fReceiver, Moderation mute) {
+        if (checkModulePredicates(fModerator)) return;
+
+        builder(fReceiver)
+                .format(s -> moderationUtil.replacePlaceholders(s.getPerson(), fReceiver, mute))
+                .sound(getSound())
+                .sendBuilt();
+    }
 
     @Override
     public void reload() {

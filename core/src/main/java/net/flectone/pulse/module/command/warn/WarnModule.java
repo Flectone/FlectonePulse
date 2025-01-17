@@ -11,10 +11,7 @@ import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.util.CommandUtil;
-import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.TimeUtil;
+import net.flectone.pulse.util.*;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -26,20 +23,20 @@ public abstract class WarnModule extends AbstractModuleCommand<Localization.Comm
     @Getter private final Permission.Command.Warn permission;
 
     private final ThreadManager threadManager;
-    private final TimeUtil timeUtil;
     private final CommandUtil commandUtil;
+    private final ModerationUtil moderationUtil;
     private final Gson gson;
 
     public WarnModule(FileManager fileManager,
                       ThreadManager threadManager,
-                      TimeUtil timeUtil,
                       CommandUtil commandUtil,
+                      ModerationUtil moderationUtil,
                       Gson gson) {
         super(localization -> localization.getCommand().getWarn(), fPlayer -> fPlayer.is(FPlayer.Setting.WARN));
 
         this.threadManager = threadManager;
-        this.timeUtil = timeUtil;
         this.commandUtil = commandUtil;
+        this.moderationUtil = moderationUtil;
         this.gson = gson;
 
         command = fileManager.getCommand().getWarn();
@@ -83,17 +80,12 @@ public abstract class WarnModule extends AbstractModuleCommand<Localization.Comm
                     .range(command.getRange())
                     .destination(command.getDestination())
                     .tag(MessageTag.COMMAND_WARN)
-                    .format(replaceTarget(fTarget.getName(), time))
-                    .message((fResolver, s) -> s.getReasons().getConstant(reason))
+                    .format(buildFormat(warn))
                     .proxy(output -> {
-                        output.writeUTF(gson.toJson(fTarget));
+                        output.writeUTF(gson.toJson(fPlayer));
                         output.writeUTF(gson.toJson(warn));
                     })
-                    .integration(s -> s
-                            .replace("<reason>", resolveLocalization().getReasons().getConstant(reason))
-                            .replace("<target>", fTarget.getName())
-                            .replace("<time>", timeUtil.format(null, time))
-                    )
+                    .integration(s -> moderationUtil.replacePlaceholders(s, FPlayer.UNKNOWN, warn))
                     .sound(getSound())
                     .sendBuilt();
 
@@ -113,19 +105,15 @@ public abstract class WarnModule extends AbstractModuleCommand<Localization.Comm
         });
     }
 
-    public BiFunction<FPlayer, Localization.Command.Warn, String> replaceTarget(String target, long time) {
-        return (fReceiver, message) -> timeUtil.format(fReceiver, time, message.getGlobal().replace("<target>", target));
+    public BiFunction<FPlayer, Localization.Command.Warn, String> buildFormat(Moderation warn) {
+        return (fReceiver, message) ->  moderationUtil.replacePlaceholders(message.getServer(), fReceiver, warn);
     }
 
-    public void send(FEntity fPlayer, FPlayer fTarget, Moderation warn) throws SQLException {
-        if (checkModulePredicates(fPlayer)) return;
+    public void send(FEntity fModerator, FPlayer fReceiver, Moderation warn) throws SQLException {
+        if (checkModulePredicates(fModerator)) return;
 
-        builder(fPlayer)
-                .receiver(fTarget)
-                .format(s -> timeUtil.format(fTarget, warn.getRemainingTime(), s.getPlayer()
-                        .replace("<message>", s.getReasons().getConstant(warn.getReason()))
-                        .replace("<moderator>", fPlayer.getName()))
-                )
+        builder(fReceiver)
+                .format(s -> moderationUtil.replacePlaceholders(s.getPerson(), fReceiver, warn))
                 .sound(getSound())
                 .sendBuilt();
     }
