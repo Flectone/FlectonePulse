@@ -56,6 +56,19 @@ public class BukkitAfkModule extends AfkModule {
     @Async
     @Override
     public void remove(@NotNull String action, FPlayer fPlayer) {
+        if (action.isEmpty()) {
+            String databaseAfkSuffix = fPlayer.getAfkSuffix();
+
+            fPlayer.setAfkSuffix(null);
+            PLAYER_BLOCK.remove(fPlayer.getUuid());
+
+            if (databaseAfkSuffix != null) {
+                threadManager.runDatabase(database -> database.updateFPlayer(fPlayer));
+            }
+
+            return;
+        }
+
         if (checkModulePredicates(fPlayer)) return;
         if (message.getIgnore().contains(action)) return;
 
