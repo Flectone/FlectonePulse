@@ -10,6 +10,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.PermissionUtil;
 import net.kyori.adventure.text.Component;
@@ -24,16 +25,20 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
 
     private final FPlayerManager fPlayerManager;
     private final PermissionUtil permissionUtil;
+    private final IntegrationModule integrationModule;
 
     @Inject private ComponentUtil componentUtil;
 
     @Inject
     public MentionModule(FileManager fileManager,
                          FPlayerManager fPlayerManager,
-                         PermissionUtil permissionUtil) {
+                         PermissionUtil permissionUtil,
+                         IntegrationModule integrationModule) {
         super(localization -> localization.getMessage().getFormat().getMention());
+
         this.fPlayerManager = fPlayerManager;
         this.permissionUtil = permissionUtil;
+        this.integrationModule = integrationModule;
 
         message = fileManager.getMessage().getFormat().getMention();
         permission = fileManager.getPermission().getMessage().getFormat().getMention();
@@ -45,6 +50,7 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
 
         createSound(message.getSound(), permission.getSound());
 
+        registerPermission(permission.getGroup());
         registerPermission(permission.getBypass());
     }
 
@@ -64,7 +70,13 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
             if (!word.startsWith(this.message.getTrigger())) continue;
 
             String wordWithoutPrefix = word.replaceFirst(this.message.getTrigger(), "");
-            if (fPlayerManager.getOnline(wordWithoutPrefix).isUnknown()) continue;
+
+            boolean isMention = !fPlayerManager.getOnline(wordWithoutPrefix).isUnknown()
+                    || integrationModule.getGroups().contains(wordWithoutPrefix)
+                    && permissionUtil.has(sender, permission.getGroup());
+
+            if (!isMention) continue;
+
             words[i] = "<mention:" + wordWithoutPrefix + ">";
             break;
         }
@@ -72,31 +84,56 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
         return String.join(" ", words);
     }
 
-    public TagResolver mentionTag(FEntity sender, FEntity receiver) {;
+    public TagResolver mentionTag(FEntity sender, FEntity receiver) {
         if (checkModulePredicates(sender)) return TagResolver.empty();
 
         return TagResolver.resolver("mention", (argumentQueue, context) -> {
             Tag.Argument mentionTag = argumentQueue.peek();
             if (mentionTag == null) return Tag.selfClosingInserting(Component.empty());
 
-            String playerName = mentionTag.value();
-            if (playerName.isEmpty()) {
-                return Tag.preProcessParsed(message.getTrigger() + playerName);
+            String mention = mentionTag.value();
+            if (mention.isEmpty()) {
+                return Tag.preProcessParsed(message.getTrigger() + mention);
             }
 
-            FPlayer mentionFPlayer = fPlayerManager.getOnline(playerName);
-            if (mentionFPlayer.isUnknown() || permissionUtil.has(mentionFPlayer, permission.getBypass())) {
-                return Tag.preProcessParsed(message.getTrigger() + playerName);
+            if (integrationModule.getGroups().contains(mention)) {
+                for (String group : integrationModule.getGroups()) {
+                    if (receiver instanceof FPlayer mentionFPlayer
+                            && permissionUtil.has(receiver, "group." + group)) {
+                        sendMention(mentionFPlayer);
+                        break;
+                    }
+                }
+
+            } else {
+                FPlayer mentionFPlayer = fPlayerManager.getOnline(mention);
+                if (mentionFPlayer.isUnknown() || permissionUtil.has(mentionFPlayer, permission.getBypass())) {
+                    return Tag.preProcessParsed(message.getTrigger() + mention);
+                }
+
+                if (mentionFPlayer.equals(receiver)) {
+                    sendMention(mentionFPlayer);
+                }
             }
 
-            if (mentionFPlayer.equals(receiver)) {
-                playSound(mentionFPlayer);
-            }
+            String format = resolveLocalization(receiver).getFormat()
+                    .replace("<player>", mention)
+                    .replace("<target>", mention);
 
             return Tag.selfClosingInserting(componentUtil
-                    .builder(mentionFPlayer, receiver, resolveLocalization(receiver).getFormat())
+                    .builder(receiver, format)
                     .build()
             );
         });
+    }
+
+    private void sendMention(FPlayer fPlayer) {
+        playSound(fPlayer);
+
+        builder(fPlayer)
+                .destination(message.getDestination())
+                .format(Localization.Message.Format.Mention::getPerson)
+                .sound(null)
+                .sendBuilt();
     }
 }

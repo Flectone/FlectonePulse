@@ -431,6 +431,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         public static final class Mention implements ISubFormatMessage, Config.IEnable {
             private boolean enable = true;
             private String trigger = "@";
+            private Destination destination = new Destination(Destination.Type.TITLE);
             private Sound sound = new Sound(true, 0.1f, 0.1f, SoundCategory.NEUTRAL.name(), Sounds.ENTITY_EXPERIENCE_ORB_PICKUP.getName().toString());
         }
 
