@@ -98,20 +98,17 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
 
             if (integrationModule.getGroups().contains(mention)) {
                 for (String group : integrationModule.getGroups()) {
-                    if (receiver instanceof FPlayer mentionFPlayer
-                            && permissionUtil.has(receiver, "group." + group)) {
-                        sendMention(mentionFPlayer);
-                        break;
-                    }
+                    if (!(receiver instanceof FPlayer mentionFPlayer)) break;
+                    if (permissionUtil.has(mentionFPlayer, permission.getBypass())) break;
+                    if (!permissionUtil.has(receiver, "group." + group)) continue;
+
+                    sendMention(mentionFPlayer);
+                    break;
                 }
 
             } else {
                 FPlayer mentionFPlayer = fPlayerManager.getOnline(mention);
-                if (mentionFPlayer.isUnknown() || permissionUtil.has(mentionFPlayer, permission.getBypass())) {
-                    return Tag.preProcessParsed(message.getTrigger() + mention);
-                }
-
-                if (mentionFPlayer.equals(receiver)) {
+                if (mentionFPlayer.equals(receiver) && !permissionUtil.has(mentionFPlayer, permission.getBypass())) {
                     sendMention(mentionFPlayer);
                 }
             }
@@ -120,10 +117,7 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
                     .replace("<player>", mention)
                     .replace("<target>", mention);
 
-            return Tag.selfClosingInserting(componentUtil
-                    .builder(receiver, format)
-                    .build()
-            );
+            return Tag.selfClosingInserting(componentUtil.builder(receiver, format).build());
         });
     }
 
