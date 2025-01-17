@@ -46,7 +46,7 @@ public abstract class MessageSender {
             case BOSS_BAR -> sendBoosBar(fPlayer, component, destination.getBossBar());
             case TAB_HEADER -> sendPlayerListHeaderAndFooter(fPlayer, component, fPlayerManager.getPlayerListFooter(fPlayer));
             case TAB_FOOTER -> sendPlayerListHeaderAndFooter(fPlayer, fPlayerManager.getPlayerListHeader(fPlayer), component);
-            case TOAST -> sendToast(fPlayer, component, subcomponent, destination.getToast());
+            case TOAST -> sendToast(fPlayer, component, destination.getToast());
             case BRAND -> sendBrand(fPlayer, component);
             default -> sendMessage(fPlayer, component);
         }
@@ -108,5 +108,5 @@ public abstract class MessageSender {
         );
     }
 
-    public abstract void sendToast(FPlayer fPlayer, Component title, Component description, Toast toast);
+    public abstract void sendToast(FPlayer fPlayer, Component title, Toast toast);
 }

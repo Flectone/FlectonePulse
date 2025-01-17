@@ -40,8 +40,8 @@ public class Destination {
         this.times = times;
     }
 
-    public Destination(Type type, Toast toast, String subtext) {
-        this(type, subtext);
+    public Destination(Type type, Toast toast) {
+        this(type, "");
         this.toast = toast;
     }
 

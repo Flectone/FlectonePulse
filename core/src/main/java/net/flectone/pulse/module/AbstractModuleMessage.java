@@ -335,9 +335,12 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
                 // final formatted message: TheFaser > hello world!
                 Component component = combine(buildFormatComponent(fReceiver), message);
 
-                // destination subtext for title and toast
-                // mostly empty
-                Component subcomponent = combine(buildSubcomponent(fReceiver), message);
+                // destination subtext
+                Component subcomponent = Component.empty();
+                if (destination.getType() == Destination.Type.TITLE
+                        || destination.getType() == Destination.Type.SUBTITLE) {
+                    subcomponent = combine(buildSubcomponent(fReceiver), message);
+                }
 
                 messageSender.send(fReceiver, component, subcomponent, destination);
 

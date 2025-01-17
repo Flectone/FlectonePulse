@@ -123,7 +123,6 @@ public abstract class FileSerializable extends YamlSerializable {
                         case TOAST -> {
                             Toast toast = destination.getToast();
 
-                            map.put("subtext", destination.getSubtext());
                             map.put("icon", toast.getIcon());
                             map.put("style", toast.getStyle());
                         }
@@ -166,10 +165,7 @@ public abstract class FileSerializable extends YamlSerializable {
                             Object style = map.get("style");
                             AdvancementType toastStyle = style == null ? AdvancementType.TASK : AdvancementType.valueOf(String.valueOf(style));
 
-                            Object subtext = map.get("subtext");
-                            String stringSubtext = subtext == null ? "" : String.valueOf(subtext);
-
-                            yield new Destination(Destination.Type.TOAST, new Toast(stringIcon, toastStyle), stringSubtext);
+                            yield new Destination(Destination.Type.TOAST, new Toast(stringIcon, toastStyle));
                         }
                         case TITLE, SUBTITLE -> {
                             Object times = map.get("times");

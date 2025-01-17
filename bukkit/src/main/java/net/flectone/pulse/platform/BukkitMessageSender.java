@@ -43,18 +43,18 @@ public class BukkitMessageSender extends MessageSender {
     }
 
     @Override
-    public void sendToast(FPlayer fPlayer, Component title, Component description, Toast toast) {
+    public void sendToast(FPlayer fPlayer, Component title, Toast toast) {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;
 
         NamespacedKey namespacedKey = new NamespacedKey(plugin, UUID.randomUUID() + fPlayer.getName());
 
-        createToast(namespacedKey, title, description, toast);
+        createToast(namespacedKey, title, toast);
         grantToast(namespacedKey, player);
         revokeToast(namespacedKey, player);
     }
 
-    private void createToast(NamespacedKey key, Component title, Component description, Toast toast) {
+    private void createToast(NamespacedKey key, Component title, Toast toast) {
         JsonObject jsonObject = new JsonObject();
 
         JsonObject criteriaObject = new JsonObject();
@@ -78,7 +78,7 @@ public class BukkitMessageSender extends MessageSender {
         displayObject.add("icon", iconObject);
 
         displayObject.add("title", GsonComponentSerializer.gson().serializeToTree(title));
-        displayObject.add("description", GsonComponentSerializer.gson().serializeToTree(description));
+        displayObject.add("description", GsonComponentSerializer.gson().serializeToTree(Component.empty()));
         displayObject.addProperty("background", "minecraft:textures/gui/advancements/backgrounds/adventure.png");
         displayObject.addProperty("frame", toast.getStyle().name().toLowerCase());
         displayObject.addProperty("announce_to_chat", false);
