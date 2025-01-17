@@ -134,18 +134,18 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                 case COMMAND_BAN -> {
                     BanModule banModule = injector.getInstance(BanModule.class);
-                    if (banModule.checkModulePredicates(fEntity)) return;
 
-                    FPlayer fTarget = gson.fromJson(input.readUTF(), FPlayer.class);
+                    FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
+                    if (banModule.checkModulePredicates(fModerator)) return;
+
                     Moderation ban = gson.fromJson(input.readUTF(), Moderation.class);
 
-                    banModule.kick(fEntity, fTarget, ban);
+                    banModule.kick(fModerator, (FPlayer) fEntity, ban);
 
                     banModule.builder(fEntity)
                             .range(Range.SERVER)
                             .destination(banModule.getCommand().getDestination())
-                            .format(banModule.replaceTarget(fTarget.getName(), ban.getRemainingTime()))
-                            .message((fResolver, s) -> banModule.getTypeLocalization(s, ban.getRemainingTime()).getReasons().getConstant(ban.getReason()))
+                            .format(banModule.buildFormat(ban))
                             .sound(banModule.getSound())
                             .sendBuilt();
                 }
@@ -225,7 +225,9 @@ public class BukkitProxyListener implements PluginMessageListener {
                 }
                 case COMMAND_MUTE -> {
                     MuteModule muteModule = injector.getInstance(MuteModule.class);
-                    if (muteModule.checkModulePredicates(fEntity)) return;
+
+                    FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
+                    if (muteModule.checkModulePredicates(fModerator)) return;
 
                     if (!fPlayerManager.get(fEntity.getUuid()).isUnknown()) {
                         fPlayerManager.get(fEntity.getUuid()).updateMutes(database.getValidModerations(Moderation.Type.MUTE));
@@ -236,12 +238,11 @@ public class BukkitProxyListener implements PluginMessageListener {
                     muteModule.builder(fEntity)
                             .range(Range.SERVER)
                             .destination(muteModule.getCommand().getDestination())
-                            .format(muteModule.replaceTarget(fTarget.getName(), mute.getRemainingTime()))
-                            .message((fResolver, s) -> s.getReasons().getConstant(mute.getReason()))
+                            .format(muteModule.buildFormat(mute))
                             .sound(muteModule.getSound())
                             .sendBuilt();
 
-                    muteModule.sendForTarget(fEntity, fTarget, mute);
+                    muteModule.sendForTarget(fModerator, (FPlayer) fEntity, mute);
                 }
                 case COMMAND_UNBAN -> {
                     UnbanModule unbanModule = injector.getInstance(UnbanModule.class);
@@ -383,37 +384,37 @@ public class BukkitProxyListener implements PluginMessageListener {
                 }
                 case COMMAND_WARN -> {
                     WarnModule warnModule = injector.getInstance(WarnModule.class);
-                    if (warnModule.checkModulePredicates(fEntity)) return;
 
-                    FPlayer fTarget = gson.fromJson(input.readUTF(), FPlayer.class);
+                    FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
+                    if (warnModule.checkModulePredicates(fModerator)) return;
+
                     Moderation warn = gson.fromJson(input.readUTF(), Moderation.class);
 
                     warnModule.builder(fEntity)
                             .range(Range.SERVER)
                             .destination(warnModule.getCommand().getDestination())
-                            .format(warnModule.replaceTarget(fTarget.getName(), warn.getRemainingTime()))
-                            .message((fResolver, s) -> s.getReasons().getConstant(warn.getReason()))
+                            .format(warnModule.buildFormat(warn))
                             .sound(warnModule.getSound())
                             .sendBuilt();
 
-                    warnModule.send(fEntity, fTarget, warn);
+                    warnModule.send(fModerator, (FPlayer) fEntity, warn);
                 }
                 case COMMAND_KICK -> {
                     KickModule kickModule = injector.getInstance(KickModule.class);
-                    if (kickModule.checkModulePredicates(fEntity)) return;
 
-                    FPlayer fTarget = gson.fromJson(input.readUTF(), FPlayer.class);
-                    String reason = input.readUTF();
+                    FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
+                    if (kickModule.checkModulePredicates(fModerator)) return;
+
+                    Moderation kick = gson.fromJson(input.readUTF(), Moderation.class);
 
                     kickModule.builder(fEntity)
                             .range(Range.SERVER)
                             .destination(kickModule.getCommand().getDestination())
-                            .format(kickModule.replaceTarget(fTarget.getName()))
-                            .message((fResolver, s) -> s.getReasons().getConstant(reason))
+                            .format(kickModule.buildFormat(kick))
                             .sound(kickModule.getSound())
                             .sendBuilt();
 
-                    kickModule.kick(fEntity, fTarget, reason);
+                    kickModule.kick(fModerator, (FPlayer) fEntity, kick);
                 }
                 case COMMAND_TICTACTOE_CREATE -> {
                     if (!(fEntity instanceof FPlayer fPlayer)) return;
