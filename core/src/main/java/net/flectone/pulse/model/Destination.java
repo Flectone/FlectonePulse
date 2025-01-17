@@ -7,6 +7,7 @@ import net.flectone.pulse.util.AdvancementType;
 public class Destination {
 
     private final Type type;
+    private final String subtext;
 
     private BossBar bossBar = new BossBar(100, 1f,
             net.kyori.adventure.bossbar.BossBar.Overlay.PROGRESS,
@@ -14,28 +15,33 @@ public class Destination {
     );
 
     private Times times = new Times(20, 100, 20);
-    private Toast toast = new Toast("minecraft:diamond", AdvancementType.CHALLENGE);
+    private Toast toast = new Toast("minecraft:diamond", AdvancementType.TASK);
 
     public Destination() {
-        this(Type.CHAT);
+        this(Type.CHAT, "");
     }
 
     public Destination(Type type) {
+        this(type, "");
+    }
+
+    public Destination(Type type, String subtext) {
         this.type = type;
+        this.subtext = subtext;
     }
 
     public Destination(Type type, BossBar bossBar) {
-        this(type);
+        this(type, "");
         this.bossBar = bossBar;
     }
 
-    public Destination(Type type, Times times) {
-        this(type);
+    public Destination(Type type, Times times, String subtext) {
+        this(type, subtext);
         this.times = times;
     }
 
-    public Destination(Type type, Toast toast) {
-        this(type);
+    public Destination(Type type, Toast toast, String subtext) {
+        this(type, subtext);
         this.toast = toast;
     }
 

@@ -123,6 +123,7 @@ public abstract class FileSerializable extends YamlSerializable {
                         case TOAST -> {
                             Toast toast = destination.getToast();
 
+                            map.put("subtext", destination.getSubtext());
                             map.put("icon", toast.getIcon());
                             map.put("style", toast.getStyle());
                         }
@@ -134,6 +135,7 @@ public abstract class FileSerializable extends YamlSerializable {
                             timesMap.put("stayTicks", times.stayTicks());
                             timesMap.put("fade-out", times.fadeOutTicks());
 
+                            map.put("subtext", destination.getSubtext());
                             map.put("times",  timesMap);
                         }
                         case BOSS_BAR -> {
@@ -162,9 +164,12 @@ public abstract class FileSerializable extends YamlSerializable {
                             String stringIcon = icon == null ? "minecraft:diamond" : String.valueOf(icon);
 
                             Object style = map.get("style");
-                            AdvancementType toastStyle = style == null ? AdvancementType.CHALLENGE : AdvancementType.valueOf(String.valueOf(style));
+                            AdvancementType toastStyle = style == null ? AdvancementType.TASK : AdvancementType.valueOf(String.valueOf(style));
 
-                            yield new Destination(Destination.Type.TOAST, new Toast(stringIcon, toastStyle));
+                            Object subtext = map.get("subtext");
+                            String stringSubtext = subtext == null ? "" : String.valueOf(subtext);
+
+                            yield new Destination(Destination.Type.TOAST, new Toast(stringIcon, toastStyle), stringSubtext);
                         }
                         case TITLE, SUBTITLE -> {
                             Object times = map.get("times");
@@ -186,7 +191,10 @@ public abstract class FileSerializable extends YamlSerializable {
 
                             Times titleTimes = new Times(fadeInTicks, stayTicks, fadeOutTicks);
 
-                            yield new Destination(type, titleTimes);
+                            Object subtext = map.get("subtext");
+                            String stringSubtext = subtext == null ? "" : String.valueOf(subtext);
+
+                            yield new Destination(type, titleTimes, stringSubtext);
                         }
                         case BOSS_BAR -> {
                             Object duration = map.get("duration");

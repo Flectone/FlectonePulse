@@ -36,12 +36,12 @@ public abstract class MessageSender {
         this.fLogger = fLogger;
     }
 
-    public void send(Destination destination, FPlayer fPlayer, Component component) {
+    public void send(FPlayer fPlayer, Component component, Component subcomponent, Destination destination) {
         if (!Component.IS_NOT_EMPTY.test(component)) return;
 
         switch (destination.getType()) {
-            case TITLE -> sendTitle(fPlayer, destination.getTimes(), component, Component.empty());
-            case SUBTITLE -> sendTitle(fPlayer, destination.getTimes(), Component.empty(), component);
+            case TITLE -> sendTitle(fPlayer, destination.getTimes(), component, subcomponent);
+            case SUBTITLE -> sendTitle(fPlayer, destination.getTimes(), subcomponent, component);
             case ACTION_BAR -> sendActionBar(fPlayer, component);
             case BOSS_BAR -> sendBoosBar(fPlayer, component, destination.getBossBar());
             case TAB_HEADER -> sendPlayerListHeaderAndFooter(fPlayer, component, fPlayerManager.getPlayerListFooter(fPlayer));
@@ -108,6 +108,5 @@ public abstract class MessageSender {
         );
     }
 
-    public abstract void sendToast(FPlayer fPlayer, Component component, Toast toast);
-
+    public abstract void sendToast(FPlayer fPlayer, Component title, Component description, Toast toast);
 }
