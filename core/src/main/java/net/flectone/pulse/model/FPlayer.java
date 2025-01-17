@@ -96,6 +96,10 @@ public class FPlayer extends FEntity {
                 .anyMatch(ignore -> ignore.target() == fPlayer.getId());
     }
 
+    public boolean isMuted() {
+        return getMute().isPresent();
+    }
+
     public Optional<Moderation> getMute() {
         if (mutes.isEmpty()) return Optional.empty();
 
