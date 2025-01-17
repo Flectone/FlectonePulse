@@ -105,7 +105,11 @@ public class BukkitCommandUtil extends CommandUtil {
     @Override
     public String getLiteral(int index, Object arguments) {
         if (arguments instanceof CommandArguments commandArguments) {
-            return commandArguments.fullInput().split(" ")[index+1];
+            String[] strings = commandArguments.fullInput().split(" ");
+
+            if (strings.length <= index+1) return "";
+
+            return strings[index+1];
         }
 
         return "";
