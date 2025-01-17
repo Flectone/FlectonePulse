@@ -8,6 +8,7 @@ import net.elytrium.serializer.annotations.Transient;
 import net.elytrium.serializer.custom.ClassSerializer;
 import net.elytrium.serializer.language.object.YamlSerializable;
 import net.flectone.pulse.model.*;
+import net.flectone.pulse.util.AdvancementType;
 import net.kyori.adventure.bossbar.BossBar;
 
 import java.nio.file.Path;
@@ -119,6 +120,12 @@ public abstract class FileSerializable extends YamlSerializable {
                     map.put("type", destination.getType());
 
                     switch (destination.getType()) {
+                        case TOAST -> {
+                            Toast toast = destination.getToast();
+
+                            map.put("icon", toast.getIcon());
+                            map.put("style", toast.getStyle());
+                        }
                         case TITLE, SUBTITLE -> {
                             Times times = destination.getTimes();
 
@@ -150,6 +157,15 @@ public abstract class FileSerializable extends YamlSerializable {
                     Destination.Type type = Destination.Type.valueOf(String.valueOf(map.get("type")));
 
                     return switch (type) {
+                        case TOAST -> {
+                            Object icon = map.get("icon");
+                            String stringIcon = icon == null ? "minecraft:diamond" : String.valueOf(icon);
+
+                            Object style = map.get("style");
+                            AdvancementType toastStyle = style == null ? AdvancementType.CHALLENGE : AdvancementType.valueOf(String.valueOf(style));
+
+                            yield new Destination(Destination.Type.TOAST, new Toast(stringIcon, toastStyle));
+                        }
                         case TITLE, SUBTITLE -> {
                             Object times = map.get("times");
 

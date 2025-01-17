@@ -5,15 +5,10 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBo
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerListHeaderAndFooter;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPluginMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.ThreadManager;
-import net.flectone.pulse.model.BossBar;
-import net.flectone.pulse.model.Destination;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.Times;
+import net.flectone.pulse.model.*;
 import net.flectone.pulse.util.BrandPacketSerializer;
 import net.flectone.pulse.util.PacketEventsUtil;
 import net.kyori.adventure.text.Component;
@@ -21,8 +16,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.UUID;
 
-@Singleton
-public class MessageSender {
+public abstract class MessageSender {
 
     private final BrandPacketSerializer packetSerializer;
     private final ThreadManager threadManager;
@@ -30,7 +24,6 @@ public class MessageSender {
     private final PacketEventsUtil packetEventsUtil;
     private final FLogger fLogger;
 
-    @Inject
     public MessageSender(ThreadManager threadManager,
                          FPlayerManager fPlayerManager,
                          BrandPacketSerializer packetSerializer,
@@ -53,6 +46,7 @@ public class MessageSender {
             case BOSS_BAR -> sendBoosBar(fPlayer, component, destination.getBossBar());
             case TAB_HEADER -> sendPlayerListHeaderAndFooter(fPlayer, component, fPlayerManager.getPlayerListFooter(fPlayer));
             case TAB_FOOTER -> sendPlayerListHeaderAndFooter(fPlayer, fPlayerManager.getPlayerListHeader(fPlayer), component);
+            case TOAST -> sendToast(fPlayer, component, subcomponent, destination.getToast());
             case BRAND -> sendBrand(fPlayer, component);
             default -> sendMessage(fPlayer, component);
         }
@@ -113,5 +107,7 @@ public class MessageSender {
                 new WrapperPlayServerPluginMessage(BrandPacketSerializer.MINECRAFT_BRAND, packetSerializer.serialize(message))
         );
     }
+
+    public abstract void sendToast(FPlayer fPlayer, Component component, Toast toast);
 
 }

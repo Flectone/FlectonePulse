@@ -121,7 +121,9 @@ import net.flectone.pulse.module.message.scoreboard.BukkitScoreboardModule;
 import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.sign.BukkitSignModule;
 import net.flectone.pulse.module.message.sign.SignModule;
+import net.flectone.pulse.platform.BukkitMessageSender;
 import net.flectone.pulse.platform.LibraryResolver;
+import net.flectone.pulse.platform.MessageSender;
 import net.flectone.pulse.util.*;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -168,6 +170,7 @@ public class BukkitInjector extends AbstractModule {
         bind(MetricsUtil.class).to(BukkitMetricsUtil.class);
         bind(FileUtil.class).to(BukkitFileUtil.class);
         bind(BubbleManager.class).to(BukkitBubbleManager.class);
+        bind(MessageSender.class).to(BukkitMessageSender.class);
 
         // modules
         bind(IntegrationModule.class).to(BukkitIntegrationModule.class);

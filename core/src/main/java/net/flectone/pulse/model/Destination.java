@@ -1,6 +1,7 @@
 package net.flectone.pulse.model;
 
 import lombok.Getter;
+import net.flectone.pulse.util.AdvancementType;
 
 @Getter
 public class Destination {
@@ -13,6 +14,7 @@ public class Destination {
     );
 
     private Times times = new Times(20, 100, 20);
+    private Toast toast = new Toast("minecraft:diamond", AdvancementType.CHALLENGE);
 
     public Destination() {
         this(Type.CHAT);
@@ -32,6 +34,11 @@ public class Destination {
         this.times = times;
     }
 
+    public Destination(Type type, Toast toast) {
+        this(type);
+        this.toast = toast;
+    }
+
     public enum Type {
         ACTION_BAR,
         BOSS_BAR,
@@ -40,6 +47,7 @@ public class Destination {
         TITLE,
         SUBTITLE,
         TAB_HEADER,
-        TAB_FOOTER
+        TAB_FOOTER,
+        TOAST
     }
 }
