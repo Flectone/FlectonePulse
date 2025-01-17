@@ -30,6 +30,9 @@ public class BukkitItemUtil implements ItemUtil {
         this.signKey = signKey;
     }
 
+    // don't work after 0.2.0 release
+    // need fix but idk how
+    // more information https://discord.com/channels/861147957365964810/1329866516732182579
     @Nullable
     @Override
     public HoverEvent<?> hoverEvent(Object item) {
