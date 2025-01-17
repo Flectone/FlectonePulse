@@ -38,13 +38,11 @@ public class BukkitTictactoeModule extends TictactoeModule {
 
     @Override
     public void createCommand() {
-        String name = getCommand().getAliases().get(0);
-
         String playerPrompt = getPrompt().getPlayer();
         String hardPrompt = getPrompt().getHard();
         String promptId = getPrompt().getId();
 
-        new FCommand(name)
+        new FCommand(getName(getCommand()))
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(new StringArgument(playerPrompt)

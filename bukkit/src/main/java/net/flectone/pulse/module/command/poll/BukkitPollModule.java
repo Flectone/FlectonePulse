@@ -32,14 +32,13 @@ public class BukkitPollModule extends PollModule {
 
     @Override
     public void createCommand() {
-        String name = getCommand().getAliases().get(0);
         String promptMessage = getPrompt().getMessage();
         String promptTime = getPrompt().getTime();
         String promptMultipleVote = getPrompt().getMultipleVote();
         String promptId = getPrompt().getId();
         String promptNumber = getPrompt().getNumber();
 
-        new FCommand(name)
+        new FCommand(getName(getCommand()))
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(new LiteralArgument("create")

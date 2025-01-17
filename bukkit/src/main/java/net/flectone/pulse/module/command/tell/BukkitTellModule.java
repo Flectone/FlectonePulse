@@ -31,11 +31,10 @@ public class BukkitTellModule extends TellModule {
 
     @Override
     public void createCommand() {
-        String name = getCommand().getAliases().get(0);
         String promptPlayer = getPrompt().getPlayer();
         String promptMessage = getPrompt().getMessage();
 
-        new FCommand(name)
+        new FCommand(getName(getCommand()))
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(new StringArgument(promptPlayer)

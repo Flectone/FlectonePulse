@@ -29,23 +29,22 @@ public class BukkitBanModule extends BanModule {
                            BukkitCommandUtil commandManager,
                            ComponentUtil componentUtil,
                            PacketEventsUtil packetEventsUtil,
-                           TimeUtil timeUtil,
+                           ModerationUtil moderationUtil,
                            FLogger fLogger,
                            Gson gson) {
         super(database, fileManager, fPlayerManager, permissionUtil, threadManager, listenerManager, commandManager,
-                componentUtil, packetEventsUtil, timeUtil, fLogger, gson);
+                componentUtil, packetEventsUtil, moderationUtil, fLogger, gson);
 
         this.commandManager = commandManager;
     }
 
     @Override
     public void createCommand() {
-        String name = getCommand().getAliases().get(0);
         String promptPlayer = getPrompt().getPlayer();
         String promptReason = getPrompt().getReason();
         String promptTime = getPrompt().getTime();
 
-        new FCommand(name)
+        new FCommand(getName(getCommand()))
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(new StringArgument(promptPlayer)

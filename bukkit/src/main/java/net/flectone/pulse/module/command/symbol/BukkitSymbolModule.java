@@ -20,14 +20,12 @@ public class BukkitSymbolModule extends SymbolModule {
 
     @Override
     public void createCommand() {
-        String name = getCommand().getAliases().get(0);
-
         String promptCategory = getPrompt().getCategory();
         String promptMessage = getPrompt().getMessage();
 
         Localization.Command.Symbol localization = resolveLocalization();
 
-        new FCommand(name)
+        new FCommand(getName(getCommand()))
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(new MultiLiteralArgument(promptCategory, localization.getCategories().values().toArray(new String[]{}))

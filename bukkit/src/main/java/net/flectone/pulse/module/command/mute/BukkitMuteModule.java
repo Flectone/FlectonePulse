@@ -43,12 +43,11 @@ public class BukkitMuteModule extends MuteModule {
 
     @Override
     public void createCommand() {
-        String name = getCommand().getAliases().get(0);
         String promptPlayer = getPrompt().getPlayer();
         String promptReason = getPrompt().getReason();
         String promptTime = getPrompt().getTime();
 
-        new FCommand(name)
+        new FCommand(getName(getCommand()))
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(new StringArgument(promptPlayer)

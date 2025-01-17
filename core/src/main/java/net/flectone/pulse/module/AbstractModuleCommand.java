@@ -3,6 +3,7 @@ package net.flectone.pulse.module;
 import com.google.inject.Inject;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.database.Database;
+import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
@@ -15,6 +16,7 @@ import net.flectone.pulse.util.Range;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -57,6 +59,13 @@ public abstract class AbstractModuleCommand<M extends Localization.ILocalization
 
     public Localization.Command.Prompt getPrompt() {
         return fileManager.getLocalization().getCommand().getPrompt();
+    }
+
+    public String getName(Command.ICommandFile command) {
+        List<String> aliases = command.getAliases();
+        if (aliases.isEmpty()) return "flectonepulsenull";
+
+        return aliases.get(0);
     }
 
     public boolean checkDisable(FEntity entity, @NotNull FEntity receiver, DisableAction action) {

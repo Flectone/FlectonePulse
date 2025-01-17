@@ -18,10 +18,9 @@ public class BukkitDoModule extends DoModule {
 
     @Override
     public void createCommand() {
-        String name = getCommand().getAliases().get(0);
         String prompt = getPrompt().getMessage();
 
-        new FCommand(name)
+        new FCommand(getName(getCommand()))
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(new GreedyStringArgument(prompt)

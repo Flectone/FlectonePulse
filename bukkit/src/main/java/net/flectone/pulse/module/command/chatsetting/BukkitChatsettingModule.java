@@ -83,9 +83,7 @@ public class BukkitChatsettingModule extends ChatsettingModule {
 
     @Override
     public void createCommand() {
-        String name = getCommand().getAliases().get(0);
-
-        new FCommand(name)
+        new FCommand(getName(getCommand()))
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .executesPlayer(this::executesFPlayer)

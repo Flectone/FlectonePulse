@@ -21,11 +21,10 @@ public class BukkitTranslatetoModule extends TranslatetoModule {
 
     @Override
     public void createCommand() {
-        String name = getCommand().getAliases().get(0);
         String promptMessage = getPrompt().getMessage();
         String[] suggestionLanguages = new String[]{"en", "ru"};
 
-        new FCommand(name)
+        new FCommand(getName(getCommand()))
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(new StringArgument("mainLang")

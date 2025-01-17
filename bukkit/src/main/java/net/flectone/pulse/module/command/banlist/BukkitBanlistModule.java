@@ -41,11 +41,10 @@ public class BukkitBanlistModule extends BanlistModule {
 
     @Override
     public void createCommand() {
-        String name = getCommand().getAliases().get(0);
         String promptPlayer = getPrompt().getPlayer();
         String promptNumber = getPrompt().getNumber();
 
-        new FCommand(name)
+        new FCommand(getName(getCommand()))
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(new IntegerArgument(promptNumber).setOptional(true)

@@ -38,10 +38,9 @@ public class BukkitChatcolorModule extends ChatcolorModule {
 
     @Override
     public void createCommand() {
-        String name = getCommand().getAliases().get(0);
         String prompt = getPrompt().getColor();
 
-        new FCommand(name)
+        new FCommand(getName(getCommand()))
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(colorArgument(prompt, getColor().getValues().size())

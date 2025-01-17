@@ -30,11 +30,10 @@ public class BukkitRockpaperscissorsModule extends RockpaperscissorsModule {
 
     @Override
     public void createCommand() {
-        String name = getCommand().getAliases().get(0);
         String playerPrompt = getPrompt().getPlayer();
         String movePrompt = getPrompt().getMove();
 
-        new FCommand(name)
+        new FCommand(getName(getCommand()))
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(new StringArgument(playerPrompt)

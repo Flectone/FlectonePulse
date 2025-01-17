@@ -38,10 +38,9 @@ public class BukkitMaintenanceModule extends MaintenanceModule {
 
     @Override
     public void createCommand() {
-        String name = getCommand().getAliases().get(0);
         String prompt = fileManager.getLocalization().getCommand().getPrompt().getTurn();
 
-        new FCommand(name)
+        new FCommand(getName(getCommand()))
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(new BooleanArgument(prompt)

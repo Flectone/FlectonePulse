@@ -29,11 +29,10 @@ public class BukkitKickModule extends KickModule {
 
     @Override
     public void createCommand() {
-        String name = getCommand().getAliases().get(0);
         String playerPrompt = getPrompt().getPlayer();
         String messagePrompt = getPrompt().getMessage();
 
-        new FCommand(name)
+        new FCommand(getName(getCommand()))
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(new StringArgument(playerPrompt)
