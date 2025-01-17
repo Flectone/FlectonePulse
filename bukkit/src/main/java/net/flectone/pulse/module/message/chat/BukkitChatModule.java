@@ -12,7 +12,6 @@ import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BukkitBubbleModule;
 import net.flectone.pulse.module.message.chat.listener.ChatListener;
 import net.flectone.pulse.util.MessageTag;
@@ -37,7 +36,6 @@ public class BukkitChatModule extends ChatModule {
     private final PermissionUtil permissionUtil;
     private final ThreadManager threadManager;
     private final BukkitListenerManager bukkitListenerManager;
-    private final IntegrationModule integrationModule;
     private final TimeUtil timeUtil;
 
     @Inject private BukkitBubbleModule bubbleModule;
@@ -48,7 +46,6 @@ public class BukkitChatModule extends ChatModule {
                             ThreadManager threadManager,
                             BukkitListenerManager bukkitListenerManager,
                             PermissionUtil permissionUtil,
-                            IntegrationModule integrationModule,
                             TimeUtil timeUtil) {
         super(fileManager);
 
@@ -56,7 +53,6 @@ public class BukkitChatModule extends ChatModule {
         this.permissionUtil = permissionUtil;
         this.threadManager = threadManager;
         this.bukkitListenerManager = bukkitListenerManager;
-        this.integrationModule = integrationModule;
         this.timeUtil = timeUtil;
     }
 
@@ -78,7 +74,7 @@ public class BukkitChatModule extends ChatModule {
             return;
         }
 
-        String string = integrationModule.checkMention(fPlayer, event);
+        String string = event.getMessage();
 
         Message.Chat.Type playerChat = message.getTypes().getOrDefault(fPlayer.getChat(), getPlayerChat(fPlayer, string));
 

@@ -152,7 +152,7 @@ public class ComponentUtil {
         // need refactor logic formatting
         // mb chain or eventbus pattern
         public Component build() {
-            String message = integrationModule.setPlaceholders(sender, receiver, integrationModule.mark(sender, this.message), userMessage);
+            String message = integrationModule.setPlaceholders(sender, receiver, this.message, userMessage);
 
             List<TagResolver> tagResolverList = new ArrayList<>();
             if (tagResolvers != null) {

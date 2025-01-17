@@ -56,7 +56,6 @@ public interface IModule {
     interface IIntegration {
 
         ISubIntegration getDiscord();
-        ISubIntegration getInteractivechat();
         ISubIntegration getLuckperms();
         ISubIntegration getPlaceholderapi();
         ISubIntegration getPlasmovoice();

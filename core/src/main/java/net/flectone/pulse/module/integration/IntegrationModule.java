@@ -30,10 +30,6 @@ public abstract class IntegrationModule extends AbstractModule {
         return integration.isEnable();
     }
 
-    public abstract String checkMention(FPlayer fPlayer, Object event);
-
-    public abstract String mark(FEntity sender, String message);
-
     public abstract String setPlaceholders(FEntity sender, FEntity receiver, String message, boolean permission);
 
     public abstract boolean hasFPlayerPermission(FPlayer fPlayer, String permission);
