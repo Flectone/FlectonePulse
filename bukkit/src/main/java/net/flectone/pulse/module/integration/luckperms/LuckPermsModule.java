@@ -8,6 +8,9 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 
+import java.util.Collections;
+import java.util.Set;
+
 @Singleton
 public class LuckPermsModule extends AbstractModule {
 
@@ -60,5 +63,11 @@ public class LuckPermsModule extends AbstractModule {
         if (checkModulePredicates(fPlayer)) return null;
 
         return luckPermsIntegration.getSuffix(fPlayer);
+    }
+
+    public Set<String> getGroups() {
+        if (!isEnable()) return Collections.emptySet();
+
+        return luckPermsIntegration.getGroups();
     }
 }

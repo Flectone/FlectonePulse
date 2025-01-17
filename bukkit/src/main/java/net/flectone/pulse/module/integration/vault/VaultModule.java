@@ -8,6 +8,9 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 
+import java.util.Collections;
+import java.util.Set;
+
 @Singleton
 public class VaultModule extends AbstractModule {
 
@@ -53,5 +56,11 @@ public class VaultModule extends AbstractModule {
         if (checkModulePredicates(fPlayer)) return null;
 
         return vaultIntegration.getSuffix(fPlayer);
+    }
+
+    public Set<String> getGroups() {
+        if (!isEnable()) return Collections.emptySet();;
+
+        return vaultIntegration.getGroups();
     }
 }

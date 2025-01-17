@@ -8,7 +8,6 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
-import net.flectone.pulse.module.integration.interactivechat.InteractiveChatModule;
 import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.module.integration.placeholderapi.PlaceholderAPIModule;
 import net.flectone.pulse.module.integration.plasmovoice.PlasmoVoiceModule;
@@ -20,8 +19,9 @@ import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.vault.VaultModule;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.ServerUtil;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import java.util.Collections;
+import java.util.Set;
 import java.util.function.UnaryOperator;
 
 @Singleton
@@ -66,10 +66,6 @@ public class BukkitIntegrationModule extends IntegrationModule {
             addChildren(SkinsRestorerModule.class);
         }
 
-        if (serverUtil.hasProject("InteractiveChat")) {
-            addChildren(InteractiveChatModule.class);
-        }
-
         if (serverUtil.hasProject("VoiceChat")) {
             addChildren(SimpleVoiceModule.class);
         }
@@ -87,25 +83,6 @@ public class BukkitIntegrationModule extends IntegrationModule {
         addChildren(DiscordModule.class);
         addChildren(TwitchModule.class);
         addChildren(TelegramModule.class);
-    }
-
-    @Override
-    public String checkMention(FPlayer fPlayer, Object event) {
-        if (!(event instanceof AsyncPlayerChatEvent bukkitEvent)) return "";
-
-        String message = bukkitEvent.getMessage();
-
-        if (checkModulePredicates(fPlayer)) return message;
-
-        return injector.getInstance(InteractiveChatModule.class).checkMention(bukkitEvent);
-    }
-
-    @Override
-    public String mark(FEntity sender, String message) {
-        if (checkModulePredicates(sender)) return message;
-        if (!getChildren().contains(InteractiveChatModule.class)) return message;
-
-        return injector.getInstance(InteractiveChatModule.class).mark(sender, message);
     }
 
     @Override
@@ -163,6 +140,21 @@ public class BukkitIntegrationModule extends IntegrationModule {
         }
 
         return null;
+    }
+
+    @Override
+    public Set<String> getGroups() {
+        if (!isEnable()) return Collections.emptySet();
+
+        if (getChildren().contains(LuckPermsModule.class)) {
+            return injector.getInstance(LuckPermsModule.class).getGroups();
+        }
+
+        if (getChildren().contains(VaultModule.class)) {
+            return injector.getInstance(VaultModule.class).getGroups();
+        }
+
+        return Collections.emptySet();
     }
 
     @Override

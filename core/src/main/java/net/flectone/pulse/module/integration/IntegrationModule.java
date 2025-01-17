@@ -8,6 +8,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.util.MessageTag;
 
+import java.util.Set;
 import java.util.function.UnaryOperator;
 
 public abstract class IntegrationModule extends AbstractModule {
@@ -37,6 +38,8 @@ public abstract class IntegrationModule extends AbstractModule {
     public abstract String getPrefix(FPlayer fPlayer);
 
     public abstract String getSuffix(FPlayer fPlayer);
+
+    public abstract Set<String> getGroups();
 
     public abstract int getGroupWeight(FPlayer fPlayer);
 

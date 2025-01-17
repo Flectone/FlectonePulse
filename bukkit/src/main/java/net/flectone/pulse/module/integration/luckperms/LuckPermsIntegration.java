@@ -11,7 +11,10 @@ import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
 
+import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Singleton
 public class LuckPermsIntegration implements FIntegration {
@@ -62,6 +65,14 @@ public class LuckPermsIntegration implements FIntegration {
         if (user == null) return null;
 
         return user.getCachedData().getMetaData().getSuffix();
+    }
+
+    public Set<String> getGroups() {
+        if (luckPerms == null) return Collections.emptySet();
+
+        return luckPerms.getGroupManager().getLoadedGroups().stream()
+                .map(Group::getName)
+                .collect(Collectors.toSet());
     }
 
     private User loadUser(FPlayer fPlayer) {

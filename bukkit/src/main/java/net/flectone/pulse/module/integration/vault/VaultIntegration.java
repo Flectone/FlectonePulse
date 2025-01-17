@@ -13,6 +13,9 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Collections;
+import java.util.Set;
+
 @Singleton
 public class VaultIntegration implements FIntegration {
 
@@ -75,6 +78,12 @@ public class VaultIntegration implements FIntegration {
         if (player == null) return null;
 
         return chat.getPlayerPrefix(player);
+    }
+
+    public Set<String> getGroups() {
+        if (chat == null) return Collections.emptySet();
+
+        return Set.of(chat.getGroups());
     }
 
 }
