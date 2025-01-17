@@ -17,6 +17,7 @@ public abstract class FlectonepulseModule extends AbstractModuleCommand<Localiza
     @Getter private final Permission.Command.Flectonepulse permission;
 
     private final FlectonePulse flectonePulse;
+    private final FileManager fileManager;
     private final ThreadManager threadManager;
     private final FLogger fLogger;
 
@@ -25,7 +26,9 @@ public abstract class FlectonepulseModule extends AbstractModuleCommand<Localiza
                                FlectonePulse flectonePulse,
                                FLogger fLogger) {
         super(localization -> localization.getCommand().getFlectonepulse(), null);
+
         this.flectonePulse = flectonePulse;
+        this.fileManager = fileManager;
         this.threadManager = threadManager;
         this.fLogger = fLogger;
 
@@ -38,6 +41,20 @@ public abstract class FlectonepulseModule extends AbstractModuleCommand<Localiza
     @Override
     public void onCommand(FPlayer fPlayer, Object arguments) {
         if (checkModulePredicates(fPlayer)) return;
+
+        String type = commandUtil.getLiteral(1, arguments);
+
+        if (type.equals("text")) {
+            fileManager.reload();
+
+            builder(fPlayer)
+                    .destination(command.getDestination())
+                    .format(Localization.Command.Flectonepulse::getFormatTrueText)
+                    .sound(getSound())
+                    .sendBuilt();
+
+            return;
+        }
 
         threadManager.runSync(() -> {
 

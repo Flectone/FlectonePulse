@@ -207,8 +207,9 @@ public final class Localization extends FileSerializable implements IModule {
         command.warnlist.player.line = "<hover:show_text:\"<fcolor:1>Снять предупреждение <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
         command.warnlist.player.footer = "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
 
-        command.flectonepulse.formatTrue = "<fcolor:2>★ Плагин успешно перезагружен!";
         command.flectonepulse.formatFalse = "<color:#ff7171>★ Возникла проблема при перезагрузке";
+        command.flectonepulse.formatTrue = "<fcolor:2>★ FlectonePulse успешно перезагружен!";
+        command.flectonepulse.formatTrueText = "<fcolor:2>★ ВАЖНО! Перезагружен только текст, для ПОЛНОЙ перезагрузки нужно использовать: <br><fcolor:1>/flectonepulse reload";
 
         command.chatcolor.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.chatcolor.format = "<color:#98FB98>★ Теперь цвета <fcolor:1>сообщение</fcolor> <fcolor:2>сообщение</fcolor> <fcolor:3>сообщение <fcolor:4>сообщение";
@@ -881,7 +882,8 @@ public final class Localization extends FileSerializable implements IModule {
         @Getter
         public static final class Flectonepulse implements ISubCommand, ILocalization {
             private String formatFalse = "<color:#ff7171>★ An has error occurred while reloading";
-            private String formatTrue = "<fcolor:2>★ Plugin successfully reloaded!";
+            private String formatTrue = "<fcolor:2>★ FlectonePulse successfully reloaded!";
+            private String formatTrueText = "<fcolor:2>★ IMPORTANT! <br>Only texts have been updated, for a FULL reload you need to use: <br><fcolor:1>/flectonepulse reload";
         }
 
         @Getter

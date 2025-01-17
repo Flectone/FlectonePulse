@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.flectonepulse;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import net.flectone.pulse.FlectonePulse;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
@@ -26,6 +27,9 @@ public class BukkitFlectonepulseModule extends FlectonepulseModule {
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(new LiteralArgument("reload")
+                        .then(new MultiLiteralArgument("type", "all", "text")
+                                .executes(this::executesFPlayer)
+                        )
                         .executes(this::executesFPlayer)
                 )
                 .override();
