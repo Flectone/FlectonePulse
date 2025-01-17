@@ -76,7 +76,7 @@ public abstract class WarnModule extends AbstractModuleCommand<Localization.Comm
             Moderation warn = database.insertModeration(fTarget, databaseTime, reason, fPlayer.getId(), Moderation.Type.WARN);
             if (warn == null) return;
 
-            builder(fPlayer)
+            builder(fTarget)
                     .range(command.getRange())
                     .destination(command.getDestination())
                     .tag(MessageTag.COMMAND_WARN)
