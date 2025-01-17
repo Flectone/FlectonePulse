@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.listener.AbstractPacketListener;
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
 import net.flectone.pulse.module.message.advancement.model.Advancement;
+import net.flectone.pulse.util.AdvancementType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -49,7 +50,7 @@ public class AdvancementPacketListener extends AbstractPacketListener {
 
     private void processAdvancement(String key, TranslatableComponent translatableComponent, PacketSendEvent event) {
         String stringType = key.substring(key.lastIndexOf(".") + 1);
-        Advancement.Type type = Advancement.Type.fromString(stringType);
+        AdvancementType type = AdvancementType.fromString(stringType);
         if (type == null) return;
 
         List<Component> translationArguments = translatableComponent.args();
@@ -116,9 +117,9 @@ public class AdvancementPacketListener extends AbstractPacketListener {
                         if (hoverEvent == null) return;
                         if (!(hoverEvent.value() instanceof TranslatableComponent description)) return;
 
-                        Advancement.Type type = NamedTextColor.DARK_PURPLE.equals(description.color())
-                                ? Advancement.Type.CHALLENGE
-                                : Advancement.Type.TASK;
+                        AdvancementType type = NamedTextColor.DARK_PURPLE.equals(description.color())
+                                ? AdvancementType.CHALLENGE
+                                : AdvancementType.TASK;
 
                         advancement = new Advancement(titleKey, descriptionKey, type);
 
@@ -134,9 +135,9 @@ public class AdvancementPacketListener extends AbstractPacketListener {
                         String title = titleComponent.content();
                         String description = childrenComponent.content();
 
-                        Advancement.Type type = NamedTextColor.DARK_PURPLE.equals(descriptionComponent.color())
-                                ? Advancement.Type.CHALLENGE
-                                : Advancement.Type.TASK;
+                        AdvancementType type = NamedTextColor.DARK_PURPLE.equals(descriptionComponent.color())
+                                ? AdvancementType.CHALLENGE
+                                : AdvancementType.TASK;
 
                         advancement = new Advancement(title, description, type);
                     } else return;
