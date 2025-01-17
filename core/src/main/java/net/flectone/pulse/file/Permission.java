@@ -927,7 +927,7 @@ public final class Permission extends FileSerializable implements IModule {
                 private String name = "flectonepulse.module.message.format.mention";
                 private Type type = Type.TRUE;
                 private PermissionEntry group = new PermissionEntry("flectonepulse.module.message.format.mention.group", Type.OP);
-                private PermissionEntry bypass = new PermissionEntry("flectonepulse.module.message.format.mention.bypass", Type.OP);
+                private PermissionEntry bypass = new PermissionEntry("flectonepulse.module.message.format.mention.bypass", Type.NOT_OP);
                 private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.format.mention.sound", Type.TRUE);
             }
 
