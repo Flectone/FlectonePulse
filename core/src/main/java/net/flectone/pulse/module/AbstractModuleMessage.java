@@ -324,40 +324,22 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
 
         public void send(List<FPlayer> recipients) {
             recipients.forEach(fReceiver -> {
-                ComponentUtil.Builder formatBuilder = componentUtil.builder(fPlayer, fReceiver, resolveString(fReceiver, this.format))
-                        .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(fReceiver));
 
-                if (formatComponentBuilder != null) {
-                    formatBuilder = formatComponentBuilder.apply(formatBuilder);
-                }
+                // user message
+                // example for chat message
+                Component message = buildMessageComponent(fReceiver);
 
-                Component finalComponent = formatBuilder.build();
+                // example
+                // format: TheFaser > <message>
+                // message: hello world!
+                // final formatted message: TheFaser > hello world!
+                Component component = combine(buildFormatComponent(fReceiver), message);
 
-                String message = resolveString(fReceiver, this.message);
-                if (message != null) {
+                // destination subtext for title and toast
+                // mostly empty
+                Component subcomponent = combine(buildSubcomponent(fReceiver), message);
 
-                    finalComponent = finalComponent.replaceText(TextReplacementConfig.builder()
-                            .match("<message>")
-                            .replacement(builder -> {
-
-                                ComponentUtil.Builder messageBuilder = componentUtil.builder(fPlayer, fReceiver, message);
-
-                                if (messageComponentBuilder != null) {
-                                    messageBuilder = messageComponentBuilder.apply(messageBuilder);
-                                } else {
-                                    messageBuilder
-                                            .userMessage(true)
-                                            .mention(true);
-                                }
-
-                                return messageBuilder.build();
-
-                            })
-                            .build()
-                    );
-                }
-
-                messageSender.send(destination, fReceiver, finalComponent);
+                messageSender.send(fReceiver, component, subcomponent, destination);
 
                 if (sound != null) {
                     if (!permissionUtil.has(fPlayer, sound.getPermission())) return;
@@ -365,6 +347,51 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
                     soundPlayer.play(sound, fReceiver);
                 }
             });
+        }
+
+        private Component combine(Component format, Component message) {
+            return format.replaceText(TextReplacementConfig.builder()
+                    .match("<message>")
+                    .replacement(builder -> message)
+                    .build()
+            );
+        }
+
+        private Component buildSubcomponent(FPlayer fReceiver) {
+            return destination.getSubtext().isEmpty()
+                    ? Component.empty()
+                    : componentUtil.builder(fPlayer, fReceiver, destination.getSubtext()).build();
+        }
+
+        private Component buildFormatComponent(FPlayer fReceiver) {
+            String format = resolveString(fReceiver, this.format);
+            if (format == null) return Component.empty();
+
+            ComponentUtil.Builder formatBuilder = componentUtil.builder(fPlayer, fReceiver, format)
+                    .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(fReceiver));
+
+            if (formatComponentBuilder != null) {
+                formatBuilder = formatComponentBuilder.apply(formatBuilder);
+            }
+
+            return formatBuilder.build();
+        }
+
+        private Component buildMessageComponent(FPlayer fReceiver) {
+            String message = resolveString(fReceiver, this.message);
+            if (message == null) return Component.empty();
+
+            ComponentUtil.Builder messageBuilder = componentUtil.builder(fPlayer, fReceiver, message);
+
+            if (messageComponentBuilder != null) {
+                messageBuilder = messageComponentBuilder.apply(messageBuilder);
+            } else {
+                messageBuilder = messageBuilder
+                        .userMessage(true)
+                        .mention(true);
+            }
+
+            return messageBuilder.build();
         }
 
         public void sendToIntegrations() {
