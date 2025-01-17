@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.command.unmute;
 
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
@@ -26,10 +27,11 @@ public class BukkitUnmuteModule extends UnmuteModule {
     @Inject
     public BukkitUnmuteModule(FileManager fileManager,
                               ThreadManager threadManager,
+                              CommandUtil commandUtil,
+                              Gson gson,
                               Database database,
-                              FLogger fLogger,
-                              CommandUtil commandUtil) {
-        super(fileManager, threadManager, commandUtil);
+                              FLogger fLogger){
+        super(fileManager, threadManager, commandUtil, gson);
 
         this.database = database;
         this.fLogger = fLogger;

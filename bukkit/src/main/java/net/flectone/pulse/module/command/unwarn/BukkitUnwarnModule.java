@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.command.unwarn;
 
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
@@ -27,9 +28,10 @@ public class BukkitUnwarnModule extends UnwarnModule {
     public BukkitUnwarnModule(FileManager fileManager,
                               ThreadManager threadManager,
                               CommandUtil commandUtil,
+                              Gson gson,
                               Database database,
                               FLogger fLogger) {
-        super(fileManager, threadManager, commandUtil);
+        super(fileManager, threadManager, commandUtil, gson);
 
         this.database = database;
         this.fLogger = fLogger;

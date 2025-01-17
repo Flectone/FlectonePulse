@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.command.unwarn;
 
+import com.google.gson.Gson;
 import lombok.Getter;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
@@ -22,14 +23,17 @@ public abstract class UnwarnModule extends AbstractModuleCommand<Localization.Co
 
     private final ThreadManager threadManager;
     private final CommandUtil commandUtil;
+    private final Gson gson;
 
     public UnwarnModule(FileManager fileManager,
                         ThreadManager threadManager,
-                        CommandUtil commandUtil) {
+                        CommandUtil commandUtil,
+                        Gson gson) {
         super(localization -> localization.getCommand().getUnwarn(), null);
 
         this.threadManager = threadManager;
         this.commandUtil = commandUtil;
+        this.gson = gson;
 
         command = fileManager.getCommand().getUnwarn();
         permission = fileManager.getPermission().getCommand().getUnwarn();
@@ -85,9 +89,9 @@ public abstract class UnwarnModule extends AbstractModuleCommand<Localization.Co
                     .destination(command.getDestination())
                     .range(command.getRange())
                     .filter(filter -> filter.is(FPlayer.Setting.WARN))
-                    .format(Localization.Command.Unwarn::getFormat)
-                    .proxy()
-                    .integration()
+                    .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
+                    .proxy(output -> output.writeUTF(gson.toJson(fPlayer)))
+                    .integration(s -> s.replace("<moderator>", fPlayer.getName()))
                     .sound(getSound())
                     .sendBuilt();
         });

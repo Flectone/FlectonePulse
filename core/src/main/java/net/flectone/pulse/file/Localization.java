@@ -157,7 +157,7 @@ public final class Localization extends FileSerializable implements IModule {
 
         command.unban.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.unban.notBanned = "<color:#ff7171><b>⁉</b> Игрок не заблокирован";
-        command.unban.format = "<color:#98FB98>☻ Игрок <display_name> разблокирован";
+        command.unban.format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator></fcolor> разблокировал игрока <fcolor:2><player></fcolor>";
 
         command.banlist.empty = "<color:#98FB98>☺ Блокировки не найдены";
         command.banlist.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
@@ -179,7 +179,7 @@ public final class Localization extends FileSerializable implements IModule {
 
         command.unmute.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.unmute.notMuted = "<color:#ff7171><b>⁉</b> Игрок не замучен";
-        command.unmute.format = "<color:#98FB98>☻ Игрок <display_name> размучен";
+        command.unmute.format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator></fcolor> размутил игрока <fcolor:2><player></fcolor>";
 
         command.mutelist.empty = "<color:#98FB98>☺ Муты не найдены";
         command.mutelist.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
@@ -200,7 +200,7 @@ public final class Localization extends FileSerializable implements IModule {
 
         command.unwarn.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.unwarn.notWarned = "<color:#ff7171><b>⁉</b> Игрок не имеет предупреждений";
-        command.unwarn.format = "<color:#98FB98>☻ С игрока <display_name> снято предупреждение";
+        command.unwarn.format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator></fcolor> снял предупреждение с игрока <fcolor:2><player></fcolor>";
 
         command.warnlist.empty = "<color:#98FB98>☺ Предупреждения не найдены";
         command.warnlist.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
@@ -1147,21 +1147,21 @@ public final class Localization extends FileSerializable implements IModule {
         public static final class Unban implements ISubCommand, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String notBanned = "<color:#ff7171><b>⁉</b> This player is not banned";
-            private String format = "<color:#98FB98>☻ Player <display_name> unbanned";
+            private String format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator></fcolor> unbanned the player <fcolor:2><player></fcolor>";
         }
 
         @Getter
         public static final class Unmute implements ISubCommand, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String notMuted = "<color:#ff7171><b>⁉</b> This player is not muted";
-            private String format = "<color:#98FB98>☻ Player <display_name> unmuted";
+            private String format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator></fcolor> unmutted the player <fcolor:2><player></fcolor>";
         }
 
         @Getter
         public static final class Unwarn implements ISubCommand, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String notWarned = "<color:#ff7171><b>⁉</b> This player is not warned";
-            private String format = "<color:#98FB98>☻ Player <display_name> unwarned";
+            private String format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator></fcolor> unwarned the player <fcolor:2><player></fcolor>";
         }
 
         @Getter
@@ -1278,7 +1278,6 @@ public final class Localization extends FileSerializable implements IModule {
                         new Embed.Author("", "", "https://mc-heads.net/avatar/<skin>/16.png"),
                         "",
                         "",
-                        new LinkedList<>(List.of(new Embed.Field("", "", false))),
                         "",
                         true,
                         new Embed.Footer("", "https://mc-heads.net/avatar/<skin>/16.png")
@@ -1294,7 +1293,6 @@ public final class Localization extends FileSerializable implements IModule {
             }
 
             @Getter
-            @AllArgsConstructor
             public static final class Embed {
                 private boolean enable;
                 private String color;
@@ -1303,7 +1301,6 @@ public final class Localization extends FileSerializable implements IModule {
                 private Author author;
                 private String description;
                 private String thumbnail;
-                private List<Field> fields;
                 private String image;
                 private boolean timestamp;
                 private Footer footer;
@@ -1314,14 +1311,6 @@ public final class Localization extends FileSerializable implements IModule {
                     private String name;
                     private String url;
                     private String iconUrl;
-                }
-
-                @Getter
-                @AllArgsConstructor
-                public static final class Field {
-                    private String name;
-                    private String value;
-                    private boolean inline;
                 }
 
                 @Getter

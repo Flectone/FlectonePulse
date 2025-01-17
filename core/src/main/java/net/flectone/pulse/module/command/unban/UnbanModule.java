@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.command.unban;
 
+import com.google.gson.Gson;
 import lombok.Getter;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
@@ -22,14 +23,17 @@ public abstract class UnbanModule extends AbstractModuleCommand<Localization.Com
 
     private final ThreadManager threadManager;
     private final CommandUtil commandUtil;
+    private final Gson gson;
 
     public UnbanModule(FileManager fileManager,
                        ThreadManager threadManager,
-                       CommandUtil commandUtil) {
+                       CommandUtil commandUtil,
+                       Gson gson) {
         super(localization -> localization.getCommand().getUnban(), null);
 
         this.threadManager = threadManager;
         this.commandUtil = commandUtil;
+        this.gson = gson;
 
         command = fileManager.getCommand().getUnban();
         permission = fileManager.getPermission().getCommand().getUnban();
@@ -85,9 +89,9 @@ public abstract class UnbanModule extends AbstractModuleCommand<Localization.Com
                     .destination(command.getDestination())
                     .range(command.getRange())
                     .filter(filter -> filter.is(FPlayer.Setting.BAN))
-                    .format(Localization.Command.Unban::getFormat)
-                    .proxy()
-                    .integration()
+                    .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
+                    .proxy(output -> output.writeUTF(gson.toJson(fPlayer)))
+                    .integration(s -> s.replace("<moderator>", fPlayer.getName()))
                     .sound(getSound())
                     .sendBuilt();
         });

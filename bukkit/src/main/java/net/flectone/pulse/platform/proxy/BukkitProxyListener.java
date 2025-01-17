@@ -242,37 +242,43 @@ public class BukkitProxyListener implements PluginMessageListener {
                 }
                 case COMMAND_UNBAN -> {
                     UnbanModule unbanModule = injector.getInstance(UnbanModule.class);
-                    if (!unbanModule.isEnable()) return;
+
+                    FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
+                    if (unbanModule.checkModulePredicates(fPlayer)) return;
 
                     unbanModule.builder(fEntity)
                             .destination(unbanModule.getCommand().getDestination())
                             .range(Range.SERVER)
                             .filter(filter -> filter.is(FPlayer.Setting.BAN))
-                            .format(Localization.Command.Unban::getFormat)
+                            .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
                             .sound(unbanModule.getCommand().getSound())
                             .sendBuilt();
                 }
                 case COMMAND_UNMUTE -> {
                     UnmuteModule unmuteModule = injector.getInstance(UnmuteModule.class);
-                    if (!unmuteModule.isEnable()) return;
+
+                    FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
+                    if (unmuteModule.checkModulePredicates(fPlayer)) return;
 
                     unmuteModule.builder(fEntity)
                             .destination(unmuteModule.getCommand().getDestination())
                             .range(Range.SERVER)
                             .filter(filter -> filter.is(FPlayer.Setting.MUTE))
-                            .format(Localization.Command.Unmute::getFormat)
+                            .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
                             .sound(unmuteModule.getCommand().getSound())
                             .sendBuilt();
                 }
                 case COMMAND_UNWARN -> {
                     UnwarnModule unwarnModule = injector.getInstance(UnwarnModule.class);
-                    if (!unwarnModule.isEnable()) return;
+
+                    FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
+                    if (unwarnModule.checkModulePredicates(fPlayer)) return;
 
                     unwarnModule.builder(fEntity)
                             .destination(unwarnModule.getCommand().getDestination())
                             .range(Range.SERVER)
                             .filter(filter -> filter.is(FPlayer.Setting.WARN))
-                            .format(Localization.Command.Unwarn::getFormat)
+                            .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
                             .sound(unwarnModule.getCommand().getSound())
                             .sendBuilt();
                 }

@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.command.unmute;
 
+import com.google.gson.Gson;
 import lombok.Getter;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
@@ -22,14 +23,17 @@ public abstract class UnmuteModule extends AbstractModuleCommand<Localization.Co
 
     private final ThreadManager threadManager;
     private final CommandUtil commandUtil;
+    private final Gson gson;
 
     public UnmuteModule(FileManager fileManager,
                         ThreadManager threadManager,
-                        CommandUtil commandUtil) {
+                        CommandUtil commandUtil,
+                        Gson gson) {
         super(localization -> localization.getCommand().getUnmute(), null);
 
         this.threadManager = threadManager;
         this.commandUtil = commandUtil;
+        this.gson = gson;
 
         command = fileManager.getCommand().getUnmute();
         permission = fileManager.getPermission().getCommand().getUnmute();
@@ -85,9 +89,9 @@ public abstract class UnmuteModule extends AbstractModuleCommand<Localization.Co
                     .destination(command.getDestination())
                     .range(command.getRange())
                     .filter(filter -> filter.is(FPlayer.Setting.MUTE))
-                    .format(Localization.Command.Unmute::getFormat)
-                    .proxy()
-                    .integration()
+                    .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
+                    .proxy(output -> output.writeUTF(gson.toJson(fPlayer)))
+                    .integration(s -> s.replace("<moderator>", fPlayer.getName()))
                     .sound(getSound())
                     .sendBuilt();
         });
