@@ -48,6 +48,11 @@ public class FPlayer extends FEntity {
         this(-1, name, FEntity.UNKNOWN_UUID, "unknown");
     }
 
+    public void updateMutes(List<Moderation> mutes) {
+        this.mutes.clear();
+        this.mutes.addAll(mutes);
+    }
+
     public void setOnline(boolean online) {
         if (isUnknown()) return;
         this.online = online;

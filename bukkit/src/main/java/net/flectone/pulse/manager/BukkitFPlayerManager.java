@@ -105,7 +105,8 @@ public class BukkitFPlayerManager extends FPlayerManager {
 
         database.setColors(fPlayer);
         database.setIgnores(fPlayer);
-        fPlayer.getMutes().addAll(database.getModerations(fPlayer, Moderation.Type.MUTE));
+
+        fPlayer.updateMutes(database.getModerations(fPlayer, Moderation.Type.MUTE));
 
         fPlayer.setOnline(true);
         fPlayer.setIp(ip);

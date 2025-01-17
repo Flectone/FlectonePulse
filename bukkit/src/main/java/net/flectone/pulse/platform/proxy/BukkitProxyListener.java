@@ -227,7 +227,10 @@ public class BukkitProxyListener implements PluginMessageListener {
                     MuteModule muteModule = injector.getInstance(MuteModule.class);
                     if (muteModule.checkModulePredicates(fEntity)) return;
 
-                    FPlayer fTarget = gson.fromJson(input.readUTF(), FPlayer.class);
+                    if (!fPlayerManager.get(fEntity.getUuid()).isUnknown()) {
+                        fPlayerManager.get(fEntity.getUuid()).updateMutes(database.getValidModerations(Moderation.Type.MUTE));
+                    }
+
                     Moderation mute = gson.fromJson(input.readUTF(), Moderation.class);
 
                     muteModule.builder(fEntity)
@@ -259,6 +262,10 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
                     if (unmuteModule.checkModulePredicates(fPlayer)) return;
+
+                    if (!fPlayerManager.get(fEntity.getUuid()).isUnknown()) {
+                        fPlayerManager.get(fEntity.getUuid()).updateMutes(database.getValidModerations(Moderation.Type.MUTE));
+                    }
 
                     unmuteModule.builder(fEntity)
                             .destination(unmuteModule.getCommand().getDestination())
