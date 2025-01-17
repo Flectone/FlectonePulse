@@ -199,16 +199,6 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
             embedBuilder.thumbnail(discordString.apply(embed.getThumbnail()));
         }
 
-        if (!embed.getFields().isEmpty()) {
-            for (var field : embed.getFields()) {
-                embedBuilder.addField(
-                        discordString.apply(field.getName()),
-                        discordString.apply(field.getValue()),
-                        field.isInline()
-                );
-            }
-        }
-
         if (!embed.getImage().isEmpty()) {
             embedBuilder.image(discordString.apply(embed.getImage()));
         }
@@ -218,7 +208,6 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
         }
 
         Localization.Integration.Discord.Embed.Footer footer = embed.getFooter();
-
         if (!footer.getText().isEmpty() || !footer.getIconUrl().isEmpty()) {
             embedBuilder.footer(
                     discordString.apply(footer.getText()),

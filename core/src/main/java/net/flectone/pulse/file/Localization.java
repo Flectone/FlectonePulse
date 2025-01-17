@@ -1305,6 +1305,19 @@ public final class Localization extends FileSerializable implements IModule {
                 private boolean timestamp;
                 private Footer footer;
 
+                public Embed(boolean enable, String color, String title, String url, Author author, String description, String thumbnail, String image, boolean timestamp, Footer footer) {
+                    this.enable = enable;
+                    this.color = color;
+                    this.title = title;
+                    this.url = url;
+                    this.author = author;
+                    this.description = description;
+                    this.thumbnail = thumbnail;
+                    this.image = image;
+                    this.timestamp = timestamp;
+                    this.footer = footer;
+                }
+
                 @Getter
                 @AllArgsConstructor
                 public static final class Author {
