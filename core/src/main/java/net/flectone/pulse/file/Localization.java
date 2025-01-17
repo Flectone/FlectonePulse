@@ -44,6 +44,7 @@ public final class Localization extends FileSerializable implements IModule {
         cooldown = "<color:#ff7171><b>⁉</b> Слишком быстро, попробуй через <time>";
 
         time.format = "dd'д' HH'ч' mm'м' ss.SSS'с'";
+        time.permanent = "НАВСЕГДА";
         time.zero = "0с";
 
         command.dice.format = "<fcolor:1>✎ <display_name> кинул кубики <message> (<sum>)";
@@ -105,8 +106,8 @@ public final class Localization extends FileSerializable implements IModule {
         command.kick.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.kick.reasons.clear();
         command.kick.reasons.put("default", "Исключён модератором");
-        command.kick.global = "<color:#ff7171><br>⏵ Игрок <target> был исключён <br>⏵ Причина: <message> <br>⏵ Модератор: <display_name><br>";
-        command.kick.player = "<color:#ff7171>☠ Ты исключён модератором <moderator> <br>Причина: <message>";
+        command.kick.server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> исключил <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
+        command.kick.person = "<color:#ff7171>🔒 КИК 🔒 <fcolor:1><br><br>Айди: <id><br><br>Дата: <date><br><br>Модератор: <moderator><br><br>Причина: <reason>";
 
         command.helper.nullHelper = "<color:#ff7171><b>⁉</b> Сейчас нет людей, кто бы смог помочь";
         command.helper.global = "<fcolor:2>👤 <display_name> просит помощи ⏩ <fcolor:1><message>";
@@ -144,16 +145,11 @@ public final class Localization extends FileSerializable implements IModule {
 
         command.ban.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.ban.nullTime = "<color:#ff7171><b>⁉</b> Невозможное время";
-        command.ban.temporarily.reasons.clear();
-        command.ban.temporarily.reasons.put("default", "Ты временно заблокирован на этом сервере");
-        command.ban.temporarily.connectionAttempt = "<color:#ff7171>☠ Заблокированный <target> пытался подключиться, ему осталось <time>";
-        command.ban.temporarily.global = "<color:#ff7171><br>⏵ Игрок <target> заблокирован на <time> <br>⏵ Причина: <message> <br>⏵ Модератор: <display_name><br>";
-        command.ban.temporarily.player = "<color:#ff7171>☠ Ты заблокирован, осталось <time> <br>Причина: <message>";
-        command.ban.permanent.reasons.clear();
-        command.ban.permanent.reasons.put("default", "Ты заблокирован на этом сервере");
-        command.ban.permanent.connectionAttempt = "<color:#ff7171>☠ Навсегда заблокированный <target> пытался подключиться";
-        command.ban.permanent.global = "<color:#ff7171><br>⏵ Игрок <target> заблокирован навсегда <br>⏵ Причина: <message> <br>⏵ Модератор: <display_name><br>";
-        command.ban.permanent.player = "<color:#ff7171>☠ Ты заблокирован навсегда, <br>Причина: <message>";
+        command.ban.reasons.clear();
+        command.ban.reasons.put("default", "Ты заблокирован на этом сервере");
+        command.ban.server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> заблокировал игрока <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
+        command.ban.person = "<color:#ff7171>🔒 БАН 🔒 <fcolor:1><br><br>Дата: <date><br><br>Время: <time><br><br>Осталось: <time_left><br><br>Модератор: <moderator><br><br>Причина: <reason>";
+        command.ban.connectionAttempt = "<color:#ff7171>🔒 Заблокированный <fcolor:2><player></fcolor> попытался подключиться <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
 
         command.unban.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.unban.notBanned = "<color:#ff7171><b>⁉</b> Игрок не заблокирован";
@@ -162,20 +158,19 @@ public final class Localization extends FileSerializable implements IModule {
         command.banlist.empty = "<color:#98FB98>☺ Блокировки не найдены";
         command.banlist.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.banlist.nullPage = "<color:#ff7171><b>⁉</b> Страница не найдена";
-        command.banlist.permanentName = "НАВСЕГДА";
         command.banlist.global.header = "<fcolor:2>▋ Блокировки: <count> <br>";
-        command.banlist.global.line = "<hover:show_text:\"<fcolor:1>Разблокировать <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Дата: <date><br>Время: <time><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
+        command.banlist.global.line = "<hover:show_text:\"<fcolor:1>Разблокировать <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
         command.banlist.global.footer = "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
         command.banlist.player.header = "<fcolor:2>▋ Все блокировки: <count> <br>";
-        command.banlist.player.line = "<hover:show_text:\"<fcolor:1>Разблокировать <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Дата: <date><br>Время: <time><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
+        command.banlist.player.line = "<hover:show_text:\"<fcolor:1>Разблокировать <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
         command.banlist.player.footer = "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
 
         command.mute.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.mute.nullTime = "<color:#ff7171><b>⁉</b> Невозможное время";
         command.mute.reasons.clear();
         command.mute.reasons.put("default", "Ты был замучен на сервере");
-        command.mute.global = "<color:#ff7171><br>⏵ Игрок <target> замучен на <time> <br>⏵ Причина: <message> <br>⏵ Модератор: <display_name><br>";
-        command.mute.player = "<color:#ff7171>☠ Ты замучен, осталось <time>. Причина: <message>";
+        command.mute.server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> выдал мут игроку <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
+        command.mute.person = "<color:#ff7171>🔒 Ты замучен, осталось <time_left>";
 
         command.unmute.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.unmute.notMuted = "<color:#ff7171><b>⁉</b> Игрок не замучен";
@@ -185,18 +180,18 @@ public final class Localization extends FileSerializable implements IModule {
         command.mutelist.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.mutelist.nullPage = "<color:#ff7171><b>⁉</b> Страница не найдена";
         command.mutelist.global.header = "<fcolor:2>▋ Муты: <count> <br>";
-        command.mutelist.global.line = "<hover:show_text:\"<fcolor:1>Размутить <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Дата: <date><br>Время: <time><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
+        command.mutelist.global.line = "<hover:show_text:\"<fcolor:1>Размутить <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
         command.mutelist.global.footer = "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
         command.mutelist.player.header = "<fcolor:2>▋ Все муты: <count> <br>";
-        command.mutelist.player.line = "<hover:show_text:\"<fcolor:1>Размутить <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Дата: <date><br>Время: <time><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
+        command.mutelist.player.line = "<hover:show_text:\"<fcolor:1>Размутить <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
         command.mutelist.player.footer = "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
 
         command.warn.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.warn.nullTime = "<color:#ff7171><b>⁉</b> Невозможное время";
         command.warn.reasons.clear();
         command.warn.reasons.put("default", "Ты получил предупреждение");
-        command.warn.global = "<color:#ff7171><br>⏵ Игрок <target> получил предупреждение на <time> <br>⏵ Причина: <message> <br>⏵ Модератор: <display_name><br>";
-        command.warn.player = "<color:#ff7171>☠ Ты получил предупреждение на <time>. Причина: <message>";
+        command.warn.server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> выдал предупреждение игроку <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
+        command.warn.person = "<color:#ff7171>🔒 Ты получил предупреждение на <time>";
 
         command.unwarn.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.unwarn.notWarned = "<color:#ff7171><b>⁉</b> Игрок не имеет предупреждений";
@@ -206,10 +201,10 @@ public final class Localization extends FileSerializable implements IModule {
         command.warnlist.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.warnlist.nullPage = "<color:#ff7171><b>⁉</b> Страница не найдена";
         command.warnlist.global.header = "<fcolor:2>▋ Предупреждения: <count> <br>";
-        command.warnlist.global.line = "<hover:show_text:\"<fcolor:1>Снять предупреждение <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Дата: <date><br>Время: <time><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
+        command.warnlist.global.line = "<hover:show_text:\"<fcolor:1>Снять предупреждение <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
         command.warnlist.global.footer = "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
         command.warnlist.player.header = "<fcolor:2>▋ Все предупреждения: <count> <br>";
-        command.warnlist.player.line = "<hover:show_text:\"<fcolor:1>Снять предупреждение <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Дата: <date><br>Время: <time><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
+        command.warnlist.player.line = "<hover:show_text:\"<fcolor:1>Снять предупреждение <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
         command.warnlist.player.footer = "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
 
         command.flectonepulse.formatTrue = "<fcolor:2>★ Плагин успешно перезагружен!";
@@ -487,6 +482,8 @@ public final class Localization extends FileSerializable implements IModule {
         message.enchant.single = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:<enchant>> <lang:<level>></fcolor:2>» на предмет <display_name>";
         message.enchant.multiple = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:<enchant>> <lang:<level>></fcolor:2>» на предмет <fcolor:2><count></fcolor:2> сущностей";
 
+        message.format.mention.person = "<fcolor:2>Тебя упомянули!";
+
         message.format.tags.put(TagType.URL, "<click:open_url:\"<message>\"><hover:show_text:\"<fcolor:2>Открыть ссылку <br><u><message>\"><fcolor:2><u>🗗 Ссылка</u></fcolor:2></hover></click>");
         message.format.tags.put(TagType.IMAGE, "<image:\"<message>\"><u>🖃 Картинка</u></image>");
         message.format.tags.put(TagType.SKIN, "<image:\"<message>\"><u>👨 Скин</u></image>");
@@ -589,6 +586,7 @@ public final class Localization extends FileSerializable implements IModule {
     @Getter
     public static final class Time {
         private String format = "dd'd' HH'h' mm'm' ss.SSS's'";
+        private String permanent = "PERMANENT";
         private String zero = "0s";
     }
 
@@ -739,33 +737,19 @@ public final class Localization extends FileSerializable implements IModule {
         public static final class Ban implements ISubCommand, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String nullTime = "<color:#ff7171><b>⁉</b> Incorrect time";
-            private Type temporarily = new Type(
-                    "<color:#ff7171>☠ Banned <target> tried to log in, <time> left",
-                    "<color:#ff7171><br>⏵ Player <target> has been banned for <time> <br>⏵ Reason: <message> <br>⏵ Moderator: <display_name><br>",
-                    "<color:#ff7171>☠ You are banned, <time> left <br>Reason: <message>",
-                    new ReasonMap(){
-                        {
-                            put("default", "You have been banned from this server");
-                        }
-                    }
-            );
-            private Type permanent = new Type(
-                    "<color:#ff7171>☠ Permanently banned <target> tried to log in",
-                    "<color:#ff7171><br>⏵ Player <target> has been banned permanently <br>⏵ Reason: <message> <br>⏵ Moderator: <display_name><br>",
-                    "<color:#ff7171>☠ You are banned permanently <br>Reason: <message>",
-                    new ReasonMap(){
-                        {
-                            put("default", "You have been banned permanent from this server");
-                        }
-                    }
-            );
+            private ReasonMap reasons = new ReasonMap(){
+                {
+                    put("default", "You have been banned from this server");
+                }
+            };
+            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> was banned player <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
+            private String person = "<color:#ff7171>🔒 BAN 🔒<fcolor:1><br><br>Date: <date><br><br>Time: <time><br><br>Remaining time: <time_left><br><br>Moderator: <moderator><br><br>Reason: <reason>";
+            private String connectionAttempt = "<color:#ff7171>🔒 Banned <fcolor:2><player></fcolor> tried to log in <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
 
             @Getter
             @AllArgsConstructor
             public static final class Type {
                 private String connectionAttempt;
-                private String global;
-                private String player;
                 private ReasonMap reasons;
             }
         }
@@ -775,16 +759,15 @@ public final class Localization extends FileSerializable implements IModule {
             private String empty = "<color:#98FB98>☺ No bans found";
             private String nullPage = "<color:#ff7171><b>⁉</b> This page doesn't exist";
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
-            private String permanentName = "PERMANENT";
             private ListTypeMessage global = new ListTypeMessage(
                     "<fcolor:2>▋ Bans: <count> <br>",
-                    "<hover:show_text:\"<fcolor:1>Click to unban <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Date: <date><br>Time: <time><br>Reason: <reason>\">[MORE]</hover>",
+                    "<hover:show_text:\"<fcolor:1>Click to unban <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>",
                     "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
             );
 
             private ListTypeMessage player = new ListTypeMessage(
                     "<fcolor:2>▋ All bans: <count> <br>",
-                    "<hover:show_text:\"<fcolor:1>Click to unban <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Date: <date><br>Time: <time><br>Reason: <reason>\">[MORE]</hover>",
+                    "<hover:show_text:\"<fcolor:1>Click to unban <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>",
                     "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
             );
         }
@@ -942,8 +925,9 @@ public final class Localization extends FileSerializable implements IModule {
                     put("default", "Kicked by an operator");
                 }
             };
-            private String global = "<color:#ff7171><br>⏵ Player <target> was kicked <br>⏵ Reason: <message> <br>⏵ Moderator: <display_name><br>";
-            private String player = "<color:#ff7171>☠ You were kicked by <moderator> <br>Reason: <message>";
+
+            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> was kicked player <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
+            private String person = "<color:#ff7171>🔒 KICK 🔒 <fcolor:1><br><br>ID: <id><br><br>Date: <date><br><br>Moderator: <moderator><br><br>Reason: <reason>";
         }
 
         @Getter
@@ -978,8 +962,8 @@ public final class Localization extends FileSerializable implements IModule {
                     put("default", "You have been muted on this server");
                 }
             };
-            private String global = "<color:#ff7171><br>⏵ Player <target> has been muted for <time> <br>⏵ Reason: <message> <br>⏵ Moderator: <display_name><br>";
-            private String player = "<color:#ff7171>☠ You are muted, <time> left. Reason: <message>";
+            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> was muted player <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
+            private String person = "<color:#ff7171>🔒 You are muted, <time_left> left";
         }
 
         @Getter
@@ -989,13 +973,13 @@ public final class Localization extends FileSerializable implements IModule {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private ListTypeMessage global = new ListTypeMessage(
                     "<fcolor:2>▋ Mutes: <count> <br>",
-                    "<hover:show_text:\"<fcolor:1>Click to unmute <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Date: <date><br>Time: <time><br>Reason: <reason>\">[MORE]</hover>",
+                    "<hover:show_text:\"<fcolor:1>Click to unmute <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[MORE]</hover>",
                     "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
             );
 
             private ListTypeMessage player = new ListTypeMessage(
                     "<fcolor:2>▋ All mutes: <count> <br>",
-                    "<hover:show_text:\"<fcolor:1>Click to unmute <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Date: <date><br>Time: <time><br>Reason: <reason>\">[MORE]</hover>",
+                    "<hover:show_text:\"<fcolor:1>Click to unmute <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[MORE]</hover>",
                     "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
             );
         }
@@ -1173,8 +1157,9 @@ public final class Localization extends FileSerializable implements IModule {
                     put("default", "You have been warned on this server");
                 }
             };
-            private String global = "<color:#ff7171><br>⏵ Player <target> has been warned for <time> <br>⏵ Reason: <message> <br>⏵ Moderator: <display_name><br>";
-            private String player = "<color:#ff7171>☠ You are warned, <time> left. Reason: <message>";
+
+            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> was warned player <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
+            private String person = "<color:#ff7171>🔒 You are warned a <time>";
         }
 
         @Getter
@@ -1184,17 +1169,16 @@ public final class Localization extends FileSerializable implements IModule {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private ListTypeMessage global = new ListTypeMessage(
                     "<fcolor:2>▋ Warns: <count> <br>",
-                    "<hover:show_text:\"<fcolor:1>Click to unwarn <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Date: <date><br>Time: <time><br>Reason: <reason>\">[MORE]</hover>",
+                    "<hover:show_text:\"<fcolor:1>Click to unwarn <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>",
                     "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
             );
 
             private ListTypeMessage player = new ListTypeMessage(
                     "<fcolor:2>▋ All warns: <count> <br>",
-                    "<hover:show_text:\"<fcolor:1>Click to unwarn <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Date: <date><br>Time: <time><br>Reason: <reason>\">[MORE]</hover>",
+                    "<hover:show_text:\"<fcolor:1>Click to unwarn <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>",
                     "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→"
             );
         }
-
     }
 
     @Getter
@@ -1206,11 +1190,6 @@ public final class Localization extends FileSerializable implements IModule {
         private Telegram telegram = new Telegram();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/integration/twitch/")})
         private Twitch twitch = new Twitch();
-
-        @Override
-        public ISubIntegration getInteractivechat() {
-            return null;
-        }
 
         @Override
         public ISubIntegration getLuckperms() {
@@ -1747,7 +1726,8 @@ public final class Localization extends FileSerializable implements IModule {
 
             @Getter
             public static final class Mention implements ISubFormatMessage, ILocalization {
-                private String format = "<fcolor:2>@<player></fcolor>";
+                private String person = "<fcolor:2>You were mentioned";
+                private String format = "<fcolor:2>@<target></fcolor>";
             }
 
             @Getter
