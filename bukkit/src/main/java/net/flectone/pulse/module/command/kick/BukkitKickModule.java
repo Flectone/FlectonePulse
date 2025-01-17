@@ -10,6 +10,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.util.BukkitCommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
+import net.flectone.pulse.util.ModerationUtil;
 
 @Singleton
 public class BukkitKickModule extends KickModule {
@@ -21,8 +22,9 @@ public class BukkitKickModule extends KickModule {
                             FPlayerManager fPlayerManager,
                             BukkitCommandUtil commandUtil,
                             ComponentUtil componentUtil,
+                            ModerationUtil moderationUtil,
                             Gson gson) {
-        super(fileManager, fPlayerManager, commandUtil, componentUtil, gson);
+        super(fileManager, fPlayerManager, commandUtil, componentUtil, moderationUtil, gson);
 
         this.commandUtil = commandUtil;
     }

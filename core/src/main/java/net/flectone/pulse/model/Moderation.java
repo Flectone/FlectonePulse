@@ -55,7 +55,8 @@ public class Moderation {
     public enum Type {
         MUTE,
         BAN,
-        WARN
+        WARN,
+        KICK
     }
 
 }

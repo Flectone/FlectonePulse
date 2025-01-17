@@ -10,16 +10,12 @@ import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.util.CommandUtil;
-import net.flectone.pulse.util.ComponentUtil;
-import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.MessageTag;
-import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.Nullable;
+import net.flectone.pulse.util.*;
 
 import java.sql.SQLException;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 public abstract class KickModule extends AbstractModuleCommand<Localization.Command.Kick> {
 
@@ -29,18 +25,21 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
     private final FPlayerManager fPlayerManager;
     private final CommandUtil commandUtil;
     private final ComponentUtil componentUtil;
+    private final ModerationUtil moderationUtil;
     private final Gson gson;
 
     public KickModule(FileManager fileManager,
                       FPlayerManager fPlayerManager,
                       CommandUtil commandUtil,
                       ComponentUtil componentUtil,
+                      ModerationUtil moderationUtil,
                       Gson gson) {
         super(localization -> localization.getCommand().getKick(), fPlayer -> fPlayer.is(FPlayer.Setting.KICK));
 
         this.fPlayerManager = fPlayerManager;
         this.commandUtil = commandUtil;
         this.componentUtil = componentUtil;
+        this.moderationUtil = moderationUtil;
         this.gson = gson;
 
         command = fileManager.getCommand().getKick();
@@ -66,41 +65,35 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
 
         String reason = commandUtil.getString(1, arguments);
 
-        kick(fPlayer, fTarget, reason);
+        Moderation kick = database.insertModeration(fTarget, -1, reason, fPlayer.getId(), Moderation.Type.KICK);
+        if (kick == null) return;
 
-        builder(fPlayer)
+        kick(fPlayer, fTarget, kick);
+
+        builder(fTarget)
                 .destination(command.getDestination())
                 .range(command.getRange())
                 .tag(MessageTag.COMMAND_KICK)
-                .format(replaceTarget(fTarget.getName()))
-                .message((fResolver, s) -> s.getReasons().getConstant(reason))
+                .format(buildFormat(kick))
                 .proxy(output -> {
                     output.writeUTF(gson.toJson(fTarget));
-                    output.writeUTF(reason == null ? "" : reason);
+                    output.writeUTF(gson.toJson(kick));
                 })
-                .integration(s -> s
-                        .replace("<reason>", resolveLocalization().getReasons().getConstant(reason))
-                        .replace("<target>", fTarget.getName())
-                )
+                .integration(s -> moderationUtil.replacePlaceholders(s, FPlayer.UNKNOWN, kick))
                 .sound(getSound())
                 .sendBuilt();
     }
 
-    public Function<Localization.Command.Kick, String> replaceTarget(String target) {
-        return message -> message.getGlobal().replace("<target>", target);
+    public BiFunction<FPlayer, Localization.Command.Kick, String> buildFormat(Moderation kick) {
+        return (fReceiver, message) ->  moderationUtil.replacePlaceholders(message.getServer(), fReceiver, kick);
     }
 
-    public void kick(FEntity fPlayer, FPlayer fTarget, @Nullable String reason) {
-        if (checkModulePredicates(fPlayer)) return;
+    public void kick(FEntity fModerator, FPlayer fReceiver, Moderation kick) {
+        if (checkModulePredicates(fModerator)) return;
 
-        Localization.Command.Kick localization = resolveLocalization(fTarget);
+        String format = moderationUtil.replacePlaceholders(resolveLocalization(fReceiver).getPerson(), fReceiver, kick);
 
-        String format = localization.getPlayer()
-                .replace("<message>",localization.getReasons().getConstant(reason))
-                .replace("<moderator>", fPlayer.getName());
-
-        Component component = componentUtil.builder(fPlayer, format).build();
-        fPlayerManager.kick(fTarget, component);
+        fPlayerManager.kick(fReceiver, componentUtil.builder(fReceiver, format).build());
     }
 
     @Override
