@@ -56,26 +56,23 @@ public abstract class FlectonepulseModule extends AbstractModuleCommand<Localiza
             return;
         }
 
-        threadManager.runSync(() -> {
+        try {
+            flectonePulse.reload();
 
-            try {
-                flectonePulse.reload();
+            builder(fPlayer)
+                    .destination(command.getDestination())
+                    .format(Localization.Command.Flectonepulse::getFormatTrue)
+                    .sound(getSound())
+                    .sendBuilt();
 
-                builder(fPlayer)
-                        .destination(command.getDestination())
-                        .format(Localization.Command.Flectonepulse::getFormatTrue)
-                        .sound(getSound())
-                        .sendBuilt();
+        } catch (Exception e) {
+            fLogger.warning(e);
 
-            } catch (Exception e) {
-                fLogger.warning(e);
-
-                builder(fPlayer)
-                        .destination(command.getDestination())
-                        .format(Localization.Command.Flectonepulse::getFormatFalse)
-                        .sendBuilt();
-            }
-        });
+            builder(fPlayer)
+                    .destination(command.getDestination())
+                    .format(Localization.Command.Flectonepulse::getFormatFalse)
+                    .sendBuilt();
+        }
     }
 
     @Override
