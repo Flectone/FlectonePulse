@@ -7,18 +7,18 @@ import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import net.flectone.pulse.FlectonePulse;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.module.command.FCommand;
+import net.flectone.pulse.util.TimeUtil;
 
 @Singleton
 public class BukkitFlectonepulseModule extends FlectonepulseModule {
 
     @Inject
     public BukkitFlectonepulseModule(FileManager fileManager,
-                                     ThreadManager threadManager,
+                                     TimeUtil timeUtil,
                                      FlectonePulse flectonePulse,
                                      FLogger fLogger) {
-        super(fileManager, threadManager, flectonePulse, fLogger);
+        super(fileManager, timeUtil, flectonePulse, fLogger);
     }
 
     @Override

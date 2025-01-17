@@ -7,9 +7,12 @@ import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.util.TimeUtil;
+
+import java.time.Duration;
+import java.time.Instant;
 
 public abstract class FlectonepulseModule extends AbstractModuleCommand<Localization.Command.Flectonepulse> {
 
@@ -18,18 +21,18 @@ public abstract class FlectonepulseModule extends AbstractModuleCommand<Localiza
 
     private final FlectonePulse flectonePulse;
     private final FileManager fileManager;
-    private final ThreadManager threadManager;
+    private final TimeUtil timeUtil;
     private final FLogger fLogger;
 
     public FlectonepulseModule(FileManager fileManager,
-                               ThreadManager threadManager,
+                               TimeUtil timeUtil,
                                FlectonePulse flectonePulse,
                                FLogger fLogger) {
         super(localization -> localization.getCommand().getFlectonepulse(), null);
 
         this.flectonePulse = flectonePulse;
         this.fileManager = fileManager;
-        this.threadManager = threadManager;
+        this.timeUtil = timeUtil;
         this.fLogger = fLogger;
 
         command = fileManager.getCommand().getFlectonepulse();
@@ -57,11 +60,17 @@ public abstract class FlectonepulseModule extends AbstractModuleCommand<Localiza
         }
 
         try {
+            Instant start = Instant.now();
+
             flectonePulse.reload();
+
+            Instant end = Instant.now();
+
+            String formattedTime = timeUtil.format(fPlayer, Duration.between(start, end).toMillis());
 
             builder(fPlayer)
                     .destination(command.getDestination())
-                    .format(Localization.Command.Flectonepulse::getFormatTrue)
+                    .format(flectonepulse -> flectonepulse.getFormatTrue().replace("<time>", formattedTime))
                     .sound(getSound())
                     .sendBuilt();
 
