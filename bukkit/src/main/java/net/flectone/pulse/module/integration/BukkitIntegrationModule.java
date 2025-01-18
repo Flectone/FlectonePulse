@@ -79,10 +79,6 @@ public class BukkitIntegrationModule extends IntegrationModule {
                 fLogger.warning("Update PlasmoVoice to the latest version");
             }
         }
-
-        addChildren(DiscordModule.class);
-        addChildren(TwitchModule.class);
-        addChildren(TelegramModule.class);
     }
 
     @Override

@@ -10,6 +10,11 @@ dependencies {
     compileOnly "com.github.retrooper:packetevents-spigot:$packetevents_spigot_version"
     compileOnly "io.netty:netty-all:$netty_all_version"
     compileOnly "commons-lang:commons-lang:$commons_lang_version"
+
+    compileOnly "com.discord4j:discord4j-core:$discord4j_version"
+    compileOnly "com.github.twitch4j:twitch4j:$twitch4j_version"
+    compileOnly "org.telegram:telegrambots-longpolling:$telegrambots_version"
+    compileOnly "org.telegram:telegrambots-client:$telegrambots_version"
 }
 
 buildConfig {

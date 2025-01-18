@@ -27,21 +27,20 @@ public class TelegramIntegration implements FIntegration {
     private final Integration.Telegram integration;
 
     private final FileManager fileManager;
-    private final MessageListener messageListener;
     private final SystemUtil systemUtil;
     private final FLogger fLogger;
 
     private TelegramBotsLongPollingApplication botsApplication;
     private OkHttpTelegramClient telegramClient;
 
+    @Inject private MessageListener messageListener;
+
     @Inject
     public TelegramIntegration(FileManager fileManager,
-                               MessageListener messageListener,
                                SystemUtil systemUtil,
                                FLogger fLogger) {
 
         this.fileManager = fileManager;
-        this.messageListener = messageListener;
         this.systemUtil = systemUtil;
         this.fLogger = fLogger;
 
@@ -107,7 +106,7 @@ public class TelegramIntegration implements FIntegration {
         }
     }
 
-    protected void executeMethod(BotApiMethod<?> method) {
+    public void executeMethod(BotApiMethod<?> method) {
         try {
             telegramClient.executeAsync(method);
         } catch (TelegramApiException e) {

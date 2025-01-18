@@ -16,10 +16,6 @@ dependencies {
     compileOnly "com.zaxxer:HikariCP:$HikariCP_version"
     compileOnly "com.mojang:brigadier:$brigadier_version"
     compileOnly "com.mojang:authlib:$authlib_version"
-    compileOnly "com.discord4j:discord4j-core:$discord4j_version"
-    compileOnly "com.github.twitch4j:twitch4j:$twitch4j_version"
-    compileOnly "org.telegram:telegrambots-longpolling:$telegrambots_version"
-    compileOnly "org.telegram:telegrambots-client:$telegrambots_version"
     compileOnly "me.clip:placeholderapi:$placeholderapi_version"
     compileOnly "com.github.MilkBowl:VaultAPI:$vaultapi_version"
     compileOnly "net.luckperms:api:$luckpermsapi_version"
@@ -28,6 +24,8 @@ dependencies {
     compileOnly "com.github.LeonMangler:SuperVanish:$supervanishapi_version"
     compileOnly "net.skinsrestorer:skinsrestorer-api:$skinsrestorerapi_version"
     compileOnly "com.loohp:InteractiveChat:$interactivechatapi_version"
+
+    compileOnly "org.telegram:telegrambots-longpolling:$telegrambots_version"
 
     implementation(project(":core"))
 }

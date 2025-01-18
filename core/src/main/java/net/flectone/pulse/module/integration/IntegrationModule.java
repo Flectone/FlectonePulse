@@ -6,6 +6,9 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.integration.discord.DiscordModule;
+import net.flectone.pulse.module.integration.telegram.TelegramModule;
+import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.util.MessageTag;
 
 import java.util.Set;
@@ -24,6 +27,10 @@ public abstract class IntegrationModule extends AbstractModule {
     @Override
     public void reload() {
         registerModulePermission(permission);
+
+        addChildren(DiscordModule.class);
+        addChildren(TelegramModule.class);
+        addChildren(TwitchModule.class);
     }
 
     @Override

@@ -14,7 +14,6 @@ import net.flectone.pulse.database.Database;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
@@ -170,7 +169,7 @@ public class BukkitCommandUtil extends CommandUtil {
                 return -1;
             }
         }).includeSuggestions(ArgumentSuggestions.strings(info -> {
-            if (!info.currentArg().isEmpty() && StringUtils.isNumeric(info.currentArg())) {
+            if (!info.currentArg().isEmpty() && isNumeric(info.currentArg())) {
                 return Arrays.stream(CommandUtil.TimeType.values())
                         .map(value -> info.currentArg() + value.getFormat())
                         .toArray(String[]::new);
@@ -178,5 +177,14 @@ public class BukkitCommandUtil extends CommandUtil {
 
             return new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9"};
         }));
+    }
+
+    private boolean isNumeric(String string) {
+        try {
+            Integer.parseInt(string);
+            return true;
+        } catch (NumberFormatException ignored) {}
+
+        return false;
     }
 }
