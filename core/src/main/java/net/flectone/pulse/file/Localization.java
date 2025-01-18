@@ -208,7 +208,7 @@ public final class Localization extends FileSerializable implements IModule {
         command.warnlist.player.footer = "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
 
         command.flectonepulse.formatFalse = "<color:#ff7171>★ Возникла проблема при перезагрузке";
-        command.flectonepulse.formatTrue = "<fcolor:2>★ <fcolor:1>FlectonePulse</fcolor:1> успешно перезагружен! (<i><time></i>)";
+        command.flectonepulse.formatTrue = "<fcolor:2>★ <u>FlectonePulse</u> успешно перезагружен! (<i><time></i>)";
         command.flectonepulse.formatTrueText = "<fcolor:2>★ ВАЖНО! Перезагружен только текст, для ПОЛНОЙ перезагрузки нужно использовать: <br><fcolor:1>/flectonepulse reload";
 
         command.chatcolor.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
@@ -882,7 +882,7 @@ public final class Localization extends FileSerializable implements IModule {
         @Getter
         public static final class Flectonepulse implements ISubCommand, ILocalization {
             private String formatFalse = "<color:#ff7171>★ An has error occurred while reloading";
-            private String formatTrue = "<fcolor:2>★ <fcolor:1>FlectonePulse</fcolor:1> successfully reloaded! (<i><time></i>)";
+            private String formatTrue = "<fcolor:2>★ <u>FlectonePulse</u> successfully reloaded! (<i><time></i>)";
             private String formatTrueText = "<fcolor:2>★ IMPORTANT! <br>Only texts have been updated, for a FULL reload you need to use: <br><fcolor:1>/flectonepulse reload";
         }
 
