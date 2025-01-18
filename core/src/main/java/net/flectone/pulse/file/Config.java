@@ -8,7 +8,9 @@ import net.flectone.pulse.BuildConfig;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings({"FieldMayBeFinal", "unused"})
 @Comment(
@@ -65,6 +67,7 @@ public final class Config extends FileSerializable {
         private String port = "3306";
         private String user = "root";
         private String password = "1234";
+        private String parameters = "?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8";
         public Database() {}
     }
 

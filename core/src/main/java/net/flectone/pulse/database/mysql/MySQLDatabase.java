@@ -46,6 +46,7 @@ public class MySQLDatabase extends Database {
                 .append(config.getPort())
                 .append("/")
                 .append(config.getName())
+                .append(config.getParameters())
                 .toString();
 
         HikariConfig hikariConfig = getHikariConfig(connectionURL);
