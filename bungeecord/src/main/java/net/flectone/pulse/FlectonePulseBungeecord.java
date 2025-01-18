@@ -43,9 +43,9 @@ public final class FlectonePulseBungeecord extends Plugin implements Listener, F
         ByteArrayDataOutput output = Proxy.create(event.getData());
         if (output == null) return;
 
-        ProxyServer.getInstance().getServers()
-                .values()
-                .forEach(serverInfo -> serverInfo.sendData(CHANNEL, output.toByteArray()));
+        ProxyServer.getInstance().getServers().values().stream()
+                .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
+                .forEach(serverInfo -> serverInfo.sendData(CHANNEL, data));
     }
 
     @Override

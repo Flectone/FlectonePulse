@@ -50,8 +50,9 @@ public class FlectonePulseVelocity implements FlectonePulse {
         var output = Proxy.create(event.getData());
         if (output == null) return;
 
-        proxyServer.getAllServers().forEach(serverInfo ->
-                serverInfo.sendPluginMessage(IDENTIFIER, output.toByteArray()));
+        proxyServer.getAllServers().stream()
+                .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
+                .forEach(serverInfo -> serverInfo.sendPluginMessage(IDENTIFIER, data));
     }
 
     @Subscribe
