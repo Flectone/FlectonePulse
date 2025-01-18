@@ -1,21 +1,31 @@
 dependencies {
     implementation "com.alessiodp.libby:libby-bukkit:$libby_version"
+
     compileOnly "org.bstats:bstats-bukkit:$bstats_version"
+
     compileOnly "com.github.Anon8281:UniversalScheduler:$UniversalScheduler_version"
+
     compileOnly "dev.jorel:commandapi-bukkit-shade:$commandapi_bukkit_version"
     compileOnly "dev.jorel:commandapi-bukkit-shade-mojang-mapped:$commandapi_bukkit_version"
+
     compileOnly "net.elytrium:serializer:$elytrium_serializer_version"
+
     compileOnly "org.spigotmc:spigot-api:$spigot_version"
+
     compileOnly "io.netty:netty-all:$netty_all_version"
+
     compileOnly "net.megavex:scoreboard-library-api:$scoreboard_library_api_version"
     compileOnly "net.megavex:scoreboard-library-implementation:$scoreboard_library_api_version"
     compileOnly "net.megavex:scoreboard-library-packetevents:$scoreboard_library_api_version"
+
     compileOnly "com.github.retrooper:packetevents-spigot:$packetevents_spigot_version"
-    compileOnly "net.kyori:adventure-platform-bukkit:$adventure_platform_bukkit_version"
-    compileOnly "net.kyori:adventure-api:$adventure_api"
+
     compileOnly "com.zaxxer:HikariCP:$HikariCP_version"
+
     compileOnly "com.mojang:brigadier:$brigadier_version"
+
     compileOnly "com.mojang:authlib:$authlib_version"
+
     compileOnly "me.clip:placeholderapi:$placeholderapi_version"
     compileOnly "com.github.MilkBowl:VaultAPI:$vaultapi_version"
     compileOnly "net.luckperms:api:$luckpermsapi_version"
@@ -23,7 +33,13 @@ dependencies {
     compileOnly "su.plo.voice.api:server:$plasmovoiceapi_version"
     compileOnly "com.github.LeonMangler:SuperVanish:$supervanishapi_version"
     compileOnly "net.skinsrestorer:skinsrestorer-api:$skinsrestorerapi_version"
-    compileOnly "com.loohp:InteractiveChat:$interactivechatapi_version"
+
+    compileOnly "net.kyori:adventure-platform-bukkit:$adventure_platform_bukkit_version"
+    compileOnly "net.kyori:adventure-api:$adventure_api"
+    compileOnly "net.kyori:adventure-text-serializer-legacy:$adventure_api"
+    compileOnly "net.kyori:adventure-text-minimessage:$adventure_api"
+    compileOnly "net.kyori:adventure-text-serializer-gson:$adventure_api"
+    compileOnly "net.kyori:adventure-text-serializer-plain:$adventure_api"
 
     compileOnly "org.telegram:telegrambots-longpolling:$telegrambots_version"
 
