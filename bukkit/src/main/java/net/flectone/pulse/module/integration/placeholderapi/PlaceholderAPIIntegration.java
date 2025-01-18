@@ -9,6 +9,7 @@ import net.flectone.pulse.file.Message;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
@@ -25,15 +26,18 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     private final Message.Format.Color color;
 
     private final FPlayerManager fPlayerManager;
+    private final ThreadManager threadManager;
     private final ServerUtil serverUtil;
     private final FLogger fLogger;
 
     @Inject
     public PlaceholderAPIIntegration(FPlayerManager fPlayerManager,
+                                     ThreadManager threadManager,
                                      FileManager fileManager,
                                      ServerUtil serverUtil,
                                      FLogger fLogger) {
         this.fPlayerManager = fPlayerManager;
+        this.threadManager = threadManager;
         this.serverUtil = serverUtil;
         this.fLogger = fLogger;
 
@@ -57,11 +61,14 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
 
     @Override
     public void hook() {
-        if (isRegistered()) {
-            unregister();
-        }
-        register();
-        fLogger.info("PlaceholderAPI hooked");
+        threadManager.runSync(() -> {
+            if (isRegistered()) {
+                unregister();
+            }
+
+            register();
+            fLogger.info("PlaceholderAPI hooked");
+        });
     }
 
     @Override
