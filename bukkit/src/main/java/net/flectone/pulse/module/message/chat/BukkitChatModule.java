@@ -205,6 +205,7 @@ public class BukkitChatModule extends ChatModule {
         });
 
         builder(fPlayer)
+                .range(Range.SERVER)
                 .destination(playerChat.getDestination())
                 .filter(filter)
                 .format(s -> s.getTypes().get(playerChatName))
