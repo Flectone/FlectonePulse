@@ -41,7 +41,6 @@ Read the full list on our [documentation message.yml](https://flectone.net/pulse
 [![telegram](https://flectone.net/pulse/telegrammessage2.png)](https://flectone.net/pulse/docs/integration/telegram/)\
 [![twitch](https://flectone.net/pulse/twitchmessage.png)](https://flectone.net/pulse/docs/integration/twitch/)
 ### and Bukkit plugins
-- [InteractiveChat](https://flectone.net/pulse/docs/integration/interactivechat/) - it works
 - [LuckPerms](https://flectone.net/pulse/docs/integration/luckperms/) - permissions and group weights
 - [PlaceholderAPI](https://flectone.net/pulse/docs/integration/placeholderapi/) - placeholders
 - [PlasmoVoice](https://flectone.net/pulse/docs/integration/plasmovoice/) - mutes and ignore sync
