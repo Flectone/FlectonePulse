@@ -7,8 +7,10 @@ import net.flectone.pulse.file.Integration;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.module.integration.telegram.TelegramIntegration;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.Range;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 
@@ -20,6 +22,8 @@ public class MessageListener extends EventListener {
     @Getter private final Integration.Telegram integration;
 
     private final ThreadManager threadManager;
+
+    @Inject private TelegramIntegration telegramIntegration;
 
     @Inject
     public MessageListener(FileManager fileManager,
@@ -58,6 +62,11 @@ public class MessageListener extends EventListener {
             chatID += "_" + message.getMessageThreadId();
         }
 
+        if (text.equalsIgnoreCase("/id")) {
+            sendInfoMessage(chatID, message);
+            return;
+        }
+
         List<String> chats = integration.getMessageChannel().get(MessageTag.FROM_TELEGRAM_TO_MINECRAFT);
         if (!chats.contains(chatID)) return;
 
@@ -80,5 +89,18 @@ public class MessageListener extends EventListener {
                 .sound(getSound())
                 .sendBuilt()
         );
+    }
+
+    private void sendInfoMessage(String chatID, Message message) {
+        SendMessage.SendMessageBuilder<?, ?> sendMessage = SendMessage
+                .builder()
+                .chatId(chatID)
+                .text("Channel id: " + chatID);
+
+        if (message.isTopicMessage()) {
+            sendMessage = sendMessage.messageThreadId(message.getMessageThreadId());
+        }
+
+        telegramIntegration.executeMethod(sendMessage.build());
     }
 }
