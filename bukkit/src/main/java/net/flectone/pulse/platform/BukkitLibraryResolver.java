@@ -226,7 +226,7 @@ public class BukkitLibraryResolver extends LibraryResolver {
 
         String commandApiArtifact = "commandapi-bukkit-shade";
 
-        if (BukkitServerUtil.IS_PAPER && BukkitServerUtil.IS_1_20_6_OR_NEWER && !BukkitServerUtil.IS_FOLIA) {
+        if (BukkitServerUtil.IS_PAPER && BukkitServerUtil.IS_1_20_6_OR_NEWER) {
             commandApiArtifact += "-mojang-mapped";
         }
 
