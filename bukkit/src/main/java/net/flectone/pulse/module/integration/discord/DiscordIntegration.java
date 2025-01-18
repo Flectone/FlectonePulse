@@ -29,6 +29,7 @@ import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.discord.listener.MessageCreateListener;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.util.SystemUtil;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import java.awt.*;
@@ -45,11 +46,12 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
 
     private final List<Long> webhooks = new ArrayList<>();
 
-    private final ComponentUtil componentUtil;
     private final FileManager fileManager;
     private final ThreadManager threadManager;
     private final FPlayerManager fPlayerManager;
     private final MessageCreateListener messageCreateListener;
+    private final ComponentUtil componentUtil;
+    private final SystemUtil systemUtil;
     private final FLogger fLogger;
 
     private DiscordClient discordClient;
@@ -61,12 +63,14 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
                               ThreadManager threadManager,
                               FPlayerManager fPlayerManager,
                               ComponentUtil componentUtil,
+                              SystemUtil systemUtil,
                               MessageCreateListener messageCreateListener,
                               FLogger fLogger) {
         this.fileManager = fileManager;
         this.threadManager = threadManager;
         this.fPlayerManager = fPlayerManager;
         this.componentUtil = componentUtil;
+        this.systemUtil = systemUtil;
         this.messageCreateListener = messageCreateListener;
         this.fLogger = fLogger;
 
@@ -221,7 +225,7 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
     @Async
     @Override
     public void hook() {
-        String token = integration.getToken();
+        String token = systemUtil.substituteEnvVars(integration.getToken());
         if (token.isEmpty()) return;
 
         discordClient = DiscordClient.create(token);

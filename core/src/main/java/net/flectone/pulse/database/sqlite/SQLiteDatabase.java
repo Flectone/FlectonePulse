@@ -7,6 +7,7 @@ import net.flectone.pulse.database.Database;
 import net.flectone.pulse.file.Config;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.util.SystemUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -25,6 +26,7 @@ public class SQLiteDatabase extends Database {
 
     private final Path projectPath;
     private final InputStream SQLFile;
+    private final SystemUtil systemUtil;
     private final FLogger fLogger;
 
     private String connectionURL;
@@ -33,9 +35,11 @@ public class SQLiteDatabase extends Database {
     public SQLiteDatabase(FileManager fileManager,
                           @Named("projectPath") Path projectPath,
                           @Named("SQLFile") InputStream SQLFile,
+                          SystemUtil systemUtil,
                           FLogger fLogger) {
         this.projectPath = projectPath;
         this.SQLFile = SQLFile;
+        this.systemUtil = systemUtil;
         this.fLogger = fLogger;
 
         config = fileManager.getConfig().getDatabase();
@@ -55,7 +59,7 @@ public class SQLiteDatabase extends Database {
                 .append("jdbc:sqlite:")
                 .append(projectPath.toString())
                 .append(File.separator)
-                .append(config.getName())
+                .append(systemUtil.substituteEnvVars(config.getName()))
                 .append(".db")
                 .toString();
 

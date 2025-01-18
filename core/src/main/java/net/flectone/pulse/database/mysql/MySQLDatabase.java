@@ -11,6 +11,7 @@ import net.flectone.pulse.database.Database;
 import net.flectone.pulse.file.Config;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.util.SystemUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -23,6 +24,7 @@ public class MySQLDatabase extends Database {
 
     private final Config.Database config;
     private final InputStream SQLFile;
+    private final SystemUtil systemUtil;
     private final FLogger fLogger;
 
     private HikariDataSource dataSource;
@@ -30,8 +32,11 @@ public class MySQLDatabase extends Database {
     @Inject
     public MySQLDatabase(FileManager fileManager,
                          @Named("SQLFile") InputStream SQLFile,
+                         SystemUtil systemUtil,
                          FLogger fLogger) {
+
         this.SQLFile = SQLFile;
+        this.systemUtil = systemUtil;
         this.fLogger = fLogger;
 
         config = fileManager.getConfig().getDatabase();
@@ -41,11 +46,11 @@ public class MySQLDatabase extends Database {
     public void connect() throws SQLException, IOException {
         String connectionURL = new StringBuilder()
                 .append("jdbc:mysql://")
-                .append(config.getHost())
+                .append(systemUtil.substituteEnvVars(config.getHost()))
                 .append(":")
-                .append(config.getPort())
+                .append(systemUtil.substituteEnvVars(config.getPort()))
                 .append("/")
-                .append(config.getName())
+                .append(systemUtil.substituteEnvVars(config.getName()))
                 .append(config.getParameters())
                 .toString();
 
@@ -73,8 +78,8 @@ public class MySQLDatabase extends Database {
     private HikariConfig getHikariConfig(String connectionURL) {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(connectionURL);
-        hikariConfig.setUsername(config.getUser());
-        hikariConfig.setPassword(config.getPassword());
+        hikariConfig.setUsername(systemUtil.substituteEnvVars(config.getUser()));
+        hikariConfig.setPassword(systemUtil.substituteEnvVars(config.getPassword()));
         hikariConfig.addDataSourceProperty( "cachePrepStmts" , "true" );
         hikariConfig.addDataSourceProperty( "prepStmtCacheSize" , "250" );
         hikariConfig.addDataSourceProperty( "prepStmtCacheSqlLimit" , "2048" );

@@ -17,6 +17,7 @@ import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.twitch.listener.ChannelMessageListener;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.util.SystemUtil;
 
 import java.util.List;
 import java.util.function.UnaryOperator;
@@ -29,6 +30,7 @@ public class TwitchIntegration implements FIntegration {
 
     private final ChannelMessageListener channelMessageListener;
     private final CommandUtil commandUtil;
+    private final SystemUtil systemUtil;
     private final FLogger fLogger;
 
     private OAuth2Credential oAuth2Credential;
@@ -37,10 +39,13 @@ public class TwitchIntegration implements FIntegration {
     @Inject
     public TwitchIntegration(FileManager fileManager,
                              CommandUtil commandUtil,
+                             SystemUtil systemUtil,
                              ChannelMessageListener channelMessageListener,
                              FLogger fLogger) {
+
         this.channelMessageListener = channelMessageListener;
         this.commandUtil = commandUtil;
+        this.systemUtil = systemUtil;
         this.fLogger = fLogger;
 
         integration = fileManager.getIntegration().getTwitch();
@@ -52,8 +57,8 @@ public class TwitchIntegration implements FIntegration {
     public void hook() {
         disconnect();
 
-        String token = integration.getToken();
-        String identityProvider = integration.getClientID();
+        String token = systemUtil.substituteEnvVars(integration.getToken());
+        String identityProvider = systemUtil.substituteEnvVars(integration.getClientID());
         if (token.isEmpty() || identityProvider.isEmpty()) return;
 
         oAuth2Credential = new OAuth2Credential(identityProvider, token);

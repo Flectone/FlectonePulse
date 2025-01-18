@@ -11,6 +11,7 @@ import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.telegram.listener.MessageListener;
 import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.util.SystemUtil;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethod;
@@ -27,6 +28,7 @@ public class TelegramIntegration implements FIntegration {
 
     private final FileManager fileManager;
     private final MessageListener messageListener;
+    private final SystemUtil systemUtil;
     private final FLogger fLogger;
 
     private TelegramBotsLongPollingApplication botsApplication;
@@ -35,9 +37,12 @@ public class TelegramIntegration implements FIntegration {
     @Inject
     public TelegramIntegration(FileManager fileManager,
                                MessageListener messageListener,
+                               SystemUtil systemUtil,
                                FLogger fLogger) {
+
         this.fileManager = fileManager;
         this.messageListener = messageListener;
+        this.systemUtil = systemUtil;
         this.fLogger = fLogger;
 
         integration = fileManager.getIntegration().getTelegram();
@@ -48,7 +53,7 @@ public class TelegramIntegration implements FIntegration {
     public void hook() {
         disconnect();
 
-        String token = integration.getToken();
+        String token = systemUtil.substituteEnvVars(integration.getToken());
         if (token.isEmpty()) return;
 
         try (TelegramBotsLongPollingApplication botsApplication = new TelegramBotsLongPollingApplication()) {
