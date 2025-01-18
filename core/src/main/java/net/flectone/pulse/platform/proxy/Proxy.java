@@ -6,10 +6,13 @@ import com.google.common.io.ByteStreams;
 import lombok.experimental.UtilityClass;
 import net.flectone.pulse.util.MessageTag;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @UtilityClass
 public class Proxy {
 
-    public ByteArrayDataOutput create(byte[] data) {
+    public byte[] create(byte[] data) {
         ByteArrayDataInput input = ByteStreams.newDataInput(data);
 
         String tag = input.readUTF();
@@ -18,11 +21,24 @@ public class Proxy {
         MessageTag proxyMessageTag = MessageTag.fromProxyString(tag);
         if (proxyMessageTag == null) return null;
 
+        int clustersCount = input.readInt();
+        Set<String> clusters = new HashSet<>(clustersCount);
+
+        for (int i = 0; i < clustersCount; i++) {
+            clusters.add(input.readUTF());
+        }
+
         boolean isPlayer = input.readBoolean();
         String fPlayer = input.readUTF();
 
         ByteArrayDataOutput output = ByteStreams.newDataOutput();
         output.writeUTF(tag);
+
+        output.writeInt(clustersCount);
+        for (String cluster : clusters) {
+            output.writeUTF(cluster);
+        }
+
         output.writeBoolean(isPlayer);
         output.writeUTF(fPlayer);
 
@@ -74,7 +90,7 @@ public class Proxy {
             default -> {}
         }
 
-        return output;
+        return output.toByteArray();
     }
 
 }

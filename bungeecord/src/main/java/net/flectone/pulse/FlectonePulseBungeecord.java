@@ -1,6 +1,5 @@
 package net.flectone.pulse;
 
-import com.google.common.io.ByteArrayDataOutput;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.platform.proxy.Proxy;
 import net.md_5.bungee.api.ProxyServer;
@@ -40,8 +39,8 @@ public final class FlectonePulseBungeecord extends Plugin implements Listener, F
     public void onPluginMessageEvent(PluginMessageEvent event) {
         if (!event.getTag().equals(CHANNEL)) return;
 
-        ByteArrayDataOutput output = Proxy.create(event.getData());
-        if (output == null) return;
+        byte[] data = Proxy.create(event.getData());
+        if (data == null) return;
 
         ProxyServer.getInstance().getServers().values().stream()
                 .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())

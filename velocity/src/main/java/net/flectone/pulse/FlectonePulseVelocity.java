@@ -47,8 +47,8 @@ public class FlectonePulseVelocity implements FlectonePulse {
     public void onPluginMessageEvent(PluginMessageEvent event) {
         if (!event.getIdentifier().equals(IDENTIFIER)) return;
 
-        var output = Proxy.create(event.getData());
-        if (output == null) return;
+        byte[] data = Proxy.create(event.getData());
+        if (data == null) return;
 
         proxyServer.getAllServers().stream()
                 .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())

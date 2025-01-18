@@ -45,6 +45,7 @@ public final class Config extends FileSerializable {
     private boolean metrics = true;
     private boolean bungeecord = false;
     private boolean velocity = false;
+    private Set<String> clusters = new HashSet<>();
 
     private List<String> logFilter = new ArrayList<>(List.of(
             "Paper Async Command Builder",

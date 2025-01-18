@@ -9,6 +9,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.manager.FPlayerManager;
+import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ProxyManager;
 import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FEntity;
@@ -58,13 +59,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Singleton
 public class BukkitProxyListener implements PluginMessageListener {
 
+    private final FileManager fileManager;
     private final FPlayerManager fPlayerManager;
     private final ThreadManager threadManager;
     private final ProxyManager proxyManager;
@@ -72,11 +72,13 @@ public class BukkitProxyListener implements PluginMessageListener {
     private final Injector injector;
 
     @Inject
-    public BukkitProxyListener(FPlayerManager fPlayerManager,
+    public BukkitProxyListener(FileManager fileManager,
+                               FPlayerManager fPlayerManager,
                                ThreadManager threadManager,
                                ProxyManager proxyManager,
                                Gson gson,
                                Injector injector) {
+        this.fileManager = fileManager;
         this.fPlayerManager = fPlayerManager;
         this.threadManager = threadManager;
         this.proxyManager = proxyManager;
@@ -94,6 +96,16 @@ public class BukkitProxyListener implements PluginMessageListener {
 
             MessageTag tag = MessageTag.fromProxyString(input.readUTF());
             if (tag == null) return;
+
+            int clustersCount = input.readInt();
+            Set<String> proxyClusters = new HashSet<>(clustersCount);
+            while (clustersCount != 0) {
+                proxyClusters.add(input.readUTF());
+                clustersCount--;
+            }
+
+            Set<String> configClusters = fileManager.getConfig().getClusters();
+            if (!configClusters.isEmpty() && configClusters.stream().noneMatch(proxyClusters::contains)) return;
 
             boolean isPlayer = input.readBoolean();
 

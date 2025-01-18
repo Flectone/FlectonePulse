@@ -15,13 +15,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Set;
 import java.util.function.Consumer;
 
 @Singleton
 public class BukkitProxyManager extends ProxyManager {
 
+    private final FileManager fileManager;
     private final Plugin plugin;
     private final Gson gson;
+    private final FLogger fLogger;
 
     @Inject private BukkitProxyListener proxyListener;
 
@@ -31,8 +34,11 @@ public class BukkitProxyManager extends ProxyManager {
                               Plugin plugin,
                               Gson gson) {
         super(fileManager, fLogger);
+
+        this.fileManager = fileManager;
         this.plugin = plugin;
         this.gson = gson;
+        this.fLogger = fLogger;
     }
 
     @Override
@@ -55,9 +61,17 @@ public class BukkitProxyManager extends ProxyManager {
         if (tag == null) return false;
         if (outputConsumer == null) return false;
 
+        Set<String> clusters = fileManager.getConfig().getClusters();
+
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
 
         out.writeUTF(tag.toProxyTag());
+
+        out.writeInt(clusters.size());
+        for (String cluster : clusters) {
+            out.writeUTF(cluster);
+        }
+
         out.writeBoolean(sender instanceof FPlayer);
         out.writeUTF(gson.toJson(sender));
         outputConsumer.accept(out);
