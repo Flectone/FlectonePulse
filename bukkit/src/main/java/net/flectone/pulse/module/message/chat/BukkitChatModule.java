@@ -12,6 +12,7 @@ import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BukkitBubbleModule;
 import net.flectone.pulse.module.message.chat.listener.ChatListener;
 import net.flectone.pulse.util.MessageTag;
@@ -36,6 +37,7 @@ public class BukkitChatModule extends ChatModule {
     private final PermissionUtil permissionUtil;
     private final ThreadManager threadManager;
     private final BukkitListenerManager bukkitListenerManager;
+    private final IntegrationModule integrationModule;
     private final TimeUtil timeUtil;
 
     @Inject private BukkitBubbleModule bubbleModule;
@@ -45,14 +47,16 @@ public class BukkitChatModule extends ChatModule {
                             FPlayerManager fPlayerManager,
                             ThreadManager threadManager,
                             BukkitListenerManager bukkitListenerManager,
+                            IntegrationModule integrationModule,
                             PermissionUtil permissionUtil,
                             TimeUtil timeUtil) {
         super(fileManager);
 
         this.fPlayerManager = fPlayerManager;
-        this.permissionUtil = permissionUtil;
         this.threadManager = threadManager;
         this.bukkitListenerManager = bukkitListenerManager;
+        this.integrationModule = integrationModule;
+        this.permissionUtil = permissionUtil;
         this.timeUtil = timeUtil;
     }
 
@@ -74,9 +78,9 @@ public class BukkitChatModule extends ChatModule {
             return;
         }
 
-        String string = event.getMessage();
+        String eventMessage = event.getMessage();
 
-        Message.Chat.Type playerChat = message.getTypes().getOrDefault(fPlayer.getChat(), getPlayerChat(fPlayer, string));
+        Message.Chat.Type playerChat = message.getTypes().getOrDefault(fPlayer.getChat(), getPlayerChat(fPlayer, eventMessage));
 
         var configChatEntry = message.getTypes().entrySet()
                 .stream()
@@ -113,8 +117,8 @@ public class BukkitChatModule extends ChatModule {
 
         String trigger = playerChat.getTrigger();
 
-        if (trigger != null && !trigger.isEmpty() && string.startsWith(trigger)) {
-            string = string.substring(trigger.length()).trim();
+        if (trigger != null && !trigger.isEmpty() && eventMessage.startsWith(trigger)) {
+            eventMessage = eventMessage.substring(trigger.length()).trim();
         }
 
         Player sender = Bukkit.getPlayer(fPlayer.getUuid());
@@ -135,10 +139,15 @@ public class BukkitChatModule extends ChatModule {
             return true;
         });
 
-        String finalMessage = string;
-        threadManager.runAsync(database -> {
+        int chatRange = playerChat.getRange();
 
-            int chatRange = playerChat.getRange();
+        // in local chat you can mention it too,
+        // but I don't want to full support InteractiveChat
+        String finalMessage = chatRange == Range.PROXY || chatRange == Range.SERVER
+                ? integrationModule.checkMention(fPlayer, eventMessage)
+                : eventMessage;
+
+        threadManager.runAsync(database -> {
 
             builder(fPlayer)
                     .tag(MessageTag.CHAT)
@@ -182,7 +191,7 @@ public class BukkitChatModule extends ChatModule {
         event.setCancelled(playerChat.isCancel());
         event.getRecipients().clear();
 
-        bubbleModule.add(fPlayer, string);
+        bubbleModule.add(fPlayer, eventMessage);
     }
 
     @Async

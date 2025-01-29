@@ -33,6 +33,7 @@ dependencies {
     compileOnly "su.plo.voice.api:server:$plasmovoiceapi_version"
     compileOnly "com.github.LeonMangler:SuperVanish:$supervanishapi_version"
     compileOnly "net.skinsrestorer:skinsrestorer-api:$skinsrestorerapi_version"
+    compileOnly "com.loohp:InteractiveChat:$interactivechatapi_version"
 
     compileOnly "net.kyori:adventure-platform-bukkit:$adventure_platform_bukkit_version"
     compileOnly "net.kyori:adventure-api:$adventure_api"

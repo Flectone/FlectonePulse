@@ -17,3 +17,5 @@ softdepend:
   - PremiumVanish
   - SkinsRestorer
   - InteractiveChat
+  - ProtocolLib
+  - PacketEvents

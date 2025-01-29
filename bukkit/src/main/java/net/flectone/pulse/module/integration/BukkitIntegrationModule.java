@@ -8,6 +8,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
+import net.flectone.pulse.module.integration.interactivechat.InteractiveChatModule;
 import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.module.integration.placeholderapi.PlaceholderAPIModule;
 import net.flectone.pulse.module.integration.plasmovoice.PlasmoVoiceModule;
@@ -19,6 +20,7 @@ import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.vault.VaultModule;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.ServerUtil;
+import net.kyori.adventure.text.Component;
 
 import java.util.Collections;
 import java.util.Set;
@@ -54,6 +56,10 @@ public class BukkitIntegrationModule extends IntegrationModule {
             addChildren(VaultModule.class);
         }
 
+        if (serverUtil.hasProject("InteractiveChat")) {
+            addChildren(InteractiveChatModule.class);
+        }
+
         if (serverUtil.hasProject("LuckPerms")) {
             addChildren(LuckPermsModule.class);
         }
@@ -79,6 +85,28 @@ public class BukkitIntegrationModule extends IntegrationModule {
                 fLogger.warning("Update PlasmoVoice to the latest version");
             }
         }
+    }
+
+    @Override
+    public String checkMention(FEntity fSender, String message) {
+        if (checkModulePredicates(fSender)) return message;
+
+        if (getChildren().contains(InteractiveChatModule.class)) {
+            return injector.getInstance(InteractiveChatModule.class).checkMention(fSender, message);
+        }
+
+        return message;
+    }
+
+    @Override
+    public String markSender(FEntity fSender, String message) {
+        if (checkModulePredicates(fSender)) return message;
+
+        if (getChildren().contains(InteractiveChatModule.class)) {
+            return injector.getInstance(InteractiveChatModule.class).markSender(fSender, message);
+        }
+
+        return message;
     }
 
     @Override
@@ -189,6 +217,16 @@ public class BukkitIntegrationModule extends IntegrationModule {
     public boolean isVanished(FEntity sender) {
         if (getChildren().contains(SuperVanishModule.class)) {
             return injector.getInstance(SuperVanishModule.class).isVanished(sender);
+        }
+
+        return false;
+    }
+
+    public boolean sendMessageWithInteractiveChat(FEntity fReceiver, Component message) {
+        if (checkModulePredicates(fReceiver)) return false;
+
+        if (getChildren().contains(InteractiveChatModule.class)) {
+            return injector.getInstance(InteractiveChatModule.class).sendMessage(fReceiver, message);
         }
 
         return false;

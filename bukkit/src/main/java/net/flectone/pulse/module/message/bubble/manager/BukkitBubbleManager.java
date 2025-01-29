@@ -124,6 +124,7 @@ public class BukkitBubbleManager implements BubbleManager {
                             .replaceText(TextReplacementConfig.builder().match("<message>").replacement(
                                                     componentUtil.builder(fPlayer, fReceiver, message)
                                                             .userMessage(true)
+                                                            .interactiveChat(false)
                                                             .build()
                                             )
                                             .build()

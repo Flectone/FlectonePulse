@@ -86,6 +86,7 @@ public class ComponentUtil {
         private boolean url = true;
         private boolean image = true;
         private boolean colors = true;
+        private boolean interactiveChat = true;
         private TagResolver[] tagResolvers;
 
         public Builder(FEntity sender, FEntity receiver, String message) {
@@ -144,6 +145,11 @@ public class ComponentUtil {
             return this;
         }
 
+        public Builder interactiveChat(boolean interactiveChat) {
+            this.interactiveChat = interactiveChat;
+            return this;
+        }
+
         public Builder tagResolvers(TagResolver... tagResolvers) {
             this.tagResolvers = tagResolvers;
             return this;
@@ -152,7 +158,13 @@ public class ComponentUtil {
         // need refactor logic formatting
         // mb chain or eventbus pattern
         public Component build() {
-            String message = integrationModule.setPlaceholders(sender, receiver, this.message, userMessage);
+            String message = integrationModule.setPlaceholders(
+                    sender,
+                    receiver,
+                    // InteractiveChat integration
+                    interactiveChat ? integrationModule.markSender(sender, this.message) : this.message,
+                    userMessage
+            );
 
             List<TagResolver> tagResolverList = new ArrayList<>();
             if (tagResolvers != null) {

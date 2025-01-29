@@ -41,6 +41,8 @@ public final class Integration extends FileSerializable implements IModule.IInte
 
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/discord/")})
     private Discord discord = new Discord();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/interactivechat/")})
+    private Interactivechat interactivechat = new Interactivechat();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/luckperms/")})
     private Luckperms luckperms = new Luckperms();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/placeholderapi/")})
@@ -95,6 +97,11 @@ public final class Integration extends FileSerializable implements IModule.IInte
             private boolean enable = false;
             private Ticker ticker = new Ticker(true, 1200);
         }
+    }
+
+    @Getter
+    public static final class Interactivechat implements ISubIntegration, Config.IEnable {
+        private boolean enable = true;
     }
 
     @Getter

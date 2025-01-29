@@ -522,6 +522,8 @@ public final class Permission extends FileSerializable implements IModule {
 
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/integration/discord/")})
         private Discord discord = new Discord();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/integration/interactivechat/")})
+        private Interactivechat interactivechat = new Interactivechat();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/integration/luckperms/")})
         private Luckperms luckperms = new Luckperms();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/integration/placeholderapi/")})
@@ -544,6 +546,12 @@ public final class Permission extends FileSerializable implements IModule {
         @Getter
         public static final class Discord implements ISubIntegration, IPermission {
             private String name = "flectonepulse.module.integration.discord";
+            private Type type = Type.TRUE;
+        }
+
+        @Getter
+        public static final class Interactivechat implements ISubIntegration, IPermission {
+            private String name = "flectonepulse.module.integration.interactivechat";
             private Type type = Type.TRUE;
         }
 

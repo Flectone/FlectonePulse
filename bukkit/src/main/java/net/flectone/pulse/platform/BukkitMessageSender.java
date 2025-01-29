@@ -11,6 +11,7 @@ import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Toast;
+import net.flectone.pulse.module.integration.BukkitIntegrationModule;
 import net.flectone.pulse.util.BrandPacketSerializer;
 import net.flectone.pulse.util.PacketEventsUtil;
 import net.kyori.adventure.text.Component;
@@ -28,10 +29,12 @@ public class BukkitMessageSender extends MessageSender {
 
     private final Plugin plugin;
     private final ThreadManager threadManager;
+    private final BukkitIntegrationModule integrationModule;
 
     @Inject
     public BukkitMessageSender(Plugin plugin,
                                ThreadManager threadManager,
+                               BukkitIntegrationModule integrationModule,
                                FPlayerManager fPlayerManager,
                                BrandPacketSerializer packetSerializer,
                                PacketEventsUtil packetEventsUtil,
@@ -40,6 +43,14 @@ public class BukkitMessageSender extends MessageSender {
 
         this.plugin = plugin;
         this.threadManager = threadManager;
+        this.integrationModule = integrationModule;
+    }
+
+    @Override
+    public void sendMessage(FPlayer fPlayer, Component component) {
+        if (integrationModule.sendMessageWithInteractiveChat(fPlayer, component)) return;
+
+        super.sendMessage(fPlayer, component);
     }
 
     @Override
