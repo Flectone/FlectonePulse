@@ -96,6 +96,8 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     private Mutelist mutelist = new Mutelist();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/online/")})
     private Online online = new Online();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ping/")})
+    private Ping ping = new Ping();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/poll/")})
     private Poll poll = new Poll();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/reply/")})
@@ -420,6 +422,15 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private boolean suggestOfflinePlayers = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("online"));
+        private Destination destination = new Destination();
+        private Cooldown cooldown = new Cooldown();
+        private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Ping implements ISubCommand, ICommandFile {
+        private boolean enable = true;
+        private List<String> aliases = new ArrayList<>(List.of("ping"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();

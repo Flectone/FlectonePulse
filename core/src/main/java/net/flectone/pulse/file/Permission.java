@@ -101,6 +101,8 @@ public final class Permission extends FileSerializable implements IModule {
         private Mutelist mutelist = new Mutelist();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/online/")})
         private Online online = new Online();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/ping/")})
+        private Ping ping = new Ping();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/poll/")})
         private Poll poll = new Poll();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/reply/")})
@@ -381,6 +383,14 @@ public final class Permission extends FileSerializable implements IModule {
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.online.cooldown.bypass", Type.OP);
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.online.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Ping implements ISubCommand, IPermission {
+            private String name = "flectonepulse.module.command.ping";
+            private Type type = Type.TRUE;
+            private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.ping.cooldown.bypass", Type.OP);
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.ping.sound", Type.TRUE);
         }
 
         @Getter

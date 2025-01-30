@@ -33,6 +33,7 @@ public interface IModule {
         ISubCommand getMute();
         ISubCommand getMutelist();
         ISubCommand getOnline();
+        ISubCommand getPing();
         ISubCommand getPoll();
         ISubCommand getReply();
         ISubCommand getRockpaperscissors();

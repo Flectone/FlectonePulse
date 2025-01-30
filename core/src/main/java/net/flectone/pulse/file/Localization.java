@@ -77,6 +77,9 @@ public final class Localization extends FileSerializable implements IModule {
         command.online.formatLast = "<fcolor:1>⌛ <display_name> <fcolor:1>последний раз был на сервере <time> назад";
         command.online.formatTotal = "<fcolor:1>⌛ <display_name> <fcolor:1>всего провёл на сервере <time>";
 
+        command.ping.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
+        command.ping.format = "<fcolor:1>🖧 Пинг игрока <fcolor:2><player></fcolor:2> равен <ping>";
+
         command.coin.head = "орёл";
         command.coin.tail = "решка";
         command.coin.format = "<fcolor:1>✎ <display_name> подбросил монетку - <result>";
@@ -681,6 +684,8 @@ public final class Localization extends FileSerializable implements IModule {
         private Mutelist mutelist = new Mutelist();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/online/")})
         private Online online = new Online();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/ping/")})
+        private Ping ping = new Ping();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/poll/")})
         private Poll poll = new Poll();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/reply/")})
@@ -997,6 +1002,12 @@ public final class Localization extends FileSerializable implements IModule {
             private String formatFirst = "<fcolor:1>⌛ <display_name> was first on server <time> ago";
             private String formatLast = "<fcolor:1>⌛ <display_name> <fcolor:1>was last on server <time> ago";
             private String formatTotal = "<fcolor:1>⌛ <display_name> <fcolor:1>has spent a total of <time> on server";
+        }
+
+        @Getter
+        public static final class Ping implements ISubCommand, ILocalization {
+            private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
+            private String format = "<fcolor:1>🖧 <fcolor:2><player>'s</fcolor:2> ping is <ping>";
         }
 
         @Getter

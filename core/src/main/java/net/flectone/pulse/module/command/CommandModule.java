@@ -31,6 +31,7 @@ import net.flectone.pulse.module.command.me.MeModule;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.command.mutelist.MutelistModule;
 import net.flectone.pulse.module.command.online.OnlineModule;
+import net.flectone.pulse.module.command.ping.PingModule;
 import net.flectone.pulse.module.command.poll.PollModule;
 import net.flectone.pulse.module.command.reply.ReplyModule;
 import net.flectone.pulse.module.command.rockpaperscissors.RockpaperscissorsModule;
@@ -89,6 +90,7 @@ public class CommandModule extends AbstractModule {
         addChildren(MuteModule.class);
         addChildren(MutelistModule.class);
         addChildren(OnlineModule.class);
+        addChildren(PingModule.class);
         addChildren(PollModule.class);
         addChildren(ReplyModule.class);
         addChildren(RockpaperscissorsModule.class);

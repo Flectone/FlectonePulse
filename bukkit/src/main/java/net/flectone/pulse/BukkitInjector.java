@@ -63,6 +63,8 @@ import net.flectone.pulse.module.command.mutelist.BukkitMutelistModule;
 import net.flectone.pulse.module.command.mutelist.MutelistModule;
 import net.flectone.pulse.module.command.online.BukkitOnlineModule;
 import net.flectone.pulse.module.command.online.OnlineModule;
+import net.flectone.pulse.module.command.ping.BukkitPingModule;
+import net.flectone.pulse.module.command.ping.PingModule;
 import net.flectone.pulse.module.command.poll.BukkitPollModule;
 import net.flectone.pulse.module.command.poll.PollModule;
 import net.flectone.pulse.module.command.reply.BukkitReplyModule;
@@ -212,6 +214,7 @@ public class BukkitInjector extends AbstractModule {
         bind(MuteModule.class).to(BukkitMuteModule.class);
         bind(MutelistModule.class).to(BukkitMutelistModule.class);
         bind(OnlineModule.class).to(BukkitOnlineModule.class);
+        bind(PingModule.class).to(BukkitPingModule.class);
         bind(PollModule.class).to(BukkitPollModule.class);
         bind(ReplyModule.class).to(BukkitReplyModule.class);
         bind(RockpaperscissorsModule.class).to(BukkitRockpaperscissorsModule.class);
