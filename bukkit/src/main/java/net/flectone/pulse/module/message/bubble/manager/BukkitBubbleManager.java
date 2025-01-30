@@ -120,10 +120,15 @@ public class BukkitBubbleManager implements BubbleManager {
                     if (fReceiver.isIgnored(fPlayer)) return;
 
                     Component component = componentUtil.builder(fPlayer, fReceiver, localizationBubble.getFormat())
+                            .mention(false)
+                            .question(false)
+                            .interactiveChat(false)
                             .build()
                             .replaceText(TextReplacementConfig.builder().match("<message>").replacement(
                                                     componentUtil.builder(fPlayer, fReceiver, message)
                                                             .userMessage(true)
+                                                            .mention(false)
+                                                            .question(false)
                                                             .interactiveChat(false)
                                                             .build()
                                             )

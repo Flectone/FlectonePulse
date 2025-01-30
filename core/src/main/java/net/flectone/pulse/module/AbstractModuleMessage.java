@@ -413,6 +413,9 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
                         .replacement(componentUtil
                                 .builder(fPlayer, FPlayer.UNKNOWN, message)
                                 .userMessage(true)
+                                .mention(false)
+                                .interactiveChat(false)
+                                .question(false)
                                 .build()
                         )
                         .build()
