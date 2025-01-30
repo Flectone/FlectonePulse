@@ -17,8 +17,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
+import java.util.UUID;
+import java.util.WeakHashMap;
+
 @Singleton
 public class MentionModule extends AbstractModuleMessage<Localization.Message.Format.Mention> {
+
+    private final WeakHashMap<UUID, Boolean> processedMentions = new WeakHashMap<>();
 
     private final Message.Format.Mention message;
     private final Permission.Message.Format.Mention permission;
@@ -84,7 +89,7 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
         return String.join(" ", words);
     }
 
-    public TagResolver mentionTag(FEntity sender, FEntity receiver) {
+    public TagResolver mentionTag(UUID processId, FEntity sender, FEntity receiver) {
         if (checkModulePredicates(sender)) return TagResolver.empty();
 
         return TagResolver.resolver("mention", (argumentQueue, context) -> {
@@ -102,14 +107,14 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
                     if (permissionUtil.has(mentionFPlayer, permission.getBypass())) break;
                     if (!permissionUtil.has(receiver, "group." + group)) continue;
 
-                    sendMention(mentionFPlayer);
+                    sendMention(processId, mentionFPlayer);
                     break;
                 }
 
             } else {
                 FPlayer mentionFPlayer = fPlayerManager.getOnline(mention);
                 if (mentionFPlayer.equals(receiver) && !permissionUtil.has(mentionFPlayer, permission.getBypass())) {
-                    sendMention(mentionFPlayer);
+                    sendMention(processId, mentionFPlayer);
                 }
             }
 
@@ -121,7 +126,11 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
         });
     }
 
-    private void sendMention(FPlayer fPlayer) {
+    private void sendMention(UUID processId, FPlayer fPlayer) {
+        if (processedMentions.containsKey(processId)) return;
+
+        processedMentions.put(processId, true);
+
         playSound(fPlayer);
 
         builder(fPlayer)

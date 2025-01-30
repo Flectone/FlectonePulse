@@ -72,6 +72,7 @@ public class ComponentUtil {
 
     public class Builder {
 
+        private final UUID processId;
         private final FEntity sender;
         private final FEntity receiver;
         private final String message;
@@ -90,6 +91,7 @@ public class ComponentUtil {
         private TagResolver[] tagResolvers;
 
         public Builder(FEntity sender, FEntity receiver, String message) {
+            this.processId = UUID.randomUUID();
             this.sender = sender;
             this.receiver = receiver;
             this.message = message;
@@ -206,8 +208,8 @@ public class ComponentUtil {
             }
 
             if (mention) {
-                tagResolverList.add(mentionModule.mentionTag(sender, receiver));
                 message = mentionModule.replace(sender, message);
+                tagResolverList.add(mentionModule.mentionTag(processId, sender, receiver));
             }
 
             if (caps && userMessage) {
