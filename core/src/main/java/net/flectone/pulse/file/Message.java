@@ -357,6 +357,8 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         private Moderation moderation = new Moderation();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/name_/")})
         private Name name_ = new Name();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/questionanswer/")})
+        private QuestionAnswer questionAnswer = new QuestionAnswer();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/spoiler/")})
         private Spoiler spoiler = new Spoiler();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/world/")})
@@ -468,6 +470,31 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private boolean team = true;
             private boolean visible = false;
             private String color = "<white>";
+        }
+
+        @Getter
+        public static final class QuestionAnswer implements ISubFormatMessage, Config.IEnable {
+            private boolean enable = false;
+            private Map<String, Question> questions = new LinkedHashMap<>(){
+                {
+                    put("server", new Question("(?i)\\b(what\\s+is\\s+this\\s+server|what\\'?s\\s+this\\s+server|what\\s+server\\s+is\\s+this)\\b"));
+                    put("flectone", new Question("(?i)\\b(flectone|flectonepulse|flecton)\\b"));
+                }
+            };
+
+            @Getter
+            @NoArgsConstructor
+            public static final class Question {
+                private int range = Range.PLAYER;
+                private Destination destination = new Destination(Destination.Type.CHAT);
+                private Cooldown cooldown = new Cooldown();
+                private Sound sound = new Sound();
+                private String target = "";
+
+                public Question(String target) {
+                    this.target = target;
+                }
+            }
         }
 
         @Getter

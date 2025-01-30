@@ -16,6 +16,7 @@ import net.flectone.pulse.module.message.format.mention.MentionModule;
 import net.flectone.pulse.module.message.format.moderation.caps.CapsModule;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
 import net.flectone.pulse.module.message.format.name.NameModule;
+import net.flectone.pulse.module.message.format.questionanswer.QuestionAnswerModule;
 import net.flectone.pulse.module.message.format.spoiler.SpoilerModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.kyori.adventure.text.Component;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Singleton
 public class ComponentUtil {
@@ -48,6 +50,7 @@ public class ComponentUtil {
     @Inject private AfkModule afkModule;
     @Inject private StreamModule streamModule;
     @Inject private NameModule nameModule;
+    @Inject private QuestionAnswerModule questionAnswerModule;
 
     @Inject
     public ComponentUtil(ColorUtil colorUtil,
@@ -80,6 +83,7 @@ public class ComponentUtil {
         private boolean userMessage;
         private boolean mention;
         private boolean emoji = true;
+        private boolean question = true;
         private boolean spoiler = true;
         private boolean swear = true;
         private boolean caps = true;
@@ -132,6 +136,11 @@ public class ComponentUtil {
             return this;
         }
 
+        public Builder question(boolean question) {
+            this.question = question;
+            return this;
+        }
+
         public Builder spoiler(boolean spoiler) {
             this.spoiler = spoiler;
             return this;
@@ -176,6 +185,11 @@ public class ComponentUtil {
             if (emoji) {
                 message = emojiModule.replace(sender, message);
                 tagResolverList.add(emojiModule.emojiTag(sender, receiver));
+            }
+
+            if (question && userMessage) {
+                message = questionAnswerModule.replace(sender, message);
+                tagResolverList.add(questionAnswerModule.questionAnswerTag(processId, sender, receiver));
             }
 
             if (spoiler) {

@@ -16,6 +16,7 @@ import net.flectone.pulse.module.message.format.image.ImageModule;
 import net.flectone.pulse.module.message.format.mention.MentionModule;
 import net.flectone.pulse.module.message.format.moderation.ModerationModule;
 import net.flectone.pulse.module.message.format.name.NameModule;
+import net.flectone.pulse.module.message.format.questionanswer.QuestionAnswerModule;
 import net.flectone.pulse.module.message.format.spoiler.SpoilerModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.util.*;
@@ -95,6 +96,7 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
         addChildren(MentionModule.class);
         addChildren(ModerationModule.class);
         addChildren(NameModule.class);
+        addChildren(QuestionAnswerModule.class);
         addChildren(SpoilerModule.class);
         addChildren(WorldModule.class);
     }

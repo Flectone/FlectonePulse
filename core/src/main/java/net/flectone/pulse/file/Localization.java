@@ -493,6 +493,10 @@ public final class Localization extends FileSerializable implements IModule {
         message.format.name_.entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:<name>> <br><fcolor:1>Тип <fcolor:2><lang:<type>> <br><fcolor:1>Айди <fcolor:2><uuid>\"><lang:<name>></hover></fcolor:2>";
         message.format.name_.unknown = "<fcolor:2><name></fcolor:2>";
 
+        message.format.questionAnswer.questions.clear();
+        message.format.questionAnswer.questions.put("server", "<fcolor:2>[Вопрос-Ответ] @<player><fcolor:1>, это ванильный сервер в Майнкрафте!");
+        message.format.questionAnswer.questions.put("flectone", "<fcolor:2>[Вопрос-Ответ] @<player><fcolor:1>, это бренд и проекты созданные TheFaser'ом");
+
         message.gamemode.self.creative = "<fcolor:1>\uD83D\uDDD8 Твой режим игры изменён на <fcolor:2>Творческий режим";
         message.gamemode.self.survival = "<fcolor:1>\uD83D\uDDD8 Твой режим игры изменён на <fcolor:2>Режим выживания";
         message.gamemode.self.adventure = "<fcolor:1>\uD83D\uDDD8 Твой режим игры изменён на <fcolor:2>Режим приключения";
@@ -1718,6 +1722,8 @@ public final class Localization extends FileSerializable implements IModule {
             private Moderation moderation = new Moderation();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/format/name_/")})
             private Name name_ = new Name();
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/format/questionanswer/")})
+            private QuestionAnswer questionAnswer = new QuestionAnswer();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/format/spoiler/")})
             private Spoiler spoiler = new Spoiler();
 
@@ -1757,6 +1763,16 @@ public final class Localization extends FileSerializable implements IModule {
                 private String unknown = "<fcolor:2><name></fcolor:2>";
                 private String prefix = "<vault_prefix><stream_prefix>";
                 private String suffix = "<afk_suffix><vault_suffix>";
+            }
+
+            @Getter
+            public static final class QuestionAnswer implements ISubFormatMessage, ILocalization {
+                private Map<String, String> questions = new LinkedHashMap<>(){
+                    {
+                        put("server", "<fcolor:2>[Q&A] @<player><fcolor:1>, this is a vanilla server in minecraft!");
+                        put("flectone", "<fcolor:2>[Q&A] @<player><fcolor:1>, this is a brand and projects created by TheFaser");
+                    }
+                };
             }
 
             @Getter

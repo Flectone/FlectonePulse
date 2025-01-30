@@ -122,6 +122,7 @@ public interface IModule {
             ISubFormatMessage getMention();
             IModerationFormatMessage getModeration();
             ISubFormatMessage getName_();
+            ISubFormatMessage getQuestionAnswer();
             ISubFormatMessage getSpoiler();
             ISubFormatMessage getWorld();
 

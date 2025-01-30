@@ -907,6 +907,8 @@ public final class Permission extends FileSerializable implements IModule {
             private Moderation moderation = new Moderation();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/format/name_/")})
             private Name name_ = new Name();
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/format/questionanswer/")})
+            private QuestionAnswer questionAnswer = new QuestionAnswer();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/format/spoiler/")})
             private Spoiler spoiler = new Spoiler();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/format/world/")})
@@ -973,6 +975,35 @@ public final class Permission extends FileSerializable implements IModule {
             public static final class Name implements ISubFormatMessage, IPermission {
                 private String name = "flectonepulse.module.format.name";
                 private Type type = Type.TRUE;
+            }
+
+            @Getter
+            public static final class QuestionAnswer implements ISubFormatMessage, IPermission {
+                private String name = "flectonepulse.module.format.questionanswer";
+                private Type type = Type.TRUE;
+                private Map<String, Question> questions = new LinkedHashMap<>(){
+                    {
+                        put("server", new Question(
+                                new PermissionEntry("flectonepulse.module.format.questionanswer.server", Type.TRUE),
+                                new PermissionEntry("flectonepulse.module.format.questionanswer.sound.server", Type.TRUE),
+                                new PermissionEntry("flectonepulse.module.format.questionanswer.cooldown.bypass.server", Type.TRUE)
+                        ));
+                        put("flectone", new Question(
+                                new PermissionEntry("flectonepulse.module.format.questionanswer.flectone", Type.TRUE),
+                                new PermissionEntry("flectonepulse.module.format.questionanswer.sound.flectone", Type.TRUE),
+                                new PermissionEntry("flectonepulse.module.format.questionanswer.cooldown.bypass.flectone", Type.TRUE)
+                        ));
+                    }
+                };
+
+                @Getter
+                @NoArgsConstructor
+                @AllArgsConstructor
+                public static final class Question {
+                    private PermissionEntry ask = new PermissionEntry();
+                    private PermissionEntry sound = new PermissionEntry();
+                    private PermissionEntry cooldownBypass = new PermissionEntry();
+                }
             }
 
             @Getter
