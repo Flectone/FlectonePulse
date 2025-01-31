@@ -41,7 +41,9 @@ public class FMark extends FPacketEntity {
         World world = location.getWorld();
         if (world == null) return;
 
-        viewers.addAll(world.getPlayers().stream()
+        viewers.addAll(world.getPlayers()
+                .stream()
+                .filter(receiver -> receiver.getWorld().equals(world))
                 .filter(receiver -> receiver.getLocation().distance(location) <= 100.0)
                 .map(fPlayerManager::get)
                 .toList()
@@ -53,9 +55,12 @@ public class FMark extends FPacketEntity {
         id = entity.getEntityId();
         uuid = entity.getUniqueId();
         this.entity = entity;
-        viewers.addAll(entity.getWorld().getPlayers().stream()
+        viewers.addAll(entity.getWorld().getPlayers()
+                .stream()
+                .filter(receiver -> receiver.getWorld().equals(entity.getWorld()))
                 .filter(receiver -> receiver.getLocation().distance(entity.getLocation()) <= 100.0)
-                .map(fPlayerManager::get).map(fPlayerManager::get).toList()
+                .map(fPlayerManager::get).map(fPlayerManager::get)
+                .toList()
         );
         alive = true;
     }

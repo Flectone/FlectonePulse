@@ -113,6 +113,7 @@ public class BukkitBubbleManager implements BubbleManager {
 
         player.getWorld().getPlayers()
                 .stream()
+                .filter(receiver -> receiver.getWorld().equals(player.getWorld()))
                 .filter(receiver -> receiver.canSee(player))
                 .filter(receiver -> receiver.getLocation().distance(player.getLocation()) <= distance)
                 .forEach(receiver -> {
