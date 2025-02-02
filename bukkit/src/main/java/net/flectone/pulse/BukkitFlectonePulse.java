@@ -62,11 +62,12 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
     @Override
     public void onEnable() {
-        try {
-            injector = Guice.createInjector(new BukkitInjector(this, this, libraryResolver, fLogger));
-        } catch (Exception e) {
-            fLogger.warning(e);
+        injector = Guice.createInjector(new BukkitInjector(this, this, libraryResolver, fLogger));
+
+        if (injector == null) {
+            fLogger.warning("Failed to enable FlectonePulse");
             Bukkit.getPluginManager().disablePlugin(this);
+            return;
         }
 
         fLogger.logPluginInfo();
@@ -108,6 +109,8 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
     @Override
     public void onDisable() {
+        if (injector == null) return;
+
         fLogger.logDisabling();
 
         injector.getInstance(InventoryManager.class).closeAll();
@@ -130,14 +133,9 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(ListenerManager.class).unregisterAll();
         PacketEvents.getAPI().terminate();
 
-//        injector.getInstance(InventoryManager.class).closeAll();
-
         injector.getInstance(ProxyManager.class).disable();
 
         CommandAPI.onDisable();
-        FileManager fileManager = injector.getInstance(FileManager.class);
-//        configManager.save();
-//        injector.getInstance(DatabaseThread.class).close();
         injector.getInstance(DiscordModule.class).disconnect();
         injector.getInstance(TwitchModule.class).disconnect();
         injector.getInstance(TelegramModule.class).disconnect();
@@ -148,6 +146,8 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
     @Override
     public void reload() {
+        if (injector == null) return;
+
         fLogger.logReloading();
 
         injector.getInstance(InventoryManager.class).closeAll();
