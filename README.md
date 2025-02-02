@@ -31,7 +31,7 @@ Dependency injection? Easy! **Guice** keeps code clean and logic modular. Want t
 Supports **all** popular platforms: Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Velocity. No matter your server’s "engine"—**Pulse** adapts to any setup!  
 
 - 🎨 **Customize Every Detail**  
-Colors, animations, Discord/Telegram/Twitch integrations—**everything** under your control. Even death messages can become memes! 😈  
+Colors, animations, Discord/Telegram/Twitch integrations — **everything** under your control. Even death messages can become memes! 😈  
 
 ---
 
@@ -53,7 +53,7 @@ Colors, animations, Discord/Telegram/Twitch integrations—**everything** under 
 
 ![color](https://cdn.modrinth.com/data/cached_images/918bc78d4897d0453625d35b3b1f4271b092651b.gif)  
 
-Create unique chat designs—players will gasp at the style 💥. Even the server console becomes more colorful!  
+Create unique chat designs — players will gasp at the style 💥. Even the server console becomes more colorful!  
 
 ---
 
@@ -100,14 +100,15 @@ If localization isn’t found for a player’s language, it uses the default lan
 
 ### 🔌 With Plugins
 
-| 🖼️ **Plugin** | 💬 **Description** |  
-|--------|-------|  
-| 🛡️ **[LuckPerms](https://flectone.net/pulse/docs/integration/luckperms/)** | Roles, permissions, and weighted groups—all under control |  
-| 🧩 **[PlaceholderAPI](https://flectone.net/pulse/docs/integration/placeholderapi/)** | Dynamic variables like <code>%player_level%</code> in any message |  
-| 🎙️ **[PlasmoVoice & SimpleVoice](https://flectone.net/pulse/docs/integration/plasmovoice/)** | Sync ignores/mutes between voice chat and server |  
-| 🖼️ **[SkinsRestorer](https://flectone.net/pulse/docs/integration/skinsrestorer/)** | Custom skins in chat/TAB without hassle |  
-| 👻 **[SuperVanish](https://flectone.net/pulse/docs/integration/supervanish/)** | Hidden players don’t break chat/command logic |  
-| 💰 **[Vault](https://flectone.net/pulse/docs/integration/vault/)** | Unified permissions via vanilla permissions |  
+| 🖼️ **Plugin**                                                                                | 💬 **Description**                                                 |  
+|-----------------------------------------------------------------------------------------------|--------------------------------------------------------------------|  
+| 💬 **[InteractiveChat](https://flectone.net/pulse/docs/integration/interactivechat/)**        | Advanced chat formatting with interactive elements                 | 
+| 🛡️ **[LuckPerms](https://flectone.net/pulse/docs/integration/luckperms/)**                   | Roles, permissions, and weighted groups—all under control          |  
+| 🧩 **[PlaceholderAPI](https://flectone.net/pulse/docs/integration/placeholderapi/)**          | Dynamic variables like <code>%player_level%</code> in any message  |  
+| 🎙️ **[PlasmoVoice & SimpleVoice](https://flectone.net/pulse/docs/integration/plasmovoice/)** | Sync ignores/mutes between voice chat and server                   |  
+| 🖼️ **[SkinsRestorer](https://flectone.net/pulse/docs/integration/skinsrestorer/)**           | Custom skins in chat/TAB without hassle                            |  
+| 👻 **[SuperVanish](https://flectone.net/pulse/docs/integration/supervanish/)**                | Hidden players don’t break chat/command logic                      |  
+| 💰 **[Vault](https://flectone.net/pulse/docs/integration/vault/)**                            | Unified permissions via vanilla permissions                        |  
 
 **→ Full integration list in** [documentation](https://flectone.net/pulse/docs/integration/) 🔗  
 

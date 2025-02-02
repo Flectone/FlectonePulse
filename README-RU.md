@@ -100,14 +100,15 @@
 
 ### 🔌 С плагинами
 
-| 🖼️ **Плагин** | 💬 **Описание** |  
-|--------|-------|  
-| 🛡️ **[LuckPerms](https://flectone.net/pulse/docs/integration/luckperms/)** | Роли, права и взвешенные группы — всё под контролем |  
-| 🧩 **[PlaceholderAPI](https://flectone.net/pulse/docs/integration/placeholderapi/)** | Динамические переменные типа <code>%player_level%</code> в любом сообщении |  
-| 🎙️ **[PlasmoVoice и SimpleVoice](https://flectone.net/pulse/docs/integration/plasmovoice/)** | Синхронизация игноров и мутов между голосовым чатом и сервером |  
-| 🖼️ **[SkinsRestorer](https://flectone.net/pulse/docs/integration/skinsrestorer/)** | Кастомные скины в чате и TAB-меню без танцев с бубном |  
-| 👻 **[SuperVanish](https://flectone.net/pulse/docs/integration/supervanish/)** | Скрытые игроки не ломают логику чата и команд |  
-| 💰 **[Vault](https://flectone.net/pulse/docs/integration/vault/)** | Единая система прав через ванильные разрешения |  
+| 🖼️ **Плагин**                                                                                  | 💬 **Описание**                                                            |  
+|-------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|  
+| 💬 **[InteractiveChat](https://flectone.net/pulse/docs/integration/interactivechat/)**          | Совместимость с интерактивными элементами чата, улучшенное форматирование  | 
+| 🛡️ **[LuckPerms](https://flectone.net/pulse/docs/integration/luckperms/)**                     | Роли, права и взвешенные группы — всё под контролем                        |  
+| 🧩 **[PlaceholderAPI](https://flectone.net/pulse/docs/integration/placeholderapi/)**            | Динамические переменные типа <code>%player_level%</code> в любом сообщении |  
+| 🎙️ **[PlasmoVoice и SimpleVoice](https://flectone.net/pulse/docs/integration/plasmovoice/)**   | Синхронизация игноров и мутов между голосовым чатом и сервером             |  
+| 🖼️ **[SkinsRestorer](https://flectone.net/pulse/docs/integration/skinsrestorer/)**             | Кастомные скины в чате и TAB-меню без танцев с бубном                      |  
+| 👻 **[SuperVanish](https://flectone.net/pulse/docs/integration/supervanish/)**                  | Скрытые игроки не ломают логику чата и команд                              |  
+| 💰 **[Vault](https://flectone.net/pulse/docs/integration/vault/)**                              | Единая система прав через ванильные разрешения                             |  
 
 **→ весь список интеграций на** [документации](https://flectone.net/pulse/docs/integration/) 🔗  
 
