@@ -3,6 +3,7 @@ package net.flectone.pulse.util;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import net.flectone.pulse.logger.FLogger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,8 @@ import java.util.Map;
 @Getter
 @Singleton
 public class ColorUtil {
+
+    private final int DEFAULT_ARGB = 0x40000000;
 
     private final Map<String, String> legacyAdventureMap = new HashMap<>();
     private final Map<String, String> minecraftHexMap = new HashMap<>();
@@ -37,8 +40,12 @@ public class ColorUtil {
             "f"
     );
 
+    private final FLogger fLogger;
+
     @Inject
-    public ColorUtil() {
+    public ColorUtil(FLogger fLogger) {
+        this.fLogger = fLogger;
+
         legacyAdventureMap.put("&0", "<black>");
         legacyAdventureMap.put("&1", "<dark_blue>");
         legacyAdventureMap.put("&2", "<dark_green>");
@@ -128,6 +135,44 @@ public class ColorUtil {
         }
 
         return message.replaceAll("(?<!:)#([a-fA-F0-9]{6})", "<color:#$1>");
+    }
+
+    public int parseHexToArgb(String hex) {
+        hex = hex.trim().replace("#", "");
+
+        if (hex.length() != 3 && hex.length() != 4 && hex.length() != 6 && hex.length() != 8) {
+            fLogger.warning("Incorrect HEX string length");
+            return DEFAULT_ARGB;
+        }
+
+        // #RGB -> RRGGBB, #RGBA -> RRGGBBAA
+        if (hex.length() == 3 || hex.length() == 4) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (char value : hex.toCharArray()) {
+                stringBuilder.append(value).append(value);
+            }
+
+            hex = stringBuilder.toString();
+        }
+
+        int alpha = 0xFF;
+        int rgbPartLength = hex.length();
+
+        if (hex.length() == 8) {
+            alpha = Integer.parseInt(hex.substring(6, 8), 16);
+            rgbPartLength = 6;
+        }
+
+        try {
+            int r = Integer.parseInt(hex.substring(0, 2), 16);
+            int g = Integer.parseInt(hex.substring(2, 4), 16);
+            int b = Integer.parseInt(hex.substring(4, rgbPartLength), 16);
+
+            return (alpha << 24) | (r << 16) | (g << 8) | b;
+        } catch (NumberFormatException e) {
+            fLogger.warning("Incorrect HEX characters");
+            return DEFAULT_ARGB;
+        }
     }
 
 }
