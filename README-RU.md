@@ -7,7 +7,7 @@
 
 ![pulse](https://flectone.net/pulse/flectonepulse.png)  
 <div class="center-row" align="center">
-    <h1> 💥 FlectonePulse — каждое сообщение под вашим контролем! 🚀 </h1>
+    <h1> FlectonePulse — каждое сообщение под вашим контролем! </h1>
     <a href="https://www.spigotmc.org/"><img src="https://flectone.net/pulse/bukkit.svg" alt="bukkit" class="hover-brightness"></a>
     <a href="https://www.spigotmc.org/"><img src="https://flectone.net/pulse/spigot.svg" alt="spigot" class="hover-brightness"></a>
     <a href="https://papermc.io/"><img src="https://flectone.net/pulse/paper.svg" alt="paper" class="hover-brightness"></a>
