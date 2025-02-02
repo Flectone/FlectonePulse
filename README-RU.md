@@ -1,3 +1,10 @@
+<div align="center">
+  <h3>
+    <a href="README.md">EN</a> | 
+    <a href="README.ru.md">РУ</a>
+  </h3>
+</div>
+
 ![pulse](https://flectone.net/pulse/flectonepulse.png)  
 <div class="center-row" align="center">
     <h1> 💥 FlectonePulse — каждое сообщение под вашим контролем! 🚀 </h1>
