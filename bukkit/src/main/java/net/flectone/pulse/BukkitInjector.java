@@ -160,6 +160,23 @@ public class BukkitInjector extends AbstractModule {
 
     @Override
     protected void configure() {
+        Path projectPath = plugin.getDataFolder().toPath();
+
+        bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
+        bind(NamespacedKey.class).annotatedWith(Names.named("flectonepulseSign")).toInstance(new NamespacedKey(plugin, "flectonepulse.sign"));
+
+        FileManager fileManager;
+        try {
+            fileManager = new FileManager(projectPath);
+            fileManager.reload();
+        } catch (Exception e) {
+            fLogger.warning(e);
+            instance.setDisableSilently(true);
+            return;
+        }
+
+        bind(FileManager.class).toInstance(fileManager);
+
         bind(ThreadManager.class).to(BukkitThreadManager.class);
         bind(FPlayerManager.class).to(BukkitFPlayerManager.class);
         bind(ListenerManager.class).to(BukkitListenerManager.class);
@@ -271,16 +288,6 @@ public class BukkitInjector extends AbstractModule {
         bind(ObjectiveManager.class).toInstance(scoreboardLibrary.createObjectiveManager());
         bind(TeamManager.class).toInstance(scoreboardLibrary.createTeamManager());
         bind(BukkitFPlayerManager.class).asEagerSingleton();
-
-        Path projectPath = plugin.getDataFolder().toPath();
-
-        bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
-        bind(NamespacedKey.class).annotatedWith(Names.named("flectonepulseSign")).toInstance(new NamespacedKey(plugin, "flectonepulse.sign"));
-
-        FileManager fileManager = new FileManager(projectPath);
-        fileManager.reload();
-
-        bind(FileManager.class).toInstance(fileManager);
 
         if (fileManager.getConfig().getDatabase().getType() == Database.Type.MYSQL) {
             bind(InputStream.class).annotatedWith(Names.named("SQLFile")).toInstance(plugin.getResource("sqls/mysql_flectonepulse.sql"));

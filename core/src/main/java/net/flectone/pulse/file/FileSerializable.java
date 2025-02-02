@@ -3,6 +3,7 @@ package net.flectone.pulse.file;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import lombok.Getter;
+import net.elytrium.serializer.LoadResult;
 import net.elytrium.serializer.SerializerConfig;
 import net.elytrium.serializer.annotations.Transient;
 import net.elytrium.serializer.custom.ClassSerializer;
@@ -241,5 +242,15 @@ public abstract class FileSerializable extends YamlSerializable {
     public FileSerializable(Path path) {
         super(CONFIG);
         this.path = path;
+    }
+
+    @Override
+    public LoadResult reload() {
+        return super.reload(path);
+    }
+
+    @Override
+    public void save() {
+        super.save(path);
     }
 }

@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.Getter;
+import net.elytrium.serializer.language.object.AbstractSerializable;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.file.*;
 import net.flectone.pulse.model.FEntity;
@@ -39,19 +40,19 @@ public class FileManager {
         this.projectPath = projectPath;
 
         command = new Command(projectPath);
-        command.reload(command.getPath());
+        command.reload();
 
         config = new Config(projectPath);
-        config.reload(config.getPath());
+        config.reload();
 
         integration = new Integration(projectPath);
-        integration.reload(integration.getPath());
+        integration.reload();
 
         message = new Message(projectPath);
-        message.reload(message.getPath());
+        message.reload();
 
         permission = new Permission(projectPath);
-        permission.reload(permission.getPath());
+        permission.reload();
 
         reloadLanguages();
 
@@ -70,22 +71,22 @@ public class FileManager {
     }
 
     public void reload() {
-        config.reload(config.getPath());
+        config.reload();
         config.setLanguage(config.getLanguage());
 
         String configVersion = config.getVersion();
 
         if (!configVersion.equals(BuildConfig.PROJECT_VERSION)) {
             config.setVersion(BuildConfig.PROJECT_VERSION);
-            config.save(config.getPath());
+            config.save();
 
             upgradeIfNewerThanV_0_1_0(configVersion);
         }
 
-        command.reload(command.getPath());
-        integration.reload(integration.getPath());
-        message.reload(message.getPath());
-        permission.reload(permission.getPath());
+        command.reload();
+        integration.reload();
+        message.reload();
+        permission.reload();
 
         reloadLanguages();
 
@@ -93,12 +94,12 @@ public class FileManager {
     }
 
     public void save() {
-        command.save(command.getPath());
-        config.save(config.getPath());
-        integration.save(integration.getPath());
-        message.save(message.getPath());
-        permission.save(permission.getPath());
-        localizationMap.values().forEach(file -> file.save(file.getPath()));
+        command.save();
+        config.save();
+        integration.save();
+        message.save();
+        permission.save();
+        localizationMap.values().forEach(AbstractSerializable::save);
     }
 
     private void reloadLanguages() {

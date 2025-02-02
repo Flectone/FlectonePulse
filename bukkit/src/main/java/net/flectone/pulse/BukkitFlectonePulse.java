@@ -7,6 +7,7 @@ import com.google.inject.Singleton;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
+import lombok.Setter;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.*;
@@ -30,6 +31,9 @@ import java.util.stream.Collectors;
 
 @Singleton
 public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
+
+    @Setter
+    private boolean disableSilently = false;
 
     private FLogger fLogger;
     private LibraryResolver libraryResolver;
@@ -64,13 +68,18 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
     public void onEnable() {
         injector = Guice.createInjector(new BukkitInjector(this, this, libraryResolver, fLogger));
 
-        if (injector == null) {
-            fLogger.warning("Failed to enable FlectonePulse");
-            Bukkit.getPluginManager().disablePlugin(this);
+        fLogger.logPluginInfo();
+
+        if (injector == null || disableSilently) {
+            fLogger.warning("FAILED TO ENABLE");
+            fLogger.warning("Report a problem on github https://github.com/Flectone/FlectonePulse/issues");
+            fLogger.warning("or in discord https://discord.com/channels/861147957365964810/1271850075064369152");
             return;
         }
 
-        fLogger.logPluginInfo();
+        FileManager fileManager = injector.getInstance(FileManager.class);
+
+        fLogger.reload(fileManager.getConfig().getLogFilter());
 
         // test
 //        PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(TestListener.class), PacketListenerPriority.NORMAL);
@@ -79,11 +88,6 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         PacketEvents.getAPI().init();
 
-        FileManager fileManager = injector.getInstance(FileManager.class);
-        fileManager.reload();
-
-        fLogger.reload(fileManager.getConfig().getLogFilter());
-
         injector.getInstance(ModuleManager.class).reload();
 
         try {
@@ -91,8 +95,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         } catch (Exception e) {
             fLogger.warning("Failed to connect database");
             fLogger.warning(e);
-
-            Bukkit.getPluginManager().disablePlugin(this);
+            return;
         }
 
         injector.getInstance(FPlayerManager.class).reload();
@@ -109,7 +112,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
     @Override
     public void onDisable() {
-        if (injector == null) return;
+        if (injector == null || disableSilently) return;
 
         fLogger.logDisabling();
 
