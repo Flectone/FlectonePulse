@@ -9,6 +9,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
+import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ThreadManager;
@@ -16,6 +17,7 @@ import net.flectone.pulse.model.FPacketEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.model.FBubble;
+import net.flectone.pulse.util.ColorUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.RandomUtil;
 import net.kyori.adventure.text.Component;
@@ -43,6 +45,7 @@ public class BukkitBubbleManager implements BubbleManager {
     private final FileManager fileManager;
     private final ComponentUtil componentUtil;
     private final RandomUtil randomUtil;
+    private final ColorUtil colorUtil;
     private final IntegrationModule integrationModule;
 
     @Inject
@@ -51,12 +54,14 @@ public class BukkitBubbleManager implements BubbleManager {
                                FileManager fileManager,
                                RandomUtil randomUtil,
                                ComponentUtil componentUtil,
+                               ColorUtil colorUtil,
                                IntegrationModule integrationModule) {
         this.threadManager = threadManager;
         this.fPlayerManager = fPlayerManager;
         this.fileManager = fileManager;
         this.randomUtil = randomUtil;
         this.componentUtil = componentUtil;
+        this.colorUtil = colorUtil;
         this.integrationModule = integrationModule;
     }
 
@@ -102,14 +107,19 @@ public class BukkitBubbleManager implements BubbleManager {
         if (player == null) return -1;
 
         Message.Bubble messageBubble = fileManager.getMessage().getBubble();
+        Message.Bubble.Modern modernBubble = messageBubble.getModern();
         Localization.Message.Bubble localizationBubble = fileManager.getLocalization(fPlayer).getMessage().getBubble();
 
-        boolean isTextDisplay = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4) && messageBubble.isNewSystem();
+        boolean isTextDisplay = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4) && modernBubble.isEnable();
 
         int lineWidth = messageBubble.getLineWidth();
         double distance = messageBubble.getDistance();
-        float height = messageBubble.getHeight();
         long duration = calculateDuration(message, messageBubble);
+
+        boolean hasShadow = modernBubble.isHasShadow();
+        int background = isTextDisplay ? colorUtil.parseHexToArgb(modernBubble.getBackground()) : 0;
+        float scale = modernBubble.getScale();
+        float height = modernBubble.getHeight();
 
         player.getWorld().getPlayers()
                 .stream()
@@ -137,10 +147,12 @@ public class BukkitBubbleManager implements BubbleManager {
                             );
 
                     if (isTextDisplay) {
+
                         teleport(new ArrayDeque<>(List.of(
                                 new FBubble(duration, height, fPlayer, fReceiver),
-                                new FBubble(duration, lineWidth, fPlayer, fReceiver, component)
+                                new FBubble(hasShadow, duration, lineWidth, background, scale, fPlayer, fReceiver, component)
                         )));
+
                         return;
                     }
 
@@ -157,6 +169,9 @@ public class BukkitBubbleManager implements BubbleManager {
 
         return duration;
     }
+
+    @Inject
+    private FLogger fLogger;
 
     @Sync
     public void teleport(Deque<FBubble> bubbleDeque) {

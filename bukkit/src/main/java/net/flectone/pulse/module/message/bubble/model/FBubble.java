@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
+import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
@@ -34,12 +35,19 @@ public class FBubble extends FPacketEntity {
     private final Component text;
     private final EntityType type;
 
+    private boolean hasShadow;
+    private int backgroundColor;
+    private float scale;
+
     public FBubble(long duration, FPlayer fPlayer, FPlayer fReceiver, Component text) {
         this(duration, 0, 0, fPlayer, fReceiver, text, EntityTypes.AREA_EFFECT_CLOUD);
     }
 
-    public FBubble(long duration, int lineWidth, FPlayer fPlayer, FPlayer fReceiver, Component text) {
+    public FBubble(boolean hasShadow, long duration, int lineWidth, int backgroundColor, float scale, FPlayer fPlayer, FPlayer fReceiver, Component text) {
         this(duration, lineWidth, 0, fPlayer, fReceiver, text, EntityTypes.TEXT_DISPLAY);
+        this.hasShadow = hasShadow;
+        this.backgroundColor = backgroundColor;
+        this.scale = scale;
     }
 
     public FBubble(long duration, float height, FPlayer fPlayer, FPlayer fReceiver) {
@@ -81,12 +89,21 @@ public class FBubble extends FPacketEntity {
             // height
             metadataList.add(new EntityData(9, EntityDataTypes.FLOAT, height));
         } else if (type == EntityTypes.TEXT_DISPLAY) {
+            // scale
+            metadataList.add(new EntityData(12, EntityDataTypes.VECTOR3F, new Vector3f(scale, scale, scale)));
             // center for viewer
             metadataList.add(new EntityData(15, EntityDataTypes.BYTE, (byte) 3));
             // text
             metadataList.add(new EntityData(23, EntityDataTypes.ADV_COMPONENT, text));
             // width
             metadataList.add(new EntityData(24, EntityDataTypes.INT, lineWidth));
+            // background color
+            metadataList.add(new EntityData(25, EntityDataTypes.INT, backgroundColor));
+
+            if (hasShadow) {
+                metadataList.add(new EntityData(27, EntityDataTypes.BYTE, (byte) 0x01));
+            }
+
         } else {
             // text
             metadataList.add(new EntityData(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(text)));
