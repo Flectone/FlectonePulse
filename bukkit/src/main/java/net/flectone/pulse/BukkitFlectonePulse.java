@@ -81,9 +81,6 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         fLogger.reload(fileManager.getConfig().getLogFilter());
 
-        // test
-//        PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(TestListener.class), PacketListenerPriority.NORMAL);
-
         CommandAPI.onEnable();
 
         PacketEvents.getAPI().init();
