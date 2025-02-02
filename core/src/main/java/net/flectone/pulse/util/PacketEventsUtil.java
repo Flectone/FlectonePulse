@@ -18,8 +18,12 @@ public class PacketEventsUtil {
     @Inject
     public PacketEventsUtil() {}
 
+    public Object getChannel(UUID uuid) {
+        return packetEvents.getProtocolManager().getChannel(uuid);
+    }
+
     public User getUser(UUID uuid) {
-        Object channel = packetEvents.getProtocolManager().getChannel(uuid);
+        Object channel = getChannel(uuid);
         if (channel == null) return null;
 
         return packetEvents.getProtocolManager().getUser(channel);
@@ -29,15 +33,15 @@ public class PacketEventsUtil {
         return getUser(fPlayer.getUuid());
     }
 
-    public void sendPacket(UUID uuid, PacketWrapper<?> packetWrapper) {
-        User user = getUser(uuid);
-        if (user == null) return;
-
-        user.sendPacket(packetWrapper);
-    }
-
     public void sendPacket(FPlayer fPlayer, PacketWrapper<?> packetWrapper) {
         sendPacket(fPlayer.getUuid(), packetWrapper);
+    }
+
+    public void sendPacket(UUID uuid, PacketWrapper<?> packetWrapper) {
+        Object channel = getChannel(uuid);
+        if (channel == null) return;
+
+        packetEvents.getProtocolManager().sendPacket(channel, packetWrapper);
     }
 
     public void sendPacket(Object channel, PacketWrapper<?> packetWrapper) {
@@ -48,6 +52,6 @@ public class PacketEventsUtil {
         Object channel = PacketEvents.getAPI().getProtocolManager().getChannel(fPlayer.getUuid());
         if (channel == null) return;
 
-        PacketEvents.getAPI().getProtocolManager().getUser(channel).sendPacket(packetWrapper);
+        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, packetWrapper);
     }
 }
