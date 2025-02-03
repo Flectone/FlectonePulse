@@ -926,19 +926,19 @@ public final class Permission extends FileSerializable implements IModule {
 
             @Getter
             public static final class Color implements ISubFormatMessage, IPermission {
-                private String name = "flectonepulse.module.tag.color";
+                private String name = "flectonepulse.module.message.format.fcolor";
                 private Type type = Type.TRUE;
             }
 
             @Getter
             public static final class Emoji implements ISubFormatMessage, IPermission {
-                private String name = "flectonepulse.module.tag.emoji";
+                private String name = "flectonepulse.module.message.format.emoji";
                 private Type type = Type.TRUE;
             }
 
             @Getter
             public static final class Image implements ISubFormatMessage, IPermission {
-                private String name = "flectonepulse.module.tag.image";
+                private String name = "flectonepulse.module.message.format.image";
                 private Type type = Type.TRUE;
             }
 
