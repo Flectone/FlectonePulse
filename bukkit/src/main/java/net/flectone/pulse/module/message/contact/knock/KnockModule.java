@@ -53,10 +53,10 @@ public class KnockModule extends AbstractModuleMessage<Localization.Message.Cont
         registerModulePermission(permission);
 
         BLOCK_SOUND.clear();
-        message.getTypes().forEach((key, value) -> {
-            Permission.PermissionEntry soundPermission = permission.getTypes().get(key);
+        message.getVariants().forEach(value -> {
+            Permission.PermissionEntry soundPermission = permission.getTypes().get(value.getType());
 
-            BLOCK_SOUND.put(key, createSound(value, soundPermission));
+            BLOCK_SOUND.put(value.getType(), createSound(value.getSound(), soundPermission));
         });
 
         createCooldown(message.getCooldown(), permission.getCooldownBypass());
@@ -74,10 +74,13 @@ public class KnockModule extends AbstractModuleMessage<Localization.Message.Cont
         if (checkModulePredicates(fPlayer)) return;
 
         String blockType = clickedBlock.getType().toString().toUpperCase();
-        Optional<String> blockKey = BLOCK_SOUND.keySet().stream().filter(blockType::contains).findAny();
+        Optional<Map.Entry<String, Sound>> blockEntry = BLOCK_SOUND.entrySet()
+                .stream()
+                .filter(entry -> blockType.contains(entry.getKey()))
+                .findAny();
 
-        if (blockKey.isEmpty()) return;
+        if (blockEntry.isEmpty()) return;
 
-        soundPlayer.play(BLOCK_SOUND.get(blockKey.get()), fPlayer, new Vector3i(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+        soundPlayer.play(blockEntry.get().getValue(), fPlayer, new Vector3i(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
     }
 }

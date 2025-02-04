@@ -2,6 +2,7 @@ package net.flectone.pulse.file;
 
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.elytrium.serializer.annotations.Comment;
@@ -14,10 +15,7 @@ import net.flectone.pulse.util.Range;
 import net.flectone.pulse.util.TagType;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @SuppressWarnings({"FieldMayBeFinal", "unused"})
@@ -230,12 +228,20 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         public static final class Knock implements ISubContactMessage, Config.IEnable {
             private boolean enable = false;
             private Cooldown cooldown = new Cooldown();
-            private Map<String, Sound> types = new LinkedHashMap<>(){
+            private List<Type> variants = new LinkedList<>(){
                 {
-                    put("GLASS", new Sound(true, 1f, 1f, SoundCategory.BLOCK.name(), Sounds.BLOCK_GLASS_PLACE.getName().toString()));
-                    put("DOOR", new Sound(true, 1f, 1f, SoundCategory.BLOCK.name(), Sounds.BLOCK_WOOD_PLACE.getName().toString()));
+                    push(new Type("GLASS", new Sound(true, 1f, 1f, SoundCategory.BLOCK.name(), Sounds.BLOCK_GLASS_PLACE.getName().toString())));
+                    push(new Type("DOOR", new Sound(true, 1f, 1f, SoundCategory.BLOCK.name(), Sounds.BLOCK_WOOD_PLACE.getName().toString())));
                 }
             };
+
+            @Getter
+            @NoArgsConstructor
+            @AllArgsConstructor
+            public static final class Type {
+                private String type = "";
+                private Sound sound = new Sound();
+            }
         }
 
         @Getter
