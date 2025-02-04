@@ -112,6 +112,9 @@ public class BukkitBubbleManager implements BubbleManager {
 
         boolean isTextDisplay = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4) && modernBubble.isEnable();
 
+        // 1.21.3+ supported interaction riding
+        boolean isInteractionRiding = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_21_3);
+
         int lineWidth = messageBubble.getLineWidth();
         double distance = messageBubble.getDistance();
         long duration = calculateDuration(message, messageBubble);
@@ -148,10 +151,19 @@ public class BukkitBubbleManager implements BubbleManager {
 
                     if (isTextDisplay) {
 
-                        teleport(new ArrayDeque<>(List.of(
-                                new FBubble(duration, height, fPlayer, fReceiver),
-                                new FBubble(hasShadow, duration, lineWidth, background, scale, fPlayer, fReceiver, component)
-                        )));
+                        ArrayDeque<FBubble> fBubbles = new ArrayDeque<>();
+
+                        if (isInteractionRiding) {
+                            fBubbles.add(new FBubble(duration, height, fPlayer, fReceiver));
+                        } else {
+                            for (int i = 0; i < (int) height; i++) {
+                                fBubbles.add(new FBubble(duration, fPlayer, fReceiver, Component.text(""), false));
+                            }
+                        }
+
+                        fBubbles.add(new FBubble(hasShadow, duration, lineWidth, background, scale, fPlayer, fReceiver, component));
+
+                        teleport(fBubbles);
 
                         return;
                     }

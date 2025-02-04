@@ -35,12 +35,18 @@ public class FBubble extends FPacketEntity {
     private final Component text;
     private final EntityType type;
 
+    private boolean visibleName = true;
     private boolean hasShadow;
     private int backgroundColor;
     private float scale;
 
     public FBubble(long duration, FPlayer fPlayer, FPlayer fReceiver, Component text) {
         this(duration, 0, 0, fPlayer, fReceiver, text, EntityTypes.AREA_EFFECT_CLOUD);
+    }
+
+    public FBubble(long duration, FPlayer fPlayer, FPlayer fReceiver, Component text, boolean visibleName) {
+        this(duration, fPlayer, fReceiver, text);
+        this.visibleName = visibleName;
     }
 
     public FBubble(boolean hasShadow, long duration, int lineWidth, int backgroundColor, float scale, FPlayer fPlayer, FPlayer fReceiver, Component text) {
@@ -108,7 +114,7 @@ public class FBubble extends FPacketEntity {
             // text
             metadataList.add(new EntityData(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(text)));
             // custom name visible
-            metadataList.add(new EntityData(3, EntityDataTypes.BOOLEAN, true));
+            metadataList.add(new EntityData(3, EntityDataTypes.BOOLEAN, visibleName));
 
             // radius
             int radiusIndex = 8;
