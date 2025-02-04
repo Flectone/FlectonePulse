@@ -35,14 +35,14 @@ public final class Permission extends FileSerializable implements IModule {
         super(projectPath.resolve("permission.yml"));
     }
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message")})
     private PermissionEntry module = new PermissionEntry("flectonepulse.module", Type.TRUE);
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/")})
     private Command command = new Command();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/integration/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/")})
     private Integration integration = new Integration();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/")})
     private Message message = new Message();
 
     @Getter
@@ -51,89 +51,89 @@ public final class Permission extends FileSerializable implements IModule {
         private String name = "flectonepulse.module.command";
         private Type type = Type.TRUE;
 
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/afk/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/afk/")})
         private Afk afk = new Afk();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/ball/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ball/")})
         private Ball ball = new Ball();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/ban/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ban/")})
         private Ban ban = new Ban();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/banlist/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/banlist/")})
         private Banlist banlist = new Banlist();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/broadcast/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/broadcast/")})
         private Broadcast broadcast = new Broadcast();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/chatcolor/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatcolor/")})
         private Chatcolor chatcolor = new Chatcolor();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/chatsetting/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatsetting/")})
         private Chatsetting chatsetting = new Chatsetting();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/clearchat/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearchat/")})
         private Clearchat clearchat = new Clearchat();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/clearmail/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearmail/")})
         private Clearmail clearmail = new Clearmail();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/coin/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/coin/")})
         private Coin coin = new Coin();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/dice/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/dice/")})
         private Dice dice = new Dice();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/do/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/do/")})
         private Do Do = new Do();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/flectonepulse/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/flectonepulse/")})
         private Flectonepulse flectonepulse = new Flectonepulse();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/geolocate/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/geolocate/")})
         private Geolocate geolocate = new Geolocate();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/helper/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/helper/")})
         private Helper helper = new Helper();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/ignore/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ignore/")})
         private Ignore ignore = new Ignore();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/ignorelist/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ignorelist/")})
         private Ignorelist ignorelist = new Ignorelist();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/kick/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/kick/")})
         private Kick kick = new Kick();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/mail/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/mail/")})
         private Mail mail = new Mail();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/maintenace/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/maintenace/")})
         private Maintenance maintenance = new Maintenance();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/mark/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/mark/")})
         private Mark mark = new Mark();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/me/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/me/")})
         private Me me = new Me();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/mute/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/mute/")})
         private Mute mute = new Mute();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/mutelist/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/mutelist/")})
         private Mutelist mutelist = new Mutelist();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/online/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/online/")})
         private Online online = new Online();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/ping/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ping/")})
         private Ping ping = new Ping();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/poll/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/poll/")})
         private Poll poll = new Poll();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/reply/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/reply/")})
         private Reply reply = new Reply();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/rockpaperscissors/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/rockpaperscissors/")})
         private Rockpaperscissors rockpaperscissors = new Rockpaperscissors();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/spit/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/spit/")})
         private Spit spit = new Spit();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/spy/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/spy/")})
         private Spy spy = new Spy();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/stream/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/stream/")})
         private Stream stream = new Stream();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/symbol/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/symbol/")})
         private Symbol symbol = new Symbol();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/tell/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/tell/")})
         private Tell tell = new Tell();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/tictactoe/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/tictactoe/")})
         private Tictactoe tictactoe = new Tictactoe();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/translateto/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/translateto/")})
         private Translateto translateto = new Translateto();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/try/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/try/")})
         private Try Try = new Try();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/unban/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/unban/")})
         private Unban unban = new Unban();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/unmute/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/unmute/")})
         private Unmute unmute = new Unmute();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/unwarn/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/unwarn/")})
         private Unwarn unwarn = new Unwarn();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/warn/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/warn/")})
         private Warn warn = new Warn();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/command/warnlist/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/warnlist/")})
         private Warnlist warnlist = new Warnlist();
 
         @Getter
@@ -530,27 +530,27 @@ public final class Permission extends FileSerializable implements IModule {
         private String name = "flectonepulse.module.integration";
         private Type type = Type.TRUE;
 
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/integration/discord/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/discord/")})
         private Discord discord = new Discord();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/integration/interactivechat/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/interactivechat/")})
         private Interactivechat interactivechat = new Interactivechat();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/integration/luckperms/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/luckperms/")})
         private Luckperms luckperms = new Luckperms();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/integration/placeholderapi/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/placeholderapi/")})
         private Placeholderapi placeholderapi = new Placeholderapi();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/integration/plasmovoice/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/plasmovoice/")})
         private Plasmovoice plasmovoice = new Plasmovoice();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/integration/simplevoice/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/simplevoice/")})
         private Simplevoice simplevoice = new Simplevoice();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/integration/skinsrestorer/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/skinsrestorer/")})
         private Skinsrestorer skinsrestorer = new Skinsrestorer();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/integration/supervanish/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/supervanish/")})
         private Supervanish supervanish = new Supervanish();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/integration/telegram/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/telegram/")})
         private Telegram telegram = new Telegram();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/integration/twitch/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/twitch/")})
         private Twitch twitch = new Twitch();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/integration/vault/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/vault/")})
         private Vault vault = new Vault();
 
         @Getter
@@ -627,57 +627,57 @@ public final class Permission extends FileSerializable implements IModule {
         private String name = "flectonepulse.module.message";
         private Type type = Type.TRUE;
 
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/advancement/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/advancement/")})
         private Advancement advancement = new Advancement();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/anvil/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/anvil/")})
         private Anvil anvil = new Anvil();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/auto/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/auto/")})
         private Auto auto = new Auto();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/book/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/book/")})
         private Book book = new Book();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/brand/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/brand/")})
         private Brand brand = new Brand();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/bubble/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/bubble/")})
         private Bubble bubble = new Bubble();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/chat/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/chat/")})
         private Chat chat = new Chat();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/clear/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/clear/")})
         private Clear clear = new Clear();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/contact/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/")})
         private Contact contact = new Contact();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/death/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/death/")})
         private Death death = new Death();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/deop/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/deop/")})
         private Deop deop = new Deop();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/enchant/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/enchant/")})
         private Enchant enchant = new Enchant();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/format/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/")})
         private Format format = new Format();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/gamemode/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/gamemode/")})
         private Gamemode gamemode = new Gamemode();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/greeting/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/greeting/")})
         private Greeting greeting = new Greeting();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/join/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/join/")})
         private Join join = new Join();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/objective/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/objective/")})
         private Objective objective = new Objective();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/op/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/op/")})
         private Op op = new Op();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/quit/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/quit/")})
         private Quit quit = new Quit();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/scoreboard/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/scoreboard/")})
         private Scoreboard scoreboard = new Scoreboard();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/seed/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/seed/")})
         private Seed seed = new Seed();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/setblock/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/setblock/")})
         private Setblock setblock = new Setblock();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/sign/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/sign/")})
         private Sign sign = new Sign();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/spawnpoint/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/spawnpoint/")})
         private Spawnpoint spawnpoint = new Spawnpoint();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/status/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/")})
         private Status status = new Status();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/tab/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/")})
         private Tab tab = new Tab();
 
         @Getter
@@ -761,19 +761,19 @@ public final class Permission extends FileSerializable implements IModule {
             private String name = "flectonepulse.module.message.contact";
             private Type type = Type.TRUE;
 
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/contact/afk/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/afk/")})
             private Afk afk = new Afk();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/contact/knock/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/knock/")})
             private Knock knock = new Knock();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/contact/mark/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/mark/")})
             private Mark mark = new Mark();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/contact/rightclick/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/rightclick/")})
             private Rightclick rightclick = new Rightclick();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/contact/sign/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/sign/")})
             private Sign sign = new Sign();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/contact/spit/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/spit/")})
             private Spit spit = new Spit();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/contact/unsign/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/unsign/")})
             private Unsign unsign = new Unsign();
 
             @Getter
@@ -905,23 +905,23 @@ public final class Permission extends FileSerializable implements IModule {
                 }
             };
 
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/format/color/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/color/")})
             private Color color = new Color();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/format/emoji/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/emoji/")})
             private Emoji emoji = new Emoji();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/format/image/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/image/")})
             private Image image = new Image();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/format/mention/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/mention/")})
             private Mention mention = new Mention();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/format/moderation/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/")})
             private Moderation moderation = new Moderation();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/format/name_/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/name_/")})
             private Name name_ = new Name();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/format/questionanswer/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/questionanswer/")})
             private QuestionAnswer questionAnswer = new QuestionAnswer();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/format/spoiler/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/spoiler/")})
             private Spoiler spoiler = new Spoiler();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/format/world/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/world/")})
             private World world = new World();
 
             @Getter
@@ -957,9 +957,9 @@ public final class Permission extends FileSerializable implements IModule {
                 private String name = "flectonepulse.module.message.format.moderation";
                 private Type type = Type.TRUE;
 
-                @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/format/moderation/caps/")})
+                @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/caps/")})
                 private Caps caps = new Caps();
-                @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/format/moderation/swear/")})
+                @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/swear/")})
                 private Swear swear = new Swear();
 
                 @Getter
@@ -1056,9 +1056,9 @@ public final class Permission extends FileSerializable implements IModule {
             private String name = "flectonepulse.module.message.objective";
             private Type type = Type.TRUE;
 
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/objective/belowname/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/objective/belowname/")})
             private Belowname belowname = new Belowname();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/objective/tabname/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/objective/tabname/")})
             private Tabname tabname = new Tabname();
 
             @Getter
@@ -1127,13 +1127,13 @@ public final class Permission extends FileSerializable implements IModule {
             private String name = "flectonepulse.module.message.status";
             private Type type = Type.TRUE;
 
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/status/icon/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/icon/")})
             private Icon icon = new Icon();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/status/motd/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/motd/")})
             private MOTD motd = new MOTD();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/status/players/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/players/")})
             private Players players = new Players();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/status/version/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/version/")})
             private Version version = new Version();
 
             @Getter
@@ -1168,11 +1168,11 @@ public final class Permission extends FileSerializable implements IModule {
             private String name = "flectonepulse.module.message.tab";
             private Type type = Type.TRUE;
 
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/status/footer/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/footer/")})
             private Footer footer = new Footer();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/status/header/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/header/")})
             private Header header = new Tab.Header();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/permission/message/status/playerlistname/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/playerlistname/")})
             private Playerlistname playerlistname = new Playerlistname();
 
             @Getter

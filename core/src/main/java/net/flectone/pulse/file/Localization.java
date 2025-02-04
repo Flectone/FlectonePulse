@@ -578,17 +578,17 @@ public final class Localization extends FileSerializable implements IModule {
     }
 
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/")})
 
     private String cooldown = "<color:#ff7171><b>⁉</b> Too fast, you'll be able to use it in <time>";
 
     private Time time = new Time();
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/")})
     private Command command = new Command();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/integration/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/")})
     private Integration integration = new Integration();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/")})
     private Message message = new Message();
 
     @Getter
@@ -638,83 +638,83 @@ public final class Localization extends FileSerializable implements IModule {
             private String move = "move";
         }
 
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/ball/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ball/")})
         private Ball ball = new Ball();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/ban/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ban/")})
         private Ban ban = new Ban();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/banlist/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/banlist/")})
         private Banlist banlist = new Banlist();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/broadcast/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/broadcast/")})
         private Broadcast broadcast = new Broadcast();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/chatcolor/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatcolor/")})
         private Chatcolor chatcolor = new Chatcolor();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/chatsetting/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatsetting/")})
         private Chatsetting chatsetting = new Chatsetting();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/clearchat/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearchat/")})
         private Clearchat clearchat = new Clearchat();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/clearmail/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearmail/")})
         private Clearmail clearmail = new Clearmail();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/coin/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/coin/")})
         private Coin coin = new Coin();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/dice/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/dice/")})
         private Dice dice = new Dice();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/do/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/do/")})
         private Do Do = new Do();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/flectonepulse/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/flectonepulse/")})
         private Flectonepulse flectonepulse = new Flectonepulse();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/geolocate/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/geolocate/")})
         private Geolocate geolocate = new Geolocate();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/helper/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/helper/")})
         private Helper helper = new Helper();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/ignore/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ignore/")})
         private Ignore ignore = new Ignore();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/ignorelist/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ignorelist/")})
         private Ignorelist ignorelist = new Ignorelist();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/kick/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/kick/")})
         private Kick kick = new Kick();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/mail/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/mail/")})
         private Mail mail = new Mail();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/maintenace/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/maintenace/")})
         private Maintenance maintenance = new Maintenance();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/me/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/me/")})
         private Me me = new Me();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/mute/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/mute/")})
         private Mute mute = new Mute();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/mutelist/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/mutelist/")})
         private Mutelist mutelist = new Mutelist();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/online/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/online/")})
         private Online online = new Online();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/ping/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ping/")})
         private Ping ping = new Ping();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/poll/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/poll/")})
         private Poll poll = new Poll();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/reply/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/reply/")})
         private Reply reply = new Reply();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/rockpaperscissors/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/rockpaperscissors/")})
         private Rockpaperscissors rockpaperscissors = new Rockpaperscissors();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/spy/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/spy/")})
         private Spy spy = new Spy();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/stream/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/stream/")})
         private Stream stream = new Stream();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/symbol/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/symbol/")})
         private Symbol symbol = new Symbol();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/tell/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/tell/")})
         private Tell tell = new Tell();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/tictactoe/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/tictactoe/")})
         private Tictactoe tictactoe = new Tictactoe();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/translateto/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/translateto/")})
         private Translateto translateto = new Translateto();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/try/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/try/")})
         private Try Try = new Try();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/unban/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/unban/")})
         private Unban unban = new Unban();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/unmute/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/unmute/")})
         private Unmute unmute = new Unmute();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/unwarn/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/unwarn/")})
         private Unwarn unwarn = new Unwarn();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/warn/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/warn/")})
         private Warn warn = new Warn();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/command/warnlist/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/warnlist/")})
         private Warnlist warnlist = new Warnlist();
 
         @Getter
@@ -1201,11 +1201,11 @@ public final class Localization extends FileSerializable implements IModule {
     @Getter
     public static final class Integration implements IModule.IIntegration, ILocalization {
 
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/module/integration/discord/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/discord/")})
         private Discord discord = new Discord();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/integration/telegram/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/telegram/")})
         private Telegram telegram = new Telegram();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/integration/twitch/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/twitch/")})
         private Twitch twitch = new Twitch();
 
         @Override
@@ -1355,7 +1355,7 @@ public final class Localization extends FileSerializable implements IModule {
     @Getter
     public static final class Message implements IModule.IMessage, ILocalization {
 
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/advancement/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/advancement/")})
         private Advancement advancement = new Advancement();
 
         @Override
@@ -1363,7 +1363,7 @@ public final class Localization extends FileSerializable implements IModule {
             return null;
         }
 
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/auto/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/auto/")})
         private Auto auto = new Auto();
 
         @Override
@@ -1371,29 +1371,29 @@ public final class Localization extends FileSerializable implements IModule {
             return null;
         }
 
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/brand/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/brand/")})
         private Brand brand = new Brand();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/bubble/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/bubble/")})
         private Bubble bubble = new Bubble();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/chat/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/chat/")})
         private Chat chat = new Chat();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/clear/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/clear/")})
         private Clear clear = new Clear();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/contact/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/")})
         private Contact contact = new Contact();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/death/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/death/")})
         private Death death = new Death();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/deop/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/deop/")})
         private Deop deop = new Deop();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/enchant/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/enchant/")})
         private Enchant enchant = new Enchant();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/format/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/")})
         private Format format = new Format();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/gamemode/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/gamemode/")})
         private Gamemode gamemode = new Gamemode();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/greeting/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/greeting/")})
         private Greeting greeting = new Greeting();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/join/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/join/")})
         private Join join = new Join();
 
         @Override
@@ -1401,15 +1401,15 @@ public final class Localization extends FileSerializable implements IModule {
             return null;
         }
 
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/op/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/op/")})
         private Op op = new Op();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/scoreboard/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/scoreboard/")})
         private Scoreboard scoreboard = new Scoreboard();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/quit/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/quit/")})
         private Quit quit = new Quit();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/seed/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/seed/")})
         private Seed seed = new Seed();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/setblock/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/setblock/")})
         private Setblock setblock = new Setblock();
 
         @Override
@@ -1417,11 +1417,11 @@ public final class Localization extends FileSerializable implements IModule {
             return null;
         }
 
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/spawnpoint/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/spawnpoint/")})
         private Spawnpoint spawnpoint = new Spawnpoint();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/status/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/")})
         private Status status = new Status();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/tab/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/")})
         private Tab tab = new Tab();
 
         @Getter
@@ -1515,7 +1515,7 @@ public final class Localization extends FileSerializable implements IModule {
         @Getter
         public static final class Contact implements IContactMessage, ILocalization {
 
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/contact/afk/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/afk/")})
             private Afk afk = new Afk();
 
             @Override
@@ -1528,11 +1528,11 @@ public final class Localization extends FileSerializable implements IModule {
                 return null;
             }
 
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/contact/rightclick/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/rightclick/")})
             private Rightclick rightclick = new Rightclick();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/contact/sign/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/sign/")})
             private Sign sign = new Sign();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/contact/spit/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/spit/")})
             private Spit spit = new Spit();
 
             @Override
@@ -1727,15 +1727,15 @@ public final class Localization extends FileSerializable implements IModule {
                 return null;
             }
 
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/format/mention/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/mention/")})
             private Mention mention = new Mention();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/format/moderation/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/")})
             private Moderation moderation = new Moderation();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/format/name_/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/name_/")})
             private Name name_ = new Name();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/format/questionanswer/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/questionanswer/")})
             private QuestionAnswer questionAnswer = new QuestionAnswer();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/format/spoiler/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/spoiler/")})
             private Spoiler spoiler = new Spoiler();
 
             @Override
@@ -1757,7 +1757,7 @@ public final class Localization extends FileSerializable implements IModule {
                     return null;
                 }
 
-                @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/format/moderation/swear/")})
+                @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/swear/")})
                 private Swear swear = new Swear();
 
                 @Getter
@@ -1884,11 +1884,11 @@ public final class Localization extends FileSerializable implements IModule {
         @Getter
         public static final class Status implements IStatusMessage, ILocalization {
 
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/status/motd/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/motd/")})
             private MOTD motd = new MOTD();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/status/players/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/players/")})
             private Players players = new Players();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/status/version/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/version/")})
             private Version version = new Version();
 
             @Override
@@ -1934,11 +1934,11 @@ public final class Localization extends FileSerializable implements IModule {
         @Getter
         public static final class Tab implements ITabMessage, ILocalization {
 
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/tab/header/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/header/")})
             private Header header = new Header();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/tab/footer/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/footer/")})
             private Footer footer = new Footer();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/localizations/en_us/message/tab/playerlistname/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/playerlistname/")})
             private Playerlistname playerlistname = new Playerlistname();
 
             @Getter
