@@ -54,7 +54,7 @@ public class KnockModule extends AbstractModuleMessage<Localization.Message.Cont
 
         BLOCK_SOUND.clear();
         message.getVariants().forEach(value -> {
-            Permission.PermissionEntry soundPermission = permission.getTypes().get(value.getType());
+            Permission.PermissionEntry soundPermission = permission.getVariants().get(value.getType());
 
             BLOCK_SOUND.put(value.getType(), createSound(value.getSound(), soundPermission));
         });

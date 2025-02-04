@@ -786,7 +786,7 @@ public final class Permission extends FileSerializable implements IModule {
             public static final class Knock implements ISubContactMessage, IPermission {
                 private String name = "flectonepulse.module.message.contact.knock";
                 private Type type = Type.TRUE;
-                private Map<String, PermissionEntry> types = new LinkedHashMap<>(){
+                private Map<String, PermissionEntry> variants = new LinkedHashMap<>(){
                     {
                         put("GLASS", new PermissionEntry("flectonepulse.module.message.contact.knock.glass.sound", Type.TRUE));
                         put("DOOR", new PermissionEntry("flectonepulse.module.message.contact.knock.door.sound", Type.TRUE));
