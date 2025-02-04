@@ -26,12 +26,12 @@ public class BukkitServerUtil implements ServerUtil {
 
     public final static boolean IS_FOLIA;
     public final static boolean IS_PAPER;
-    public final static boolean IS_1_20_6_OR_NEWER;
+    public final static boolean IS_1_20_5_OR_NEWER;
 
     static {
         IS_FOLIA = isFolia();
         IS_PAPER = isPaper();
-        IS_1_20_6_OR_NEWER = getBukkitVersion() >= 20.6;
+        IS_1_20_5_OR_NEWER = getBukkitVersion() >= 20.5;
     }
 
     private final Plugin plugin;
