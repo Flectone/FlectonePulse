@@ -46,76 +46,27 @@ public class MarkManager {
     }
 
     public boolean create(FPlayer fPlayer, FMark fMark, NamedTextColor color) {
-        Entity entity = getRayTracedEntity(fPlayer, fMark.getRange());
+        Location location = getRayTracedLocation(fPlayer, fMark.getRange());
+        if (location == null) return false;
 
-        Runnable removeMarkRunnable;
+        fMark.create(fPlayerManager, location, randomUtil);
 
-        if (entity == null) {
-            Location location = getRayTracedLocation(fPlayer, fMark.getRange());
-            if (location == null) return false;
+        ScoreboardTeam scoreboardTeam = teamManager.createIfAbsent(color.toString());
+        TeamDisplay teamDisplay = scoreboardTeam.defaultDisplay();
+        teamDisplay.playerColor(color);
 
-            fMark.create(fPlayerManager, location, randomUtil);
-
-            ScoreboardTeam scoreboardTeam = teamManager.createIfAbsent(color.toString());
-            TeamDisplay teamDisplay = scoreboardTeam.defaultDisplay();
-            teamDisplay.playerColor(color);
-
-            teamDisplay.addEntry(fMark.getUuid().toString());
-            teamDisplay.collisionRule(CollisionRule.NEVER);
-
-            removeMarkRunnable = () -> {
-                fMark.setGlowing(location);
-                threadManager.runSyncLater(fMark::remove, fMark.getDuration());
-            };
-
-        } else {
-            fMark.create(fPlayerManager, entity);
-
-            if (entity instanceof Player target) {
-                FPlayer fReceiver = fPlayerManager.get(target);
-
-                ScoreboardTeam scoreboardTeam = teamManager.createIfAbsent(fPlayerManager.getSortedName(fReceiver));
-                TeamDisplay teamDisplay = scoreboardTeam.defaultDisplay();
-                teamDisplay.playerColor(color);
-
-                teamDisplay.addEntry(target.getName());
-
-                NamedTextColor lastColor = teamDisplay.playerColor();
-
-                removeMarkRunnable = () -> {
-                    fMark.setGlowing(true);
-
-                    threadManager.runSyncLater(() -> {
-                        teamDisplay.playerColor(lastColor);
-                        fMark.setAlive(false);
-                        fMark.setGlowing(false);
-
-                    }, fMark.getDuration());
-                };
-
-            } else {
-
-                ScoreboardTeam scoreboardTeam = teamManager.createIfAbsent(color.toString());
-                TeamDisplay teamDisplay = scoreboardTeam.defaultDisplay();
-                teamDisplay.playerColor(color);
-
-                teamDisplay.addEntry(fMark.getUuid().toString());
-
-                removeMarkRunnable = () -> {
-                    fMark.setGlowing(true);
-
-                    threadManager.runAsyncLater(() -> {
-                        fMark.setAlive(false);
-                        fMark.setGlowing(false);
-                        teamDisplay.removeEntry(fMark.getUuid().toString());
-                    }, fMark.getDuration());
-                };
-            }
-        }
+        teamDisplay.addEntry(fMark.getUuid().toString());
+        teamDisplay.collisionRule(CollisionRule.NEVER);
 
         // color update takes too long and there is a visual bug when color changes from white to specified color
         // a delay of 2 ticks fixes that
-        threadManager.runAsyncLater(removeMarkRunnable, 2);
+        threadManager.runAsyncLater(() -> {
+            fMark.setGlowing(location);
+
+            threadManager.runSyncLater(fMark::remove, fMark.getDuration());
+        }, 2);
+
+        threadManager.runAsyncLater(fMark::remove, fMark.getDuration());
 
         playerMarkMap.put(fPlayer.getUuid(), fMark);
         return true;

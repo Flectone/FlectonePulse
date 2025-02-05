@@ -72,7 +72,7 @@ public class MarkModule extends AbstractModuleMessage<Localization.Message.Conta
 
         NamedTextColor namedTextColor = message.isColor() ? textColor : NamedTextColor.WHITE;
 
-        FMark fMark = new FMark(message.getSize(), message.getRange(), message.getDuration(), message.getEntity());
+        FMark fMark = new FMark(message.getRange(), message.getDuration(), message.getLegacy(), message.getModern());
 
         markManager.create(fPlayer, fMark, namedTextColor);
 

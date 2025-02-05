@@ -251,11 +251,25 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private boolean color = true;
             private int range = 100;
             private int duration = 60;
-            private int size = 1;
             private String item = "WOODEN_SWORD";
-            private String entity = "MAGMA_CUBE";
+            private Legacy legacy = new Legacy();
+            private Modern modern = new Modern();
             private Cooldown cooldown = new Cooldown();
             private Sound sound = new Sound();
+
+            @Getter
+            public static final class Legacy {
+                private boolean enable = true;
+                private int size = 1;
+                private String entity = "MAGMA_CUBE";
+            }
+
+            @Getter
+            public static final class Modern {
+                private boolean enable = false;
+                private float scale = 1.0f;
+                private String block = "BEACON";
+            }
         }
 
         @Getter
