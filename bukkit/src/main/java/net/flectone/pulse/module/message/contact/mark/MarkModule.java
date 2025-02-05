@@ -57,6 +57,8 @@ public class MarkModule extends AbstractModuleMessage<Localization.Message.Conta
         createSound(message.getSound(), permission.getSound());
         createCooldown(message.getCooldown(), permission.getCooldownBypass());
 
+        markManager.reload();
+
         bukkitListenerManager.register(MarkListener.class, EventPriority.NORMAL);
     }
 

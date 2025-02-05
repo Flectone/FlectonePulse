@@ -114,6 +114,7 @@ public class MarkManager {
     }
 
     public void reload() {
+        playerMarkMap.values().forEach(FMark::remove);
         playerMarkMap.clear();
     }
 
