@@ -66,17 +66,13 @@ public class MarkModule extends AbstractModuleMessage<Localization.Message.Conta
     }
 
     @Async
-    public void mark(@NotNull FPlayer fPlayer, @NotNull String color) {
+    public void mark(@NotNull FPlayer fPlayer, @NotNull NamedTextColor textColor) {
         if (checkModulePredicates(fPlayer)) return;
         if (message.isLimit() && markManager.contains(fPlayer)) return;
 
-        NamedTextColor namedTextColor = NamedTextColor.WHITE;
+        NamedTextColor namedTextColor = message.isColor() ? textColor : NamedTextColor.WHITE;
 
-        if (message.isColor()) {
-            namedTextColor = NamedTextColor.NAMES.valueOr(color, namedTextColor);
-        }
-
-        FMark fMark = new FMark(message.getRange(), message.getDuration(), message.getEntity());
+        FMark fMark = new FMark(message.getSize(), message.getRange(), message.getDuration(), message.getEntity());
 
         markManager.create(fPlayer, fMark, namedTextColor);
 

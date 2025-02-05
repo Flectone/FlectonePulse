@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.contact.mark.MarkModule;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -45,6 +46,6 @@ public class MarkListener implements Listener {
                 ? itemStack.getItemMeta().getDisplayName().trim().toLowerCase()
                 : "white";
 
-        markModule.mark(fPlayer, color);
+        markModule.mark(fPlayer, NamedTextColor.NAMES.valueOr(color, NamedTextColor.WHITE));
     }
 }

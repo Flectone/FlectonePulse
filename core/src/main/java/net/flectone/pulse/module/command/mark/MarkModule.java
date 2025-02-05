@@ -8,6 +8,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.util.CommandUtil;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.function.BiConsumer;
 
@@ -16,11 +17,11 @@ public abstract class MarkModule extends AbstractModuleCommand<Localization.Comm
     @Getter private final Command.Mark command;
     @Getter private final Permission.Command.Mark permission;
 
-    private final BiConsumer<FPlayer, String> markConsumer;
+    private final BiConsumer<FPlayer, NamedTextColor> markConsumer;
     private final CommandUtil commandUtil;
 
     public MarkModule(FileManager fileManager,
-                      BiConsumer<FPlayer, String> markConsumer,
+                      BiConsumer<FPlayer, NamedTextColor> markConsumer,
                       CommandUtil commandUtil) {
         super(Localization::getCommand, null);
 
@@ -38,7 +39,7 @@ public abstract class MarkModule extends AbstractModuleCommand<Localization.Comm
     public void onCommand(FPlayer fPlayer, Object arguments) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String color = commandUtil.getByClassOrDefault(0, String.class, "white", arguments);
+        NamedTextColor color = commandUtil.getByClassOrDefault(0, NamedTextColor.class, NamedTextColor.WHITE, arguments);
 
         markConsumer.accept(fPlayer, color);
         playSound(fPlayer);
