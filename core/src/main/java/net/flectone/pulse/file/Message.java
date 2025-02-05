@@ -251,6 +251,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private boolean color = true;
             private int range = 100;
             private int duration = 60;
+            private int size = 1;
             private String item = "WOODEN_SWORD";
             private String entity = "MAGMA_CUBE";
             private Cooldown cooldown = new Cooldown();
