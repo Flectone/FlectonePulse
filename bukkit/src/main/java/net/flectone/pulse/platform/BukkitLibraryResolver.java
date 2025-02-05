@@ -240,6 +240,11 @@ public class BukkitLibraryResolver extends LibraryResolver {
                         .relocatedPattern("net.flectone.pulse.library.commandapi")
                         .build()
                 )
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build()
+                )
                 .build()
         );
     }
