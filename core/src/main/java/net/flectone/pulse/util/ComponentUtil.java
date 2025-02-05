@@ -3,6 +3,7 @@ package net.flectone.pulse.util;
 import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.stream.StreamModule;
@@ -36,6 +37,7 @@ public class ComponentUtil {
     private final ColorUtil colorUtil;
     private final PermissionUtil permissionUtil;
     private final MiniMessage miniMessage;
+    private final FLogger fLogger;
 
     @Inject private IntegrationModule integrationModule;
     @Inject private ColorModule colorModule;
@@ -55,10 +57,12 @@ public class ComponentUtil {
     @Inject
     public ComponentUtil(ColorUtil colorUtil,
                          PermissionUtil permissionUtil,
-                         MiniMessage miniMessage) {
+                         MiniMessage miniMessage,
+                         FLogger fLogger) {
         this.colorUtil = colorUtil;
         this.permissionUtil = permissionUtil;
         this.miniMessage = miniMessage;
+        this.fLogger = fLogger;
     }
 
     public Builder builder(@NotNull String message) {
@@ -260,7 +264,13 @@ public class ComponentUtil {
                 }
             }
 
-            return miniMessage.deserialize(message, tagResolverList.toArray(new TagResolver[0]));
+            try {
+                return miniMessage.deserialize(message, tagResolverList.toArray(new TagResolver[0]));
+            } catch (Exception e) {
+                fLogger.warning(e);
+            }
+
+            return Component.empty();
         }
 
         public String serialize() {
