@@ -3,6 +3,7 @@ package net.flectone.pulse.util;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import me.imdanix.text.MiniTranslator;
 import net.flectone.pulse.logger.FLogger;
 
 import java.util.HashMap;
@@ -125,16 +126,9 @@ public class ColorUtil {
         legacyHexMap.put("&f", "#FFFFFF");
     }
 
-    public String convertColorsToAdventure(String message) {
-        for (Map.Entry<String, String> entry : legacyAdventureMap.entrySet()) {
-            message = message
-                    .replace(entry.getKey(), entry.getValue())
-                    .replace(entry.getKey().replace("&", "§"), entry.getValue())
-                    .replace("&#", "#")
-                    .replace("§#", "#");
-        }
-
-        return message.replaceAll("(?<!:)#([a-fA-F0-9]{6})", "<color:#$1>");
+    public String toMiniMessage(String message) {
+        return MiniTranslator.toMini(message.replace("§", "&"))
+                .replaceAll("(?<!:)#([a-fA-F0-9]{6})", "<color:#$1>");
     }
 
     public int parseHexToArgb(String hex) {

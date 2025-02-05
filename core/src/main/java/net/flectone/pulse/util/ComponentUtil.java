@@ -260,7 +260,7 @@ public class ComponentUtil {
                 tagResolverList.add(nameModule.vaultPrefixTag(sender, receiver));
 
                 if (colors) {
-                    message = colorUtil.convertColorsToAdventure(message);
+                    message = colorUtil.toMiniMessage(message);
                 }
             }
 
