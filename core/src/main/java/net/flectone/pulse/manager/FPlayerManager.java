@@ -29,14 +29,9 @@ public abstract class FPlayerManager {
 
     private final Config config;
 
-    @Inject
-    private ThreadManager threadManager;
-
-    @Inject
-    private IntegrationModule integrationModule;
-
-    @Inject
-    private PacketEventsUtil packetEventsUtil;
+    @Inject private ThreadManager threadManager;
+    @Inject private IntegrationModule integrationModule;
+    @Inject private PacketEventsUtil packetEventsUtil;
 
     public FPlayerManager(FileManager fileManager) {
         config = fileManager.getConfig();
@@ -59,17 +54,16 @@ public abstract class FPlayerManager {
         fPlayers.put(fPlayer.getUuid(), fPlayer);
     }
 
-    public abstract FPlayer convert(Object sender);
+    public abstract FPlayer convertToFPlayer(Object player);
+    public abstract Object convertToPlayer(FPlayer fPlayer);
     public abstract FPlayer put(Database database, UUID uuid, int entityId, String name, String ip) throws SQLException;
     public abstract void remove(Database database, FPlayer fPlayer) throws SQLException;
-    public abstract String getIP(UUID uuid);
     public abstract String getWorldName(FPlayer fPlayer);
     public abstract String getWorldEnvironment(FPlayer fPlayer);
     public abstract Object getItem(@NotNull UUID uuid);
     public abstract Component getPlayerListHeader(FPlayer fPlayer);
     public abstract Component getPlayerListFooter(FPlayer fPlayer);
     public abstract int getObjectiveScore(UUID uuid, ObjectiveMode objectiveValueType);
-    public abstract int getPing(FPlayer fPlayer);
     public abstract double distance(FPlayer first, FPlayer second);
     public abstract GameMode getGamemode(FPlayer fPlayer);
     public abstract boolean hasPlayedBefore(FPlayer fPlayer);
@@ -86,6 +80,13 @@ public abstract class FPlayerManager {
         });
 
         loadOnlinePlayers();
+    }
+
+    public int getPing(FPlayer fPlayer) {
+        Object player = convertToPlayer(fPlayer);
+        if (player == null) return 0;
+
+        return packetEventsUtil.getPing(player);
     }
 
     public String getSortedName(@NotNull FPlayer fPlayer) {

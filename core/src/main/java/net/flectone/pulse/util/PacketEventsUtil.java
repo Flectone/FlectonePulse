@@ -48,6 +48,10 @@ public class PacketEventsUtil {
         packetEvents.getProtocolManager().sendPacket(channel, packetWrapper);
     }
 
+    public int getPing(Object player) {
+        return packetEvents.getPlayerManager().getPing(player);
+    }
+
     public static void sendStaticPacket(FPlayer fPlayer, PacketWrapper<?> packetWrapper) {
         Object channel = PacketEvents.getAPI().getProtocolManager().getChannel(fPlayer.getUuid());
         if (channel == null) return;

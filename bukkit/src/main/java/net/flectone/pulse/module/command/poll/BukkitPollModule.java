@@ -53,7 +53,7 @@ public class BukkitPollModule extends PollModule {
                                                         .withoutValueList()
                                                         .build()
                                                         .executes((commandSender, commandArguments) -> {
-                                                            onCommandCreate(fPlayerManager.convert(commandSender), commandArguments);
+                                                            onCommandCreate(fPlayerManager.convertToFPlayer(commandSender), commandArguments);
                                                         })
                                                 )
                                         )

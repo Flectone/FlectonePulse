@@ -31,7 +31,6 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.net.InetSocketAddress;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -86,7 +85,7 @@ public class BukkitFPlayerManager extends FPlayerManager {
     }
 
     @Override
-    public FPlayer convert(Object sender) {
+    public FPlayer convertToFPlayer(Object sender) {
         if (!(sender instanceof CommandSender commandSender)) return FPlayer.UNKNOWN;
 
         return commandSender instanceof Player player
@@ -94,6 +93,11 @@ public class BukkitFPlayerManager extends FPlayerManager {
                 : commandSender instanceof ConsoleCommandSender
                         ? get(FPlayer.UNKNOWN.getUuid())
                         : new FPlayer(commandSender.getName());
+    }
+
+    @Override
+    public Object convertToPlayer(FPlayer fPlayer) {
+        return Bukkit.getPlayer(fPlayer.getUuid());
     }
 
     @Override
@@ -144,17 +148,6 @@ public class BukkitFPlayerManager extends FPlayerManager {
     }
 
     @Override
-    public String getIP(UUID uuid) {
-        Player player = Bukkit.getPlayer(uuid);
-        if (player == null) return null;
-
-        InetSocketAddress playerAddress = player.getAddress();
-        if (playerAddress == null || playerAddress.isUnresolved()) return null;
-
-        return playerAddress.getHostString();
-    }
-
-    @Override
     public boolean hasPlayedBefore(FPlayer fPlayer) {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return false;
@@ -199,14 +192,6 @@ public class BukkitFPlayerManager extends FPlayerManager {
                 yield damage != null ? (int) Math.round(damage.getValue() * 10.0)/10 : 0;
             }
         };
-    }
-
-    @Override
-    public int getPing(FPlayer fPlayer) {
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
-        if (player == null) return 0;
-
-        return player.getPing();
     }
 
     @Override

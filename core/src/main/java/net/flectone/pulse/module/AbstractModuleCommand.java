@@ -38,14 +38,14 @@ public abstract class AbstractModuleCommand<M extends Localization.ILocalization
 
     @Async
     protected void executesFPlayer(Object commandSender, Object arguments) {
-        FPlayer fPlayer = fPlayerManager.convert(commandSender);
+        FPlayer fPlayer = fPlayerManager.convertToFPlayer(commandSender);
 
         onCommand(fPlayer, arguments);
     }
 
     @Async
     protected void executesFPlayerDatabase(Object commandSender, Object commandArguments) {
-        FPlayer fPlayer = fPlayerManager.convert(commandSender);
+        FPlayer fPlayer = fPlayerManager.convertToFPlayer(commandSender);
 
         try {
             onCommand(database, fPlayer, commandArguments);
