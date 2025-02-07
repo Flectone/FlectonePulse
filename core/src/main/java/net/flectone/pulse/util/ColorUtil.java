@@ -16,7 +16,6 @@ public class ColorUtil {
 
     private final int DEFAULT_ARGB = 0x40000000;
 
-    private final Map<String, String> legacyAdventureMap = new HashMap<>();
     private final Map<String, String> minecraftHexMap = new HashMap<>();
     private final Map<String, String> legacyHexMap = new HashMap<>();
 
@@ -46,41 +45,6 @@ public class ColorUtil {
     @Inject
     public ColorUtil(FLogger fLogger) {
         this.fLogger = fLogger;
-
-        legacyAdventureMap.put("&0", "<black>");
-        legacyAdventureMap.put("&1", "<dark_blue>");
-        legacyAdventureMap.put("&2", "<dark_green>");
-        legacyAdventureMap.put("&3", "<dark_aqua>");
-        legacyAdventureMap.put("&4", "<dark_red>");
-        legacyAdventureMap.put("&5", "<dark_purple>");
-        legacyAdventureMap.put("&6", "<gold>");
-        legacyAdventureMap.put("&7", "<gray>");
-        legacyAdventureMap.put("&8", "<dark_gray>");
-        legacyAdventureMap.put("&9", "<blue>");
-        legacyAdventureMap.put("&a", "<green>");
-        legacyAdventureMap.put("&A", "<green>");
-        legacyAdventureMap.put("&b", "<aqua>");
-        legacyAdventureMap.put("&B", "<aqua>");
-        legacyAdventureMap.put("&c", "<red>");
-        legacyAdventureMap.put("&C", "<red>");
-        legacyAdventureMap.put("&d", "<light_purple>");
-        legacyAdventureMap.put("&D", "<light_purple>");
-        legacyAdventureMap.put("&e", "<yellow>");
-        legacyAdventureMap.put("&E", "<yellow>");
-        legacyAdventureMap.put("&f", "<white>");
-        legacyAdventureMap.put("&F", "<white>");
-        legacyAdventureMap.put("&k", "<obf>");
-        legacyAdventureMap.put("&K", "<obf>");
-        legacyAdventureMap.put("&l", "<b>");
-        legacyAdventureMap.put("&L", "<b>");
-        legacyAdventureMap.put("&m", "<st>");
-        legacyAdventureMap.put("&M", "<st>");
-        legacyAdventureMap.put("&n", "<u>");
-        legacyAdventureMap.put("&N", "<u>");
-        legacyAdventureMap.put("&o", "<i>");
-        legacyAdventureMap.put("&O", "<i>");
-        legacyAdventureMap.put("&r", "<reset>");
-        legacyAdventureMap.put("&R", "<reset>");
 
         minecraftHexMap.put("black", "#000000");
         minecraftHexMap.put("dark_blue", "#0000AA");
