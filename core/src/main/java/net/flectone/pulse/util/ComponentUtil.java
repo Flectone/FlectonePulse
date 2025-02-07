@@ -262,10 +262,8 @@ public class ComponentUtil {
                 }
             }
 
-            if (image) {
-                if (!userMessage || formatModule.isCorrectTag(TagType.IMAGE, sender)) {
-                    tagResolverList.add(imageModule.imageTag(sender, receiver));
-                }
+            if (image && !userMessage) {
+                tagResolverList.add(imageModule.imageTag(sender, receiver));
             }
 
             if (!userMessage || permissionUtil.has(receiver, formatModule.getPermission().getAll().getName())) {

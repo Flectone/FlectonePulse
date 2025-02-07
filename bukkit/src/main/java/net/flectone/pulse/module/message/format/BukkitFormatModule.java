@@ -36,8 +36,7 @@ public class BukkitFormatModule extends FormatModule {
 
     @Override
     public TagResolver coordsTag(FEntity sender, FEntity fReceiver) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
-        if (!permissionUtil.has(sender, getPermission().getTags().get(TagType.COORDS))) return TagResolver.empty();
+        if (!isCorrectTag(TagType.COORDS, sender)) return TagResolver.empty();
 
         Player player = Bukkit.getPlayer(sender.getUuid());
         if (player == null) return TagResolver.resolver("coords", ((argumentQueue, context) -> Tag.selfClosingInserting(Component.empty())));
@@ -59,8 +58,7 @@ public class BukkitFormatModule extends FormatModule {
 
     @Override
     public TagResolver statsTag(FEntity sender, FEntity fReceiver) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
-        if (!permissionUtil.has(sender, getPermission().getTags().get(TagType.STATS))) return TagResolver.empty();
+        if (!isCorrectTag(TagType.STATS, sender)) return TagResolver.empty();
 
         Player player = Bukkit.getPlayer(sender.getUuid());
         if (player == null) return TagResolver.resolver("stats", ((argumentQueue, context) -> Tag.selfClosingInserting(Component.empty())));

@@ -65,31 +65,33 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
     public void reload() {
         registerModulePermission(permission);
 
-        permission.getTags().values().forEach(this::registerPermission);
+        message.getTags().forEach((key, value) -> {
+            if (!value.isEnable()) return;
+
+            registerPermission(permission.getTags().get(key));
+        });
 
         registerPermission(permission.getAll());
 
-        try {
-            tagResolverMap.put(TagType.HOVER, StandardTags.hoverEvent());
-            tagResolverMap.put(TagType.CLICK, StandardTags.clickEvent());
-            tagResolverMap.put(TagType.COLOR, StandardTags.color());
-            tagResolverMap.put(TagType.KEYBIND, StandardTags.keybind());
-            tagResolverMap.put(TagType.TRANSLATABLE, StandardTags.translatable());
-            tagResolverMap.put(TagType.TRANSLATABLE_FALLBACK, StandardTags.translatableFallback());
-            tagResolverMap.put(TagType.INSERTION, StandardTags.insertion());
-            tagResolverMap.put(TagType.FONT, StandardTags.font());
-            tagResolverMap.put(TagType.DECORATION, StandardTags.decorations());
-            tagResolverMap.put(TagType.GRADIENT, StandardTags.gradient());
-            tagResolverMap.put(TagType.RAINBOW, StandardTags.rainbow());
-            tagResolverMap.put(TagType.RESET, StandardTags.reset());
-            tagResolverMap.put(TagType.NEWLINE, StandardTags.newline());
-            tagResolverMap.put(TagType.TRANSITION, StandardTags.transition());
-            tagResolverMap.put(TagType.SELECTOR, StandardTags.selector());
-            tagResolverMap.put(TagType.SCORE, StandardTags.score());
-            tagResolverMap.put(TagType.NBT, StandardTags.nbt());
-            tagResolverMap.put(TagType.PRIDE, StandardTags.pride());
-            tagResolverMap.put(TagType.SHADOW_COLOR, StandardTags.shadowColor());
-        } catch (NoSuchMethodError ignored) {}
+        putKyoriTag(TagType.HOVER, StandardTags.hoverEvent());
+        putKyoriTag(TagType.CLICK, StandardTags.clickEvent());
+        putKyoriTag(TagType.COLOR, StandardTags.color());
+        putKyoriTag(TagType.KEYBIND, StandardTags.keybind());
+        putKyoriTag(TagType.TRANSLATABLE, StandardTags.translatable());
+        putKyoriTag(TagType.TRANSLATABLE_FALLBACK, StandardTags.translatableFallback());
+        putKyoriTag(TagType.INSERTION, StandardTags.insertion());
+        putKyoriTag(TagType.FONT, StandardTags.font());
+        putKyoriTag(TagType.DECORATION, StandardTags.decorations());
+        putKyoriTag(TagType.GRADIENT, StandardTags.gradient());
+        putKyoriTag(TagType.RAINBOW, StandardTags.rainbow());
+        putKyoriTag(TagType.RESET, StandardTags.reset());
+        putKyoriTag(TagType.NEWLINE, StandardTags.newline());
+        putKyoriTag(TagType.TRANSITION, StandardTags.transition());
+        putKyoriTag(TagType.SELECTOR, StandardTags.selector());
+        putKyoriTag(TagType.SCORE, StandardTags.score());
+        putKyoriTag(TagType.NBT, StandardTags.nbt());
+        putKyoriTag(TagType.PRIDE, StandardTags.pride());
+        putKyoriTag(TagType.SHADOW_COLOR, StandardTags.shadowColor());
 
         addChildren(ColorModule.class);
         addChildren(EmojiModule.class);
@@ -108,9 +110,16 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
         return message.isEnable();
     }
 
+    private void putKyoriTag(TagType type, TagResolver tagResolver) {
+        Message.Format.Tag tag = message.getTags().get(type);
+        if (tag == null) return;
+        if (!tag.isEnable()) return;
+
+        tagResolverMap.put(type, tagResolver);
+    }
+
     public TagResolver tpsTag(FEntity sender, FEntity fReceiver) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
-        if (!permissionUtil.has(sender, permission.getTags().get(TagType.TPS))) return TagResolver.empty();
+        if (!isCorrectTag(TagType.TPS, sender)) return TagResolver.empty();
 
         return TagResolver.resolver("tps", (argumentQueue, context) -> {
 
@@ -123,8 +132,7 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
     }
 
     public TagResolver onlineTag(FEntity sender, FEntity fReceiver) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
-        if (!permissionUtil.has(sender, permission.getTags().get(TagType.ONLINE))) return TagResolver.empty();
+        if (!isCorrectTag(TagType.ONLINE, sender)) return TagResolver.empty();
 
         return TagResolver.resolver("online", (argumentQueue, context) -> {
 
@@ -137,9 +145,8 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
     }
 
     public TagResolver pingTag(FEntity sender, FEntity fReceiver) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
         if (!(sender instanceof FPlayer fPlayer)) return TagResolver.empty();
-        if (!permissionUtil.has(sender, permission.getTags().get(TagType.PING))) return TagResolver.empty();
+        if (!isCorrectTag(TagType.PING, sender)) return TagResolver.empty();
 
         return TagResolver.resolver("ping", (argumentQueue, context) -> {
 
@@ -155,8 +162,7 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
     public abstract TagResolver statsTag(FEntity sender, FEntity fReceiver);
 
     public TagResolver skinTag(FEntity sender, FEntity fReceiver) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
-        if (!permissionUtil.has(sender, permission.getTags().get(TagType.SKIN))) return TagResolver.empty();
+        if (!isCorrectTag(TagType.SKIN, sender)) return TagResolver.empty();
 
         return TagResolver.resolver("skin", (argumentQueue, context) -> {
 
@@ -168,8 +174,7 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
     }
 
     public TagResolver itemTag(FEntity sender, FEntity fReceiver) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
-        if (!permissionUtil.has(sender, permission.getTags().get(TagType.ITEM))) return TagResolver.empty();
+        if (!isCorrectTag(TagType.ITEM, sender)) return TagResolver.empty();
 
         Object itemStackObject = fPlayerManager.getItem(sender.getUuid());
 
@@ -187,8 +192,7 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
     }
 
     public TagResolver urlTag(FEntity sender, FEntity fReceiver) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
-        if (!permissionUtil.has(sender, permission.getTags().get(TagType.URL))) return TagResolver.empty();
+        if (!isCorrectTag(TagType.URL, sender)) return TagResolver.empty();
 
         return TagResolver.resolver("url", (argumentQueue, context) -> {
 
@@ -205,7 +209,6 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
     }
 
     public String replaceAll(FEntity sender, FEntity fReceiver, String message) {
-
         Localization.Message.Format localization = resolveLocalization(fReceiver);
 
         message = replaceAll(sender, message,
