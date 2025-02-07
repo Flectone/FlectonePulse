@@ -91,7 +91,11 @@ public class ColorUtil {
     }
 
     public String toMiniMessage(String message) {
-        return MiniTranslator.toMini(message.replace("§", "&"))
+        return MiniTranslator.toMini(message
+                        .replace("§", "&")
+                        .replace("&#", "#")
+                        .replace("§#", "#")
+                )
                 .replaceAll("(?<!:)#([a-fA-F0-9]{6})", "<color:#$1>");
     }
 
