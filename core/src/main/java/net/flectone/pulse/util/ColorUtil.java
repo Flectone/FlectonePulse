@@ -91,8 +91,10 @@ public class ColorUtil {
     }
 
     public String toMiniMessage(String message) {
-        return MiniTranslator.toMini(message.replace("§", "&"))
-                .replaceAll("(?<!:)#([a-fA-F0-9]{6})", "<color:#$1>");
+        return MiniTranslator.toMini(message
+                        .replace("§", "&")
+                        .replaceAll("(?<!:)#", "&#")
+                );
     }
 
     public int parseHexToArgb(String hex) {
