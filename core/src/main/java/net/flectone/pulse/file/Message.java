@@ -115,10 +115,20 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     @Getter
     public static final class Auto implements ISubMessage, Config.IEnable {
         private boolean enable = false;
-        private boolean random = true;
-        private Destination destination = new Destination();
-        private Ticker ticker = new Ticker(true, 9000);
-        private Sound sound = new Sound();
+        private Map<String, Type> types = new LinkedHashMap<>(){
+            {
+                put("announcement", new Type());
+            }
+        };
+
+        @Getter
+        @NoArgsConstructor
+        public static final class Type {
+            private boolean random = true;
+            private Destination destination = new Destination();
+            private Ticker ticker = new Ticker(true, 9000);
+            private Sound sound = new Sound();
+        }
     }
 
     @Getter

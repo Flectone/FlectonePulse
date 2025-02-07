@@ -721,7 +721,12 @@ public final class Permission extends FileSerializable implements IModule {
         public static final class Auto implements ISubMessage, IPermission {
             private String name = "flectonepulse.module.message.auto";
             private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.auto.sound", Type.TRUE);
+
+            private Map<String, PermissionEntry> types = new LinkedHashMap<>(){
+                {
+                    put("announcement", new PermissionEntry("flectonepulse.module.message.auto.sound", Type.TRUE));
+                }
+            };
         }
 
         @Getter

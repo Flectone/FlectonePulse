@@ -6,11 +6,13 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleListMessage;
-import net.flectone.pulse.module.message.auto.ticker.AutoTicker;
 
 import java.util.List;
 
@@ -20,11 +22,17 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
     private final Message.Auto message;
     private final Permission.Message.Auto permission;
 
-    @Inject private AutoTicker autoTicker;
+    private final ThreadManager threadManager;
+    private final FPlayerManager fPlayerManager;
 
     @Inject
-    public AutoModule(FileManager fileManager) {
+    public AutoModule(FileManager fileManager,
+                      ThreadManager threadManager,
+                      FPlayerManager fPlayerManager) {
         super(localization -> localization.getMessage().getAuto());
+
+        this.threadManager = threadManager;
+        this.fPlayerManager = fPlayerManager;
 
         message = fileManager.getMessage().getAuto();
         permission = fileManager.getPermission().getMessage().getAuto();
@@ -34,12 +42,16 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
     public void reload() {
         registerModulePermission(permission);
 
-        createSound(message.getSound(), permission.getSound());
+        message.getTypes().forEach((key, value) -> {
+            Sound sound = createSound(value.getSound(), permission.getTypes().get(key));
 
-        Ticker ticker = message.getTicker();
-        if (ticker.isEnable()) {
-            autoTicker.runTaskTimerAsync(ticker.getPeriod(), ticker.getPeriod());
-        }
+            Ticker ticker = value.getTicker();
+            if (ticker.isEnable()) {
+                threadManager.runAsyncTimer(() -> fPlayerManager.getFPlayers().forEach(fPlayer -> send(fPlayer, key, value, sound)),
+                        ticker.getPeriod(), ticker.getPeriod()
+                );
+            }
+        });
     }
 
     @Override
@@ -48,22 +60,25 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
     }
 
     @Async
-    public void send(FPlayer fPlayer) {
+    public void send(FPlayer fPlayer, String name, Message.Auto.Type type, Sound sound) {
         if (checkModulePredicates(fPlayer)) return;
         if (!fPlayer.is(FPlayer.Setting.AUTO)) return;
 
-        String format = getNextMessage(fPlayer, message.isRandom());
+        List<String> messages = resolveLocalization(fPlayer).getTypes().get(name);
+        if (messages == null) return;
+
+        String format = getNextMessage(messages, fPlayer, type.isRandom());
         if (format == null) return;
 
         builder(fPlayer)
-                .destination(message.getDestination())
+                .destination(type.getDestination())
                 .format(format)
-                .sound(getSound())
+                .sound(sound)
                 .sendBuilt();
     }
 
     @Override
     public List<String> getAvailableMessages(FPlayer fPlayer) {
-        return resolveLocalization(fPlayer).getValues();
+        return List.of();
     }
 }
