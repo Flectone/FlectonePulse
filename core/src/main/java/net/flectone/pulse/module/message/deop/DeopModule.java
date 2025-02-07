@@ -13,7 +13,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ListenerManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.module.message.death.listener.DeathPacketListener;
+import net.flectone.pulse.module.message.deop.listener.DeopPacketListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
@@ -53,7 +53,7 @@ public class DeopModule extends AbstractModuleMessage<Localization.Message.Deop>
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerManager.register(DeathPacketListener.class);
+        listenerManager.register(DeopPacketListener.class);
     }
 
     @Override
