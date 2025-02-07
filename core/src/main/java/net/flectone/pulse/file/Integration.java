@@ -39,6 +39,8 @@ public final class Integration extends FileSerializable implements IModule.IInte
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/")})
     private boolean enable = true;
 
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/deepl/")})
+    private Deepl deepl = new Deepl();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/discord/")})
     private Discord discord = new Discord();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/interactivechat/")})
@@ -63,6 +65,12 @@ public final class Integration extends FileSerializable implements IModule.IInte
     private Vault vault = new Vault();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/yandex/")})
     private Yandex yandex = new Yandex();
+
+    @Getter
+    public static final class Deepl implements ISubIntegration, Config.IEnable {
+        private boolean enable = false;
+        private String authKey = "";
+    }
 
     @Getter
     public static final class Discord implements ISubIntegration, Config.IEnable {

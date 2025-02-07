@@ -79,7 +79,15 @@ public abstract class TranslatetoModule extends AbstractModuleCommand<Localizati
         return message -> message.getFormat().replace("<language>", targetLang);
     }
 
-    public String translate(String sourceLang, String targetLang, String msg) {
+    public String translate(FPlayer fPlayer, String source, String target, String text) {
+        return switch (command.getService()) {
+            case DEEPL -> integrationModule.deeplTranslate(fPlayer, source, target, text);
+            case GOOGLE -> googleTranslate(source, target, text);
+            case YANDEX -> integrationModule.yandexTranslate(fPlayer, source, target, text);
+        };
+    }
+
+    public String googleTranslate(String source, String lang, String text) {
         try {
             msg = URLEncoder.encode(msg, StandardCharsets.UTF_8);
             URL url = new URL("http://translate.googleapis.com/translate_a/single?client=gtx&sl=" + sourceLang + "&tl="

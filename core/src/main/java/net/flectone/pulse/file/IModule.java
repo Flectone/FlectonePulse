@@ -56,6 +56,7 @@ public interface IModule {
 
     interface IIntegration {
 
+        ISubIntegration getDeepl();
         ISubIntegration getDiscord();
         ISubIntegration getLuckperms();
         ISubIntegration getPlaceholderapi();
@@ -126,6 +127,7 @@ public interface IModule {
             ISubFormatMessage getName_();
             ISubFormatMessage getQuestionAnswer();
             ISubFormatMessage getSpoiler();
+            ISubFormatMessage getTranslate();
             ISubFormatMessage getWorld();
 
             interface ISubFormatMessage {}

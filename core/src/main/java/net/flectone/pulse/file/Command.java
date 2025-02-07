@@ -588,6 +588,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private Sound sound = new Sound();
 
         public enum Service {
+            DEEPL,
             GOOGLE,
             YANDEX
         }

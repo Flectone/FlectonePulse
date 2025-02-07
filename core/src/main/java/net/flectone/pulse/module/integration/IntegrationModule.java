@@ -7,6 +7,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.integration.deepl.DeeplModule;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
@@ -34,6 +35,7 @@ public abstract class IntegrationModule extends AbstractModule {
     public void reload() {
         registerModulePermission(permission);
 
+        addChildren(DeeplModule.class);
         addChildren(DiscordModule.class);
         addChildren(TelegramModule.class);
         addChildren(TwitchModule.class);
@@ -67,7 +69,16 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public abstract boolean isVanished(FEntity sender);
 
-    public String translate(FPlayer sender, String source, String target, String text) {
+    public String deeplTranslate(FPlayer sender, String source, String target, String text) {
+        if (checkModulePredicates(sender)) return text;
+        if (getChildren().contains(DeeplModule.class)) {
+            return injector.getInstance(DeeplModule.class).translate(sender, source, target, text);
+        }
+
+        return text;
+    }
+
+    public String yandexTranslate(FPlayer sender, String source, String target, String text) {
         if (checkModulePredicates(sender)) return text;
         if (getChildren().contains(YandexModule.class)) {
             return injector.getInstance(YandexModule.class).translate(sender, source, target, text);

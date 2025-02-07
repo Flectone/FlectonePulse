@@ -17,6 +17,7 @@ dependencies {
     compileOnly "org.telegram:telegrambots-longpolling:$telegrambots_version"
     compileOnly "org.telegram:telegrambots-client:$telegrambots_version"
     compileOnly "com.yandex.cloud:java-sdk-services:$yandexsdk_version"
+    compileOnly "com.deepl.api:deepl-java:$deepl_version"
 }
 
 buildConfig {

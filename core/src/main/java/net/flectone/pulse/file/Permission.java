@@ -530,6 +530,8 @@ public final class Permission extends FileSerializable implements IModule {
         private String name = "flectonepulse.module.integration";
         private Type type = Type.TRUE;
 
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/deepl/")})
+        private Deepl deepl = new Deepl();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/discord/")})
         private Discord discord = new Discord();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/interactivechat/")})
@@ -552,6 +554,14 @@ public final class Permission extends FileSerializable implements IModule {
         private Twitch twitch = new Twitch();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/vault/")})
         private Vault vault = new Vault();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/yandex/")})
+        private Yandex yandex = new Yandex();
+
+        @Getter
+        public static final class Deepl implements ISubIntegration, IPermission {
+            private String name = "flectonepulse.module.integration.deepl";
+            private Type type = Type.TRUE;
+        }
 
         @Getter
         public static final class Discord implements ISubIntegration, IPermission {
