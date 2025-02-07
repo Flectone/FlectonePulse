@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.command.geolocate;
 
+import com.github.retrooper.packetevents.protocol.player.User;
 import lombok.Getter;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.file.Command;
@@ -10,6 +11,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
+import net.flectone.pulse.util.PacketEventsUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,12 +29,15 @@ public abstract class GeolocateModule extends AbstractModuleCommand<Localization
     @Getter private final Permission.Command.Geolocate permission;
 
     private final CommandUtil commandUtil;
+    private final PacketEventsUtil packetEventsUtil;
 
     public GeolocateModule(FileManager fileManager,
-                           CommandUtil commandUtil) {
+                           CommandUtil commandUtil,
+                           PacketEventsUtil packetEventsUtil) {
         super(localization -> localization.getCommand().getGeolocate(), null);
 
         this.commandUtil = commandUtil;
+        this.packetEventsUtil = packetEventsUtil;
 
         command = fileManager.getCommand().getGeolocate();
         permission = fileManager.getPermission().getCommand().getGeolocate();
@@ -56,7 +61,10 @@ public abstract class GeolocateModule extends AbstractModuleCommand<Localization
             return;
         }
 
-        List<String> request = readResponse(HTTP_URL.replace("<ip>", String.valueOf(fTarget.getIp())));
+        User user = packetEventsUtil.getUser(fTarget);
+        String ip = user == null ? fTarget.getIp() : user.getAddress().getHostString();
+
+        List<String> request = readResponse(HTTP_URL.replace("<ip>", ip));
         if (request.isEmpty() || request.get(0).equals("fail")) {
             builder(fPlayer)
                     .format(Localization.Command.Geolocate::getNullOrError)

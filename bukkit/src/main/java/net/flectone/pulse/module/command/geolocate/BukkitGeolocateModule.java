@@ -6,6 +6,7 @@ import dev.jorel.commandapi.arguments.StringArgument;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.util.BukkitCommandUtil;
+import net.flectone.pulse.util.PacketEventsUtil;
 
 @Singleton
 public class BukkitGeolocateModule extends GeolocateModule {
@@ -14,10 +15,11 @@ public class BukkitGeolocateModule extends GeolocateModule {
 
     @Inject
     public BukkitGeolocateModule(FileManager fileManager,
-                                 BukkitCommandUtil commandManager) {
-        super(fileManager, commandManager);
+                                 BukkitCommandUtil commandUtil,
+                                 PacketEventsUtil packetEventsUtil) {
+        super(fileManager, commandUtil, packetEventsUtil);
 
-        this.commandManager = commandManager;
+        this.commandManager = commandUtil;
     }
 
     @Override
