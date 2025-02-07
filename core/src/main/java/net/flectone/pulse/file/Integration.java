@@ -59,6 +59,8 @@ public final class Integration extends FileSerializable implements IModule.IInte
     private Supervanish supervanish = new Supervanish();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/telegram/")})
     private Telegram telegram = new Telegram();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/triton/")})
+    private Triton triton = new Triton();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/twitch/")})
     private Twitch twitch = new Twitch();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/vault/")})
@@ -156,6 +158,11 @@ public final class Integration extends FileSerializable implements IModule.IInte
             }
         };
         private Destination destination = new Destination();
+    }
+
+    @Getter
+    public static final class Triton implements ISubIntegration, Config.IEnable {
+        private boolean enable = true;
     }
 
     @Getter

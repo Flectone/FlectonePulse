@@ -65,6 +65,7 @@ public interface IModule {
         ISubIntegration getSkinsrestorer();
         ISubIntegration getSupervanish();
         ISubIntegration getTelegram();
+        ISubIntegration getTriton();
         ISubIntegration getTwitch();
         ISubIntegration getVault();
         ISubIntegration getYandex();

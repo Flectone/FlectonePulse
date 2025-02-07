@@ -107,6 +107,10 @@ subprojects {
         maven {
             url = "https://repo.loohpjames.com/repository"
         }
+
+        maven {
+            url = "https://repo.diogotc.com/releases"
+        }
     }
 
     dependencies {

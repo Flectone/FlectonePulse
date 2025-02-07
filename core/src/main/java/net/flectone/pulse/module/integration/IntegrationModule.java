@@ -69,6 +69,8 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public abstract boolean isVanished(FEntity sender);
 
+    public abstract String getTritonLocale(FPlayer fPlayer);
+
     public String deeplTranslate(FPlayer sender, String source, String target, String text) {
         if (checkModulePredicates(sender)) return text;
         if (getChildren().contains(DeeplModule.class)) {

@@ -16,6 +16,7 @@ import net.flectone.pulse.module.integration.simplevoice.SimpleVoiceModule;
 import net.flectone.pulse.module.integration.skinsrestorer.SkinsRestorerModule;
 import net.flectone.pulse.module.integration.supervanish.SuperVanishModule;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
+import net.flectone.pulse.module.integration.triton.TritonModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.vault.VaultModule;
 import net.flectone.pulse.util.MessageTag;
@@ -84,6 +85,10 @@ public class BukkitIntegrationModule extends IntegrationModule {
             } catch (ClassNotFoundException e) {
                 fLogger.warning("Update PlasmoVoice to the latest version");
             }
+        }
+
+        if (serverUtil.hasProject("Triton")) {
+            addChildren(TritonModule.class);
         }
     }
 
@@ -220,6 +225,14 @@ public class BukkitIntegrationModule extends IntegrationModule {
         }
 
         return false;
+    }
+
+    @Override
+    public String getTritonLocale(FPlayer fPlayer) {
+        if (!isEnable()) return null;
+        if (!getChildren().contains(TritonModule.class)) return null;
+
+        return injector.getInstance(TritonModule.class).getLocale(fPlayer);
     }
 
     public boolean sendMessageWithInteractiveChat(FEntity fReceiver, Component message) {

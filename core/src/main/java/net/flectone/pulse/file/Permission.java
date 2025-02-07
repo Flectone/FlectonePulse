@@ -550,6 +550,8 @@ public final class Permission extends FileSerializable implements IModule {
         private Supervanish supervanish = new Supervanish();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/telegram/")})
         private Telegram telegram = new Telegram();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/triton/")})
+        private Triton triton = new Triton();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/twitch/")})
         private Twitch twitch = new Twitch();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/vault/")})
@@ -615,6 +617,12 @@ public final class Permission extends FileSerializable implements IModule {
         @Getter
         public static final class Telegram implements ISubIntegration, IPermission {
             private String name = "flectonepulse.module.integration.telegram";
+            private Type type = Type.TRUE;
+        }
+
+        @Getter
+        public static final class Triton implements ISubIntegration, IPermission {
+            private String name = "flectonepulse.module.integration.triton";
             private Type type = Type.TRUE;
         }
 

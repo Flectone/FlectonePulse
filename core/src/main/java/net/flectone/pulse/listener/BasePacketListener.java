@@ -13,6 +13,7 @@ import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.mail.MailModule;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.manager.BubbleManager;
 import net.flectone.pulse.module.message.greeting.GreetingModule;
 import net.flectone.pulse.module.message.join.JoinModule;
@@ -30,6 +31,7 @@ public class BasePacketListener extends AbstractPacketListener {
     @Inject private JoinModule joinModule;
     @Inject private GreetingModule greetingModule;
     @Inject private MailModule mailModule;
+    @Inject private IntegrationModule integrationModule;
     @Inject private BubbleManager bubbleManager;
 
     @Inject
@@ -84,9 +86,7 @@ public class BasePacketListener extends AbstractPacketListener {
         UUID uuid = event.getUser().getUUID();
         FPlayer fPlayer = fPlayerManager.get(uuid);
 
-        WrapperPlayClientSettings wrapperPlayClientSettings = new WrapperPlayClientSettings(event);
-
-        String locale = wrapperPlayClientSettings.getLocale();
+        String locale = getLocale(fPlayer, event);
 
         if (locale.equals(fPlayer.getLocale())) return;
         if (!fPlayer.isUnknown()) {
@@ -96,11 +96,22 @@ public class BasePacketListener extends AbstractPacketListener {
 
         // first time player joined, wait for it to be added
         // this needs to change in the future
+
         threadManager.runAsyncLater(() -> {
             FPlayer newFPlayer = fPlayerManager.get(uuid);
 
             setLocale(newFPlayer, locale);
         }, 20);
+    }
+
+    private String getLocale(FPlayer fPlayer, PacketReceiveEvent event) {
+        String locale = integrationModule.getTritonLocale(fPlayer);
+        if (locale == null) {
+            WrapperPlayClientSettings wrapperPlayClientSettings = new WrapperPlayClientSettings(event);
+            locale = wrapperPlayClientSettings.getLocale();
+        }
+
+        return locale;
     }
 
     private void setLocale(FPlayer fPlayer, String locale) {

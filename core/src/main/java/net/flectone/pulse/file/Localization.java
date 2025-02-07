@@ -1353,6 +1353,11 @@ public final class Localization extends FileSerializable implements IModule {
             };
         }
 
+        @Override
+        public ISubIntegration getTriton() {
+            return null;
+        }
+
         @Getter
         public static final class Twitch implements ISubIntegration, ILocalization {
             private String forMinecraft = "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>";
