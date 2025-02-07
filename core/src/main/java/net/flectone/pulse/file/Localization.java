@@ -331,6 +331,7 @@ public final class Localization extends FileSerializable implements IModule {
         command.prompt.reason = "причина";
         command.prompt.id = "айди";
         command.prompt.time = "время";
+        command.prompt.repeatTime = "время повторения";
         command.prompt.multipleVote = "мульти голосование";
         command.prompt.player = "игрок";
         command.prompt.number = "число";
@@ -631,6 +632,7 @@ public final class Localization extends FileSerializable implements IModule {
             private String category = "category";
             private String id = "id";
             private String time = "time";
+            private String repeatTime = "repeat time";
             private String multipleVote = "multiple vote";
             private String player = "player";
             private String number = "number";

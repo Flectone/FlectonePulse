@@ -85,18 +85,25 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
         if (checkCooldown(fPlayer)) return;
         if (checkMute(fPlayer)) return;
 
-        Integer time = commandUtil.getInteger(0, arguments);
-        boolean multipleVote = commandUtil.getBoolean(1, arguments);
-        String title = commandUtil.getText(2, arguments);
-
-        Map<String, String> answerSet = ((Map<String, String>) commandUtil.getOptional(3, arguments).get());
+        int time = commandUtil.getInteger(0, arguments);
+        int repeatTime = commandUtil.getInteger(1, arguments);
+        boolean multipleVote = commandUtil.getBoolean(2, arguments);
+        String title = commandUtil.getText(3, arguments);
+        Map<String, String> answerSet = ((Map<String, String>) commandUtil.getOptional(4, arguments).get());
 
         Poll poll = new Poll(command.getLastId(), answerSet.size(), multipleVote);
         put(poll);
 
         int range = command.getRange();
 
-        sendMessage(fPlayer, poll, answerSet, range, title);
+        Runnable sendRunnable = () -> sendMessage(fPlayer, poll, answerSet, range, title);
+
+        sendRunnable.run();
+
+        if (repeatTime != -1) {
+            recursiveSend(repeatTime * 20L, poll, sendRunnable);
+            threadManager.runAsync(() -> {});
+        }
 
         threadManager.runAsyncLater(() -> {
             Poll expiredPoll = pollMap.get(poll.getId());
@@ -104,13 +111,13 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
 
             sendMessage(fPlayer, expiredPoll, answerSet, range, title);
 
-        }, time * 20);
+        }, time * 20L);
     }
 
     public void put(Poll poll) {
         pollMap.put(poll.getId(), poll);
         command.setLastId(poll.getId() + 1);
-        fileManager.save();
+        fileManager.getCommand().save();
     }
 
     public void vote(FEntity fPlayer, int id, int numberVote) {
@@ -234,5 +241,14 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
     @Override
     public boolean isConfigEnable() {
         return command.isEnable();
+    }
+
+    public void recursiveSend(long repeatTime, Poll poll, Runnable runnable) {
+        threadManager.runAsyncLater(() -> {
+            if (poll.isExpired()) return;
+            runnable.run();
+
+            recursiveSend(repeatTime, poll, runnable);
+        }, repeatTime);
     }
 }

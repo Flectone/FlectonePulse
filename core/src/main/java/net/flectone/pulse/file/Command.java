@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
-import net.flectone.pulse.model.Cooldown;
-import net.flectone.pulse.model.Destination;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.Sound;
+import net.flectone.pulse.model.*;
 import net.flectone.pulse.util.Range;
 
 import java.nio.file.Path;
@@ -442,7 +439,6 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int range = Range.PROXY;
         @Setter
         private int lastId = 1;
-        private int maxTime = 60000;
         private List<String> aliases = new ArrayList<>(List.of("poll"));
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();

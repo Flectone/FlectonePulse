@@ -9,31 +9,34 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ProxyManager;
 import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.module.command.FCommand;
-import net.flectone.pulse.util.CommandUtil;
+import net.flectone.pulse.util.BukkitCommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 
 @Singleton
 public class BukkitPollModule extends PollModule {
 
     private final FPlayerManager fPlayerManager;
+    private final BukkitCommandUtil commandUtil;
 
     @Inject
     public BukkitPollModule(FileManager fileManager,
                             ProxyManager proxyManager,
                             ThreadManager threadManager,
                             FPlayerManager fPlayerManager,
-                            CommandUtil commandUtil,
+                            BukkitCommandUtil commandUtil,
                             ComponentUtil componentUtil,
                             Gson gson) {
         super(fileManager, proxyManager, threadManager, commandUtil, componentUtil, gson);
 
         this.fPlayerManager = fPlayerManager;
+        this.commandUtil = commandUtil;
     }
 
     @Override
     public void createCommand() {
         String promptMessage = getPrompt().getMessage();
         String promptTime = getPrompt().getTime();
+        String promptRepeatTime = getPrompt().getRepeatTime();
         String promptMultipleVote = getPrompt().getMultipleVote();
         String promptId = getPrompt().getId();
         String promptNumber = getPrompt().getNumber();
@@ -43,18 +46,20 @@ public class BukkitPollModule extends PollModule {
                 .withPermission(getPermission())
                 .then(new LiteralArgument("create")
                         .withPermission(getPermission().getCreate().getName())
-                        .then(new IntegerArgument(promptTime, 1, getCommand().getMaxTime())
-                                .then(new BooleanArgument(promptMultipleVote)
-                                        .then(new TextArgument("title")
-                                                .then(new MapArgumentBuilder<String, String>(promptMessage)
-                                                        .withKeyMapper(s -> s)
-                                                        .withValueMapper(s -> s)
-                                                        .withoutKeyList()
-                                                        .withoutValueList()
-                                                        .build()
-                                                        .executes((commandSender, commandArguments) -> {
-                                                            onCommandCreate(fPlayerManager.convertToFPlayer(commandSender), commandArguments);
-                                                        })
+                        .then(commandUtil.timeArgument(promptTime)
+                                .then(commandUtil.timeArgument(promptRepeatTime)
+                                        .then(new BooleanArgument(promptMultipleVote)
+                                                .then(new TextArgument("title")
+                                                        .then(new MapArgumentBuilder<String, String>(promptMessage)
+                                                                .withKeyMapper(s -> s)
+                                                                .withValueMapper(s -> s)
+                                                                .withoutKeyList()
+                                                                .withoutValueList()
+                                                                .build()
+                                                                .executes((commandSender, commandArguments) -> {
+                                                                    onCommandCreate(fPlayerManager.convertToFPlayer(commandSender), commandArguments);
+                                                                })
+                                                        )
                                                 )
                                         )
                                 )
