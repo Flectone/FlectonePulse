@@ -370,7 +370,9 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
             String format = resolveString(fReceiver, this.format);
             if (format == null) return Component.empty();
 
-            ComponentUtil.Builder formatBuilder = componentUtil.builder(fPlayer, fReceiver, format)
+            ComponentUtil.Builder formatBuilder = componentUtil
+                    .builder(fPlayer, fReceiver, format)
+                    .translate(resolveString(fReceiver, this.message), format.contains("message_to_translate"))
                     .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(fReceiver));
 
             if (formatComponentBuilder != null) {

@@ -391,6 +391,8 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         private QuestionAnswer questionAnswer = new QuestionAnswer();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/spoiler/")})
         private Spoiler spoiler = new Spoiler();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/translate/")})
+        private Translate translate = new Translate();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/world/")})
         private World world = new World();
 
@@ -531,6 +533,11 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         public static final class Spoiler implements ISubFormatMessage, Config.IEnable {
             private boolean enable = true;
             private String color = "<fcolor:2>";
+        }
+
+        @Getter
+        public static final class Translate implements ISubFormatMessage, Config.IEnable {
+            private boolean enable = true;
         }
 
         @Getter

@@ -937,6 +937,8 @@ public final class Permission extends FileSerializable implements IModule {
             private QuestionAnswer questionAnswer = new QuestionAnswer();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/spoiler/")})
             private Spoiler spoiler = new Spoiler();
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/translate/")})
+            private Translate translate = new Translate();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/world/")})
             private World world = new World();
 
@@ -1035,6 +1037,12 @@ public final class Permission extends FileSerializable implements IModule {
             @Getter
             public static final class Spoiler implements ISubFormatMessage, IPermission {
                 private String name = "flectonepulse.module.format.spoiler";
+                private Type type = Type.TRUE;
+            }
+
+            @Getter
+            public static final class Translate implements ISubFormatMessage, IPermission {
+                private String name = "flectonepulse.module.format.translate";
                 private Type type = Type.TRUE;
             }
 

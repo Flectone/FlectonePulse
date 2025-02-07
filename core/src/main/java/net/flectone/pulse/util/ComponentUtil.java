@@ -19,6 +19,7 @@ import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
 import net.flectone.pulse.module.message.format.name.NameModule;
 import net.flectone.pulse.module.message.format.questionanswer.QuestionAnswerModule;
 import net.flectone.pulse.module.message.format.spoiler.SpoilerModule;
+import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -43,6 +44,7 @@ public class ComponentUtil {
     @Inject private ColorModule colorModule;
     @Inject private EmojiModule emojiModule;
     @Inject private SpoilerModule spoilerModule;
+    @Inject private TranslateModule translateModule;
     @Inject private FormatModule formatModule;
     @Inject private MentionModule mentionModule;
     @Inject private CapsModule capsModule;
@@ -84,11 +86,13 @@ public class ComponentUtil {
         private final FEntity receiver;
         private final String message;
 
+        private String messageToTranslate;
         private boolean userMessage;
         private boolean mention;
         private boolean emoji = true;
         private boolean question = true;
         private boolean spoiler = true;
+        private boolean translate;
         private boolean swear = true;
         private boolean caps = true;
         private boolean formatting = true;
@@ -150,6 +154,17 @@ public class ComponentUtil {
             return this;
         }
 
+        public Builder translate(boolean translate) {
+            this.translate = translate;
+            return this;
+        }
+
+        public Builder translate(String messageToTranslate, boolean translate) {
+            this.messageToTranslate = messageToTranslate;
+            this.translate = translate;
+            return this;
+        }
+
         public Builder userMessage(boolean userMessage) {
             this.userMessage = userMessage;
             return this;
@@ -198,6 +213,11 @@ public class ComponentUtil {
 
             if (spoiler) {
                 tagResolverList.add(spoilerModule.spoilerTag(sender, receiver, userMessage));
+            }
+
+            if (translate) {
+                message = message.replace("<message_to_translate>", messageToTranslate == null ? "" : messageToTranslate);
+                tagResolverList.add(translateModule.translateTag(sender, receiver));
             }
 
             if (formatting) {

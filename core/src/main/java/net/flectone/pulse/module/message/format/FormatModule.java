@@ -18,6 +18,7 @@ import net.flectone.pulse.module.message.format.moderation.ModerationModule;
 import net.flectone.pulse.module.message.format.name.NameModule;
 import net.flectone.pulse.module.message.format.questionanswer.QuestionAnswerModule;
 import net.flectone.pulse.module.message.format.spoiler.SpoilerModule;
+import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.util.*;
 import net.kyori.adventure.text.Component;
@@ -98,6 +99,7 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
         addChildren(NameModule.class);
         addChildren(QuestionAnswerModule.class);
         addChildren(SpoilerModule.class);
+        addChildren(TranslateModule.class);
         addChildren(WorldModule.class);
     }
 

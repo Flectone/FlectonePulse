@@ -85,8 +85,8 @@ public final class Localization extends FileSerializable implements IModule {
         command.coin.format = "<fcolor:1>✎ <display_name> подбросил монетку - <result>";
         command.coin.formatDraw = "<fcolor:1>✎ <display_name> неудачно подбросил монетку ребром :)";
 
-        command.translateto.nullOrError = "<color:#ff7171><b>⁉</b> Ошибка, возможно ты указал неправильный язык";
-        command.translateto.format = "<fcolor:1>\uD83D\uDCD6 [<language>] <display_name> перевёл → <fcolor:2><message>";
+        command.translateto.nullOrError = "<color:#ff7171><b>⁉</b> Ошибка, возможно указан неправильный язык";
+        command.translateto.format = "<fcolor:1>📖 Перевод на [<language>] → <fcolor:2><message>";
 
         command.clearchat.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.clearchat.format = "<fcolor:1>\uD83D\uDCAC Чат очищен";
@@ -241,7 +241,7 @@ public final class Localization extends FileSerializable implements IModule {
         command.chatsetting.settings.put(FPlayer.Setting.MAIL, List.of(List.of("<fcolor:2>Команда /mail", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /mail", "<color:#ff7171>Скрыта")));
         command.chatsetting.settings.put(FPlayer.Setting.TICTACTOE, List.of(List.of("<fcolor:2>Команда /tictactoe", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /tictactoe", "<color:#ff7171>Скрыта")));
         command.chatsetting.settings.put(FPlayer.Setting.KICK, List.of(List.of("<fcolor:2>Команда /kick", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /kick", "<color:#ff7171>Скрыта")));
-        command.chatsetting.settings.put(FPlayer.Setting.TRANSLATETO, List.of(List.of("<fcolor:2>Команда /translateto", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /translateto", "<color:#ff7171>Скрыта")));
+        command.chatsetting.settings.put(FPlayer.Setting.TRANSLATETO, List.of(List.of("<fcolor:2>Команда /translate", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /translate", "<color:#ff7171>Скрыта")));
         command.chatsetting.settings.put(FPlayer.Setting.BROADCAST, List.of(List.of("<fcolor:2>Команда /broadcast", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /broadcast", "<color:#ff7171>Скрыта")));
         command.chatsetting.settings.put(FPlayer.Setting.DO, List.of(List.of("<fcolor:2>Команда /do", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /do", "<color:#ff7171>Скрыта")));
         command.chatsetting.settings.put(FPlayer.Setting.COIN, List.of(List.of("<fcolor:2>Команда /coin", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /coin", "<color:#ff7171>Скрыта")));
@@ -364,8 +364,8 @@ public final class Localization extends FileSerializable implements IModule {
 
         message.chat.types.clear();
         message.chat.types.putAll(Map.of(
-                "local", "<display_name><fcolor:3>: <message>",
-                "global", "<display_name> <world_prefix>»<fcolor:4> <message>"
+                "local", "<display_name><fcolor:3>: <message> <translateto:\"<message_to_translate>\">",
+                "global", "<display_name> <world_prefix>»<fcolor:4> <message> <translateto:\"<message_to_translate>\">"
         ));
         message.chat.nullChat = "<color:#ff7171><b>⁉</b> На сервер выключен чат";
         message.chat.nullRecipient = "<color:#ff7171><b>⁉</b> Тебя никто не услышал";
@@ -495,6 +495,8 @@ public final class Localization extends FileSerializable implements IModule {
         message.format.name_.display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <player>\"><vault_prefix><stream_prefix><fcolor:2><player></fcolor><afk_suffix><vault_suffix></hover></click>";
         message.format.name_.entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:<name>> <br><fcolor:1>Тип <fcolor:2><lang:<type>> <br><fcolor:1>Айди <fcolor:2><uuid>\"><lang:<name>></hover></fcolor:2>";
         message.format.name_.unknown = "<fcolor:2><name></fcolor:2>";
+
+        message.format.translate.action = "<click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Перевести сообщение\"><fcolor:1>[📖]";
 
         message.format.questionAnswer.questions.clear();
         message.format.questionAnswer.questions.put("server", "<fcolor:2>[Вопрос-Ответ] @<player><fcolor:1>, это ванильный сервер в Майнкрафте!");
@@ -1135,7 +1137,7 @@ public final class Localization extends FileSerializable implements IModule {
         @Getter
         public static final class Translateto implements ISubCommand, ILocalization {
             private String nullOrError = "<color:#ff7171><b>⁉</b> Error, you may have specified an unsupported language";
-            private String format = "<fcolor:1>📖 [<language>] <display_name> translated → <fcolor:2><message>";
+            private String format = "<fcolor:1>📖 Translation to [<language>] → <fcolor:2><message>";
         }
 
         @Getter
@@ -1209,6 +1211,11 @@ public final class Localization extends FileSerializable implements IModule {
         private Twitch twitch = new Twitch();
 
         @Override
+        public ISubIntegration getDeepl() {
+            return null;
+        }
+
+        @Override
         public ISubIntegration getLuckperms() {
             return null;
         }
@@ -1240,6 +1247,11 @@ public final class Localization extends FileSerializable implements IModule {
 
         @Override
         public ISubIntegration getVault() {
+            return null;
+        }
+
+        @Override
+        public ISubIntegration getYandex() {
             return null;
         }
 
@@ -1500,8 +1512,8 @@ public final class Localization extends FileSerializable implements IModule {
             private String nullRecipient = "<color:#ff7171><b>⁉</b> Nobody heard you";
             private Map<String, String> types = new LinkedHashMap<>(){
                 {
-                    put("global", "<display_name> <world_prefix>»<fcolor:4> <message>");
-                    put("local", "<display_name><fcolor:3>: <message>");
+                    put("global", "<display_name> <world_prefix>»<fcolor:4> <message> <translateto:\"<message_to_translate>\">");
+                    put("local", "<display_name><fcolor:3>: <message> <translateto:\"<message_to_translate>\">");
                 }
             };
         }
@@ -1737,6 +1749,8 @@ public final class Localization extends FileSerializable implements IModule {
             private QuestionAnswer questionAnswer = new QuestionAnswer();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/spoiler/")})
             private Spoiler spoiler = new Spoiler();
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/translate/")})
+            private Translate translate = new Translate();
 
             @Override
             public ISubFormatMessage getWorld() {
@@ -1790,6 +1804,11 @@ public final class Localization extends FileSerializable implements IModule {
             public static final class Spoiler implements ISubFormatMessage, ILocalization {
                 private String symbol = "█";
                 private String hover = "<fcolor:2><message>";
+            }
+
+            @Getter
+            public static final class Translate implements ISubFormatMessage, ILocalization {
+                private String action = "<click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Translate message\"><fcolor:1>[📖]";
             }
         }
 
