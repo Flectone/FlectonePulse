@@ -93,7 +93,7 @@ public class ColorUtil {
     public String toMiniMessage(String message) {
         return MiniTranslator.toMini(message
                         .replace("§", "&")
-                        .replaceAll("(?<!:)#", "&#")
+                        .replaceAll("(?<![:&])#", "&#")
                 );
     }
 
