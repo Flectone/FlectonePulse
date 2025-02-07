@@ -7,6 +7,7 @@ import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
@@ -26,12 +27,15 @@ public abstract class TranslatetoModule extends AbstractModuleCommand<Localizati
     @Getter private final Permission.Command.Translateto permission;
 
     private final CommandUtil commandUtil;
+    private final IntegrationModule integrationModule;
 
     public TranslatetoModule(FileManager fileManager,
-                             CommandUtil commandUtil) {
+                             CommandUtil commandUtil,
+                             IntegrationModule integrationModule) {
         super(localization -> localization.getCommand().getTranslateto(), fPlayer -> fPlayer.is(FPlayer.Setting.TRANSLATETO));
 
         this.commandUtil = commandUtil;
+        this.integrationModule = integrationModule;
 
         command = fileManager.getCommand().getTranslateto();
         permission = fileManager.getPermission().getCommand().getTranslateto();
@@ -49,8 +53,8 @@ public abstract class TranslatetoModule extends AbstractModuleCommand<Localizati
         String targetLang = commandUtil.getString(1, arguments);
         String message = commandUtil.getString(2, arguments);
 
-        String translated = translate(mainLang, targetLang, message);
-        if (translated.isEmpty() || message.equals(translated)) {
+        String translated = translate(fPlayer, mainLang, targetLang, message);
+        if (translated.isEmpty()) {
             builder(fPlayer)
                     .format(Localization.Command.Translateto::getNullOrError)
                     .sendBuilt();
@@ -89,9 +93,9 @@ public abstract class TranslatetoModule extends AbstractModuleCommand<Localizati
 
     public String googleTranslate(String source, String lang, String text) {
         try {
-            msg = URLEncoder.encode(msg, StandardCharsets.UTF_8);
-            URL url = new URL("http://translate.googleapis.com/translate_a/single?client=gtx&sl=" + sourceLang + "&tl="
-                    + targetLang + "&dt=t&q=" + msg + "&ie=UTF-8&oe=UTF-8");
+            text = URLEncoder.encode(text, StandardCharsets.UTF_8);
+            URL url = new URL("http://translate.googleapis.com/translate_a/single?client=gtx&sl=" + source + "&tl="
+                    + lang + "&dt=t&q=" + text + "&ie=UTF-8&oe=UTF-8");
 
             URLConnection uc = url.openConnection();
             uc.setRequestProperty("User-Agent", "Mozilla/5.0");
@@ -100,12 +104,12 @@ public abstract class TranslatetoModule extends AbstractModuleCommand<Localizati
             String inputLine;
 
             while ((inputLine = in.readLine()) != null) {
-                msg = inputLine;
+                text = inputLine;
             }
 
             in.close();
 
-            String jsonResponse = msg;
+            String jsonResponse = text;
             int startIndex = jsonResponse.indexOf("\"") + 1;
             int endIndex = jsonResponse.indexOf("\"", startIndex);
             return jsonResponse.substring(startIndex, endIndex);

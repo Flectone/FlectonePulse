@@ -583,6 +583,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
         private int range = Range.PLAYER;
         private Service service = Service.GOOGLE;
         private List<String> aliases = new ArrayList<>(List.of("translateto"));
+        private List<String> languages = new ArrayList<>(List.of("en_us", "ru_ru"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
