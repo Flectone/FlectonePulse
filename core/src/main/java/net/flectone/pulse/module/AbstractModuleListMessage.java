@@ -43,9 +43,13 @@ public abstract class AbstractModuleListMessage<M extends Localization.ILocaliza
     public String getNextMessage(FPlayer fPlayer, boolean random) {
         List<String> messages = getAvailableMessages(fPlayer);
         if (messages.isEmpty()) return null;
+        return getNextMessage(messages, fPlayer, random);
+    }
 
-        int fPlayerID = fPlayer.getId();
-        int playerIndex = PLAYER_INDEX.getOrDefault(fPlayerID, 0);
+    @Nullable
+    public String getNextMessage(List<String> messages, FPlayer fPlayer, boolean random) {
+        int id = fPlayer.getId() + messages.hashCode();
+        int playerIndex = PLAYER_INDEX.getOrDefault(id, 0);
 
         if (random) {
             playerIndex = randomUtil.nextInt(0, messages.size());
@@ -54,7 +58,7 @@ public abstract class AbstractModuleListMessage<M extends Localization.ILocaliza
             playerIndex = playerIndex % messages.size();
         }
 
-        PLAYER_INDEX.put(fPlayerID, playerIndex);
+        PLAYER_INDEX.put(id, playerIndex);
 
         return messages.get(playerIndex);
     }
