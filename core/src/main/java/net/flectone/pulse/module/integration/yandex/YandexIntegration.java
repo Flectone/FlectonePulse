@@ -51,7 +51,8 @@ public class YandexIntegration implements FIntegration {
                     .credentialProvider(Auth.oauthTokenBuilder().oauth(integration.getToken()))
                     .requestTimeout(Duration.ofMinutes(1))
                     .build();
-            fLogger.info("Telegram integration enabled");
+
+            fLogger.info("Yandex integration enabled");
         } catch (Exception e) {
             fLogger.warning(e);
         }

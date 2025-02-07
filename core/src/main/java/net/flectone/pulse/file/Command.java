@@ -580,7 +580,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     @Getter
     public static final class Translateto implements ISubCommand, ICommandFile {
         private boolean enable = true;
-        private int range = Range.PROXY;
+        private int range = Range.PLAYER;
         private Service service = Service.GOOGLE;
         private List<String> aliases = new ArrayList<>(List.of("translateto"));
         private Destination destination = new Destination();
