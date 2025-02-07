@@ -355,7 +355,7 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
         private Component combine(Component format, Component message) {
             return format.replaceText(TextReplacementConfig.builder()
                     .match("<message>")
-                    .replacement(builder -> message)
+                    .replacement(message)
                     .build()
             );
         }
