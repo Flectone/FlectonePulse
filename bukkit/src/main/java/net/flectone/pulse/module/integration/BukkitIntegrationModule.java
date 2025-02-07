@@ -38,7 +38,7 @@ public class BukkitIntegrationModule extends IntegrationModule {
     public BukkitIntegrationModule(FileManager fileManager,
                                    FLogger fLogger,
                                    Injector injector) {
-        super(fileManager);
+        super(fileManager, injector);
 
         this.fLogger = fLogger;
         this.injector = injector;

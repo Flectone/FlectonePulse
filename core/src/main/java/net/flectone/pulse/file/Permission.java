@@ -619,6 +619,12 @@ public final class Permission extends FileSerializable implements IModule {
             private String name = "flectonepulse.module.integration.vault";
             private Type type = Type.TRUE;
         }
+
+        @Getter
+        public static final class Yandex implements ISubIntegration, IPermission {
+            private String name = "flectonepulse.module.integration.yandex";
+            private Type type = Type.TRUE;
+        }
     }
 
     @Getter

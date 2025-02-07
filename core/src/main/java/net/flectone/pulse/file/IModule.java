@@ -66,6 +66,7 @@ public interface IModule {
         ISubIntegration getTelegram();
         ISubIntegration getTwitch();
         ISubIntegration getVault();
+        ISubIntegration getYandex();
 
         interface ISubIntegration {}
     }

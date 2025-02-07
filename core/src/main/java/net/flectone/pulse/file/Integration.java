@@ -61,6 +61,8 @@ public final class Integration extends FileSerializable implements IModule.IInte
     private Twitch twitch = new Twitch();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/vault/")})
     private Vault vault = new Vault();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/yandex/")})
+    private Yandex yandex = new Yandex();
 
     @Getter
     public static final class Discord implements ISubIntegration, Config.IEnable {
@@ -168,5 +170,12 @@ public final class Integration extends FileSerializable implements IModule.IInte
     @Getter
     public static final class Vault implements ISubIntegration, Config.IEnable {
         private boolean enable = true;
+    }
+
+    @Getter
+    public static final class Yandex implements ISubIntegration, Config.IEnable {
+        private boolean enable = false;
+        private String token = "";
+        private String folderId = "";
     }
 }

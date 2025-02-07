@@ -16,6 +16,7 @@ dependencies {
     compileOnly "com.github.twitch4j:twitch4j:$twitch4j_version"
     compileOnly "org.telegram:telegrambots-longpolling:$telegrambots_version"
     compileOnly "org.telegram:telegrambots-client:$telegrambots_version"
+    compileOnly "com.yandex.cloud:java-sdk-services:$yandexsdk_version"
 }
 
 buildConfig {

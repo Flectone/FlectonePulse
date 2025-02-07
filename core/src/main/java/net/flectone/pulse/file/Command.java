@@ -581,10 +581,16 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     public static final class Translateto implements ISubCommand, ICommandFile {
         private boolean enable = true;
         private int range = Range.PROXY;
+        private Service service = Service.GOOGLE;
         private List<String> aliases = new ArrayList<>(List.of("translateto"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
+
+        public enum Service {
+            GOOGLE,
+            YANDEX
+        }
     }
 
     @Getter
