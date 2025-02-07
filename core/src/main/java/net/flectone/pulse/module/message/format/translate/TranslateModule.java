@@ -40,7 +40,7 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
         if (checkModulePredicates(fPlayer)) return TagResolver.empty();
 
         return TagResolver.resolver("translateto", (argumentQueue, context) -> {
-            if (!(receiver instanceof FPlayer fReceiver)) return Tag.selfClosingInserting(Component.empty());
+            if (!(receiver instanceof FPlayer fReceiver) || fReceiver.isUnknown()) return Tag.selfClosingInserting(Component.empty());
             if (!argumentQueue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
             String firstLang;
