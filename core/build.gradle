@@ -7,7 +7,7 @@ dependencies {
     compileOnly "net.kyori:adventure-text-minimessage:$adventure_api"
     compileOnly "net.kyori:adventure-text-serializer-gson:$adventure_api"
     compileOnly "net.kyori:adventure-text-serializer-plain:$adventure_api"
-    compileOnly "com.github.imDaniX:MiniTranslator:$minitranslator_version"
+//    compileOnly "com.github.imDaniX:MiniTranslator:$minitranslator_version"
     compileOnly "com.github.retrooper:packetevents-spigot:$packetevents_spigot_version"
     compileOnly "io.netty:netty-all:$netty_all_version"
     compileOnly "commons-lang:commons-lang:$commons_lang_version"
