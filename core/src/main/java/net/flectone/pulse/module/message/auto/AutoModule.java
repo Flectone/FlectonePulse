@@ -67,7 +67,7 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
         List<String> messages = resolveLocalization(fPlayer).getTypes().get(name);
         if (messages == null) return;
 
-        String format = getNextMessage(messages, fPlayer, type.isRandom());
+        String format = getNextMessage(fPlayer, type.isRandom(), messages);
         if (format == null) return;
 
         builder(fPlayer)

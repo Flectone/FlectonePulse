@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 public abstract class AbstractModuleListMessage<M extends Localization.ILocalization> extends AbstractModuleMessage<M> {
 
-    private final HashMap<Integer, Integer> PLAYER_INDEX = new HashMap<>();
+    private final HashMap<Integer, Integer> MESSAGE_INDEX_MAP = new HashMap<>();
 
     @Inject private RandomUtil randomUtil;
 
@@ -34,22 +34,31 @@ public abstract class AbstractModuleListMessage<M extends Localization.ILocaliza
         if (messages.isEmpty()) return null;
 
         int fPlayerID = fPlayer.getId();
-        int playerIndex = PLAYER_INDEX.getOrDefault(fPlayerID, 0) % messages.size();
+        int playerIndex = MESSAGE_INDEX_MAP.getOrDefault(fPlayerID, 0) % messages.size();
 
         return messages.get(playerIndex);
     }
 
     @Nullable
     public String getNextMessage(FPlayer fPlayer, boolean random) {
+        int id = fPlayer.getId();
         List<String> messages = getAvailableMessages(fPlayer);
-        if (messages.isEmpty()) return null;
-        return getNextMessage(messages, fPlayer, random);
+
+        return incrementAndGetMessage(id, random, messages);
     }
 
     @Nullable
-    public String getNextMessage(List<String> messages, FPlayer fPlayer, boolean random) {
+    public String getNextMessage(FPlayer fPlayer, boolean random, List<String> messages) {
         int id = fPlayer.getId() + messages.hashCode();
-        int playerIndex = PLAYER_INDEX.getOrDefault(id, 0);
+
+        return incrementAndGetMessage(id, random, messages);
+    }
+
+    @Nullable
+    private String incrementAndGetMessage(int id, boolean random, List<String> messages) {
+        if (messages.isEmpty()) return null;
+
+        int playerIndex = MESSAGE_INDEX_MAP.getOrDefault(id, 0);
 
         if (random) {
             playerIndex = randomUtil.nextInt(0, messages.size());
@@ -58,7 +67,7 @@ public abstract class AbstractModuleListMessage<M extends Localization.ILocaliza
             playerIndex = playerIndex % messages.size();
         }
 
-        PLAYER_INDEX.put(id, playerIndex);
+        MESSAGE_INDEX_MAP.put(id, playerIndex);
 
         return messages.get(playerIndex);
     }
