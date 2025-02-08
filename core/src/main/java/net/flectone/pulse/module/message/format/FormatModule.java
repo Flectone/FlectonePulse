@@ -209,60 +209,110 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
     }
 
     public String replaceAll(FEntity sender, FEntity fReceiver, String message) {
-        Localization.Message.Format localization = resolveLocalization(fReceiver);
+        if (checkModulePredicates(sender)) return message;
 
-        message = replaceAll(sender, message,
-                permission.getTags().get(TagType.IMAGE),
-                this.message.getTags().get(TagType.IMAGE).getTrigger(),
-                localization.getTags().get(TagType.IMAGE).replace("<message>", "$1")
-        );
+        if (isCorrectTag(TagType.IMAGE, sender)) {
+            Localization.Message.Format localization = resolveLocalization(fReceiver);
+            message = replaceAll(sender, message,
+                    permission.getTags().get(TagType.IMAGE),
+                    this.message.getTags().get(TagType.IMAGE).getTrigger(),
+                    localization.getTags().get(TagType.IMAGE).replace("<message>", "$1")
+            );
+        }
 
-        message = replaceAll(sender, message,
-                permission.getTags().get(TagType.URL),
-                this.message.getTags().get(TagType.URL).getTrigger(),
-                "<url:'$1'>"
-        );
+        if (isCorrectTag(TagType.URL, sender)) {
+            message = replaceAll(sender, message,
+                    permission.getTags().get(TagType.URL),
+                    this.message.getTags().get(TagType.URL).getTrigger(),
+                    "<url:'$1'>"
+            );
+        }
 
-        message = message
-                .replace(this.message.getTags().get(TagType.PING).getTrigger(), "<ping>")
-                .replace(this.message.getTags().get(TagType.TPS).getTrigger(), "<tps>")
-                .replace(this.message.getTags().get(TagType.ONLINE).getTrigger(), "<online>")
-                .replace(this.message.getTags().get(TagType.COORDS).getTrigger(), "<coords>")
-                .replace(this.message.getTags().get(TagType.STATS).getTrigger(), "<stats>")
-                .replace(this.message.getTags().get(TagType.SKIN).getTrigger(), "<skin>")
-                .replace(this.message.getTags().get(TagType.ITEM).getTrigger(), "<item>");
+        if (isCorrectTag(TagType.PING, sender)) {
+            message = message
+                    .replace(this.message.getTags().get(TagType.PING).getTrigger(), "<ping>");
+        }
+
+        if (isCorrectTag(TagType.TPS, sender)) {
+            message = message
+                    .replace(this.message.getTags().get(TagType.TPS).getTrigger(), "<tps>");
+        }
+
+        if (isCorrectTag(TagType.ONLINE, sender)) {
+            message = message
+                    .replace(this.message.getTags().get(TagType.ONLINE).getTrigger(), "<online>");
+        }
+
+        if (isCorrectTag(TagType.COORDS, sender)) {
+            message = message
+                    .replace(this.message.getTags().get(TagType.COORDS).getTrigger(), "<coords>");
+        }
+
+        if (isCorrectTag(TagType.STATS, sender)) {
+            message = message
+                    .replace(this.message.getTags().get(TagType.STATS).getTrigger(), "<stats>");
+        }
+
+        if (isCorrectTag(TagType.SKIN, sender)) {
+            message = message
+                    .replace(this.message.getTags().get(TagType.SKIN).getTrigger(), "<skin>");
+        }
+
+        if (isCorrectTag(TagType.ITEM, sender)) {
+            message = message
+                    .replace(this.message.getTags().get(TagType.ITEM).getTrigger(), "<item>");
+        }
 
         String regex = "<trigger>(.*?)<trigger>";
-        message = replaceAll(sender, message,
-                permission.getTags().get(TagType.SPOILER),
-                regex.replace("<trigger>", this.message.getTags().get(TagType.SPOILER).getTrigger()),
-                "<spoiler:'$1'>"
-        );
-        message = replaceAll(sender, message,
-                permission.getTags().get(TagType.BOLD),
-                regex.replace("<trigger>", this.message.getTags().get(TagType.BOLD).getTrigger()),
-                "<bold>$1</bold>"
-        );
-        message = replaceAll(sender, message,
-                permission.getTags().get(TagType.ITALIC),
-                regex.replace("<trigger>", this.message.getTags().get(TagType.ITALIC).getTrigger()),
-                "<italic>$1</italic>"
-        );
-        message = replaceAll(sender, message,
-                permission.getTags().get(TagType.UNDERLINE),
-                regex.replace("<trigger>", this.message.getTags().get(TagType.UNDERLINE).getTrigger()),
-                "<underlined>$1</underlined>"
-        );
-        message = replaceAll(sender, message,
-                permission.getTags().get(TagType.OBFUSCATED),
-                regex.replace("<trigger>", this.message.getTags().get(TagType.OBFUSCATED).getTrigger()),
-                "<obfuscated>$1</obfuscated>"
-        );
-        message = replaceAll(sender, message,
-                permission.getTags().get(TagType.STRIKETHROUGH),
-                regex.replace("<trigger>", this.message.getTags().get(TagType.STRIKETHROUGH).getTrigger()),
-                "<strikethrough>$1</strikethrough>"
-        );
+
+        if (isCorrectTag(TagType.SPOILER, sender)) {
+            message = replaceAll(sender, message,
+                    permission.getTags().get(TagType.SPOILER),
+                    regex.replace("<trigger>", this.message.getTags().get(TagType.SPOILER).getTrigger()),
+                    "<spoiler:'$1'>"
+            );
+        }
+
+        if (isCorrectTag(TagType.BOLD, sender)) {
+            message = replaceAll(sender, message,
+                    permission.getTags().get(TagType.BOLD),
+                    regex.replace("<trigger>", this.message.getTags().get(TagType.BOLD).getTrigger()),
+                    "<bold>$1</bold>"
+            );
+        }
+
+        if (isCorrectTag(TagType.ITALIC, sender)) {
+            message = replaceAll(sender, message,
+                    permission.getTags().get(TagType.ITALIC),
+                    regex.replace("<trigger>", this.message.getTags().get(TagType.ITALIC).getTrigger()),
+                    "<italic>$1</italic>"
+            );
+        }
+
+        if (isCorrectTag(TagType.UNDERLINE, sender)) {
+            message = replaceAll(sender, message,
+                    permission.getTags().get(TagType.UNDERLINE),
+                    regex.replace("<trigger>", this.message.getTags().get(TagType.UNDERLINE).getTrigger()),
+                    "<underlined>$1</underlined>"
+            );
+        }
+
+        if (isCorrectTag(TagType.OBFUSCATED, sender)) {
+            message = replaceAll(sender, message,
+                    permission.getTags().get(TagType.OBFUSCATED),
+                    regex.replace("<trigger>", this.message.getTags().get(TagType.OBFUSCATED).getTrigger()),
+                    "<obfuscated>$1</obfuscated>"
+            );
+        }
+
+        if (isCorrectTag(TagType.STRIKETHROUGH, sender)) {
+            message = replaceAll(sender, message,
+                    permission.getTags().get(TagType.STRIKETHROUGH),
+                    regex.replace("<trigger>", this.message.getTags().get(TagType.STRIKETHROUGH).getTrigger()),
+                    "<strikethrough>$1</strikethrough>"
+            );
+        }
+
         return message;
     }
 
