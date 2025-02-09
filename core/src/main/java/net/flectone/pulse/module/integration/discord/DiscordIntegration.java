@@ -134,7 +134,7 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
 
             webhookBuilder.content(replaceString.apply(messageWebhook.getContent()));
 
-            discordClient.getWebhookService().executeWebhook(webhookPlayerData.id().asLong(), webhookPlayerData.token().get(), true,
+            discordClient.getWebhookService().executeWebhook(webhookPlayerData.id().asLong(), webhookPlayerData.token().get(), false,
                     MultipartRequest.ofRequest(webhookBuilder.build())
             ).subscribe();
 
