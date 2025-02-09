@@ -1,8 +1,8 @@
 package net.flectone.pulse.module.command.ban.listener;
 
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
+import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.AbstractPacketListener;
@@ -19,14 +19,14 @@ public class BanPacketListener extends AbstractPacketListener {
     }
 
     @Override
-    public void onPacketReceive(PacketReceiveEvent event) {
+    public void onPacketSend(PacketSendEvent event) {
         if (event.isCancelled()) return;
-        if (event.getPacketType() != PacketType.Login.Client.LOGIN_START) return;
+        if (event.getPacketType() != PacketType.Login.Server.LOGIN_SUCCESS) return;
+        if (!banModule.isEnable()) return;
 
-        WrapperLoginClientLoginStart wrapperLoginClientLoginStart = new WrapperLoginClientLoginStart(event);
-        if (wrapperLoginClientLoginStart.getPlayerUUID().isEmpty()) return;
+        event.setCancelled(true);
 
-        banModule.checkJoin(wrapperLoginClientLoginStart.getPlayerUUID().get(), event.getChannel());
+        WrapperLoginServerLoginSuccess wrapperLoginServerLoginSuccess = new WrapperLoginServerLoginSuccess(event);
+        banModule.checkJoin(wrapperLoginServerLoginSuccess.getUserProfile());
     }
-
 }

@@ -1,6 +1,8 @@
 package net.flectone.pulse.module.command.ban;
 
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerDisconnect;
+import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
 import com.google.gson.Gson;
 import lombok.Getter;
 import net.flectone.pulse.database.Database;
@@ -21,7 +23,6 @@ import net.flectone.pulse.util.*;
 import net.kyori.adventure.text.Component;
 
 import java.sql.SQLException;
-import java.util.UUID;
 import java.util.function.BiFunction;
 
 public abstract class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
@@ -164,11 +165,11 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
         });
     }
 
-    public void checkJoin(UUID uuid, Object channel) {
+    public void checkJoin(UserProfile userProfile) {
         if (!isEnable()) return;
 
         try {
-            FPlayer fPlayer = database.getFPlayer(uuid);
+            FPlayer fPlayer = database.getFPlayer(userProfile.getUUID());
 
             for (Moderation ban : database.getValidModerations(fPlayer, Moderation.Type.BAN)) {
                 FPlayer fModerator = database.getFPlayer(ban.getModerator());
@@ -179,7 +180,7 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
                 formatPlayer =  moderationUtil.replacePlaceholders(formatPlayer, fPlayer, ban);
 
                 Component reason = componentUtil.builder(fModerator, fPlayer, formatPlayer).build();
-                packetEventsUtil.sendPacket(channel, new WrapperLoginServerDisconnect(reason));
+                packetEventsUtil.sendPacket(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
 
                 if (!command.isShowConnectionAttempts()) return;
 
@@ -196,6 +197,8 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
         } catch (SQLException e) {
             fLogger.warning(e);
         }
+
+        packetEventsUtil.sendPacket(userProfile.getUUID(), new WrapperLoginServerLoginSuccess(userProfile));
     }
 
     @Override
