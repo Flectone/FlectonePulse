@@ -60,7 +60,7 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
         Inventory.Builder inventoryBuilder = new Inventory.Builder()
                 .name(header)
                 .size(54)
-                .addCloseConsumer(inventory -> threadManager.runDatabase(database -> database.updateFPlayer(fPlayer)));
+                .addCloseConsumer(inventory -> fPlayerDAO.updateFPlayer(fPlayer));
 
         for (var entry : command.getSettings().entrySet()) {
             FPlayer.Setting setting = entry.getKey();

@@ -32,6 +32,10 @@ public abstract class InventoryManager {
     }
 
     public void close(UUID uuid) {
+        Inventory inventory = inventoryMap.get(uuid);
+        if (inventory == null) return;
+
+        inventory.getCloseConsumerList().forEach(closeConsumer -> closeConsumer.accept(inventory));
         inventoryMap.remove(uuid);
     }
 
