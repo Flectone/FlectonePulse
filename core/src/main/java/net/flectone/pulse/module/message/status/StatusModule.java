@@ -101,9 +101,7 @@ public class StatusModule extends AbstractModule {
         try {
             fPlayer = database.getFPlayer(user.getAddress().getAddress());
             database.setColors(fPlayer);
-        } catch (SQLException e) {
-            fLogger.warning(e);
-        }
+        } catch (SQLException ignored) {}
 
         if (checkModulePredicates(fPlayer)) return;
 
