@@ -1,23 +1,29 @@
 package net.flectone.pulse.listener;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
+import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSettings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.mail.MailModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.manager.BubbleManager;
 import net.flectone.pulse.module.message.greeting.GreetingModule;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
+import net.flectone.pulse.module.message.status.players.PlayersModule;
+import net.flectone.pulse.util.PacketEventsUtil;
 
 import java.util.UUID;
 
@@ -26,6 +32,7 @@ public class BasePacketListener extends AbstractPacketListener {
 
     private final FPlayerManager fPlayerManager;
     private final ThreadManager threadManager;
+    private final PacketEventsUtil packetEventsUtil;
 
     @Inject private QuitModule quitModule;
     @Inject private JoinModule joinModule;
@@ -33,12 +40,16 @@ public class BasePacketListener extends AbstractPacketListener {
     @Inject private MailModule mailModule;
     @Inject private IntegrationModule integrationModule;
     @Inject private BubbleManager bubbleManager;
+    @Inject private BanModule banModule;
+    @Inject private PlayersModule playersModule;
 
     @Inject
     public BasePacketListener(FPlayerManager fPlayerManager,
-                              ThreadManager threadManager) {
+                              ThreadManager threadManager,
+                              PacketEventsUtil packetEventsUtil) {
         this.fPlayerManager = fPlayerManager;
         this.threadManager = threadManager;
+        this.packetEventsUtil = packetEventsUtil;
     }
 
     @Override
@@ -102,6 +113,23 @@ public class BasePacketListener extends AbstractPacketListener {
 
             setLocale(newFPlayer, locale);
         }, 20);
+    }
+
+    @Override
+    public void onPacketSend(PacketSendEvent event) {
+        if (event.getPacketType() != PacketType.Login.Server.LOGIN_SUCCESS) return;
+        if (event.isCancelled()) return;
+        if (!playersModule.isEnable() && !banModule.isEnable()) return;
+
+        event.setCancelled(true);
+
+        WrapperLoginServerLoginSuccess wrapperLoginServerLoginSuccess = new WrapperLoginServerLoginSuccess(event);
+        UserProfile userProfile = wrapperLoginServerLoginSuccess.getUserProfile();
+
+        if (playersModule.isEnable() && playersModule.isKicked(userProfile)) return;
+        if (banModule.isEnable() && banModule.isKicked(userProfile)) return;
+
+        packetEventsUtil.sendPacket(userProfile.getUUID(), new WrapperLoginServerLoginSuccess(userProfile));
     }
 
     private String getLocale(FPlayer fPlayer, PacketReceiveEvent event) {

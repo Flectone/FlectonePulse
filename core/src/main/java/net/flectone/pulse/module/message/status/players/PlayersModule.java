@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.message.status.players;
 
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerDisconnect;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -10,10 +11,8 @@ import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ListenerManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.module.message.status.players.listener.PlayersPacketListener;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.PacketEventsUtil;
 import net.flectone.pulse.util.PermissionUtil;
@@ -22,7 +21,6 @@ import net.kyori.adventure.text.Component;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.UUID;
 
 @Singleton
 public class PlayersModule extends AbstractModuleMessage<Localization.Message.Status.Players> {
@@ -30,7 +28,6 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
     @Getter private final Message.Status.Players message;
     private final Permission.Message.Status.Players permission;
 
-    private final ListenerManager listenerManager;
     private final PermissionUtil permissionUtil;
     private final ServerUtil serverUtil;
     private final ComponentUtil componentUtil;
@@ -40,7 +37,6 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
 
     @Inject
     public PlayersModule(FileManager fileManager,
-                         ListenerManager listenerManager,
                          PermissionUtil permissionUtil,
                          ServerUtil serverUtil,
                          ComponentUtil componentUtil,
@@ -49,7 +45,6 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
                          FLogger fLogger) {
         super(module -> module.getMessage().getStatus().getPlayers());
 
-        this.listenerManager = listenerManager;
         this.permissionUtil = permissionUtil;
         this.serverUtil = serverUtil;
         this.componentUtil = componentUtil;
@@ -65,32 +60,32 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
     public void reload() {
         registerModulePermission(permission);
         registerPermission(permission.getBypass());
-
-        listenerManager.register(PlayersPacketListener.class);
     }
 
-    public void check(UUID uuid, Object channel) {
-        if (!message.isControl()) return;
+    public boolean isKicked(UserProfile userProfile) {
+        if (!isEnable()) return false;
+        if (!message.isControl()) return false;
 
         FPlayer fPlayer = FPlayer.UNKNOWN;
 
         try {
-            fPlayer = database.getFPlayer(uuid);
+            fPlayer = database.getFPlayer(userProfile.getUUID());
         } catch (SQLException e) {
             fLogger.warning(e);
         }
 
-        if (checkModulePredicates(fPlayer)) return;
-        if (permissionUtil.has(fPlayer, permission.getBypass())) return;
+        if (checkModulePredicates(fPlayer)) return false;
+        if (permissionUtil.has(fPlayer, permission.getBypass())) return false;
 
         int online = serverUtil.getOnlineCount();
-        if (online < message.getMax()) return;
+        if (online < message.getMax()) return false;
 
         String message = resolveLocalization(fPlayer).getFull();
 
         Component reason = componentUtil.builder(fPlayer, message).build();
 
-        packetEventsUtil.sendPacket(channel, new WrapperLoginServerDisconnect(reason));
+        packetEventsUtil.sendPacket(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
+        return true;
     }
 
     @Override

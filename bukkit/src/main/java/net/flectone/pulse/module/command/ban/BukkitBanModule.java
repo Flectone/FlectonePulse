@@ -9,7 +9,6 @@ import net.flectone.pulse.database.Database;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ListenerManager;
 import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.util.*;
@@ -25,15 +24,14 @@ public class BukkitBanModule extends BanModule {
                            FPlayerManager fPlayerManager,
                            PermissionUtil permissionUtil,
                            ThreadManager threadManager,
-                           ListenerManager listenerManager,
                            BukkitCommandUtil commandManager,
                            ComponentUtil componentUtil,
                            PacketEventsUtil packetEventsUtil,
                            ModerationUtil moderationUtil,
                            FLogger fLogger,
                            Gson gson) {
-        super(database, fileManager, fPlayerManager, permissionUtil, threadManager, listenerManager, commandManager,
-                componentUtil, packetEventsUtil, moderationUtil, fLogger, gson);
+        super(database, fileManager, fPlayerManager, permissionUtil, threadManager, commandManager, componentUtil,
+                packetEventsUtil, moderationUtil, fLogger, gson);
 
         this.commandManager = commandManager;
     }

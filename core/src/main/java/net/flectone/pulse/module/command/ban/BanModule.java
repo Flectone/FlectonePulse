@@ -2,7 +2,6 @@ package net.flectone.pulse.module.command.ban;
 
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerDisconnect;
-import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
 import com.google.gson.Gson;
 import lombok.Getter;
 import net.flectone.pulse.database.Database;
@@ -12,13 +11,11 @@ import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ListenerManager;
 import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.module.command.ban.listener.BanPacketListener;
 import net.flectone.pulse.util.*;
 import net.kyori.adventure.text.Component;
 
@@ -34,7 +31,6 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
     private final ThreadManager threadManager;
     private final FPlayerManager fPlayerManager;
     private final PermissionUtil permissionUtil;
-    private final ListenerManager listenerManager;
     private final CommandUtil commandUtil;
     private final ComponentUtil componentUtil;
     private final PacketEventsUtil packetEventsUtil;
@@ -47,7 +43,6 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
                      FPlayerManager fPlayerManager,
                      PermissionUtil permissionUtil,
                      ThreadManager threadManager,
-                     ListenerManager listenerManager,
                      CommandUtil commandUtil,
                      ComponentUtil componentUtil,
                      PacketEventsUtil packetEventsUtil,
@@ -60,7 +55,6 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
         this.threadManager = threadManager;
         this.fPlayerManager = fPlayerManager;
         this.permissionUtil = permissionUtil;
-        this.listenerManager = listenerManager;
         this.commandUtil = commandUtil;
         this.componentUtil = componentUtil;
         this.packetEventsUtil = packetEventsUtil;
@@ -165,8 +159,8 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
         });
     }
 
-    public void checkJoin(UserProfile userProfile) {
-        if (!isEnable()) return;
+    public boolean isKicked(UserProfile userProfile) {
+        if (!isEnable()) return false;
 
         try {
             FPlayer fPlayer = database.getFPlayer(userProfile.getUUID());
@@ -182,23 +176,25 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
                 Component reason = componentUtil.builder(fModerator, fPlayer, formatPlayer).build();
                 packetEventsUtil.sendPacket(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
 
-                if (!command.isShowConnectionAttempts()) return;
+                if (command.isShowConnectionAttempts()) {
+                    builder(fPlayer)
+                            .range(Range.SERVER)
+                            .filter(filter -> permissionUtil.has(filter, getModulePermission()))
+                            .format((fReceiver, message) -> {
+                                String format = message.getConnectionAttempt();
+                                return moderationUtil.replacePlaceholders(format, fReceiver, ban);
+                            })
+                            .sendBuilt();
+                }
 
-                builder(fPlayer)
-                        .range(Range.SERVER)
-                        .filter(filter -> permissionUtil.has(filter, getModulePermission()))
-                        .format((fReceiver, message) -> {
-                            String format = message.getConnectionAttempt();
-                            return moderationUtil.replacePlaceholders(format, fReceiver, ban);
-                        })
-                        .sendBuilt();
+                return true;
             }
 
         } catch (SQLException e) {
             fLogger.warning(e);
         }
 
-        packetEventsUtil.sendPacket(userProfile.getUUID(), new WrapperLoginServerLoginSuccess(userProfile));
+        return false;
     }
 
     @Override
@@ -207,8 +203,6 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
-
-        listenerManager.register(BanPacketListener.class);
 
         getCommand().getAliases().forEach(commandUtil::unregister);
 
