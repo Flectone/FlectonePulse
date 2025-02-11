@@ -2,7 +2,8 @@ package net.flectone.pulse.module.command.clearmail;
 
 import com.google.inject.Inject;
 import lombok.Getter;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.MailDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
@@ -12,7 +13,6 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.util.CommandUtil;
 
-import java.sql.SQLException;
 import java.util.Optional;
 
 public abstract class ClearmailModule extends AbstractModuleCommand<Localization.Command.Clearmail> {
@@ -20,13 +20,19 @@ public abstract class ClearmailModule extends AbstractModuleCommand<Localization
     @Getter private final Command.Clearmail command;
     @Getter private final Permission.Command.Clearmail permission;
 
+    private final FPlayerDAO fPlayerDAO;
+    private final MailDAO mailDAO;
     private final CommandUtil commandUtil;
 
     @Inject
     public ClearmailModule(FileManager fileManager,
+                           FPlayerDAO fPlayerDAO,
+                           MailDAO mailDAO,
                            CommandUtil commandUtil) {
         super(localization -> localization.getCommand().getClearmail(), null);
 
+        this.fPlayerDAO = fPlayerDAO;
+        this.mailDAO = mailDAO;
         this.commandUtil = commandUtil;
 
         command = fileManager.getCommand().getClearmail();
@@ -36,11 +42,11 @@ public abstract class ClearmailModule extends AbstractModuleCommand<Localization
     }
 
     @Override
-    public void onCommand(Database database, FPlayer fPlayer, Object arguments) throws SQLException {
+    public void onCommand(FPlayer fPlayer, Object arguments) {
         if (checkModulePredicates(fPlayer)) return;
 
         int mailID = commandUtil.getInteger(0, arguments);
-        Optional<Mail> optionalMail = database.getMails(fPlayer)
+        Optional<Mail> optionalMail = mailDAO.getMails(fPlayer)
                 .stream()
                 .filter(mail -> mail.id() == mailID)
                 .findAny();
@@ -52,9 +58,9 @@ public abstract class ClearmailModule extends AbstractModuleCommand<Localization
             return;
         }
 
-        FPlayer fReceiver = database.getFPlayer(optionalMail.get().receiver());
+        FPlayer fReceiver = fPlayerDAO.getFPlayer(optionalMail.get().receiver());
 
-        database.removeMail(optionalMail.get());
+        mailDAO.removeMail(optionalMail.get());
 
         builder(fReceiver)
                 .destination(command.getDestination())

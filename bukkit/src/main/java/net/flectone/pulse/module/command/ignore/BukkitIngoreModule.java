@@ -3,8 +3,9 @@ package net.flectone.pulse.module.command.ignore;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.StringArgument;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.IgnoreDAO;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.util.BukkitCommandUtil;
 
@@ -15,9 +16,10 @@ public class BukkitIngoreModule extends IgnoreModule {
 
     @Inject
     public BukkitIngoreModule(FileManager fileManager,
-                              ThreadManager threadManager,
+                              FPlayerDAO fPlayerDAO,
+                              IgnoreDAO ignoreDAO,
                               BukkitCommandUtil commandUtil) {
-        super(fileManager, threadManager, commandUtil);
+        super(fileManager, fPlayerDAO, ignoreDAO, commandUtil);
 
         this.commandUtil = commandUtil;
     }

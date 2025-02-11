@@ -2,12 +2,13 @@ package net.flectone.pulse.module.command.mute;
 
 import com.google.gson.Gson;
 import lombok.Getter;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
@@ -23,21 +24,24 @@ public abstract class MuteModule extends AbstractModuleCommand<Localization.Comm
     @Getter private final Command.Mute command;
     @Getter private final Permission.Command.Mute permission;
 
-    private final ThreadManager threadManager;
+    private final FPlayerDAO fPlayerDAO;
+    private final ModerationDAO moderationDAO;
     private final FPlayerManager fPlayerManager;
     private final CommandUtil commandUtil;
     private final ModerationUtil moderationUtil;
     private final Gson gson;
 
     public MuteModule(FileManager fileManager,
-                      ThreadManager threadManager,
+                      FPlayerDAO fPlayerDAO,
+                      ModerationDAO moderationDAO,
                       FPlayerManager fPlayerManager,
                       CommandUtil commandUtil,
                       ModerationUtil moderationUtil,
                       Gson gson) {
         super(localization -> localization.getCommand().getMute(), fPlayer -> fPlayer.is(FPlayer.Setting.MUTE));
 
-        this.threadManager = threadManager;
+        this.fPlayerDAO = fPlayerDAO;
+        this.moderationDAO = moderationDAO;
         this.fPlayerManager = fPlayerManager;
         this.commandUtil = commandUtil;
         this.moderationUtil = moderationUtil;
@@ -64,40 +68,37 @@ public abstract class MuteModule extends AbstractModuleCommand<Localization.Comm
         }
 
         String reason =  commandUtil.getString(2, arguments);
-        threadManager.runDatabase(database -> {
-
-            FPlayer fTarget = database.getFPlayer(target);
-            if (fTarget.isUnknown()) {
-                builder(fPlayer)
-                        .format(Localization.Command.Mute::getNullPlayer)
-                        .sendBuilt();
-                return;
-            }
-
-            long databaseTime = time != -1 ? time + System.currentTimeMillis() : -1;
-
-            Moderation mute = database.insertModeration(fTarget, databaseTime, reason, fPlayer.getId(), Moderation.Type.MUTE);
-            if (mute == null) return;
-
-            if (!fPlayerManager.get(fTarget.getUuid()).isUnknown()) {
-                fPlayerManager.get(fTarget.getUuid()).updateMutes(database.getValidModerations(Moderation.Type.MUTE));
-            }
-
-            builder(fTarget)
-                    .range(command.getRange())
-                    .destination(command.getDestination())
-                    .tag(MessageTag.COMMAND_MUTE)
-                    .format(buildFormat(mute))
-                    .proxy(output -> {
-                        output.writeUTF(gson.toJson(fPlayer));
-                        output.writeUTF(gson.toJson(mute));
-                    })
-                    .integration(s -> moderationUtil.replacePlaceholders(s, FPlayer.UNKNOWN, mute))
-                    .sound(getSound())
+        FPlayer fTarget = fPlayerDAO.getFPlayer(target);
+        if (fTarget.isUnknown()) {
+            builder(fPlayer)
+                    .format(Localization.Command.Mute::getNullPlayer)
                     .sendBuilt();
+            return;
+        }
 
-            sendForTarget(fPlayer, fTarget, mute);
-        });
+        long databaseTime = time != -1 ? time + System.currentTimeMillis() : -1;
+
+        Moderation mute = moderationDAO.insertModeration(fTarget, databaseTime, reason, fPlayer.getId(), Moderation.Type.MUTE);
+        if (mute == null) return;
+
+        if (!fPlayerManager.get(fTarget.getUuid()).isUnknown()) {
+            fPlayerManager.get(fTarget.getUuid()).updateMutes(moderationDAO.getValidModerations(Moderation.Type.MUTE));
+        }
+
+        builder(fTarget)
+                .range(command.getRange())
+                .destination(command.getDestination())
+                .tag(MessageTag.COMMAND_MUTE)
+                .format(buildFormat(mute))
+                .proxy(output -> {
+                    output.writeUTF(gson.toJson(fPlayer));
+                    output.writeUTF(gson.toJson(mute));
+                })
+                .integration(s -> moderationUtil.replacePlaceholders(s, FPlayer.UNKNOWN, mute))
+                .sound(getSound())
+                .sendBuilt();
+
+        sendForTarget(fPlayer, fTarget, mute);
     }
 
     public BiFunction<FPlayer, Localization.Command.Mute, String> buildFormat(Moderation mute) {

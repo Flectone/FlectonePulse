@@ -9,6 +9,7 @@ import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Setter;
 import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.*;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
@@ -25,7 +26,6 @@ import net.megavex.scoreboardlibrary.api.team.TeamManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -118,19 +118,15 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         injector.getInstance(InventoryManager.class).closeAll();
 
-        Database database = injector.getInstance(Database.class);
+        FPlayerDAO fPlayerDAO = injector.getInstance(FPlayerDAO.class);
 
         injector.getInstance(FPlayerManager.class).getFPlayers().forEach(fPlayer -> {
             fPlayer.setOnline(false);
-            try {
-                database.updateFPlayer(fPlayer);
-            } catch (SQLException e) {
-                fLogger.warning(e);
-            }
+            fPlayerDAO.updateFPlayer(fPlayer);
         });
 
         injector.getInstance(ScoreboardLibrary.class).close();
-        database.disconnect();
+        injector.getInstance(Database.class).disconnect();
         injector.getInstance(ObjectiveManager.class).close();
         injector.getInstance(TeamManager.class).close();
         injector.getInstance(ListenerManager.class).unregisterAll();

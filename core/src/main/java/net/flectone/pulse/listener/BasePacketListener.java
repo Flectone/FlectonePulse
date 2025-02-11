@@ -12,11 +12,13 @@ import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServer
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSettings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.mail.MailModule;
+import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.manager.BubbleManager;
 import net.flectone.pulse.module.message.greeting.GreetingModule;
@@ -30,6 +32,7 @@ import java.util.UUID;
 @Singleton
 public class BasePacketListener extends AbstractPacketListener {
 
+    private final FPlayerDAO fPlayerDAO;
     private final FPlayerManager fPlayerManager;
     private final ThreadManager threadManager;
     private final PacketEventsUtil packetEventsUtil;
@@ -42,11 +45,14 @@ public class BasePacketListener extends AbstractPacketListener {
     @Inject private BubbleManager bubbleManager;
     @Inject private BanModule banModule;
     @Inject private PlayersModule playersModule;
+    @Inject private MaintenanceModule maintenanceModule;
 
     @Inject
-    public BasePacketListener(FPlayerManager fPlayerManager,
+    public BasePacketListener(FPlayerDAO fPlayerDAO,
+                              FPlayerManager fPlayerManager,
                               ThreadManager threadManager,
                               PacketEventsUtil packetEventsUtil) {
+        this.fPlayerDAO = fPlayerDAO;
         this.fPlayerManager = fPlayerManager;
         this.threadManager = threadManager;
         this.packetEventsUtil = packetEventsUtil;
@@ -64,8 +70,8 @@ public class BasePacketListener extends AbstractPacketListener {
         String name = user.getName();
         String ip = user.getAddress().getHostString();
 
-        threadManager.runDatabase(database -> {
-            FPlayer fPlayer = fPlayerManager.put(database, uuid, entityId, name, ip);
+        threadManager.runAsync(() -> {
+            FPlayer fPlayer = fPlayerManager.put(uuid, entityId, name, ip);
 
             joinModule.send(fPlayer, true);
             greetingModule.send(fPlayer);
@@ -77,11 +83,11 @@ public class BasePacketListener extends AbstractPacketListener {
     public void onUserDisconnect(UserDisconnectEvent event) {
         if (event.getUser().getUUID() == null) return;
 
-        threadManager.runDatabase(database -> {
+        threadManager.runAsync(() -> {
             FPlayer fPlayer = fPlayerManager.get(event.getUser().getUUID());
             if (!fPlayer.isOnline()) return;
 
-            fPlayerManager.remove(database, fPlayer);
+            fPlayerManager.remove(fPlayer);
             bubbleManager.remove(fPlayer);
             quitModule.send(fPlayer);
         });
@@ -145,6 +151,6 @@ public class BasePacketListener extends AbstractPacketListener {
 
     private void setLocale(FPlayer fPlayer, String locale) {
         fPlayer.setLocale(locale);
-        threadManager.runDatabase(database -> database.updateFPlayer(fPlayer));
+        fPlayerDAO.updateFPlayer(fPlayer);
     }
 }

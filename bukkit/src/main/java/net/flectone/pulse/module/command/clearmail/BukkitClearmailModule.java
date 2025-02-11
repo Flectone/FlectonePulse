@@ -6,7 +6,8 @@ import dev.jorel.commandapi.IStringTooltip;
 import dev.jorel.commandapi.StringTooltip;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.IntegerArgument;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.MailDAO;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
@@ -15,27 +16,24 @@ import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.util.CommandUtil;
 import org.bukkit.entity.Player;
 
-import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class BukkitClearmailModule extends ClearmailModule {
 
     private final FPlayerManager fPlayerManager;
-    private final Database database;
-    private final FLogger fLogger;
+    private final MailDAO mailDAO;
 
     @Inject
     public BukkitClearmailModule(FileManager fileManager,
-                                 CommandUtil commandUtil,
                                  FPlayerManager fPlayerManager,
-                                 Database database,
-                                 FLogger fLogger) {
-        super(fileManager, commandUtil);
+                                 FPlayerDAO fPlayerDAO,
+                                 MailDAO mailDAO,
+                                 CommandUtil commandUtil) {
+        super(fileManager, fPlayerDAO, mailDAO, commandUtil);
 
         this.fPlayerManager = fPlayerManager;
-        this.database = database;
-        this.fLogger = fLogger;
+        this.mailDAO = mailDAO;
     }
 
     @Override
@@ -51,18 +49,13 @@ public class BukkitClearmailModule extends ClearmailModule {
 
                             FPlayer fPlayer = fPlayerManager.get(player);
 
-                            try {
-                                return database.getMails(fPlayer)
-                                        .stream()
-                                        .map(mail -> StringTooltip.ofString(String.valueOf(mail.id()), mail.message()))
-                                        .toList()
-                                        .toArray(new IStringTooltip[]{});
-                            } catch (SQLException e) {
-                                fLogger.warning(e);
-                                return new IStringTooltip[]{};
-                            }
+                            return mailDAO.getMails(fPlayer)
+                                    .stream()
+                                    .map(mail -> StringTooltip.ofString(String.valueOf(mail.id()), mail.message()))
+                                    .toList()
+                                    .toArray(new IStringTooltip[]{});
                         })))
-                        .executes(this::executesFPlayerDatabase)
+                        .executes(this::executesFPlayer)
                 )
                 .override();
     }

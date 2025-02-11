@@ -4,7 +4,10 @@ import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.ColorsDAO;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.IgnoreDAO;
+import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.command.stream.StreamModule;
@@ -31,13 +34,15 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.SQLException;
 import java.util.UUID;
 
 @Singleton
 public class BukkitFPlayerManager extends FPlayerManager {
 
-    private final ThreadManager threadManager;
+    private final ColorsDAO colorsDAO;
+    private final FPlayerDAO fPlayerDAO;
+    private final IgnoreDAO ignoreDAO;
+    private final ModerationDAO moderationDAO;
 
     @Inject private WorldModule worldModule;
     @Inject private BukkitAfkModule afkModule;
@@ -54,10 +59,16 @@ public class BukkitFPlayerManager extends FPlayerManager {
 
     @Inject
     public BukkitFPlayerManager(FileManager fileManager,
-                                ThreadManager threadManager) {
+                                ColorsDAO colorsDAO,
+                                FPlayerDAO fPlayerDAO,
+                                IgnoreDAO ignoreDAO,
+                                ModerationDAO moderationDAO) {
         super(fileManager);
 
-        this.threadManager = threadManager;
+        this.colorsDAO = colorsDAO;
+        this.fPlayerDAO = fPlayerDAO;
+        this.ignoreDAO = ignoreDAO;
+        this.moderationDAO = moderationDAO;
     }
 
     @NotNull
@@ -101,23 +112,23 @@ public class BukkitFPlayerManager extends FPlayerManager {
     }
 
     @Override
-    public FPlayer put(Database database, UUID uuid, int entityId, String name, String ip) throws SQLException {
-        database.insertPlayer(uuid, name);
+    public FPlayer put(UUID uuid, int entityId, String name, String ip) {
+        fPlayerDAO.insertPlayer(uuid, name);
 
-        FPlayer fPlayer = database.getFPlayer(uuid);
+        FPlayer fPlayer = fPlayerDAO.getFPlayer(uuid);
         put(fPlayer);
 
-        database.setColors(fPlayer);
-        database.setIgnores(fPlayer);
+        colorsDAO.setFPlayerColors(fPlayer);
+        ignoreDAO.setIgnores(fPlayer);
 
-        fPlayer.updateMutes(database.getModerations(fPlayer, Moderation.Type.MUTE));
+        fPlayer.updateMutes(moderationDAO.getModerations(fPlayer, Moderation.Type.MUTE));
 
         fPlayer.setOnline(true);
         fPlayer.setIp(ip);
         fPlayer.setCurrentName(name);
         fPlayer.setEntityId(entityId);
 
-        database.updateFPlayer(fPlayer);
+        fPlayerDAO.updateFPlayer(fPlayer);
 
         worldModule.update(fPlayer);
         afkModule.remove("", fPlayer);
@@ -135,12 +146,12 @@ public class BukkitFPlayerManager extends FPlayerManager {
     }
 
     @Override
-    public void remove(Database database, FPlayer fPlayer) throws SQLException {
+    public void remove(FPlayer fPlayer) {
         fPlayer.setOnline(false);
 
         afkModule.remove("quit", fPlayer);
 
-        database.updateFPlayer(fPlayer);
+        fPlayerDAO.updateFPlayer(fPlayer);
 
         nameModule.remove(fPlayer);
         belowNameModule.remove(fPlayer);
@@ -258,10 +269,8 @@ public class BukkitFPlayerManager extends FPlayerManager {
 
     @Override
     public void loadOnlinePlayers() {
-        threadManager.runDatabase(database -> {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                put(database, player.getUniqueId(), player.getEntityId(), player.getName(), player.getAddress().getHostString());
-            }
-        });
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            put(player.getUniqueId(), player.getEntityId(), player.getName(), player.getAddress().getHostString());
+        }
     }
 }

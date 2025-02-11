@@ -2,11 +2,12 @@ package net.flectone.pulse.module.command.unban;
 
 import com.google.gson.Gson;
 import lombok.Getter;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -21,17 +22,20 @@ public abstract class UnbanModule extends AbstractModuleCommand<Localization.Com
     @Getter private final Command.Unban command;
     @Getter private final Permission.Command.Unban permission;
 
-    private final ThreadManager threadManager;
+    private final FPlayerDAO fPlayerDAO;
+    private final ModerationDAO moderationDAO;
     private final CommandUtil commandUtil;
     private final Gson gson;
 
     public UnbanModule(FileManager fileManager,
-                       ThreadManager threadManager,
+                       FPlayerDAO fPlayerDAO,
+                       ModerationDAO moderationDAO,
                        CommandUtil commandUtil,
                        Gson gson) {
         super(localization -> localization.getCommand().getUnban(), null);
 
-        this.threadManager = threadManager;
+        this.fPlayerDAO = fPlayerDAO;
+        this.moderationDAO = moderationDAO;
         this.commandUtil = commandUtil;
         this.gson = gson;
 
@@ -53,48 +57,46 @@ public abstract class UnbanModule extends AbstractModuleCommand<Localization.Com
     public void unban(FPlayer fPlayer, String target, int id) {
         if (checkModulePredicates(fPlayer)) return;
 
-        threadManager.runDatabase(database -> {
-            FPlayer fTarget = database.getFPlayer(target);
-            if (fTarget.isUnknown()) {
-                builder(fPlayer)
-                        .format(Localization.Command.Unban::getNullPlayer)
-                        .sendBuilt();
-                return;
-            }
-
-            List<Moderation> bans = new ArrayList<>();
-
-            if (id == -1) {
-                bans.addAll(database.getValidModerations(fTarget, Moderation.Type.BAN));
-            } else {
-                database.getValidModerations(fTarget, Moderation.Type.BAN).stream()
-                        .filter(moderation -> moderation.getId() == id)
-                        .findAny()
-                        .ifPresent(bans::add);
-            }
-
-            if (bans.isEmpty()) {
-                builder(fPlayer)
-                        .format(Localization.Command.Unban::getNotBanned)
-                        .sendBuilt();
-                return;
-            }
-
-            for (Moderation ban : bans) {
-                database.setInvalidModeration(ban);
-            }
-
-            builder(fTarget)
-                    .tag(MessageTag.COMMAND_UNBAN)
-                    .destination(command.getDestination())
-                    .range(command.getRange())
-                    .filter(filter -> filter.is(FPlayer.Setting.BAN))
-                    .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
-                    .proxy(output -> output.writeUTF(gson.toJson(fPlayer)))
-                    .integration(s -> s.replace("<moderator>", fPlayer.getName()))
-                    .sound(getSound())
+        FPlayer fTarget = fPlayerDAO.getFPlayer(target);
+        if (fTarget.isUnknown()) {
+            builder(fPlayer)
+                    .format(Localization.Command.Unban::getNullPlayer)
                     .sendBuilt();
-        });
+            return;
+        }
+
+        List<Moderation> bans = new ArrayList<>();
+
+        if (id == -1) {
+            bans.addAll(moderationDAO.getValidModerations(fTarget, Moderation.Type.BAN));
+        } else {
+            moderationDAO.getValidModerations(fTarget, Moderation.Type.BAN).stream()
+                    .filter(moderation -> moderation.getId() == id)
+                    .findAny()
+                    .ifPresent(bans::add);
+        }
+
+        if (bans.isEmpty()) {
+            builder(fPlayer)
+                    .format(Localization.Command.Unban::getNotBanned)
+                    .sendBuilt();
+            return;
+        }
+
+        for (Moderation ban : bans) {
+            moderationDAO.updateInvalidModeration(ban);
+        }
+
+        builder(fTarget)
+                .tag(MessageTag.COMMAND_UNBAN)
+                .destination(command.getDestination())
+                .range(command.getRange())
+                .filter(filter -> filter.is(FPlayer.Setting.BAN))
+                .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
+                .proxy(output -> output.writeUTF(gson.toJson(fPlayer)))
+                .integration(s -> s.replace("<moderator>", fPlayer.getName()))
+                .sound(getSound())
+                .sendBuilt();
     }
 
     @Override

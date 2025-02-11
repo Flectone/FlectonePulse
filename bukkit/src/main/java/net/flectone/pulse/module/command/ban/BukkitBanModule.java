@@ -5,11 +5,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
-import net.flectone.pulse.database.Database;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.util.*;
 
@@ -19,19 +18,18 @@ public class BukkitBanModule extends BanModule {
     private final BukkitCommandUtil commandManager;
 
     @Inject
-    public BukkitBanModule(Database database,
+    public BukkitBanModule(FPlayerDAO fPlayerDAO,
+                           ModerationDAO moderationDAO,
                            FileManager fileManager,
                            FPlayerManager fPlayerManager,
                            PermissionUtil permissionUtil,
-                           ThreadManager threadManager,
                            BukkitCommandUtil commandManager,
                            ComponentUtil componentUtil,
                            PacketEventsUtil packetEventsUtil,
                            ModerationUtil moderationUtil,
-                           FLogger fLogger,
                            Gson gson) {
-        super(database, fileManager, fPlayerManager, permissionUtil, threadManager, commandManager, componentUtil,
-                packetEventsUtil, moderationUtil, fLogger, gson);
+        super(fPlayerDAO, moderationDAO, fileManager, fPlayerManager, permissionUtil, commandManager, componentUtil,
+                packetEventsUtil, moderationUtil, gson);
 
         this.commandManager = commandManager;
     }

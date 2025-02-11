@@ -1,7 +1,8 @@
 package net.flectone.pulse.module.command.banlist;
 
 import lombok.Getter;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
@@ -16,7 +17,6 @@ import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.ModerationUtil;
 import net.kyori.adventure.text.Component;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +25,8 @@ public abstract class BanlistModule extends AbstractModuleCommand<Localization.C
     @Getter private final Command.Banlist command;
     @Getter private final Permission.Command.Banlist permission;
 
+    private final FPlayerDAO fPlayerDAO;
+    private final ModerationDAO moderationDAO;
     private final UnbanModule unbanModule;
     private final CommandUtil commandUtil;
     private final ComponentUtil componentUtil;
@@ -32,6 +34,8 @@ public abstract class BanlistModule extends AbstractModuleCommand<Localization.C
     private final MessageSender messageSender;
 
     public BanlistModule(FileManager fileManager,
+                         FPlayerDAO fPlayerDAO,
+                         ModerationDAO moderationDAO,
                          UnbanModule unbanModule,
                          CommandUtil commandUtil,
                          ComponentUtil componentUtil,
@@ -39,7 +43,9 @@ public abstract class BanlistModule extends AbstractModuleCommand<Localization.C
                          MessageSender messageSender) {
         super(localization -> localization.getCommand().getBanlist(), null);
 
+        this.fPlayerDAO = fPlayerDAO;
         this.unbanModule = unbanModule;
+        this.moderationDAO = moderationDAO;
         this.commandUtil = commandUtil;
         this.componentUtil = componentUtil;
         this.moderationUtil = moderationUtil;
@@ -52,7 +58,7 @@ public abstract class BanlistModule extends AbstractModuleCommand<Localization.C
     }
 
     @Override
-    public void onCommand(Database database, FPlayer fPlayer, Object arguments) throws SQLException {
+    public void onCommand(FPlayer fPlayer, Object arguments) {
         if (checkModulePredicates(fPlayer)) return;
 
         Localization.Command.Banlist localization = resolveLocalization(fPlayer);
@@ -67,7 +73,7 @@ public abstract class BanlistModule extends AbstractModuleCommand<Localization.C
         FPlayer targetFPlayer = null;
 
         if (optionalObject.isPresent() && optionalObject.get() instanceof String playerName) {
-            targetFPlayer = database.getFPlayer(playerName);
+            targetFPlayer = fPlayerDAO.getFPlayer(playerName);
 
             if (targetFPlayer.isUnknown()) {
                 builder(fPlayer)
@@ -85,8 +91,8 @@ public abstract class BanlistModule extends AbstractModuleCommand<Localization.C
         page = optionalObject.map(o -> (int) o).orElse(1);
 
         List<Moderation> moderationList = targetFPlayer == null
-                ? database.getValidModerations(Moderation.Type.BAN)
-                : database.getModerations(targetFPlayer, Moderation.Type.BAN);
+                ? moderationDAO.getValidModerations(Moderation.Type.BAN)
+                : moderationDAO.getModerations(targetFPlayer, Moderation.Type.BAN);
 
         if (moderationList.isEmpty()) {
             builder(fPlayer)
@@ -117,7 +123,7 @@ public abstract class BanlistModule extends AbstractModuleCommand<Localization.C
                 .append(Component.newline());
 
         for (Moderation moderation : finalModerationList) {
-            FPlayer fTarget = database.getFPlayer(moderation.getPlayer());
+            FPlayer fTarget = fPlayerDAO.getFPlayer(moderation.getPlayer());
 
             String line = localizationType.getLine().replace("<command>", "/" + unbanModule.getName(unbanModule.getCommand()) + " <player> <id>");
             line = moderationUtil.replacePlaceholders(line, fPlayer, moderation);

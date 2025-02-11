@@ -5,6 +5,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.FCommand;
@@ -19,12 +21,14 @@ public class BukkitKickModule extends KickModule {
 
     @Inject
     public BukkitKickModule(FileManager fileManager,
+                            FPlayerDAO fPlayerDAO,
+                            ModerationDAO moderationDAO,
                             FPlayerManager fPlayerManager,
                             BukkitCommandUtil commandUtil,
                             ComponentUtil componentUtil,
                             ModerationUtil moderationUtil,
                             Gson gson) {
-        super(fileManager, fPlayerManager, commandUtil, componentUtil, moderationUtil, gson);
+        super(fileManager, fPlayerDAO, moderationDAO, fPlayerManager, commandUtil, componentUtil, moderationUtil, gson);
 
         this.commandUtil = commandUtil;
     }
@@ -40,7 +44,7 @@ public class BukkitKickModule extends KickModule {
                 .then(new StringArgument(playerPrompt)
                         .includeSuggestions(commandUtil.argumentFPlayers(false))
                         .then(new GreedyStringArgument(messagePrompt).setOptional(true)
-                                .executes(this::executesFPlayerDatabase)))
+                                .executes(this::executesFPlayer)))
                 .override();
     }
 }

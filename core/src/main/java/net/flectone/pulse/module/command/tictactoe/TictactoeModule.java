@@ -4,13 +4,12 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ProxyManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tictactoe.manager.TictactoeManager;
@@ -20,7 +19,6 @@ import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 
-import java.sql.SQLException;
 import java.util.function.BiFunction;
 
 public abstract class TictactoeModule extends AbstractModuleCommand<Localization.Command.Tictactoe> {
@@ -28,8 +26,8 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
     @Getter private final Command.Tictactoe command;
     @Getter private final Permission.Command.Tictactoe permission;
 
+    private final FPlayerDAO fPlayerDAO;
     private final TictactoeManager tictactoeManager;
-    private final ThreadManager threadManager;
     private final ProxyManager proxyManager;
     private final IntegrationModule integrationModule;
     private final CommandUtil commandUtil;
@@ -37,16 +35,16 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
 
     @Inject
     public TictactoeModule(FileManager fileManager,
+                           FPlayerDAO fPlayerDAO,
                            TictactoeManager tictactoeManager,
-                           ThreadManager threadManager,
                            ProxyManager proxyManager,
                            IntegrationModule integrationModule,
                            CommandUtil commandUtil,
                            Gson gson) {
         super(localization -> localization.getCommand().getTictactoe(), fPlayer -> fPlayer.is(FPlayer.Setting.TICTACTOE));
 
+        this.fPlayerDAO = fPlayerDAO;
         this.tictactoeManager = tictactoeManager;
-        this.threadManager = threadManager;
         this.proxyManager = proxyManager;
         this.integrationModule = integrationModule;
         this.commandUtil = commandUtil;
@@ -57,7 +55,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
     }
 
     @Override
-    public void onCommand(Database database, FPlayer fPlayer, Object arguments) throws SQLException {
+    public void onCommand(FPlayer fPlayer, Object arguments) {
         if (checkModulePredicates(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
         if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
@@ -66,7 +64,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
         String receiverName = commandUtil.getString(0, arguments);
         boolean isHard = commandUtil.getByClassOrDefault(1, Boolean.class, true, arguments);
 
-        FPlayer fReceiver = database.getFPlayer(receiverName);
+        FPlayer fReceiver = fPlayerDAO.getFPlayer(receiverName);
         if (!fReceiver.isOnline() || integrationModule.isVanished(fReceiver)) {
             builder(fPlayer)
                     .format(Localization.Command.Tictactoe::getNullPlayer)
@@ -133,65 +131,62 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
         int tictactoeID = commandUtil.getInteger(0, arguments);
         String move = commandUtil.getByClassOrDefault(1, String.class, "create", arguments);
 
-        threadManager.runAsync(database -> {
-
-            TicTacToe ticTacToe = tictactoeManager.get(tictactoeID);
-            if (ticTacToe == null || ticTacToe.isEnded() || !ticTacToe.contains(fPlayer) || (move.equals("create") && ticTacToe.isCreated())) {
-                builder(fPlayer)
-                        .format(Localization.Command.Tictactoe::getWrongGame)
-                        .sendBuilt();
-                return;
-            }
-
-            if (!ticTacToe.move(fPlayer, move)) {
-                builder(fPlayer)
-                        .format(Localization.Command.Tictactoe::getWrongMove)
-                        .sendBuilt();
-                return;
-            }
-
-            FPlayer fReceiver = database.getFPlayer(ticTacToe.getNextPlayer());
-            if (!fReceiver.isOnline() || integrationModule.isVanished(fReceiver)) {
-                ticTacToe.setEnded(true);
-                builder(fPlayer)
-                        .format(Localization.Command.Tictactoe::getWrongByPlayer)
-                        .sendBuilt();
-                return;
-            }
-
-            int typeTitle = 0;
-
-            if (ticTacToe.isWin()) {
-                ticTacToe.setEnded(true);
-                typeTitle = 1;
-            }
-
-            if (ticTacToe.isDraw()) {
-                ticTacToe.setEnded(true);
-                typeTitle = -1;
-            }
-
-            int finalTypeTitle = typeTitle;
-
-            builder(fReceiver)
-                    .receiver(fPlayer)
-                    .format(getMoveMessage(ticTacToe, fReceiver, fPlayer, finalTypeTitle, move))
-                    .sendBuilt();
-
-            boolean isSent = proxyManager.sendMessage(fPlayer, MessageTag.COMMAND_TICTACTOE_MOVE, byteArrayDataOutput -> {
-                byteArrayDataOutput.writeUTF(gson.toJson(fReceiver));
-                byteArrayDataOutput.writeUTF(ticTacToe.toString());
-                byteArrayDataOutput.writeInt(finalTypeTitle);
-                byteArrayDataOutput.writeUTF(move);
-            });
-
-            if (isSent) return;
-
+        TicTacToe ticTacToe = tictactoeManager.get(tictactoeID);
+        if (ticTacToe == null || ticTacToe.isEnded() || !ticTacToe.contains(fPlayer) || (move.equals("create") && ticTacToe.isCreated())) {
             builder(fPlayer)
-                    .receiver(fReceiver)
-                    .format(getMoveMessage(ticTacToe, fReceiver, fPlayer, finalTypeTitle, move))
+                    .format(Localization.Command.Tictactoe::getWrongGame)
                     .sendBuilt();
+            return;
+        }
+
+        if (!ticTacToe.move(fPlayer, move)) {
+            builder(fPlayer)
+                    .format(Localization.Command.Tictactoe::getWrongMove)
+                    .sendBuilt();
+            return;
+        }
+
+        FPlayer fReceiver = fPlayerDAO.getFPlayer(ticTacToe.getNextPlayer());
+        if (!fReceiver.isOnline() || integrationModule.isVanished(fReceiver)) {
+            ticTacToe.setEnded(true);
+            builder(fPlayer)
+                    .format(Localization.Command.Tictactoe::getWrongByPlayer)
+                    .sendBuilt();
+            return;
+        }
+
+        int typeTitle = 0;
+
+        if (ticTacToe.isWin()) {
+            ticTacToe.setEnded(true);
+            typeTitle = 1;
+        }
+
+        if (ticTacToe.isDraw()) {
+            ticTacToe.setEnded(true);
+            typeTitle = -1;
+        }
+
+        int finalTypeTitle = typeTitle;
+
+        builder(fReceiver)
+                .receiver(fPlayer)
+                .format(getMoveMessage(ticTacToe, fReceiver, fPlayer, finalTypeTitle, move))
+                .sendBuilt();
+
+        boolean isSent = proxyManager.sendMessage(fPlayer, MessageTag.COMMAND_TICTACTOE_MOVE, byteArrayDataOutput -> {
+            byteArrayDataOutput.writeUTF(gson.toJson(fReceiver));
+            byteArrayDataOutput.writeUTF(ticTacToe.toString());
+            byteArrayDataOutput.writeInt(finalTypeTitle);
+            byteArrayDataOutput.writeUTF(move);
         });
+
+        if (isSent) return;
+
+        builder(fPlayer)
+                .receiver(fReceiver)
+                .format(getMoveMessage(ticTacToe, fReceiver, fPlayer, finalTypeTitle, move))
+                .sendBuilt();
     }
 
     public BiFunction<FPlayer, Localization.Command.Tictactoe, String> getMoveMessage(TicTacToe ticTacToe,

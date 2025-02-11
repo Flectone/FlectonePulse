@@ -5,9 +5,9 @@ import com.google.inject.Singleton;
 import com.rexcantor64.triton.api.TritonAPI;
 import com.rexcantor64.triton.api.events.PlayerChangeLanguageSpigotEvent;
 import com.rexcantor64.triton.api.players.LanguagePlayer;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import org.bukkit.event.EventHandler;
@@ -18,15 +18,15 @@ import org.jetbrains.annotations.Nullable;
 public class TritonIntegration implements Listener, FIntegration {
 
     private final FPlayerManager fPlayerManager;
-    private final ThreadManager threadManager;
+    private final FPlayerDAO fPlayerDAO;
     private final FLogger fLogger;
 
     @Inject
     public TritonIntegration(FPlayerManager fPlayerManager,
-                             ThreadManager threadManager,
+                             FPlayerDAO fPlayerDAO,
                              FLogger fLogger) {
         this.fPlayerManager = fPlayerManager;
-        this.threadManager = threadManager;
+        this.fPlayerDAO = fPlayerDAO;
         this.fLogger = fLogger;
     }
 
@@ -41,7 +41,7 @@ public class TritonIntegration implements Listener, FIntegration {
 
         FPlayer fPlayer = fPlayerManager.get(event.getLanguagePlayer().getUUID());
         fPlayer.setLocale(event.getNewLanguage().getLanguageId());
-        threadManager.runDatabase(database -> database.updateFPlayer(fPlayer));
+        fPlayerDAO.updateFPlayer(fPlayer);
     }
 
     @Nullable

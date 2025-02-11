@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.arguments.UUIDArgument;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ProxyManager;
 import net.flectone.pulse.module.command.FCommand;
@@ -20,10 +20,10 @@ public class BukkitRockpaperscissorsModule extends RockpaperscissorsModule {
     @Inject
     public BukkitRockpaperscissorsModule(FileManager fileManager,
                                          ProxyManager proxyManager,
-                                         Database database,
+                                         FPlayerDAO FPlayerDAO,
                                          BukkitCommandUtil commandUtil,
                                          IntegrationModule integrationModule) {
-        super(fileManager, proxyManager, database, commandUtil, integrationModule);
+        super(fileManager, proxyManager, FPlayerDAO, commandUtil, integrationModule);
 
         this.commandUtil = commandUtil;
     }
@@ -38,12 +38,12 @@ public class BukkitRockpaperscissorsModule extends RockpaperscissorsModule {
                 .withPermission(getPermission())
                 .then(new StringArgument(playerPrompt)
                         .includeSuggestions(commandUtil.argumentFPlayers(false))
-                        .executes(this::executesFPlayerDatabase)
+                        .executes(this::executesFPlayer)
                         .then(new StringArgument(movePrompt)
                                 .then(new UUIDArgument("uuid")
                                         .then(new BooleanArgument("boolean")
                                                 .setOptional(true)
-                                                .executes(this::executesFPlayerDatabase)
+                                                .executes(this::executesFPlayer)
                                         )
                                 )
                         )

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
@@ -26,10 +27,11 @@ public class BukkitOnlineModule extends OnlineModule {
 
     @Inject
     public BukkitOnlineModule(FileManager fileManager,
+                              FPlayerDAO fPlayerDAO,
                               BukkitCommandUtil commandUtil,
                               TimeUtil timeUtil,
                               IntegrationModule integrationModule) {
-        super(fileManager, commandUtil);
+        super(fileManager, fPlayerDAO, commandUtil);
 
         this.timeUtil = timeUtil;
         this.commandUtil = commandUtil;
@@ -69,7 +71,7 @@ public class BukkitOnlineModule extends OnlineModule {
                 .then(new MultiLiteralArgument("type", "first", "last", "total")
                         .then(new StringArgument(prompt)
                                 .includeSuggestions(commandUtil.argumentFPlayers(getCommand().isSuggestOfflinePlayers()))
-                                .executes(this::executesFPlayerDatabase)
+                                .executes(this::executesFPlayer)
                         )
                 )
                 .override();

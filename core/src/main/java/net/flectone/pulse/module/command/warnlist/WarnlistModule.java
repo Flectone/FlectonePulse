@@ -2,7 +2,8 @@ package net.flectone.pulse.module.command.warnlist;
 
 import com.google.inject.Inject;
 import lombok.Getter;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
@@ -17,7 +18,6 @@ import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.ModerationUtil;
 import net.kyori.adventure.text.Component;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +26,8 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
     @Getter private final Command.Warnlist command;
     @Getter private final Permission.Command.Warnlist permission;
 
+    private final FPlayerDAO fPlayerDAO;
+    private final ModerationDAO moderationDAO;
     private final UnwarnModule unwarnModule;
     private final ComponentUtil componentUtil;
     private final CommandUtil commandUtil;
@@ -34,6 +36,8 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
 
     @Inject
     public WarnlistModule(FileManager fileManager,
+                          FPlayerDAO fPlayerDAO,
+                          ModerationDAO moderationDAO,
                           UnwarnModule unwarnModule,
                           ComponentUtil componentUtil,
                           CommandUtil commandUtil,
@@ -41,6 +45,8 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
                           MessageSender messageSender) {
         super(localization -> localization.getCommand().getWarnlist(), null);
 
+        this.fPlayerDAO = fPlayerDAO;
+        this.moderationDAO = moderationDAO;
         this.unwarnModule = unwarnModule;
         this.componentUtil = componentUtil;
         this.moderationUtil = moderationUtil;
@@ -52,7 +58,7 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
     }
 
     @Override
-    public void onCommand(Database database, FPlayer fPlayer, Object arguments) throws SQLException {
+    public void onCommand(FPlayer fPlayer, Object arguments) {
         if (checkModulePredicates(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
 
@@ -68,7 +74,7 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
         FPlayer targetFPlayer = null;
 
         if (optionalObject.isPresent() && optionalObject.get() instanceof String playerName) {
-            targetFPlayer = database.getFPlayer(playerName);
+            targetFPlayer = fPlayerDAO.getFPlayer(playerName);
 
             if (targetFPlayer.isUnknown()) {
                 builder(fPlayer)
@@ -89,8 +95,8 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
         }
 
         List<Moderation> moderationList = targetFPlayer == null
-                ? database.getValidModerations(Moderation.Type.WARN)
-                : database.getModerations(targetFPlayer, Moderation.Type.WARN);
+                ? moderationDAO.getValidModerations(Moderation.Type.WARN)
+                : moderationDAO.getModerations(targetFPlayer, Moderation.Type.WARN);
 
         if (moderationList.isEmpty()) {
             builder(fPlayer)
@@ -122,7 +128,7 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
 
         for (Moderation moderation : finalModerationList) {
 
-            FPlayer fTarget = database.getFPlayer(moderation.getPlayer());
+            FPlayer fTarget = fPlayerDAO.getFPlayer(moderation.getPlayer());
 
             String line = localizationType.getLine().replace("<command>", "/" + unwarnModule.getName(unwarnModule.getCommand()) + " <player> <id>");
             line = moderationUtil.replacePlaceholders(line, fPlayer, moderation);

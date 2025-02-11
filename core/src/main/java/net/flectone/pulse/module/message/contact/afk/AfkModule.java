@@ -2,11 +2,11 @@ package net.flectone.pulse.module.message.contact.afk;
 
 import com.google.inject.Inject;
 import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -24,16 +24,16 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
     private final Message.Contact.Afk message;
     private final Permission.Message.Contact.Afk permission;
 
-    private final ThreadManager threadManager;
+    private final FPlayerDAO fPlayerDAO;
 
     @Inject private IntegrationModule integrationModule;
     @Inject private AfkTicker afkTicker;
 
     public AfkModule(FileManager fileManager,
-                     ThreadManager threadManager) {
+                     FPlayerDAO fPlayerDAO) {
         super(localization -> localization.getMessage().getContact().getAfk());
 
-        this.threadManager = threadManager;
+        this.fPlayerDAO = fPlayerDAO;
 
         message = fileManager.getMessage().getContact().getAfk();
         permission = fileManager.getPermission().getMessage().getContact().getAfk();
@@ -63,7 +63,7 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
         fPlayer.setAfkSuffix(resolveLocalization(fPlayer).getSuffix());
         send(fPlayer);
 
-        threadManager.runDatabase(database -> database.updateFPlayer(fPlayer));
+        fPlayerDAO.updateFPlayer(fPlayer);
     }
 
     @Async

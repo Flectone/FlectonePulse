@@ -2,7 +2,8 @@ package net.flectone.pulse.module.command.kick;
 
 import com.google.gson.Gson;
 import lombok.Getter;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
@@ -14,7 +15,6 @@ import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.util.*;
 
-import java.sql.SQLException;
 import java.util.function.BiFunction;
 
 public abstract class KickModule extends AbstractModuleCommand<Localization.Command.Kick> {
@@ -22,6 +22,8 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
     @Getter private final Command.Kick command;
     @Getter private final Permission.Command.Kick permission;
 
+    private final FPlayerDAO fPlayerDAO;
+    private final ModerationDAO moderationDAO;
     private final FPlayerManager fPlayerManager;
     private final CommandUtil commandUtil;
     private final ComponentUtil componentUtil;
@@ -29,6 +31,8 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
     private final Gson gson;
 
     public KickModule(FileManager fileManager,
+                      FPlayerDAO fPlayerDAO,
+                      ModerationDAO moderationDAO,
                       FPlayerManager fPlayerManager,
                       CommandUtil commandUtil,
                       ComponentUtil componentUtil,
@@ -36,6 +40,8 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
                       Gson gson) {
         super(localization -> localization.getCommand().getKick(), fPlayer -> fPlayer.is(FPlayer.Setting.KICK));
 
+        this.fPlayerDAO = fPlayerDAO;
+        this.moderationDAO = moderationDAO;
         this.fPlayerManager = fPlayerManager;
         this.commandUtil = commandUtil;
         this.componentUtil = componentUtil;
@@ -47,7 +53,7 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
     }
 
     @Override
-    public void onCommand(Database database, FPlayer fPlayer, Object arguments) throws SQLException {
+    public void onCommand(FPlayer fPlayer, Object arguments) {
         if (checkCooldown(fPlayer)) return;
         if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
         if (checkMute(fPlayer)) return;
@@ -55,7 +61,7 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
 
         String playerName = commandUtil.getString(0, arguments);
 
-        FPlayer fTarget = database.getFPlayer(playerName);
+        FPlayer fTarget = fPlayerDAO.getFPlayer(playerName);
         if (!fTarget.isOnline()) {
             builder(fPlayer)
                     .format(Localization.Command.Kick::getNullPlayer)
@@ -65,7 +71,7 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
 
         String reason = commandUtil.getString(1, arguments);
 
-        Moderation kick = database.insertModeration(fTarget, -1, reason, fPlayer.getId(), Moderation.Type.KICK);
+        Moderation kick = moderationDAO.insertModeration(fTarget, -1, reason, fPlayer.getId(), Moderation.Type.KICK);
         if (kick == null) return;
 
         kick(fPlayer, fTarget, kick);

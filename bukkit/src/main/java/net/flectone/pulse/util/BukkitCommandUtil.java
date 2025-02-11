@@ -10,15 +10,12 @@ import dev.jorel.commandapi.arguments.CustomArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.executors.CommandArguments;
 import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.database.Database;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -26,16 +23,13 @@ import java.util.concurrent.CompletableFuture;
 @Singleton
 public class BukkitCommandUtil extends CommandUtil {
 
-    private final Database database;
-    private final FLogger fLogger;
+    private final FPlayerDAO fPlayerDAO;
     private final IntegrationModule integrationModule;
 
     @Inject
-    public BukkitCommandUtil(Database database,
-                             FLogger fLogger,
+    public BukkitCommandUtil(FPlayerDAO fPlayerDAO,
                              IntegrationModule integrationModule) {
-        this.database = database;
-        this.fLogger = fLogger;
+        this.fPlayerDAO = fPlayerDAO;
         this.integrationModule = integrationModule;
     }
 
@@ -134,24 +128,18 @@ public class BukkitCommandUtil extends CommandUtil {
 
     public ArgumentSuggestions<CommandSender> argumentFPlayers(boolean offlinePlayers) {
         return ArgumentSuggestions.stringCollectionAsync(info -> CompletableFuture.supplyAsync(() -> {
-            try {
-                if (offlinePlayers) {
-                    return database.getFPlayers().stream()
-                            .filter(player -> !integrationModule.isVanished(player))
-                            .filter(player -> !player.isUnknown())
-                            .map(FEntity::getName)
-                            .toList();
-                }
-
-                return database.getOnlineFPlayers().stream()
+            if (offlinePlayers) {
+                return fPlayerDAO.getFPlayers().stream()
                         .filter(player -> !integrationModule.isVanished(player))
+                        .filter(player -> !player.isUnknown())
                         .map(FEntity::getName)
                         .toList();
-
-            } catch (SQLException e) {
-                fLogger.warning(e);
-                return new ArrayList<>();
             }
+
+            return fPlayerDAO.getOnlineFPlayers().stream()
+                    .filter(player -> !integrationModule.isVanished(player))
+                    .map(FEntity::getName)
+                    .toList();
         }));
     }
 

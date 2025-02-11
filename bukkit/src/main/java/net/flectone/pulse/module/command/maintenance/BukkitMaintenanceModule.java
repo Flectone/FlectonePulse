@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import dev.jorel.commandapi.arguments.BooleanArgument;
-import net.flectone.pulse.database.Database;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.database.dao.ColorsDAO;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ListenerManager;
@@ -24,14 +24,14 @@ public class BukkitMaintenanceModule extends MaintenanceModule {
                                    FPlayerManager fPlayerManager,
                                    PermissionUtil permissionUtil,
                                    ListenerManager listenerManager,
-                                   Database database,
+                                   FPlayerDAO fPlayerDAO,
+                                   ColorsDAO colorsDAO,
                                    @Named("projectPath") Path projectPath,
                                    FileUtil fileUtil,
                                    CommandUtil commandUtil,
                                    ComponentUtil componentUtil,
-                                   PacketEventsUtil packetEventsUtil,
-                                   FLogger fLogger) {
-        super(fileManager, fPlayerManager, permissionUtil, listenerManager, database, projectPath, fileUtil, commandUtil, componentUtil, packetEventsUtil, fLogger);
+                                   PacketEventsUtil packetEventsUtil) {
+        super(fileManager, fPlayerManager, permissionUtil, listenerManager, fPlayerDAO, colorsDAO, projectPath, fileUtil, commandUtil, componentUtil, packetEventsUtil);
 
         this.fileManager = fileManager;
     }

@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.chat;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.manager.BukkitListenerManager;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class BukkitChatModule extends ChatModule {
 
+    private final FPlayerDAO fPlayerDAO;
     private final FPlayerManager fPlayerManager;
     private final PermissionUtil permissionUtil;
     private final ThreadManager threadManager;
@@ -44,6 +46,7 @@ public class BukkitChatModule extends ChatModule {
 
     @Inject
     public BukkitChatModule(FileManager fileManager,
+                            FPlayerDAO fPlayerDAO,
                             FPlayerManager fPlayerManager,
                             ThreadManager threadManager,
                             BukkitListenerManager bukkitListenerManager,
@@ -52,6 +55,7 @@ public class BukkitChatModule extends ChatModule {
                             TimeUtil timeUtil) {
         super(fileManager);
 
+        this.fPlayerDAO = fPlayerDAO;
         this.fPlayerManager = fPlayerManager;
         this.threadManager = threadManager;
         this.bukkitListenerManager = bukkitListenerManager;
@@ -147,46 +151,43 @@ public class BukkitChatModule extends ChatModule {
                 ? integrationModule.checkMention(fPlayer, eventMessage)
                 : eventMessage;
 
-        threadManager.runAsync(database -> {
+        builder(fPlayer)
+                .tag(MessageTag.CHAT)
+                .destination(playerChat.getDestination())
+                .range(chatRange)
+                .filter(filter)
+                .format(message -> message.getTypes().get(chatName))
+                .message(finalMessage)
+                .proxy(output -> {
+                    output.writeUTF(chatName);
+                    output.writeUTF(finalMessage);
+                })
+                .integration(s -> s.replace("<message>", finalMessage))
+                .sound(soundMap.get(chatName))
+                .sendBuilt();
 
-            builder(fPlayer)
-                    .tag(MessageTag.CHAT)
-                    .destination(playerChat.getDestination())
-                    .range(chatRange)
-                    .filter(filter)
-                    .format(message -> message.getTypes().get(chatName))
-                    .message(finalMessage)
-                    .proxy(output -> {
-                        output.writeUTF(chatName);
-                        output.writeUTF(finalMessage);
-                    })
-                    .integration(s -> s.replace("<message>", finalMessage))
-                    .sound(soundMap.get(chatName))
-                    .sendBuilt();
+        List<UUID> recipients = fPlayerManager.getFPlayers()
+                .stream()
+                .filter(filter)
+                .map(FEntity::getUuid)
+                .toList();
 
-            List<UUID> recipients = fPlayerManager.getFPlayers()
+        int countRecipients = recipients.size();
+
+        if (playerChat.isNullRecipient() && countRecipients < 2) {
+
+            Set<UUID> onlinePlayers = fPlayerDAO.getOnlineFPlayers()
                     .stream()
-                    .filter(filter)
                     .map(FEntity::getUuid)
-                    .toList();
+                    .collect(Collectors.toSet());
 
-            int countRecipients = recipients.size();
-
-            if (playerChat.isNullRecipient() && countRecipients < 2) {
-
-                Set<UUID> onlinePlayers = database.getOnlineFPlayers()
-                        .stream()
-                        .map(FEntity::getUuid)
-                        .collect(Collectors.toSet());
-
-                if ((onlinePlayers.containsAll(recipients) && onlinePlayers.size() <= countRecipients)
-                        || chatRange > -1) {
-                    threadManager.runAsyncLater(() -> builder(fPlayer)
-                            .format(Localization.Message.Chat::getNullRecipient)
-                            .sendBuilt(), 5);
-                }
+            if ((onlinePlayers.containsAll(recipients) && onlinePlayers.size() <= countRecipients)
+                    || chatRange > -1) {
+                threadManager.runAsyncLater(() -> builder(fPlayer)
+                        .format(Localization.Message.Chat::getNullRecipient)
+                        .sendBuilt(), 5);
             }
-        });
+        }
 
         event.setCancelled(playerChat.isCancel());
         event.getRecipients().clear();

@@ -62,7 +62,7 @@ public final class Config extends FileSerializable {
 
     @Getter
     public static final class Database {
-        private net.flectone.pulse.database.Database.Type type = net.flectone.pulse.database.Database.Type.SQLITE;
+        private Type type = Type.SQLITE;
         private String name = "flectonepulse";
         private String host = "localhost";
         private String port = "3306";
@@ -70,6 +70,11 @@ public final class Config extends FileSerializable {
         private String password = "1234";
         private String parameters = "?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8";
         public Database() {}
+
+        public enum Type {
+            SQLITE,
+            MYSQL
+        }
     }
 
     @Getter

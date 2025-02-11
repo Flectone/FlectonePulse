@@ -1,6 +1,8 @@
 package net.flectone.pulse.module.command.chatcolor;
 
 import lombok.Getter;
+import net.flectone.pulse.database.dao.ColorsDAO;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
@@ -8,7 +10,6 @@ import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ProxyManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.util.ColorUtil;
@@ -26,7 +27,8 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
     @Getter private final Command.Chatcolor command;
     @Getter private final Permission.Command.Chatcolor permission;
 
-    private final ThreadManager threadManager;
+    private final FPlayerDAO fPlayerDAO;
+    private final ColorsDAO colorsDAO;
     private final FPlayerManager fPlayerManager;
     private final PermissionUtil permissionUtil;
     private final ProxyManager proxyManager;
@@ -34,14 +36,16 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
     private final ColorUtil colorUtil;
 
     public ChatcolorModule(FileManager fileManager,
-                           ThreadManager threadManager,
+                           FPlayerDAO fPlayerDAO,
+                           ColorsDAO colorsDAO,
                            FPlayerManager fPlayerManager,
                            PermissionUtil permissionUtil,
                            ProxyManager proxyManager,
                            CommandUtil commandUtil,
                            ColorUtil colorUtil) {
         super(localization -> localization.getCommand().getChatcolor(), null);
-        this.threadManager = threadManager;
+        this.fPlayerDAO = fPlayerDAO;
+        this.colorsDAO = colorsDAO;
         this.fPlayerManager = fPlayerManager;
         this.permissionUtil = permissionUtil;
         this.proxyManager = proxyManager;
@@ -68,27 +72,24 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
                     && !player.startsWith("&")
                     && !player.equalsIgnoreCase("clear")) {
 
-                threadManager.runDatabase(database -> {
+                FPlayer fTarget = fPlayerDAO.getFPlayer(player);
 
-                    FPlayer fTarget = database.getFPlayer(player);
+                if (fTarget.isUnknown()) {
+                    builder(fPlayer)
+                            .format(Localization.Command.Chatcolor::getNullPlayer)
+                            .sendBuilt();
+                    return;
+                }
 
-                    if (fTarget.isUnknown()) {
-                        builder(fPlayer)
-                                .format(Localization.Command.Chatcolor::getNullPlayer)
-                                .sendBuilt();
-                        return;
-                    }
+                colorsDAO.setFPlayerColors(fTarget);
 
-                    database.setColors(fTarget);
+                proxyManager.sendMessage(fTarget, MessageTag.COMMAND_CHATCOLOR, byteArrayDataOutput ->
+                        byteArrayDataOutput.writeUTF(input)
+                );
 
-                    proxyManager.sendMessage(fTarget, MessageTag.COMMAND_CHATCOLOR, byteArrayDataOutput ->
-                            byteArrayDataOutput.writeUTF(input)
-                    );
-
-                    if (words.length > 1) {
-                        prepareInput(input.substring(player.length() + 1).trim(), fTarget);
-                    }
-                });
+                if (words.length > 1) {
+                    prepareInput(input.substring(player.length() + 1).trim(), fTarget);
+                }
 
                 return;
             }
@@ -138,24 +139,22 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
             x++;
         }
 
-        threadManager.runDatabase(database -> {
-            database.updateColors(fPlayer);
+        colorsDAO.updateColors(fPlayer);
 
-            FPlayer onlineFPlayer = fPlayerManager.get(fPlayer.getUuid());
-            if (!onlineFPlayer.isUnknown()) {
-                if (fPlayer.getColors().isEmpty()) {
-                    onlineFPlayer.getColors().clear();
-                } else {
-                    onlineFPlayer.getColors().putAll(fPlayer.getColors());
-                }
+        FPlayer onlineFPlayer = fPlayerManager.get(fPlayer.getUuid());
+        if (!onlineFPlayer.isUnknown()) {
+            if (fPlayer.getColors().isEmpty()) {
+                onlineFPlayer.getColors().clear();
+            } else {
+                onlineFPlayer.getColors().putAll(fPlayer.getColors());
             }
+        }
 
-            builder(fPlayer)
-                    .destination(command.getDestination())
-                    .format((fResolver, s) -> s.getFormat())
-                    .sound(getSound())
-                    .sendBuilt();
-        });
+        builder(fPlayer)
+                .destination(command.getDestination())
+                .format((fResolver, s) -> s.getFormat())
+                .sound(getSound())
+                .sendBuilt();
     }
 
     @Override

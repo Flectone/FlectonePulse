@@ -1,17 +1,18 @@
 package net.flectone.pulse.module.command.maintenance;
 
 import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerDisconnect;
 import com.github.retrooper.packetevents.wrapper.status.server.WrapperStatusServerResponse;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.ColorsDAO;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ListenerManager;
@@ -23,8 +24,6 @@ import net.kyori.adventure.text.Component;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.sql.SQLException;
-import java.util.UUID;
 
 public abstract class MaintenanceModule extends AbstractModuleCommand<Localization.Command.Maintenance> {
 
@@ -35,13 +34,13 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
     private final FPlayerManager fPlayerManager;
     private final PermissionUtil permissionUtil;
     private final ListenerManager listenerManager;
-    private final Database database;
+    private final FPlayerDAO fPlayerDAO;
+    private final ColorsDAO colorsDAO;
     private final Path iconPath;
     private final FileUtil fileUtil;
     private final ComponentUtil componentUtil;
     private final CommandUtil commandUtil;
     private final PacketEventsUtil packetEventsUtil;
-    private final FLogger fLogger;
 
     private String icon;
 
@@ -49,13 +48,13 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
                              FPlayerManager fPlayerManager,
                              PermissionUtil permissionUtil,
                              ListenerManager listenerManager,
-                             Database database,
+                             FPlayerDAO fPlayerDAO,
+                             ColorsDAO colorsDAO,
                              Path projectPath,
                              FileUtil fileUtil,
                              CommandUtil commandUtil,
                              ComponentUtil componentUtil,
-                             PacketEventsUtil packetEventsUtil,
-                             FLogger fLogger) {
+                             PacketEventsUtil packetEventsUtil) {
         super(module -> module.getCommand().getMaintenance(), null);
 
         this.fileManager = fileManager;
@@ -63,12 +62,12 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         this.permissionUtil = permissionUtil;
         this.commandUtil = commandUtil;
         this.listenerManager = listenerManager;
-        this.database = database;
+        this.fPlayerDAO = fPlayerDAO;
+        this.colorsDAO = colorsDAO;
         this.iconPath = projectPath.resolve("images");
         this.fileUtil = fileUtil;
         this.componentUtil = componentUtil;
         this.packetEventsUtil = packetEventsUtil;
-        this.fLogger = fLogger;
 
         command = fileManager.getCommand().getMaintenance();
         permission = fileManager.getPermission().getCommand().getMaintenance();
@@ -112,14 +111,8 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         if (!isEnable()) return;
         if (!command.isTurnedOn()) return;
 
-        FPlayer fPlayer = FPlayer.UNKNOWN;
-
-        try {
-            fPlayer = database.getFPlayer(user.getAddress().getAddress());
-            database.setColors(fPlayer);
-        } catch (SQLException e) {
-            fLogger.warning(e);
-        }
+        FPlayer fPlayer = fPlayerDAO.getFPlayer(user.getAddress().getAddress());
+        colorsDAO.setFPlayerColors(fPlayer);
 
         JsonObject responseJson = new JsonObject();
 
@@ -136,43 +129,18 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         user.sendPacket(wrapperStatusServerResponse);
     }
 
-    private JsonElement getVersionJson(String message) {
-        JsonObject jsonObject = new JsonObject();
-
-        jsonObject.addProperty("name", message);
-        jsonObject.addProperty("protocol", -1);
-
-        return jsonObject;
-    }
-
-    private JsonElement getPlayersJson() {
-        JsonObject playersJson = new JsonObject();
-
-        playersJson.addProperty("max", -1);
-        playersJson.addProperty("online", -1);
-
-        playersJson.add("sample", new JsonArray());
-
-        return playersJson;
-    }
-
     public boolean isKicked(UserProfile userProfile) {
         if (!isEnable()) return false;
         if (!command.isTurnedOn()) return false;
 
         String messageKick = resolveLocalization().getKick();
 
-        try {
-            FPlayer fPlayer = database.getFPlayer(uuid);
-            if (permissionUtil.has(fPlayer, permission.getJoin())) return;
+        FPlayer fPlayer = fPlayerDAO.getFPlayer(userProfile.getUUID());
+        if (permissionUtil.has(fPlayer, permission.getJoin())) return false;
 
-            Component reason = componentUtil.builder(fPlayer, messageKick).build();
-            packetEventsUtil.sendPacket(channel, new WrapperLoginServerDisconnect(reason));
-
-        } catch (SQLException e) {
-            fLogger.warning(e);
-        }
+        Component reason = componentUtil.builder(fPlayer, messageKick).build();
         packetEventsUtil.sendPacket(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
+        return true;
     }
 
     @Override
@@ -206,6 +174,26 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
     @Override
     public boolean isConfigEnable() {
         return command.isEnable();
+    }
+
+    private JsonElement getVersionJson(String message) {
+        JsonObject jsonObject = new JsonObject();
+
+        jsonObject.addProperty("name", message);
+        jsonObject.addProperty("protocol", -1);
+
+        return jsonObject;
+    }
+
+    private JsonElement getPlayersJson() {
+        JsonObject playersJson = new JsonObject();
+
+        playersJson.addProperty("max", -1);
+        playersJson.addProperty("online", -1);
+
+        playersJson.add("sample", new JsonArray());
+
+        return playersJson;
     }
 
     private void kickOnlinePlayers(FPlayer fSender) {

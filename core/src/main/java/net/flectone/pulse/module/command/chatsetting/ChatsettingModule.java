@@ -2,13 +2,13 @@ package net.flectone.pulse.module.command.chatsetting;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import lombok.Getter;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.InventoryManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.inventory.Inventory;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -26,19 +26,19 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
     @Getter private final Command.Chatsetting command;
     @Getter private final Permission.Command.Chatsetting permission;
 
-    private final ThreadManager threadManager;
+    private final FPlayerDAO fPlayerDAO;
     private final ComponentUtil componentUtil;
     private final PermissionUtil permissionUtil;
     private final InventoryManager inventoryManager;
 
     public ChatsettingModule(FileManager fileManager,
-                             ThreadManager threadManager,
+                             FPlayerDAO fPlayerDAO,
                              InventoryManager inventoryManager,
                              ComponentUtil componentUtil,
                              PermissionUtil permissionUtil) {
         super(localization -> localization.getCommand().getChatsetting(), null);
 
-        this.threadManager = threadManager;
+        this.fPlayerDAO = fPlayerDAO;
         this.inventoryManager = inventoryManager;
         this.componentUtil = componentUtil;
         this.permissionUtil = permissionUtil;

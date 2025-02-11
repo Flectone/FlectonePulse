@@ -5,7 +5,8 @@ import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.Moderation;
@@ -16,29 +17,25 @@ import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.ModerationUtil;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class BukkitWarnlistModule extends WarnlistModule {
 
-    private final Database database;
-    private final FLogger fLogger;
+    private final ModerationDAO moderationDAO;
 
     @Inject
     public BukkitWarnlistModule(FileManager fileManager,
+                                FPlayerDAO fPlayerDAO,
+                                ModerationDAO moderationDAO,
                                 UnwarnModule unwarnModule,
                                 ComponentUtil componentUtil,
                                 CommandUtil commandUtil,
                                 ModerationUtil moderationUtil,
-                                MessageSender messageSender,
-                                Database database,
-                                FLogger fLogger) {
-        super(fileManager, unwarnModule, componentUtil, commandUtil, moderationUtil, messageSender);
+                                MessageSender messageSender) {
+        super(fileManager, fPlayerDAO, moderationDAO, unwarnModule, componentUtil, commandUtil, moderationUtil, messageSender);
 
-        this.database = database;
-        this.fLogger = fLogger;
+        this.moderationDAO = moderationDAO;
     }
 
     @Override
@@ -50,20 +47,14 @@ public class BukkitWarnlistModule extends WarnlistModule {
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(new IntegerArgument(promptNumber).setOptional(true)
-                        .executesPlayer(this::executesFPlayerDatabase)
+                        .executesPlayer(this::executesFPlayer)
                 )
                 .then(new StringArgument(promptPlayer)
-                        .includeSuggestions(ArgumentSuggestions.stringCollectionAsync(info -> CompletableFuture.supplyAsync(() -> {
-                            try {
-                                return database.getModerationsNames(Moderation.Type.WARN);
-                            } catch (SQLException e) {
-                                fLogger.warning(e);
-                            }
-
-                            return new ArrayList<>();
-                        })))
+                        .includeSuggestions(ArgumentSuggestions.stringCollectionAsync(info ->
+                                CompletableFuture.supplyAsync(() ->
+                                        moderationDAO.getModerationsNames(Moderation.Type.WARN))))
                         .then(new IntegerArgument(promptNumber).setOptional(true)
-                                .executesPlayer(this::executesFPlayerDatabase)
+                                .executesPlayer(this::executesFPlayer)
                         )
                 )
                 .override();

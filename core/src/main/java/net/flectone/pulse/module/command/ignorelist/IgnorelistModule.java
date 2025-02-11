@@ -1,7 +1,7 @@
 package net.flectone.pulse.module.command.ignorelist;
 
 import lombok.Getter;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
@@ -15,7 +15,6 @@ import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.TimeUtil;
 import net.kyori.adventure.text.Component;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public abstract class IgnorelistModule extends AbstractModuleCommand<Localization.Command.Ignorelist> {
@@ -23,18 +22,21 @@ public abstract class IgnorelistModule extends AbstractModuleCommand<Localizatio
     @Getter private final Command.Ignorelist command;
     @Getter private final Permission.Command.Ignorelist permission;
 
+    private final FPlayerDAO fPlayerDAO;
     private final MessageSender messageSender;
     private final ComponentUtil componentUtil;
     private final CommandUtil commandUtil;
     private final TimeUtil timeUtil;
 
     public IgnorelistModule(FileManager fileManager,
+                            FPlayerDAO fPlayerDAO,
                             MessageSender messageSender,
                             ComponentUtil componentUtil,
                             CommandUtil commandUtil,
                             TimeUtil timeUtil) {
         super(localization -> localization.getCommand().getIgnorelist(), null);
 
+        this.fPlayerDAO = fPlayerDAO;
         this.messageSender = messageSender;
         this.componentUtil = componentUtil;
         this.commandUtil = commandUtil;
@@ -47,7 +49,7 @@ public abstract class IgnorelistModule extends AbstractModuleCommand<Localizatio
     }
 
     @Override
-    public void onCommand(Database database, FPlayer fPlayer, Object arguments) throws SQLException {
+    public void onCommand(FPlayer fPlayer, Object arguments) {
         if (checkModulePredicates(fPlayer)) return;
 
         List<Ignore> ignoreList = fPlayer.getIgnores();
@@ -86,7 +88,7 @@ public abstract class IgnorelistModule extends AbstractModuleCommand<Localizatio
 
         for (Ignore ignore : finalIgnoreList) {
 
-            FPlayer fTarget = database.getFPlayer(ignore.target());
+            FPlayer fTarget = fPlayerDAO.getFPlayer(ignore.target());
             String line = localization.getLine()
                     .replace("<command>", "/ignore " + fTarget.getName())
                     .replace("<date>", timeUtil.formatDate(ignore.date()));

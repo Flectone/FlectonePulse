@@ -3,12 +3,12 @@ package net.flectone.pulse.module.message.format.world;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ListenerManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
@@ -24,16 +24,16 @@ public class WorldModule extends AbstractModule {
     private final Message.Format.World message;
     private final Permission.Message.Format.World permission;
 
-    private final ThreadManager threadManager;
+    private final FPlayerDAO fPlayerDAO;
     private final FPlayerManager fPlayerManager;
     private final ListenerManager listenerManager;
 
     @Inject
     public WorldModule(FileManager fileManager,
-                       ThreadManager threadManager,
+                       FPlayerDAO fPlayerDAO,
                        FPlayerManager fPlayerManager,
                        ListenerManager listenerManager) {
-        this.threadManager = threadManager;
+        this.fPlayerDAO = fPlayerDAO;
         this.fPlayerManager = fPlayerManager;
         this.listenerManager = listenerManager;
 
@@ -65,7 +65,7 @@ public class WorldModule extends AbstractModule {
         if (worldPrefix != null && worldPrefix.equalsIgnoreCase(fPlayer.getWorldPrefix())) return;
 
         fPlayer.setWorldPrefix(worldPrefix);
-        threadManager.runDatabase(database -> database.updateFPlayer(fPlayer));
+        fPlayerDAO.updateFPlayer(fPlayer);
     }
 
     public TagResolver worldTag(@NotNull FEntity sender) {

@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.manager.BukkitListenerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.contact.afk.listener.AfkListener;
 import net.flectone.pulse.util.Pair;
@@ -29,16 +29,16 @@ public class BukkitAfkModule extends AfkModule {
 
     @Getter private final Message.Contact.Afk message;
 
-    private final ThreadManager threadManager;
+    private final FPlayerDAO fPlayerDAO;
     private final BukkitListenerManager bukkitListenerManager;
 
     @Inject
     public BukkitAfkModule(FileManager fileManager,
-                           ThreadManager threadManager,
+                           FPlayerDAO fPlayerDAO,
                            BukkitListenerManager bukkitListenerManager) {
-        super(fileManager, threadManager);
+        super(fileManager, fPlayerDAO);
 
-        this.threadManager = threadManager;
+        this.fPlayerDAO = fPlayerDAO;
         this.bukkitListenerManager = bukkitListenerManager;
 
         message = fileManager.getMessage().getContact().getAfk();
@@ -63,7 +63,7 @@ public class BukkitAfkModule extends AfkModule {
             PLAYER_BLOCK.remove(fPlayer.getUuid());
 
             if (databaseAfkSuffix != null) {
-                threadManager.runDatabase(database -> database.updateFPlayer(fPlayer));
+                fPlayerDAO.updateFPlayer(fPlayer);
             }
 
             return;
@@ -105,7 +105,7 @@ public class BukkitAfkModule extends AfkModule {
             if (fPlayer.getAfkSuffix() != null) {
                 fPlayer.setAfkSuffix(null);
                 send(fPlayer);
-                threadManager.runDatabase(database -> database.updateFPlayer(fPlayer));
+                fPlayerDAO.updateFPlayer(fPlayer);
             }
 
             PLAYER_BLOCK.put(fPlayer.getUuid(), new Pair<>(time, getVector(player)));

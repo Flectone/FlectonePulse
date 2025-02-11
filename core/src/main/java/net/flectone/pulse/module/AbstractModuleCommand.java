@@ -2,10 +2,8 @@ package net.flectone.pulse.module;
 
 import com.google.inject.Inject;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.database.Database;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
-import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
@@ -15,7 +13,6 @@ import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.Range;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -27,8 +24,6 @@ public abstract class AbstractModuleCommand<M extends Localization.ILocalization
     @Inject private FPlayerManager fPlayerManager;
     @Inject protected CommandUtil commandUtil;
     @Inject private FileManager fileManager;
-    @Inject private FLogger fLogger;
-    @Inject private Database database;
 
     public AbstractModuleCommand(Function<Localization, M> messageFunction, Predicate<FPlayer> commandPredicate) {
         super(messageFunction);
@@ -43,19 +38,7 @@ public abstract class AbstractModuleCommand<M extends Localization.ILocalization
         onCommand(fPlayer, arguments);
     }
 
-    @Async
-    protected void executesFPlayerDatabase(Object commandSender, Object commandArguments) {
-        FPlayer fPlayer = fPlayerManager.convertToFPlayer(commandSender);
-
-        try {
-            onCommand(database, fPlayer, commandArguments);
-        } catch (SQLException e) {
-            fLogger.warning(e);
-        }
-    }
-
-    public void onCommand(FPlayer fPlayer, Object commandArguments) {}
-    public void onCommand(Database database, FPlayer fPlayer, Object commandArguments) throws SQLException {}
+    public abstract void onCommand(FPlayer fPlayer, Object commandArguments);
 
     public Localization.Command.Prompt getPrompt() {
         return fileManager.getLocalization().getCommand().getPrompt();

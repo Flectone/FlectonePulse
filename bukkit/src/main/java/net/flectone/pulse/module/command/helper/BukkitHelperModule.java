@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.helper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ProxyManager;
@@ -15,11 +16,12 @@ public class BukkitHelperModule extends HelperModule {
 
     @Inject
     public BukkitHelperModule(FileManager fileManager,
+                              FPlayerDAO fPlayerDAO,
                               FPlayerManager fPlayerManager,
                               ProxyManager proxyManager,
                               PermissionUtil permissionUtil,
                               CommandUtil commandUtil) {
-        super(fileManager, fPlayerManager, proxyManager, permissionUtil, commandUtil);
+        super(fileManager, fPlayerDAO, fPlayerManager, proxyManager, permissionUtil, commandUtil);
     }
 
     @Override
@@ -30,7 +32,7 @@ public class BukkitHelperModule extends HelperModule {
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(new GreedyStringArgument(prompt)
-                        .executesPlayer(this::executesFPlayerDatabase)
+                        .executesPlayer(this::executesFPlayer)
                 )
                 .override();
     }

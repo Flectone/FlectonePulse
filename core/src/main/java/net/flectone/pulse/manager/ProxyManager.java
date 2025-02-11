@@ -2,7 +2,6 @@ package net.flectone.pulse.manager;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
-import net.flectone.pulse.database.Database;
 import net.flectone.pulse.file.Config;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.model.FEntity;
@@ -25,7 +24,7 @@ public abstract class ProxyManager {
     }
 
     public boolean isEnabledProxy() {
-        return (config.isBungeecord() || config.isVelocity()) && config.getDatabase().getType() == Database.Type.MYSQL;
+        return (config.isBungeecord() || config.isVelocity()) && config.getDatabase().getType() == Config.Database.Type.MYSQL;
     }
 
     public void reload() {
@@ -35,7 +34,7 @@ public abstract class ProxyManager {
             channel = "flectonepulse:main";
         } else return;
 
-        if (config.getDatabase().getType() == Database.Type.SQLITE) {
+        if (config.getDatabase().getType() == Config.Database.Type.SQLITE) {
             fLogger.warning("SQLITE database and Proxy are incompatible");
             return;
         }

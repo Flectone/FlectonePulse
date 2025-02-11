@@ -1,7 +1,7 @@
 package net.flectone.pulse.module.command.rockpaperscissors;
 
 import lombok.Getter;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
@@ -16,7 +16,6 @@ import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -30,19 +29,19 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
     @Getter private final Permission.Command.Rockpaperscissors permission;
 
     private final ProxyManager proxyManager;
-    private final Database database;
+    private final FPlayerDAO fPlayerDAO;
     private final CommandUtil commandUtil;
     private final IntegrationModule integrationModule;
 
     public RockpaperscissorsModule(FileManager fileManager,
                                    ProxyManager proxyManager,
-                                   Database database,
+                                   FPlayerDAO fPlayerDAO,
                                    CommandUtil commandUtil,
                                    IntegrationModule integrationModule) {
         super(localization -> localization.getCommand().getRockpaperscissors(), fPlayer -> fPlayer.is(FPlayer.Setting.ROCKPAPERSCISSORS));
 
         this.proxyManager = proxyManager;
-        this.database = database;
+        this.fPlayerDAO = fPlayerDAO;
         this.commandUtil = commandUtil;
         this.integrationModule = integrationModule;
 
@@ -51,14 +50,14 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
     }
 
     @Override
-    public void onCommand(Database database, FPlayer fPlayer, Object arguments) throws SQLException {
+    public void onCommand(FPlayer fPlayer, Object arguments) {
         if (checkModulePredicates(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
         if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
         if (checkMute(fPlayer)) return;
 
         String player = commandUtil.getString(0, arguments);
-        FPlayer fReceiver = database.getFPlayer(player);
+        FPlayer fReceiver = fPlayerDAO.getFPlayer(player);
         if (!fReceiver.isOnline() || integrationModule.isVanished(fReceiver)) {
             builder(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::getNullPlayer)
@@ -153,13 +152,13 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
                 .sendBuilt();
     }
 
-    public void finalMove(UUID id, FPlayer fPlayer, String move) throws SQLException {
+    public void finalMove(UUID id, FPlayer fPlayer, String move) {
         if (checkModulePredicates(fPlayer)) return;
 
         RockPaperScissors rockPaperScissors = gameMap.get(id);
         if (rockPaperScissors == null) return;
 
-        FPlayer fReceiver = database.getFPlayer(rockPaperScissors.getSender());
+        FPlayer fReceiver = fPlayerDAO.getFPlayer(rockPaperScissors.getSender());
 
         gameMap.remove(id);
 
@@ -199,13 +198,13 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
                 .sendBuilt();
     }
 
-    public void move(UUID id, FEntity fPlayer, String move) throws SQLException {
+    public void move(UUID id, FEntity fPlayer, String move) {
         if (checkModulePredicates(fPlayer)) return;
 
         RockPaperScissors rockPaperScissors = gameMap.get(id);
         if (rockPaperScissors == null) return;
 
-        FPlayer fReceiver = database.getFPlayer(rockPaperScissors.getReceiver());
+        FPlayer fReceiver = fPlayerDAO.getFPlayer(rockPaperScissors.getReceiver());
 
         rockPaperScissors.setSenderMove(move);
 

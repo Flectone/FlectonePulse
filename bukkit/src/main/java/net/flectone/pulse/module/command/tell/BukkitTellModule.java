@@ -4,10 +4,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.IgnoreDAO;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ProxyManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.util.BukkitCommandUtil;
@@ -19,12 +20,13 @@ public class BukkitTellModule extends TellModule {
 
     @Inject
     public BukkitTellModule(FileManager fileManager,
-                            ThreadManager threadManager,
+                            FPlayerDAO fPlayerDAO,
+                            IgnoreDAO ignoreDAO,
                             FPlayerManager fPlayerManager,
                             ProxyManager proxyManager,
                             IntegrationModule integrationModule,
                             BukkitCommandUtil commandUtil) {
-        super(fileManager, threadManager, fPlayerManager, proxyManager, integrationModule, commandUtil);
+        super(fileManager, fPlayerDAO, ignoreDAO, fPlayerManager, proxyManager, integrationModule, commandUtil);
 
         this.commandUtil = commandUtil;
     }

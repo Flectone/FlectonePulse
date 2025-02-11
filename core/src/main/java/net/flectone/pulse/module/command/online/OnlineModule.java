@@ -1,7 +1,7 @@
 package net.flectone.pulse.module.command.online;
 
 import lombok.Getter;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
@@ -11,7 +11,6 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 
-import java.sql.SQLException;
 import java.util.function.BiFunction;
 
 public abstract class OnlineModule extends AbstractModuleCommand<Localization.Command.Online> {
@@ -19,12 +18,15 @@ public abstract class OnlineModule extends AbstractModuleCommand<Localization.Co
     @Getter private final Command.Online command;
     @Getter private final Permission.Command.Online permission;
 
+    private final FPlayerDAO fPlayerDAO;
     private final CommandUtil commandUtil;
 
     public OnlineModule(FileManager fileManager,
+                        FPlayerDAO fPlayerDAO,
                         CommandUtil commandUtil) {
         super(localization -> localization.getCommand().getOnline(), null);
 
+        this.fPlayerDAO = fPlayerDAO;
         this.commandUtil = commandUtil;
 
         command = fileManager.getCommand().getOnline();
@@ -35,12 +37,12 @@ public abstract class OnlineModule extends AbstractModuleCommand<Localization.Co
     }
 
     @Override
-    public void onCommand(Database database, FPlayer fPlayer, Object arguments) throws SQLException {
+    public void onCommand(FPlayer fPlayer, Object arguments) {
         if (checkModulePredicates(fPlayer)) return;
 
         String target = commandUtil.getString(1, arguments);
 
-        FPlayer targetFPlayer = database.getFPlayer(target);
+        FPlayer targetFPlayer = fPlayerDAO.getFPlayer(target);
         if (targetFPlayer.isUnknown()) {
             builder(fPlayer)
                     .format(Localization.Command.Online::getNullPlayer)

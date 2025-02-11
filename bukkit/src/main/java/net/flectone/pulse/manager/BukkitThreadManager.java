@@ -3,42 +3,19 @@ package net.flectone.pulse.manager;
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.database.Database;
-import net.flectone.pulse.database.DatabaseConsumer;
-import net.flectone.pulse.logger.FLogger;
 import org.bukkit.plugin.Plugin;
-
-import java.sql.SQLException;
 
 @Singleton
 public class BukkitThreadManager extends ThreadManager {
 
     private final Plugin plugin;
     private final TaskScheduler taskScheduler;
-    private final Database database;
-    private final FLogger fLogger;
 
     @Inject
     public BukkitThreadManager(Plugin plugin,
-                               TaskScheduler taskScheduler,
-                               Database database,
-                               FLogger fLogger) {
-        super(database, fLogger);
+                               TaskScheduler taskScheduler) {
         this.plugin = plugin;
         this.taskScheduler = taskScheduler;
-        this.database = database;
-        this.fLogger = fLogger;
-    }
-
-    @Override
-    public void runAsync(DatabaseConsumer databaseAction) {
-        runAsync(() -> {
-            try {
-                databaseAction.accept(database);
-            } catch (SQLException e) {
-                fLogger.warning(e);
-            }
-        });
     }
 
     @Override

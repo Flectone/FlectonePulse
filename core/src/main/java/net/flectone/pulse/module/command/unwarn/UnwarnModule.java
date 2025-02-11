@@ -2,11 +2,12 @@ package net.flectone.pulse.module.command.unwarn;
 
 import com.google.gson.Gson;
 import lombok.Getter;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -21,17 +22,20 @@ public abstract class UnwarnModule extends AbstractModuleCommand<Localization.Co
     @Getter private final Command.Unwarn command;
     @Getter private final Permission.Command.Unwarn permission;
 
-    private final ThreadManager threadManager;
+    private final FPlayerDAO fPlayerDAO;
+    private final ModerationDAO moderationDAO;
     private final CommandUtil commandUtil;
     private final Gson gson;
 
     public UnwarnModule(FileManager fileManager,
-                        ThreadManager threadManager,
+                        FPlayerDAO fPlayerDAO,
+                        ModerationDAO moderationDAO,
                         CommandUtil commandUtil,
                         Gson gson) {
         super(localization -> localization.getCommand().getUnwarn(), null);
 
-        this.threadManager = threadManager;
+        this.fPlayerDAO = fPlayerDAO;
+        this.moderationDAO = moderationDAO;
         this.commandUtil = commandUtil;
         this.gson = gson;
 
@@ -53,48 +57,46 @@ public abstract class UnwarnModule extends AbstractModuleCommand<Localization.Co
     public void unwarn(FPlayer fPlayer, String target, int id) {
         if (checkModulePredicates(fPlayer)) return;
 
-        threadManager.runDatabase(database -> {
-            FPlayer fTarget = database.getFPlayer(target);
-            if (fTarget.isUnknown()) {
-                builder(fPlayer)
-                        .format(Localization.Command.Unwarn::getNullPlayer)
-                        .sendBuilt();
-                return;
-            }
-
-            List<Moderation> warns = new ArrayList<>();
-
-            if (id == -1) {
-                warns.addAll(database.getValidModerations(fTarget, Moderation.Type.WARN));
-            } else {
-                database.getValidModerations(fTarget, Moderation.Type.WARN).stream()
-                        .filter(warn -> warn.getId() == id)
-                        .findAny()
-                        .ifPresent(warns::add);
-            }
-
-            if (warns.isEmpty()) {
-                builder(fPlayer)
-                        .format(Localization.Command.Unwarn::getNotWarned)
-                        .sendBuilt();
-                return;
-            }
-
-            for (Moderation warn : warns) {
-                database.setInvalidModeration(warn);
-            }
-
-            builder(fTarget)
-                    .tag(MessageTag.COMMAND_UNWARN)
-                    .destination(command.getDestination())
-                    .range(command.getRange())
-                    .filter(filter -> filter.is(FPlayer.Setting.WARN))
-                    .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
-                    .proxy(output -> output.writeUTF(gson.toJson(fPlayer)))
-                    .integration(s -> s.replace("<moderator>", fPlayer.getName()))
-                    .sound(getSound())
+        FPlayer fTarget = fPlayerDAO.getFPlayer(target);
+        if (fTarget.isUnknown()) {
+            builder(fPlayer)
+                    .format(Localization.Command.Unwarn::getNullPlayer)
                     .sendBuilt();
-        });
+            return;
+        }
+
+        List<Moderation> warns = new ArrayList<>();
+
+        if (id == -1) {
+            warns.addAll(moderationDAO.getValidModerations(fTarget, Moderation.Type.WARN));
+        } else {
+            moderationDAO.getValidModerations(fTarget, Moderation.Type.WARN).stream()
+                    .filter(warn -> warn.getId() == id)
+                    .findAny()
+                    .ifPresent(warns::add);
+        }
+
+        if (warns.isEmpty()) {
+            builder(fPlayer)
+                    .format(Localization.Command.Unwarn::getNotWarned)
+                    .sendBuilt();
+            return;
+        }
+
+        for (Moderation warn : warns) {
+            moderationDAO.updateInvalidModeration(warn);
+        }
+
+        builder(fTarget)
+                .tag(MessageTag.COMMAND_UNWARN)
+                .destination(command.getDestination())
+                .range(command.getRange())
+                .filter(filter -> filter.is(FPlayer.Setting.WARN))
+                .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
+                .proxy(output -> output.writeUTF(gson.toJson(fPlayer)))
+                .integration(s -> s.replace("<moderator>", fPlayer.getName()))
+                .sound(getSound())
+                .sendBuilt();
     }
 
     @Override

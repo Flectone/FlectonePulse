@@ -8,7 +8,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.ColorsDAO;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
@@ -27,7 +28,6 @@ import net.flectone.pulse.module.message.status.version.VersionModule;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.ServerUtil;
 
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
@@ -37,12 +37,12 @@ public class StatusModule extends AbstractModule {
     private final Message.Status message;
     private final Permission.Message.Status permission;
 
-    private final Database database;
+    private final FPlayerDAO fPlayerDAO;
+    private final ColorsDAO colorsDAO;
     private final MOTDModule MOTDModule;
     private final IconModule iconModule;
     private final PlayersModule playersModule;
     private final VersionModule versionModule;
-    private final FLogger fLogger;
     private final ComponentUtil componentUtil;
     private final ServerUtil bukkitUtil;
     private final FPlayerManager fPlayerManager;
@@ -51,7 +51,8 @@ public class StatusModule extends AbstractModule {
 
     @Inject
     public StatusModule(FileManager fileManager,
-                        Database database,
+                        FPlayerDAO fPlayerDAO,
+                        ColorsDAO colorsDAO,
                         MOTDModule MOTDModule,
                         IconModule iconModule,
                         PlayersModule playersModule,
@@ -62,12 +63,12 @@ public class StatusModule extends AbstractModule {
                         FPlayerManager fPlayerManager,
                         ListenerManager listenerManager,
                         IntegrationModule integrationModule) {
-        this.database = database;
+        this.fPlayerDAO = fPlayerDAO;
+        this.colorsDAO = colorsDAO;
         this.MOTDModule = MOTDModule;
         this.iconModule = iconModule;
         this.playersModule = playersModule;
         this.versionModule = versionModule;
-        this.fLogger = fLogger;
         this.componentUtil = componentUtil;
         this.bukkitUtil = bukkitUtil;
         this.fPlayerManager = fPlayerManager;
@@ -96,12 +97,8 @@ public class StatusModule extends AbstractModule {
     }
 
     public void send(User user) {
-        FPlayer fPlayer = FPlayer.UNKNOWN;
-
-        try {
-            fPlayer = database.getFPlayer(user.getAddress().getAddress());
-            database.setColors(fPlayer);
-        } catch (SQLException ignored) {}
+        FPlayer fPlayer = fPlayerDAO.getFPlayer(user.getAddress().getAddress());
+        colorsDAO.setFPlayerColors(fPlayer);
 
         if (checkModulePredicates(fPlayer)) return;
 

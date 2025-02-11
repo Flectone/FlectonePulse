@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.ignorelist;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.IntegerArgument;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.platform.MessageSender;
@@ -15,11 +16,12 @@ public class BukkitIgnorelistModule extends IgnorelistModule {
 
     @Inject
     public BukkitIgnorelistModule(FileManager fileManager,
+                                  FPlayerDAO fPlayerDAO,
                                   MessageSender messageSender,
                                   ComponentUtil componentUtil,
                                   CommandUtil commandUtil,
                                   TimeUtil timeUtil) {
-        super(fileManager, messageSender, componentUtil, commandUtil, timeUtil);
+        super(fileManager, fPlayerDAO, messageSender, componentUtil, commandUtil, timeUtil);
     }
 
     @Override
@@ -30,7 +32,7 @@ public class BukkitIgnorelistModule extends IgnorelistModule {
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(new IntegerArgument(prompt).setOptional(true)
-                        .executesPlayer(this::executesFPlayerDatabase)
+                        .executesPlayer(this::executesFPlayer)
                 )
                 .override();
     }

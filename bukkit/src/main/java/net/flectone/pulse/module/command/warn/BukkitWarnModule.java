@@ -5,8 +5,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.util.BukkitCommandUtil;
 import net.flectone.pulse.util.ModerationUtil;
@@ -18,11 +19,12 @@ public class BukkitWarnModule extends WarnModule {
 
     @Inject
     public BukkitWarnModule(FileManager fileManager,
-                            ThreadManager threadManager,
+                            FPlayerDAO fPlayerDAO,
+                            ModerationDAO moderationDAO,
                             BukkitCommandUtil commandUtil,
                             ModerationUtil moderationUtil,
                             Gson gson) {
-        super(fileManager, threadManager, commandUtil, moderationUtil, gson);
+        super(fileManager, fPlayerDAO, moderationDAO, commandUtil, moderationUtil, gson);
 
         this.commandUtil = commandUtil;
     }

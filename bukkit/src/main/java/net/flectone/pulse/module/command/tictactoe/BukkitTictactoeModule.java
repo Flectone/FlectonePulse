@@ -6,10 +6,10 @@ import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ProxyManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.module.command.tictactoe.manager.TictactoeManager;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -23,14 +23,14 @@ public class BukkitTictactoeModule extends TictactoeModule {
 
     @Inject
     public BukkitTictactoeModule(FileManager fileManager,
+                                 FPlayerDAO fPlayerDAO,
                                  TictactoeManager tictactoeManager,
-                                 ThreadManager threadManager,
                                  FPlayerManager fPlayerManager,
                                  ProxyManager proxyManager,
                                  IntegrationModule integrationModule,
                                  BukkitCommandUtil commandUtil,
                                  Gson gson) {
-        super(fileManager, tictactoeManager, threadManager, proxyManager, integrationModule, commandUtil, gson);
+        super(fileManager, fPlayerDAO, tictactoeManager, proxyManager, integrationModule, commandUtil, gson);
 
         this.fPlayerManager = fPlayerManager;
         this.commandUtil = commandUtil;
@@ -48,7 +48,7 @@ public class BukkitTictactoeModule extends TictactoeModule {
                 .then(new StringArgument(playerPrompt)
                         .includeSuggestions(commandUtil.argumentFPlayers(false))
                         .then(new BooleanArgument(hardPrompt).setOptional(true)
-                                .executesPlayer(this::executesFPlayerDatabase)
+                                .executesPlayer(this::executesFPlayer)
                         )
                 )
                 .then(new IntegerArgument(promptId + " 1")

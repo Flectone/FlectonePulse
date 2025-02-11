@@ -5,7 +5,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import com.google.inject.Inject;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Config;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -15,7 +15,6 @@ import net.flectone.pulse.util.PacketEventsUtil;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +28,7 @@ public abstract class FPlayerManager {
 
     private final Config config;
 
+    @Inject private FPlayerDAO fPlayerDAO;
     @Inject private ThreadManager threadManager;
     @Inject private IntegrationModule integrationModule;
     @Inject private PacketEventsUtil packetEventsUtil;
@@ -56,8 +56,8 @@ public abstract class FPlayerManager {
 
     public abstract FPlayer convertToFPlayer(Object player);
     public abstract Object convertToPlayer(FPlayer fPlayer);
-    public abstract FPlayer put(Database database, UUID uuid, int entityId, String name, String ip) throws SQLException;
-    public abstract void remove(Database database, FPlayer fPlayer) throws SQLException;
+    public abstract FPlayer put(UUID uuid, int entityId, String name, String ip);
+    public abstract void remove(FPlayer fPlayer);
     public abstract String getWorldName(FPlayer fPlayer);
     public abstract String getWorldEnvironment(FPlayer fPlayer);
     public abstract Object getItem(@NotNull UUID uuid);
@@ -75,9 +75,7 @@ public abstract class FPlayerManager {
         FPlayer console = new FPlayer(config.getConsole());
         fPlayers.put(console.getUuid(), console);
 
-        threadManager.runDatabase(database -> {
-            database.insertFPlayer(console);
-        });
+        fPlayerDAO.insertFPlayer(console);
 
         loadOnlinePlayers();
     }

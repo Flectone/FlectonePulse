@@ -7,6 +7,9 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import net.flectone.pulse.database.dao.ColorsDAO;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
@@ -64,6 +67,8 @@ import java.util.*;
 @Singleton
 public class BukkitProxyListener implements PluginMessageListener {
 
+    private final ColorsDAO colorsDAO;
+    private final ModerationDAO moderationDAO;
     private final FileManager fileManager;
     private final FPlayerManager fPlayerManager;
     private final ThreadManager threadManager;
@@ -72,12 +77,16 @@ public class BukkitProxyListener implements PluginMessageListener {
     private final Injector injector;
 
     @Inject
-    public BukkitProxyListener(FileManager fileManager,
+    public BukkitProxyListener(ColorsDAO colorsDAO,
+                               ModerationDAO moderationDAO,
+                               FileManager fileManager,
                                FPlayerManager fPlayerManager,
                                ThreadManager threadManager,
                                ProxyManager proxyManager,
                                Gson gson,
                                Injector injector) {
+        this.colorsDAO = colorsDAO;
+        this.moderationDAO = moderationDAO;
         this.fileManager = fileManager;
         this.fPlayerManager = fPlayerManager;
         this.threadManager = threadManager;
@@ -91,7 +100,7 @@ public class BukkitProxyListener implements PluginMessageListener {
         if (!channel.equals(proxyManager.getChannel())) return;
         if (!proxyManager.isEnabledProxy()) return;
 
-        threadManager.runAsync(database -> {
+        threadManager.runAsync(() -> {
             ByteArrayDataInput input = ByteStreams.newDataInput(bytes);
 
             MessageTag tag = MessageTag.fromProxyString(input.readUTF());
@@ -177,7 +186,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                             .sendBuilt();
                 }
 
-                case COMMAND_CHATCOLOR -> database.setColors(fPlayerManager.get(fEntity.getUuid()));
+                case COMMAND_CHATCOLOR -> colorsDAO.setFPlayerColors(fPlayerManager.get(fEntity.getUuid()));
 
                 case COMMAND_COIN -> {
                     CoinModule coinModule = injector.getInstance(CoinModule.class);
@@ -242,7 +251,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                     if (muteModule.checkModulePredicates(fModerator)) return;
 
                     if (!fPlayerManager.get(fEntity.getUuid()).isUnknown()) {
-                        fPlayerManager.get(fEntity.getUuid()).updateMutes(database.getValidModerations(Moderation.Type.MUTE));
+                        fPlayerManager.get(fEntity.getUuid()).updateMutes(moderationDAO.getValidModerations(Moderation.Type.MUTE));
                     }
 
                     Moderation mute = gson.fromJson(input.readUTF(), Moderation.class);
@@ -277,7 +286,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                     if (unmuteModule.checkModulePredicates(fPlayer)) return;
 
                     if (!fPlayerManager.get(fEntity.getUuid()).isUnknown()) {
-                        fPlayerManager.get(fEntity.getUuid()).updateMutes(database.getValidModerations(Moderation.Type.MUTE));
+                        fPlayerManager.get(fEntity.getUuid()).updateMutes(moderationDAO.getValidModerations(Moderation.Type.MUTE));
                     }
 
                     unmuteModule.builder(fEntity)

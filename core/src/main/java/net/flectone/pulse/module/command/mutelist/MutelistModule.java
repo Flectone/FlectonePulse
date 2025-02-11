@@ -1,7 +1,8 @@
 package net.flectone.pulse.module.command.mutelist;
 
 import lombok.Getter;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
@@ -16,7 +17,6 @@ import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.ModerationUtil;
 import net.kyori.adventure.text.Component;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +25,8 @@ public abstract class MutelistModule extends AbstractModuleCommand<Localization.
     @Getter private final Command.Mutelist command;
     @Getter private final Permission.Command.Mutelist permission;
 
+    private final FPlayerDAO fPlayerDAO;
+    private final ModerationDAO moderationDAO;
     private final UnmuteModule unmuteModule;
     private final ComponentUtil componentUtil;
     private final CommandUtil commandUtil;
@@ -32,6 +34,8 @@ public abstract class MutelistModule extends AbstractModuleCommand<Localization.
     private final MessageSender messageSender;
 
     public MutelistModule(FileManager fileManager,
+                          FPlayerDAO fPlayerDAO,
+                          ModerationDAO moderationDAO,
                           UnmuteModule unmuteModule,
                           ComponentUtil componentUtil,
                           CommandUtil commandUtil,
@@ -39,6 +43,8 @@ public abstract class MutelistModule extends AbstractModuleCommand<Localization.
                           MessageSender messageSender) {
         super(localization -> localization.getCommand().getMutelist(), null);
 
+        this.fPlayerDAO = fPlayerDAO;
+        this.moderationDAO = moderationDAO;
         this.unmuteModule = unmuteModule;
         this.componentUtil = componentUtil;
         this.commandUtil = commandUtil;
@@ -52,7 +58,7 @@ public abstract class MutelistModule extends AbstractModuleCommand<Localization.
     }
 
     @Override
-    public void onCommand(Database database, FPlayer fPlayer, Object arguments) throws SQLException {
+    public void onCommand(FPlayer fPlayer, Object arguments) {
         if (checkModulePredicates(fPlayer)) return;
 
         Localization.Command.Mutelist localization = resolveLocalization(fPlayer);
@@ -67,7 +73,7 @@ public abstract class MutelistModule extends AbstractModuleCommand<Localization.
         FPlayer targetFPlayer = null;
 
         if (optionalObject.isPresent() && optionalObject.get() instanceof String playerName) {
-            targetFPlayer = database.getFPlayer(playerName);
+            targetFPlayer = fPlayerDAO.getFPlayer(playerName);
 
             if (targetFPlayer.isUnknown()) {
                 builder(fPlayer)
@@ -88,8 +94,8 @@ public abstract class MutelistModule extends AbstractModuleCommand<Localization.
         }
 
         List<Moderation> moderationList = targetFPlayer == null
-                ? database.getValidModerations(Moderation.Type.MUTE)
-                : database.getModerations(targetFPlayer, Moderation.Type.MUTE);
+                ? moderationDAO.getValidModerations(Moderation.Type.MUTE)
+                : moderationDAO.getModerations(targetFPlayer, Moderation.Type.MUTE);
 
         if (moderationList.isEmpty()) {
             builder(fPlayer)
@@ -121,7 +127,7 @@ public abstract class MutelistModule extends AbstractModuleCommand<Localization.
 
         for (Moderation moderation : finalModerationList) {
 
-            FPlayer fTarget = database.getFPlayer(moderation.getPlayer());
+            FPlayer fTarget = fPlayerDAO.getFPlayer(moderation.getPlayer());
 
             String line = localizationType.getLine().replace("<command>", "/" + unmuteModule.getName(unmuteModule.getCommand()) + " <player> <id>");
             line = moderationUtil.replacePlaceholders(line, fPlayer, moderation);

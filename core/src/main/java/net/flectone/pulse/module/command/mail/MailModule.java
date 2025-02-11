@@ -2,12 +2,12 @@ package net.flectone.pulse.module.command.mail;
 
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.MailDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.mail.model.Mail;
@@ -16,7 +16,6 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,20 +25,23 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
     @Getter private final Permission.Command.Mail permission;
 
     private final TellModule tellModule;
-    private final ThreadManager threadManager;
     private final IntegrationModule integrationModule;
+    private final FPlayerDAO fPlayerDAO;
+    private final MailDAO mailDAO;
     private final CommandUtil commandUtil;
 
     public MailModule(FileManager fileManager,
                       TellModule tellModule,
-                      ThreadManager threadManager,
                       IntegrationModule integrationModule,
+                      FPlayerDAO fPlayerDAO,
+                      MailDAO mailDAO,
                       CommandUtil commandUtil) {
         super(localization -> localization.getCommand().getMail(), fPlayer -> fPlayer.is(FPlayer.Setting.MAIL));
 
         this.tellModule = tellModule;
-        this.threadManager = threadManager;
         this.integrationModule = integrationModule;
+        this.fPlayerDAO = fPlayerDAO;
+        this.mailDAO = mailDAO;
         this.commandUtil = commandUtil;
 
         command = fileManager.getCommand().getMail();
@@ -47,7 +49,7 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
     }
 
     @Override
-    public void onCommand(Database database, FPlayer fPlayer, Object arguments) throws SQLException {
+    public void onCommand(FPlayer fPlayer, Object arguments) {
         if (checkCooldown(fPlayer)) return;
         if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
         if (checkMute(fPlayer)) return;
@@ -56,7 +58,7 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
         String playerName = commandUtil.getString(0, arguments);
         if (playerName == null) return;
 
-        Optional<FPlayer> optionalPlayer = database.getFPlayers().stream()
+        Optional<FPlayer> optionalPlayer = fPlayerDAO.getFPlayers().stream()
                 .filter(offlinePlayer -> playerName.equalsIgnoreCase(offlinePlayer.getName()))
                 .findAny();
 
@@ -67,7 +69,7 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
             return;
         }
 
-        FPlayer fReceiver = database.getFPlayer(optionalPlayer.get().getUuid());
+        FPlayer fReceiver = fPlayerDAO.getFPlayer(optionalPlayer.get().getUuid());
 
         if (fReceiver.isOnline() && !integrationModule.isVanished(fReceiver)) {
             if (!tellModule.isEnable()) return;
@@ -81,7 +83,7 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
 
         String string = commandUtil.getString(1, arguments);
 
-        Mail mail = database.insertMail(fPlayer, fReceiver, string);
+        Mail mail = mailDAO.insertMail(fPlayer, fReceiver, string);
         if (mail == null) return;
 
         builder(fReceiver)
@@ -96,22 +98,20 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
     public void send(FPlayer fReceiver) {
         if (checkModulePredicates(fReceiver)) return;
 
-        threadManager.runDatabase(database -> {
-            List<Mail> mails = database.getMails(fReceiver);
-            if (mails.isEmpty()) return;
+        List<Mail> mails = mailDAO.getMails(fReceiver);
+        if (mails.isEmpty()) return;
 
-            for (Mail mail : mails) {
-                FPlayer fPlayer = database.getFPlayer(mail.sender());
+        for (Mail mail : mails) {
+            FPlayer fPlayer = fPlayerDAO.getFPlayer(mail.sender());
 
-                builder(fPlayer)
-                        .receiver(fReceiver)
-                        .format((fResolver, s) -> s.getReceiver())
-                        .message((fResolver, s) -> mail.message())
-                        .sendBuilt();
+            builder(fPlayer)
+                    .receiver(fReceiver)
+                    .format((fResolver, s) -> s.getReceiver())
+                    .message((fResolver, s) -> mail.message())
+                    .sendBuilt();
 
-                database.removeMail(mail);
-            }
-        });
+            mailDAO.removeMail(mail);
+        }
     }
 
     @Override

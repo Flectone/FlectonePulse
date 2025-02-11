@@ -2,7 +2,7 @@ package net.flectone.pulse.module.command.geolocate;
 
 import com.github.retrooper.packetevents.protocol.player.User;
 import lombok.Getter;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
@@ -17,7 +17,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,14 +27,17 @@ public abstract class GeolocateModule extends AbstractModuleCommand<Localization
     @Getter private final Command.Geolocate command;
     @Getter private final Permission.Command.Geolocate permission;
 
+    private final FPlayerDAO fPlayerDAO;
     private final CommandUtil commandUtil;
     private final PacketEventsUtil packetEventsUtil;
 
     public GeolocateModule(FileManager fileManager,
+                           FPlayerDAO fPlayerDAO,
                            CommandUtil commandUtil,
                            PacketEventsUtil packetEventsUtil) {
         super(localization -> localization.getCommand().getGeolocate(), null);
 
+        this.fPlayerDAO = fPlayerDAO;
         this.commandUtil = commandUtil;
         this.packetEventsUtil = packetEventsUtil;
 
@@ -47,12 +49,12 @@ public abstract class GeolocateModule extends AbstractModuleCommand<Localization
     }
 
     @Override
-    public void onCommand(Database database, FPlayer fPlayer, Object arguments) throws SQLException {
+    public void onCommand(FPlayer fPlayer, Object arguments) {
         if (checkModulePredicates(fPlayer)) return;
 
         String playerName = commandUtil.getString(0, arguments);
 
-        FPlayer fTarget = database.getFPlayer(playerName);
+        FPlayer fTarget = fPlayerDAO.getFPlayer(playerName);
 
         if (fTarget.isUnknown()) {
             builder(fPlayer)

@@ -5,7 +5,7 @@ import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServer
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
@@ -19,7 +19,6 @@ import net.flectone.pulse.util.PermissionUtil;
 import net.flectone.pulse.util.ServerUtil;
 import net.kyori.adventure.text.Component;
 
-import java.sql.SQLException;
 import java.util.List;
 
 @Singleton
@@ -32,8 +31,7 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
     private final ServerUtil serverUtil;
     private final ComponentUtil componentUtil;
     private final PacketEventsUtil packetEventsUtil;
-    private final Database database;
-    private final FLogger fLogger;
+    private final FPlayerDAO fPlayerDAO;
 
     @Inject
     public PlayersModule(FileManager fileManager,
@@ -41,16 +39,14 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
                          ServerUtil serverUtil,
                          ComponentUtil componentUtil,
                          PacketEventsUtil packetEventsUtil,
-                         Database database,
-                         FLogger fLogger) {
+                         FPlayerDAO fPlayerDAO) {
         super(module -> module.getMessage().getStatus().getPlayers());
 
         this.permissionUtil = permissionUtil;
         this.serverUtil = serverUtil;
         this.componentUtil = componentUtil;
         this.packetEventsUtil = packetEventsUtil;
-        this.database = database;
-        this.fLogger = fLogger;
+        this.fPlayerDAO = fPlayerDAO;
 
         message = fileManager.getMessage().getStatus().getPlayers();
         permission = fileManager.getPermission().getMessage().getStatus().getPlayers();
@@ -66,13 +62,7 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
         if (!isEnable()) return false;
         if (!message.isControl()) return false;
 
-        FPlayer fPlayer = FPlayer.UNKNOWN;
-
-        try {
-            fPlayer = database.getFPlayer(userProfile.getUUID());
-        } catch (SQLException e) {
-            fLogger.warning(e);
-        }
+        FPlayer fPlayer = fPlayerDAO.getFPlayer(userProfile.getUUID());
 
         if (checkModulePredicates(fPlayer)) return false;
         if (permissionUtil.has(fPlayer, permission.getBypass())) return false;

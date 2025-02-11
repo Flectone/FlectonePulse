@@ -3,7 +3,7 @@ package net.flectone.pulse.module.message.op;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.database.Database;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
@@ -16,7 +16,6 @@ import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.op.listener.OpPacketListener;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.SQLException;
 import java.util.UUID;
 
 @Singleton
@@ -27,21 +26,18 @@ public class OpModule extends AbstractModuleMessage<Localization.Message.Op> {
 
     private final FPlayerManager fPlayerManager;
     private final ListenerManager listenerManager;
-    private final Database database;
-    private final FLogger fLogger;
+    private final FPlayerDAO fPlayerDAO;
 
     @Inject
     public OpModule(FileManager fileManager,
                     FPlayerManager fPlayerManager,
                     ListenerManager listenerManager,
-                    Database database,
-                    FLogger fLogger) {
+                    FPlayerDAO fPlayerDAO) {
         super(localization -> localization.getMessage().getOp());
 
         this.fPlayerManager = fPlayerManager;
         this.listenerManager = listenerManager;
-        this.database = database;
-        this.fLogger = fLogger;
+        this.fPlayerDAO = fPlayerDAO;
 
         message = fileManager.getMessage().getOp();
         permission = fileManager.getPermission().getMessage().getOp();
@@ -66,20 +62,15 @@ public class OpModule extends AbstractModuleMessage<Localization.Message.Op> {
         FPlayer fPlayer = fPlayerManager.get(receiver);
         if (checkModulePredicates(fPlayer)) return;
 
-        try {
-            FPlayer fTarget = database.getFPlayer(target);
-            if (fTarget.isUnknown()) return;
+        FPlayer fTarget = fPlayerDAO.getFPlayer(target);
+        if (fTarget.isUnknown()) return;
 
-            builder(fTarget)
-                    .destination(message.getDestination())
-                    .receiver(fPlayer)
-                    .format(Localization.Message.Op::getFormat)
-                    .sound(getSound())
-                    .sendBuilt();
-
-        } catch (SQLException e) {
-            fLogger.warning(e);
-        }
+        builder(fTarget)
+                .destination(message.getDestination())
+                .receiver(fPlayer)
+                .format(Localization.Message.Op::getFormat)
+                .sound(getSound())
+                .sendBuilt();
     }
 
 }

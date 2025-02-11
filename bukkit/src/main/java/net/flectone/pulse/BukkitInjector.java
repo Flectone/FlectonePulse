@@ -10,9 +10,7 @@ import com.google.inject.name.Names;
 import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.database.Database;
-import net.flectone.pulse.database.mysql.MySQLDatabase;
-import net.flectone.pulse.database.sqlite.SQLiteDatabase;
+import net.flectone.pulse.file.Config;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.*;
 import net.flectone.pulse.module.command.ball.BallModule;
@@ -289,12 +287,10 @@ public class BukkitInjector extends AbstractModule {
         bind(TeamManager.class).toInstance(scoreboardLibrary.createTeamManager());
         bind(BukkitFPlayerManager.class).asEagerSingleton();
 
-        if (fileManager.getConfig().getDatabase().getType() == Database.Type.MYSQL) {
-            bind(InputStream.class).annotatedWith(Names.named("SQLFile")).toInstance(plugin.getResource("sqls/mysql_flectonepulse.sql"));
-            bind(Database.class).to(MySQLDatabase.class);
+        if (fileManager.getConfig().getDatabase().getType() == Config.Database.Type.MYSQL) {
+            bind(InputStream.class).annotatedWith(Names.named("SQLFile")).toInstance(plugin.getResource("sqls/mysql.sql"));
         } else {
-            bind(InputStream.class).annotatedWith(Names.named("SQLFile")).toInstance(plugin.getResource("sqls/sqlite_flectonepulse.sql"));
-            bind(Database.class).to(SQLiteDatabase.class);
+            bind(InputStream.class).annotatedWith(Names.named("SQLFile")).toInstance(plugin.getResource("sqls/sqlite.sql"));
         }
 
         bind(ModuleManager.class).asEagerSingleton();

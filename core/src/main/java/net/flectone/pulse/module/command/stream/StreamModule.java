@@ -2,11 +2,11 @@ package net.flectone.pulse.module.command.stream;
 
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -27,15 +27,15 @@ public abstract class StreamModule extends AbstractModuleCommand<Localization.Co
     @Getter private final Command.Stream command;
     @Getter private final Permission.Command.Stream permission;
 
-    private final ThreadManager threadManager;
+    private final FPlayerDAO fPlayerDAO;
     private final CommandUtil commandUtil;
 
     public StreamModule(FileManager fileManager,
-                        ThreadManager threadManager,
+                        FPlayerDAO fPlayerDAO,
                         CommandUtil commandUtil) {
         super(localization -> localization.getCommand().getStream(), null);
 
-        this.threadManager = threadManager;
+        this.fPlayerDAO = fPlayerDAO;
         this.commandUtil = commandUtil;
 
         command = fileManager.getCommand().getStream();
@@ -109,7 +109,7 @@ public abstract class StreamModule extends AbstractModuleCommand<Localization.Co
         Localization.Command.Stream localization = resolveLocalization(fPlayer);
         fPlayer.setStreamPrefix(isStart ? localization.getPrefixTrue() : localization.getPrefixFalse());
 
-        threadManager.runDatabase(database -> database.updateFPlayer(fPlayer));
+        fPlayerDAO.updateFPlayer(fPlayer);
     }
 
     public TagResolver streamTag(@NotNull FEntity sender) {

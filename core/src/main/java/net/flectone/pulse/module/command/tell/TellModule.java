@@ -1,13 +1,14 @@
 package net.flectone.pulse.module.command.tell;
 
 import lombok.Getter;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.IgnoreDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ProxyManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -29,21 +30,24 @@ public abstract class TellModule extends AbstractModuleCommand<Localization.Comm
     @Getter private final Command.Tell command;
     @Getter private final Permission.Command.Tell permission;
 
-    private final ThreadManager threadManager;
+    private final FPlayerDAO fPlayerDAO;
+    private final IgnoreDAO ignoreDAO;
     private final FPlayerManager fPlayerManager;
     private final ProxyManager proxyManager;
     private final IntegrationModule integrationModule;
     private final CommandUtil commandUtil;
 
     public TellModule(FileManager fileManager,
-                      ThreadManager threadManager,
+                      FPlayerDAO fPlayerDAO,
+                      IgnoreDAO ignoreDAO,
                       FPlayerManager fPlayerManager,
                       ProxyManager proxyManager,
                       IntegrationModule integrationModule,
                       CommandUtil commandUtil) {
         super(localization -> localization.getCommand().getTell(), fPlayer -> fPlayer.is(FPlayer.Setting.TELL));
 
-        this.threadManager = threadManager;
+        this.fPlayerDAO = fPlayerDAO;
+        this.ignoreDAO = ignoreDAO;
         this.fPlayerManager = fPlayerManager;
         this.proxyManager = proxyManager;
         this.integrationModule = integrationModule;
@@ -77,48 +81,45 @@ public abstract class TellModule extends AbstractModuleCommand<Localization.Comm
             return;
         }
 
-        threadManager.runAsync(database -> {
+        Optional<FPlayer> optionalFReceiver = fPlayerDAO.getOnlineFPlayers().stream()
+                .filter(filterPlayer -> filterPlayer.getName().equalsIgnoreCase(playerName))
+                .findAny();
 
-            Optional<FPlayer> optionalFReceiver = database.getOnlineFPlayers().stream()
-                    .filter(filterPlayer -> filterPlayer.getName().equalsIgnoreCase(playerName))
-                    .findAny();
+        if (optionalFReceiver.isEmpty()) {
+            builder(fPlayer)
+                    .format(Localization.Command.Tell::getNullPlayer)
+                    .sendBuilt();
+            return;
+        }
 
-            if (optionalFReceiver.isEmpty()) {
-                builder(fPlayer)
-                        .format(Localization.Command.Tell::getNullPlayer)
-                        .sendBuilt();
-                return;
-            }
+        FPlayer fReceiver = fPlayerDAO.getFPlayer(optionalFReceiver.get().getId());
 
-            FPlayer fReceiver = database.getFPlayer(optionalFReceiver.get().getId());
+        ignoreDAO.setIgnores(fReceiver);
 
-            database.setIgnores(fReceiver);
+        if (checkIgnore(fPlayer, fReceiver)) return;
+        if (checkDisable(fPlayer, fReceiver, DisableAction.HE)) return;
 
-            if (checkIgnore(fPlayer, fReceiver)) return;
-            if (checkDisable(fPlayer, fReceiver, DisableAction.HE)) return;
+        String receiverUUID = fReceiver.getUuid().toString();
 
-            String receiverUUID = fReceiver.getUuid().toString();
+        boolean isSent = proxyManager.sendMessage(fPlayer, MessageTag.COMMAND_TELL, byteArrayDataOutput -> {
+            byteArrayDataOutput.writeUTF(receiverUUID);
+            byteArrayDataOutput.writeUTF(message);
 
-            boolean isSent = proxyManager.sendMessage(fPlayer, MessageTag.COMMAND_TELL, byteArrayDataOutput -> {
-                byteArrayDataOutput.writeUTF(receiverUUID);
-                byteArrayDataOutput.writeUTF(message);
-
-                send(fReceiver, fPlayer, (fResolver, s) -> s.getSender(), message);
-            });
-
-            if (isSent) return;
-
-            FPlayer fNewReceiver = fPlayerManager.get(fReceiver.getUuid());
-            if (integrationModule.isVanished(fNewReceiver)) {
-                builder(fPlayer)
-                        .format(Localization.Command.Tell::getNullPlayer)
-                        .sendBuilt();
-                return;
-            }
-
-            send(fPlayer, fNewReceiver, (fResolver, s) -> s.getReceiver(), message);
-            send(fNewReceiver, fPlayer, (fResolver, s) -> s.getSender(), message);
+            send(fReceiver, fPlayer, (fResolver, s) -> s.getSender(), message);
         });
+
+        if (isSent) return;
+
+        FPlayer fNewReceiver = fPlayerManager.get(fReceiver.getUuid());
+        if (integrationModule.isVanished(fNewReceiver)) {
+            builder(fPlayer)
+                    .format(Localization.Command.Tell::getNullPlayer)
+                    .sendBuilt();
+            return;
+        }
+
+        send(fPlayer, fNewReceiver, (fResolver, s) -> s.getReceiver(), message);
+        send(fNewReceiver, fPlayer, (fResolver, s) -> s.getSender(), message);
     }
 
     public void send(FEntity fPlayer, FPlayer fReceiver, BiFunction<FPlayer, Localization.Command.Tell, String> format, String string) {

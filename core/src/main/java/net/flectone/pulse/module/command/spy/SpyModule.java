@@ -1,11 +1,11 @@
 package net.flectone.pulse.module.command.spy;
 
 import lombok.Getter;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.util.MessageTag;
@@ -18,15 +18,15 @@ public abstract class SpyModule extends AbstractModuleCommand<Localization.Comma
     @Getter private final Command.Spy command;
     @Getter private final Permission.Command.Spy permission;
 
-    private final ThreadManager threadManager;
+    private final FPlayerDAO fPlayerDAO;
     private final PermissionUtil permissionUtil;
 
     public SpyModule(FileManager fileManager,
-                     ThreadManager threadManager,
+                     FPlayerDAO fPlayerDAO,
                      PermissionUtil permissionUtil) {
         super(localization -> localization.getCommand().getSpy(), null);
 
-        this.threadManager = threadManager;
+        this.fPlayerDAO = fPlayerDAO;
         this.permissionUtil = permissionUtil;
 
         command = fileManager.getCommand().getSpy();
@@ -39,7 +39,7 @@ public abstract class SpyModule extends AbstractModuleCommand<Localization.Comma
         if (checkModulePredicates(fPlayer)) return;
 
         fPlayer.set(FPlayer.Setting.SPY, !fPlayer.is(FPlayer.Setting.SPY));
-        threadManager.runDatabase(database -> database.updateFPlayer(fPlayer));
+        fPlayerDAO.updateFPlayer(fPlayer);
 
         builder(fPlayer)
                 .destination(command.getDestination())

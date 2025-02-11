@@ -8,10 +8,10 @@ import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.InventoryManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.util.ComponentUtil;
@@ -31,11 +31,11 @@ public class BukkitChatsettingModule extends ChatsettingModule {
 
     @Inject
     public BukkitChatsettingModule(FileManager fileManager,
-                                   ThreadManager threadManager,
+                                   FPlayerDAO fPlayerDAO,
                                    InventoryManager inventoryManager,
                                    ComponentUtil componentUtil,
                                    PermissionUtil permissionUtil) {
-        super(fileManager, threadManager, inventoryManager, componentUtil, permissionUtil);
+        super(fileManager, fPlayerDAO, inventoryManager, componentUtil, permissionUtil);
 
         this.componentUtil = componentUtil;
     }

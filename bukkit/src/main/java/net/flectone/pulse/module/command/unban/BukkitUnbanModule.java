@@ -6,35 +6,29 @@ import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
-import net.flectone.pulse.database.Database;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.util.CommandUtil;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class BukkitUnbanModule extends UnbanModule {
 
-    private final Database database;
-    private final FLogger fLogger;
+    private final ModerationDAO moderationDAO;
 
     @Inject
     public BukkitUnbanModule(FileManager fileManager,
-                             ThreadManager threadManager,
+                             FPlayerDAO fPlayerDAO,
+                             ModerationDAO moderationDAO,
                              CommandUtil commandUtil,
-                             Gson gson,
-                             Database database,
-                             FLogger fLogger) {
-        super(fileManager, threadManager, commandUtil, gson);
+                             Gson gson) {
+        super(fileManager, fPlayerDAO, moderationDAO, commandUtil, gson);
 
-        this.database = database;
-        this.fLogger = fLogger;
+        this.moderationDAO = moderationDAO;
     }
 
     @Override
@@ -46,15 +40,9 @@ public class BukkitUnbanModule extends UnbanModule {
                 .withAliases(getCommand().getAliases())
                 .withPermission(getPermission())
                 .then(new StringArgument(prompt)
-                        .includeSuggestions(ArgumentSuggestions.stringCollectionAsync(info -> CompletableFuture.supplyAsync(() -> {
-                            try {
-                                return database.getValidModerationsNames(Moderation.Type.BAN);
-                            } catch (SQLException e) {
-                                fLogger.warning(e);
-                            }
-
-                            return new ArrayList<>();
-                        })))
+                        .includeSuggestions(ArgumentSuggestions.stringCollectionAsync(info ->
+                                CompletableFuture.supplyAsync(() ->
+                                        moderationDAO.getPlayersNameWithValidModeration(Moderation.Type.BAN))))
                         .then(new IntegerArgument(promptNumber).setOptional(true)
                                 .executes(this::executesFPlayer)
                         )
