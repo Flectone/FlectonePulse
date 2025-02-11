@@ -44,14 +44,19 @@ public class BukkitProxyConnector extends ProxyConnector {
     public void reload() {
         super.reload();
 
+        String channel = getChannel();
+        if (channel == null) return;
+
         plugin.getServer().getMessenger().unregisterOutgoingPluginChannel(plugin);
         plugin.getServer().getMessenger().unregisterIncomingPluginChannel(plugin);
-        plugin.getServer().getMessenger().registerOutgoingPluginChannel(plugin, getChannel());
-        plugin.getServer().getMessenger().registerIncomingPluginChannel(plugin, getChannel(), proxyListener);
+        plugin.getServer().getMessenger().registerOutgoingPluginChannel(plugin, channel);
+        plugin.getServer().getMessenger().registerIncomingPluginChannel(plugin, channel, proxyListener);
     }
 
     @Override
     public void disable() {
+        if (getChannel() == null) return;
+
         plugin.getServer().getMessenger().unregisterOutgoingPluginChannel(plugin);
         plugin.getServer().getMessenger().unregisterIncomingPluginChannel(plugin);
     }
