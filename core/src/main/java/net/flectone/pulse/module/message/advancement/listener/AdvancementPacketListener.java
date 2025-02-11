@@ -44,7 +44,6 @@ public class AdvancementPacketListener extends AbstractPacketListener {
 
         if (key.startsWith("chat.type.advancement")) {
             processAdvancement(key, translatableComponent, event);
-            return;
         }
     }
 

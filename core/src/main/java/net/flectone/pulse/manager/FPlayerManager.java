@@ -5,13 +5,12 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import com.google.inject.Inject;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Config;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.PacketEventsUtil;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +29,6 @@ public abstract class FPlayerManager {
     private final Config config;
 
     @Inject private FPlayerDAO fPlayerDAO;
-    @Inject private TaskScheduler taskScheduler;
     @Inject private IntegrationModule integrationModule;
     @Inject private PacketEventsUtil packetEventsUtil;
 

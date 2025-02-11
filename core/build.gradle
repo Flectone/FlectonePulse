@@ -26,6 +26,6 @@ buildConfig {
     rootProject.ext.properties.findAll { key, value ->
         !key.contains('.')
     }.each { key, value ->
-        buildConfigField(String, key.toString().toUpperCase(), value);
+        buildConfigField(String, key.toString().toUpperCase(), value)
     }
 }

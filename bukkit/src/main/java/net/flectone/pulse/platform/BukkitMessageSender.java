@@ -81,9 +81,9 @@ public class BukkitMessageSender extends MessageSender {
         JsonObject iconObject = new JsonObject();
 
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            iconObject.addProperty("id", toast.getIcon());
+            iconObject.addProperty("id", toast.icon());
         } else {
-            iconObject.addProperty("item", toast.getIcon());
+            iconObject.addProperty("item", toast.icon());
         }
 
         displayObject.add("icon", iconObject);
@@ -91,7 +91,7 @@ public class BukkitMessageSender extends MessageSender {
         displayObject.add("title", GsonComponentSerializer.gson().serializeToTree(title));
         displayObject.add("description", GsonComponentSerializer.gson().serializeToTree(Component.empty()));
         displayObject.addProperty("background", "minecraft:textures/gui/advancements/backgrounds/adventure.png");
-        displayObject.addProperty("frame", toast.getStyle().name().toLowerCase());
+        displayObject.addProperty("frame", toast.style().name().toLowerCase());
         displayObject.addProperty("announce_to_chat", false);
         displayObject.addProperty("show_toast", true);
         displayObject.addProperty("hidden", true);

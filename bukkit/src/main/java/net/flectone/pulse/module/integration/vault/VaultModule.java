@@ -59,7 +59,7 @@ public class VaultModule extends AbstractModule {
     }
 
     public Set<String> getGroups() {
-        if (!isEnable()) return Collections.emptySet();;
+        if (!isEnable()) return Collections.emptySet();
 
         return vaultIntegration.getGroups();
     }

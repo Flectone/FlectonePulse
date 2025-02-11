@@ -126,8 +126,8 @@ public abstract class FileSerializable extends YamlSerializable {
                         case TOAST -> {
                             Toast toast = destination.getToast();
 
-                            map.put("icon", toast.getIcon());
-                            map.put("style", toast.getStyle());
+                            map.put("icon", toast.icon());
+                            map.put("style", toast.style());
                         }
                         case TITLE, SUBTITLE, ACTION_BAR -> {
                             Times times = destination.getTimes();
