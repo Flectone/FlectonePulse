@@ -9,7 +9,7 @@ import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ListenerManager;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -22,18 +22,18 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
     @Getter private final Message.Join message;
     private final Permission.Message.Join permission;
 
-    private final ListenerManager listenerManager;
+    private final ListenerRegistry listenerRegistry;
     private final FPlayerManager fPlayerManager;
     private final IntegrationModule integrationModule;
 
     @Inject
     public JoinModule(FileManager fileManager,
-                      ListenerManager listenerManager,
+                      ListenerRegistry listenerRegistry,
                       FPlayerManager fPlayerManager,
                       IntegrationModule integrationModule) {
         super(localization -> localization.getMessage().getJoin());
 
-        this.listenerManager = listenerManager;
+        this.listenerRegistry = listenerRegistry;
         this.fPlayerManager = fPlayerManager;
         this.integrationModule =  integrationModule;
 
@@ -47,7 +47,7 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerManager.register(JoinPacketListener.class);
+        listenerRegistry.register(JoinPacketListener.class);
     }
 
     @Override

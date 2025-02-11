@@ -8,7 +8,7 @@ import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ListenerManager;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.spawnpoint.listener.SpawnpointPacketListener;
@@ -23,16 +23,16 @@ public class SpawnpointModule extends AbstractModuleMessage<Localization.Message
     private final Permission.Message.Spawnpoint permission;
 
     private final FPlayerManager fPlayerManager;
-    private final ListenerManager listenerManager;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public SpawnpointModule(FileManager fileManager,
                             FPlayerManager fPlayerManager,
-                            ListenerManager listenerManager) {
+                            ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getSpawnpoint());
 
         this.fPlayerManager = fPlayerManager;
-        this.listenerManager = listenerManager;
+        this.listenerRegistry = listenerRegistry;
 
         message = fileManager.getMessage().getSpawnpoint();
         permission = fileManager.getPermission().getMessage().getSpawnpoint();
@@ -44,7 +44,7 @@ public class SpawnpointModule extends AbstractModuleMessage<Localization.Message
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerManager.register(SpawnpointPacketListener.class);
+        listenerRegistry.register(SpawnpointPacketListener.class);
     }
 
     @Override

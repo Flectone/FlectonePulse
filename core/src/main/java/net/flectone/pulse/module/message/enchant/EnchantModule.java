@@ -8,7 +8,7 @@ import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ListenerManager;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.enchant.listener.EnchantPacketListener;
@@ -24,16 +24,16 @@ public class EnchantModule extends AbstractModuleMessage<Localization.Message.En
     private final Permission.Message.Enchant permission;
 
     private final FPlayerManager fPlayerManager;
-    private final ListenerManager listenerManager;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public EnchantModule(FileManager fileManager,
                          FPlayerManager fPlayerManager,
-                         ListenerManager listenerManager) {
+                         ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getEnchant());
 
         this.fPlayerManager = fPlayerManager;
-        this.listenerManager = listenerManager;
+        this.listenerRegistry = listenerRegistry;
 
         message = fileManager.getMessage().getEnchant();
         permission = fileManager.getPermission().getMessage().getEnchant();
@@ -45,7 +45,7 @@ public class EnchantModule extends AbstractModuleMessage<Localization.Message.En
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerManager.register(EnchantPacketListener.class);
+        listenerRegistry.register(EnchantPacketListener.class);
     }
 
     @Override

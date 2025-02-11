@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.file.Integration;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.manager.BukkitListenerManager;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
@@ -20,12 +20,12 @@ public class SuperVanishModule extends AbstractModule {
     private final Permission.Integration.Supervanish permission;
 
     private final SuperVanishIntegration superVanishIntegration;
-    private final BukkitListenerManager bukkitListenerManager;
+    private final BukkitListenerRegistry bukkitListenerManager;
 
     @Inject
     public SuperVanishModule(FileManager fileManager,
                              SuperVanishIntegration superVanishIntegration,
-                             BukkitListenerManager bukkitListenerManager) {
+                             BukkitListenerRegistry bukkitListenerManager) {
         this.superVanishIntegration = superVanishIntegration;
         this.bukkitListenerManager = bukkitListenerManager;
 

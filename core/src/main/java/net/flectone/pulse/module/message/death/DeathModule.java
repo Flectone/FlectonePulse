@@ -12,7 +12,7 @@ import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ListenerManager;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -38,7 +38,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
     private final ComponentUtil componentUtil;
     private final PacketEventsUtil packetEventsUtil;
     private final FPlayerManager fPlayerManager;
-    private final ListenerManager listenerManager;
+    private final ListenerRegistry listenerRegistry;
     private final Gson gson;
 
     @Inject
@@ -46,7 +46,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
                        ComponentUtil componentUtil,
                        PacketEventsUtil packetEventsUtil,
                        FPlayerManager fPlayerManager,
-                       ListenerManager listenerManager,
+                       ListenerRegistry listenerRegistry,
                        IntegrationModule integrationModule,
                        Gson gson) {
         super(localization -> localization.getMessage().getDeath());
@@ -54,7 +54,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
         this.componentUtil = componentUtil;
         this.packetEventsUtil = packetEventsUtil;
         this.fPlayerManager = fPlayerManager;
-        this.listenerManager = listenerManager;
+        this.listenerRegistry = listenerRegistry;
         this.gson = gson;
 
         message = fileManager.getMessage().getDeath();
@@ -69,7 +69,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerManager.register(DeathPacketListener.class);
+        listenerRegistry.register(DeathPacketListener.class);
     }
 
     @Override

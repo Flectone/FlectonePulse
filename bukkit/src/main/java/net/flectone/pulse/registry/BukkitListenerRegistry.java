@@ -1,4 +1,4 @@
-package net.flectone.pulse.manager;
+package net.flectone.pulse.registry;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -14,21 +14,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
-public class BukkitListenerManager extends ListenerManager {
+public class BukkitListenerRegistry extends ListenerRegistry {
 
-    private final List<Listener> listenerList = new ArrayList<>();
+    private final List<Listener> listeners = new ArrayList<>();
     private final Plugin plugin;
+    private final Injector injector;
 
     @Inject
-    public BukkitListenerManager(Plugin plugin, Injector injector) {
+    public BukkitListenerRegistry(Plugin plugin, Injector injector) {
         super(injector);
 
         this.plugin = plugin;
+        this.injector = injector;
     }
 
     public void register(Class<? extends Listener> clazzListener, EventPriority eventPriority) {
         Listener abstractListener = injector.getInstance(clazzListener);
-        listenerList.add(abstractListener);
+        listeners.add(abstractListener);
         registerEvents(abstractListener, eventPriority);
     }
 
@@ -67,7 +69,7 @@ public class BukkitListenerManager extends ListenerManager {
     public void unregisterAll() {
         super.unregisterAll();
 
-        listenerList.forEach(HandlerList::unregisterAll);
-        listenerList.clear();
+        listeners.forEach(HandlerList::unregisterAll);
+        listeners.clear();
     }
 }

@@ -8,7 +8,7 @@ import net.flectone.pulse.database.dao.ColorsDAO;
 import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ListenerManager;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.util.*;
 
@@ -23,7 +23,7 @@ public class BukkitMaintenanceModule extends MaintenanceModule {
     public BukkitMaintenanceModule(FileManager fileManager,
                                    FPlayerManager fPlayerManager,
                                    PermissionUtil permissionUtil,
-                                   ListenerManager listenerManager,
+                                   ListenerRegistry listenerRegistry,
                                    FPlayerDAO fPlayerDAO,
                                    ColorsDAO colorsDAO,
                                    @Named("projectPath") Path projectPath,
@@ -31,7 +31,7 @@ public class BukkitMaintenanceModule extends MaintenanceModule {
                                    CommandUtil commandUtil,
                                    ComponentUtil componentUtil,
                                    PacketEventsUtil packetEventsUtil) {
-        super(fileManager, fPlayerManager, permissionUtil, listenerManager, fPlayerDAO, colorsDAO, projectPath, fileUtil, commandUtil, componentUtil, packetEventsUtil);
+        super(fileManager, fPlayerManager, permissionUtil, listenerRegistry, fPlayerDAO, colorsDAO, projectPath, fileUtil, commandUtil, componentUtil, packetEventsUtil);
 
         this.fileManager = fileManager;
     }

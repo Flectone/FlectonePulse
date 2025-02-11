@@ -3,7 +3,7 @@ package net.flectone.pulse.module.message.bubble;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.manager.BukkitListenerManager;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.bubble.listener.BubbleListener;
@@ -16,14 +16,14 @@ import org.jetbrains.annotations.NotNull;
 public class BukkitBubbleModule extends BubbleModule {
 
     private final BukkitBubbleManager bubbleManager;
-    private final BukkitListenerManager bukkitListenerManager;
+    private final BukkitListenerRegistry bukkitListenerManager;
 
     @Inject private BukkitChatModule chatModule;
 
     @Inject
     public BukkitBubbleModule(FileManager fileManager,
                               BukkitBubbleManager bubbleManager,
-                              BukkitListenerManager bukkitListenerManager) {
+                              BukkitListenerRegistry bukkitListenerManager) {
         super(fileManager);
         this.bubbleManager = bubbleManager;
         this.bukkitListenerManager = bukkitListenerManager;

@@ -10,7 +10,7 @@ import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ListenerManager;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -34,21 +34,21 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
     private final Permission.Message.Advancement permission;
 
     private final FPlayerManager fPlayerManager;
-    private final ListenerManager listenerManager;
+    private final ListenerRegistry listenerRegistry;
     private final ComponentUtil componentUtil;
     private final Gson gson;
 
     @Inject
     public AdvancementModule(FileManager fileManager,
                              FPlayerManager fPlayerManager,
-                             ListenerManager listenerManager,
+                             ListenerRegistry listenerRegistry,
                              IntegrationModule integrationModule,
                              ComponentUtil componentUtil,
                              Gson gson) {
         super(localization -> localization.getMessage().getAdvancement());
 
         this.fPlayerManager = fPlayerManager;
-        this.listenerManager = listenerManager;
+        this.listenerRegistry = listenerRegistry;
         this.componentUtil = componentUtil;
         this.gson = gson;
 
@@ -64,7 +64,7 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerManager.register(AdvancementPacketListener.class);
+        listenerRegistry.register(AdvancementPacketListener.class);
     }
 
     @Override

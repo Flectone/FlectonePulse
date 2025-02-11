@@ -8,7 +8,7 @@ import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ListenerManager;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.contact.rightclick.listener.RightclickPacketListener;
@@ -24,15 +24,15 @@ public class RightclickModule extends AbstractModuleMessage<Localization.Message
     private final Permission.Message.Contact.Rightclick permission;
 
     private final FPlayerManager fPlayerManager;
-    private final ListenerManager listenerManager;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public RightclickModule(FileManager fileManager,
                             FPlayerManager fPlayerManager,
-                            ListenerManager listenerManager) {
+                            ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getContact().getRightclick());
         this.fPlayerManager = fPlayerManager;
-        this.listenerManager = listenerManager;
+        this.listenerRegistry = listenerRegistry;
 
         message = fileManager.getMessage().getContact().getRightclick();
         permission = fileManager.getPermission().getMessage().getContact().getRightclick();
@@ -47,7 +47,7 @@ public class RightclickModule extends AbstractModuleMessage<Localization.Message
         createSound(message.getSound(), permission.getSound());
         createCooldown(message.getCooldown(), permission.getCooldownBypass());
 
-        listenerManager.register(RightclickPacketListener.class);
+        listenerRegistry.register(RightclickPacketListener.class);
     }
 
     @Override

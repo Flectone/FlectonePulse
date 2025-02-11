@@ -7,7 +7,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.manager.BukkitListenerManager;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -42,7 +42,7 @@ public class SignModule extends AbstractModuleMessage<Localization.Message.Conta
     private final Message.Contact.Sign message;
     private final Permission.Message.Contact.Sign permission;
 
-    private final BukkitListenerManager bukkitListenerManager;
+    private final BukkitListenerRegistry bukkitListenerManager;
     private final DyeUtil dyeUtil;
     private final ItemUtil itemUtil;
     private final ComponentUtil componentUtil;
@@ -51,7 +51,7 @@ public class SignModule extends AbstractModuleMessage<Localization.Message.Conta
 
     @Inject
     public SignModule(FileManager fileManager,
-                      BukkitListenerManager bukkitListenerManager,
+                      BukkitListenerRegistry bukkitListenerManager,
                       ItemUtil itemUtil,
                       DyeUtil dyeUtil,
                       ComponentUtil componentUtil,

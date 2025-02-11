@@ -6,7 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
-import net.flectone.pulse.manager.BukkitListenerManager;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.scheduler.TaskScheduler;
@@ -38,7 +38,7 @@ public class BukkitChatModule extends ChatModule {
     private final FPlayerManager fPlayerManager;
     private final PermissionUtil permissionUtil;
     private final TaskScheduler taskScheduler;
-    private final BukkitListenerManager bukkitListenerManager;
+    private final BukkitListenerRegistry bukkitListenerManager;
     private final IntegrationModule integrationModule;
     private final TimeUtil timeUtil;
 
@@ -49,7 +49,7 @@ public class BukkitChatModule extends ChatModule {
                             FPlayerDAO fPlayerDAO,
                             FPlayerManager fPlayerManager,
                             TaskScheduler taskScheduler,
-                            BukkitListenerManager bukkitListenerManager,
+                            BukkitListenerRegistry bukkitListenerManager,
                             IntegrationModule integrationModule,
                             PermissionUtil permissionUtil,
                             TimeUtil timeUtil) {

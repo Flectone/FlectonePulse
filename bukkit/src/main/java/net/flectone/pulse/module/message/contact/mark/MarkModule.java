@@ -8,7 +8,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.manager.BukkitListenerManager;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -30,13 +30,13 @@ public class MarkModule extends AbstractModuleMessage<Localization.Message.Conta
     private final Permission.Message.Contact.Mark permission;
 
     private final MarkManager markManager;
-    private final BukkitListenerManager bukkitListenerManager;
+    private final BukkitListenerRegistry bukkitListenerManager;
     private final SoundPlayer soundPlayer;
 
     @Inject
     public MarkModule(FileManager fileManager,
                       MarkManager markManager,
-                      BukkitListenerManager bukkitListenerManager,
+                      BukkitListenerRegistry bukkitListenerManager,
                       SoundPlayer soundPlayer) {
         super(localization -> localization.getMessage().getContact());
 

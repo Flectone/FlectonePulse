@@ -8,7 +8,7 @@ import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ListenerManager;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
@@ -26,16 +26,16 @@ public class WorldModule extends AbstractModule {
 
     private final FPlayerDAO fPlayerDAO;
     private final FPlayerManager fPlayerManager;
-    private final ListenerManager listenerManager;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public WorldModule(FileManager fileManager,
                        FPlayerDAO fPlayerDAO,
                        FPlayerManager fPlayerManager,
-                       ListenerManager listenerManager) {
+                       ListenerRegistry listenerRegistry) {
         this.fPlayerDAO = fPlayerDAO;
         this.fPlayerManager = fPlayerManager;
-        this.listenerManager = listenerManager;
+        this.listenerRegistry = listenerRegistry;
 
         message = fileManager.getMessage().getFormat().getWorld();
         permission = fileManager.getPermission().getMessage().getFormat().getWorld();
@@ -45,7 +45,7 @@ public class WorldModule extends AbstractModule {
     public void reload() {
         registerModulePermission(permission);
 
-        listenerManager.register(WorldPacketListener.class);
+        listenerRegistry.register(WorldPacketListener.class);
     }
 
     @Override

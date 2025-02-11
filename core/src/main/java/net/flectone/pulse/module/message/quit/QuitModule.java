@@ -8,7 +8,7 @@ import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ListenerManager;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -21,15 +21,15 @@ public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit>
     @Getter private final Message.Quit message;
     private final Permission.Message.Quit permission;
 
-    private final ListenerManager listenerManager;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public QuitModule(FileManager fileManager,
-                      ListenerManager listenerManager,
+                      ListenerRegistry listenerRegistry,
                       IntegrationModule integrationModule) {
         super(localization -> localization.getMessage().getQuit());
 
-        this.listenerManager = listenerManager;
+        this.listenerRegistry = listenerRegistry;
 
         message = fileManager.getMessage().getQuit();
         permission = fileManager.getPermission().getMessage().getQuit();
@@ -44,7 +44,7 @@ public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit>
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerManager.register(QuitPacketListener.class);
+        listenerRegistry.register(QuitPacketListener.class);
     }
 
     @Override

@@ -15,7 +15,7 @@ import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ListenerManager;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.maintenance.listener.MaintenancePacketListener;
@@ -33,7 +33,7 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
     private final FileManager fileManager;
     private final FPlayerManager fPlayerManager;
     private final PermissionUtil permissionUtil;
-    private final ListenerManager listenerManager;
+    private final ListenerRegistry listenerRegistry;
     private final FPlayerDAO fPlayerDAO;
     private final ColorsDAO colorsDAO;
     private final Path iconPath;
@@ -47,7 +47,7 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
     public MaintenanceModule(FileManager fileManager,
                              FPlayerManager fPlayerManager,
                              PermissionUtil permissionUtil,
-                             ListenerManager listenerManager,
+                             ListenerRegistry listenerRegistry,
                              FPlayerDAO fPlayerDAO,
                              ColorsDAO colorsDAO,
                              Path projectPath,
@@ -61,7 +61,7 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         this.fPlayerManager = fPlayerManager;
         this.permissionUtil = permissionUtil;
         this.commandUtil = commandUtil;
-        this.listenerManager = listenerManager;
+        this.listenerRegistry = listenerRegistry;
         this.fPlayerDAO = fPlayerDAO;
         this.colorsDAO = colorsDAO;
         this.iconPath = projectPath.resolve("images");
@@ -152,7 +152,7 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
 
         registerPermission(permission.getJoin());
 
-        listenerManager.register(MaintenancePacketListener.class);
+        listenerRegistry.register(MaintenancePacketListener.class);
 
         File file = new File(iconPath.toString() + File.separator + "maintenance.png");
 

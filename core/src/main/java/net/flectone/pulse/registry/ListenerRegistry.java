@@ -1,4 +1,4 @@
-package net.flectone.pulse.manager;
+package net.flectone.pulse.registry;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerCommon;
@@ -12,13 +12,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ListenerManager {
+public abstract class ListenerRegistry {
 
-    private final List<PacketListenerCommon> packetListenerList = new ArrayList<>();
+    private final List<PacketListenerCommon> packetListeners = new ArrayList<>();
 
-    protected final Injector injector;
+    private final Injector injector;
 
-    public ListenerManager(Injector injector) {
+    public ListenerRegistry(Injector injector) {
         this.injector = injector;
     }
 
@@ -29,15 +29,15 @@ public abstract class ListenerManager {
     public void register(Class<? extends AbstractPacketListener> clazzListener, @NotNull PacketListenerPriority packetListenerPriority) {
         AbstractPacketListener abstractPacketListener = injector.getInstance(clazzListener);
         PacketListenerCommon packetListenerCommon = PacketEvents.getAPI().getEventManager().registerListener(abstractPacketListener, packetListenerPriority);
-        packetListenerList.add(packetListenerCommon);
+        packetListeners.add(packetListenerCommon);
     }
 
     public void unregisterAll() {
-        packetListenerList.forEach(listener -> PacketEvents.getAPI()
+        packetListeners.forEach(listener -> PacketEvents.getAPI()
                 .getEventManager()
                 .unregisterListeners(listener)
         );
-        packetListenerList.clear();
+        packetListeners.clear();
     }
 
     public void reload() {

@@ -7,10 +7,9 @@ import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ListenerManager;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.deop.listener.DeopPacketListener;
@@ -25,18 +24,18 @@ public class DeopModule extends AbstractModuleMessage<Localization.Message.Deop>
     private final Permission.Message.Deop permission;
 
     private final FPlayerManager fPlayerManager;
-    private final ListenerManager listenerManager;
+    private final ListenerRegistry listenerRegistry;
     private final FPlayerDAO fPlayerDAO;
 
     @Inject
     public DeopModule(FileManager fileManager,
                       FPlayerManager fPlayerManager,
-                      ListenerManager listenerManager,
+                      ListenerRegistry listenerRegistry,
                       FPlayerDAO fPlayerDAO) {
         super(localization -> localization.getMessage().getDeop());
 
         this.fPlayerManager = fPlayerManager;
-        this.listenerManager = listenerManager;
+        this.listenerRegistry = listenerRegistry;
         this.fPlayerDAO = fPlayerDAO;
 
         message = fileManager.getMessage().getDeop();
@@ -49,7 +48,7 @@ public class DeopModule extends AbstractModuleMessage<Localization.Message.Deop>
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerManager.register(DeopPacketListener.class);
+        listenerRegistry.register(DeopPacketListener.class);
     }
 
     @Override

@@ -2,7 +2,7 @@ package net.flectone.pulse.module.message.anvil;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.manager.BukkitListenerManager;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.anvil.listener.AnvilListener;
@@ -16,12 +16,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 @Singleton
 public class BukkitAnvilModule extends AnvilModule {
 
-    private final BukkitListenerManager bukkitListenerManager;
+    private final BukkitListenerRegistry bukkitListenerManager;
     private final ComponentUtil componentUtil;
 
     @Inject
     public BukkitAnvilModule(FileManager fileManager,
-                             BukkitListenerManager bukkitListenerManager,
+                             BukkitListenerRegistry bukkitListenerManager,
                              ComponentUtil componentUtil) {
         super(fileManager);
         this.bukkitListenerManager = bukkitListenerManager;

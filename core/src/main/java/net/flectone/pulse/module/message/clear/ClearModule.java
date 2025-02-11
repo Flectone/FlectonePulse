@@ -8,7 +8,7 @@ import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ListenerManager;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.clear.listener.ClearPacketListener;
@@ -24,16 +24,16 @@ public class ClearModule extends AbstractModuleMessage<Localization.Message.Clea
     private final Permission.Message.Clear permission;
 
     private final FPlayerManager fPlayerManager;
-    private final ListenerManager listenerManager;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public ClearModule(FileManager fileManager,
                        FPlayerManager fPlayerManager,
-                       ListenerManager listenerManager) {
+                       ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getClear());
 
         this.fPlayerManager = fPlayerManager;
-        this.listenerManager = listenerManager;
+        this.listenerRegistry = listenerRegistry;
 
         message = fileManager.getMessage().getClear();
         permission = fileManager.getPermission().getMessage().getClear();
@@ -45,7 +45,7 @@ public class ClearModule extends AbstractModuleMessage<Localization.Message.Clea
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerManager.register(ClearPacketListener.class);
+        listenerRegistry.register(ClearPacketListener.class);
     }
 
     @Override

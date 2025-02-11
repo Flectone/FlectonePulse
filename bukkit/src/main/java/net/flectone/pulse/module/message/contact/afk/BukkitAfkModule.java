@@ -6,7 +6,7 @@ import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Message;
-import net.flectone.pulse.manager.BukkitListenerManager;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.contact.afk.listener.AfkListener;
@@ -30,12 +30,12 @@ public class BukkitAfkModule extends AfkModule {
     @Getter private final Message.Contact.Afk message;
 
     private final FPlayerDAO fPlayerDAO;
-    private final BukkitListenerManager bukkitListenerManager;
+    private final BukkitListenerRegistry bukkitListenerManager;
 
     @Inject
     public BukkitAfkModule(FileManager fileManager,
                            FPlayerDAO fPlayerDAO,
-                           BukkitListenerManager bukkitListenerManager) {
+                           BukkitListenerRegistry bukkitListenerManager) {
         super(fileManager, fPlayerDAO);
 
         this.fPlayerDAO = fPlayerDAO;

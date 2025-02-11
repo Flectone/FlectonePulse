@@ -9,7 +9,7 @@ import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.manager.BukkitListenerManager;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -33,13 +33,13 @@ public class SpitModule extends AbstractModuleMessage<Localization.Message.Conta
 
     @Getter private final String SPIT_NAME = "SPIT_NAME";
 
-    private final BukkitListenerManager bukkitListenerManager;
+    private final BukkitListenerRegistry bukkitListenerManager;
     private final SoundPlayer soundPlayer;
     private final PermissionUtil permissionUtil;
 
     @Inject
     public SpitModule(FileManager fileManager,
-                      BukkitListenerManager bukkitListenerManager,
+                      BukkitListenerRegistry bukkitListenerManager,
                       PermissionUtil permissionUtil,
                       SoundPlayer soundPlayer) {
         super(localization -> localization.getMessage().getContact().getSpit());

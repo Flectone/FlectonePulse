@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.manager.BukkitListenerManager;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
@@ -30,7 +30,7 @@ import java.util.Map;
 public class BukkitSpyModule extends SpyModule {
 
     private final FPlayerManager fPlayerManager;
-    private final BukkitListenerManager bukkitListenerManager;
+    private final BukkitListenerRegistry bukkitListenerManager;
 
     @Inject
     public BukkitSpyModule(FileManager fileManager,
@@ -38,7 +38,7 @@ public class BukkitSpyModule extends SpyModule {
                            FPlayerManager fPlayerManager,
                            CommandUtil commandUtil,
                            PermissionUtil permissionUtil,
-                           BukkitListenerManager bukkitListenerManager) {
+                           BukkitListenerRegistry bukkitListenerManager) {
         super(fileManager, fPlayerDAO, commandUtil, permissionUtil);
 
         this.fPlayerManager = fPlayerManager;

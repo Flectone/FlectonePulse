@@ -127,6 +127,8 @@ import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.platform.BukkitMessageSender;
 import net.flectone.pulse.platform.LibraryResolver;
 import net.flectone.pulse.platform.MessageSender;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.scheduler.BukkitTaskScheduler;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.*;
@@ -182,7 +184,7 @@ public class BukkitInjector extends AbstractModule {
 
         bind(TaskScheduler.class).to(BukkitTaskScheduler.class);
         bind(FPlayerManager.class).to(BukkitFPlayerManager.class);
-        bind(ListenerManager.class).to(BukkitListenerManager.class);
+        bind(ListenerRegistry.class).to(BukkitListenerRegistry.class);
         bind(InventoryManager.class).to(BukkitInventoryManager.class);
         bind(PermissionUtil.class).to(BukkitPermissionUtil.class);
         bind(CommandUtil.class).to(BukkitCommandUtil.class);

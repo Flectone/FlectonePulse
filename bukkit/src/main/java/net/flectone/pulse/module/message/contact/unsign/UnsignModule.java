@@ -7,7 +7,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.manager.BukkitListenerManager;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -37,14 +37,14 @@ public class UnsignModule extends AbstractModuleMessage<Localization.Message.Con
     private final Message.Contact.Unsign message;
     private final Permission.Message.Contact.Unsign permission;
 
-    private final BukkitListenerManager bukkitListenerManager;
+    private final BukkitListenerRegistry bukkitListenerManager;
     private final ItemUtil itemUtil;
     private final DyeUtil dyeUtil;
     private final SoundPlayer soundPlayer;
 
     @Inject
     public UnsignModule(FileManager fileManager,
-                        BukkitListenerManager bukkitListenerManager,
+                        BukkitListenerRegistry bukkitListenerManager,
                         ItemUtil itemUtil,
                         DyeUtil dyeUtil,
                         SoundPlayer soundPlayer) {

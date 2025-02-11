@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.file.Integration;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.manager.BukkitListenerManager;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
@@ -18,12 +18,12 @@ public class TritonModule extends AbstractModule {
     private final Permission.Integration.Triton permission;
 
     private final TritonIntegration tritonIntegration;
-    private final BukkitListenerManager bukkitListenerManager;
+    private final BukkitListenerRegistry bukkitListenerManager;
 
     @Inject
     public TritonModule(FileManager fileManager,
                         TritonIntegration tritonIntegration,
-                        BukkitListenerManager bukkitListenerManager) {
+                        BukkitListenerRegistry bukkitListenerManager) {
         this.tritonIntegration = tritonIntegration;
         this.bukkitListenerManager = bukkitListenerManager;
 

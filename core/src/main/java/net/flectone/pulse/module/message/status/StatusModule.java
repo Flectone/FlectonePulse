@@ -16,7 +16,7 @@ import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ListenerManager;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -46,7 +46,7 @@ public class StatusModule extends AbstractModule {
     private final ComponentUtil componentUtil;
     private final ServerUtil bukkitUtil;
     private final FPlayerManager fPlayerManager;
-    private final ListenerManager listenerManager;
+    private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
 
     @Inject
@@ -61,7 +61,7 @@ public class StatusModule extends AbstractModule {
                         ComponentUtil componentUtil,
                         ServerUtil bukkitUtil,
                         FPlayerManager fPlayerManager,
-                        ListenerManager listenerManager,
+                        ListenerRegistry listenerRegistry,
                         IntegrationModule integrationModule) {
         this.fPlayerDAO = fPlayerDAO;
         this.colorsDAO = colorsDAO;
@@ -72,7 +72,7 @@ public class StatusModule extends AbstractModule {
         this.componentUtil = componentUtil;
         this.bukkitUtil = bukkitUtil;
         this.fPlayerManager = fPlayerManager;
-        this.listenerManager = listenerManager;
+        this.listenerRegistry = listenerRegistry;
         this.integrationModule = integrationModule;
 
         message = fileManager.getMessage().getStatus();
@@ -88,7 +88,7 @@ public class StatusModule extends AbstractModule {
         addChildren(PlayersModule.class);
         addChildren(VersionModule.class);
 
-        listenerManager.register(StatusPacketListener.class);
+        listenerRegistry.register(StatusPacketListener.class);
     }
 
     @Override

@@ -21,6 +21,7 @@ import net.flectone.pulse.module.message.bubble.manager.BubbleManager;
 import net.flectone.pulse.module.message.contact.mark.manager.MarkManager;
 import net.flectone.pulse.platform.BukkitLibraryResolver;
 import net.flectone.pulse.platform.LibraryResolver;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.MetricsUtil;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
@@ -108,7 +109,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
             injector.getInstance(MetricsUtil.class).setup();
         }
 
-        injector.getInstance(ListenerManager.class).registerDefaultListeners();
+        injector.getInstance(ListenerRegistry.class).registerDefaultListeners();
 
         fLogger.logEnabled();
     }
@@ -132,7 +133,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(Database.class).disconnect();
         injector.getInstance(ObjectiveManager.class).close();
         injector.getInstance(TeamManager.class).close();
-        injector.getInstance(ListenerManager.class).unregisterAll();
+        injector.getInstance(ListenerRegistry.class).unregisterAll();
         PacketEvents.getAPI().terminate();
 
         injector.getInstance(ProxyConnector.class).disable();
@@ -161,7 +162,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
                 .collect(Collectors.toSet())
                 .forEach(CommandAPI::unregister);
 
-        injector.getInstance(ListenerManager.class).reload();
+        injector.getInstance(ListenerRegistry.class).reload();
         injector.getInstance(TaskScheduler.class).reload();
         injector.getInstance(BubbleManager.class).reload();
         injector.getInstance(MarkManager.class).reload();

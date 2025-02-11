@@ -7,7 +7,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.manager.BukkitListenerManager;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Sound;
@@ -31,12 +31,12 @@ public class KnockModule extends AbstractModuleMessage<Localization.Message.Cont
 
     private final Map<String, Sound> BLOCK_SOUND = new HashMap<>();
 
-    private final BukkitListenerManager bukkitListenerManager;
+    private final BukkitListenerRegistry bukkitListenerManager;
     private final SoundPlayer soundPlayer;
 
     @Inject
     public KnockModule(FileManager fileManager,
-                       BukkitListenerManager bukkitListenerManager,
+                       BukkitListenerRegistry bukkitListenerManager,
                        SoundPlayer soundPlayer) {
         super(localization -> localization.getMessage().getContact());
         this.bukkitListenerManager = bukkitListenerManager;
