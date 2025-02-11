@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.message.scoreboard;
 
-import com.google.inject.Inject;
 import lombok.Getter;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
@@ -9,17 +8,20 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleListMessage;
-import net.flectone.pulse.module.message.scoreboard.ticker.ScoreboardTicker;
+import net.flectone.pulse.scheduler.TaskScheduler;
 
 public abstract class ScoreboardModule extends AbstractModuleListMessage<Localization.Message.Scoreboard> {
 
     @Getter private final Message.Scoreboard message;
     private final Permission.Message.Scoreboard permission;
 
-    @Inject private ScoreboardTicker scoreboardTicker;
+    private final TaskScheduler taskScheduler;
 
-    public ScoreboardModule(FileManager fileManager) {
+    public ScoreboardModule(FileManager fileManager,
+                            TaskScheduler taskScheduler) {
         super(localization -> localization.getMessage().getScoreboard());
+
+        this.taskScheduler = taskScheduler;
 
         message = fileManager.getMessage().getScoreboard();
         permission = fileManager.getPermission().getMessage().getScoreboard();
@@ -31,7 +33,7 @@ public abstract class ScoreboardModule extends AbstractModuleListMessage<Localiz
 
         Ticker ticker = message.getTicker();
         if (ticker.isEnable()) {
-            scoreboardTicker.runTaskTimerAsync(ticker.getPeriod(), ticker.getPeriod());
+            taskScheduler.runAsyncTicker(this::send, ticker.getPeriod());
         }
     }
 

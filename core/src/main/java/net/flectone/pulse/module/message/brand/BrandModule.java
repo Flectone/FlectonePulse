@@ -10,7 +10,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleListMessage;
-import net.flectone.pulse.module.message.brand.ticker.BrandTicker;
+import net.flectone.pulse.scheduler.TaskScheduler;
 
 import java.util.List;
 
@@ -20,11 +20,14 @@ public class BrandModule extends AbstractModuleListMessage<Localization.Message.
     private final Message.Brand message;
     private final Permission.Message.Brand permission;
 
-    @Inject private BrandTicker brandTicker;
+    private final TaskScheduler taskScheduler;
 
     @Inject
-    public BrandModule(FileManager fileManager) {
+    public BrandModule(FileManager fileManager,
+                       TaskScheduler taskScheduler) {
         super(localization -> localization.getMessage().getBrand());
+
+        this.taskScheduler = taskScheduler;
 
         message = fileManager.getMessage().getBrand();
         permission = fileManager.getPermission().getMessage().getBrand();
@@ -36,7 +39,7 @@ public class BrandModule extends AbstractModuleListMessage<Localization.Message.
 
         Ticker ticker = message.getTicker();
         if (ticker.isEnable()) {
-            brandTicker.runTaskTimerAsync(ticker.getPeriod(), ticker.getPeriod());
+            taskScheduler.runAsyncTicker(this::send, ticker.getPeriod());
         }
     }
 

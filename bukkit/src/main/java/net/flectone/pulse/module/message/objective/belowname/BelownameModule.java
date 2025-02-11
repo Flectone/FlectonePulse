@@ -11,7 +11,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
-import net.flectone.pulse.module.message.objective.belowname.ticker.BelownameTicker;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveDisplaySlot;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
 import net.megavex.scoreboardlibrary.api.objective.ScoreboardObjective;
@@ -26,18 +26,19 @@ public class BelownameModule extends AbstractModule {
 
     private final ObjectiveManager objectiveManager;
     private final FPlayerManager fPlayerManager;
+    private final TaskScheduler taskScheduler;
 
     private ObjectiveMode objectiveValueType;
     private ScoreboardObjective scoreboardObjective;
 
-    @Inject private BelownameTicker belowNameTicker;
-
     @Inject
     public BelownameModule(FileManager fileManager,
                            ObjectiveManager objectiveManager,
-                           FPlayerManager fPlayerManager) {
+                           FPlayerManager fPlayerManager,
+                           TaskScheduler taskScheduler) {
         this.objectiveManager = objectiveManager;
         this.fPlayerManager = fPlayerManager;
+        this.taskScheduler = taskScheduler;
 
         message = fileManager.getMessage().getObjective().getBelowname();
         permission = fileManager.getPermission().getMessage().getObjective().getBelowname();
@@ -54,7 +55,7 @@ public class BelownameModule extends AbstractModule {
 
         Ticker ticker = message.getTicker();
         if (ticker.isEnable()) {
-            belowNameTicker.runTaskTimerAsync(ticker.getPeriod(), ticker.getPeriod());
+            taskScheduler.runAsyncTicker(this::add, ticker.getPeriod());
         }
     }
 

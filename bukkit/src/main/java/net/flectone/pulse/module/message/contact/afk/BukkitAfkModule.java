@@ -10,6 +10,7 @@ import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.contact.afk.listener.AfkListener;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -35,8 +36,9 @@ public class BukkitAfkModule extends AfkModule {
     @Inject
     public BukkitAfkModule(FileManager fileManager,
                            FPlayerDAO fPlayerDAO,
+                           TaskScheduler taskScheduler,
                            BukkitListenerRegistry bukkitListenerManager) {
-        super(fileManager, fPlayerDAO);
+        super(fileManager, fPlayerDAO, taskScheduler);
 
         this.fPlayerDAO = fPlayerDAO;
         this.bukkitListenerManager = bukkitListenerManager;

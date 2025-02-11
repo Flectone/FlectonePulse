@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.ComponentUtil;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.sidebar.Sidebar;
@@ -26,9 +27,10 @@ public class BukkitScoreboardModule extends ScoreboardModule {
 
     @Inject
     public BukkitScoreboardModule(FileManager fileManager,
+                                  TaskScheduler taskScheduler,
                                   ScoreboardLibrary scoreboardLibrary,
                                   ComponentUtil componentUtil) {
-        super(fileManager);
+        super(fileManager, taskScheduler);
 
         this.scoreboardLibrary = scoreboardLibrary;
         this.componentUtil = componentUtil;

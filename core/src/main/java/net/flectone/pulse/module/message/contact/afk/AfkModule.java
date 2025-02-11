@@ -2,16 +2,16 @@ package net.flectone.pulse.module.message.contact.afk;
 
 import com.google.inject.Inject;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.contact.afk.ticker.AfkTicker;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.Range;
 import net.kyori.adventure.text.Component;
@@ -25,15 +25,17 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
     private final Permission.Message.Contact.Afk permission;
 
     private final FPlayerDAO fPlayerDAO;
+    private final TaskScheduler taskScheduler;
 
     @Inject private IntegrationModule integrationModule;
-    @Inject private AfkTicker afkTicker;
 
     public AfkModule(FileManager fileManager,
-                     FPlayerDAO fPlayerDAO) {
+                     FPlayerDAO fPlayerDAO,
+                     TaskScheduler taskScheduler) {
         super(localization -> localization.getMessage().getContact().getAfk());
 
         this.fPlayerDAO = fPlayerDAO;
+        this.taskScheduler = taskScheduler;
 
         message = fileManager.getMessage().getContact().getAfk();
         permission = fileManager.getPermission().getMessage().getContact().getAfk();
@@ -44,7 +46,7 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
         registerModulePermission(permission);
 
         if (message.getTicker().isEnable()) {
-            afkTicker.runTaskTimerAsync(message.getTicker().getPeriod(), message.getTicker().getPeriod());
+            taskScheduler.runAsyncTicker(this::check, message.getTicker().getPeriod());
         }
     }
 

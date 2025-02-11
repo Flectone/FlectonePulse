@@ -10,7 +10,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleListMessage;
-import net.flectone.pulse.module.message.tab.header.ticker.HeaderTicker;
+import net.flectone.pulse.scheduler.TaskScheduler;
 
 import java.util.List;
 
@@ -20,11 +20,14 @@ public class HeaderModule extends AbstractModuleListMessage<Localization.Message
     private final Message.Tab.Header message;
     private final Permission.Message.Tab.Header permission;
 
-    @Inject private HeaderTicker headerTicker;
+    private final TaskScheduler taskScheduler;
 
     @Inject
-    public HeaderModule(FileManager fileManager) {
+    public HeaderModule(FileManager fileManager,
+                        TaskScheduler taskScheduler) {
         super(module -> module.getMessage().getTab().getHeader());
+
+        this.taskScheduler = taskScheduler;
 
         message = fileManager.getMessage().getTab().getHeader();
         permission = fileManager.getPermission().getMessage().getTab().getHeader();
@@ -36,7 +39,7 @@ public class HeaderModule extends AbstractModuleListMessage<Localization.Message
 
         Ticker ticker = message.getTicker();
         if (ticker.isEnable()) {
-            headerTicker.runTaskTimerAsync(ticker.getPeriod(), ticker.getPeriod());
+            taskScheduler.runAsyncTicker(this::send, ticker.getPeriod());
         }
     }
 
