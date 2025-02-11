@@ -293,8 +293,6 @@ public class BukkitInjector extends AbstractModule {
             bind(InputStream.class).annotatedWith(Names.named("SQLFile")).toInstance(plugin.getResource("sqls/sqlite.sql"));
         }
 
-        bind(ModuleManager.class).asEagerSingleton();
-
 //        try {
 //            Package[] packs = Package.getPackages();
 //

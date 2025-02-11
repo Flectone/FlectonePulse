@@ -12,6 +12,7 @@ import net.flectone.pulse.database.Database;
 import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.*;
+import net.flectone.pulse.module.Module;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
@@ -88,7 +89,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         PacketEvents.getAPI().init();
 
-        injector.getInstance(ModuleManager.class).reload();
+        injector.getInstance(Module.class).reloadWithChildren();
 
         try {
             injector.getInstance(Database.class).connect();
@@ -180,7 +181,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         injector.getInstance(ProxyManager.class).reload();
         injector.getInstance(FPlayerManager.class).reload();
-        injector.getInstance(ModuleManager.class).reload();
+        injector.getInstance(Module.class).reloadWithChildren();
 
         fLogger.logReloaded();
     }

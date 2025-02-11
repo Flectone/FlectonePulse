@@ -1,13 +1,16 @@
 package net.flectone.pulse.module;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.Setter;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.util.PermissionUtil;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -18,6 +21,8 @@ public abstract class AbstractModule {
     private final Set<Predicate<FEntity>> predicates = new HashSet<>();
 
     @Inject private PermissionUtil permissionUtil;
+    @Inject private Injector injector;
+
     private String modulePermission;
 
     @Setter private boolean enable;
@@ -61,5 +66,39 @@ public abstract class AbstractModule {
         }
 
         return false;
+    }
+
+    public Map<String, Integer> collectModuleStatuses() {
+        return collectModuleStatuses(this.getClass());
+    }
+
+    public void reloadWithChildren() {
+        reloadWithChildren(this.getClass());
+    }
+
+    private Map<String, Integer> collectModuleStatuses(Class<? extends AbstractModule> clazz) {
+        AbstractModule module = injector.getInstance(clazz);
+
+        Map<String, Integer> modules = new HashMap<>();
+
+        modules.put(clazz.getSimpleName(), module.isEnable() ? 1 : 0);
+
+        injector.getInstance(clazz)
+                .getChildren()
+                .forEach(subModule -> modules.putAll(collectModuleStatuses(subModule)));
+
+        return modules;
+    }
+
+    private void reloadWithChildren(Class<? extends AbstractModule> clazz) {
+        AbstractModule module = injector.getInstance(clazz);
+        module.setEnable(module.isConfigEnable());
+
+        if (module.isEnable()) {
+            module.reload();
+            module.getChildren().forEach(this::reloadWithChildren);
+        } else {
+            module.getChildren().forEach(subModule -> injector.getInstance(subModule).setEnable(false));
+        }
     }
 }

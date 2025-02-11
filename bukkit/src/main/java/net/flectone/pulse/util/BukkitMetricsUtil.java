@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.file.Config;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ModuleManager;
 import net.flectone.pulse.module.Module;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.AdvancedPie;
@@ -18,13 +17,15 @@ public class BukkitMetricsUtil implements MetricsUtil {
 
     private final Plugin plugin;
     private final FileManager fileManager;
-    private final ModuleManager moduleManager;
+    private final Module module;
 
     @Inject
-    public BukkitMetricsUtil(Plugin plugin, FileManager fileManager, ModuleManager moduleManager) {
+    public BukkitMetricsUtil(Plugin plugin,
+                             FileManager fileManager,
+                             Module module) {
         this.plugin = plugin;
         this.fileManager = fileManager;
-        this.moduleManager = moduleManager;
+        this.module = module;
     }
 
     public void setup() {
@@ -40,6 +41,6 @@ public class BukkitMetricsUtil implements MetricsUtil {
         ));
 
         metrics.addCustomChart(new SimplePie("database", () -> config.getDatabase().getType().name()));
-        metrics.addCustomChart(new AdvancedPie("modules", () -> moduleManager.getModules(Module.class)));
+        metrics.addCustomChart(new AdvancedPie("modules", module::collectModuleStatuses));
     }
 }
