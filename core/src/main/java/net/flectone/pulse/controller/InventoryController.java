@@ -1,4 +1,4 @@
-package net.flectone.pulse.manager;
+package net.flectone.pulse.controller;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
@@ -17,13 +17,13 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class InventoryManager {
+public abstract class InventoryController {
 
     private final Map<UUID, Inventory> inventoryMap = new ConcurrentHashMap<>();
 
     @Inject private PacketEventsUtil packetEventsUtil;
 
-    public InventoryManager() {
+    public InventoryController() {
 
     }
 

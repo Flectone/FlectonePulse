@@ -11,6 +11,8 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.connector.BukkitProxyConnector;
 import net.flectone.pulse.connector.ProxyConnector;
+import net.flectone.pulse.controller.BukkitInventoryController;
+import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.file.Config;
 import net.flectone.pulse.interceptor.AsyncInterceptor;
 import net.flectone.pulse.interceptor.SyncInterceptor;
@@ -185,7 +187,7 @@ public class BukkitInjector extends AbstractModule {
         bind(TaskScheduler.class).to(BukkitTaskScheduler.class);
         bind(FPlayerManager.class).to(BukkitFPlayerManager.class);
         bind(ListenerRegistry.class).to(BukkitListenerRegistry.class);
-        bind(InventoryManager.class).to(BukkitInventoryManager.class);
+        bind(InventoryController.class).to(BukkitInventoryController.class);
         bind(PermissionUtil.class).to(BukkitPermissionUtil.class);
         bind(CommandUtil.class).to(BukkitCommandUtil.class);
         bind(ProxyConnector.class).to(BukkitProxyConnector.class);

@@ -11,7 +11,7 @@ import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.file.Command;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.InventoryManager;
+import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.util.CommandUtil;
@@ -36,8 +36,8 @@ public class BukkitChatsettingModule extends ChatsettingModule {
                                    ComponentUtil componentUtil,
                                    CommandUtil commandUtil,
                                    PermissionUtil permissionUtil,
-                                   InventoryManager inventoryManager) {
-        super(fileManager, fPlayerDAO, componentUtil, commandUtil, permissionUtil, inventoryManager);
+                                   InventoryController inventoryController) {
+        super(fileManager, fPlayerDAO, componentUtil, commandUtil, permissionUtil, inventoryController);
 
         this.componentUtil = componentUtil;
     }

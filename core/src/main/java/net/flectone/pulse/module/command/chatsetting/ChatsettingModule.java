@@ -8,7 +8,7 @@ import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.InventoryManager;
+import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.inventory.Inventory;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -31,21 +31,21 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
     private final ComponentUtil componentUtil;
     private final CommandUtil commandUtil;
     private final PermissionUtil permissionUtil;
-    private final InventoryManager inventoryManager;
+    private final InventoryController inventoryController;
 
     public ChatsettingModule(FileManager fileManager,
                              FPlayerDAO fPlayerDAO,
                              ComponentUtil componentUtil,
                              CommandUtil commandUtil,
                              PermissionUtil permissionUtil,
-                             InventoryManager inventoryManager) {
+                             InventoryController inventoryController) {
         super(localization -> localization.getCommand().getChatsetting(), null);
 
         this.fPlayerDAO = fPlayerDAO;
         this.componentUtil = componentUtil;
         this.commandUtil = commandUtil;
         this.permissionUtil = permissionUtil;
-        this.inventoryManager = inventoryManager;
+        this.inventoryController = inventoryController;
 
         chat = fileManager.getMessage().getChat();
         command = fileManager.getCommand().getChatsetting();
@@ -113,11 +113,11 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
                         }
 
                         ItemStack newItemStack = buildItemStack(newSettingIndex, fPlayer, itemMessages, entry.getValue());
-                        inventoryManager.changeItem(fPlayer, inventory, slot, newItemStack);
+                        inventoryController.changeItem(fPlayer, inventory, slot, newItemStack);
                     });
         }
 
-        inventoryManager.open(fPlayer, inventoryBuilder.build());
+        inventoryController.open(fPlayer, inventoryBuilder.build());
 
         playSound(fPlayer);
     }

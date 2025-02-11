@@ -9,6 +9,7 @@ import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Setter;
 import net.flectone.pulse.connector.ProxyConnector;
+import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.logger.FLogger;
@@ -120,7 +121,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         fLogger.logDisabling();
 
-        injector.getInstance(InventoryManager.class).closeAll();
+        injector.getInstance(InventoryController.class).closeAll();
 
         FPlayerDAO fPlayerDAO = injector.getInstance(FPlayerDAO.class);
 
@@ -153,7 +154,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         fLogger.logReloading();
 
-        injector.getInstance(InventoryManager.class).closeAll();
+        injector.getInstance(InventoryController.class).closeAll();
 
         CommandAPI.getRegisteredCommands().stream()
                 .filter(registeredCommand -> registeredCommand.shortDescription().isPresent()
