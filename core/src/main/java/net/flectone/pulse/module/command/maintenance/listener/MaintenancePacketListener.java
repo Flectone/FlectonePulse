@@ -2,7 +2,6 @@ package net.flectone.pulse.module.command.maintenance.listener;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.login.client.WrapperLoginClientLoginStart;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.AbstractPacketListener;
@@ -26,15 +25,6 @@ public class MaintenancePacketListener extends AbstractPacketListener {
 
             event.setCancelled(true);
             maintenanceModule.sendStatus(event.getUser());
-            return;
-        }
-
-        if (event.getPacketType() == PacketType.Login.Client.LOGIN_START) {
-            WrapperLoginClientLoginStart wrapperLoginClientLoginStart = new WrapperLoginClientLoginStart(event);
-            if (wrapperLoginClientLoginStart.getPlayerUUID().isEmpty()) return;
-
-            maintenanceModule.checkJoin(wrapperLoginClientLoginStart.getPlayerUUID().get(), event.getChannel());
         }
     }
-
 }

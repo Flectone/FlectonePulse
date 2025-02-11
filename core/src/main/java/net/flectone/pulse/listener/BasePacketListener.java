@@ -119,7 +119,7 @@ public class BasePacketListener extends AbstractPacketListener {
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() != PacketType.Login.Server.LOGIN_SUCCESS) return;
         if (event.isCancelled()) return;
-        if (!playersModule.isEnable() && !banModule.isEnable()) return;
+        if (!playersModule.isEnable() && !banModule.isEnable() && !maintenanceModule.isEnable()) return;
 
         event.setCancelled(true);
 
@@ -128,6 +128,7 @@ public class BasePacketListener extends AbstractPacketListener {
 
         if (playersModule.isEnable() && playersModule.isKicked(userProfile)) return;
         if (banModule.isEnable() && banModule.isKicked(userProfile)) return;
+        if (maintenanceModule.isEnable() && maintenanceModule.isKicked(userProfile)) return;
 
         packetEventsUtil.sendPacket(userProfile.getUUID(), new WrapperLoginServerLoginSuccess(userProfile));
     }

@@ -163,9 +163,9 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         return playersJson;
     }
 
-    public void checkJoin(UUID uuid, Object channel) {
-        if (!isEnable()) return;
-        if (!command.isTurnedOn()) return;
+    public boolean isKicked(UserProfile userProfile) {
+        if (!isEnable()) return false;
+        if (!command.isTurnedOn()) return false;
 
         String messageKick = resolveLocalization().getKick();
 
@@ -179,6 +179,7 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         } catch (SQLException e) {
             fLogger.warning(e);
         }
+        packetEventsUtil.sendPacket(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
     }
 
     @Override
