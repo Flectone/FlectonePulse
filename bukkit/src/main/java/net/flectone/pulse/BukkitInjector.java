@@ -268,9 +268,7 @@ public class BukkitInjector extends AbstractModule {
         requestInjection(asyncInterceptor);
 
         bindInterceptor(Matchers.any(),
-                Matchers.annotatedWith(Sync.class)
-                        .or(Matchers.annotatedWith(Async.class))
-                        .or(Matchers.annotatedWith(Sync.class)),
+                Matchers.annotatedWith(Sync.class).or(Matchers.annotatedWith(Async.class)),
                 asyncInterceptor,
                 syncInterceptor
         );
