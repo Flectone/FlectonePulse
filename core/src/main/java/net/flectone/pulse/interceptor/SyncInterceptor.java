@@ -2,7 +2,7 @@ package net.flectone.pulse.interceptor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import org.aopalliance.intercept.Invocation;
@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 import java.util.concurrent.CompletableFuture;
 
 @Singleton
-public class InterceptorAsync implements MethodInterceptor {
+public class SyncInterceptor implements MethodInterceptor {
 
     @Inject private TaskScheduler taskScheduler;
     @Inject private FLogger fLogger;
@@ -22,11 +22,13 @@ public class InterceptorAsync implements MethodInterceptor {
     public Object invoke(final MethodInvocation invocation) throws Throwable {
         Method method = invocation.getMethod();
 
-        if (method.isAnnotationPresent(Async.class)) {
-            CompletableFuture<Object> future = new CompletableFuture<>();
+        if (method.isAnnotationPresent(Sync.class) && !Thread.currentThread().getName().equals("Server thread")) {
 
-            taskScheduler.runAsync(() -> proceed(method, invocation, future));
-            return future;
+            CompletableFuture<Object> completableFuture = new CompletableFuture<>();
+
+            taskScheduler.runSync(() -> proceed(method, invocation, completableFuture));
+
+            return completableFuture.get();
         }
 
         return invocation.proceed();
