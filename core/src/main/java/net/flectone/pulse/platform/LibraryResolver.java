@@ -79,23 +79,23 @@ public abstract class LibraryResolver {
                 .build()
         );
 
-//        addLibrary(Library.builder()
-//                .groupId("com{}github{}imDaniX")
-//                .artifactId("MiniTranslator")
-//                .version(BuildConfig.MINITRANSLATOR_VERSION)
-//                .resolveTransitiveDependencies(true)
-//                .relocate(Relocation.builder()
-//                        .pattern("me{}imdanix{}text")
-//                        .relocatedPattern("net.flectone.pulse.library.minitranslator")
-//                        .build()
-//                )
-//                .relocate(Relocation.builder()
-//                        .pattern("net{}kyori")
-//                        .relocatedPattern("net.flectone.pulse.library")
-//                        .build()
-//                )
-//                .build()
-//        );
+        addLibrary(Library.builder()
+                .groupId("com{}github{}imDaniX")
+                .artifactId("MiniTranslator")
+                .version(BuildConfig.MINITRANSLATOR_VERSION)
+                .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("me{}imdanix{}text")
+                        .relocatedPattern("net.flectone.pulse.library.minitranslator")
+                        .build()
+                )
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build()
+                )
+                .build()
+        );
 
     }
 }

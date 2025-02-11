@@ -3,6 +3,7 @@ package net.flectone.pulse.util;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import me.imdanix.text.MiniTranslator;
 import net.flectone.pulse.logger.FLogger;
 
 import java.util.HashMap;
