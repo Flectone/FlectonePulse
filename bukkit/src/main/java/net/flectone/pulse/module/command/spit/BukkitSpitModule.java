@@ -13,6 +13,11 @@ public class BukkitSpitModule extends SpitModule {
     public BukkitSpitModule(FileManager fileManager,
                             net.flectone.pulse.module.message.contact.spit.SpitModule spitModule) {
         super(fileManager, fPlayer -> spitModule.send(fPlayer, Bukkit.getPlayer(fPlayer.getUuid()).getLocation()));
+        super(fileManager, fPlayer -> {
+            Player player = Bukkit.getPlayer(fPlayer.getUuid());
+            if (player == null) return;
+
+            spitModule.send(fPlayer, player.getLocation());
     }
 
     @Override
