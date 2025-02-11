@@ -285,7 +285,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         @Getter
         public static final class Rightclick implements SubContactMessageConfig, Config.IEnable {
             private boolean enable = true;
-            private Destination destination = new Destination(Destination.Type.ACTION_BAR);
+            private Destination destination = new Destination(Destination.Type.ACTION_BAR, new Times(0, 60, 0));
             private Cooldown cooldown = new Cooldown();
             private Sound sound = new Sound();
         }
@@ -304,7 +304,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             private boolean enable = false;
             private boolean message = true;
             private String item = "WHITE_DYE";
-            private Destination destination = new Destination(Destination.Type.ACTION_BAR);
+            private Destination destination = new Destination(Destination.Type.ACTION_BAR, new Times(0, 60, 0));
             private Cooldown cooldown = new Cooldown(true, 60);
             private Sound sound = new Sound(true, 0.3f, 1f, SoundCategory.HOSTILE.name(), Sounds.ENTITY_LLAMA_SPIT.getName().toString());
         }

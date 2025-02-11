@@ -14,7 +14,7 @@ public class Destination {
             net.kyori.adventure.bossbar.BossBar.Color.BLUE
     );
 
-    private Times times = new Times(20, 100, 20);
+    private Times times = new Times(20, 60, 20);
     private Toast toast = new Toast("minecraft:diamond", AdvancementType.TASK);
 
     public Destination() {
@@ -33,6 +33,11 @@ public class Destination {
     public Destination(Type type, BossBar bossBar) {
         this(type, "");
         this.bossBar = bossBar;
+    }
+
+    public Destination(Type type, Times times) {
+        this(type, "");
+        this.times = times;
     }
 
     public Destination(Type type, Times times, String subtext) {

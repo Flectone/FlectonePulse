@@ -118,24 +118,30 @@ public abstract class FileSerializable extends YamlSerializable {
                 public Map<String, Object> serialize(Destination destination) {
                     Map<String, Object> map = new LinkedHashMap<>();
 
-                    map.put("type", destination.getType());
+                    Destination.Type type = destination.getType();
 
-                    switch (destination.getType()) {
+                    map.put("type", type);
+
+                    switch (type) {
                         case TOAST -> {
                             Toast toast = destination.getToast();
 
                             map.put("icon", toast.getIcon());
                             map.put("style", toast.getStyle());
                         }
-                        case TITLE, SUBTITLE -> {
+                        case TITLE, SUBTITLE, ACTION_BAR -> {
                             Times times = destination.getTimes();
 
                             Map<String, Object> timesMap = new LinkedHashMap<>();
-                            timesMap.put("fade-in", times.fadeInTicks());
-                            timesMap.put("stayTicks", times.stayTicks());
-                            timesMap.put("fade-out", times.fadeOutTicks());
+                            timesMap.put("stay", times.stayTicks());
 
-                            map.put("subtext", destination.getSubtext());
+                            if (type != Destination.Type.ACTION_BAR) {
+                                timesMap.put("fade-in", times.fadeInTicks());
+                                timesMap.put("fade-out", times.fadeOutTicks());
+
+                                map.put("subtext", destination.getSubtext());
+                            }
+
                             map.put("times",  timesMap);
                         }
                         case BOSS_BAR -> {
@@ -168,7 +174,7 @@ public abstract class FileSerializable extends YamlSerializable {
 
                             yield new Destination(Destination.Type.TOAST, new Toast(stringIcon, toastStyle));
                         }
-                        case TITLE, SUBTITLE -> {
+                        case TITLE, SUBTITLE, ACTION_BAR -> {
                             Object times = map.get("times");
 
                             if (times == null) {
@@ -181,12 +187,14 @@ public abstract class FileSerializable extends YamlSerializable {
                             int fadeInTicks = fadeIn == null ? 20 : Integer.parseInt(String.valueOf(fadeIn));
 
                             Object stay = timesMap.get("stay");
-                            int stayTicks = stay == null ? 100 : Integer.parseInt(String.valueOf(stay));
+                            int stayTicks = stay == null ? 60 : Integer.parseInt(String.valueOf(stay));
 
                             Object fadeOut = timesMap.get("fade-out");
                             int fadeOutTicks = fadeOut == null ? 20 : Integer.parseInt(String.valueOf(fadeOut));
 
                             Times titleTimes = new Times(fadeInTicks, stayTicks, fadeOutTicks);
+
+                            if (type == Destination.Type.ACTION_BAR) yield new Destination(type, titleTimes);
 
                             Object subtext = map.get("subtext");
                             String stringSubtext = subtext == null ? "" : String.valueOf(subtext);

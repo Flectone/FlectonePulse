@@ -41,7 +41,7 @@ public abstract class MessageSender {
         switch (destination.getType()) {
             case TITLE -> sendTitle(fPlayer, destination.getTimes(), component, subcomponent);
             case SUBTITLE -> sendTitle(fPlayer, destination.getTimes(), subcomponent, component);
-            case ACTION_BAR -> sendActionBar(fPlayer, component);
+            case ACTION_BAR -> sendActionBar(fPlayer, component, destination.getTimes().stayTicks());
             case BOSS_BAR -> sendBoosBar(fPlayer, component, destination.getBossBar());
             case TAB_HEADER -> sendPlayerListHeaderAndFooter(fPlayer, component, fPlayerManager.getPlayerListFooter(fPlayer));
             case TAB_FOOTER -> sendPlayerListHeaderAndFooter(fPlayer, fPlayerManager.getPlayerListHeader(fPlayer), component);
@@ -72,13 +72,23 @@ public abstract class MessageSender {
     }
 
     public void sendActionBar(FPlayer fPlayer, Component component) {
+        sendActionBar(fPlayer, component, 0);
+    }
+
+    public void sendActionBar(FPlayer fPlayer, Component component, int stayTicks) {
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
             packetEventsUtil.sendPacket(fPlayer, new WrapperPlayServerSystemChatMessage(true, component));
         } else {
             packetEventsUtil.sendPacket(fPlayer, new WrapperPlayServerActionBar(component));
         }
 
-        packetEventsUtil.sendPacket(fPlayer, new WrapperPlayServerActionBar(component));
+        // cannot set stay ticks for action bar, so
+        if (stayTicks <= 30) return;
+
+        int remainingTicks = stayTicks - 30;
+        int delay = Math.min(30, remainingTicks);
+
+        taskScheduler.runAsyncLater(() -> sendActionBar(fPlayer, component, remainingTicks), delay);
     }
 
     public void sendPlayerListHeaderAndFooter(FPlayer fPlayer, Component header, Component footer) {
