@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.*;
 
-public abstract class AbstractModuleMessage<M extends Localization.ILocalization> extends AbstractModule {
+public abstract class AbstractModuleMessage<M extends Localization.Localizable> extends AbstractModule {
 
     private final Function<Localization, M> messageResolver;
 

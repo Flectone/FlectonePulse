@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public abstract class AbstractModuleCommand<M extends Localization.ILocalization> extends AbstractModuleMessage<M> {
+public abstract class AbstractModuleCommand<M extends Localization.Localizable> extends AbstractModuleMessage<M> {
 
     private final Predicate<FPlayer> commandPredicate;
 

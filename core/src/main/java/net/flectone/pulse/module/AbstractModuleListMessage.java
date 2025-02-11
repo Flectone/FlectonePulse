@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 
-public abstract class AbstractModuleListMessage<M extends Localization.ILocalization> extends AbstractModuleMessage<M> {
+public abstract class AbstractModuleListMessage<M extends Localization.Localizable> extends AbstractModuleMessage<M> {
 
     private final HashMap<Integer, Integer> MESSAGE_INDEX_MAP = new HashMap<>();
 
