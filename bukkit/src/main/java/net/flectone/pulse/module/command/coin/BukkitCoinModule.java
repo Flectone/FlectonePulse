@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.FCommand;
+import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.RandomUtil;
 
 @Singleton
@@ -11,8 +12,9 @@ public class BukkitCoinModule extends CoinModule {
 
     @Inject
     public BukkitCoinModule(FileManager fileManager,
+                            CommandUtil commandUtil,
                             RandomUtil randomUtil) {
-        super(fileManager, randomUtil);
+        super(fileManager, commandUtil, randomUtil);
     }
 
     @Override

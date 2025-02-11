@@ -7,6 +7,7 @@ import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.util.CommandUtil;
 
 @Getter
 public abstract class AfkModule extends AbstractModuleCommand<Localization.Command> {
@@ -15,12 +16,15 @@ public abstract class AfkModule extends AbstractModuleCommand<Localization.Comma
     private final Permission.Command.Afk permission;
 
     private final net.flectone.pulse.module.message.contact.afk.AfkModule afkModule;
+    private final CommandUtil commandUtil;
 
     public AfkModule(FileManager fileManager,
-                     net.flectone.pulse.module.message.contact.afk.AfkModule afkModule) {
+                     net.flectone.pulse.module.message.contact.afk.AfkModule afkModule,
+                     CommandUtil commandUtil) {
         super(Localization::getCommand, fPlayer -> fPlayer.is(FPlayer.Setting.AFK));
 
         this.afkModule = afkModule;
+        this.commandUtil = commandUtil;
 
         command = fileManager.getCommand().getAfk();
         permission = fileManager.getPermission().getCommand().getAfk();

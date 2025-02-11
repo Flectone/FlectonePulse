@@ -7,6 +7,7 @@ import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.RandomUtil;
@@ -18,12 +19,15 @@ public abstract class CoinModule extends AbstractModuleCommand<Localization.Comm
     @Getter private final Command.Coin command;
     @Getter private final Permission.Command.Coin permission;
 
+    private final CommandUtil commandUtil;
     private final RandomUtil randomUtil;
 
     public CoinModule(FileManager fileManager,
+                      CommandUtil commandUtil,
                       RandomUtil randomUtil) {
         super(localization -> localization.getCommand().getCoin(), fPlayer -> fPlayer.is(FPlayer.Setting.COIN));
 
+        this.commandUtil = commandUtil;
         this.randomUtil = randomUtil;
 
         command = fileManager.getCommand().getCoin();

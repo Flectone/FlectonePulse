@@ -8,6 +8,7 @@ import net.flectone.pulse.FlectonePulse;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.FCommand;
+import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.TimeUtil;
 
 @Singleton
@@ -15,10 +16,11 @@ public class BukkitFlectonepulseModule extends FlectonepulseModule {
 
     @Inject
     public BukkitFlectonepulseModule(FileManager fileManager,
+                                     CommandUtil commandUtil,
                                      TimeUtil timeUtil,
                                      FlectonePulse flectonePulse,
                                      FLogger fLogger) {
-        super(fileManager, timeUtil, flectonePulse, fLogger);
+        super(fileManager, commandUtil, timeUtil, flectonePulse, fLogger);
     }
 
     @Override

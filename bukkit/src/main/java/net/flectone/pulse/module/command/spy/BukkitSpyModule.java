@@ -9,6 +9,7 @@ import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.FCommand;
+import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.PermissionUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
@@ -35,9 +36,10 @@ public class BukkitSpyModule extends SpyModule {
     public BukkitSpyModule(FileManager fileManager,
                            FPlayerDAO fPlayerDAO,
                            FPlayerManager fPlayerManager,
+                           CommandUtil commandUtil,
                            PermissionUtil permissionUtil,
                            BukkitListenerManager bukkitListenerManager) {
-        super(fileManager, fPlayerDAO, permissionUtil);
+        super(fileManager, fPlayerDAO, commandUtil, permissionUtil);
 
         this.fPlayerManager = fPlayerManager;
         this.bukkitListenerManager = bukkitListenerManager;

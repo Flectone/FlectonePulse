@@ -14,6 +14,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.InventoryManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.FCommand;
+import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.PermissionUtil;
 import net.kyori.adventure.text.Component;
@@ -32,10 +33,11 @@ public class BukkitChatsettingModule extends ChatsettingModule {
     @Inject
     public BukkitChatsettingModule(FileManager fileManager,
                                    FPlayerDAO fPlayerDAO,
-                                   InventoryManager inventoryManager,
                                    ComponentUtil componentUtil,
-                                   PermissionUtil permissionUtil) {
-        super(fileManager, fPlayerDAO, inventoryManager, componentUtil, permissionUtil);
+                                   CommandUtil commandUtil,
+                                   PermissionUtil permissionUtil,
+                                   InventoryManager inventoryManager) {
+        super(fileManager, fPlayerDAO, componentUtil, commandUtil, permissionUtil, inventoryManager);
 
         this.componentUtil = componentUtil;
     }

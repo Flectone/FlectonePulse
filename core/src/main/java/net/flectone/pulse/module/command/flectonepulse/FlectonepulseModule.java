@@ -9,6 +9,7 @@ import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.TimeUtil;
 
 import java.time.Duration;
@@ -21,10 +22,12 @@ public abstract class FlectonepulseModule extends AbstractModuleCommand<Localiza
 
     private final FlectonePulse flectonePulse;
     private final FileManager fileManager;
+    private final CommandUtil commandUtil;
     private final TimeUtil timeUtil;
     private final FLogger fLogger;
 
     public FlectonepulseModule(FileManager fileManager,
+                               CommandUtil commandUtil,
                                TimeUtil timeUtil,
                                FlectonePulse flectonePulse,
                                FLogger fLogger) {
@@ -32,6 +35,7 @@ public abstract class FlectonepulseModule extends AbstractModuleCommand<Localiza
 
         this.flectonePulse = flectonePulse;
         this.fileManager = fileManager;
+        this.commandUtil = commandUtil;
         this.timeUtil = timeUtil;
         this.fLogger = fLogger;
 

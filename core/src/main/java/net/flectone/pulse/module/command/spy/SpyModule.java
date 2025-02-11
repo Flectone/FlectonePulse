@@ -8,6 +8,7 @@ import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.PermissionUtil;
 
@@ -19,14 +20,17 @@ public abstract class SpyModule extends AbstractModuleCommand<Localization.Comma
     @Getter private final Permission.Command.Spy permission;
 
     private final FPlayerDAO fPlayerDAO;
+    private final CommandUtil commandUtil;
     private final PermissionUtil permissionUtil;
 
     public SpyModule(FileManager fileManager,
                      FPlayerDAO fPlayerDAO,
+                     CommandUtil commandUtil,
                      PermissionUtil permissionUtil) {
         super(localization -> localization.getCommand().getSpy(), null);
 
         this.fPlayerDAO = fPlayerDAO;
+        this.commandUtil = commandUtil;
         this.permissionUtil = permissionUtil;
 
         command = fileManager.getCommand().getSpy();

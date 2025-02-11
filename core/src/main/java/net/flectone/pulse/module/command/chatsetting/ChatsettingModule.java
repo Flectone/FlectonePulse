@@ -12,6 +12,7 @@ import net.flectone.pulse.manager.InventoryManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.inventory.Inventory;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.PermissionUtil;
 import net.kyori.adventure.text.Component;
@@ -28,20 +29,23 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
 
     private final FPlayerDAO fPlayerDAO;
     private final ComponentUtil componentUtil;
+    private final CommandUtil commandUtil;
     private final PermissionUtil permissionUtil;
     private final InventoryManager inventoryManager;
 
     public ChatsettingModule(FileManager fileManager,
                              FPlayerDAO fPlayerDAO,
-                             InventoryManager inventoryManager,
                              ComponentUtil componentUtil,
-                             PermissionUtil permissionUtil) {
+                             CommandUtil commandUtil,
+                             PermissionUtil permissionUtil,
+                             InventoryManager inventoryManager) {
         super(localization -> localization.getCommand().getChatsetting(), null);
 
         this.fPlayerDAO = fPlayerDAO;
-        this.inventoryManager = inventoryManager;
         this.componentUtil = componentUtil;
+        this.commandUtil = commandUtil;
         this.permissionUtil = permissionUtil;
+        this.inventoryManager = inventoryManager;
 
         chat = fileManager.getMessage().getChat();
         command = fileManager.getCommand().getChatsetting();

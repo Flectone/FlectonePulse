@@ -8,7 +8,6 @@ import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.Range;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +21,6 @@ public abstract class AbstractModuleCommand<M extends Localization.ILocalization
     private final Predicate<FPlayer> commandPredicate;
 
     @Inject private FPlayerManager fPlayerManager;
-    @Inject protected CommandUtil commandUtil;
     @Inject private FileManager fileManager;
 
     public AbstractModuleCommand(Function<Localization, M> messageFunction, Predicate<FPlayer> commandPredicate) {

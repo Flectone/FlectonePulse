@@ -7,6 +7,7 @@ import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.util.CommandUtil;
 
 import java.util.function.Consumer;
 
@@ -16,12 +17,15 @@ public abstract class SpitModule extends AbstractModuleCommand<Localization.Comm
     @Getter private final Permission.Command.Spit permission;
 
     private final Consumer<FPlayer> spitConsumer;
+    private final CommandUtil commandUtil;
 
     public SpitModule(FileManager fileManager,
-                      Consumer<FPlayer> spitConsumer) {
+                      Consumer<FPlayer> spitConsumer,
+                      CommandUtil commandUtil) {
         super(Localization::getCommand, fPlayer -> fPlayer.is(FPlayer.Setting.SPIT));
 
         this.spitConsumer = spitConsumer;
+        this.commandUtil = commandUtil;
 
         command = fileManager.getCommand().getSpit();
         permission = fileManager.getPermission().getCommand().getSpit();
