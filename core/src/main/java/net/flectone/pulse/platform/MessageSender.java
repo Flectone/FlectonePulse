@@ -1,16 +1,15 @@
 package net.flectone.pulse.platform;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBossBar;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerListHeaderAndFooter;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPluginMessage;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
-import net.flectone.pulse.util.logging.FLogger;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import net.flectone.pulse.manager.FPlayerManager;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.*;
-import net.flectone.pulse.util.serializer.BrandPacketSerializer;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.PacketEventsUtil;
+import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.util.serializer.BrandPacketSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
@@ -72,8 +71,14 @@ public abstract class MessageSender {
         user.sendTitle(title, subTitle, times.fadeInTicks(), times.stayTicks(), times.fadeOutTicks());
     }
 
-    public void sendActionBar(FPlayer fPlayer, Component component) {;
-        packetEventsUtil.sendPacket(fPlayer, new WrapperPlayServerSystemChatMessage(true, component));
+    public void sendActionBar(FPlayer fPlayer, Component component) {
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
+            packetEventsUtil.sendPacket(fPlayer, new WrapperPlayServerSystemChatMessage(true, component));
+        } else {
+            packetEventsUtil.sendPacket(fPlayer, new WrapperPlayServerActionBar(component));
+        }
+
+        packetEventsUtil.sendPacket(fPlayer, new WrapperPlayServerActionBar(component));
     }
 
     public void sendPlayerListHeaderAndFooter(FPlayer fPlayer, Component header, Component footer) {
