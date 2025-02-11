@@ -116,17 +116,17 @@ public class BukkitFPlayerManager extends FPlayerManager {
         fPlayerDAO.insertPlayer(uuid, name);
 
         FPlayer fPlayer = fPlayerDAO.getFPlayer(uuid);
-        put(fPlayer);
-
+        fPlayer.setOnline(true);
         colorsDAO.setFPlayerColors(fPlayer);
         ignoreDAO.setIgnores(fPlayer);
 
         fPlayer.updateMutes(moderationDAO.getModerations(fPlayer, Moderation.Type.MUTE));
 
-        fPlayer.setOnline(true);
         fPlayer.setIp(ip);
         fPlayer.setCurrentName(name);
         fPlayer.setEntityId(entityId);
+
+        put(fPlayer);
 
         fPlayerDAO.updateFPlayer(fPlayer);
 
