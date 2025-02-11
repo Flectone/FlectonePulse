@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.Cooldown;

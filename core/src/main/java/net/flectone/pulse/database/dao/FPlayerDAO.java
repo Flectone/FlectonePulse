@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.database.SQLType;
 import net.flectone.pulse.file.Config;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import org.jetbrains.annotations.NotNull;

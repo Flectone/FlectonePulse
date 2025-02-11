@@ -1,4 +1,4 @@
-package net.flectone.pulse.logger;
+package net.flectone.pulse.util.logging;
 
 import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
@@ -37,7 +37,7 @@ public class FLogger extends Logger {
 
     private final Consumer<LogRecord> logConsumer;
 
-    private FFilter fFilter;
+    private LogFilter logFilter;
 
     public FLogger(Consumer<LogRecord> logConsumer) {
         super("", null);
@@ -56,14 +56,14 @@ public class FLogger extends Logger {
     }
 
     public void enableFilter() {
-        this.fFilter = new FFilter();
+        this.logFilter = new LogFilter();
     }
 
     public void reload(List<String> messages) {
-        if (fFilter == null) return;
+        if (logFilter == null) return;
 
-        fFilter.getMessages().clear();
-        fFilter.getMessages().addAll(messages);
+        logFilter.getMessages().clear();
+        logFilter.getMessages().addAll(messages);
     }
 
     @Override

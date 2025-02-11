@@ -7,7 +7,7 @@ import com.loohp.interactivechat.api.InteractiveChatAPI;
 import com.loohp.interactivechat.data.PlayerDataManager;
 import com.loohp.interactivechat.listeners.ChatEvents;
 import com.loohp.interactivechat.registry.Registry;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.kyori.adventure.text.Component;

@@ -3,7 +3,7 @@ package net.flectone.pulse.connector;
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
 import net.flectone.pulse.file.Config;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.util.MessageTag;

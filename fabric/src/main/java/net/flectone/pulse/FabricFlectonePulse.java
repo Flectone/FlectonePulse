@@ -8,7 +8,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.flectone.pulse.database.Database;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.manager.*;
 import net.flectone.pulse.platform.FabricDependencyResolver;
 import net.minecraft.server.MinecraftServer;

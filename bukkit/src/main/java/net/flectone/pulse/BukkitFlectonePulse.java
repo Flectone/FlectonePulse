@@ -12,7 +12,7 @@ import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.*;
 import net.flectone.pulse.module.Module;
 import net.flectone.pulse.module.integration.discord.DiscordModule;

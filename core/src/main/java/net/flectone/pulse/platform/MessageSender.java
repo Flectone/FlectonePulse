@@ -5,7 +5,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBo
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerListHeaderAndFooter;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPluginMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.*;

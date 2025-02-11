@@ -10,7 +10,7 @@ import feign.Logger;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.file.Integration;
 import net.flectone.pulse.file.Localization;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;

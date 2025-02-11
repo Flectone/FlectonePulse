@@ -19,7 +19,7 @@ import discord4j.rest.util.MultipartRequest;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.file.Integration;
 import net.flectone.pulse.file.Localization;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.scheduler.TaskScheduler;

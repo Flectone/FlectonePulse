@@ -3,7 +3,7 @@ package net.flectone.pulse.manager;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.util.MessageTag;
 

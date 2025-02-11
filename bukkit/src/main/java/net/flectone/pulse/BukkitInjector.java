@@ -16,7 +16,7 @@ import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.file.Config;
 import net.flectone.pulse.interceptor.AsyncInterceptor;
 import net.flectone.pulse.interceptor.SyncInterceptor;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.*;
 import net.flectone.pulse.module.command.ball.BallModule;
 import net.flectone.pulse.module.command.ball.BukkitBallModule;

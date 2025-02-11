@@ -1,4 +1,4 @@
-package net.flectone.pulse.logger;
+package net.flectone.pulse.util.logging;
 
 import lombok.Getter;
 import org.apache.logging.log4j.Level;
@@ -20,11 +20,11 @@ import java.util.List;
  * @since 1.0.0
  */
 @Getter
-public class FFilter implements Filter {
+public class LogFilter implements Filter {
 
     private final List<String> messages = new ArrayList<>();
 
-    public FFilter() {
+    public LogFilter() {
         ((Logger) LogManager.getRootLogger()).addFilter(this);
     }
 

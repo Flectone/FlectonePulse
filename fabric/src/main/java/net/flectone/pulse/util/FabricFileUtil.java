@@ -2,7 +2,7 @@ package net.flectone.pulse.util;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.logging.FLogger;
 
 @Singleton
 public class FabricFileUtil extends FileUtil {

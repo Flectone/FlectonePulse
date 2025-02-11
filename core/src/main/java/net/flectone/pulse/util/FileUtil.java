@@ -1,6 +1,6 @@
 package net.flectone.pulse.util;
 
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.util.logging.FLogger;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

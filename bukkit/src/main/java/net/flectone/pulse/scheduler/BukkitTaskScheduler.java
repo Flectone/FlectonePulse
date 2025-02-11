@@ -2,7 +2,7 @@ package net.flectone.pulse.scheduler;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.plugin.Plugin;
 
 @Singleton

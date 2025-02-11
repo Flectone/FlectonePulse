@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.database.DatabaseConsumer;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.logging.FLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

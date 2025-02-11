@@ -12,7 +12,7 @@ import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.database.mysql.MySQLDatabase;
 import net.flectone.pulse.database.sqlite.SQLiteDatabase;
-import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.logging.FLogger;
 import net.flectone.pulse.manager.*;
 import net.flectone.pulse.module.command.CommandModule;
 import net.flectone.pulse.module.command.FabricCommandModule;
