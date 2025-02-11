@@ -11,6 +11,7 @@ import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.PacketEventsUtil;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +30,7 @@ public abstract class FPlayerManager {
     private final Config config;
 
     @Inject private FPlayerDAO fPlayerDAO;
-    @Inject private ThreadManager threadManager;
+    @Inject private TaskScheduler taskScheduler;
     @Inject private IntegrationModule integrationModule;
     @Inject private PacketEventsUtil packetEventsUtil;
 

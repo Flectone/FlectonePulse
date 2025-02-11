@@ -20,6 +20,7 @@ import net.flectone.pulse.module.message.bubble.manager.BubbleManager;
 import net.flectone.pulse.module.message.contact.mark.manager.MarkManager;
 import net.flectone.pulse.platform.BukkitLibraryResolver;
 import net.flectone.pulse.platform.LibraryResolver;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.MetricsUtil;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
@@ -139,7 +140,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(DiscordModule.class).disconnect();
         injector.getInstance(TwitchModule.class).disconnect();
         injector.getInstance(TelegramModule.class).disconnect();
-        injector.getInstance(ThreadManager.class).reload();
+        injector.getInstance(TaskScheduler.class).reload();
 
         fLogger.logDisabled();
     }
@@ -160,7 +161,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
                 .forEach(CommandAPI::unregister);
 
         injector.getInstance(ListenerManager.class).reload();
-        injector.getInstance(ThreadManager.class).reload();
+        injector.getInstance(TaskScheduler.class).reload();
         injector.getInstance(BubbleManager.class).reload();
         injector.getInstance(MarkManager.class).reload();
 

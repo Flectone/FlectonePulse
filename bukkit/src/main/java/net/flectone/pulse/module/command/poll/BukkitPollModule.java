@@ -7,7 +7,7 @@ import dev.jorel.commandapi.arguments.*;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ProxyManager;
-import net.flectone.pulse.manager.ThreadManager;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.util.BukkitCommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
@@ -21,12 +21,12 @@ public class BukkitPollModule extends PollModule {
     @Inject
     public BukkitPollModule(FileManager fileManager,
                             ProxyManager proxyManager,
-                            ThreadManager threadManager,
+                            TaskScheduler taskScheduler,
                             FPlayerManager fPlayerManager,
                             BukkitCommandUtil commandUtil,
                             ComponentUtil componentUtil,
                             Gson gson) {
-        super(fileManager, proxyManager, threadManager, commandUtil, componentUtil, gson);
+        super(fileManager, proxyManager, taskScheduler, commandUtil, componentUtil, gson);
 
         this.fPlayerManager = fPlayerManager;
         this.commandUtil = commandUtil;

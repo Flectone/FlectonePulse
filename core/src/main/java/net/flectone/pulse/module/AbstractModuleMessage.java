@@ -8,7 +8,7 @@ import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ProxyManager;
-import net.flectone.pulse.manager.ThreadManager;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.MessageSender;
@@ -38,7 +38,7 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
     @Inject private IntegrationModule integrationModule;
     @Inject private MessageSender messageSender;
     @Inject private SoundPlayer soundPlayer;
-    @Inject private ThreadManager threadManager;
+    @Inject private TaskScheduler taskScheduler;
 
     @Getter private Cooldown cooldown;
     @Getter private Sound sound;
@@ -430,7 +430,7 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
                     .replace("<final_message>", finalMessage)
                     .replace("<final_clear_message>", finalMessage.replaceAll("[\\p{C}\\p{So}\\x{E0100}-\\x{E01EF}]+", ""));
 
-            threadManager.runAsync(() -> integrationModule.sendMessage(fPlayer, tag, interfaceReplaceString));
+            taskScheduler.runAsync(() -> integrationModule.sendMessage(fPlayer, tag, interfaceReplaceString));
         }
 
         public boolean sendToProxy() {

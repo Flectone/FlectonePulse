@@ -8,7 +8,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
-import net.flectone.pulse.manager.ThreadManager;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Toast;
 import net.flectone.pulse.module.integration.BukkitIntegrationModule;
@@ -28,21 +28,21 @@ import java.util.UUID;
 public class BukkitMessageSender extends MessageSender {
 
     private final Plugin plugin;
-    private final ThreadManager threadManager;
+    private final TaskScheduler taskScheduler;
     private final BukkitIntegrationModule integrationModule;
 
     @Inject
     public BukkitMessageSender(Plugin plugin,
-                               ThreadManager threadManager,
+                               TaskScheduler taskScheduler,
                                BukkitIntegrationModule integrationModule,
                                FPlayerManager fPlayerManager,
                                BrandPacketSerializer packetSerializer,
                                PacketEventsUtil packetEventsUtil,
                                FLogger fLogger) {
-        super(threadManager, fPlayerManager, packetSerializer, packetEventsUtil, fLogger);
+        super(taskScheduler, fPlayerManager, packetSerializer, packetEventsUtil, fLogger);
 
         this.plugin = plugin;
-        this.threadManager = threadManager;
+        this.taskScheduler = taskScheduler;
         this.integrationModule = integrationModule;
     }
 
@@ -109,11 +109,11 @@ public class BukkitMessageSender extends MessageSender {
 
         String jsonToast = jsonObject.toString();
 
-        threadManager.runSync(() -> Bukkit.getUnsafe().loadAdvancement(key, jsonToast));
+        taskScheduler.runSync(() -> Bukkit.getUnsafe().loadAdvancement(key, jsonToast));
     }
 
     private void grantToast(NamespacedKey key, Player player) {
-        threadManager.runSync(() -> {
+        taskScheduler.runSync(() -> {
             Advancement advancement = Bukkit.getAdvancement(key);
             if (advancement == null) return;
 
@@ -122,7 +122,7 @@ public class BukkitMessageSender extends MessageSender {
     }
 
     private void revokeToast(NamespacedKey key, Player player) {
-        threadManager.runSyncLater(() -> {
+        taskScheduler.runSyncLater(() -> {
             Advancement advancement = Bukkit.getAdvancement(key);
             if (advancement == null) return;
 

@@ -1,7 +1,6 @@
 package net.flectone.pulse;
 
 import com.github.Anon8281.universalScheduler.UniversalScheduler;
-import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
 import com.google.gson.Gson;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
@@ -11,6 +10,8 @@ import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentS
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.file.Config;
+import net.flectone.pulse.interceptor.AsyncInterceptor;
+import net.flectone.pulse.interceptor.SyncInterceptor;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.*;
 import net.flectone.pulse.module.command.ball.BallModule;
@@ -124,6 +125,8 @@ import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.platform.BukkitMessageSender;
 import net.flectone.pulse.platform.LibraryResolver;
 import net.flectone.pulse.platform.MessageSender;
+import net.flectone.pulse.scheduler.BukkitTaskScheduler;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.*;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -175,7 +178,7 @@ public class BukkitInjector extends AbstractModule {
 
         bind(FileManager.class).toInstance(fileManager);
 
-        bind(ThreadManager.class).to(BukkitThreadManager.class);
+        bind(TaskScheduler.class).to(BukkitTaskScheduler.class);
         bind(FPlayerManager.class).to(BukkitFPlayerManager.class);
         bind(ListenerManager.class).to(BukkitListenerManager.class);
         bind(InventoryManager.class).to(BukkitInventoryManager.class);
@@ -256,20 +259,20 @@ public class BukkitInjector extends AbstractModule {
         bind(Plugin.class).toInstance(plugin);
         bind(FLogger.class).toInstance(fLogger);
 
-        bind(TaskScheduler.class).toInstance(UniversalScheduler.getScheduler(plugin));
+        bind(com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler.class).toInstance(UniversalScheduler.getScheduler(plugin));
 
-        InterceptorSync interceptorSync = new InterceptorSync();
-        requestInjection(interceptorSync);
+        SyncInterceptor syncInterceptor = new SyncInterceptor();
+        requestInjection(syncInterceptor);
 
-        InterceptorAsync interceptorAsync = new InterceptorAsync();
-        requestInjection(interceptorAsync);
+        AsyncInterceptor asyncInterceptor = new AsyncInterceptor();
+        requestInjection(asyncInterceptor);
 
         bindInterceptor(Matchers.any(),
                 Matchers.annotatedWith(Sync.class)
                         .or(Matchers.annotatedWith(Async.class))
                         .or(Matchers.annotatedWith(Sync.class)),
-                interceptorAsync,
-                interceptorSync
+                asyncInterceptor,
+                syncInterceptor
         );
 
         bind(MiniMessage.class).toInstance(MiniMessage.builder().tags(TagResolver.builder().build()).build());

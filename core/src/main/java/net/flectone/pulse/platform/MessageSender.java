@@ -7,7 +7,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
-import net.flectone.pulse.manager.ThreadManager;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.util.BrandPacketSerializer;
 import net.flectone.pulse.util.PacketEventsUtil;
@@ -19,17 +19,17 @@ import java.util.UUID;
 public abstract class MessageSender {
 
     private final BrandPacketSerializer packetSerializer;
-    private final ThreadManager threadManager;
+    private final TaskScheduler taskScheduler;
     private final FPlayerManager fPlayerManager;
     private final PacketEventsUtil packetEventsUtil;
     private final FLogger fLogger;
 
-    public MessageSender(ThreadManager threadManager,
+    public MessageSender(TaskScheduler taskScheduler,
                          FPlayerManager fPlayerManager,
                          BrandPacketSerializer packetSerializer,
                          PacketEventsUtil packetEventsUtil,
                          FLogger fLogger) {
-        this.threadManager = threadManager;
+        this.taskScheduler = taskScheduler;
         this.fPlayerManager = fPlayerManager;
         this.packetSerializer = packetSerializer;
         this.packetEventsUtil = packetEventsUtil;
@@ -93,7 +93,7 @@ public abstract class MessageSender {
 
         packetEventsUtil.sendPacket(fPlayer, addWrapper);
 
-        threadManager.runAsyncLater(() -> {
+        taskScheduler.runAsyncLater(() -> {
             WrapperPlayServerBossBar removeWrapper = new WrapperPlayServerBossBar(bossBarUUID, WrapperPlayServerBossBar.Action.REMOVE);
             packetEventsUtil.sendPacket(fPlayer, removeWrapper);
 

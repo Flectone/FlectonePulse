@@ -8,13 +8,12 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.database.dao.ColorsDAO;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ProxyManager;
-import net.flectone.pulse.manager.ThreadManager;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
@@ -71,7 +70,7 @@ public class BukkitProxyListener implements PluginMessageListener {
     private final ModerationDAO moderationDAO;
     private final FileManager fileManager;
     private final FPlayerManager fPlayerManager;
-    private final ThreadManager threadManager;
+    private final TaskScheduler taskScheduler;
     private final ProxyManager proxyManager;
     private final Gson gson;
     private final Injector injector;
@@ -81,7 +80,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                                ModerationDAO moderationDAO,
                                FileManager fileManager,
                                FPlayerManager fPlayerManager,
-                               ThreadManager threadManager,
+                               TaskScheduler taskScheduler,
                                ProxyManager proxyManager,
                                Gson gson,
                                Injector injector) {
@@ -89,7 +88,7 @@ public class BukkitProxyListener implements PluginMessageListener {
         this.moderationDAO = moderationDAO;
         this.fileManager = fileManager;
         this.fPlayerManager = fPlayerManager;
-        this.threadManager = threadManager;
+        this.taskScheduler = taskScheduler;
         this.proxyManager = proxyManager;
         this.gson = gson;
         this.injector = injector;
@@ -100,7 +99,7 @@ public class BukkitProxyListener implements PluginMessageListener {
         if (!channel.equals(proxyManager.getChannel())) return;
         if (!proxyManager.isEnabledProxy()) return;
 
-        threadManager.runAsync(() -> {
+        taskScheduler.runAsync(() -> {
             ByteArrayDataInput input = ByteStreams.newDataInput(bytes);
 
             MessageTag tag = MessageTag.fromProxyString(input.readUTF());

@@ -8,7 +8,7 @@ import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.manager.ProxyManager;
-import net.flectone.pulse.manager.ThreadManager;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -34,14 +34,14 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
 
     private final FileManager fileManager;
     private final ProxyManager proxyManager;
-    private final ThreadManager threadManager;
+    private final TaskScheduler taskScheduler;
     private final CommandUtil commandUtil;
     private final ComponentUtil componentUtil;
     private final Gson gson;
 
     public PollModule(FileManager fileManager,
                       ProxyManager proxyManager,
-                      ThreadManager threadManager,
+                      TaskScheduler taskScheduler,
                       CommandUtil commandUtil,
                       ComponentUtil componentUtil,
                       Gson gson) {
@@ -49,7 +49,7 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
 
         this.fileManager = fileManager;
         this.proxyManager = proxyManager;
-        this.threadManager = threadManager;
+        this.taskScheduler = taskScheduler;
         this.commandUtil = commandUtil;
         this.componentUtil = componentUtil;
         this.gson = gson;
@@ -102,10 +102,10 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
 
         if (repeatTime != -1) {
             recursiveSend(repeatTime * 20L, poll, sendRunnable);
-            threadManager.runAsync(() -> {});
+            taskScheduler.runAsync(() -> {});
         }
 
-        threadManager.runAsyncLater(() -> {
+        taskScheduler.runAsyncLater(() -> {
             Poll expiredPoll = pollMap.get(poll.getId());
             expiredPoll.setExpired(true);
 
@@ -244,7 +244,7 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
     }
 
     public void recursiveSend(long repeatTime, Poll poll, Runnable runnable) {
-        threadManager.runAsyncLater(() -> {
+        taskScheduler.runAsyncLater(() -> {
             if (poll.isExpired()) return;
             runnable.run();
 

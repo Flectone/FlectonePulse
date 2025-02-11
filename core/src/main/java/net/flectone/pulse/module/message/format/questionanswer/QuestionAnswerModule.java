@@ -7,7 +7,7 @@ import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -39,18 +39,18 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
     private final Message.Format.QuestionAnswer message;
     private final Permission.Message.Format.QuestionAnswer permission;
 
-    private final ThreadManager threadManager;
+    private final TaskScheduler taskScheduler;
     private final PermissionUtil permissionUtil;
     private final FLogger fLogger;
 
     @Inject
     public QuestionAnswerModule(FileManager fileManager,
-                                ThreadManager threadManager,
+                                TaskScheduler taskScheduler,
                                 PermissionUtil permissionUtil,
                                 FLogger fLogger) {
         super(localization -> localization.getMessage().getFormat().getQuestionAnswer());
 
-        this.threadManager = threadManager;
+        this.taskScheduler = taskScheduler;
         this.permissionUtil = permissionUtil;
         this.fLogger = fLogger;
 
@@ -124,7 +124,7 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
 
         processedQuestions.put(processId, true);
 
-        threadManager.runAsyncLater(() -> {
+        taskScheduler.runAsyncLater(() -> {
             Message.Format.QuestionAnswer.Question questionMessage = message.getQuestions().get(question);
             if (questionMessage == null) return;
 

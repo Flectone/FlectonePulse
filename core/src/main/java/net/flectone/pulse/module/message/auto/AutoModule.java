@@ -8,7 +8,7 @@ import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.model.Ticker;
@@ -22,16 +22,16 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
     private final Message.Auto message;
     private final Permission.Message.Auto permission;
 
-    private final ThreadManager threadManager;
+    private final TaskScheduler taskScheduler;
     private final FPlayerManager fPlayerManager;
 
     @Inject
     public AutoModule(FileManager fileManager,
-                      ThreadManager threadManager,
+                      TaskScheduler taskScheduler,
                       FPlayerManager fPlayerManager) {
         super(localization -> localization.getMessage().getAuto());
 
-        this.threadManager = threadManager;
+        this.taskScheduler = taskScheduler;
         this.fPlayerManager = fPlayerManager;
 
         message = fileManager.getMessage().getAuto();
@@ -47,7 +47,7 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
 
             Ticker ticker = value.getTicker();
             if (ticker.isEnable()) {
-                threadManager.runAsyncTimer(() -> fPlayerManager.getFPlayers().forEach(fPlayer -> send(fPlayer, key, value, sound)),
+                taskScheduler.runAsyncTimer(() -> fPlayerManager.getFPlayers().forEach(fPlayer -> send(fPlayer, key, value, sound)),
                         ticker.getPeriod(), ticker.getPeriod()
                 );
             }

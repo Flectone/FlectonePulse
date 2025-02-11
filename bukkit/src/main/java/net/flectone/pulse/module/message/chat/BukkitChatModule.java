@@ -9,7 +9,7 @@ import net.flectone.pulse.file.Message;
 import net.flectone.pulse.manager.BukkitListenerManager;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -37,7 +37,7 @@ public class BukkitChatModule extends ChatModule {
     private final FPlayerDAO fPlayerDAO;
     private final FPlayerManager fPlayerManager;
     private final PermissionUtil permissionUtil;
-    private final ThreadManager threadManager;
+    private final TaskScheduler taskScheduler;
     private final BukkitListenerManager bukkitListenerManager;
     private final IntegrationModule integrationModule;
     private final TimeUtil timeUtil;
@@ -48,7 +48,7 @@ public class BukkitChatModule extends ChatModule {
     public BukkitChatModule(FileManager fileManager,
                             FPlayerDAO fPlayerDAO,
                             FPlayerManager fPlayerManager,
-                            ThreadManager threadManager,
+                            TaskScheduler taskScheduler,
                             BukkitListenerManager bukkitListenerManager,
                             IntegrationModule integrationModule,
                             PermissionUtil permissionUtil,
@@ -57,7 +57,7 @@ public class BukkitChatModule extends ChatModule {
 
         this.fPlayerDAO = fPlayerDAO;
         this.fPlayerManager = fPlayerManager;
-        this.threadManager = threadManager;
+        this.taskScheduler = taskScheduler;
         this.bukkitListenerManager = bukkitListenerManager;
         this.integrationModule = integrationModule;
         this.permissionUtil = permissionUtil;
@@ -183,7 +183,7 @@ public class BukkitChatModule extends ChatModule {
 
             if ((onlinePlayers.containsAll(recipients) && onlinePlayers.size() <= countRecipients)
                     || chatRange > -1) {
-                threadManager.runAsyncLater(() -> builder(fPlayer)
+                taskScheduler.runAsyncLater(() -> builder(fPlayer)
                         .format(Localization.Message.Chat::getNullRecipient)
                         .sendBuilt(), 5);
             }

@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.manager.FPlayerManager;
-import net.flectone.pulse.manager.ThreadManager;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.contact.mark.model.FMark;
 import net.flectone.pulse.util.RandomUtil;
@@ -30,17 +30,17 @@ public class MarkManager {
     private final Map<UUID, FMark> playerMarkMap = new HashMap<>();
 
     private final TeamManager teamManager;
-    private final ThreadManager threadManager;
+    private final TaskScheduler taskScheduler;
     private final FPlayerManager fPlayerManager;
     private final RandomUtil randomUtil;
 
     @Inject
     public MarkManager(TeamManager teamManager,
-                       ThreadManager threadManager,
+                       TaskScheduler taskScheduler,
                        FPlayerManager fPlayerManager,
                        RandomUtil randomUtil) {
         this.teamManager = teamManager;
-        this.threadManager = threadManager;
+        this.taskScheduler = taskScheduler;
         this.fPlayerManager = fPlayerManager;
         this.randomUtil = randomUtil;
     }
@@ -60,13 +60,13 @@ public class MarkManager {
 
         // color update takes too long and there is a visual bug when color changes from white to specified color
         // a delay of 2 ticks fixes that
-        threadManager.runAsyncLater(() -> {
+        taskScheduler.runAsyncLater(() -> {
             fMark.setGlowing(location);
 
-            threadManager.runSyncLater(fMark::remove, fMark.getDuration());
+            taskScheduler.runSyncLater(fMark::remove, fMark.getDuration());
         }, 2);
 
-        threadManager.runAsyncLater(fMark::remove, fMark.getDuration());
+        taskScheduler.runAsyncLater(fMark::remove, fMark.getDuration());
 
         playerMarkMap.put(fPlayer.getUuid(), fMark);
         return true;

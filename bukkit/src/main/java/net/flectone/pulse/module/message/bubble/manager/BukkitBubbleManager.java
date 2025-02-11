@@ -12,7 +12,7 @@ import net.flectone.pulse.file.Message;
 import net.flectone.pulse.logger.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPacketEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -40,7 +40,7 @@ public class BukkitBubbleManager implements BubbleManager {
     public final Map<UUID, Queue<String>> messageMap = new ConcurrentHashMap<>();
     private final List<FBubble> fBubbleList = new ArrayList<>();
 
-    private final ThreadManager threadManager;
+    private final TaskScheduler taskScheduler;
     private final FPlayerManager fPlayerManager;
     private final FileManager fileManager;
     private final ComponentUtil componentUtil;
@@ -49,14 +49,14 @@ public class BukkitBubbleManager implements BubbleManager {
     private final IntegrationModule integrationModule;
 
     @Inject
-    public BukkitBubbleManager(ThreadManager threadManager,
+    public BukkitBubbleManager(TaskScheduler taskScheduler,
                                FPlayerManager fPlayerManager,
                                FileManager fileManager,
                                RandomUtil randomUtil,
                                ComponentUtil componentUtil,
                                ColorUtil colorUtil,
                                IntegrationModule integrationModule) {
-        this.threadManager = threadManager;
+        this.taskScheduler = taskScheduler;
         this.fPlayerManager = fPlayerManager;
         this.fileManager = fileManager;
         this.randomUtil = randomUtil;
@@ -99,7 +99,7 @@ public class BukkitBubbleManager implements BubbleManager {
             return;
         }
 
-        threadManager.runAsyncLater(() -> process(fPlayer), duration);
+        taskScheduler.runAsyncLater(() -> process(fPlayer), duration);
     }
 
     public long next(FPlayer fPlayer, String message) {
@@ -203,7 +203,7 @@ public class BukkitBubbleManager implements BubbleManager {
         for (FBubble fBubble : bubbleDeque) {
             fBubble.spawn(randomUtil);
             fBubbleList.add(fBubble);
-            threadManager.runAsyncLater(fBubble::remove, fBubble.getDuration());
+            taskScheduler.runAsyncLater(fBubble::remove, fBubble.getDuration());
 
             Player sender = Bukkit.getPlayer(fBubble.getFPlayer().getUuid());
             if (sender == null) continue;

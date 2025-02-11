@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.image.model.FImage;
@@ -32,15 +32,15 @@ public class ImageModule extends AbstractModule {
     private final Message.Format.Image message;
     private final Permission.Message.Format.Image permission;
 
-    private final ThreadManager threadManager;
+    private final TaskScheduler taskScheduler;
 
     @Inject private ComponentUtil componentUtil;
 
     @Inject
     public ImageModule(FileManager fileManager,
-                       ThreadManager threadManager) {
+                       TaskScheduler taskScheduler) {
 
-        this.threadManager = threadManager;
+        this.taskScheduler = taskScheduler;
 
         message = fileManager.getMessage().getFormat().getImage();
         permission = fileManager.getPermission().getMessage().getFormat().getImage();
@@ -52,7 +52,7 @@ public class ImageModule extends AbstractModule {
         registerModulePermission(permission);
 
         // 10 min timer
-        threadManager.runAsyncTimer(imageMap::clear, 12000L, 12000L);
+        taskScheduler.runAsyncTimer(imageMap::clear, 12000L, 12000L);
     }
 
     public TagResolver imageTag(FEntity sender, FEntity receiver) {

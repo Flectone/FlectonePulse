@@ -14,7 +14,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.manager.FPlayerManager;
-import net.flectone.pulse.manager.ThreadManager;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.mail.MailModule;
@@ -34,7 +34,7 @@ public class BasePacketListener extends AbstractPacketListener {
 
     private final FPlayerDAO fPlayerDAO;
     private final FPlayerManager fPlayerManager;
-    private final ThreadManager threadManager;
+    private final TaskScheduler taskScheduler;
     private final PacketEventsUtil packetEventsUtil;
 
     @Inject private QuitModule quitModule;
@@ -50,11 +50,11 @@ public class BasePacketListener extends AbstractPacketListener {
     @Inject
     public BasePacketListener(FPlayerDAO fPlayerDAO,
                               FPlayerManager fPlayerManager,
-                              ThreadManager threadManager,
+                              TaskScheduler taskScheduler,
                               PacketEventsUtil packetEventsUtil) {
         this.fPlayerDAO = fPlayerDAO;
         this.fPlayerManager = fPlayerManager;
-        this.threadManager = threadManager;
+        this.taskScheduler = taskScheduler;
         this.packetEventsUtil = packetEventsUtil;
     }
 
@@ -70,7 +70,7 @@ public class BasePacketListener extends AbstractPacketListener {
         String name = user.getName();
         String ip = user.getAddress().getHostString();
 
-        threadManager.runAsync(() -> {
+        taskScheduler.runAsync(() -> {
             FPlayer fPlayer = fPlayerManager.put(uuid, entityId, name, ip);
 
             joinModule.send(fPlayer, true);
@@ -83,7 +83,7 @@ public class BasePacketListener extends AbstractPacketListener {
     public void onUserDisconnect(UserDisconnectEvent event) {
         if (event.getUser().getUUID() == null) return;
 
-        threadManager.runAsync(() -> {
+        taskScheduler.runAsync(() -> {
             FPlayer fPlayer = fPlayerManager.get(event.getUser().getUUID());
             if (!fPlayer.isOnline()) return;
 
@@ -114,7 +114,7 @@ public class BasePacketListener extends AbstractPacketListener {
         // first time player joined, wait for it to be added
         // this needs to change in the future
 
-        threadManager.runAsyncLater(() -> {
+        taskScheduler.runAsyncLater(() -> {
             FPlayer newFPlayer = fPlayerManager.get(uuid);
 
             setLocale(newFPlayer, locale);

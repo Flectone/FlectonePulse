@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.file.Integration;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ThreadManager;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.Range;
@@ -18,12 +18,12 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
 
     @Getter private final Integration.Twitch integration;
 
-    private final ThreadManager threadManager;
+    private final TaskScheduler taskScheduler;
 
     @Inject
     public ChannelMessageListener(FileManager fileManager,
-                                  ThreadManager threadManager) {
-        this.threadManager = threadManager;
+                                  TaskScheduler taskScheduler) {
+        this.taskScheduler = taskScheduler;
 
         integration = fileManager.getIntegration().getTwitch();
     }
@@ -41,7 +41,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
 
         String nickname = event.getUser().getName();
         String message = event.getMessage();
-        threadManager.runAsync(() -> builder(FPlayer.UNKNOWN)
+        taskScheduler.runAsync(() -> builder(FPlayer.UNKNOWN)
                 .range(Range.PROXY)
                 .destination(integration.getDestination())
                 .filter(fPlayer -> fPlayer.is(FPlayer.Setting.TWITCH))
