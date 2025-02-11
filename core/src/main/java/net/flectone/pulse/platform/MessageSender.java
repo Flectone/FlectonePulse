@@ -9,7 +9,7 @@ import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.*;
-import net.flectone.pulse.util.BrandPacketSerializer;
+import net.flectone.pulse.util.serializer.BrandPacketSerializer;
 import net.flectone.pulse.util.PacketEventsUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;

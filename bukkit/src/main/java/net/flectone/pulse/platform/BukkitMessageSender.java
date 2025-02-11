@@ -12,7 +12,7 @@ import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Toast;
 import net.flectone.pulse.module.integration.BukkitIntegrationModule;
-import net.flectone.pulse.util.BrandPacketSerializer;
+import net.flectone.pulse.util.serializer.BrandPacketSerializer;
 import net.flectone.pulse.util.PacketEventsUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;

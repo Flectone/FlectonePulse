@@ -1,4 +1,4 @@
-package net.flectone.pulse.util;
+package net.flectone.pulse.util.serializer;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
