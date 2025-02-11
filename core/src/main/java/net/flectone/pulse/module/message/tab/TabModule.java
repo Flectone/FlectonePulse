@@ -2,8 +2,8 @@ package net.flectone.pulse.module.message.tab;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.file.Message;
-import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.config.Message;
+import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;

@@ -13,7 +13,7 @@ import net.flectone.pulse.connector.BukkitProxyConnector;
 import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.controller.BukkitInventoryController;
 import net.flectone.pulse.controller.InventoryController;
-import net.flectone.pulse.file.Config;
+import net.flectone.pulse.config.Config;
 import net.flectone.pulse.util.interceptor.AsyncInterceptor;
 import net.flectone.pulse.util.interceptor.SyncInterceptor;
 import net.flectone.pulse.util.logging.FLogger;

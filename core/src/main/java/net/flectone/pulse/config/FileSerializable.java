@@ -1,4 +1,4 @@
-package net.flectone.pulse.file;
+package net.flectone.pulse.config;
 
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;

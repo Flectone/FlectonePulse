@@ -9,7 +9,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.file.Command;
+import net.flectone.pulse.config.Command;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.model.FPlayer;

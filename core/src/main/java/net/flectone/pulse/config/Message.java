@@ -1,4 +1,4 @@
-package net.flectone.pulse.file;
+package net.flectone.pulse.config;
 
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
         at = Comment.At.PREPEND
 )
 @Getter
-public final class Message extends FileSerializable implements IModule.IMessage {
+public final class Message extends FileSerializable implements ModuleConfig.MessageConfig {
 
     public Message(Path projectPath) {
         super(projectPath.resolve("message.yml"));
@@ -98,7 +98,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     private Tab tab = new Tab();
 
     @Getter
-    public static final class Advancement implements ISubMessage, Config.IEnable {
+    public static final class Advancement implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private boolean grant = true;
         private boolean revoke = true;
@@ -108,12 +108,12 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     }
 
     @Getter
-    public static final class Anvil implements ISubMessage, Config.IEnable {
+    public static final class Anvil implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
     }
 
     @Getter
-    public static final class Auto implements ISubMessage, Config.IEnable {
+    public static final class Auto implements SubMessageConfig, Config.IEnable {
         private boolean enable = false;
         private Map<String, Type> types = new LinkedHashMap<>(){
             {
@@ -132,12 +132,12 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     }
 
     @Getter
-    public static final class Book implements ISubMessage, Config.IEnable {
+    public static final class Book implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
     }
 
     @Getter
-    public static final class Brand implements ISubMessage, Config.IEnable {
+    public static final class Brand implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private boolean random = true;
         private Destination destination = new Destination(Destination.Type.BRAND);
@@ -145,7 +145,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     }
 
     @Getter
-    public static final class Bubble implements ISubMessage, Config.IEnable {
+    public static final class Bubble implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private double distance = 30.0;
         private int lineWidth = 200;
@@ -165,7 +165,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     }
 
     @Getter
-    public static final class Chat implements ISubMessage, Config.IEnable {
+    public static final class Chat implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Map<String, Type> types = new LinkedHashMap<>(){
             {
@@ -198,14 +198,14 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     }
 
     @Getter
-    public static final class Clear implements ISubMessage, Config.IEnable {
+    public static final class Clear implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Sound sound = new Sound();
         private Destination destination = new Destination();
     }
 
     @Getter
-    public static final class Contact implements IContactMessage, Config.IEnable {
+    public static final class Contact implements ContactMessageConfig, Config.IEnable {
 
         private boolean enable = true;
 
@@ -225,7 +225,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         private Unsign unsign = new Unsign();
 
         @Getter
-        public static final class Afk implements ISubContactMessage, Config.IEnable {
+        public static final class Afk implements SubContactMessageConfig, Config.IEnable {
             private boolean enable = true;
             private int range = Range.SERVER;
             private int delay = 3000;
@@ -235,7 +235,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         }
 
         @Getter
-        public static final class Knock implements ISubContactMessage, Config.IEnable {
+        public static final class Knock implements SubContactMessageConfig, Config.IEnable {
             private boolean enable = false;
             private Cooldown cooldown = new Cooldown();
             private List<Type> variants = new LinkedList<>(){
@@ -255,7 +255,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         }
 
         @Getter
-        public static final class Mark implements ISubContactMessage, Config.IEnable {
+        public static final class Mark implements SubContactMessageConfig, Config.IEnable {
             private boolean enable = false;
             private boolean limit = true;
             private boolean color = true;
@@ -283,7 +283,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         }
 
         @Getter
-        public static final class Rightclick implements ISubContactMessage, Config.IEnable {
+        public static final class Rightclick implements SubContactMessageConfig, Config.IEnable {
             private boolean enable = true;
             private Destination destination = new Destination(Destination.Type.ACTION_BAR);
             private Cooldown cooldown = new Cooldown();
@@ -291,7 +291,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         }
 
         @Getter
-        public static final class Sign implements ISubContactMessage, Config.IEnable {
+        public static final class Sign implements SubContactMessageConfig, Config.IEnable {
             private boolean enable = false;
             private boolean dropDye = true;
             private String block = "ANVIL";
@@ -300,7 +300,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         }
 
         @Getter
-        public static final class Spit implements ISubContactMessage, Config.IEnable {
+        public static final class Spit implements SubContactMessageConfig, Config.IEnable {
             private boolean enable = false;
             private boolean message = true;
             private String item = "WHITE_DYE";
@@ -310,7 +310,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         }
 
         @Getter
-        public static final class Unsign implements ISubContactMessage, Config.IEnable {
+        public static final class Unsign implements SubContactMessageConfig, Config.IEnable {
             private boolean enable = false;
             private boolean dropDye = true;
             private String block = "GRINDSTONE";
@@ -320,7 +320,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     }
 
     @Getter
-    public static final class Death implements ISubMessage, Config.IEnable {
+    public static final class Death implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private int range = Range.SERVER;
         private Destination destination = new Destination();
@@ -328,21 +328,21 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     }
 
     @Getter
-    public static final class Deop implements ISubMessage, Config.IEnable {
+    public static final class Deop implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
 
     @Getter
-    public static final class Enchant implements ISubMessage, Config.IEnable {
+    public static final class Enchant implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
 
     @Getter
-    public static final class Format implements IFormatMessage, Config.IEnable {
+    public static final class Format implements FormatMessageConfig, Config.IEnable {
 
         private boolean enable = true;
 
@@ -424,7 +424,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         }
 
         @Getter
-        public static final class Color implements ISubFormatMessage, Config.IEnable {
+        public static final class Color implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
             private boolean useRecipientColors = true;
             private Map<String, String> values = new LinkedHashMap<>(){
@@ -438,7 +438,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         }
 
         @Getter
-        public static final class Emoji implements ISubFormatMessage, Config.IEnable {
+        public static final class Emoji implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
             private Map<String, String> values = new LinkedHashMap<>(){
                 {
@@ -464,13 +464,13 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         }
 
         @Getter
-        public static final class Image implements ISubFormatMessage, Config.IEnable {
+        public static final class Image implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
             private String color = "<fcolor:2>";
         }
 
         @Getter
-        public static final class Mention implements ISubFormatMessage, Config.IEnable {
+        public static final class Mention implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
             private String trigger = "@";
             private Destination destination = new Destination(Destination.Type.TOAST, new Toast("minecraft:bell", AdvancementType.TASK));
@@ -478,7 +478,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         }
 
         @Getter
-        public static final class Moderation implements IModerationFormatMessage, Config.IEnable {
+        public static final class Moderation implements ModerationFormatMessageConfig, Config.IEnable {
 
             private boolean enable = true;
 
@@ -488,14 +488,14 @@ public final class Message extends FileSerializable implements IModule.IMessage 
             private Swear swear = new Swear();
 
             @Getter
-            public static final class Caps implements ISubModerationFormatMessage, Config.IEnable {
+            public static final class Caps implements SubModerationFormatMessageConfig, Config.IEnable {
                 private boolean enable = false;
                 private double trigger = 0.7;
                 private Sound sound = new Sound();
             }
 
             @Getter
-            public static final class Swear implements ISubModerationFormatMessage, Config.IEnable {
+            public static final class Swear implements SubModerationFormatMessageConfig, Config.IEnable {
                 private boolean enable = false;
                 private List<String> trigger = new ArrayList<>(List.of(
                         "((у|[нз]а|(хитро|не)?вз?[ыьъ]|с[ьъ]|(и|ра)[зс]ъ?|(о[тб]|под)[ьъ]?|(.\\B)+?[оаеи])?-?([её]б(?!о[рй])|и[пб][ае][тц]).*?|(н[иеа]|([дп]|верт)о|ра[зс]|з?а|с(ме)?|о(т|дно)?|апч)?-?ху([яйиеёю]|ли(?!ган)).*?|(в[зы]|(три|два|четыре)жды|(н|сук)а)?-?бл(я(?!(х|ш[кн]|мб)[ауеыио]).*?|[еэ][дт]ь?)|(ра[сз]|[зн]а|[со]|вы?|п(ере|р[оие]|од)|и[зс]ъ?|[ао]т)?п[иеё]зд.*?|(за)?п[ие]д[аое]?р([оа]м|(ас)?(ну.*?|и(ли)?[нщктл]ь?)?|(о(ч[еи])?|ас)?к(ой)|юг)[ауеы]?|манд([ауеыи](л(и[сзщ])?[ауеиы])?|ой|[ао]вошь?(е?к[ауе])?|юк(ов|[ауи])?)|муд([яаио].*?|е?н([ьюия]|ей))|мля([тд]ь)?|лять|([нз]а|по|пи)х|м[ао]л[ао]фь([яию]|[еёо]й))(?=[\\s,.:;\"']|$)",
@@ -507,7 +507,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         }
 
         @Getter
-        public static final class Name implements ISubFormatMessage, Config.IEnable {
+        public static final class Name implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
             private boolean team = true;
             private boolean visible = false;
@@ -515,7 +515,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         }
 
         @Getter
-        public static final class QuestionAnswer implements ISubFormatMessage, Config.IEnable {
+        public static final class QuestionAnswer implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = false;
             private Map<String, Question> questions = new LinkedHashMap<>(){
                 {
@@ -540,18 +540,18 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         }
 
         @Getter
-        public static final class Spoiler implements ISubFormatMessage, Config.IEnable {
+        public static final class Spoiler implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
             private String color = "<fcolor:2>";
         }
 
         @Getter
-        public static final class Translate implements ISubFormatMessage, Config.IEnable {
+        public static final class Translate implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
         }
 
         @Getter
-        public static final class World implements ISubFormatMessage, Config.IEnable {
+        public static final class World implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
             private WorldMode mode = WorldMode.TYPE;
             private Map<String, String> values = new LinkedHashMap<>(){
@@ -569,21 +569,21 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     }
 
     @Getter
-    public static final class Gamemode implements ISubMessage, Config.IEnable {
+    public static final class Gamemode implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
 
     @Getter
-    public static final class Greeting implements ISubMessage, Config.IEnable {
+    public static final class Greeting implements SubMessageConfig, Config.IEnable {
         private boolean enable = false;
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
 
     @Getter
-    public static final class Join implements ISubMessage, Config.IEnable {
+    public static final class Join implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private boolean first = true;
         private int range = Range.SERVER;
@@ -592,7 +592,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     }
 
     @Getter
-    public static final class Objective implements IObjectiveMessage, Config.IEnable {
+    public static final class Objective implements ObjectiveMessageConfig, Config.IEnable {
 
         private boolean enable = true;
 
@@ -602,14 +602,14 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         private Tabname tabname = new Tabname();
 
         @Getter
-        public static final class Belowname implements ISubObjectiveMessage {
+        public static final class Belowname implements SubObjectiveMessageConfig {
             private boolean enable = false;
             private ObjectiveMode mode = ObjectiveMode.PING;
             private Ticker ticker = new Ticker(true, 100);
         }
 
         @Getter
-        public static final class Tabname implements ISubObjectiveMessage {
+        public static final class Tabname implements SubObjectiveMessageConfig {
             private boolean enable = false;
             private ObjectiveMode mode = ObjectiveMode.PING;
             private Ticker ticker = new Ticker(true, 100);
@@ -618,14 +618,14 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     }
 
     @Getter
-    public static final class Op implements ISubMessage, Config.IEnable {
+    public static final class Op implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
 
     @Getter
-    public static final class Quit implements ISubMessage, Config.IEnable {
+    public static final class Quit implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private int range = Range.SERVER;
         private Destination destination = new Destination();
@@ -633,41 +633,41 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     }
 
     @Getter
-    public static final class Scoreboard implements ISubMessage, Config.IEnable {
+    public static final class Scoreboard implements SubMessageConfig, Config.IEnable {
         private boolean enable = false;
         private boolean random = true;
         private Ticker ticker = new Ticker(true, 100);
     }
 
     @Getter
-    public static final class Seed implements ISubMessage, Config.IEnable {
+    public static final class Seed implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
 
     @Getter
-    public static final class Setblock implements ISubMessage, Config.IEnable {
+    public static final class Setblock implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
 
     @Getter
-    public static final class Sign implements ISubMessage, Config.IEnable {
+    public static final class Sign implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
     }
 
     @Getter
-    public static final class Spawnpoint implements ISubMessage, Config.IEnable {
+    public static final class Spawnpoint implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
 
     @Getter
-    public static final class Status implements IStatusMessage, Config.IEnable {
+    public static final class Status implements StatusMessageConfig, Config.IEnable {
 
         private boolean enable = true;
 
@@ -681,13 +681,13 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         private Version version = new Version();
 
         @Getter
-        public static final class MOTD implements ISubStatusMessage, Config.IEnable {
+        public static final class MOTD implements SubStatusMessageConfig, Config.IEnable {
             private boolean enable = true;
             private boolean random = true;
         }
 
         @Getter
-        public static final class Icon implements ISubStatusMessage, Config.IEnable {
+        public static final class Icon implements SubStatusMessageConfig, Config.IEnable {
             private boolean enable = false;
             private boolean random = true;
             private List<String> values = new ArrayList<>(){
@@ -699,7 +699,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         }
 
         @Getter
-        public static final class Players implements ISubStatusMessage, Config.IEnable {
+        public static final class Players implements SubStatusMessageConfig, Config.IEnable {
             private boolean enable = false;
             private boolean control = true;
             private int max = 69;
@@ -707,7 +707,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         }
 
         @Getter
-        public static final class Version implements ISubStatusMessage, Config.IEnable {
+        public static final class Version implements SubStatusMessageConfig, Config.IEnable {
             private boolean enable = false;
             private int protocol = -1;
         }
@@ -715,7 +715,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
     }
 
     @Getter
-    public static final class Tab implements ITabMessage, Config.IEnable {
+    public static final class Tab implements TabMessageConfig, Config.IEnable {
 
         private boolean enable = true;
 
@@ -727,7 +727,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         private Playerlistname playerlistname = new Playerlistname();
 
         @Getter
-        public static final class Footer implements ISubTabMessage, Config.IEnable {
+        public static final class Footer implements SubTabMessageConfig, Config.IEnable {
             private boolean enable = true;
             private boolean random = true;
             private Destination destination = new Destination(Destination.Type.TAB_FOOTER);
@@ -735,7 +735,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         }
 
         @Getter
-        public static final class Header implements ISubTabMessage, Config.IEnable {
+        public static final class Header implements SubTabMessageConfig, Config.IEnable {
             private boolean enable = true;
             private boolean random = true;
             private Destination destination = new Destination(Destination.Type.TAB_HEADER);
@@ -743,7 +743,7 @@ public final class Message extends FileSerializable implements IModule.IMessage 
         }
 
         @Getter
-        public static final class Playerlistname implements ISubTabMessage, Config.IEnable {
+        public static final class Playerlistname implements SubTabMessageConfig, Config.IEnable {
             private boolean enable = true;
             private Ticker ticker = new Ticker(true, 100);
         }

@@ -1,7 +1,7 @@
 package net.flectone.pulse.module.message.bubble;
 
-import net.flectone.pulse.file.Message;
-import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.config.Message;
+import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;

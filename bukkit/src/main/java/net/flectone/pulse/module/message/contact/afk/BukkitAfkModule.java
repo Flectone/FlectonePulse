@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.file.Message;
+import net.flectone.pulse.config.Message;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;

@@ -3,7 +3,7 @@ package net.flectone.pulse.module.integration.telegram.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import net.flectone.pulse.file.Integration;
+import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPlayer;

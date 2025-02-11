@@ -1,6 +1,6 @@
 package net.flectone.pulse.util;
 
-import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.FEntity;
 
 public abstract class PermissionUtil {

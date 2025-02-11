@@ -2,7 +2,7 @@ package net.flectone.pulse.util;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.file.Config;
+import net.flectone.pulse.config.Config;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.Module;
 import org.bstats.bukkit.Metrics;

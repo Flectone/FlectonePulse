@@ -9,7 +9,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.database.dao.ColorsDAO;
 import net.flectone.pulse.database.dao.ModerationDAO;
-import net.flectone.pulse.file.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.connector.ProxyConnector;

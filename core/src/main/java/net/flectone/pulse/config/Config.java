@@ -1,4 +1,4 @@
-package net.flectone.pulse.file;
+package net.flectone.pulse.config;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -78,22 +78,22 @@ public final class Config extends FileSerializable {
     }
 
     @Getter
-    public static final class Module implements IModule, IEnable {
+    public static final class Module implements ModuleConfig, IEnable {
 
         private boolean enable = true;
 
         @Override
-        public ICommand getCommand() {
+        public CommandConfig getCommand() {
             return null;
         }
 
         @Override
-        public IIntegration getIntegration() {
+        public IntegrationConfig getIntegration() {
             return null;
         }
 
         @Override
-        public IMessage getMessage() {
+        public MessageConfig getMessage() {
             return null;
         }
     }

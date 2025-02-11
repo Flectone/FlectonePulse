@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.file.Localization;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.FCommand;

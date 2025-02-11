@@ -2,9 +2,9 @@ package net.flectone.pulse.module.command.spy;
 
 import lombok.Getter;
 import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.file.Command;
-import net.flectone.pulse.file.Localization;
-import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.config.Command;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;

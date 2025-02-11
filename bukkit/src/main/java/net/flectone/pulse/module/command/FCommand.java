@@ -2,7 +2,7 @@ package net.flectone.pulse.module.command;
 
 import dev.jorel.commandapi.CommandTree;
 import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.config.Permission;
 
 import java.util.List;
 

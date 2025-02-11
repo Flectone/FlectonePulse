@@ -1,4 +1,4 @@
-package net.flectone.pulse.file;
+package net.flectone.pulse.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,7 +30,7 @@ import java.util.*;
         at = Comment.At.PREPEND
 )
 @Getter
-public final class Localization extends FileSerializable implements IModule {
+public final class Localization extends FileSerializable implements ModuleConfig {
 
     public Localization(Path projectPath, String language) {
         super(Paths.get(projectPath.toString(), "localizations", language + ".yml"));
@@ -606,22 +606,22 @@ public final class Localization extends FileSerializable implements IModule {
     }
 
     @Getter
-    public static final class Command implements IModule.ICommand, ILocalization {
+    public static final class Command implements CommandConfig, ILocalization {
 
         private Prompt prompt = new Prompt();
 
         @Override
-        public ISubCommand getAfk() {
+        public SubCommandConfig getAfk() {
             return null;
         }
 
         @Override
-        public ISubCommand getMark() {
+        public SubCommandConfig getMark() {
             return null;
         }
 
         @Override
-        public ISubCommand getSpit() {
+        public SubCommandConfig getSpit() {
             return null;
         }
 
@@ -726,7 +726,7 @@ public final class Localization extends FileSerializable implements IModule {
         private Warnlist warnlist = new Warnlist();
 
         @Getter
-        public static final class Ball implements ISubCommand, ILocalization {
+        public static final class Ball implements SubCommandConfig, ILocalization {
             private String format = "<color:#9370DB>❓ <display_name> asked: <message> <br>\uD83D\uDD2E Ball answered: <u><answer></u>";
             private List<String> answers = new LinkedList<>(){
                 {
@@ -752,7 +752,7 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Ban implements ISubCommand, ILocalization {
+        public static final class Ban implements SubCommandConfig, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String nullTime = "<color:#ff7171><b>⁉</b> Incorrect time";
             private ReasonMap reasons = new ReasonMap(){
@@ -773,7 +773,7 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Banlist implements ISubCommand, ILocalization {
+        public static final class Banlist implements SubCommandConfig, ILocalization {
             private String empty = "<color:#98FB98>☺ No bans found";
             private String nullPage = "<color:#ff7171><b>⁉</b> This page doesn't exist";
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
@@ -791,19 +791,19 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Broadcast implements ISubCommand, ILocalization {
+        public static final class Broadcast implements SubCommandConfig, ILocalization {
             private String format = "<color:#fce303>\uD83D\uDD6B Message for all from <display_name> <br>❝ <message> ❠";
         }
 
         @Getter
-        public static final class Chatcolor implements ISubCommand, ILocalization {
+        public static final class Chatcolor implements SubCommandConfig, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String nullColor = "<color:#ff7171><b>⁉</b> Incorrect colors entered";
             private String format = "<color:#98FB98>★ You set <fcolor:1>message</fcolor> <fcolor:2>message</fcolor> <fcolor:3>message <fcolor:4>message";
         }
 
         @Getter
-        public static final class Chatsetting implements ISubCommand, ILocalization {
+        public static final class Chatsetting implements SubCommandConfig, ILocalization {
             private String noPermission = "<color:#ff7171><b>⁉</b> No permission to change this setting";
             private Disable disable = new Disable();
 
@@ -857,19 +857,19 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Clearchat implements ISubCommand, ILocalization {
+        public static final class Clearchat implements SubCommandConfig, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String format = "<fcolor:1>💬 Chat is cleared";
         }
 
         @Getter
-        public static final class Clearmail implements ISubCommand, ILocalization {
+        public static final class Clearmail implements SubCommandConfig, ILocalization {
             private String nullMail = "<color:#ff7171><b>⁉</b> This mail does not exist";
             private String format = "<fcolor:2>✉ [REMOVED] Mail #<id> for <display_name> » <fcolor:1><message>";
         }
 
         @Getter
-        public static final class Coin implements ISubCommand, ILocalization {
+        public static final class Coin implements SubCommandConfig, ILocalization {
             private String head = "heads";
             private String tail = "tails";
             private String format = "<fcolor:1>✎ <display_name> player got <result>";
@@ -877,7 +877,7 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Dice implements ISubCommand, ILocalization {
+        public static final class Dice implements SubCommandConfig, ILocalization {
             private Map<Integer, String> symbols = new LinkedHashMap<>(){
                 {
                     put(1, "⚀");
@@ -892,33 +892,33 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Do implements ISubCommand, ILocalization {
+        public static final class Do implements SubCommandConfig, ILocalization {
             private String format = "<fcolor:1>✎ <message> (<i><display_name></i>)";
         }
 
         @Getter
-        public static final class Flectonepulse implements ISubCommand, ILocalization {
+        public static final class Flectonepulse implements SubCommandConfig, ILocalization {
             private String formatFalse = "<color:#ff7171>★ An has error occurred while reloading";
             private String formatTrue = "<fcolor:2>★ <u>FlectonePulse</u> successfully reloaded! (<i><time></i>)";
             private String formatTrueText = "<fcolor:2>★ IMPORTANT! <br>Only texts have been updated, for a FULL reload you need to use: <br><fcolor:1>/flectonepulse reload";
         }
 
         @Getter
-        public static final class Geolocate implements ISubCommand, ILocalization {
+        public static final class Geolocate implements SubCommandConfig, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String nullOrError = "<color:#ff7171><b>⁉</b> Problem receiving information, try again";
             private String format = "<fcolor:1>Geolocation for <display_name><br>Country: <fcolor:2><country><br><fcolor:1>Region: <fcolor:2><region_name><br><fcolor:1>City: <fcolor:2><city><br><fcolor:1>Timezone: <fcolor:2><timezone><br><fcolor:1>Mobile connection: <fcolor:2><mobile><br><fcolor:1>VPN: <fcolor:2><proxy><br><fcolor:1>Hosting: <fcolor:2><hosting><br><fcolor:1>IP: <fcolor:2><query>";
         }
 
         @Getter
-        public static final class Helper implements ISubCommand, ILocalization {
+        public static final class Helper implements SubCommandConfig, ILocalization {
             private String nullHelper = "<color:#ff7171><b>⁉</b> There are no people who can help you";
             private String global = "<fcolor:2>👤 <display_name> needs help ⏩ <fcolor:1><message>";
             private String player = "<fcolor:2>👤 Request sent, awaiting reply";
         }
 
         @Getter
-        public static final class Ignore implements ISubCommand, ILocalization {
+        public static final class Ignore implements SubCommandConfig, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String myself = "<color:#ff7171><b>⁉</b> You can't ignore yourself";
             private String he = "<color:#ff7171><b>⁉</b> You can't write to him because he ignore you";
@@ -928,7 +928,7 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Ignorelist implements ISubCommand, ILocalization {
+        public static final class Ignorelist implements SubCommandConfig, ILocalization {
             private String empty = "<color:#98FB98>☺ You don't ignore anyone";
             private String nullPage = "<color:#ff7171><b>⁉</b> This page doesn't exist";
             private String header = "<fcolor:2>▋ Ignores: <count><br>";
@@ -937,7 +937,7 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Kick implements ISubCommand, ILocalization {
+        public static final class Kick implements SubCommandConfig, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private ReasonMap reasons = new ReasonMap(){
                 {
@@ -950,14 +950,14 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Mail implements ISubCommand, ILocalization {
+        public static final class Mail implements SubCommandConfig, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String sender = "<fcolor:2>✉ Mail #<id> for <display_name> » <fcolor:1><message>";
             private String receiver = "<fcolor:2>✉ Mail from <display_name> » <fcolor:1><message>";
         }
 
         @Getter
-        public static final class Maintenance implements ISubCommand, ILocalization {
+        public static final class Maintenance implements SubCommandConfig, ILocalization {
             private String not = "<color:#ff7171><b>⁉</b> You have not maintenance";
             private String already = "<color:#ff7171><b>⁉</b> You have already maintenance";
             private String serverDescription = "<color:#ff7171>The server is under maintenance";
@@ -968,12 +968,12 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Me implements ISubCommand, ILocalization {
+        public static final class Me implements SubCommandConfig, ILocalization {
             private String format = "<fcolor:1>✎ <display_name> <message>";
         }
 
         @Getter
-        public static final class Mute implements ISubCommand, ILocalization {
+        public static final class Mute implements SubCommandConfig, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String nullTime = "<color:#ff7171><b>⁉</b> Incorrect time";
             private ReasonMap reasons = new ReasonMap(){
@@ -986,7 +986,7 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Mutelist implements ISubCommand, ILocalization {
+        public static final class Mutelist implements SubCommandConfig, ILocalization {
             private String empty = "<color:#98FB98>☺ No mutes found";
             private String nullPage = "<color:#ff7171><b>⁉</b> This page doesn't exist";
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
@@ -1004,7 +1004,7 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Online implements ISubCommand, ILocalization {
+        public static final class Online implements SubCommandConfig, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String formatCurrent = "<fcolor:1>⌛ <display_name> currently on server";
             private String formatFirst = "<fcolor:1>⌛ <display_name> was first on server <time> ago";
@@ -1013,13 +1013,13 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Ping implements ISubCommand, ILocalization {
+        public static final class Ping implements SubCommandConfig, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String format = "<fcolor:1>🖧 <fcolor:2><player>'s</fcolor:2> ping is <ping>";
         }
 
         @Getter
-        public static final class Poll implements ISubCommand, ILocalization {
+        public static final class Poll implements SubCommandConfig, ILocalization {
             private String nullPoll = "<color:#ff7171><b>⁉</b> This poll does not exist";
             private String expired = "<color:#ff7171><b>⁉</b> This poll has already ended";
             private String already = "<color:#ff7171><b>⁉</b> You've already voted in this poll";
@@ -1032,12 +1032,12 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Reply implements ISubCommand, ILocalization {
+        public static final class Reply implements SubCommandConfig, ILocalization {
             private String nullReceiver = "<color:#ff7171><b>⁉</b> No one to answer";
         }
 
         @Getter
-        public static final class Rockpaperscissors implements ISubCommand, ILocalization {
+        public static final class Rockpaperscissors implements SubCommandConfig, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String nullGame = "<color:#ff7171><b>⁉</b> This game does not exist";
             private String wrongMove = "<color:#ff7171><b>⁉</b> This move is not possible";
@@ -1058,14 +1058,14 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Spy implements ISubCommand, ILocalization {
+        public static final class Spy implements SubCommandConfig, ILocalization {
             private String formatTrue = "<fcolor:1>[👁] You <color:#98FB98>turned on <fcolor:1>spy mode";
             private String formatFalse = "<fcolor:1>[👁] You <color:#F08080>turned off <fcolor:1>spy mode";
             private String formatLog = "<fcolor:1>[👁] <display_name> <color:#98FB98><action> <fcolor:1>→ <fcolor:2><message>";
         }
 
         @Getter
-        public static final class Stream implements ISubCommand, ILocalization {
+        public static final class Stream implements SubCommandConfig, ILocalization {
             private String already = "<color:#ff7171><b>⁉</b> You are already streaming";
             private String not = "<color:#ff7171><b>⁉</b> You don't stream";
             private String prefixTrue = "<color:#ff4e4e>⏻</color:#ff4e4e> ";
@@ -1076,7 +1076,7 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Symbol implements ISubCommand, ILocalization {
+        public static final class Symbol implements SubCommandConfig, ILocalization {
             private String format = "<click:suggest_command:\"<message>\"><fcolor:2>🖥 Click for using: <fcolor:1><message>";
             private Map<String, String> categories = new LinkedHashMap<>(){
                 {
@@ -1102,7 +1102,7 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Tell implements ISubCommand, ILocalization {
+        public static final class Tell implements SubCommandConfig, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String sender = "<fcolor:2>✉ You → <display_name> » <fcolor:1><message>";
             private String receiver = "<fcolor:2>✉ <display_name> → You » <fcolor:1><message>";
@@ -1110,7 +1110,7 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Tictactoe implements ISubCommand, ILocalization {
+        public static final class Tictactoe implements SubCommandConfig, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String myself = "<color:#ff7171><b>⁉</b> You can't play with yourself";
             private String wrongGame = "<color:#ff7171><b>⁉</b> This game does not exist";
@@ -1141,40 +1141,40 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Translateto implements ISubCommand, ILocalization {
+        public static final class Translateto implements SubCommandConfig, ILocalization {
             private String nullOrError = "<color:#ff7171><b>⁉</b> Error, you may have specified an unsupported language";
             private String format = "<fcolor:1>📖 Translation to [<language>] → <fcolor:2><message>";
         }
 
         @Getter
-        public static final class Try implements ISubCommand, ILocalization {
+        public static final class Try implements SubCommandConfig, ILocalization {
             private String formatTrue = "<color:#98FB98>☺ <display_name> <message> <percent>%";
             private String formatFalse = "<color:#F08080>☹ <display_name> <message> <percent>%";
         }
 
         @Getter
-        public static final class Unban implements ISubCommand, ILocalization {
+        public static final class Unban implements SubCommandConfig, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String notBanned = "<color:#ff7171><b>⁉</b> This player is not banned";
             private String format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator></fcolor> unbanned the player <fcolor:2><player></fcolor>";
         }
 
         @Getter
-        public static final class Unmute implements ISubCommand, ILocalization {
+        public static final class Unmute implements SubCommandConfig, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String notMuted = "<color:#ff7171><b>⁉</b> This player is not muted";
             private String format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator></fcolor> unmutted the player <fcolor:2><player></fcolor>";
         }
 
         @Getter
-        public static final class Unwarn implements ISubCommand, ILocalization {
+        public static final class Unwarn implements SubCommandConfig, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String notWarned = "<color:#ff7171><b>⁉</b> This player is not warned";
             private String format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator></fcolor> unwarned the player <fcolor:2><player></fcolor>";
         }
 
         @Getter
-        public static final class Warn implements ISubCommand, ILocalization {
+        public static final class Warn implements SubCommandConfig, ILocalization {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String nullTime = "<color:#ff7171><b>⁉</b> Incorrect time";
             private ReasonMap reasons = new ReasonMap(){
@@ -1188,7 +1188,7 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Warnlist implements ISubCommand, ILocalization {
+        public static final class Warnlist implements SubCommandConfig, ILocalization {
             private String empty = "<color:#98FB98>☺ No warns found";
             private String nullPage = "<color:#ff7171><b>⁉</b> This page doesn't exist";
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
@@ -1207,7 +1207,7 @@ public final class Localization extends FileSerializable implements IModule {
     }
 
     @Getter
-    public static final class Integration implements IModule.IIntegration, ILocalization {
+    public static final class Integration implements IntegrationConfig, ILocalization {
 
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/discord/")})
         private Discord discord = new Discord();
@@ -1217,52 +1217,52 @@ public final class Localization extends FileSerializable implements IModule {
         private Twitch twitch = new Twitch();
 
         @Override
-        public ISubIntegration getDeepl() {
+        public SubIntegrationConfig getDeepl() {
             return null;
         }
 
         @Override
-        public ISubIntegration getLuckperms() {
+        public SubIntegrationConfig getLuckperms() {
             return null;
         }
 
         @Override
-        public ISubIntegration getPlaceholderapi() {
+        public SubIntegrationConfig getPlaceholderapi() {
             return null;
         }
 
         @Override
-        public ISubIntegration getPlasmovoice() {
+        public SubIntegrationConfig getPlasmovoice() {
             return null;
         }
 
         @Override
-        public ISubIntegration getSimplevoice() {
+        public SubIntegrationConfig getSimplevoice() {
             return null;
         }
 
         @Override
-        public ISubIntegration getSkinsrestorer() {
+        public SubIntegrationConfig getSkinsrestorer() {
             return null;
         }
 
         @Override
-        public ISubIntegration getSupervanish() {
+        public SubIntegrationConfig getSupervanish() {
             return null;
         }
 
         @Override
-        public ISubIntegration getVault() {
+        public SubIntegrationConfig getVault() {
             return null;
         }
 
         @Override
-        public ISubIntegration getYandex() {
+        public SubIntegrationConfig getYandex() {
             return null;
         }
 
         @Getter
-        public static final class Discord implements ISubIntegration, ILocalization {
+        public static final class Discord implements SubIntegrationConfig, ILocalization {
             private String forMinecraft = "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>";
             private Map<String, String> infoChannel = new LinkedHashMap<>(){
                 {
@@ -1350,7 +1350,7 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Telegram implements ISubIntegration, ILocalization {
+        public static final class Telegram implements SubIntegrationConfig, ILocalization {
             private String forMinecraft = "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>";
             private Map<MessageTag, String> messageChannel = new LinkedHashMap<>(){
                 {
@@ -1360,12 +1360,12 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Override
-        public ISubIntegration getTriton() {
+        public SubIntegrationConfig getTriton() {
             return null;
         }
 
         @Getter
-        public static final class Twitch implements ISubIntegration, ILocalization {
+        public static final class Twitch implements SubIntegrationConfig, ILocalization {
             private String forMinecraft = "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>";
             private Map<MessageTag, String> messageChannel = new LinkedHashMap<>(){
                 {
@@ -1376,13 +1376,13 @@ public final class Localization extends FileSerializable implements IModule {
     }
 
     @Getter
-    public static final class Message implements IModule.IMessage, ILocalization {
+    public static final class Message implements MessageConfig, ILocalization {
 
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/advancement/")})
         private Advancement advancement = new Advancement();
 
         @Override
-        public ISubMessage getAnvil() {
+        public SubMessageConfig getAnvil() {
             return null;
         }
 
@@ -1390,7 +1390,7 @@ public final class Localization extends FileSerializable implements IModule {
         private Auto auto = new Auto();
 
         @Override
-        public ISubMessage getBook() {
+        public SubMessageConfig getBook() {
             return null;
         }
 
@@ -1420,7 +1420,7 @@ public final class Localization extends FileSerializable implements IModule {
         private Join join = new Join();
 
         @Override
-        public IObjectiveMessage getObjective() {
+        public ObjectiveMessageConfig getObjective() {
             return null;
         }
 
@@ -1436,7 +1436,7 @@ public final class Localization extends FileSerializable implements IModule {
         private Setblock setblock = new Setblock();
 
         @Override
-        public ISubMessage getSign() {
+        public SubMessageConfig getSign() {
             return null;
         }
 
@@ -1448,7 +1448,7 @@ public final class Localization extends FileSerializable implements IModule {
         private Tab tab = new Tab();
 
         @Getter
-        public static final class Advancement implements ISubMessage, ILocalization {
+        public static final class Advancement implements SubMessageConfig, ILocalization {
 
             private Type task = new Type(
                     "<color:#4eff52>🌠 <fcolor:2><display_name> <fcolor:1>has completed the task <advancement>",
@@ -1491,7 +1491,7 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Auto implements ISubMessage, ILocalization {
+        public static final class Auto implements SubMessageConfig, ILocalization {
             private Map<String, List<String>> types = new LinkedHashMap<>(){
                 {
                     put("announcement", new LinkedList<>(){
@@ -1507,7 +1507,7 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Brand implements ISubMessage, ILocalization {
+        public static final class Brand implements SubMessageConfig, ILocalization {
             private List<String> values = new LinkedList<>(){
                 {
                     push("<white>Minecraft");
@@ -1517,12 +1517,12 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Bubble implements ISubMessage, ILocalization {
+        public static final class Bubble implements SubMessageConfig, ILocalization {
             private String format = "<fcolor:3><message>";
         }
 
         @Getter
-        public static final class Chat implements ISubMessage, ILocalization {
+        public static final class Chat implements SubMessageConfig, ILocalization {
             private String nullChat = "<color:#ff7171><b>⁉</b> Chat is disabled on this server";
             private String nullRecipient = "<color:#ff7171><b>⁉</b> Nobody heard you";
             private Map<String, String> types = new LinkedHashMap<>(){
@@ -1534,24 +1534,24 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Clear implements ISubMessage, ILocalization {
+        public static final class Clear implements SubMessageConfig, ILocalization {
             private String single = "<fcolor:1>🌊 Removed <fcolor:2><number></fcolor:2> item(s) from player <display_name>";
             private String multiple = "<fcolor:1>🌊 Removed <fcolor:2><number></fcolor:2> item(s) from <fcolor:2><count></fcolor:2> players";
         }
 
         @Getter
-        public static final class Contact implements IContactMessage, ILocalization {
+        public static final class Contact implements ContactMessageConfig, ILocalization {
 
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/afk/")})
             private Afk afk = new Afk();
 
             @Override
-            public ISubContactMessage getKnock() {
+            public SubContactMessageConfig getKnock() {
                 return null;
             }
 
             @Override
-            public ISubContactMessage getMark() {
+            public SubContactMessageConfig getMark() {
                 return null;
             }
 
@@ -1563,12 +1563,12 @@ public final class Localization extends FileSerializable implements IModule {
             private Spit spit = new Spit();
 
             @Override
-            public ISubContactMessage getUnsign() {
+            public SubContactMessageConfig getUnsign() {
                 return null;
             }
 
             @Getter
-            public static final class Afk implements ISubContactMessage, ILocalization {
+            public static final class Afk implements SubContactMessageConfig, ILocalization {
                 private String suffix = " <color:#FFFF00>⌚</color>";
                 private Format formatTrue = new Format(
                         "<gradient:#ffd500:#FFFF00>⌚ <player> is now afk",
@@ -1588,23 +1588,23 @@ public final class Localization extends FileSerializable implements IModule {
             }
 
             @Getter
-            public static final class Rightclick implements ISubContactMessage, ILocalization {
+            public static final class Rightclick implements SubContactMessageConfig, ILocalization {
                 private String format = "<fcolor:1>◁ <display_name> ▷";
             }
 
             @Getter
-            public static final class Sign implements ISubContactMessage, ILocalization {
+            public static final class Sign implements SubContactMessageConfig, ILocalization {
                 private String format = "<dye><italic>#<player>";
             }
 
             @Getter
-            public static final class Spit implements ISubContactMessage, ILocalization {
+            public static final class Spit implements SubContactMessageConfig, ILocalization {
                 private String format = "<fcolor:1>🫐 You were spat on by <display_name>!";
             }
         }
 
         @Getter
-        public static final class Death implements ISubMessage, ILocalization {
+        public static final class Death implements SubMessageConfig, ILocalization {
             private Map<String, String> types = new LinkedHashMap<>(){
                 {
                     put("death.attack.anvil", "<color:#778899>🪦 <fcolor:1><display_name> was squashed by a falling anvil");
@@ -1712,18 +1712,18 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Deop implements ISubMessage, ILocalization {
+        public static final class Deop implements SubMessageConfig, ILocalization {
             private String format = "<fcolor:1>🤖 Made <display_name> no longer a server operator";
         }
 
         @Getter
-        public static final class Enchant implements ISubMessage, ILocalization {
+        public static final class Enchant implements SubMessageConfig, ILocalization {
             private String single = "<fcolor:1>📖 Applied enchantment «<fcolor:2><lang:<enchant>> <lang:<level>></fcolor:2>» to <display_name>'s item";
             private String multiple = "<fcolor:1>📖 Applied enchantment «<fcolor:2><lang:<enchant>> <lang:<level>></fcolor:2>» to <fcolor:2><count></fcolor:2> entities";
         }
 
         @Getter
-        public static final class Format implements IFormatMessage, ILocalization {
+        public static final class Format implements FormatMessageConfig, ILocalization {
 
             private Map<TagType, String> tags = new LinkedHashMap<>(){
                 {
@@ -1740,17 +1740,17 @@ public final class Localization extends FileSerializable implements IModule {
             };
 
             @Override
-            public ISubFormatMessage getColor() {
+            public SubFormatMessageConfig getColor() {
                 return null;
             }
 
             @Override
-            public ISubFormatMessage getEmoji() {
+            public SubFormatMessageConfig getEmoji() {
                 return null;
             }
 
             @Override
-            public ISubFormatMessage getImage() {
+            public SubFormatMessageConfig getImage() {
                 return null;
             }
 
@@ -1768,21 +1768,21 @@ public final class Localization extends FileSerializable implements IModule {
             private Translate translate = new Translate();
 
             @Override
-            public ISubFormatMessage getWorld() {
+            public SubFormatMessageConfig getWorld() {
                 return null;
             }
 
             @Getter
-            public static final class Mention implements ISubFormatMessage, ILocalization {
+            public static final class Mention implements SubFormatMessageConfig, ILocalization {
                 private String person = "<fcolor:2>You were mentioned";
                 private String format = "<fcolor:2>@<target></fcolor>";
             }
 
             @Getter
-            public static final class Moderation implements IModerationFormatMessage, ILocalization {
+            public static final class Moderation implements ModerationFormatMessageConfig, ILocalization {
 
                 @Override
-                public ISubModerationFormatMessage getCaps() {
+                public SubModerationFormatMessageConfig getCaps() {
                     return null;
                 }
 
@@ -1790,14 +1790,14 @@ public final class Localization extends FileSerializable implements IModule {
                 private Swear swear = new Swear();
 
                 @Getter
-                public static final class Swear implements ISubModerationFormatMessage, ILocalization {
+                public static final class Swear implements SubModerationFormatMessageConfig, ILocalization {
                     private String symbol = "❤";
                 }
 
             }
 
             @Getter
-            public static final class Name implements ISubFormatMessage, ILocalization {
+            public static final class Name implements SubFormatMessageConfig, ILocalization {
                 private String display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <player>\"><vault_prefix><stream_prefix><fcolor:2><player></fcolor><afk_suffix><vault_suffix></hover></click>";
                 private String entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:<name>> <br><fcolor:1>Type <fcolor:2><lang:<type>> <br><fcolor:1>ID <fcolor:2><uuid>\"><lang:<name>></hover></fcolor:2>";
                 private String unknown = "<fcolor:2><name></fcolor:2>";
@@ -1806,7 +1806,7 @@ public final class Localization extends FileSerializable implements IModule {
             }
 
             @Getter
-            public static final class QuestionAnswer implements ISubFormatMessage, ILocalization {
+            public static final class QuestionAnswer implements SubFormatMessageConfig, ILocalization {
                 private Map<String, String> questions = new LinkedHashMap<>(){
                     {
                         put("server", "<fcolor:2>[Q&A] @<player><fcolor:1>, this is a vanilla server in minecraft!");
@@ -1816,19 +1816,19 @@ public final class Localization extends FileSerializable implements IModule {
             }
 
             @Getter
-            public static final class Spoiler implements ISubFormatMessage, ILocalization {
+            public static final class Spoiler implements SubFormatMessageConfig, ILocalization {
                 private String symbol = "█";
                 private String hover = "<fcolor:2><message>";
             }
 
             @Getter
-            public static final class Translate implements ISubFormatMessage, ILocalization {
+            public static final class Translate implements SubFormatMessageConfig, ILocalization {
                 private String action = "<click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Translate message\"><fcolor:1>[📖]";
             }
         }
 
         @Getter
-        public static final class Gamemode implements ISubMessage, ILocalization {
+        public static final class Gamemode implements SubMessageConfig, ILocalization {
 
             private Type self = new Type(
                     "<fcolor:1>🗘 Set own game mode to <fcolor:2>Creative Mode",
@@ -1855,23 +1855,23 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Greeting implements ISubMessage, ILocalization {
+        public static final class Greeting implements SubMessageConfig, ILocalization {
             private String format = "<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]  <fcolor:1>Hello,<br>[#][#][#][#][#][#][#][#]  <player><br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>";
         }
 
         @Getter
-        public static final class Join implements ISubMessage, ILocalization {
+        public static final class Join implements SubMessageConfig, ILocalization {
             private String format = "<color:#4eff52>→ <display_name>";
             private String formatFirstTime = "<color:#4eff52>→ <display_name> <fcolor:1>welcome!";
         }
 
         @Getter
-        public static final class Op implements ISubMessage, ILocalization {
+        public static final class Op implements SubMessageConfig, ILocalization {
             private String format = "<fcolor:1>🤖 Made <display_name> a server operator";
         }
 
         @Getter
-        public static final class Scoreboard implements ISubMessage, ILocalization {
+        public static final class Scoreboard implements SubMessageConfig, ILocalization {
             private List<List<String>> values = new LinkedList<>(){
                 {
                     push(new LinkedList<>(){
@@ -1895,28 +1895,28 @@ public final class Localization extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Quit implements ISubMessage, ILocalization {
+        public static final class Quit implements SubMessageConfig, ILocalization {
             private String format = "<color:#ff4e4e>← <display_name>";
         }
 
         @Getter
-        public static final class Seed implements ISubMessage, ILocalization {
+        public static final class Seed implements SubMessageConfig, ILocalization {
             private String format = "<fcolor:1>🌐 Seed: [<fcolor:2><hover:show_text:'<fcolor:2>Click to Copy to Clipboard'><click:copy_to_clipboard:<seed>><seed></click></fcolor:2>]";
         }
 
         @Getter
-        public static final class Setblock implements ISubMessage, ILocalization {
+        public static final class Setblock implements SubMessageConfig, ILocalization {
             private String format = "<fcolor:1>⏹ Changed the block at <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2>";
         }
 
         @Getter
-        public static final class Spawnpoint implements ISubMessage, ILocalization {
+        public static final class Spawnpoint implements SubMessageConfig, ILocalization {
             private String single = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2> [<fcolor:2><angle></fcolor:2>] in <fcolor:2><world></fcolor:2> for <display_name>";
             private String multiple = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2> [<fcolor:2><angle></fcolor:2>] in <fcolor:2><world></fcolor:2> for <fcolor:2><count></fcolor:2> players";
         }
 
         @Getter
-        public static final class Status implements IStatusMessage, ILocalization {
+        public static final class Status implements StatusMessageConfig, ILocalization {
 
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/motd/")})
             private MOTD motd = new MOTD();
@@ -1926,12 +1926,12 @@ public final class Localization extends FileSerializable implements IModule {
             private Version version = new Version();
 
             @Override
-            public ISubStatusMessage getIcon() {
+            public SubStatusMessageConfig getIcon() {
                 return null;
             }
 
             @Getter
-            public static final class MOTD implements ISubStatusMessage, ILocalization {
+            public static final class MOTD implements SubStatusMessageConfig, ILocalization {
                 private List<String> values = new LinkedList<>(){
                     {
                         push("<fcolor:1>Welcome to our server!");
@@ -1943,7 +1943,7 @@ public final class Localization extends FileSerializable implements IModule {
             }
 
             @Getter
-            public static final class Players implements ISubStatusMessage, ILocalization {
+            public static final class Players implements SubStatusMessageConfig, ILocalization {
                 private List<Sample> samples = new LinkedList<>(List.of(
                         new Sample()
                 ));
@@ -1959,14 +1959,14 @@ public final class Localization extends FileSerializable implements IModule {
             }
 
             @Getter
-            public static final class Version implements ISubStatusMessage, ILocalization {
+            public static final class Version implements SubStatusMessageConfig, ILocalization {
                 private String name = "Minecraft server";
             }
 
         }
 
         @Getter
-        public static final class Tab implements ITabMessage, ILocalization {
+        public static final class Tab implements TabMessageConfig, ILocalization {
 
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/header/")})
             private Header header = new Header();
@@ -1976,7 +1976,7 @@ public final class Localization extends FileSerializable implements IModule {
             private Playerlistname playerlistname = new Playerlistname();
 
             @Getter
-            public static final class Footer implements ISubTabMessage, ILocalization {
+            public static final class Footer implements SubTabMessageConfig, ILocalization {
                 private List<List<String>> lists = new LinkedList<>(){
                     {
                         push(new LinkedList<>(){
@@ -1998,7 +1998,7 @@ public final class Localization extends FileSerializable implements IModule {
             }
 
             @Getter
-            public static final class Header implements ISubTabMessage, ILocalization {
+            public static final class Header implements SubTabMessageConfig, ILocalization {
                 private List<List<String>> lists = new LinkedList<>(){
                     {
                         push(new LinkedList<>(){
@@ -2020,7 +2020,7 @@ public final class Localization extends FileSerializable implements IModule {
             }
 
             @Getter
-            public static final class Playerlistname implements ISubTabMessage, ILocalization {
+            public static final class Playerlistname implements SubTabMessageConfig, ILocalization {
                 private String format = "<world_prefix>▋ <reset><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix>";
             }
         }

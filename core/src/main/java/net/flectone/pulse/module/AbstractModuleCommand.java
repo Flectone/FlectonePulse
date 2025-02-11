@@ -2,8 +2,8 @@ package net.flectone.pulse.module;
 
 import com.google.inject.Inject;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.file.Command;
-import net.flectone.pulse.file.Localization;
+import net.flectone.pulse.config.Command;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;

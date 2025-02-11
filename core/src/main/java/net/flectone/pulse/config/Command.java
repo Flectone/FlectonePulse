@@ -1,4 +1,4 @@
-package net.flectone.pulse.file;
+package net.flectone.pulse.config;
 
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
@@ -34,7 +34,7 @@ import java.util.Map;
         at = Comment.At.PREPEND
 )
 @Getter
-public final class Command extends FileSerializable implements IModule.ICommand {
+public final class Command extends FileSerializable implements ModuleConfig.CommandConfig {
 
     public Command(Path projectPath) {
         super(projectPath.resolve("command.yml"));
@@ -129,7 +129,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     private Warnlist warnlist = new Warnlist();
 
     @Getter
-    public static final class Afk implements ISubCommand, ICommandFile {
+    public static final class Afk implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("afk"));
         private Cooldown cooldown = new Cooldown();
@@ -137,7 +137,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Ball implements ISubCommand, ICommandFile {
+    public static final class Ball implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("ball"));
@@ -147,7 +147,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Ban implements ISubCommand, ICommandFile {
+    public static final class Ban implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
         private boolean showConnectionAttempts = true;
@@ -159,7 +159,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Banlist implements ISubCommand, ICommandFile {
+    public static final class Banlist implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int perPage = 4;
         private List<String> aliases = new ArrayList<>(List.of("banlist"));
@@ -168,7 +168,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Broadcast implements ISubCommand, ICommandFile {
+    public static final class Broadcast implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("broadcast"));
@@ -178,7 +178,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Chatcolor implements ISubCommand, ICommandFile {
+    public static final class Chatcolor implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("chatcolor"));
         private Destination destination = new Destination();
@@ -187,7 +187,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Chatsetting implements ISubCommand, ICommandFile {
+    public static final class Chatsetting implements SubCommandConfig, ICommandFile {
 
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("chatsetting"));
@@ -242,7 +242,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Clearchat implements ISubCommand, ICommandFile {
+    public static final class Clearchat implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("clearchat"));
         private Destination destination = new Destination();
@@ -251,7 +251,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Clearmail implements ISubCommand, ICommandFile {
+    public static final class Clearmail implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("clearmail"));
         private Destination destination = new Destination();
@@ -260,7 +260,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Coin implements ISubCommand, ICommandFile {
+    public static final class Coin implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean draw = true;
         private int range = Range.PROXY;
@@ -271,7 +271,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Dice implements ISubCommand, ICommandFile {
+    public static final class Dice implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int range = Range.PROXY;
         private int min = 1;
@@ -283,7 +283,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Do implements ISubCommand, ICommandFile {
+    public static final class Do implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("do"));
@@ -293,7 +293,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Flectonepulse implements ISubCommand, ICommandFile {
+    public static final class Flectonepulse implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(){
             {
@@ -307,7 +307,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Geolocate implements ISubCommand, ICommandFile {
+    public static final class Geolocate implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
         private List<String> aliases = new ArrayList<>(List.of("geolocate"));
@@ -317,7 +317,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Helper implements ISubCommand, ICommandFile {
+    public static final class Helper implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("helper"));
@@ -327,7 +327,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Ignore implements ISubCommand, ICommandFile {
+    public static final class Ignore implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
         private List<String> aliases = new ArrayList<>(List.of("ignore"));
@@ -337,7 +337,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Ignorelist implements ISubCommand, ICommandFile {
+    public static final class Ignorelist implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int perPage = 4;
         private List<String> aliases = new ArrayList<>(List.of("ignorelist"));
@@ -346,7 +346,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Kick implements ISubCommand, ICommandFile {
+    public static final class Kick implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("kick"));
@@ -356,7 +356,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Mail implements ISubCommand, ICommandFile {
+    public static final class Mail implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("mail"));
         private Destination destination = new Destination();
@@ -365,7 +365,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Maintenance implements ISubCommand, ICommandFile {
+    public static final class Maintenance implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         @Setter
         public boolean turnedOn;
@@ -376,7 +376,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Mark implements ISubCommand, ICommandFile {
+    public static final class Mark implements SubCommandConfig, ICommandFile {
         private boolean enable = false;
         private List<String> aliases = new ArrayList<>(List.of("mark"));
         private Cooldown cooldown = new Cooldown();
@@ -384,7 +384,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Me implements ISubCommand, ICommandFile {
+    public static final class Me implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("me"));
@@ -394,7 +394,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Mute implements ISubCommand, ICommandFile {
+    public static final class Mute implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
         private int range = Range.PROXY;
@@ -405,7 +405,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Mutelist implements ISubCommand, ICommandFile {
+    public static final class Mutelist implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int perPage = 4;
         private List<String> aliases = new ArrayList<>(List.of("mutelist"));
@@ -414,7 +414,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Online implements ISubCommand, ICommandFile {
+    public static final class Online implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
         private int range = Range.PROXY;
@@ -425,7 +425,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Ping implements ISubCommand, ICommandFile {
+    public static final class Ping implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("ping"));
         private Destination destination = new Destination();
@@ -434,7 +434,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Poll implements ISubCommand, ICommandFile {
+    public static final class Poll implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int range = Range.PROXY;
         @Setter
@@ -445,7 +445,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Reply implements ISubCommand, ICommandFile {
+    public static final class Reply implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(){
             {
@@ -458,7 +458,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Rockpaperscissors implements ISubCommand, ICommandFile {
+    public static final class Rockpaperscissors implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(){
             {
@@ -478,7 +478,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Spit implements ISubCommand, ICommandFile {
+    public static final class Spit implements SubCommandConfig, ICommandFile {
         private boolean enable = false;
         private List<String> aliases = new ArrayList<>(List.of("spit"));
         private Cooldown cooldown = new Cooldown();
@@ -486,7 +486,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Spy implements ISubCommand, ICommandFile {
+    public static final class Spy implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("spy"));
@@ -502,7 +502,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Stream implements ISubCommand, ICommandFile {
+    public static final class Stream implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("stream"));
@@ -512,7 +512,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Symbol implements ISubCommand, ICommandFile {
+    public static final class Symbol implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("symbol"));
         private Map<String, String> categories = new LinkedHashMap<>(){
@@ -542,7 +542,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Tell implements ISubCommand, ICommandFile {
+    public static final class Tell implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean suggestOfflinePlayers = false;
         private List<String> aliases = new ArrayList<>(){
@@ -561,7 +561,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Tictactoe implements ISubCommand, ICommandFile {
+    public static final class Tictactoe implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(){
             {
@@ -574,7 +574,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Translateto implements ISubCommand, ICommandFile {
+    public static final class Translateto implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int range = Range.PLAYER;
         private Service service = Service.GOOGLE;
@@ -592,7 +592,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Try implements ISubCommand, ICommandFile {
+    public static final class Try implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int range = Range.PROXY;
         private int min = 0;
@@ -605,7 +605,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Unban implements ISubCommand, ICommandFile {
+    public static final class Unban implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(){
@@ -620,7 +620,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Unmute implements ISubCommand, ICommandFile {
+    public static final class Unmute implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("unmute"));
@@ -630,7 +630,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Unwarn implements ISubCommand, ICommandFile {
+    public static final class Unwarn implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(List.of("unwarn"));
@@ -640,7 +640,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Warn implements ISubCommand, ICommandFile {
+    public static final class Warn implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
         private int range = Range.PROXY;
@@ -658,7 +658,7 @@ public final class Command extends FileSerializable implements IModule.ICommand 
     }
 
     @Getter
-    public static final class Warnlist implements ISubCommand, ICommandFile {
+    public static final class Warnlist implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int perPage = 4;
         private List<String> aliases = new ArrayList<>(List.of("warnlist"));

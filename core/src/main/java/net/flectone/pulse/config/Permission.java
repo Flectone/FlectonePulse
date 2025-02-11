@@ -1,4 +1,4 @@
-package net.flectone.pulse.file;
+package net.flectone.pulse.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,7 +29,7 @@ import java.util.Map;
         at = Comment.At.PREPEND
 )
 @Getter
-public final class Permission extends FileSerializable implements IModule {
+public final class Permission extends FileSerializable implements ModuleConfig {
 
     public Permission(Path projectPath) {
         super(projectPath.resolve("permission.yml"));
@@ -46,7 +46,7 @@ public final class Permission extends FileSerializable implements IModule {
     private Message message = new Message();
 
     @Getter
-    public static final class Command implements ICommand, IPermission {
+    public static final class Command implements CommandConfig, IPermission {
 
         private String name = "flectonepulse.module.command";
         private Type type = Type.TRUE;
@@ -137,7 +137,7 @@ public final class Permission extends FileSerializable implements IModule {
         private Warnlist warnlist = new Warnlist();
 
         @Getter
-        public static final class Afk implements ISubCommand, IPermission {
+        public static final class Afk implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.afk";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.afk.cooldown.bypass", Type.OP);
@@ -145,7 +145,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Ball implements ISubCommand, IPermission {
+        public static final class Ball implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.ball";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.ball.cooldown.bypass", Type.OP);
@@ -153,7 +153,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Ban implements ISubCommand, IPermission {
+        public static final class Ban implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.ban";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.ban.cooldown.bypass", Type.OP);
@@ -161,7 +161,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Banlist implements ISubCommand, IPermission {
+        public static final class Banlist implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.banlist";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.banlist.cooldown.bypass", Type.OP);
@@ -169,7 +169,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Broadcast implements ISubCommand, IPermission {
+        public static final class Broadcast implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.broadcast";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.broadcast.cooldown.bypass", Type.OP);
@@ -177,7 +177,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Chatcolor implements ISubCommand, IPermission {
+        public static final class Chatcolor implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.chatcolor";
             private Type type = Type.TRUE;
             private PermissionEntry other = new PermissionEntry("flectonepulse.module.command.chatcolor.other", Type.OP);
@@ -186,7 +186,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Chatsetting implements ISubCommand, IPermission {
+        public static final class Chatsetting implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.chatsetting";
             private Type type = Type.TRUE;
             private Map<FPlayer.Setting, Chatsetting.SettingItem> settings = new LinkedHashMap<>(){
@@ -239,7 +239,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Clearchat implements ISubCommand, IPermission {
+        public static final class Clearchat implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.clearchat";
             private Type type = Type.TRUE;
             private PermissionEntry other = new PermissionEntry("flectonepulse.module.command.clearchat.other", Type.OP);
@@ -248,7 +248,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Clearmail implements ISubCommand, IPermission {
+        public static final class Clearmail implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.clearmail";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.clearmail.cooldown.bypass", Type.OP);
@@ -256,7 +256,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Coin implements ISubCommand, IPermission {
+        public static final class Coin implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.coin";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.coin.cooldown.bypass", Type.OP);
@@ -264,7 +264,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Dice implements ISubCommand, IPermission {
+        public static final class Dice implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.dice";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.dice.cooldown.bypass", Type.OP);
@@ -272,7 +272,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Do implements ISubCommand, IPermission {
+        public static final class Do implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.do";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.do.cooldown.bypass", Type.OP);
@@ -280,7 +280,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Flectonepulse implements ISubCommand, IPermission {
+        public static final class Flectonepulse implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.flectonepulse";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.flectonepulse.cooldown.bypass", Type.OP);
@@ -288,7 +288,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Geolocate implements ISubCommand, IPermission {
+        public static final class Geolocate implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.geolocate";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.geolocate.cooldown.bypass", Type.OP);
@@ -296,7 +296,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Helper implements ISubCommand, IPermission {
+        public static final class Helper implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.helper";
             private Type type = Type.TRUE;
             private PermissionEntry see = new PermissionEntry("flectonepulse.module.command.helper.see", Type.OP);
@@ -305,7 +305,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Ignore implements ISubCommand, IPermission {
+        public static final class Ignore implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.ignore";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.ignore.cooldown.bypass", Type.OP);
@@ -313,7 +313,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Ignorelist implements ISubCommand, IPermission {
+        public static final class Ignorelist implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.ignorelist";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.ignorelist.cooldown.bypass", Type.OP);
@@ -321,7 +321,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Kick implements ISubCommand, IPermission {
+        public static final class Kick implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.kick";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.kick.cooldown.bypass", Type.OP);
@@ -329,7 +329,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Mail implements ISubCommand, IPermission {
+        public static final class Mail implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.mail";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.mail.cooldown.bypass", Type.OP);
@@ -337,7 +337,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Maintenance implements ISubCommand, IPermission {
+        public static final class Maintenance implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.maintenance";
             private Type type = Type.OP;
             private PermissionEntry join = new PermissionEntry("flectonepulse.module.command.maintenance.join", Type.OP);
@@ -346,7 +346,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Mark implements ISubCommand, IPermission {
+        public static final class Mark implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.mark";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.mark.cooldown.bypass", Type.OP);
@@ -354,7 +354,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Me implements ISubCommand, IPermission {
+        public static final class Me implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.me";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.me.cooldown.bypass", Type.OP);
@@ -362,7 +362,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Mute implements ISubCommand, IPermission {
+        public static final class Mute implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.mute";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.mute.cooldown.bypass", Type.OP);
@@ -370,7 +370,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Mutelist implements ISubCommand, IPermission {
+        public static final class Mutelist implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.mutelist";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.mutelist.cooldown.bypass", Type.OP);
@@ -378,7 +378,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Online implements ISubCommand, IPermission {
+        public static final class Online implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.online";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.online.cooldown.bypass", Type.OP);
@@ -386,7 +386,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Ping implements ISubCommand, IPermission {
+        public static final class Ping implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.ping";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.ping.cooldown.bypass", Type.OP);
@@ -394,7 +394,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Poll implements ISubCommand, IPermission {
+        public static final class Poll implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.poll";
             private Type type = Type.TRUE;
             private PermissionEntry create = new PermissionEntry("flectonepulse.module.command.poll.create", Type.OP);
@@ -403,7 +403,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Reply implements ISubCommand, IPermission {
+        public static final class Reply implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.reply";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.reply.cooldown.bypass", Type.OP);
@@ -411,7 +411,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Rockpaperscissors implements ISubCommand, IPermission {
+        public static final class Rockpaperscissors implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.rockpaperscissors";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.rockpaperscissors.cooldown.bypass", Type.OP);
@@ -419,7 +419,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Spit implements ISubCommand, IPermission {
+        public static final class Spit implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.spit";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.spit.cooldown.bypass", Type.OP);
@@ -427,7 +427,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Spy implements ISubCommand, IPermission {
+        public static final class Spy implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.spy";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.spy.cooldown.bypass", Type.OP);
@@ -435,7 +435,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Stream implements ISubCommand, IPermission {
+        public static final class Stream implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.stream";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.stream.cooldown.bypass", Type.OP);
@@ -443,7 +443,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Symbol implements ISubCommand, IPermission {
+        public static final class Symbol implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.symbol";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.symbol.cooldown.bypass", Type.OP);
@@ -451,7 +451,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Tell implements ISubCommand, IPermission {
+        public static final class Tell implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.tell";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.tell.cooldown.bypass", Type.OP);
@@ -459,7 +459,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Tictactoe implements ISubCommand, IPermission {
+        public static final class Tictactoe implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.tictactoe";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.tictactoe.cooldown.bypass", Type.OP);
@@ -467,7 +467,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Translateto implements ISubCommand, IPermission {
+        public static final class Translateto implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.translateto";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.translateto.cooldown.bypass", Type.OP);
@@ -475,7 +475,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Try implements ISubCommand, IPermission {
+        public static final class Try implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.try";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.try.cooldown.bypass", Type.OP);
@@ -483,7 +483,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Unban implements ISubCommand, IPermission {
+        public static final class Unban implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.unban";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.unban.cooldown.bypass", Type.OP);
@@ -491,7 +491,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Unmute implements ISubCommand, IPermission {
+        public static final class Unmute implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.unmute";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.unmute.cooldown.bypass", Type.OP);
@@ -499,7 +499,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Unwarn implements ISubCommand, IPermission {
+        public static final class Unwarn implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.unwarn";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.unwarn.cooldown.bypass", Type.OP);
@@ -507,7 +507,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Warn implements ISubCommand, IPermission {
+        public static final class Warn implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.warn";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.warn.cooldown.bypass", Type.OP);
@@ -515,7 +515,7 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Warnlist implements ISubCommand, IPermission {
+        public static final class Warnlist implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.warnlist";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.warnlist.cooldown.bypass", Type.OP);
@@ -525,7 +525,7 @@ public final class Permission extends FileSerializable implements IModule {
     }
 
     @Getter
-    public static final class Integration implements IIntegration, IPermission {
+    public static final class Integration implements IntegrationConfig, IPermission {
 
         private String name = "flectonepulse.module.integration";
         private Type type = Type.TRUE;
@@ -560,93 +560,93 @@ public final class Permission extends FileSerializable implements IModule {
         private Yandex yandex = new Yandex();
 
         @Getter
-        public static final class Deepl implements ISubIntegration, IPermission {
+        public static final class Deepl implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.deepl";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Discord implements ISubIntegration, IPermission {
+        public static final class Discord implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.discord";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Interactivechat implements ISubIntegration, IPermission {
+        public static final class Interactivechat implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.interactivechat";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Luckperms implements ISubIntegration, IPermission {
+        public static final class Luckperms implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.luckperms";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Placeholderapi implements ISubIntegration, IPermission {
+        public static final class Placeholderapi implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.placeholderapi";
             private Type type = Type.TRUE;
             private PermissionEntry use = new PermissionEntry("flectonepulse.module.integration.placeholderapi.use", Type.OP);
         }
 
         @Getter
-        public static final class Plasmovoice implements ISubIntegration, IPermission {
+        public static final class Plasmovoice implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.plasmovoice";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Simplevoice implements ISubIntegration, IPermission {
+        public static final class Simplevoice implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.simplevoice";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Skinsrestorer implements ISubIntegration, IPermission {
+        public static final class Skinsrestorer implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.skinsrestorer";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Supervanish implements ISubIntegration, IPermission {
+        public static final class Supervanish implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.supervanish";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Telegram implements ISubIntegration, IPermission {
+        public static final class Telegram implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.telegram";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Triton implements ISubIntegration, IPermission {
+        public static final class Triton implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.triton";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Twitch implements ISubIntegration, IPermission {
+        public static final class Twitch implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.twitch";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Vault implements ISubIntegration, IPermission {
+        public static final class Vault implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.vault";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Yandex implements ISubIntegration, IPermission {
+        public static final class Yandex implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.yandex";
             private Type type = Type.TRUE;
         }
     }
 
     @Getter
-    public static final class Message implements IMessage, IPermission {
+    public static final class Message implements MessageConfig, IPermission {
 
         private String name = "flectonepulse.module.message";
         private Type type = Type.TRUE;
@@ -705,20 +705,20 @@ public final class Permission extends FileSerializable implements IModule {
         private Tab tab = new Tab();
 
         @Getter
-        public static final class Advancement implements ISubMessage, IPermission {
+        public static final class Advancement implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.advancement";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.advancement.sound", Type.TRUE);
         }
 
         @Getter
-        public static final class Anvil implements ISubMessage, IPermission {
+        public static final class Anvil implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.anvil";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Auto implements ISubMessage, IPermission {
+        public static final class Auto implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.auto";
             private Type type = Type.TRUE;
 
@@ -730,38 +730,38 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Book implements ISubMessage, IPermission {
+        public static final class Book implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.book";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Brand implements ISubMessage, IPermission {
+        public static final class Brand implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.brand";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Bubble implements ISubMessage, IPermission {
+        public static final class Bubble implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.bubble";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Chat implements ISubMessage, IPermission {
+        public static final class Chat implements SubMessageConfig, IPermission {
 
             private String name = "flectonepulse.module.message.chat";
-            private net.flectone.pulse.file.Permission.Type type = net.flectone.pulse.file.Permission.Type.TRUE;
+            private net.flectone.pulse.config.Permission.Type type = net.flectone.pulse.config.Permission.Type.TRUE;
 
             private Map<String, Type> types = new LinkedHashMap<>(){
                 {
-                    put("local", new Type("flectonepulse.module.message.chat.local", net.flectone.pulse.file.Permission.Type.TRUE,
-                            new PermissionEntry("flectonepulse.module.message.chat.local.cooldown.bypass", net.flectone.pulse.file.Permission.Type.OP),
-                            new PermissionEntry("flectonepulse.module.message.chat.local.sound", net.flectone.pulse.file.Permission.Type.TRUE)
+                    put("local", new Type("flectonepulse.module.message.chat.local", net.flectone.pulse.config.Permission.Type.TRUE,
+                            new PermissionEntry("flectonepulse.module.message.chat.local.cooldown.bypass", net.flectone.pulse.config.Permission.Type.OP),
+                            new PermissionEntry("flectonepulse.module.message.chat.local.sound", net.flectone.pulse.config.Permission.Type.TRUE)
                     ));
-                    put("global", new Type("flectonepulse.module.message.chat.global", net.flectone.pulse.file.Permission.Type.TRUE,
-                            new PermissionEntry("flectonepulse.module.message.chat.global.cooldown.bypass", net.flectone.pulse.file.Permission.Type.OP),
-                            new PermissionEntry("flectonepulse.module.message.chat.global.sound", net.flectone.pulse.file.Permission.Type.TRUE)
+                    put("global", new Type("flectonepulse.module.message.chat.global", net.flectone.pulse.config.Permission.Type.TRUE,
+                            new PermissionEntry("flectonepulse.module.message.chat.global.cooldown.bypass", net.flectone.pulse.config.Permission.Type.OP),
+                            new PermissionEntry("flectonepulse.module.message.chat.global.sound", net.flectone.pulse.config.Permission.Type.TRUE)
                     ));
                 }
             };
@@ -771,21 +771,21 @@ public final class Permission extends FileSerializable implements IModule {
             @AllArgsConstructor
             public static final class Type implements IPermission {
                 private String name = "flectonepulse.module.message.chat";
-                private net.flectone.pulse.file.Permission.Type type = net.flectone.pulse.file.Permission.Type.TRUE;
-                private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.chat.cooldown.bypass", net.flectone.pulse.file.Permission.Type.OP);
-                private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.chat.sound", net.flectone.pulse.file.Permission.Type.TRUE);
+                private net.flectone.pulse.config.Permission.Type type = net.flectone.pulse.config.Permission.Type.TRUE;
+                private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.chat.cooldown.bypass", net.flectone.pulse.config.Permission.Type.OP);
+                private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.chat.sound", net.flectone.pulse.config.Permission.Type.TRUE);
             }
         }
 
         @Getter
-        public static final class Clear implements ISubMessage, IPermission {
+        public static final class Clear implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.clear";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.clear.sound", Type.TRUE);
         }
 
         @Getter
-        public static final class Contact implements IContactMessage, IPermission {
+        public static final class Contact implements ContactMessageConfig, IPermission {
 
             private String name = "flectonepulse.module.message.contact";
             private Type type = Type.TRUE;
@@ -806,13 +806,13 @@ public final class Permission extends FileSerializable implements IModule {
             private Unsign unsign = new Unsign();
 
             @Getter
-            public static final class Afk implements ISubContactMessage, IPermission {
+            public static final class Afk implements SubContactMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.contact.afk";
-                private net.flectone.pulse.file.Permission.Type type = net.flectone.pulse.file.Permission.Type.TRUE;
+                private net.flectone.pulse.config.Permission.Type type = net.flectone.pulse.config.Permission.Type.TRUE;
             }
 
             @Getter
-            public static final class Knock implements ISubContactMessage, IPermission {
+            public static final class Knock implements SubContactMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.contact.knock";
                 private Type type = Type.TRUE;
                 private Map<String, PermissionEntry> variants = new LinkedHashMap<>(){
@@ -825,7 +825,7 @@ public final class Permission extends FileSerializable implements IModule {
             }
 
             @Getter
-            public static final class Mark implements ISubContactMessage, IPermission {
+            public static final class Mark implements SubContactMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.contact.mark";
                 private Type type = Type.TRUE;
                 private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.contact.mark.cooldown.bypass", Type.OP);
@@ -833,7 +833,7 @@ public final class Permission extends FileSerializable implements IModule {
             }
 
             @Getter
-            public static final class Rightclick implements ISubContactMessage, IPermission {
+            public static final class Rightclick implements SubContactMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.contact.rightclick";
                 private Type type = Type.TRUE;
                 private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.contact.rightclick.cooldown.bypass", Type.OP);
@@ -841,7 +841,7 @@ public final class Permission extends FileSerializable implements IModule {
             }
 
             @Getter
-            public static final class Sign implements ISubContactMessage, IPermission {
+            public static final class Sign implements SubContactMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.contact.sign";
                 private Type type = Type.TRUE;
                 private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.contact.sign.cooldown.bypass", Type.OP);
@@ -849,7 +849,7 @@ public final class Permission extends FileSerializable implements IModule {
             }
 
             @Getter
-            public static final class Spit implements ISubContactMessage, IPermission {
+            public static final class Spit implements SubContactMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.contact.spit";
                 private Type type = Type.TRUE;
                 private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.contact.spit.cooldown.bypass", Type.OP);
@@ -857,7 +857,7 @@ public final class Permission extends FileSerializable implements IModule {
             }
 
             @Getter
-            public static final class Unsign implements ISubContactMessage, IPermission {
+            public static final class Unsign implements SubContactMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.contact.unsign";
                 private Type type = Type.TRUE;
                 private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.contact.unsign.cooldown.bypass", Type.OP);
@@ -867,28 +867,28 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Death implements ISubMessage, IPermission {
+        public static final class Death implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.death";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.death.sound", Type.TRUE);
         }
 
         @Getter
-        public static final class Deop implements ISubMessage, IPermission {
+        public static final class Deop implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.deop";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.deop.sound", Type.TRUE);
         }
 
         @Getter
-        public static final class Enchant implements ISubMessage, IPermission {
+        public static final class Enchant implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.enchant";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.enchant.sound", Type.TRUE);
         }
 
         @Getter
-        public static final class Format implements IFormatMessage, IPermission {
+        public static final class Format implements FormatMessageConfig, IPermission {
 
             private String name = "flectonepulse.module.message.format";
             private Type type = Type.TRUE;
@@ -956,25 +956,25 @@ public final class Permission extends FileSerializable implements IModule {
             private World world = new World();
 
             @Getter
-            public static final class Color implements ISubFormatMessage, IPermission {
+            public static final class Color implements SubFormatMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.format.fcolor";
                 private Type type = Type.TRUE;
             }
 
             @Getter
-            public static final class Emoji implements ISubFormatMessage, IPermission {
+            public static final class Emoji implements SubFormatMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.format.emoji";
                 private Type type = Type.TRUE;
             }
 
             @Getter
-            public static final class Image implements ISubFormatMessage, IPermission {
+            public static final class Image implements SubFormatMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.format.image";
                 private Type type = Type.TRUE;
             }
 
             @Getter
-            public static final class Mention implements ISubFormatMessage, IPermission {
+            public static final class Mention implements SubFormatMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.format.mention";
                 private Type type = Type.TRUE;
                 private PermissionEntry group = new PermissionEntry("flectonepulse.module.message.format.mention.group", Type.OP);
@@ -983,7 +983,7 @@ public final class Permission extends FileSerializable implements IModule {
             }
 
             @Getter
-            public static final class Moderation implements IModerationFormatMessage, IPermission {
+            public static final class Moderation implements ModerationFormatMessageConfig, IPermission {
 
                 private String name = "flectonepulse.module.message.format.moderation";
                 private Type type = Type.TRUE;
@@ -994,7 +994,7 @@ public final class Permission extends FileSerializable implements IModule {
                 private Swear swear = new Swear();
 
                 @Getter
-                public static final class Caps implements ISubModerationFormatMessage, IPermission {
+                public static final class Caps implements SubModerationFormatMessageConfig, IPermission {
                     private String name = "flectonepulse.module.message.format.moderation.caps";
                     private Type type = Type.TRUE;
                     private PermissionEntry bypass = new PermissionEntry("flectonepulse.module.message.format.moderation.caps.bypass", Type.OP);
@@ -1002,7 +1002,7 @@ public final class Permission extends FileSerializable implements IModule {
                 }
 
                 @Getter
-                public static final class Swear implements ISubModerationFormatMessage, IPermission {
+                public static final class Swear implements SubModerationFormatMessageConfig, IPermission {
                     private String name = "flectonepulse.module.message.format.moderation.swear";
                     private Type type = Type.TRUE;
                     private PermissionEntry bypass = new PermissionEntry("flectonepulse.module.message.format.moderation.swear.bypass", Type.OP);
@@ -1013,13 +1013,13 @@ public final class Permission extends FileSerializable implements IModule {
             }
 
             @Getter
-            public static final class Name implements ISubFormatMessage, IPermission {
+            public static final class Name implements SubFormatMessageConfig, IPermission {
                 private String name = "flectonepulse.module.format.name";
                 private Type type = Type.TRUE;
             }
 
             @Getter
-            public static final class QuestionAnswer implements ISubFormatMessage, IPermission {
+            public static final class QuestionAnswer implements SubFormatMessageConfig, IPermission {
                 private String name = "flectonepulse.module.format.questionanswer";
                 private Type type = Type.TRUE;
                 private Map<String, Question> questions = new LinkedHashMap<>(){
@@ -1048,47 +1048,47 @@ public final class Permission extends FileSerializable implements IModule {
             }
 
             @Getter
-            public static final class Spoiler implements ISubFormatMessage, IPermission {
+            public static final class Spoiler implements SubFormatMessageConfig, IPermission {
                 private String name = "flectonepulse.module.format.spoiler";
                 private Type type = Type.TRUE;
             }
 
             @Getter
-            public static final class Translate implements ISubFormatMessage, IPermission {
+            public static final class Translate implements SubFormatMessageConfig, IPermission {
                 private String name = "flectonepulse.module.format.translate";
                 private Type type = Type.TRUE;
             }
 
             @Getter
-            public static final class World implements ISubFormatMessage, IPermission {
+            public static final class World implements SubFormatMessageConfig, IPermission {
                 private String name = "flectonepulse.module.format.world";
                 private Type type = Type.TRUE;
             }
         }
 
         @Getter
-        public static final class Gamemode implements ISubMessage, IPermission {
+        public static final class Gamemode implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.gamemode";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.gamemode.sound", Type.TRUE);
         }
 
         @Getter
-        public static final class Greeting implements ISubMessage, IPermission {
+        public static final class Greeting implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.greeting";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.greeting.sound", Type.TRUE);
         }
 
         @Getter
-        public static final class Join implements ISubMessage, IPermission {
+        public static final class Join implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.join";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.join.sound", Type.TRUE);
         }
 
         @Getter
-        public static final class Objective implements IObjectiveMessage, IPermission {
+        public static final class Objective implements ObjectiveMessageConfig, IPermission {
 
             private String name = "flectonepulse.module.message.objective";
             private Type type = Type.TRUE;
@@ -1099,13 +1099,13 @@ public final class Permission extends FileSerializable implements IModule {
             private Tabname tabname = new Tabname();
 
             @Getter
-            public static final class Belowname implements ISubObjectiveMessage, IPermission {
+            public static final class Belowname implements SubObjectiveMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.objective.belowname";
                 private Type type = Type.TRUE;
             }
 
             @Getter
-            public static final class Tabname implements ISubObjectiveMessage, IPermission {
+            public static final class Tabname implements SubObjectiveMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.objective.tabname";
                 private Type type = Type.TRUE;
             }
@@ -1113,54 +1113,54 @@ public final class Permission extends FileSerializable implements IModule {
         }
 
         @Getter
-        public static final class Op implements ISubMessage, IPermission {
+        public static final class Op implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.op";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.op.sound", Type.TRUE);
         }
 
         @Getter
-        public static final class Quit implements ISubMessage, IPermission {
+        public static final class Quit implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.quit";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.quit.sound", Type.TRUE);
         }
 
         @Getter
-        public static final class Scoreboard implements ISubMessage, IPermission {
+        public static final class Scoreboard implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.scoreboard";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Seed implements ISubMessage, IPermission {
+        public static final class Seed implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.seed";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.seed.sound", Type.TRUE);
         }
 
         @Getter
-        public static final class Setblock implements ISubMessage, IPermission {
+        public static final class Setblock implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.setblock";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.setblock.sound", Type.TRUE);
         }
 
         @Getter
-        public static final class Sign implements ISubMessage, IPermission {
+        public static final class Sign implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.sign";
             private Type type = Type.TRUE;
         }
 
         @Getter
-        public static final class Spawnpoint implements ISubMessage, IPermission {
+        public static final class Spawnpoint implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.spawnpoint";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.spawnpoint.sound", Type.TRUE);
         }
 
         @Getter
-        public static final class Status implements IStatusMessage, IPermission {
+        public static final class Status implements StatusMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.status";
             private Type type = Type.TRUE;
 
@@ -1174,33 +1174,33 @@ public final class Permission extends FileSerializable implements IModule {
             private Version version = new Version();
 
             @Getter
-            public static final class MOTD implements ISubStatusMessage, IPermission {
+            public static final class MOTD implements SubStatusMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.status.motd";
                 private Type type = Type.TRUE;
             }
 
             @Getter
-            public static final class Icon implements ISubStatusMessage, IPermission {
+            public static final class Icon implements SubStatusMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.status.icon";
                 private Type type = Type.TRUE;
             }
 
             @Getter
-            public static final class Players implements ISubStatusMessage, IPermission {
+            public static final class Players implements SubStatusMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.status.players";
                 private Type type = Type.TRUE;
                 private PermissionEntry bypass = new PermissionEntry("flectonepulse.module.message.status.players.bypass", Type.OP);
             }
 
             @Getter
-            public static final class Version implements ISubStatusMessage, IPermission {
+            public static final class Version implements SubStatusMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.status.version";
                 private Type type = Type.TRUE;
             }
         }
 
         @Getter
-        public static final class Tab implements ITabMessage, IPermission {
+        public static final class Tab implements TabMessageConfig, IPermission {
 
             private String name = "flectonepulse.module.message.tab";
             private Type type = Type.TRUE;
@@ -1213,19 +1213,19 @@ public final class Permission extends FileSerializable implements IModule {
             private Playerlistname playerlistname = new Playerlistname();
 
             @Getter
-            public static final class Footer implements ISubTabMessage, IPermission {
+            public static final class Footer implements SubTabMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.tab.footer";
                 private Type type = Type.TRUE;
             }
 
             @Getter
-            public static final class Header implements ISubTabMessage, IPermission {
+            public static final class Header implements SubTabMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.tab.header";
                 private Type type = Type.TRUE;
             }
 
             @Getter
-            public static final class Playerlistname implements ISubTabMessage, IPermission {
+            public static final class Playerlistname implements SubTabMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.tab.footer";
                 private Type type = Type.TRUE;
             }

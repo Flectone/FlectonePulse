@@ -6,7 +6,7 @@ import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import com.google.inject.Inject;
 import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.file.Config;
+import net.flectone.pulse.config.Config;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;

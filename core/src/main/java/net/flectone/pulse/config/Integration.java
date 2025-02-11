@@ -1,4 +1,4 @@
-package net.flectone.pulse.file;
+package net.flectone.pulse.config;
 
 import lombok.Getter;
 import net.elytrium.serializer.annotations.Comment;
@@ -30,7 +30,7 @@ import java.util.Map;
         at = Comment.At.PREPEND
 )
 @Getter
-public final class Integration extends FileSerializable implements IModule.IIntegration {
+public final class Integration extends FileSerializable implements ModuleConfig.IntegrationConfig {
 
     public Integration(Path projectPath) {
         super(projectPath.resolve("integration.yml"));
@@ -69,13 +69,13 @@ public final class Integration extends FileSerializable implements IModule.IInte
     private Yandex yandex = new Yandex();
 
     @Getter
-    public static final class Deepl implements ISubIntegration, Config.IEnable {
+    public static final class Deepl implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = false;
         private String authKey = "";
     }
 
     @Getter
-    public static final class Discord implements ISubIntegration, Config.IEnable {
+    public static final class Discord implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = false;
         private String token = "";
         private Presence presence = new Presence();
@@ -112,43 +112,43 @@ public final class Integration extends FileSerializable implements IModule.IInte
     }
 
     @Getter
-    public static final class Interactivechat implements ISubIntegration, Config.IEnable {
+    public static final class Interactivechat implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = true;
     }
 
     @Getter
-    public static final class Luckperms implements ISubIntegration, Config.IEnable {
+    public static final class Luckperms implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = true;
         private boolean tabSort = false;
     }
 
     @Getter
-    public static final class Placeholderapi implements ISubIntegration, Config.IEnable {
+    public static final class Placeholderapi implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = true;
     }
 
     @Getter
-    public static final class Plasmovoice implements ISubIntegration, Config.IEnable {
+    public static final class Plasmovoice implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = true;
     }
 
     @Getter
-    public static final class Simplevoice implements ISubIntegration, Config.IEnable {
+    public static final class Simplevoice implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = true;
     }
 
     @Getter
-    public static final class Skinsrestorer implements ISubIntegration, Config.IEnable {
+    public static final class Skinsrestorer implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = true;
     }
 
     @Getter
-    public static final class Supervanish implements ISubIntegration, Config.IEnable {
+    public static final class Supervanish implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = true;
     }
 
     @Getter
-    public static final class Telegram implements ISubIntegration, Config.IEnable {
+    public static final class Telegram implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = false;
         private String token = "";
         private Map<MessageTag, List<String>> messageChannel = new LinkedHashMap<>(){
@@ -161,12 +161,12 @@ public final class Integration extends FileSerializable implements IModule.IInte
     }
 
     @Getter
-    public static final class Triton implements ISubIntegration, Config.IEnable {
+    public static final class Triton implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = true;
     }
 
     @Getter
-    public static final class Twitch implements ISubIntegration, Config.IEnable {
+    public static final class Twitch implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = false;
         private String clientID = "";
         private String token = "";
@@ -183,12 +183,12 @@ public final class Integration extends FileSerializable implements IModule.IInte
     }
 
     @Getter
-    public static final class Vault implements ISubIntegration, Config.IEnable {
+    public static final class Vault implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = true;
     }
 
     @Getter
-    public static final class Yandex implements ISubIntegration, Config.IEnable {
+    public static final class Yandex implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = false;
         private String token = "";
         private String folderId = "";

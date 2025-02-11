@@ -7,7 +7,7 @@ import com.google.inject.name.Named;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
-import net.flectone.pulse.file.Config;
+import net.flectone.pulse.config.Config;
 import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.util.SystemUtil;

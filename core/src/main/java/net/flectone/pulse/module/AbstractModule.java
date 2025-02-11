@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.Setter;
-import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.util.PermissionUtil;
 

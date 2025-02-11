@@ -2,8 +2,8 @@ package net.flectone.pulse.module.integration.supervanish;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.file.Integration;
-import net.flectone.pulse.file.Permission;
+import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
