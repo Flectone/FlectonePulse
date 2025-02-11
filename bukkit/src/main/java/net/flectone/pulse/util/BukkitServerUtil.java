@@ -8,7 +8,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.manager.FPlayerManager;
-import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -105,7 +104,6 @@ public class BukkitServerUtil implements ServerUtil {
     @Override
     public int getOnlineCount() {
         return (int) fPlayerManager.getFPlayers().stream()
-                .filter(FPlayer::isOnline)
                 .filter(fPlayer -> !fPlayer.isUnknown())
                 .filter(fPlayer -> !integrationModule.isVanished(fPlayer))
                 .count();

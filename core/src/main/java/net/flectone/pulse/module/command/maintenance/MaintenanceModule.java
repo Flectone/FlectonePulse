@@ -199,7 +199,6 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
     private void kickOnlinePlayers(FPlayer fSender) {
         fPlayerManager.getFPlayers()
                 .stream()
-                .filter(FPlayer::isOnline)
                 .filter(filter -> !permissionUtil.has(filter, permission.getJoin()))
                 .forEach(fReceiver -> {
                     Component component = componentUtil.builder(fSender, fReceiver, resolveLocalization(fReceiver).getKick()).build();
