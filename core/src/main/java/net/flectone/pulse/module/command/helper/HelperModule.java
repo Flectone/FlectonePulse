@@ -7,7 +7,7 @@ import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ProxyManager;
+import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.util.CommandUtil;
@@ -25,21 +25,21 @@ public abstract class HelperModule extends AbstractModuleCommand<Localization.Co
 
     private final FPlayerDAO fPlayerDAO;
     private final FPlayerManager fPlayerManager;
-    private final ProxyManager proxyManager;
+    private final ProxyConnector proxyConnector;
     private final PermissionUtil permissionUtil;
     private final CommandUtil commandUtil;
 
     public HelperModule(FileManager fileManager,
                         FPlayerDAO fPlayerDAO,
                         FPlayerManager fPlayerManager,
-                        ProxyManager proxyManager,
+                        ProxyConnector proxyConnector,
                         PermissionUtil permissionUtil,
                         CommandUtil commandUtil) {
         super(localization -> localization.getCommand().getHelper(), null);
 
         this.fPlayerDAO = fPlayerDAO;
         this.fPlayerManager = fPlayerManager;
-        this.proxyManager = proxyManager;
+        this.proxyConnector = proxyConnector;
         this.permissionUtil = permissionUtil;
         this.commandUtil = commandUtil;
 
@@ -59,7 +59,7 @@ public abstract class HelperModule extends AbstractModuleCommand<Localization.Co
 
         List<FPlayer> recipients = fPlayerManager.getFPlayers().stream().filter(filter).toList();
         if (recipients.isEmpty()) {
-            boolean nullHelper = !proxyManager.isEnabledProxy() || fPlayerDAO.getOnlineFPlayers().stream()
+            boolean nullHelper = !proxyConnector.isEnable() || fPlayerDAO.getOnlineFPlayers().stream()
                     .noneMatch(online -> permissionUtil.has(online, permission.getSee()));
 
             if (nullHelper) {

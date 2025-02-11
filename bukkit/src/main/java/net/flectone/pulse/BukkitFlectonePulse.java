@@ -8,6 +8,7 @@ import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Setter;
+import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.logger.FLogger;
@@ -101,7 +102,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         }
 
         injector.getInstance(FPlayerManager.class).reload();
-        injector.getInstance(ProxyManager.class).reload();
+        injector.getInstance(ProxyConnector.class).reload();
 
         if (fileManager.getConfig().isMetrics()) {
             injector.getInstance(MetricsUtil.class).setup();
@@ -134,7 +135,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(ListenerManager.class).unregisterAll();
         PacketEvents.getAPI().terminate();
 
-        injector.getInstance(ProxyManager.class).disable();
+        injector.getInstance(ProxyConnector.class).disable();
 
         CommandAPI.onDisable();
         injector.getInstance(DiscordModule.class).disconnect();
@@ -180,7 +181,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
             Bukkit.getPluginManager().disablePlugin(this);
         }
 
-        injector.getInstance(ProxyManager.class).reload();
+        injector.getInstance(ProxyConnector.class).reload();
         injector.getInstance(FPlayerManager.class).reload();
         injector.getInstance(Module.class).reloadWithChildren();
 

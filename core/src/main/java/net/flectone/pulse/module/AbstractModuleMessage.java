@@ -7,7 +7,7 @@ import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ProxyManager;
+import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -34,7 +34,7 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
     @Inject private ComponentUtil componentUtil;
     @Inject private TimeUtil timeUtil;
     @Inject private ModerationUtil moderationUtil;
-    @Inject private ProxyManager proxyManager;
+    @Inject private ProxyConnector proxyConnector;
     @Inject private IntegrationModule integrationModule;
     @Inject private MessageSender messageSender;
     @Inject private SoundPlayer soundPlayer;
@@ -438,7 +438,7 @@ public abstract class AbstractModuleMessage<M extends Localization.ILocalization
             if (proxyOutput == null) return false;
             if (range != Range.PROXY) return false;
 
-            return proxyManager.sendMessage(fPlayer, tag, proxyOutput);
+            return proxyConnector.sendMessage(fPlayer, tag, proxyOutput);
         }
 
         private String resolveString(FPlayer fPlayer, BiFunction<FPlayer, M, String> stringResolver) {

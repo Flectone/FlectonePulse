@@ -9,7 +9,7 @@ import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ProxyManager;
+import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tictactoe.manager.TictactoeManager;
@@ -28,7 +28,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
 
     private final FPlayerDAO fPlayerDAO;
     private final TictactoeManager tictactoeManager;
-    private final ProxyManager proxyManager;
+    private final ProxyConnector proxyConnector;
     private final IntegrationModule integrationModule;
     private final CommandUtil commandUtil;
     private final Gson gson;
@@ -37,7 +37,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
     public TictactoeModule(FileManager fileManager,
                            FPlayerDAO fPlayerDAO,
                            TictactoeManager tictactoeManager,
-                           ProxyManager proxyManager,
+                           ProxyConnector proxyConnector,
                            IntegrationModule integrationModule,
                            CommandUtil commandUtil,
                            Gson gson) {
@@ -45,7 +45,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
 
         this.fPlayerDAO = fPlayerDAO;
         this.tictactoeManager = tictactoeManager;
-        this.proxyManager = proxyManager;
+        this.proxyConnector = proxyConnector;
         this.integrationModule = integrationModule;
         this.commandUtil = commandUtil;
         this.gson = gson;
@@ -91,7 +91,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
                 .sound(getSound())
                 .sendBuilt();
 
-        boolean isSent = proxyManager.sendMessage(fPlayer, MessageTag.COMMAND_TICTACTOE_CREATE, byteArrayDataOutput -> {
+        boolean isSent = proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_TICTACTOE_CREATE, byteArrayDataOutput -> {
             byteArrayDataOutput.writeUTF(gson.toJson(fReceiver));
             byteArrayDataOutput.writeInt(ticTacToe.getId());
             byteArrayDataOutput.writeBoolean(isHard);
@@ -174,7 +174,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
                 .format(getMoveMessage(ticTacToe, fReceiver, fPlayer, finalTypeTitle, move))
                 .sendBuilt();
 
-        boolean isSent = proxyManager.sendMessage(fPlayer, MessageTag.COMMAND_TICTACTOE_MOVE, byteArrayDataOutput -> {
+        boolean isSent = proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_TICTACTOE_MOVE, byteArrayDataOutput -> {
             byteArrayDataOutput.writeUTF(gson.toJson(fReceiver));
             byteArrayDataOutput.writeUTF(ticTacToe.toString());
             byteArrayDataOutput.writeInt(finalTypeTitle);

@@ -9,7 +9,7 @@ import net.flectone.pulse.file.Message;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ProxyManager;
+import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.util.ColorUtil;
@@ -31,7 +31,7 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
     private final ColorsDAO colorsDAO;
     private final FPlayerManager fPlayerManager;
     private final PermissionUtil permissionUtil;
-    private final ProxyManager proxyManager;
+    private final ProxyConnector proxyConnector;
     private final CommandUtil commandUtil;
     private final ColorUtil colorUtil;
 
@@ -40,7 +40,7 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
                            ColorsDAO colorsDAO,
                            FPlayerManager fPlayerManager,
                            PermissionUtil permissionUtil,
-                           ProxyManager proxyManager,
+                           ProxyConnector proxyConnector,
                            CommandUtil commandUtil,
                            ColorUtil colorUtil) {
         super(localization -> localization.getCommand().getChatcolor(), null);
@@ -48,7 +48,7 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
         this.colorsDAO = colorsDAO;
         this.fPlayerManager = fPlayerManager;
         this.permissionUtil = permissionUtil;
-        this.proxyManager = proxyManager;
+        this.proxyConnector = proxyConnector;
         this.commandUtil = commandUtil;
         this.colorUtil = colorUtil;
 
@@ -83,7 +83,7 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
 
                 colorsDAO.setFPlayerColors(fTarget);
 
-                proxyManager.sendMessage(fTarget, MessageTag.COMMAND_CHATCOLOR, byteArrayDataOutput ->
+                proxyConnector.sendMessage(fTarget, MessageTag.COMMAND_CHATCOLOR, byteArrayDataOutput ->
                         byteArrayDataOutput.writeUTF(input)
                 );
 

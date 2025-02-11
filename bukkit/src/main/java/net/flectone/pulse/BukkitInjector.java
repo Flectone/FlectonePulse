@@ -9,6 +9,8 @@ import com.google.inject.name.Names;
 import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
+import net.flectone.pulse.connector.BukkitProxyConnector;
+import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.file.Config;
 import net.flectone.pulse.interceptor.AsyncInterceptor;
 import net.flectone.pulse.interceptor.SyncInterceptor;
@@ -184,7 +186,7 @@ public class BukkitInjector extends AbstractModule {
         bind(InventoryManager.class).to(BukkitInventoryManager.class);
         bind(PermissionUtil.class).to(BukkitPermissionUtil.class);
         bind(CommandUtil.class).to(BukkitCommandUtil.class);
-        bind(ProxyManager.class).to(BukkitProxyManager.class);
+        bind(ProxyConnector.class).to(BukkitProxyConnector.class);
         bind(ItemUtil.class).to(BukkitItemUtil.class);
         bind(ServerUtil.class).to(BukkitServerUtil.class);
         bind(MetricsUtil.class).to(BukkitMetricsUtil.class);

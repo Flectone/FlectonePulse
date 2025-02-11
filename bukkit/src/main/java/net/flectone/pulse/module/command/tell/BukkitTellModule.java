@@ -8,7 +8,7 @@ import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.database.dao.IgnoreDAO;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ProxyManager;
+import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.util.BukkitCommandUtil;
@@ -23,10 +23,10 @@ public class BukkitTellModule extends TellModule {
                             FPlayerDAO fPlayerDAO,
                             IgnoreDAO ignoreDAO,
                             FPlayerManager fPlayerManager,
-                            ProxyManager proxyManager,
+                            ProxyConnector proxyConnector,
                             IntegrationModule integrationModule,
                             BukkitCommandUtil commandUtil) {
-        super(fileManager, fPlayerDAO, ignoreDAO, fPlayerManager, proxyManager, integrationModule, commandUtil);
+        super(fileManager, fPlayerDAO, ignoreDAO, fPlayerManager, proxyConnector, integrationModule, commandUtil);
 
         this.commandUtil = commandUtil;
     }

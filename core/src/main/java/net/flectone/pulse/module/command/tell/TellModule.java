@@ -8,7 +8,7 @@ import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ProxyManager;
+import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -33,7 +33,7 @@ public abstract class TellModule extends AbstractModuleCommand<Localization.Comm
     private final FPlayerDAO fPlayerDAO;
     private final IgnoreDAO ignoreDAO;
     private final FPlayerManager fPlayerManager;
-    private final ProxyManager proxyManager;
+    private final ProxyConnector proxyConnector;
     private final IntegrationModule integrationModule;
     private final CommandUtil commandUtil;
 
@@ -41,7 +41,7 @@ public abstract class TellModule extends AbstractModuleCommand<Localization.Comm
                       FPlayerDAO fPlayerDAO,
                       IgnoreDAO ignoreDAO,
                       FPlayerManager fPlayerManager,
-                      ProxyManager proxyManager,
+                      ProxyConnector proxyConnector,
                       IntegrationModule integrationModule,
                       CommandUtil commandUtil) {
         super(localization -> localization.getCommand().getTell(), fPlayer -> fPlayer.is(FPlayer.Setting.TELL));
@@ -49,7 +49,7 @@ public abstract class TellModule extends AbstractModuleCommand<Localization.Comm
         this.fPlayerDAO = fPlayerDAO;
         this.ignoreDAO = ignoreDAO;
         this.fPlayerManager = fPlayerManager;
-        this.proxyManager = proxyManager;
+        this.proxyConnector = proxyConnector;
         this.integrationModule = integrationModule;
         this.commandUtil = commandUtil;
 
@@ -101,7 +101,7 @@ public abstract class TellModule extends AbstractModuleCommand<Localization.Comm
 
         String receiverUUID = fReceiver.getUuid().toString();
 
-        boolean isSent = proxyManager.sendMessage(fPlayer, MessageTag.COMMAND_TELL, byteArrayDataOutput -> {
+        boolean isSent = proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_TELL, byteArrayDataOutput -> {
             byteArrayDataOutput.writeUTF(receiverUUID);
             byteArrayDataOutput.writeUTF(message);
 

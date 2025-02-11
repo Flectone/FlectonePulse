@@ -7,7 +7,7 @@ import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ProxyManager;
+import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -33,14 +33,14 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
     @Getter private final Permission.Command.Poll permission;
 
     private final FileManager fileManager;
-    private final ProxyManager proxyManager;
+    private final ProxyConnector proxyConnector;
     private final TaskScheduler taskScheduler;
     private final CommandUtil commandUtil;
     private final ComponentUtil componentUtil;
     private final Gson gson;
 
     public PollModule(FileManager fileManager,
-                      ProxyManager proxyManager,
+                      ProxyConnector proxyConnector,
                       TaskScheduler taskScheduler,
                       CommandUtil commandUtil,
                       ComponentUtil componentUtil,
@@ -48,7 +48,7 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
         super(localization -> localization.getCommand().getPoll(), fPlayer -> fPlayer.is(FPlayer.Setting.POLL));
 
         this.fileManager = fileManager;
-        this.proxyManager = proxyManager;
+        this.proxyConnector = proxyConnector;
         this.taskScheduler = taskScheduler;
         this.commandUtil = commandUtil;
         this.componentUtil = componentUtil;
@@ -68,7 +68,7 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
         Optional<Object> objectNumberVote = commandUtil.getOptional(1, arguments);
         if (objectNumberVote.isEmpty() || !(objectNumberVote.get() instanceof Integer numberVote)) return;
 
-        boolean isSent = proxyManager.sendMessage(fPlayer, MessageTag.COMMAND_POLL_VOTE, byteArrayDataOutput -> {
+        boolean isSent = proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_POLL_VOTE, byteArrayDataOutput -> {
             byteArrayDataOutput.writeInt(id);
             byteArrayDataOutput.writeInt(numberVote);
         });

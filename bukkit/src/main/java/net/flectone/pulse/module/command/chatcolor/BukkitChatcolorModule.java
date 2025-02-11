@@ -9,7 +9,7 @@ import net.flectone.pulse.database.dao.ColorsDAO;
 import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ProxyManager;
+import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.util.ColorUtil;
 import net.flectone.pulse.util.CommandUtil;
@@ -30,10 +30,10 @@ public class BukkitChatcolorModule extends ChatcolorModule {
                                  ColorsDAO colorsDAO,
                                  FPlayerManager fPlayerManager,
                                  PermissionUtil permissionUtil,
-                                 ProxyManager proxyManager,
+                                 ProxyConnector proxyConnector,
                                  CommandUtil commandUtil,
                                  ColorUtil colorUtil) {
-        super(fileManager, fPlayerDAO, colorsDAO, fPlayerManager, permissionUtil, proxyManager, commandUtil, colorUtil);
+        super(fileManager, fPlayerDAO, colorsDAO, fPlayerManager, permissionUtil, proxyConnector, commandUtil, colorUtil);
 
         this.colorUtil = colorUtil;
     }

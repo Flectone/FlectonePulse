@@ -6,7 +6,7 @@ import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ProxyManager;
+import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.PermissionUtil;
@@ -18,10 +18,10 @@ public class BukkitHelperModule extends HelperModule {
     public BukkitHelperModule(FileManager fileManager,
                               FPlayerDAO fPlayerDAO,
                               FPlayerManager fPlayerManager,
-                              ProxyManager proxyManager,
+                              ProxyConnector proxyConnector,
                               PermissionUtil permissionUtil,
                               CommandUtil commandUtil) {
-        super(fileManager, fPlayerDAO, fPlayerManager, proxyManager, permissionUtil, commandUtil);
+        super(fileManager, fPlayerDAO, fPlayerManager, proxyConnector, permissionUtil, commandUtil);
     }
 
     @Override

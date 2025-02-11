@@ -1,29 +1,30 @@
-package net.flectone.pulse.manager;
+package net.flectone.pulse.connector;
 
 import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
 import net.flectone.pulse.file.Config;
 import net.flectone.pulse.logger.FLogger;
+import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.util.MessageTag;
 
 import java.util.function.Consumer;
 
-public abstract class ProxyManager {
+public abstract class ProxyConnector {
 
     private final Config config;
     private final FLogger fLogger;
 
     @Getter private String channel;
 
-    public ProxyManager(FileManager fileManager,
-                        FLogger fLogger) {
+    public ProxyConnector(FileManager fileManager,
+                          FLogger fLogger) {
         this.fLogger = fLogger;
 
         config = fileManager.getConfig();
     }
 
-    public boolean isEnabledProxy() {
+    public boolean isEnable() {
         return (config.isBungeecord() || config.isVelocity()) && config.getDatabase().getType() == Config.Database.Type.MYSQL;
     }
 
@@ -36,13 +37,9 @@ public abstract class ProxyManager {
 
         if (config.getDatabase().getType() == Config.Database.Type.SQLITE) {
             fLogger.warning("SQLITE database and Proxy are incompatible");
-            return;
         }
-
-        reloadChannel();
     }
 
-    public abstract void reloadChannel();
     public abstract void disable();
     public abstract boolean sendMessage(FEntity sender, MessageTag tag, Consumer<ByteArrayDataOutput> output);
 }

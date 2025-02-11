@@ -12,7 +12,7 @@ import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ProxyManager;
+import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -71,7 +71,7 @@ public class BukkitProxyListener implements PluginMessageListener {
     private final FileManager fileManager;
     private final FPlayerManager fPlayerManager;
     private final TaskScheduler taskScheduler;
-    private final ProxyManager proxyManager;
+    private final ProxyConnector proxyConnector;
     private final Gson gson;
     private final Injector injector;
 
@@ -81,7 +81,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                                FileManager fileManager,
                                FPlayerManager fPlayerManager,
                                TaskScheduler taskScheduler,
-                               ProxyManager proxyManager,
+                               ProxyConnector proxyConnector,
                                Gson gson,
                                Injector injector) {
         this.colorsDAO = colorsDAO;
@@ -89,15 +89,15 @@ public class BukkitProxyListener implements PluginMessageListener {
         this.fileManager = fileManager;
         this.fPlayerManager = fPlayerManager;
         this.taskScheduler = taskScheduler;
-        this.proxyManager = proxyManager;
+        this.proxyConnector = proxyConnector;
         this.gson = gson;
         this.injector = injector;
     }
 
     @Override
     public void onPluginMessageReceived(String channel, @NotNull Player player, byte[] bytes) {
-        if (!channel.equals(proxyManager.getChannel())) return;
-        if (!proxyManager.isEnabledProxy()) return;
+        if (!channel.equals(proxyConnector.getChannel())) return;
+        if (!proxyConnector.isEnable()) return;
 
         taskScheduler.runAsync(() -> {
             ByteArrayDataInput input = ByteStreams.newDataInput(bytes);

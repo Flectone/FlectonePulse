@@ -6,7 +6,7 @@ import net.flectone.pulse.file.Command;
 import net.flectone.pulse.file.Localization;
 import net.flectone.pulse.file.Permission;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.manager.ProxyManager;
+import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -28,19 +28,19 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
     @Getter private final Command.Rockpaperscissors command;
     @Getter private final Permission.Command.Rockpaperscissors permission;
 
-    private final ProxyManager proxyManager;
+    private final ProxyConnector proxyConnector;
     private final FPlayerDAO fPlayerDAO;
     private final CommandUtil commandUtil;
     private final IntegrationModule integrationModule;
 
     public RockpaperscissorsModule(FileManager fileManager,
-                                   ProxyManager proxyManager,
+                                   ProxyConnector proxyConnector,
                                    FPlayerDAO fPlayerDAO,
                                    CommandUtil commandUtil,
                                    IntegrationModule integrationModule) {
         super(localization -> localization.getCommand().getRockpaperscissors(), fPlayer -> fPlayer.is(FPlayer.Setting.ROCKPAPERSCISSORS));
 
-        this.proxyManager = proxyManager;
+        this.proxyConnector = proxyConnector;
         this.fPlayerDAO = fPlayerDAO;
         this.commandUtil = commandUtil;
         this.integrationModule = integrationModule;
@@ -106,7 +106,7 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
                     return;
                 }
 
-                boolean isSent = proxyManager.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_FINAL, byteArrayDataOutput -> {
+                boolean isSent = proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_FINAL, byteArrayDataOutput -> {
                     byteArrayDataOutput.writeUTF(rockPaperScissors.getId().toString());
                     byteArrayDataOutput.writeUTF(move);
                 });
@@ -122,7 +122,7 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
                     .format((fResolver, s) -> s.getSender())
                     .sendBuilt();
 
-            boolean isSent = proxyManager.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_MOVE, byteArrayDataOutput -> {
+            boolean isSent = proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_MOVE, byteArrayDataOutput -> {
                 byteArrayDataOutput.writeUTF(rockPaperScissors.getId().toString());
                 byteArrayDataOutput.writeUTF(move);
             });
@@ -136,7 +136,7 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
 
         RockPaperScissors rockPaperScissors = new RockPaperScissors(fPlayer.getUuid(), fReceiver.getUuid());
 
-        proxyManager.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_CREATE, byteArrayDataOutput -> {
+        proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_CREATE, byteArrayDataOutput -> {
             byteArrayDataOutput.writeUTF(rockPaperScissors.getId().toString());
             byteArrayDataOutput.writeUTF(rockPaperScissors.getReceiver().toString());
         });
