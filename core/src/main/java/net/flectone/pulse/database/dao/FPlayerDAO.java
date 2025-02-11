@@ -186,9 +186,10 @@ public class FPlayerDAO {
             }
 
             ResultSet resultSet = statement.executeQuery();
-            if (!resultSet.next()) return FPlayer.UNKNOWN;
+            if (resultSet.next()) {
+                return getFPlayerFromResultSet(resultSet);
+            }
 
-            return getFPlayerFromResultSet(resultSet);
         } catch (SQLException e) {
             fLogger.warning(e);
         }
