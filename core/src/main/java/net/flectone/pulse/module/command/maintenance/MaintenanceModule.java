@@ -103,16 +103,9 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         command.setTurnedOn(turned);
         fileManager.save();
 
-        if (!turned) return;
-
-        fPlayerManager.getFPlayers()
-                .stream()
-                .filter(FPlayer::isOnline)
-                .filter(filter -> !permissionUtil.has(filter, permission.getJoin()))
-                .forEach(fReceiver -> {
-                    Component component = componentUtil.builder(fPlayer, fReceiver, resolveLocalization(fReceiver).getKick()).build();
-                    fPlayerManager.kick(fPlayer, component);
-                });
+        if (turned) {
+            kickOnlinePlayers(fPlayer);
+        }
     }
 
     public void sendStatus(User user) {
@@ -204,6 +197,10 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         getCommand().getAliases().forEach(commandUtil::unregister);
 
         createCommand();
+
+        if (command.isTurnedOn()) {
+            kickOnlinePlayers(FPlayer.UNKNOWN);
+        }
     }
 
     @Override
@@ -211,4 +208,14 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         return command.isEnable();
     }
 
+    private void kickOnlinePlayers(FPlayer fSender) {
+        fPlayerManager.getFPlayers()
+                .stream()
+                .filter(FPlayer::isOnline)
+                .filter(filter -> !permissionUtil.has(filter, permission.getJoin()))
+                .forEach(fReceiver -> {
+                    Component component = componentUtil.builder(fSender, fReceiver, resolveLocalization(fReceiver).getKick()).build();
+                    fPlayerManager.kick(fReceiver, component);
+                });
+    }
 }
