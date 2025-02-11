@@ -64,7 +64,7 @@ public class EmojiModule extends AbstractModule {
         if (checkModulePredicates(sender)) return message;
 
         for (Map.Entry<String, String> emoji : this.message.getValues().entrySet()) {
-            message = message.replace(emoji.getKey(), "<emoji:\"" + emoji.getKey() + "\">");
+            message = message.replace(emoji.getKey(), "<emoji:'" + emoji.getKey() + "'>");
         }
 
         return message;
