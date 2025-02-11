@@ -39,8 +39,8 @@ public abstract class MessageSender {
         if (!Component.IS_NOT_EMPTY.test(component)) return;
 
         switch (destination.getType()) {
-            case TITLE -> sendTitle(fPlayer, destination.getTimes(), component, subcomponent);
-            case SUBTITLE -> sendTitle(fPlayer, destination.getTimes(), subcomponent, component);
+            case TITLE -> sendTitle(fPlayer, component, subcomponent, destination.getTimes());
+            case SUBTITLE -> sendTitle(fPlayer, subcomponent, component, destination.getTimes());
             case ACTION_BAR -> sendActionBar(fPlayer, component, destination.getTimes().stayTicks());
             case BOSS_BAR -> sendBoosBar(fPlayer, component, destination.getBossBar());
             case TAB_HEADER -> sendPlayerListHeaderAndFooter(fPlayer, component, fPlayerManager.getPlayerListFooter(fPlayer));
@@ -64,7 +64,7 @@ public abstract class MessageSender {
         user.sendMessage(component);
     }
 
-    public void sendTitle(FPlayer fPlayer, Times times, Component title, Component subTitle) {
+    public void sendTitle(FPlayer fPlayer, Component title, Component subTitle, Times times) {
         User user = packetEventsUtil.getUser(fPlayer);
         if (user == null) return;
 
