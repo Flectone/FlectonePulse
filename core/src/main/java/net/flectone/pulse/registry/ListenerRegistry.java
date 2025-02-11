@@ -6,7 +6,7 @@ import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.google.inject.Injector;
 import net.flectone.pulse.listener.AbstractPacketListener;
 import net.flectone.pulse.listener.BasePacketListener;
-import net.flectone.pulse.listener.FInventoryPacketListener;
+import net.flectone.pulse.listener.InventoryPacketListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public abstract class ListenerRegistry {
     }
 
     public void registerDefaultListeners() {
-        register(FInventoryPacketListener.class);
+        register(InventoryPacketListener.class);
         register(BasePacketListener.class);
     }
 }

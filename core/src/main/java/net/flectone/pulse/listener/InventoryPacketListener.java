@@ -11,12 +11,12 @@ import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.model.inventory.Inventory;
 
 @Singleton
-public class FInventoryPacketListener extends AbstractPacketListener {
+public class InventoryPacketListener extends AbstractPacketListener {
 
     private final InventoryController inventoryController;
 
     @Inject
-    public FInventoryPacketListener(InventoryController inventoryController) {
+    public InventoryPacketListener(InventoryController inventoryController) {
         this.inventoryController = inventoryController;
     }
 
