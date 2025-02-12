@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
+import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
@@ -74,18 +75,15 @@ public class FBubble extends FPacketEntity {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;
 
+        Location location = SpigotConversionUtil.fromBukkitLocation(player.getLocation());
+        location.setPosition(location.getPosition().add(0, 1.8, 0));
+
         id = randomUtil.nextInt(Integer.MAX_VALUE);
         uuid = UUID.randomUUID();
         viewers.add(fReceiver);
         alive = true;
 
-        sendPacketToViewers(new WrapperPlayServerSpawnEntity(id, uuid,
-                type,
-                SpigotConversionUtil.fromBukkitLocation(player.getLocation()),
-                0,
-                0,
-                null)
-        );
+        sendPacketToViewers(new WrapperPlayServerSpawnEntity(id, uuid, type, location, 0, 0, null));
 
         List<EntityData> metadataList = new ArrayList<>();
 
