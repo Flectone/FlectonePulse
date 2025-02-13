@@ -50,11 +50,9 @@ public class BukkitOnlineModule extends OnlineModule {
             );
             case "last" -> offlinePlayer.isOnline() && !integrationModule.isVanished(targetFPlayer)
                     ? s.getFormatCurrent()
-                    : timeUtil.format(fPlayer, System.currentTimeMillis() - offlinePlayer.getLastPlayed(),
-                    s.getFormatLast()
-            );
+                    : timeUtil.format(fPlayer, System.currentTimeMillis() - offlinePlayer.getLastPlayed(), s.getFormatLast());
             case "total" -> timeUtil.format(fPlayer,
-                    offlinePlayer.getStatistic(Statistic.PLAY_ONE_MINUTE),
+                    offlinePlayer.getStatistic(Statistic.PLAY_ONE_MINUTE) * 60L,
                     s.getFormatTotal()
             );
             default -> "";
