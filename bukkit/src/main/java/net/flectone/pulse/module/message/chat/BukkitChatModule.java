@@ -189,6 +189,7 @@ public class BukkitChatModule extends ChatModule {
             }
         }
 
+        event.setMessage(finalMessage);
         event.setCancelled(playerChat.isCancel());
         event.getRecipients().clear();
 
