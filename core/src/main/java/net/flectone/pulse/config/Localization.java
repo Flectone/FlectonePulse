@@ -1750,6 +1750,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
             }
 
             @Override
+            public SubFormatMessageConfig getFixation() {
+                return null;
+            }
+
+            @Override
             public SubFormatMessageConfig getImage() {
                 return null;
             }

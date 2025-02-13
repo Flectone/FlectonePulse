@@ -12,6 +12,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.format.color.ColorModule;
 import net.flectone.pulse.module.message.format.emoji.EmojiModule;
+import net.flectone.pulse.module.message.format.fixation.FixationModule;
 import net.flectone.pulse.module.message.format.image.ImageModule;
 import net.flectone.pulse.module.message.format.mention.MentionModule;
 import net.flectone.pulse.module.message.format.moderation.ModerationModule;
@@ -95,6 +96,7 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
 
         addChildren(ColorModule.class);
         addChildren(EmojiModule.class);
+        addChildren(FixationModule.class);
         addChildren(ImageModule.class);
         addChildren(MentionModule.class);
         addChildren(ModerationModule.class);

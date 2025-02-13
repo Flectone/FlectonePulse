@@ -389,6 +389,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         private Color color = new Color();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/emoji/")})
         private Emoji emoji = new Emoji();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fixation/")})
+        private Fixation fixation = new Fixation();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/image/")})
         private Image image = new Image();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/mention/")})
@@ -459,6 +461,25 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
                     put(":idk:", "<click:suggest_command:\":idk:\"><hover:show_text:\":idk:\">¯\\_(ツ)_/¯</hover></click>");
                     put(":angry:", "<click:suggest_command:\":angry:\"><hover:show_text:\":angry:\">(╯°□°)╯︵ ┻━┻</hover></click>");
                     put(":happy:", "<click:suggest_command:\":happy:\"><hover:show_text:\":happy:\">＼(＾O＾)／</hover></click>");
+                }
+            };
+        }
+
+        @Getter
+        public static final class Fixation implements SubFormatMessageConfig, Config.IEnable {
+            private boolean enable = false;
+            private boolean endDot = false;
+            private boolean firstLetterUppercase = false;
+            private List<String> nonDotSymbols = new LinkedList<>() {
+                {
+                    push(".");
+                    push("!");
+                    push("?");
+                    push(",");
+                    push("\"");
+                    push("'");
+                    push(":");
+                    push(";");
                 }
             };
         }

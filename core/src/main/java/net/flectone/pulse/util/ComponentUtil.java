@@ -3,6 +3,7 @@ package net.flectone.pulse.util;
 import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.module.message.format.fixation.FixationModule;
 import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -43,6 +44,7 @@ public class ComponentUtil {
     @Inject private IntegrationModule integrationModule;
     @Inject private ColorModule colorModule;
     @Inject private EmojiModule emojiModule;
+    @Inject private FixationModule fixationModule;
     @Inject private SpoilerModule spoilerModule;
     @Inject private TranslateModule translateModule;
     @Inject private FormatModule formatModule;
@@ -90,6 +92,7 @@ public class ComponentUtil {
         private boolean userMessage;
         private boolean mention;
         private boolean emoji = true;
+        private boolean fixation = true;
         private boolean question = true;
         private boolean spoiler = true;
         private boolean translate;
@@ -141,6 +144,11 @@ public class ComponentUtil {
 
         public Builder emoji(boolean emoji) {
             this.emoji = emoji;
+            return this;
+        }
+
+        public Builder fixation(boolean fixation) {
+            this.fixation = fixation;
             return this;
         }
 
@@ -264,6 +272,10 @@ public class ComponentUtil {
 
             if (image && !userMessage) {
                 tagResolverList.add(imageModule.imageTag(sender, receiver));
+            }
+
+            if (fixation && userMessage) {
+                message = fixationModule.replace(sender, message);
             }
 
             if (!userMessage || permissionUtil.has(receiver, formatModule.getPermission().getAll().getName())) {

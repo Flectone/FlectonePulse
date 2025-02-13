@@ -938,6 +938,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private Color color = new Color();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/emoji/")})
             private Emoji emoji = new Emoji();
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fixation/")})
+            private Fixation fixation = new Fixation();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/image/")})
             private Image image = new Image();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/mention/")})
@@ -964,6 +966,12 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             @Getter
             public static final class Emoji implements SubFormatMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.format.emoji";
+                private Type type = Type.TRUE;
+            }
+
+            @Getter
+            public static final class Fixation implements SubFormatMessageConfig, IPermission {
+                private String name = "flectonepulse.module.message.format.fixation";
                 private Type type = Type.TRUE;
             }
 

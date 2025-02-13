@@ -122,6 +122,7 @@ public interface ModuleConfig {
 
             SubFormatMessageConfig getColor();
             SubFormatMessageConfig getEmoji();
+            SubFormatMessageConfig getFixation();
             SubFormatMessageConfig getImage();
             SubFormatMessageConfig getMention();
             ModerationFormatMessageConfig getModeration();
