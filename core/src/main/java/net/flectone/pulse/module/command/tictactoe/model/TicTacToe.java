@@ -169,7 +169,7 @@ public class TicTacToe {
         moves.add(move);
         movesMap.put(fPlayer.getId(), moves);
 
-        int currentPlayerValue = FIRST_VALUE == fPlayer.getId()
+        int currentPlayerValue = firstPlayer == fPlayer.getId()
                 ? FIRST_VALUE
                 : SECOND_VALUE;
 
