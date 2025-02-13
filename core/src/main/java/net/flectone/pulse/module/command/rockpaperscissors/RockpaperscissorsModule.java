@@ -119,6 +119,7 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
             }
 
             builder(fReceiver)
+                    .receiver(fPlayer)
                     .format((fResolver, s) -> s.getSender())
                     .sendBuilt();
 
