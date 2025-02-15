@@ -110,9 +110,7 @@ public interface ModuleConfig {
             SubContactMessageConfig getKnock();
             SubContactMessageConfig getMark();
             SubContactMessageConfig getRightclick();
-            SubContactMessageConfig getSign();
             SubContactMessageConfig getSpit();
-            SubContactMessageConfig getUnsign();
 
             interface SubContactMessageConfig {}
 

@@ -1557,15 +1557,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/rightclick/")})
             private Rightclick rightclick = new Rightclick();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/sign/")})
-            private Sign sign = new Sign();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/spit/")})
             private Spit spit = new Spit();
-
-            @Override
-            public SubContactMessageConfig getUnsign() {
-                return null;
-            }
 
             @Getter
             public static final class Afk implements SubContactMessageConfig, Localizable {
@@ -1590,11 +1583,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
             @Getter
             public static final class Rightclick implements SubContactMessageConfig, Localizable {
                 private String format = "<fcolor:1>◁ <display_name> ▷";
-            }
-
-            @Getter
-            public static final class Sign implements SubContactMessageConfig, Localizable {
-                private String format = "<dye><italic>#<player>";
             }
 
             @Getter

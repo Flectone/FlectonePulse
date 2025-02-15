@@ -798,12 +798,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private Mark mark = new Mark();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/rightclick/")})
             private Rightclick rightclick = new Rightclick();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/sign/")})
-            private Sign sign = new Sign();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/spit/")})
             private Spit spit = new Spit();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/unsign/")})
-            private Unsign unsign = new Unsign();
 
             @Getter
             public static final class Afk implements SubContactMessageConfig, IPermission {
@@ -841,27 +837,11 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             }
 
             @Getter
-            public static final class Sign implements SubContactMessageConfig, IPermission {
-                private String name = "flectonepulse.module.message.contact.sign";
-                private Type type = Type.TRUE;
-                private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.contact.sign.cooldown.bypass", Type.OP);
-                private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.contact.sign.sound", Type.TRUE);
-            }
-
-            @Getter
             public static final class Spit implements SubContactMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.contact.spit";
                 private Type type = Type.TRUE;
                 private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.contact.spit.cooldown.bypass", Type.OP);
                 private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.contact.spit.sound", Type.TRUE);
-            }
-
-            @Getter
-            public static final class Unsign implements SubContactMessageConfig, IPermission {
-                private String name = "flectonepulse.module.message.contact.unsign";
-                private Type type = Type.TRUE;
-                private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.contact.unsign.cooldown.bypass", Type.OP);
-                private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.contact.unsign.sound", Type.TRUE);
             }
 
         }

@@ -9,15 +9,14 @@ import com.google.inject.name.Names;
 import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
+import net.flectone.pulse.config.Config;
 import net.flectone.pulse.connector.BukkitProxyConnector;
 import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.controller.BukkitInventoryController;
 import net.flectone.pulse.controller.InventoryController;
-import net.flectone.pulse.config.Config;
-import net.flectone.pulse.util.interceptor.AsyncInterceptor;
-import net.flectone.pulse.util.interceptor.SyncInterceptor;
-import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.manager.*;
+import net.flectone.pulse.manager.BukkitFPlayerManager;
+import net.flectone.pulse.manager.FPlayerManager;
+import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.ball.BallModule;
 import net.flectone.pulse.module.command.ball.BukkitBallModule;
 import net.flectone.pulse.module.command.ban.BanModule;
@@ -134,6 +133,9 @@ import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.scheduler.BukkitTaskScheduler;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.*;
+import net.flectone.pulse.util.interceptor.AsyncInterceptor;
+import net.flectone.pulse.util.interceptor.SyncInterceptor;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
@@ -141,7 +143,6 @@ import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableExcep
 import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
 import net.megavex.scoreboardlibrary.api.team.TeamManager;
-import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.Plugin;
 
 import java.io.InputStream;
@@ -170,7 +171,6 @@ public class BukkitInjector extends AbstractModule {
         Path projectPath = plugin.getDataFolder().toPath();
 
         bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
-        bind(NamespacedKey.class).annotatedWith(Names.named("flectonepulseSign")).toInstance(new NamespacedKey(plugin, "flectonepulse.sign"));
 
         FileManager fileManager;
         try {
