@@ -337,7 +337,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
                 put(TagType.IMAGE, new Tag("(?<!:\")((https?|ftp|gopher|telnet|file):\\/\\/(?:i\\.imgur\\.com|media\\.discordapp\\.net)\\/[\\w:#@%/;$()~_?+-=\\\\.&]*)"));
                 put(TagType.SPOILER, new Tag(Pattern.quote("||")));
                 put(TagType.BOLD, new Tag(Pattern.quote("**")));
-                put(TagType.ITALIC, new Tag(Pattern.quote("##")));
+                put(TagType.ITALIC, new Tag(Pattern.quote("*")));
                 put(TagType.UNDERLINE, new Tag(Pattern.quote("__")));
                 put(TagType.OBFUSCATED, new Tag(Pattern.quote("??")));
                 put(TagType.STRIKETHROUGH, new Tag(Pattern.quote("~~")));
