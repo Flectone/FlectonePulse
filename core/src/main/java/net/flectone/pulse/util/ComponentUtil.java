@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.module.message.format.fixation.FixationModule;
+import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
 import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -50,6 +51,7 @@ public class ComponentUtil {
     @Inject private FormatModule formatModule;
     @Inject private MentionModule mentionModule;
     @Inject private CapsModule capsModule;
+    @Inject private FloodModule floodModule;
     @Inject private SwearModule swearModule;
     @Inject private ImageModule imageModule;
     @Inject private WorldModule worldModule;
@@ -98,6 +100,7 @@ public class ComponentUtil {
         private boolean translate;
         private boolean swear = true;
         private boolean caps = true;
+        private boolean flood = true;
         private boolean formatting = true;
         private boolean url = true;
         private boolean image = true;
@@ -114,6 +117,11 @@ public class ComponentUtil {
 
         public Builder caps(boolean caps) {
             this.caps = caps;
+            return this;
+        }
+
+        public Builder flood(boolean flood) {
+            this.flood = flood;
             return this;
         }
 
@@ -260,6 +268,10 @@ public class ComponentUtil {
 
             if (caps && userMessage) {
                 message = capsModule.replace(sender, message);
+            }
+
+            if (flood && userMessage) {
+                message = floodModule.replace(sender, message);
             }
 
             if (swear) {

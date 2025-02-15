@@ -1791,6 +1791,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
                     return null;
                 }
 
+                @Override
+                public SubModerationFormatMessageConfig getFlood() {
+                    return null;
+                }
+
                 @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/swear/")})
                 private Swear swear = new Swear();
 

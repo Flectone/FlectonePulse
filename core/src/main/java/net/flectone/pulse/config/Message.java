@@ -505,6 +505,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/caps/")})
             private Caps caps = new Caps();
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/flood/")})
+            private Flood flood = new Flood();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/swear/")})
             private Swear swear = new Swear();
 
@@ -512,7 +514,14 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             public static final class Caps implements SubModerationFormatMessageConfig, Config.IEnable {
                 private boolean enable = false;
                 private double trigger = 0.7;
-                private Sound sound = new Sound();
+            }
+
+            @Getter
+            public static final class Flood implements SubModerationFormatMessageConfig, Config.IEnable {
+                private boolean enable = false;
+                private boolean trimToSingle = false;
+                private int maxRepeatedSymbols = 10;
+                private int maxRepeatedWords = 2;
             }
 
             @Getter

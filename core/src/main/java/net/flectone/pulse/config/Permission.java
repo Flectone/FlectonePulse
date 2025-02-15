@@ -998,6 +998,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
 
                 @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/caps/")})
                 private Caps caps = new Caps();
+                @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/flood/")})
+                private Flood flood = new Flood();
                 @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/swear/")})
                 private Swear swear = new Swear();
 
@@ -1006,7 +1008,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                     private String name = "flectonepulse.module.message.format.moderation.caps";
                     private Type type = Type.TRUE;
                     private PermissionEntry bypass = new PermissionEntry("flectonepulse.module.message.format.moderation.caps.bypass", Type.OP);
-                    private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.format.moderation.caps.sound", Type.TRUE);
+                }
+
+                @Getter
+                public static final class Flood implements SubModerationFormatMessageConfig, IPermission {
+                    private String name = "flectonepulse.module.message.format.moderation.flood";
+                    private Type type = Type.TRUE;
+                    private PermissionEntry bypass = new PermissionEntry("flectonepulse.module.message.format.moderation.flood.bypass", Type.OP);
                 }
 
                 @Getter
