@@ -103,7 +103,7 @@ public abstract class DiceModule extends AbstractModuleCommand<Localization.Comm
 
             return message.getFormat()
                     .replace("<sum>", String.valueOf(sum))
-                    .replace("<message>", stringBuilder.toString());
+                    .replace("<message>", stringBuilder.toString().trim());
         };
     }
 
