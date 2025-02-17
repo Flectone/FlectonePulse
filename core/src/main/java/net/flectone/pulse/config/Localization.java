@@ -1546,11 +1546,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private Afk afk = new Afk();
 
             @Override
-            public SubContactMessageConfig getKnock() {
-                return null;
-            }
-
-            @Override
             public SubContactMessageConfig getMark() {
                 return null;
             }

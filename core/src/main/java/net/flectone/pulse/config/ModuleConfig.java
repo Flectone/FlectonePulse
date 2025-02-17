@@ -107,7 +107,6 @@ public interface ModuleConfig {
         interface ContactMessageConfig extends SubMessageConfig {
 
             SubContactMessageConfig getAfk();
-            SubContactMessageConfig getKnock();
             SubContactMessageConfig getMark();
             SubContactMessageConfig getRightclick();
             SubContactMessageConfig getSpit();

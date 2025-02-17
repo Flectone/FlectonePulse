@@ -792,8 +792,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
 
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/afk/")})
             private Afk afk = new Afk();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/knock/")})
-            private Knock knock = new Knock();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/mark/")})
             private Mark mark = new Mark();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/rightclick/")})
@@ -805,19 +803,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             public static final class Afk implements SubContactMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.contact.afk";
                 private net.flectone.pulse.config.Permission.Type type = net.flectone.pulse.config.Permission.Type.TRUE;
-            }
-
-            @Getter
-            public static final class Knock implements SubContactMessageConfig, IPermission {
-                private String name = "flectonepulse.module.message.contact.knock";
-                private Type type = Type.TRUE;
-                private Map<String, PermissionEntry> variants = new LinkedHashMap<>(){
-                    {
-                        put("GLASS", new PermissionEntry("flectonepulse.module.message.contact.knock.glass.sound", Type.TRUE));
-                        put("DOOR", new PermissionEntry("flectonepulse.module.message.contact.knock.door.sound", Type.TRUE));
-                    }
-                };
-                private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.contact.knock.cooldown.bypass", Type.OP);
             }
 
             @Getter

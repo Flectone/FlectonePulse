@@ -211,8 +211,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/afk/")})
         private Afk afk = new Afk();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/knock/")})
-        private Knock knock = new Knock();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/mark/")})
         private Mark mark = new Mark();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/rightclick/")})
@@ -228,26 +226,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             private List<String> ignore = new ArrayList<>(List.of("afk"));
             private Destination destination = new Destination();
             private Ticker ticker = new Ticker(true, 20);
-        }
-
-        @Getter
-        public static final class Knock implements SubContactMessageConfig, Config.IEnable {
-            private boolean enable = false;
-            private Cooldown cooldown = new Cooldown();
-            private List<Type> variants = new LinkedList<>(){
-                {
-                    push(new Type("GLASS", new Sound(true, 1f, 1f, SoundCategory.BLOCK.name(), Sounds.BLOCK_GLASS_PLACE.getName().toString())));
-                    push(new Type("DOOR", new Sound(true, 1f, 1f, SoundCategory.BLOCK.name(), Sounds.BLOCK_WOOD_PLACE.getName().toString())));
-                }
-            };
-
-            @Getter
-            @NoArgsConstructor
-            @AllArgsConstructor
-            public static final class Type {
-                private String type = "";
-                private Sound sound = new Sound();
-            }
         }
 
         @Getter
