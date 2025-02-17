@@ -37,7 +37,6 @@ public interface ModuleConfig {
         SubCommandConfig getPoll();
         SubCommandConfig getReply();
         SubCommandConfig getRockpaperscissors();
-        SubCommandConfig getSpit();
         SubCommandConfig getSpy();
         SubCommandConfig getStream();
         SubCommandConfig getSymbol();
@@ -109,7 +108,6 @@ public interface ModuleConfig {
             SubContactMessageConfig getAfk();
             SubContactMessageConfig getMark();
             SubContactMessageConfig getRightclick();
-            SubContactMessageConfig getSpit();
 
             interface SubContactMessageConfig {}
 

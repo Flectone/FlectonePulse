@@ -2,7 +2,6 @@ package net.flectone.pulse.config;
 
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.elytrium.serializer.annotations.Comment;
@@ -215,8 +214,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         private Mark mark = new Mark();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/rightclick/")})
         private Rightclick rightclick = new Rightclick();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/spit/")})
-        private Spit spit = new Spit();
 
         @Getter
         public static final class Afk implements SubContactMessageConfig, Config.IEnable {
@@ -262,16 +259,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             private Destination destination = new Destination(Destination.Type.ACTION_BAR, new Times(0, 60, 0));
             private Cooldown cooldown = new Cooldown();
             private Sound sound = new Sound();
-        }
-
-        @Getter
-        public static final class Spit implements SubContactMessageConfig, Config.IEnable {
-            private boolean enable = false;
-            private boolean message = true;
-            private String item = "WHITE_DYE";
-            private Destination destination = new Destination(Destination.Type.ACTION_BAR, new Times(0, 60, 0));
-            private Cooldown cooldown = new Cooldown(true, 60);
-            private Sound sound = new Sound(true, 0.3f, 1f, SoundCategory.HOSTILE.name(), Sounds.ENTITY_LLAMA_SPIT.getName().toString());
         }
     }
 

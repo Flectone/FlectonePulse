@@ -73,8 +73,6 @@ import net.flectone.pulse.module.command.reply.BukkitReplyModule;
 import net.flectone.pulse.module.command.reply.ReplyModule;
 import net.flectone.pulse.module.command.rockpaperscissors.BukkitRockpaperscissorsModule;
 import net.flectone.pulse.module.command.rockpaperscissors.RockpaperscissorsModule;
-import net.flectone.pulse.module.command.spit.BukkitSpitModule;
-import net.flectone.pulse.module.command.spit.SpitModule;
 import net.flectone.pulse.module.command.spy.BukkitSpyModule;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.command.stream.BukkitStreamModule;
@@ -242,7 +240,6 @@ public class BukkitInjector extends AbstractModule {
         bind(PollModule.class).to(BukkitPollModule.class);
         bind(ReplyModule.class).to(BukkitReplyModule.class);
         bind(RockpaperscissorsModule.class).to(BukkitRockpaperscissorsModule.class);
-        bind(SpitModule.class).to(BukkitSpitModule.class);
         bind(SpyModule.class).to(BukkitSpyModule.class);
         bind(StreamModule.class).to(BukkitStreamModule.class);
         bind(SymbolModule.class).to(BukkitSymbolModule.class);

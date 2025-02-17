@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.message.contact.mark.MarkModule;
 import net.flectone.pulse.module.message.contact.rightclick.RightclickModule;
-import net.flectone.pulse.module.message.contact.spit.SpitModule;
 
 @Singleton
 public class BukkitContactModule extends ContactModule {
@@ -21,6 +20,5 @@ public class BukkitContactModule extends ContactModule {
 
         addChildren(MarkModule.class);
         addChildren(RightclickModule.class);
-        addChildren(SpitModule.class);
     }
 }

@@ -109,8 +109,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Reply reply = new Reply();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/rockpaperscissors/")})
         private Rockpaperscissors rockpaperscissors = new Rockpaperscissors();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/spit/")})
-        private Spit spit = new Spit();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/spy/")})
         private Spy spy = new Spy();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/stream/")})
@@ -218,7 +216,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                     put(FPlayer.Setting.COIN, new SettingItem("flectonepulse.module.command.chatsetting.coin", Type.TRUE));
                     put(FPlayer.Setting.AFK, new SettingItem("flectonepulse.module.command.chatsetting.afk", Type.TRUE));
                     put(FPlayer.Setting.POLL, new SettingItem("flectonepulse.module.command.chatsetting.poll", Type.TRUE));
-                    put(FPlayer.Setting.SPIT, new SettingItem("flectonepulse.module.command.chatsetting.spit", Type.TRUE));
                     put(FPlayer.Setting.GREETING, new SettingItem("flectonepulse.module.command.chatsetting.greeting", Type.TRUE));
                     put(FPlayer.Setting.ROCKPAPERSCISSORS, new SettingItem("flectonepulse.module.command.chatsetting.rockpaperscissors", Type.TRUE));
                     put(FPlayer.Setting.DISCORD, new SettingItem("flectonepulse.module.command.chatsetting.discord", Type.TRUE));
@@ -416,14 +413,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.rockpaperscissors.cooldown.bypass", Type.OP);
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.rockpaperscissors.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Spit implements SubCommandConfig, IPermission {
-            private String name = "flectonepulse.module.command.spit";
-            private Type type = Type.TRUE;
-            private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.spit.cooldown.bypass", Type.OP);
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.spit.sound", Type.TRUE);
         }
 
         @Getter
@@ -796,8 +785,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private Mark mark = new Mark();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/rightclick/")})
             private Rightclick rightclick = new Rightclick();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/spit/")})
-            private Spit spit = new Spit();
 
             @Getter
             public static final class Afk implements SubContactMessageConfig, IPermission {
@@ -819,14 +806,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                 private Type type = Type.TRUE;
                 private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.contact.rightclick.cooldown.bypass", Type.OP);
                 private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.contact.rightclick.sound", Type.TRUE);
-            }
-
-            @Getter
-            public static final class Spit implements SubContactMessageConfig, IPermission {
-                private String name = "flectonepulse.module.message.contact.spit";
-                private Type type = Type.TRUE;
-                private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.contact.spit.cooldown.bypass", Type.OP);
-                private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.contact.spit.sound", Type.TRUE);
             }
 
         }

@@ -247,7 +247,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.chatsetting.settings.put(FPlayer.Setting.COIN, List.of(List.of("<fcolor:2>Команда /coin", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /coin", "<color:#ff7171>Скрыта")));
         command.chatsetting.settings.put(FPlayer.Setting.AFK, List.of(List.of("<fcolor:2>Команда /afk", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /afk", "<color:#ff7171>Скрыта")));
         command.chatsetting.settings.put(FPlayer.Setting.POLL, List.of(List.of("<fcolor:2>Команда /poll", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /poll", "<color:#ff7171>Скрыта")));
-        command.chatsetting.settings.put(FPlayer.Setting.SPIT, List.of(List.of("<fcolor:2>Команда /spit", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /spit", "<color:#ff7171>Скрыта")));
         command.chatsetting.settings.put(FPlayer.Setting.GREETING, List.of(List.of("<fcolor:2>Приветственное сообщение", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Приветственное сообщение", "<color:#ff7171>Скрыта")));
         command.chatsetting.settings.put(FPlayer.Setting.ROCKPAPERSCISSORS, List.of(List.of("<fcolor:2>Команда /rockpaperscissors", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /rockpaperscissors", "<color:#ff7171>Скрыта")));
         command.chatsetting.settings.put(FPlayer.Setting.DISCORD, List.of(List.of("<fcolor:2>Сообщения для/из Discord", "<color:#98FB98>Показываются"), List.of("<fcolor:2>Сообщения для/из Discord", "<color:#ff7171>Скрыты")));
@@ -382,8 +381,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.contact.afk.formatTrue.local = "<gradient:#ffd500:#FFFF00>⌚ Ты отошёл от игры";
         message.contact.afk.formatFalse.global = "<gradient:#ffd500:#FFFF00>⌚ <player> вернулся";
         message.contact.afk.formatFalse.local = "<gradient:#ffd500:#FFFF00>⌚ Ты вернулся в игру";
-
-        message.contact.spit.format = "<fcolor:1>🫐 Тебя обплевал <display_name>!";
 
         message.death.types.put("death.attack.anvil", "<color:#778899>🪦 <fcolor:1><display_name> раздавлен упавшей наковальней");
         message.death.types.put("death.attack.anvil.player", "<color:#778899>🪦 <fcolor:1><display_name> был раздавлен упавшей наковальней, пока боролся с <killer>");
@@ -620,11 +617,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
             return null;
         }
 
-        @Override
-        public SubCommandConfig getSpit() {
-            return null;
-        }
-
         @Getter
         @NoArgsConstructor
         public static final class Prompt {
@@ -846,7 +838,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
                     put(FPlayer.Setting.COIN, List.of(List.of("<fcolor:2>Command /coin", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /coin", "<color:#ff7171>Display disabled")));
                     put(FPlayer.Setting.AFK, List.of(List.of("<fcolor:2>Command /afk", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /afk", "<color:#ff7171>Display disabled")));
                     put(FPlayer.Setting.POLL, List.of(List.of("<fcolor:2>Command /poll", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /poll", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.SPIT, List.of(List.of("<fcolor:2>Command /spit", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /spit", "<color:#ff7171>Display disabled")));
                     put(FPlayer.Setting.GREETING, List.of(List.of("<fcolor:2>Greeting message", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Greeting message", "<color:#ff7171>Display disabled")));
                     put(FPlayer.Setting.ROCKPAPERSCISSORS, List.of(List.of("<fcolor:2>Command /rockpaperscissors", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /rockpaperscissors", "<color:#ff7171>Display disabled")));
                     put(FPlayer.Setting.DISCORD, List.of(List.of("<fcolor:2>Messages for/from Discord", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Messages for/from Discord", "<color:#ff7171>Display disabled")));
@@ -1552,8 +1543,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/rightclick/")})
             private Rightclick rightclick = new Rightclick();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/spit/")})
-            private Spit spit = new Spit();
 
             @Getter
             public static final class Afk implements SubContactMessageConfig, Localizable {
@@ -1578,11 +1567,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
             @Getter
             public static final class Rightclick implements SubContactMessageConfig, Localizable {
                 private String format = "<fcolor:1>◁ <display_name> ▷";
-            }
-
-            @Getter
-            public static final class Spit implements SubContactMessageConfig, Localizable {
-                private String format = "<fcolor:1>🫐 You were spat on by <display_name>!";
             }
         }
 

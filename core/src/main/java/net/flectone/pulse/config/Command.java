@@ -101,8 +101,6 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     private Reply reply = new Reply();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/rockpaperscissors/")})
     private Rockpaperscissors rockpaperscissors = new Rockpaperscissors();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/spit/")})
-    private Spit spit = new Spit();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/spy/")})
     private Spy spy = new Spy();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/stream/")})
@@ -220,12 +218,11 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
                 put(FPlayer.Setting.COIN, new SettingItem(24, List.of("LIME_CONCRETE", "RED_CONCRETE")));
                 put(FPlayer.Setting.AFK, new SettingItem(25, List.of("LIME_CONCRETE", "RED_CONCRETE")));
                 put(FPlayer.Setting.POLL, new SettingItem(26, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.SPIT, new SettingItem(27, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.GREETING, new SettingItem(28, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.ROCKPAPERSCISSORS, new SettingItem(29, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.DISCORD, new SettingItem(30, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.TELEGRAM, new SettingItem(31, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.TWITCH, new SettingItem(32, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.GREETING, new SettingItem(27, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.ROCKPAPERSCISSORS, new SettingItem(28, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.DISCORD, new SettingItem(29, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.TELEGRAM, new SettingItem(30, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.TWITCH, new SettingItem(31, List.of("LIME_CONCRETE", "RED_CONCRETE")));
             }
         };
 
@@ -473,14 +470,6 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
                 put("scissors", new ArrayList<>(List.of("paper")));
             }
         };
-        private Cooldown cooldown = new Cooldown();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Spit implements SubCommandConfig, ICommandFile {
-        private boolean enable = false;
-        private List<String> aliases = new ArrayList<>(List.of("spit"));
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
