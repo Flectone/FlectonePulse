@@ -108,7 +108,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
     @Getter
     public static final class Anvil implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
+        private boolean enable = false;
     }
 
     @Getter
@@ -132,7 +132,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
     @Getter
     public static final class Book implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
+        private boolean enable = false;
     }
 
     @Getter
@@ -628,8 +628,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
     @Getter
     public static final class Sign implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-        private Destination destination = new Destination();
+        private boolean enable = false;
     }
 
     @Getter
