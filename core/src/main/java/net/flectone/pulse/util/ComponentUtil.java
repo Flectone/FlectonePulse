@@ -10,7 +10,7 @@ import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.stream.StreamModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.contact.afk.AfkModule;
+import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.format.FormatModule;
 import net.flectone.pulse.module.message.format.color.ColorModule;
 import net.flectone.pulse.module.message.format.emoji.EmojiModule;
@@ -37,7 +37,6 @@ import java.util.UUID;
 @Singleton
 public class ComponentUtil {
 
-    private final ColorUtil colorUtil;
     private final PermissionUtil permissionUtil;
     private final MiniMessage miniMessage;
     private final FLogger fLogger;
@@ -61,11 +60,9 @@ public class ComponentUtil {
     @Inject private QuestionAnswerModule questionAnswerModule;
 
     @Inject
-    public ComponentUtil(ColorUtil colorUtil,
-                         PermissionUtil permissionUtil,
+    public ComponentUtil(PermissionUtil permissionUtil,
                          MiniMessage miniMessage,
                          FLogger fLogger) {
-        this.colorUtil = colorUtil;
         this.permissionUtil = permissionUtil;
         this.miniMessage = miniMessage;
         this.fLogger = fLogger;
@@ -302,7 +299,7 @@ public class ComponentUtil {
                 tagResolverList.add(nameModule.vaultPrefixTag(sender, receiver));
 
                 if (colors) {
-                    message = colorUtil.toMiniMessage(message);
+                    message = FlectoneMiniTranslator.toMini(message);
                 }
             }
 
