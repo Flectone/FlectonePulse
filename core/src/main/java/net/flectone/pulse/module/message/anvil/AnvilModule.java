@@ -28,5 +28,5 @@ public abstract class AnvilModule extends AbstractModule {
         return message.isEnable();
     }
 
-    public abstract void format(FPlayer fPlayer, Object itemMeta);
+    public abstract boolean format(FPlayer fPlayer, Object itemMeta);
 }

@@ -40,8 +40,8 @@ public class AnvilListener implements Listener {
         ItemStack itemStack = event.getCurrentItem();
 
         ItemMeta itemMeta = itemStack.getItemMeta();
-        anvilModule.format(fPlayer, itemMeta);
-
-        itemStack.setItemMeta(itemMeta);
+        if (anvilModule.format(fPlayer, itemMeta)) {
+            itemStack.setItemMeta(itemMeta);
+        }
     }
 }

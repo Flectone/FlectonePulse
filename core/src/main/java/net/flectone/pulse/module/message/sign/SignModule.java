@@ -43,10 +43,12 @@ public class SignModule extends AbstractModule {
         if (checkModulePredicates(fPlayer)) return null;
 
         try {
-            Component component = componentUtil.builder(fPlayer, string)
+            Component deserialized = LegacyComponentSerializer.legacySection().deserialize(string);
+
+            Component component = componentUtil.builder(fPlayer, string.replace("§", "&"))
                     .userMessage(true)
                     .build()
-                    .mergeStyle(LegacyComponentSerializer.legacySection().deserialize(string));
+                    .mergeStyle(deserialized);
 
             return LegacyComponentSerializer.legacySection().serialize(component);
 
