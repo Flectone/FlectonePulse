@@ -42,7 +42,7 @@ public class BukkitUnbanModule extends UnbanModule {
                 .then(new StringArgument(prompt)
                         .includeSuggestions(ArgumentSuggestions.stringCollectionAsync(info ->
                                 CompletableFuture.supplyAsync(() ->
-                                        moderationDAO.getPlayersNameWithValidModeration(Moderation.Type.BAN))))
+                                        moderationDAO.getValidPlayersNames(Moderation.Type.BAN))))
                         .then(new IntegerArgument(promptNumber).setOptional(true)
                                 .executes(this::executesFPlayer)
                         )

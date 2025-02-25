@@ -2,10 +2,10 @@ package net.flectone.pulse.module.command.stream;
 
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 public abstract class StreamModule extends AbstractModuleCommand<Localization.Command.Stream> {
@@ -27,15 +28,15 @@ public abstract class StreamModule extends AbstractModuleCommand<Localization.Co
     @Getter private final Command.Stream command;
     @Getter private final Permission.Command.Stream permission;
 
-    private final FPlayerDAO fPlayerDAO;
+    private final SettingDAO settingDAO;
     private final CommandUtil commandUtil;
 
     public StreamModule(FileManager fileManager,
-                        FPlayerDAO fPlayerDAO,
+                        SettingDAO settingDAO,
                         CommandUtil commandUtil) {
         super(localization -> localization.getCommand().getStream(), null);
 
-        this.fPlayerDAO = fPlayerDAO;
+        this.settingDAO = settingDAO;
         this.commandUtil = commandUtil;
 
         command = fileManager.getCommand().getStream();
@@ -50,7 +51,7 @@ public abstract class StreamModule extends AbstractModuleCommand<Localization.Co
         if (checkMute(fPlayer)) return;
 
         boolean isStart = commandUtil.getFull(arguments).contains("start");
-        boolean isStream = fPlayer.is(FPlayer.Setting.STREAM);
+        boolean isStream = fPlayer.isSetting(FPlayer.Setting.STREAM);
 
         if (isStream && isStart && !fPlayer.isUnknown()) {
             builder(fPlayer)
@@ -105,11 +106,20 @@ public abstract class StreamModule extends AbstractModuleCommand<Localization.Co
         if (checkModulePredicates(fPlayer)) return;
         if (fPlayer.isUnknown()) return;
 
-        fPlayer.set(FPlayer.Setting.STREAM, isStart);
-        Localization.Command.Stream localization = resolveLocalization(fPlayer);
-        fPlayer.setStreamPrefix(isStart ? localization.getPrefixTrue() : localization.getPrefixFalse());
+        if (isStart) {
+            fPlayer.setSetting(FPlayer.Setting.STREAM, "");
+            fPlayer.setSetting(FPlayer.Setting.STREAM_PREFIX, resolveLocalization().getPrefixTrue());
 
-        fPlayerDAO.updateFPlayer(fPlayer);
+            settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.STREAM);
+            settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.STREAM_PREFIX);
+            return;
+        }
+
+        fPlayer.removeSetting(FPlayer.Setting.STREAM);
+        fPlayer.setSetting(FPlayer.Setting.STREAM_PREFIX, resolveLocalization().getPrefixFalse());
+
+        settingDAO.delete(fPlayer, FPlayer.Setting.STREAM);
+        settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.STREAM_PREFIX);
     }
 
     public TagResolver streamTag(@NotNull FEntity sender) {
@@ -118,9 +128,9 @@ public abstract class StreamModule extends AbstractModuleCommand<Localization.Co
 
         return TagResolver.resolver("stream_prefix", (argumentQueue, context) -> {
             if (checkModulePredicates(fPlayer)) return Tag.selfClosingInserting(Component.empty());
-            if (fPlayer.getStreamPrefix() == null) return Tag.selfClosingInserting(Component.empty());
+            if (!fPlayer.isSetting(FPlayer.Setting.STREAM_PREFIX)) return Tag.selfClosingInserting(Component.empty());
 
-            return Tag.preProcessParsed(fPlayer.getStreamPrefix());
+            return Tag.preProcessParsed(Objects.requireNonNull(fPlayer.getSettingValue(FPlayer.Setting.STREAM_PREFIX)));
         });
     }
 

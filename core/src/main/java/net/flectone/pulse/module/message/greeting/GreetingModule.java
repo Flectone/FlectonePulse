@@ -60,7 +60,7 @@ public class GreetingModule extends AbstractModuleMessage<Localization.Message.G
 
             builder(fPlayer)
                     .destination(message.getDestination())
-                    .filter(fReceiver -> fReceiver.is(FPlayer.Setting.GREETING))
+                    .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.GREETING))
                     .format(s -> {
                         String greetingMessage = String.join("<br>", resolveLocalization(fPlayer).getFormat());
 

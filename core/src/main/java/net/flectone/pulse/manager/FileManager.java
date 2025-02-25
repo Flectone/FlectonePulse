@@ -32,6 +32,8 @@ public class FileManager {
     @Getter private final Message message;
     @Getter private final Permission permission;
 
+    @Getter private String preInitVersion;
+
     private Localization defaultLocalization;
 
     @Inject
@@ -66,20 +68,20 @@ public class FileManager {
         if (!config.isLanguagePlayer()) return defaultLocalization;
         if (!(sender instanceof FPlayer fPlayer)) return defaultLocalization;
 
-        return localizationMap.getOrDefault(fPlayer.getLocale(), defaultLocalization);
+        return localizationMap.getOrDefault(fPlayer.getSettingValue(FPlayer.Setting.LOCALE), defaultLocalization);
     }
 
     public void reload() {
         config.reload();
         config.setLanguage(config.getLanguage());
 
-        String configVersion = config.getVersion();
+        preInitVersion = config.getVersion();
 
-        if (!configVersion.equals(BuildConfig.PROJECT_VERSION)) {
+        if (!preInitVersion.equals(BuildConfig.PROJECT_VERSION)) {
             config.setVersion(BuildConfig.PROJECT_VERSION);
             config.save();
 
-            upgradeIfNewerThanV_0_1_0(configVersion);
+            upgradeIfNewerThanV_0_1_0(preInitVersion);
         }
 
         command.reload();

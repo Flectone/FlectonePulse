@@ -21,7 +21,7 @@ public abstract class AfkModule extends AbstractModuleCommand<Localization.Comma
     public AfkModule(FileManager fileManager,
                      net.flectone.pulse.module.message.afk.AfkModule afkModule,
                      CommandUtil commandUtil) {
-        super(Localization::getCommand, fPlayer -> fPlayer.is(FPlayer.Setting.AFK));
+        super(Localization::getCommand, fPlayer -> fPlayer.isSetting(FPlayer.Setting.AFK));
 
         this.afkModule = afkModule;
         this.commandUtil = commandUtil;
@@ -37,10 +37,10 @@ public abstract class AfkModule extends AbstractModuleCommand<Localization.Comma
     public void onCommand(FPlayer fPlayer, Object arguments) {
         if (checkModulePredicates(fPlayer)) return;
 
-        if (fPlayer.getAfkSuffix() == null) {
-            afkModule.setAfk(fPlayer);
-        } else {
+        if (fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX)) {
             afkModule.remove("afk", fPlayer);
+        } else {
+            afkModule.setAfk(fPlayer);
         }
 
         playSound(fPlayer);

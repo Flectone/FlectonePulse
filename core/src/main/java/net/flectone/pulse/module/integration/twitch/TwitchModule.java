@@ -36,7 +36,7 @@ public class TwitchModule extends AbstractModule {
         integration = fileManager.getIntegration().getTwitch();
         permission = fileManager.getPermission().getIntegration().getTwitch();
 
-        addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.is(FPlayer.Setting.TWITCH));
+        addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.isSetting(FPlayer.Setting.TWITCH));
     }
 
     @Override

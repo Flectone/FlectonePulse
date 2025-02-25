@@ -31,7 +31,7 @@ public abstract class DiceModule extends AbstractModuleCommand<Localization.Comm
                       CommandUtil commandUtil,
                       RandomUtil randomUtil,
                       Gson gson) {
-        super(localization -> localization.getCommand().getDice(), fPlayer -> fPlayer.is(FPlayer.Setting.DICE));
+        super(localization -> localization.getCommand().getDice(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.DICE));
 
         this.commandUtil = commandUtil;
         this.randomUtil = randomUtil;

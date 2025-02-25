@@ -73,7 +73,7 @@ public class MessageListener extends EventListener {
         taskScheduler.runAsync(() -> builder(FPlayer.UNKNOWN)
                 .range(Range.PROXY)
                 .destination(integration.getDestination())
-                .filter(fPlayer -> fPlayer.is(FPlayer.Setting.TELEGRAM))
+                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELEGRAM))
                 .tag(MessageTag.FROM_TELEGRAM_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft()
                         .replace("<name>", author)

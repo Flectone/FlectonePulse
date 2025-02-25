@@ -1,15 +1,17 @@
 CREATE TABLE IF NOT EXISTS `player` (
 	`id` INTEGER PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,
     `online` INTEGER NOT NULL DEFAULT '0',
-	`uuid` VARCHAR(255) NOT NULL UNIQUE,
+	`uuid` VARCHAR(36) NOT NULL UNIQUE,
 	`name` VARCHAR(255) NOT NULL UNIQUE,
-	`ip` TEXT,
-    `chat` TEXT,
-    `locale` TEXT,
-    `world_prefix` TEXT,
-    `stream_prefix` TEXT,
-    `afk_suffix` TEXT,
-    `setting` TEXT
+	`ip` VARCHAR(15)
+);
+
+CREATE TABLE IF NOT EXISTS `setting` (
+    `id` INTEGER PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,
+    `player` INTEGER NOT NULL,
+    `type` VARCHAR(255) NOT NULL,
+    `value` TEXT,
+FOREIGN KEY(`player`) REFERENCES `player`(`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `mail` (

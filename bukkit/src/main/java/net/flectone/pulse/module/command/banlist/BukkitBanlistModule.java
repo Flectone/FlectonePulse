@@ -51,7 +51,7 @@ public class BukkitBanlistModule extends BanlistModule {
                 .then(new StringArgument(promptPlayer)
                         .includeSuggestions(ArgumentSuggestions.stringCollectionAsync(info ->
                                 CompletableFuture.supplyAsync(() ->
-                                        moderationDAO.getModerationsNames(Moderation.Type.BAN))))
+                                        moderationDAO.getPlayersNames(Moderation.Type.BAN))))
                         .then(new IntegerArgument(promptNumber).setOptional(true)
                                 .executesPlayer(this::executesFPlayer)
                         )

@@ -2,6 +2,7 @@ package net.flectone.pulse.database.dao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.util.logging.FLogger;
@@ -13,16 +14,6 @@ import java.util.Map;
 
 @Singleton
 public class ColorsDAO {
-
-    private final String SQL_DELETE_PLAYER_COLOR_WITH_NUMBER_AND_SETTING = "DELETE FROM `player_color` WHERE `number` = ? AND `player` = ?";
-    private final String SQL_DELETE_PLAYER_COLOR_WITH_ID = "DELETE FROM `player_color` WHERE `player` = ?";
-    private final String SQL_GET_COLORS_WITH_NAME = "SELECT * FROM `color` WHERE `name` = ?";
-    private final String SQL_GET_PLAYER_COLORS = "SELECT * FROM `player_color` LEFT JOIN `color` ON `player_color`.`color` = `color`.`id` WHERE `player_color`.`player` = ?";
-
-    private final String SQLITE_INSERT_OR_UPDATE_PLAYER_COLOR = "INSERT OR REPLACE INTO `player_color` (`number`, `player`, `color`) VALUES (?,?,?) ";
-    private final String SQL_INSERT_OR_UPDATE_PLAYER_COLOR = "INSERT INTO `player_color` (`number`, `player`, `color`) VALUES (?,?,?) ON DUPLICATE KEY UPDATE `number` = VALUES(`number`), `player` = VALUES(`player`), `color` = VALUES(`color`)";
-    private final String SQLITE_INSERT_OR_UPDATE_COLOR = "INSERT INTO `color` (`name`) VALUES (?) ON CONFLICT(`name`) DO UPDATE SET `name` = excluded.`name`";
-    private final String SQL_INSERT_OR_UPDATE_COLOR = "INSERT INTO `color` (`name`) VALUES (?) ON DUPLICATE KEY UPDATE `name` = VALUES(`name`)";
 
     private final Config.Database config;
     private final Database database;
@@ -37,25 +28,29 @@ public class ColorsDAO {
         this.fLogger = fLogger;
     }
 
-    public void updateColors(FPlayer fPlayer) {
+    @Async
+    public void save(FPlayer fPlayer) {
         try (Connection connection = database.getConnection()) {
             Map<String, String> colors = fPlayer.getColors();
+
+            String SQL_DELETE_BY_ID = "DELETE FROM `player_color` WHERE `player` = ?";
             if (colors == null) {
-                PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE_PLAYER_COLOR_WITH_ID);
+                PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE_BY_ID);
                 preparedStatement.setInt(1, fPlayer.getId());
                 preparedStatement.executeUpdate();
                 return;
             }
 
             if (colors.isEmpty()) {
-                PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE_PLAYER_COLOR_WITH_ID);
+                PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE_BY_ID);
                 preparedStatement.setInt(1, fPlayer.getId());
                 preparedStatement.executeUpdate();
                 return;
             }
 
             for (Map.Entry<String, String> entry : colors.entrySet()) {
-                PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_COLORS_WITH_NAME);
+                String SQL_GET_BY_NAME = "SELECT * FROM `color` WHERE `name` = ?";
+                PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_BY_NAME);
                 preparedStatement.setString(1, String.valueOf(entry.getValue()));
 
                 ResultSet colorResult = preparedStatement.executeQuery();
@@ -64,9 +59,11 @@ public class ColorsDAO {
                 if (colorResult.next()) {
                     color = colorResult.getInt("id");
                 } else {
+                    String SQLITE_INSERT_OR_UPDATE = "INSERT INTO `color` (`name`) VALUES (?) ON CONFLICT(`name`) DO UPDATE SET `name` = excluded.`name`";
+                    String MYSQL_INSERT_OR_UPDATE = "INSERT INTO `color` (`name`) VALUES (?) ON DUPLICATE KEY UPDATE `name` = VALUES(`name`)";
                     preparedStatement = connection.prepareStatement(config.getType() == Config.Database.Type.MYSQL
-                            ? SQL_INSERT_OR_UPDATE_COLOR
-                            : SQLITE_INSERT_OR_UPDATE_COLOR, Statement.RETURN_GENERATED_KEYS);
+                            ? MYSQL_INSERT_OR_UPDATE
+                            : SQLITE_INSERT_OR_UPDATE, Statement.RETURN_GENERATED_KEYS);
                     preparedStatement.setString(1, String.valueOf(entry.getValue()));
                     int affectedRows = preparedStatement.executeUpdate();
                     if (affectedRows > 0) {
@@ -81,12 +78,15 @@ public class ColorsDAO {
                     continue;
                 }
 
-                preparedStatement = connection.prepareStatement(SQL_DELETE_PLAYER_COLOR_WITH_NUMBER_AND_SETTING);
+                String SQL_DELETE_BY_NUMBER_AND_SETTING = "DELETE FROM `player_color` WHERE `number` = ? AND `player` = ?";
+                preparedStatement = connection.prepareStatement(SQL_DELETE_BY_NUMBER_AND_SETTING);
                 preparedStatement.setInt(1, Integer.parseInt(entry.getKey()));
                 preparedStatement.setInt(2, fPlayer.getId());
                 preparedStatement.executeUpdate();
 
-                preparedStatement = connection.prepareStatement(config.getType() == Config.Database.Type.MYSQL ? SQL_INSERT_OR_UPDATE_PLAYER_COLOR : SQLITE_INSERT_OR_UPDATE_PLAYER_COLOR);
+                String SQLITE_INSERT_OR_UPDATE = "INSERT OR REPLACE INTO `player_color` (`number`, `player`, `color`) VALUES (?,?,?) ";
+                String MYSQL_INSERT_OR_UPDATE = "INSERT INTO `player_color` (`number`, `player`, `color`) VALUES (?,?,?) ON DUPLICATE KEY UPDATE `number` = VALUES(`number`), `player` = VALUES(`player`), `color` = VALUES(`color`)";
+                preparedStatement = connection.prepareStatement(config.getType() == Config.Database.Type.MYSQL ? MYSQL_INSERT_OR_UPDATE : SQLITE_INSERT_OR_UPDATE);
                 preparedStatement.setInt(1, Integer.parseInt(entry.getKey()));
                 preparedStatement.setInt(2, fPlayer.getId());
                 preparedStatement.setInt(3, color);
@@ -97,11 +97,12 @@ public class ColorsDAO {
         }
     }
 
-    public void setFPlayerColors(FPlayer fPlayer) {
+    public void load(FPlayer fPlayer) {
         if (fPlayer.isUnknown()) return;
 
         try (Connection connection = database.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_PLAYER_COLORS);
+            String SQL_GET_BY_PLAYER_ID = "SELECT * FROM `player_color` LEFT JOIN `color` ON `player_color`.`color` = `color`.`id` WHERE `player_color`.`player` = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_BY_PLAYER_ID);
             preparedStatement.setInt(1, fPlayer.getId());
 
             ResultSet resultSet = preparedStatement.executeQuery();

@@ -185,7 +185,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                             .sendBuilt();
                 }
 
-                case COMMAND_CHATCOLOR -> colorsDAO.setFPlayerColors(fPlayerManager.get(fEntity.getUuid()));
+                case COMMAND_CHATCOLOR -> colorsDAO.load(fPlayerManager.get(fEntity.getUuid()));
 
                 case COMMAND_COIN -> {
                     CoinModule coinModule = injector.getInstance(CoinModule.class);
@@ -250,7 +250,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                     if (muteModule.checkModulePredicates(fModerator)) return;
 
                     if (!fPlayerManager.get(fEntity.getUuid()).isUnknown()) {
-                        fPlayerManager.get(fEntity.getUuid()).updateMutes(moderationDAO.getValidModerations(Moderation.Type.MUTE));
+                        fPlayerManager.get(fEntity.getUuid()).updateMutes(moderationDAO.getValid(Moderation.Type.MUTE));
                     }
 
                     Moderation mute = gson.fromJson(input.readUTF(), Moderation.class);
@@ -273,7 +273,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                     unbanModule.builder(fEntity)
                             .destination(unbanModule.getCommand().getDestination())
                             .range(Range.SERVER)
-                            .filter(filter -> filter.is(FPlayer.Setting.BAN))
+                            .filter(filter -> filter.isSetting(FPlayer.Setting.BAN))
                             .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
                             .sound(unbanModule.getCommand().getSound())
                             .sendBuilt();
@@ -285,13 +285,13 @@ public class BukkitProxyListener implements PluginMessageListener {
                     if (unmuteModule.checkModulePredicates(fPlayer)) return;
 
                     if (!fPlayerManager.get(fEntity.getUuid()).isUnknown()) {
-                        fPlayerManager.get(fEntity.getUuid()).updateMutes(moderationDAO.getValidModerations(Moderation.Type.MUTE));
+                        fPlayerManager.get(fEntity.getUuid()).updateMutes(moderationDAO.getValid(Moderation.Type.MUTE));
                     }
 
                     unmuteModule.builder(fEntity)
                             .destination(unmuteModule.getCommand().getDestination())
                             .range(Range.SERVER)
-                            .filter(filter -> filter.is(FPlayer.Setting.MUTE))
+                            .filter(filter -> filter.isSetting(FPlayer.Setting.MUTE))
                             .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
                             .sound(unmuteModule.getCommand().getSound())
                             .sendBuilt();
@@ -305,7 +305,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                     unwarnModule.builder(fEntity)
                             .destination(unwarnModule.getCommand().getDestination())
                             .range(Range.SERVER)
-                            .filter(filter -> filter.is(FPlayer.Setting.WARN))
+                            .filter(filter -> filter.isSetting(FPlayer.Setting.WARN))
                             .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
                             .sound(unwarnModule.getCommand().getSound())
                             .sendBuilt();
@@ -338,7 +338,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                             .destination(spyModule.getCommand().getDestination())
                             .filter(fReceiver -> !fEntity.equals(fReceiver)
                                     && !spyModule.checkModulePredicates(fReceiver)
-                                    && fReceiver.is(FPlayer.Setting.SPY)
+                                    && fReceiver.isSetting(FPlayer.Setting.SPY)
                                     && fReceiver.isOnline()
                             )
                             .format(spyModule.replaceAction(action))
@@ -577,7 +577,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                             .tag(MessageTag.JOIN)
                             .destination(joinModule.getMessage().getDestination())
                             .range(Range.SERVER)
-                            .filter(fReceiver -> fReceiver.is(FPlayer.Setting.JOIN))
+                            .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.JOIN))
                             .format(s -> hasPlayedBefore || !joinModule.getMessage().isFirst() ? s.getFormat() : s.getFormatFirstTime())
                             .sound(joinModule.getSound())
                             .sendBuilt();
@@ -590,7 +590,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                             .tag(MessageTag.QUIT)
                             .destination(quitModule.getMessage().getDestination())
                             .range(Range.SERVER)
-                            .filter(fReceiver -> fReceiver.is(FPlayer.Setting.QUIT))
+                            .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.QUIT))
                             .format(Localization.Message.Quit::getFormat)
                             .sound(quitModule.getSound())
                             .sendBuilt();
@@ -604,7 +604,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                     afkModule.builder(fEntity)
                             .tag(MessageTag.AFK)
                             .destination(afkModule.getMessage().getDestination())
-                            .filter(fReceiver -> fReceiver.is(FPlayer.Setting.AFK))
+                            .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.AFK))
                             .format(s -> isAfk
                                     ? s.getFormatFalse().getGlobal()
                                     : s.getFormatTrue().getGlobal()

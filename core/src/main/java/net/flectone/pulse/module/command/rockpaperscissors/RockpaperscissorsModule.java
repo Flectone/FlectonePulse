@@ -38,7 +38,7 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
                                    FPlayerDAO fPlayerDAO,
                                    CommandUtil commandUtil,
                                    IntegrationModule integrationModule) {
-        super(localization -> localization.getCommand().getRockpaperscissors(), fPlayer -> fPlayer.is(FPlayer.Setting.ROCKPAPERSCISSORS));
+        super(localization -> localization.getCommand().getRockpaperscissors(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.ROCKPAPERSCISSORS));
 
         this.proxyConnector = proxyConnector;
         this.fPlayerDAO = fPlayerDAO;

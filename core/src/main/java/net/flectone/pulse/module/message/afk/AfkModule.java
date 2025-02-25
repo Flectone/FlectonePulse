@@ -5,7 +5,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -19,22 +19,24 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public abstract class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> {
 
     private final Message.Afk message;
     private final Permission.Message.Afk permission;
 
-    private final FPlayerDAO fPlayerDAO;
+    private final SettingDAO settingDAO;
     private final TaskScheduler taskScheduler;
 
     @Inject private IntegrationModule integrationModule;
 
     public AfkModule(FileManager fileManager,
-                     FPlayerDAO fPlayerDAO,
+                     SettingDAO settingDAO,
                      TaskScheduler taskScheduler) {
         super(localization -> localization.getMessage().getAfk());
 
-        this.fPlayerDAO = fPlayerDAO;
+        this.settingDAO = settingDAO;
         this.taskScheduler = taskScheduler;
 
         message = fileManager.getMessage().getAfk();
@@ -62,10 +64,10 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
     public void setAfk(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
-        fPlayer.setAfkSuffix(resolveLocalization(fPlayer).getSuffix());
+        fPlayer.setSetting(FPlayer.Setting.AFK_SUFFIX, resolveLocalization().getSuffix());
         send(fPlayer);
 
-        fPlayerDAO.updateFPlayer(fPlayer);
+        settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.AFK_SUFFIX);
     }
 
     @Async
@@ -73,10 +75,10 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
         if (checkModulePredicates(fPlayer)) return;
 
         int range = message.getRange();
-        boolean isAfk = fPlayer.getAfkSuffix() == null;
+        boolean isAfk = !fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX);
 
         if (range == Range.PLAYER) {
-            if (!fPlayer.is(FPlayer.Setting.AFK)) return;
+            if (!fPlayer.isSetting(FPlayer.Setting.AFK)) return;
 
             builder(fPlayer)
                     .destination(message.getDestination())
@@ -96,7 +98,7 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
                 .range(range)
                 .destination(message.getDestination())
                 .tag(MessageTag.AFK)
-                .filter(fReceiver -> fReceiver.is(FPlayer.Setting.AFK))
+                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.AFK))
                 .format(s -> isAfk
                         ? s.getFormatFalse().getGlobal()
                         : s.getFormatTrue().getGlobal()
@@ -112,9 +114,9 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
         if (!(sender instanceof FPlayer fPlayer)) return TagResolver.empty();
 
         return TagResolver.resolver("afk_suffix", (argumentQueue, context) -> {
-            if (fPlayer.getAfkSuffix() == null) return Tag.selfClosingInserting(Component.empty());
+            if (!fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX)) return Tag.selfClosingInserting(Component.empty());
 
-            return Tag.preProcessParsed(fPlayer.getAfkSuffix());
+            return Tag.preProcessParsed(Objects.requireNonNull(fPlayer.getSettingValue(FPlayer.Setting.AFK_SUFFIX)));
         });
     }
 }

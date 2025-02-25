@@ -44,7 +44,7 @@ public class BukkitUnmuteModule extends UnmuteModule {
                 .then(new StringArgument(prompt)
                         .includeSuggestions(ArgumentSuggestions.stringCollectionAsync(info ->
                                 CompletableFuture.supplyAsync(() ->
-                                        moderationDAO.getPlayersNameWithValidModeration(Moderation.Type.MUTE))))
+                                        moderationDAO.getValidPlayersNames(Moderation.Type.MUTE))))
                         .then(new IntegerArgument(promptNumber).setOptional(true)
                                 .executes(this::executesFPlayer)
                         )

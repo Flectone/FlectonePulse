@@ -76,9 +76,9 @@ public abstract class IgnoreModule extends AbstractModuleCommand<Localization.Co
 
         if (ignore.isPresent()) {
             fPlayer.getIgnores().remove(ignore.get());
-            ignoreDAO.removeIgnore(ignore.get());
+            ignoreDAO.delete(ignore.get());
         } else {
-            Ignore newIgnore = ignoreDAO.insertIgnore(fPlayer, fIgnored);
+            Ignore newIgnore = ignoreDAO.insert(fPlayer, fIgnored);
             if (newIgnore == null) return;
             fPlayer.getIgnores().add(newIgnore);
         }

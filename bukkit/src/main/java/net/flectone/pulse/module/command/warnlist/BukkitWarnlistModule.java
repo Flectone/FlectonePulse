@@ -51,7 +51,7 @@ public class BukkitWarnlistModule extends WarnlistModule {
                 .then(new StringArgument(promptPlayer)
                         .includeSuggestions(ArgumentSuggestions.stringCollectionAsync(info ->
                                 CompletableFuture.supplyAsync(() ->
-                                        moderationDAO.getModerationsNames(Moderation.Type.WARN))))
+                                        moderationDAO.getPlayersNames(Moderation.Type.WARN))))
                         .then(new IntegerArgument(promptNumber).setOptional(true)
                                 .executesPlayer(this::executesFPlayer)
                         )

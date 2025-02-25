@@ -1,10 +1,10 @@
 package net.flectone.pulse.module.command.spy;
 
 import lombok.Getter;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -19,17 +19,17 @@ public abstract class SpyModule extends AbstractModuleCommand<Localization.Comma
     @Getter private final Command.Spy command;
     @Getter private final Permission.Command.Spy permission;
 
-    private final FPlayerDAO fPlayerDAO;
+    private final SettingDAO settingDAO;
     private final CommandUtil commandUtil;
     private final PermissionUtil permissionUtil;
 
     public SpyModule(FileManager fileManager,
-                     FPlayerDAO fPlayerDAO,
+                     SettingDAO settingDAO,
                      CommandUtil commandUtil,
                      PermissionUtil permissionUtil) {
         super(localization -> localization.getCommand().getSpy(), null);
 
-        this.fPlayerDAO = fPlayerDAO;
+        this.settingDAO = settingDAO;
         this.commandUtil = commandUtil;
         this.permissionUtil = permissionUtil;
 
@@ -42,12 +42,17 @@ public abstract class SpyModule extends AbstractModuleCommand<Localization.Comma
         if (checkCooldown(fPlayer)) return;
         if (checkModulePredicates(fPlayer)) return;
 
-        fPlayer.set(FPlayer.Setting.SPY, !fPlayer.is(FPlayer.Setting.SPY));
-        fPlayerDAO.updateFPlayer(fPlayer);
+        if (fPlayer.isSetting(FPlayer.Setting.SPY)) {
+            fPlayer.removeSetting(FPlayer.Setting.SPY);
+            settingDAO.delete(fPlayer, FPlayer.Setting.SPY);
+        } else {
+            fPlayer.setSetting(FPlayer.Setting.SPY);
+            settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.SPY);
+        }
 
         builder(fPlayer)
                 .destination(command.getDestination())
-                .format(s -> fPlayer.is(FPlayer.Setting.SPY) ? s.getFormatTrue() : s.getFormatFalse())
+                .format(s -> fPlayer.isSetting(FPlayer.Setting.SPY) ? s.getFormatTrue() : s.getFormatFalse())
                 .sound(getSound())
                 .sendBuilt();
     }
@@ -60,7 +65,7 @@ public abstract class SpyModule extends AbstractModuleCommand<Localization.Comma
                 .destination(command.getDestination())
                 .filter(fReceiver -> !fPlayer.equals(fReceiver))
                 .filter(fReceiver -> permissionUtil.has(fReceiver, getModulePermission()))
-                .filter(fReceiver -> fReceiver.is(FPlayer.Setting.SPY))
+                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.SPY))
                 .filter(FPlayer::isOnline)
                 .tag(MessageTag.COMMAND_SPY)
                 .format(replaceAction(action))

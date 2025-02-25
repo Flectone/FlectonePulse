@@ -18,11 +18,6 @@ import java.util.List;
 @Singleton
 public class IgnoreDAO {
 
-    private final String SQL_DELETE_IGNORE = "DELETE FROM `ignore` WHERE `id` = ?";
-    private final String SQL_GET_IGNORES_WITH_INITIATOR = "SELECT * FROM `ignore` WHERE `initiator` = ?";
-    private final String SQL_GET_IGNORE_WITH_INITIATOR_AND_TARGET = "SELECT * FROM `ignore` WHERE `initiator` = ? AND `target` = ?";
-    private final String SQL_INSERT_IGNORE = "INSERT INTO `ignore` (`date`, `initiator`, `target`) VALUES (?,?,?)";
-
     private final Database database;
     private final FLogger fLogger;
 
@@ -34,18 +29,19 @@ public class IgnoreDAO {
     }
 
     @Nullable
-    public Ignore insertIgnore(FPlayer fSender, FPlayer fIgnored) {
+    public Ignore insert(FPlayer fSender, FPlayer fIgnored) {
         if (fSender.isUnknown() || fIgnored.isUnknown()) return null;
 
         try (Connection connection = database.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(SQL_INSERT_IGNORE);
+            String SQL_INSERT = "INSERT INTO `ignore` (`date`, `initiator`, `target`) VALUES (?,?,?)";
+            PreparedStatement statement = connection.prepareStatement(SQL_INSERT);
             statement.setLong(1, System.currentTimeMillis());
             statement.setInt(2, fSender.getId());
             statement.setInt(3, fIgnored.getId());
             statement.executeUpdate();
 
-
-            statement = connection.prepareStatement(SQL_GET_IGNORE_WITH_INITIATOR_AND_TARGET);
+            String SQL_GET_BY_INITIATOR_AND_TARGET = "SELECT * FROM `ignore` WHERE `initiator` = ? AND `target` = ?";
+            statement = connection.prepareStatement(SQL_GET_BY_INITIATOR_AND_TARGET);
             statement.setInt(1, fSender.getId());
             statement.setInt(2, fIgnored.getId());
 
@@ -65,9 +61,10 @@ public class IgnoreDAO {
     }
 
     @Async
-    public void removeIgnore(Ignore ignore) {
+    public void delete(Ignore ignore) {
         try (Connection connection = database.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE_IGNORE);
+            String SQL_DELETE = "DELETE FROM `ignore` WHERE `id` = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE);
             preparedStatement.setInt(1, ignore.id());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
@@ -75,11 +72,12 @@ public class IgnoreDAO {
         }
     }
 
-    public void setIgnores(FPlayer fPlayer) {
+    public void load(FPlayer fPlayer) {
         if (fPlayer.isUnknown()) return;
 
         try (Connection connection = database.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_IGNORES_WITH_INITIATOR);
+            String SQL_GET_BY_INITIATOR = "SELECT * FROM `ignore` WHERE `initiator` = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_BY_INITIATOR);
             preparedStatement.setInt(1, fPlayer.getId());
 
             ResultSet resultSet = preparedStatement.executeQuery();

@@ -60,7 +60,7 @@ public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit>
                 .tag(MessageTag.QUIT)
                 .destination(message.getDestination())
                 .range(message.getRange())
-                .filter(fReceiver -> fReceiver.is(FPlayer.Setting.QUIT))
+                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.QUIT))
                 .format(Localization.Message.Quit::getFormat)
                 .integration()
                 .proxy()

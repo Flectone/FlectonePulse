@@ -20,7 +20,7 @@ public abstract class MeModule extends AbstractModuleCommand<Localization.Comman
 
     public MeModule(FileManager fileManager,
                     CommandUtil commandUtil) {
-        super(localization -> localization.getCommand().getMe(), fPlayer -> fPlayer.is(FPlayer.Setting.ME));
+        super(localization -> localization.getCommand().getMe(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.ME));
 
         this.commandUtil = commandUtil;
 

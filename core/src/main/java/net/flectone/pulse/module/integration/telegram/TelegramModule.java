@@ -36,7 +36,7 @@ public class TelegramModule extends AbstractModule {
         integration = fileManager.getIntegration().getTelegram();
         permission = fileManager.getPermission().getIntegration().getTelegram();
 
-        addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.is(FPlayer.Setting.TELEGRAM));
+        addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.isSetting(FPlayer.Setting.TELEGRAM));
     }
 
     @Override

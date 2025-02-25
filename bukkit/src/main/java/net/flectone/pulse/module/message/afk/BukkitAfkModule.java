@@ -4,12 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Message;
-import net.flectone.pulse.registry.BukkitListenerRegistry;
+import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.afk.listener.AfkListener;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.Pair;
 import org.bukkit.Bukkit;
@@ -30,17 +30,17 @@ public class BukkitAfkModule extends AfkModule {
 
     @Getter private final Message.Afk message;
 
-    private final FPlayerDAO fPlayerDAO;
+    private final SettingDAO settingDAO;
     private final BukkitListenerRegistry bukkitListenerManager;
 
     @Inject
     public BukkitAfkModule(FileManager fileManager,
-                           FPlayerDAO fPlayerDAO,
+                           SettingDAO settingDAO,
                            TaskScheduler taskScheduler,
                            BukkitListenerRegistry bukkitListenerManager) {
-        super(fileManager, fPlayerDAO, taskScheduler);
+        super(fileManager, settingDAO, taskScheduler);
 
-        this.fPlayerDAO = fPlayerDAO;
+        this.settingDAO = settingDAO;
         this.bukkitListenerManager = bukkitListenerManager;
 
         message = fileManager.getMessage().getAfk();
@@ -59,15 +59,9 @@ public class BukkitAfkModule extends AfkModule {
     @Override
     public void remove(@NotNull String action, FPlayer fPlayer) {
         if (action.isEmpty()) {
-            String databaseAfkSuffix = fPlayer.getAfkSuffix();
-
-            fPlayer.setAfkSuffix(null);
+            fPlayer.removeSetting(FPlayer.Setting.AFK_SUFFIX);
             PLAYER_BLOCK.remove(fPlayer.getUuid());
-
-            if (databaseAfkSuffix != null) {
-                fPlayerDAO.updateFPlayer(fPlayer);
-            }
-
+            settingDAO.delete(fPlayer, FPlayer.Setting.AFK_SUFFIX);
             return;
         }
 
@@ -82,9 +76,9 @@ public class BukkitAfkModule extends AfkModule {
     @Override
     public void check(@NotNull FPlayer fPlayer) {
         if (!fPlayer.isOnline()) {
-            String afkSuffix = fPlayer.getAfkSuffix();
+            String afkSuffix = fPlayer.getSettingValue(FPlayer.Setting.AFK_SUFFIX);
 
-            fPlayer.setAfkSuffix(null);
+            fPlayer.removeSetting(FPlayer.Setting.AFK_SUFFIX);
             PLAYER_BLOCK.remove(fPlayer.getUuid());
 
             if (afkSuffix != null) {
@@ -104,17 +98,17 @@ public class BukkitAfkModule extends AfkModule {
         Pair<Integer, Vector> timeVector = PLAYER_BLOCK.get(fPlayer.getUuid());
         if (timeVector == null || !timeVector.getValue().equals(getVector(player))) {
 
-            if (fPlayer.getAfkSuffix() != null) {
-                fPlayer.setAfkSuffix(null);
+            if (fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX)) {
+                fPlayer.removeSetting(FPlayer.Setting.AFK_SUFFIX);
                 send(fPlayer);
-                fPlayerDAO.updateFPlayer(fPlayer);
+                settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.AFK_SUFFIX);
             }
 
             PLAYER_BLOCK.put(fPlayer.getUuid(), new Pair<>(time, getVector(player)));
             return;
         }
 
-        if (fPlayer.getAfkSuffix() != null) return;
+        if (fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX)) return;
         if (time - timeVector.getKey() < message.getDelay()) return;
 
         setAfk(fPlayer);

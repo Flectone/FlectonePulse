@@ -68,9 +68,9 @@ public abstract class UnbanModule extends AbstractModuleCommand<Localization.Com
         List<Moderation> bans = new ArrayList<>();
 
         if (id == -1) {
-            bans.addAll(moderationDAO.getValidModerations(fTarget, Moderation.Type.BAN));
+            bans.addAll(moderationDAO.getValid(fTarget, Moderation.Type.BAN));
         } else {
-            moderationDAO.getValidModerations(fTarget, Moderation.Type.BAN).stream()
+            moderationDAO.getValid(fTarget, Moderation.Type.BAN).stream()
                     .filter(moderation -> moderation.getId() == id)
                     .findAny()
                     .ifPresent(bans::add);
@@ -84,14 +84,14 @@ public abstract class UnbanModule extends AbstractModuleCommand<Localization.Com
         }
 
         for (Moderation ban : bans) {
-            moderationDAO.updateInvalidModeration(ban);
+            moderationDAO.setInvalid(ban);
         }
 
         builder(fTarget)
                 .tag(MessageTag.COMMAND_UNBAN)
                 .destination(command.getDestination())
                 .range(command.getRange())
-                .filter(filter -> filter.is(FPlayer.Setting.BAN))
+                .filter(filter -> filter.isSetting(FPlayer.Setting.BAN))
                 .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
                 .proxy(output -> output.writeUTF(gson.toJson(fPlayer)))
                 .integration(s -> s.replace("<moderator>", fPlayer.getName()))

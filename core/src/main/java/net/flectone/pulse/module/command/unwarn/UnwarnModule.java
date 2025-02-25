@@ -68,9 +68,9 @@ public abstract class UnwarnModule extends AbstractModuleCommand<Localization.Co
         List<Moderation> warns = new ArrayList<>();
 
         if (id == -1) {
-            warns.addAll(moderationDAO.getValidModerations(fTarget, Moderation.Type.WARN));
+            warns.addAll(moderationDAO.getValid(fTarget, Moderation.Type.WARN));
         } else {
-            moderationDAO.getValidModerations(fTarget, Moderation.Type.WARN).stream()
+            moderationDAO.getValid(fTarget, Moderation.Type.WARN).stream()
                     .filter(warn -> warn.getId() == id)
                     .findAny()
                     .ifPresent(warns::add);
@@ -84,14 +84,14 @@ public abstract class UnwarnModule extends AbstractModuleCommand<Localization.Co
         }
 
         for (Moderation warn : warns) {
-            moderationDAO.updateInvalidModeration(warn);
+            moderationDAO.setInvalid(warn);
         }
 
         builder(fTarget)
                 .tag(MessageTag.COMMAND_UNWARN)
                 .destination(command.getDestination())
                 .range(command.getRange())
-                .filter(filter -> filter.is(FPlayer.Setting.WARN))
+                .filter(filter -> filter.isSetting(FPlayer.Setting.WARN))
                 .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
                 .proxy(output -> output.writeUTF(gson.toJson(fPlayer)))
                 .integration(s -> s.replace("<moderator>", fPlayer.getName()))

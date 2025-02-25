@@ -48,7 +48,7 @@ public class BukkitClearmailModule extends ClearmailModule {
 
                             FPlayer fPlayer = fPlayerManager.get(player);
 
-                            return mailDAO.getMails(fPlayer)
+                            return mailDAO.get(fPlayer)
                                     .stream()
                                     .map(mail -> StringTooltip.ofString(String.valueOf(mail.id()), mail.message()))
                                     .toList()

@@ -74,7 +74,7 @@ public abstract class FPlayerManager {
         FPlayer console = new FPlayer(config.getConsole());
         fPlayers.put(console.getUuid(), console);
 
-        fPlayerDAO.insertFPlayer(console);
+        fPlayerDAO.insertOrIgnore(console);
 
         loadOnlinePlayers();
     }

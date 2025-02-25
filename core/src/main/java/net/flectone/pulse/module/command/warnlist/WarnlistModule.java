@@ -95,8 +95,8 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
         }
 
         List<Moderation> moderationList = targetFPlayer == null
-                ? moderationDAO.getValidModerations(Moderation.Type.WARN)
-                : moderationDAO.getModerations(targetFPlayer, Moderation.Type.WARN);
+                ? moderationDAO.getValid(Moderation.Type.WARN)
+                : moderationDAO.get(targetFPlayer, Moderation.Type.WARN);
 
         if (moderationList.isEmpty()) {
             builder(fPlayer)

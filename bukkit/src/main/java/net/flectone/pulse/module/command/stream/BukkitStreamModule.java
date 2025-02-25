@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
-import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.util.CommandUtil;
@@ -14,9 +14,9 @@ public class BukkitStreamModule extends StreamModule {
 
     @Inject
     public BukkitStreamModule(FileManager fileManager,
-                              FPlayerDAO fPlayerDAO,
+                              SettingDAO settingDAO,
                               CommandUtil commandUtil) {
-        super(fileManager, fPlayerDAO, commandUtil);
+        super(fileManager, settingDAO, commandUtil);
     }
 
     @Override

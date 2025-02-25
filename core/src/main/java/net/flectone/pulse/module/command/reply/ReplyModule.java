@@ -22,7 +22,7 @@ public abstract class ReplyModule extends AbstractModuleCommand<Localization.Com
     public ReplyModule(FileManager fileManager,
                        TellModule tellModule,
                        CommandUtil componentUtil) {
-        super(localization -> localization.getCommand().getReply(), fPlayer -> fPlayer.is(FPlayer.Setting.REPLY));
+        super(localization -> localization.getCommand().getReply(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.REPLY));
 
         this.tellModule = tellModule;
         this.commandUtil = componentUtil;

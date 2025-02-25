@@ -81,7 +81,7 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
                     return;
                 }
 
-                colorsDAO.setFPlayerColors(fTarget);
+                colorsDAO.load(fTarget);
 
                 proxyConnector.sendMessage(fTarget, MessageTag.COMMAND_CHATCOLOR, byteArrayDataOutput ->
                         byteArrayDataOutput.writeUTF(input)
@@ -139,7 +139,7 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
             x++;
         }
 
-        colorsDAO.updateColors(fPlayer);
+        colorsDAO.save(fPlayer);
 
         FPlayer onlineFPlayer = fPlayerManager.get(fPlayer.getUuid());
         if (!onlineFPlayer.isUnknown()) {

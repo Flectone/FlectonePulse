@@ -20,7 +20,7 @@ public abstract class DoModule extends AbstractModuleCommand<Localization.Comman
 
     public DoModule(FileManager fileManager,
                     CommandUtil commandUtil) {
-        super(localization -> localization.getCommand().getDo(), fPlayer -> fPlayer.is(FPlayer.Setting.DO));
+        super(localization -> localization.getCommand().getDo(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.DO));
 
         this.commandUtil = commandUtil;
 

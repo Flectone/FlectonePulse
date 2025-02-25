@@ -45,7 +45,7 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
                      PacketEventsUtil packetEventsUtil,
                      ModerationUtil moderationUtil,
                      Gson gson) {
-        super(localization -> localization.getCommand().getBan(), fPlayer -> fPlayer.is(FPlayer.Setting.BAN));
+        super(localization -> localization.getCommand().getBan(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.BAN));
 
         this.fPlayerDAO = fPlayerDAO;
         this.moderationDAO = moderationDAO;
@@ -111,7 +111,7 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
 
         long databaseTime = time != -1 ? time + System.currentTimeMillis() : -1;
 
-        Moderation ban = moderationDAO.insertModeration(fTarget, databaseTime, reason, fPlayer.getId(), Moderation.Type.BAN);
+        Moderation ban = moderationDAO.insert(fTarget, databaseTime, reason, fPlayer.getId(), Moderation.Type.BAN);
         if (ban == null) return;
 
         kick(fPlayer, fTarget, ban);
@@ -155,7 +155,7 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
 
         FPlayer fPlayer = fPlayerDAO.getFPlayer(userProfile.getUUID());
 
-        for (Moderation ban : moderationDAO.getValidModerations(fPlayer, Moderation.Type.BAN)) {
+        for (Moderation ban : moderationDAO.getValid(fPlayer, Moderation.Type.BAN)) {
             FPlayer fModerator = fPlayerDAO.getFPlayer(ban.getModerator());
 
             Localization.Command.Ban localization = resolveLocalization();

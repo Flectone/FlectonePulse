@@ -8,10 +8,10 @@ import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.controller.InventoryController;
+import net.flectone.pulse.database.dao.SettingDAO;
+import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.util.CommandUtil;
@@ -32,12 +32,12 @@ public class BukkitChatsettingModule extends ChatsettingModule {
 
     @Inject
     public BukkitChatsettingModule(FileManager fileManager,
-                                   FPlayerDAO fPlayerDAO,
+                                   SettingDAO settingDAO,
                                    ComponentUtil componentUtil,
                                    CommandUtil commandUtil,
                                    PermissionUtil permissionUtil,
                                    InventoryController inventoryController) {
-        super(fileManager, fPlayerDAO, componentUtil, commandUtil, permissionUtil, inventoryController);
+        super(fileManager, settingDAO, componentUtil, commandUtil, permissionUtil, inventoryController);
 
         this.componentUtil = componentUtil;
     }
@@ -55,7 +55,7 @@ public class BukkitChatsettingModule extends ChatsettingModule {
                     .skip(1)
                     .forEach(string -> lore.add(
                                     componentUtil
-                                            .builder(fPlayer, string.replace("<chat>", String.valueOf(fPlayer.getChat())))
+                                            .builder(fPlayer, string.replace("<chat>", String.valueOf(fPlayer.getSettingValue(FPlayer.Setting.CHAT))))
                                             .build()
                             )
                     );

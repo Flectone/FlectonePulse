@@ -51,7 +51,7 @@ public class BukkitMutelistModule extends MutelistModule {
                 .then(new StringArgument(promptPlayer)
                         .includeSuggestions(ArgumentSuggestions.stringCollectionAsync(info ->
                                 CompletableFuture.supplyAsync(() ->
-                                        moderationDAO.getModerationsNames(Moderation.Type.MUTE))))
+                                        moderationDAO.getPlayersNames(Moderation.Type.MUTE))))
                         .then(new IntegerArgument(promptNumber).setOptional(true)
                                 .executesPlayer(this::executesFPlayer)
                         )

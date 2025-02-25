@@ -72,9 +72,9 @@ public abstract class UnmuteModule extends AbstractModuleCommand<Localization.Co
         List<Moderation> mutes = new ArrayList<>();
 
         if (id == -1) {
-            mutes.addAll(moderationDAO.getValidModerations(fTarget, Moderation.Type.MUTE));
+            mutes.addAll(moderationDAO.getValid(fTarget, Moderation.Type.MUTE));
         } else {
-            moderationDAO.getValidModerations(fTarget, Moderation.Type.MUTE).stream()
+            moderationDAO.getValid(fTarget, Moderation.Type.MUTE).stream()
                     .filter(moderation -> moderation.getId() == id)
                     .findAny()
                     .ifPresent(mutes::add);
@@ -88,18 +88,18 @@ public abstract class UnmuteModule extends AbstractModuleCommand<Localization.Co
         }
 
         for (Moderation mute : mutes) {
-            moderationDAO.updateInvalidModeration(mute);
+            moderationDAO.setInvalid(mute);
         }
 
         if (!fPlayerManager.get(fTarget.getUuid()).isUnknown()) {
-            fPlayerManager.get(fTarget.getUuid()).updateMutes(moderationDAO.getValidModerations(Moderation.Type.MUTE));
+            fPlayerManager.get(fTarget.getUuid()).updateMutes(moderationDAO.getValid(Moderation.Type.MUTE));
         }
 
         builder(fTarget)
                 .tag(MessageTag.COMMAND_UNMUTE)
                 .destination(command.getDestination())
                 .range(command.getRange())
-                .filter(filter -> filter.is(FPlayer.Setting.MUTE))
+                .filter(filter -> filter.isSetting(FPlayer.Setting.MUTE))
                 .format(unmute -> unmute.getFormat().replace("<moderator>", fPlayer.getName()))
                 .proxy(output -> output.writeUTF(gson.toJson(fPlayer)))
                 .integration(s -> s.replace("<moderator>", fPlayer.getName()))

@@ -16,13 +16,6 @@ import java.util.List;
 @Singleton
 public class ModerationDAO {
 
-    private final String SQL_GET_MODERATIONS_WITH_TYPE = "SELECT * FROM `moderation` JOIN `player` ON `player`.`id` = `moderation`.`player` WHERE `type` = ?";
-    private final String SQL_GET_VALID_MODERATIONS_WITH_TYPE = "SELECT * FROM `moderation` JOIN `player` ON `player`.`id` = `moderation`.`player` WHERE `type` = ? AND `valid` = '1' AND (`time` = '-1' OR `time` > ?)";
-    private final String SQL_GET_VALID_MODERATIONS_WITH_PLAYER_AND_TYPE = "SELECT * FROM `moderation` WHERE `player` = ? AND `type` = ? AND `valid` = '1' AND (`time` = '-1' OR `time` > ?)";
-    private final String SQL_GET_MODERATIONS_WITH_PLAYER_AND_TYPE = "SELECT * FROM `moderation` WHERE `player` = ? AND `type` = ?";
-    private final String SQL_INSERT_MODERATION = "INSERT INTO `moderation` (`player`, `date`, `time`, `reason`, `moderator`, `type`, `valid`) VALUES (?,?,?,?,?,?,?)";
-    private final String SQL_UPDATE_VALID_MODERATION = "UPDATE `moderation` SET `valid` = ? WHERE `id` = ?";
-
     private final Database database;
     private final FLogger fLogger;
 
@@ -33,11 +26,12 @@ public class ModerationDAO {
         this.fLogger = fLogger;
     }
 
-    public List<String> getModerationsNames(Moderation.Type moderationType) {
+    public List<String> getPlayersNames(Moderation.Type moderationType) {
         List<String> names = new ArrayList<>();
 
         try (Connection connection = database.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_MODERATIONS_WITH_TYPE);
+            String SQL_GET_BY_TYPE = "SELECT * FROM `moderation` JOIN `player` ON `player`.`id` = `moderation`.`player` WHERE `type` = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_BY_TYPE);
             preparedStatement.setInt(1, moderationType.ordinal());
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -52,12 +46,13 @@ public class ModerationDAO {
         return names;
     }
 
-    public List<Moderation> getModerations(FPlayer fPlayer, Moderation.Type moderationType) {
+    public List<Moderation> get(FPlayer fPlayer, Moderation.Type moderationType) {
         List<Moderation> moderations = new ArrayList<>();
         if (fPlayer.isUnknown()) return moderations;
 
         try (Connection connection = database.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_MODERATIONS_WITH_PLAYER_AND_TYPE);
+            String SQL_GET_BY_PLAYER_AND_TYPE = "SELECT * FROM `moderation` WHERE `player` = ? AND `type` = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_BY_PLAYER_AND_TYPE);
             preparedStatement.setInt(1, fPlayer.getId());
             preparedStatement.setInt(2, moderationType.ordinal());
 
@@ -71,12 +66,13 @@ public class ModerationDAO {
         return moderations;
     }
 
-    public List<Moderation> getValidModerations(FPlayer fPlayer, Moderation.Type moderationType) {
+    public List<Moderation> getValid(FPlayer fPlayer, Moderation.Type moderationType) {
         List<Moderation> moderations = new ArrayList<>();
         if (fPlayer.isUnknown()) return moderations;
 
         try (Connection connection = database.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_VALID_MODERATIONS_WITH_PLAYER_AND_TYPE);
+            String SQL_GET_VALID_BY_PLAYER_AND_TYPE = "SELECT * FROM `moderation` WHERE `player` = ? AND `type` = ? AND `valid` = '1' AND (`time` = '-1' OR `time` > ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_VALID_BY_PLAYER_AND_TYPE);
             preparedStatement.setInt(1, fPlayer.getId());
             preparedStatement.setInt(2, moderationType.ordinal());
             preparedStatement.setLong(3, System.currentTimeMillis());
@@ -91,11 +87,12 @@ public class ModerationDAO {
         return moderations;
     }
 
-    public List<Moderation> getValidModerations(Moderation.Type moderationType) {
+    public List<Moderation> getValid(Moderation.Type moderationType) {
         List<Moderation> moderations = new ArrayList<>();
 
         try (Connection connection = database.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_VALID_MODERATIONS_WITH_TYPE);
+            String SQL_GET_VALID_BY_TYPE = "SELECT * FROM `moderation` WHERE `type` = ? AND `valid` = '1' AND (`time` = '-1' OR `time` > ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_VALID_BY_TYPE);
             preparedStatement.setInt(1, moderationType.ordinal());
             preparedStatement.setLong(2, System.currentTimeMillis());
 
@@ -109,11 +106,12 @@ public class ModerationDAO {
         return moderations;
     }
 
-    public List<String> getPlayersNameWithValidModeration(Moderation.Type moderationType) {
+    public List<String> getValidPlayersNames(Moderation.Type moderationType) {
         List<String> names = new ArrayList<>();
 
         try (Connection connection = database.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_VALID_MODERATIONS_WITH_TYPE);
+            String SQL_GET_VALID_PLAYER_BY_TYPE = "SELECT * FROM `moderation` JOIN `player` ON `player`.`id` = `moderation`.`player` WHERE `type` = ? AND `valid` = '1' AND (`time` = '-1' OR `time` > ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_VALID_PLAYER_BY_TYPE);
             preparedStatement.setInt(1, moderationType.ordinal());
             preparedStatement.setLong(2, System.currentTimeMillis());
 
@@ -130,11 +128,12 @@ public class ModerationDAO {
     }
 
     @Nullable
-    public Moderation insertModeration(FPlayer fTarget, long time, String reason, int moderatorID, Moderation.Type moderationType) {
+    public Moderation insert(FPlayer fTarget, long time, String reason, int moderatorID, Moderation.Type moderationType) {
         if (fTarget.isUnknown()) return null;
 
         try (Connection connection = database.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_MODERATION, Statement.RETURN_GENERATED_KEYS);
+            String SQL_INSERT = "INSERT INTO `moderation` (`player`, `date`, `time`, `reason`, `moderator`, `type`, `valid`) VALUES (?,?,?,?,?,?,?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setInt(1, fTarget.getId());
             long date = System.currentTimeMillis();
             preparedStatement.setLong(2, date);
@@ -166,11 +165,12 @@ public class ModerationDAO {
     }
 
     @Async
-    public void updateInvalidModeration(Moderation moderation) {
+    public void setInvalid(Moderation moderation) {
         moderation.setInvalid();
 
         try (Connection connection = database.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_VALID_MODERATION);
+            String SQL_UPDATE_VALID = "UPDATE `moderation` SET `valid` = ? WHERE `id` = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_VALID);
             preparedStatement.setBoolean(1, false);
             preparedStatement.setInt(2, moderation.getId());
             preparedStatement.execute();

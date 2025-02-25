@@ -84,7 +84,7 @@ public class BukkitChatModule extends ChatModule {
 
         String eventMessage = event.getMessage();
 
-        Message.Chat.Type playerChat = message.getTypes().getOrDefault(fPlayer.getChat(), getPlayerChat(fPlayer, eventMessage));
+        Message.Chat.Type playerChat = message.getTypes().getOrDefault(fPlayer.getSettingValue(FPlayer.Setting.CHAT), getPlayerChat(fPlayer, eventMessage));
 
         var configChatEntry = message.getTypes().entrySet()
                 .stream()

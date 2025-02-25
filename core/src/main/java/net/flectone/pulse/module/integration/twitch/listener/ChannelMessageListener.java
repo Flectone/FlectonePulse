@@ -44,7 +44,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
         taskScheduler.runAsync(() -> builder(FPlayer.UNKNOWN)
                 .range(Range.PROXY)
                 .destination(integration.getDestination())
-                .filter(fPlayer -> fPlayer.is(FPlayer.Setting.TWITCH))
+                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.TWITCH))
                 .tag(MessageTag.FROM_TWITCH_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft()
                         .replace("<name>", nickname)

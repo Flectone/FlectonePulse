@@ -189,40 +189,40 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
 
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("chatsetting"));
-        private Map<FPlayer.Setting, SettingItem> settings = new LinkedHashMap<>(){
+        private Map<FPlayer.Setting, SettingItem> items = new LinkedHashMap<>(){
             {
-                put(FPlayer.Setting.CHAT, new SettingItem(0, List.of("YELLOW_CONCRETE")));
-                put(FPlayer.Setting.COLOR, new SettingItem(1, List.of("YELLOW_CONCRETE")));
-                put(FPlayer.Setting.STREAM, new SettingItem(2, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.SPY, new SettingItem(3, List.of("LIME_CONCRETE", "RED_CONCRETE")));
                 put(FPlayer.Setting.ADVANCEMENT, new SettingItem(4, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.DEATH, new SettingItem(5, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.JOIN, new SettingItem(6, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.QUIT, new SettingItem(7, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.AUTO, new SettingItem(8, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.ME, new SettingItem(9, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.TRY, new SettingItem(10, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.DICE, new SettingItem(11, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.BALL, new SettingItem(12, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.MUTE, new SettingItem(13, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.BAN, new SettingItem(14, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.WARN, new SettingItem(15, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.TELL, new SettingItem(16, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.REPLY, new SettingItem(17, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.MAIL, new SettingItem(18, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.TICTACTOE, new SettingItem(19, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.KICK, new SettingItem(20, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.TRANSLATETO, new SettingItem(21, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.BROADCAST, new SettingItem(22, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.DO, new SettingItem(23, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.COIN, new SettingItem(24, List.of("LIME_CONCRETE", "RED_CONCRETE")));
                 put(FPlayer.Setting.AFK, new SettingItem(25, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.POLL, new SettingItem(26, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.GREETING, new SettingItem(27, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.ROCKPAPERSCISSORS, new SettingItem(28, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.AUTO, new SettingItem(8, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.BALL, new SettingItem(12, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.BAN, new SettingItem(14, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.BROADCAST, new SettingItem(22, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.CHAT, new SettingItem(0, List.of("YELLOW_CONCRETE")));
+                put(FPlayer.Setting.COIN, new SettingItem(24, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.COLOR, new SettingItem(1, List.of("YELLOW_CONCRETE")));
+                put(FPlayer.Setting.DEATH, new SettingItem(5, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.DICE, new SettingItem(11, List.of("LIME_CONCRETE", "RED_CONCRETE")));
                 put(FPlayer.Setting.DISCORD, new SettingItem(29, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.DO, new SettingItem(23, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.GREETING, new SettingItem(27, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.JOIN, new SettingItem(6, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.KICK, new SettingItem(20, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.MAIL, new SettingItem(18, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.ME, new SettingItem(9, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.MUTE, new SettingItem(13, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.POLL, new SettingItem(26, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.QUIT, new SettingItem(7, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.REPLY, new SettingItem(17, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.ROCKPAPERSCISSORS, new SettingItem(28, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.SPY, new SettingItem(3, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.STREAM, new SettingItem(2, List.of("LIME_CONCRETE", "RED_CONCRETE")));
                 put(FPlayer.Setting.TELEGRAM, new SettingItem(30, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.TELL, new SettingItem(16, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.TICTACTOE, new SettingItem(19, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.TRANSLATETO, new SettingItem(21, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.TRY, new SettingItem(10, List.of("LIME_CONCRETE", "RED_CONCRETE")));
                 put(FPlayer.Setting.TWITCH, new SettingItem(31, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.WARN, new SettingItem(15, List.of("LIME_CONCRETE", "RED_CONCRETE")));
             }
         };
 

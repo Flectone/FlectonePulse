@@ -4,10 +4,7 @@ import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import net.flectone.pulse.database.dao.ColorsDAO;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.IgnoreDAO;
-import net.flectone.pulse.database.dao.ModerationDAO;
+import net.flectone.pulse.database.dao.*;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.command.stream.StreamModule;
@@ -22,6 +19,7 @@ import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.ComponentUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -41,8 +39,10 @@ public class BukkitFPlayerManager extends FPlayerManager {
 
     private final ColorsDAO colorsDAO;
     private final FPlayerDAO fPlayerDAO;
+    private final SettingDAO settingDAO;
     private final IgnoreDAO ignoreDAO;
     private final ModerationDAO moderationDAO;
+    private final TaskScheduler taskScheduler;
 
     @Inject private WorldModule worldModule;
     @Inject private BukkitAfkModule afkModule;
@@ -61,14 +61,18 @@ public class BukkitFPlayerManager extends FPlayerManager {
     public BukkitFPlayerManager(FileManager fileManager,
                                 ColorsDAO colorsDAO,
                                 FPlayerDAO fPlayerDAO,
+                                SettingDAO settingDAO,
                                 IgnoreDAO ignoreDAO,
-                                ModerationDAO moderationDAO) {
+                                ModerationDAO moderationDAO,
+                                TaskScheduler taskScheduler) {
         super(fileManager);
 
         this.colorsDAO = colorsDAO;
         this.fPlayerDAO = fPlayerDAO;
+        this.settingDAO = settingDAO;
         this.ignoreDAO = ignoreDAO;
         this.moderationDAO = moderationDAO;
+        this.taskScheduler = taskScheduler;
     }
 
     @NotNull
@@ -113,14 +117,21 @@ public class BukkitFPlayerManager extends FPlayerManager {
 
     @Override
     public FPlayer put(UUID uuid, int entityId, String name, String ip) {
-        fPlayerDAO.insertPlayer(uuid, name);
-
+        boolean isInserted = fPlayerDAO.insert(uuid, name);
         FPlayer fPlayer = fPlayerDAO.getFPlayer(uuid);
-        fPlayer.setOnline(true);
-        colorsDAO.setFPlayerColors(fPlayer);
-        ignoreDAO.setIgnores(fPlayer);
 
-        fPlayer.updateMutes(moderationDAO.getModerations(fPlayer, Moderation.Type.MUTE));
+        if (isInserted) {
+            fPlayer.setDefaultSettings();
+            settingDAO.save(fPlayer);
+        } else {
+            settingDAO.load(fPlayer);
+        }
+
+        fPlayer.setOnline(true);
+        colorsDAO.load(fPlayer);
+        ignoreDAO.load(fPlayer);
+
+        fPlayer.updateMutes(moderationDAO.get(fPlayer, Moderation.Type.MUTE));
 
         fPlayer.setIp(ip);
         fPlayer.setCurrentName(name);
@@ -128,11 +139,11 @@ public class BukkitFPlayerManager extends FPlayerManager {
 
         put(fPlayer);
 
-        fPlayerDAO.updateFPlayer(fPlayer);
+        taskScheduler.runAsync(() -> fPlayerDAO.save(fPlayer));
 
         worldModule.update(fPlayer);
         afkModule.remove("", fPlayer);
-        streamModule.setStreamPrefix(fPlayer, fPlayer.is(FPlayer.Setting.STREAM));
+        streamModule.setStreamPrefix(fPlayer, fPlayer.isSetting(FPlayer.Setting.STREAM));
         nameModule.add(fPlayer);
         belowNameModule.add(fPlayer);
         tabnameModule.add(fPlayer);
@@ -151,7 +162,7 @@ public class BukkitFPlayerManager extends FPlayerManager {
 
         afkModule.remove("quit", fPlayer);
 
-        fPlayerDAO.updateFPlayer(fPlayer);
+        settingDAO.save(fPlayer);
 
         nameModule.remove(fPlayer);
         belowNameModule.remove(fPlayer);

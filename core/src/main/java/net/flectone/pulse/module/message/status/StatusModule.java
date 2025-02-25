@@ -98,7 +98,7 @@ public class StatusModule extends AbstractModule {
 
     public void send(User user) {
         FPlayer fPlayer = fPlayerDAO.getFPlayer(user.getAddress().getAddress());
-        colorsDAO.setFPlayerColors(fPlayer);
+        colorsDAO.load(fPlayer);
 
         if (checkModulePredicates(fPlayer)) return;
 

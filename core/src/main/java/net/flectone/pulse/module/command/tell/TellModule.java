@@ -44,7 +44,7 @@ public abstract class TellModule extends AbstractModuleCommand<Localization.Comm
                       ProxyConnector proxyConnector,
                       IntegrationModule integrationModule,
                       CommandUtil commandUtil) {
-        super(localization -> localization.getCommand().getTell(), fPlayer -> fPlayer.is(FPlayer.Setting.TELL));
+        super(localization -> localization.getCommand().getTell(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELL));
 
         this.fPlayerDAO = fPlayerDAO;
         this.ignoreDAO = ignoreDAO;
@@ -94,7 +94,7 @@ public abstract class TellModule extends AbstractModuleCommand<Localization.Comm
 
         FPlayer fReceiver = fPlayerDAO.getFPlayer(optionalFReceiver.get().getId());
 
-        ignoreDAO.setIgnores(fReceiver);
+        ignoreDAO.load(fReceiver);
 
         if (checkIgnore(fPlayer, fReceiver)) return;
         if (checkDisable(fPlayer, fReceiver, DisableAction.HE)) return;

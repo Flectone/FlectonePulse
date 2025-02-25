@@ -2,10 +2,10 @@ package net.flectone.pulse.module.message.anvil;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.anvil.listener.AnvilListener;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.util.ComponentUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.ParsingException;
@@ -36,23 +36,29 @@ public class BukkitAnvilModule extends AnvilModule {
     }
 
     @Override
-    public void format(FPlayer fPlayer, Object itemMeta) {
-        if (checkModulePredicates(fPlayer)) return;
-        if (!(itemMeta instanceof ItemMeta bukkitItemMeta)) return;
+    public boolean format(FPlayer fPlayer, Object itemMeta) {
+        if (checkModulePredicates(fPlayer)) return false;
+        if (!(itemMeta instanceof ItemMeta bukkitItemMeta)) return false;
 
         String displayName = bukkitItemMeta.getDisplayName();
-        if (displayName.isEmpty()) return;
+        if (displayName.isEmpty()) return false;
 
         try {
-            Component component = componentUtil.builder(fPlayer, displayName)
+            Component deserialized = LegacyComponentSerializer.legacySection().deserialize(displayName);
+
+            Component component = componentUtil.builder(fPlayer, displayName.replace("§", "&"))
                     .userMessage(true)
                     .colors(false)
                     .build()
-                    .applyFallbackStyle(LegacyComponentSerializer.legacySection().deserialize(displayName).style())
-                    .mergeStyle(LegacyComponentSerializer.legacySection().deserialize(displayName));
+                    .applyFallbackStyle(deserialized.style())
+                    .mergeStyle(deserialized);
 
             bukkitItemMeta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(component));
 
+            return true;
+
         } catch (ParsingException ignored) {}
+
+        return false;
     }
 }

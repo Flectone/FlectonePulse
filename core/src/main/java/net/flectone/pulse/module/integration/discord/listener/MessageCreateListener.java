@@ -64,7 +64,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
         taskScheduler.runAsync(() -> builder(FPlayer.UNKNOWN)
                 .range(Range.PROXY)
                 .destination(integration.getDestination())
-                .filter(fPlayer -> fPlayer.is(FPlayer.Setting.DISCORD))
+                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DISCORD))
                 .tag(MessageTag.FROM_DISCORD_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft().replace("<name>", nickname))
                 .message(finalMessage)

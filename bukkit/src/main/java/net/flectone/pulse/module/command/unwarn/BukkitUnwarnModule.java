@@ -42,7 +42,7 @@ public class BukkitUnwarnModule extends UnwarnModule {
                 .then(new StringArgument(prompt)
                         .includeSuggestions(ArgumentSuggestions.stringCollectionAsync(info ->
                                 CompletableFuture.supplyAsync(() ->
-                                        moderationDAO.getPlayersNameWithValidModeration(Moderation.Type.WARN))))
+                                        moderationDAO.getValidPlayersNames(Moderation.Type.WARN))))
                         .then(new IntegerArgument(promptNumber).setOptional(true)
                                 .executes(this::executesFPlayer)
                         )

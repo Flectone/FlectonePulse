@@ -46,7 +46,7 @@ public abstract class ClearmailModule extends AbstractModuleCommand<Localization
         if (checkModulePredicates(fPlayer)) return;
 
         int mailID = commandUtil.getInteger(0, arguments);
-        Optional<Mail> optionalMail = mailDAO.getMails(fPlayer)
+        Optional<Mail> optionalMail = mailDAO.get(fPlayer)
                 .stream()
                 .filter(mail -> mail.id() == mailID)
                 .findAny();
@@ -60,7 +60,7 @@ public abstract class ClearmailModule extends AbstractModuleCommand<Localization
 
         FPlayer fReceiver = fPlayerDAO.getFPlayer(optionalMail.get().receiver());
 
-        mailDAO.removeMail(optionalMail.get());
+        mailDAO.delete(optionalMail.get());
 
         builder(fReceiver)
                 .destination(command.getDestination())

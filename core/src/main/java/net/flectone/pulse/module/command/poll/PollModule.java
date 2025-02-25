@@ -45,7 +45,7 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
                       CommandUtil commandUtil,
                       ComponentUtil componentUtil,
                       Gson gson) {
-        super(localization -> localization.getCommand().getPoll(), fPlayer -> fPlayer.is(FPlayer.Setting.POLL));
+        super(localization -> localization.getCommand().getPoll(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.POLL));
 
         this.fileManager = fileManager;
         this.proxyConnector = proxyConnector;

@@ -91,8 +91,8 @@ public abstract class BanlistModule extends AbstractModuleCommand<Localization.C
         page = optionalObject.map(o -> (int) o).orElse(1);
 
         List<Moderation> moderationList = targetFPlayer == null
-                ? moderationDAO.getValidModerations(Moderation.Type.BAN)
-                : moderationDAO.getModerations(targetFPlayer, Moderation.Type.BAN);
+                ? moderationDAO.getValid(Moderation.Type.BAN)
+                : moderationDAO.get(targetFPlayer, Moderation.Type.BAN);
 
         if (moderationList.isEmpty()) {
             builder(fPlayer)

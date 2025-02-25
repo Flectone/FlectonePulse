@@ -32,7 +32,7 @@ public abstract class TranslatetoModule extends AbstractModuleCommand<Localizati
     public TranslatetoModule(FileManager fileManager,
                              CommandUtil commandUtil,
                              IntegrationModule integrationModule) {
-        super(localization -> localization.getCommand().getTranslateto(), fPlayer -> fPlayer.is(FPlayer.Setting.TRANSLATETO));
+        super(localization -> localization.getCommand().getTranslateto(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TRANSLATETO));
 
         this.commandUtil = commandUtil;
         this.integrationModule = integrationModule;

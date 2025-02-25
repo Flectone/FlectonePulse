@@ -66,7 +66,7 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
             } else {
                 // translate auto language message
                 firstLang = "auto";
-                secondLang = fReceiver.getLocale();
+                secondLang = fReceiver.getSettingValue(FPlayer.Setting.LOCALE);
                 text = first.value();
             }
 

@@ -12,8 +12,8 @@ import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.manager.*;
+import net.flectone.pulse.manager.FPlayerManager;
+import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.Module;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
@@ -25,6 +25,7 @@ import net.flectone.pulse.platform.LibraryResolver;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.MetricsUtil;
+import net.flectone.pulse.util.logging.FLogger;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
 import net.megavex.scoreboardlibrary.api.team.TeamManager;
@@ -127,7 +128,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         injector.getInstance(FPlayerManager.class).getFPlayers().forEach(fPlayer -> {
             fPlayer.setOnline(false);
-            fPlayerDAO.updateFPlayer(fPlayer);
+            fPlayerDAO.save(fPlayer);
         });
 
         injector.getInstance(ScoreboardLibrary.class).close();

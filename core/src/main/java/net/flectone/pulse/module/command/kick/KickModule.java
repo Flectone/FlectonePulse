@@ -38,7 +38,7 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
                       ComponentUtil componentUtil,
                       ModerationUtil moderationUtil,
                       Gson gson) {
-        super(localization -> localization.getCommand().getKick(), fPlayer -> fPlayer.is(FPlayer.Setting.KICK));
+        super(localization -> localization.getCommand().getKick(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.KICK));
 
         this.fPlayerDAO = fPlayerDAO;
         this.moderationDAO = moderationDAO;
@@ -71,7 +71,7 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
 
         String reason = commandUtil.getString(1, arguments);
 
-        Moderation kick = moderationDAO.insertModeration(fTarget, -1, reason, fPlayer.getId(), Moderation.Type.KICK);
+        Moderation kick = moderationDAO.insert(fTarget, -1, reason, fPlayer.getId(), Moderation.Type.KICK);
         if (kick == null) return;
 
         kick(fPlayer, fTarget, kick);

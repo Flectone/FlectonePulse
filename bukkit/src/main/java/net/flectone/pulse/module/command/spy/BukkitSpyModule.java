@@ -3,12 +3,12 @@ package net.flectone.pulse.module.command.spy;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.registry.BukkitListenerRegistry;
+import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.FCommand;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.PermissionUtil;
 import org.bukkit.entity.Player;
@@ -34,12 +34,12 @@ public class BukkitSpyModule extends SpyModule {
 
     @Inject
     public BukkitSpyModule(FileManager fileManager,
-                           FPlayerDAO fPlayerDAO,
+                           SettingDAO settingDAO,
                            FPlayerManager fPlayerManager,
                            CommandUtil commandUtil,
                            PermissionUtil permissionUtil,
                            BukkitListenerRegistry bukkitListenerManager) {
-        super(fileManager, fPlayerDAO, commandUtil, permissionUtil);
+        super(fileManager, settingDAO, commandUtil, permissionUtil);
 
         this.fPlayerManager = fPlayerManager;
         this.bukkitListenerManager = bukkitListenerManager;

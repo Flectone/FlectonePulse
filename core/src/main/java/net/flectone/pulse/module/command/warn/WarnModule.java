@@ -37,7 +37,7 @@ public abstract class WarnModule extends AbstractModuleCommand<Localization.Comm
                       CommandUtil commandUtil,
                       ModerationUtil moderationUtil,
                       Gson gson) {
-        super(localization -> localization.getCommand().getWarn(), fPlayer -> fPlayer.is(FPlayer.Setting.WARN));
+        super(localization -> localization.getCommand().getWarn(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.WARN));
 
         this.fPlayerDAO = fPlayerDAO;
         this.moderationDAO = moderationDAO;
@@ -78,7 +78,7 @@ public abstract class WarnModule extends AbstractModuleCommand<Localization.Comm
 
         long databaseTime = time != -1 ? time + System.currentTimeMillis() : -1;
 
-        Moderation warn = moderationDAO.insertModeration(fTarget, databaseTime, reason, fPlayer.getId(), Moderation.Type.WARN);
+        Moderation warn = moderationDAO.insert(fTarget, databaseTime, reason, fPlayer.getId(), Moderation.Type.WARN);
         if (warn == null) return;
 
         builder(fTarget)
@@ -96,7 +96,7 @@ public abstract class WarnModule extends AbstractModuleCommand<Localization.Comm
 
         send(fPlayer, fTarget, warn);
 
-        List<Moderation> warns = moderationDAO.getModerations(fTarget, Moderation.Type.WARN);
+        List<Moderation> warns = moderationDAO.get(fTarget, Moderation.Type.WARN);
         if (warns.isEmpty()) return;
 
         int countWarns = warns.stream()

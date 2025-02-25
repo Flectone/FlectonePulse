@@ -40,7 +40,7 @@ public class DiscordModule extends AbstractModule {
         integration = fileManager.getIntegration().getDiscord();
         permission = fileManager.getPermission().getIntegration().getDiscord();
 
-        addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.is(FPlayer.Setting.DISCORD));
+        addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.isSetting(FPlayer.Setting.DISCORD));
     }
 
     @Override

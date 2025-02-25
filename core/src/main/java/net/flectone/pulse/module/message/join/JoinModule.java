@@ -66,7 +66,7 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
                 .tag(MessageTag.JOIN)
                 .destination(message.getDestination())
                 .range(message.getRange())
-                .filter(fReceiver -> fReceiver.is(FPlayer.Setting.JOIN))
+                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.JOIN))
                 .format(s -> hasPlayedBefore || !message.isFirst() ? s.getFormat() : s.getFormatFirstTime())
                 .proxy(byteArrayDataOutput -> byteArrayDataOutput.writeBoolean(hasPlayedBefore))
                 .integration()

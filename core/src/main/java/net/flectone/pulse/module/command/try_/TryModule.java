@@ -25,7 +25,7 @@ public abstract class TryModule extends AbstractModuleCommand<Localization.Comma
     public TryModule(FileManager fileManager,
                      RandomUtil randomUtil,
                      CommandUtil commandUtil) {
-        super(localization -> localization.getCommand().getTry(), fPlayer -> fPlayer.is(FPlayer.Setting.TRY));
+        super(localization -> localization.getCommand().getTry(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TRY));
 
         this.randomUtil = randomUtil;
         this.commandUtil = commandUtil;

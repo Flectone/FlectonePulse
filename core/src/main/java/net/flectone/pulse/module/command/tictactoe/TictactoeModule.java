@@ -41,7 +41,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
                            IntegrationModule integrationModule,
                            CommandUtil commandUtil,
                            Gson gson) {
-        super(localization -> localization.getCommand().getTictactoe(), fPlayer -> fPlayer.is(FPlayer.Setting.TICTACTOE));
+        super(localization -> localization.getCommand().getTictactoe(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TICTACTOE));
 
         this.fPlayerDAO = fPlayerDAO;
         this.tictactoeManager = tictactoeManager;

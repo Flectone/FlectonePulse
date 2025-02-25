@@ -94,8 +94,8 @@ public abstract class MutelistModule extends AbstractModuleCommand<Localization.
         }
 
         List<Moderation> moderationList = targetFPlayer == null
-                ? moderationDAO.getValidModerations(Moderation.Type.MUTE)
-                : moderationDAO.getModerations(targetFPlayer, Moderation.Type.MUTE);
+                ? moderationDAO.getValid(Moderation.Type.MUTE)
+                : moderationDAO.get(targetFPlayer, Moderation.Type.MUTE);
 
         if (moderationList.isEmpty()) {
             builder(fPlayer)

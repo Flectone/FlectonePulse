@@ -112,7 +112,7 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         if (!command.isTurnedOn()) return;
 
         FPlayer fPlayer = fPlayerDAO.getFPlayer(user.getAddress().getAddress());
-        colorsDAO.setFPlayerColors(fPlayer);
+        colorsDAO.load(fPlayer);
 
         JsonObject responseJson = new JsonObject();
 

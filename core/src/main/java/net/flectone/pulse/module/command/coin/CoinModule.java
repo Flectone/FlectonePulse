@@ -25,7 +25,7 @@ public abstract class CoinModule extends AbstractModuleCommand<Localization.Comm
     public CoinModule(FileManager fileManager,
                       CommandUtil commandUtil,
                       RandomUtil randomUtil) {
-        super(localization -> localization.getCommand().getCoin(), fPlayer -> fPlayer.is(FPlayer.Setting.COIN));
+        super(localization -> localization.getCommand().getCoin(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.COIN));
 
         this.commandUtil = commandUtil;
         this.randomUtil = randomUtil;

@@ -16,10 +16,6 @@ import java.util.List;
 @Singleton
 public class MailDAO {
 
-    private final String SQL_DELETE_MAIL = "DELETE FROM `mail` WHERE `id` = ?";
-    private final String SQL_GET_MAILS_WITH_RECEIVER = "SELECT * FROM `mail` WHERE `receiver` = ?";
-    private final String SQL_INSERT_MAIL = "INSERT INTO `mail` (`date`, `sender`, `receiver`, `message`) VALUES (?,?,?,?)";
-
     private final Database database;
     private final FLogger fLogger;
 
@@ -31,11 +27,12 @@ public class MailDAO {
     }
 
     @Nullable
-    public Mail insertMail(FPlayer fPlayer, FPlayer fReceiver, String message) {
+    public Mail insert(FPlayer fPlayer, FPlayer fReceiver, String message) {
         if (fPlayer.isUnknown() || fReceiver.isUnknown()) return null;
 
         try (Connection connection = database.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(SQL_INSERT_MAIL, Statement.RETURN_GENERATED_KEYS);
+            String SQL_INSERT = "INSERT INTO `mail` (`date`, `sender`, `receiver`, `message`) VALUES (?,?,?,?)";
+            PreparedStatement statement = connection.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
 
             long date = System.currentTimeMillis();
 
@@ -64,9 +61,10 @@ public class MailDAO {
     }
 
     @Async
-    public void removeMail(Mail mail) {
+    public void delete(Mail mail) {
         try (Connection connection = database.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE_MAIL);
+            String SQL_DELETE = "DELETE FROM `mail` WHERE `id` = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE);
             preparedStatement.setInt(1, mail.id());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
@@ -74,13 +72,14 @@ public class MailDAO {
         }
     }
 
-    public List<Mail> getMails(FPlayer fPlayer) {
+    public List<Mail> get(FPlayer fPlayer) {
         List<Mail> mails = new ArrayList<>();
 
         if (fPlayer.isUnknown()) return mails;
 
         try (Connection connection = database.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_MAILS_WITH_RECEIVER);
+            String SQL_GET_BY_RECEIVER = "SELECT * FROM `mail` WHERE `receiver` = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_BY_RECEIVER);
             preparedStatement.setInt(1, fPlayer.getId());
 
             ResultSet resultSet = preparedStatement.executeQuery();

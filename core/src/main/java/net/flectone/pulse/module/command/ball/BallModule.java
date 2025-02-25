@@ -26,7 +26,7 @@ public abstract class BallModule extends AbstractModuleCommand<Localization.Comm
     public BallModule(FileManager fileManager,
                       RandomUtil randomUtil,
                       CommandUtil commandUtil) {
-        super(localization -> localization.getCommand().getBall(), fPlayer -> fPlayer.is(FPlayer.Setting.BALL));
+        super(localization -> localization.getCommand().getBall(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.BALL));
 
         this.randomUtil = randomUtil;
         this.commandUtil = commandUtil;

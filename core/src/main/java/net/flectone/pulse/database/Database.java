@@ -8,6 +8,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
 import net.flectone.pulse.config.Config;
+import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.util.SystemUtil;
@@ -15,15 +16,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 @Singleton
 public class Database {
 
     private final Config.Database config;
 
+    private final FileManager fileManager;
     private final Path projectPath;
     private final InputStream SQLFile;
     private final SystemUtil systemUtil;
@@ -32,12 +32,16 @@ public class Database {
     private HikariDataSource dataSource;
 
     @Inject
+    private SettingDAO settingDAO;
+
+    @Inject
     public Database(FileManager fileManager,
                     @Named("projectPath") Path projectPath,
                     @Named("SQLFile") InputStream SQLFile,
                     SystemUtil systemUtil,
                     FLogger fLogger) {
 
+        this.fileManager = fileManager;
         this.projectPath = projectPath;
         this.SQLFile = SQLFile;
         this.systemUtil = systemUtil;
@@ -59,6 +63,11 @@ public class Database {
 
         try (Connection ignored = getConnection()){
             executeFile(SQLFile);
+
+            if (fileManager.isOlderThan(fileManager.getPreInitVersion(), "0.6.0")) {
+                MIGRATION_0_6_0();
+            }
+
             init();
         }
     }
@@ -151,6 +160,28 @@ public class Database {
                     builder.setLength(0);
                 }
             }
+        }
+    }
+
+    private void MIGRATION_0_6_0() {
+        settingDAO.MIGRATION_0_6_0();
+
+        try (Connection connection = getConnection()) {
+            PreparedStatement preparedStatement;
+            preparedStatement = connection.prepareStatement("ALTER TABLE `player` DROP COLUMN `chat`");
+            preparedStatement.executeUpdate();
+            preparedStatement = connection.prepareStatement("ALTER TABLE `player` DROP COLUMN `locale`");
+            preparedStatement.executeUpdate();
+            preparedStatement = connection.prepareStatement("ALTER TABLE `player` DROP COLUMN `world_prefix`");
+            preparedStatement.executeUpdate();
+            preparedStatement = connection.prepareStatement("ALTER TABLE `player` DROP COLUMN `stream_prefix`");
+            preparedStatement.executeUpdate();
+            preparedStatement = connection.prepareStatement("ALTER TABLE `player` DROP COLUMN `afk_suffix`");
+            preparedStatement.executeUpdate();
+            preparedStatement = connection.prepareStatement("ALTER TABLE `player` DROP COLUMN `setting`");
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            fLogger.warning(e);
         }
     }
 }

@@ -20,7 +20,7 @@ public abstract class BroadcastModule extends AbstractModuleCommand<Localization
 
     public BroadcastModule(FileManager fileManager,
                            CommandUtil commandUtil) {
-        super(localization -> localization.getCommand().getBroadcast(), fPlayer -> fPlayer.is(FPlayer.Setting.BROADCAST));
+        super(localization -> localization.getCommand().getBroadcast(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.BROADCAST));
 
         this.commandUtil = commandUtil;
 

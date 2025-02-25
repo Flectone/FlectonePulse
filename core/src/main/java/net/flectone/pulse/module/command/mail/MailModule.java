@@ -36,7 +36,7 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
                       FPlayerDAO fPlayerDAO,
                       MailDAO mailDAO,
                       CommandUtil commandUtil) {
-        super(localization -> localization.getCommand().getMail(), fPlayer -> fPlayer.is(FPlayer.Setting.MAIL));
+        super(localization -> localization.getCommand().getMail(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.MAIL));
 
         this.tellModule = tellModule;
         this.integrationModule = integrationModule;
@@ -83,7 +83,7 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
 
         String string = commandUtil.getString(1, arguments);
 
-        Mail mail = mailDAO.insertMail(fPlayer, fReceiver, string);
+        Mail mail = mailDAO.insert(fPlayer, fReceiver, string);
         if (mail == null) return;
 
         builder(fReceiver)
@@ -98,7 +98,7 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
     public void send(FPlayer fReceiver) {
         if (checkModulePredicates(fReceiver)) return;
 
-        List<Mail> mails = mailDAO.getMails(fReceiver);
+        List<Mail> mails = mailDAO.get(fReceiver);
         if (mails.isEmpty()) return;
 
         for (Mail mail : mails) {
@@ -110,7 +110,7 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
                     .message((fResolver, s) -> mail.message())
                     .sendBuilt();
 
-            mailDAO.removeMail(mail);
+            mailDAO.delete(mail);
         }
     }
 

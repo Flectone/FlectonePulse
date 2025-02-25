@@ -38,7 +38,7 @@ public abstract class MuteModule extends AbstractModuleCommand<Localization.Comm
                       CommandUtil commandUtil,
                       ModerationUtil moderationUtil,
                       Gson gson) {
-        super(localization -> localization.getCommand().getMute(), fPlayer -> fPlayer.is(FPlayer.Setting.MUTE));
+        super(localization -> localization.getCommand().getMute(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.MUTE));
 
         this.fPlayerDAO = fPlayerDAO;
         this.moderationDAO = moderationDAO;
@@ -78,11 +78,11 @@ public abstract class MuteModule extends AbstractModuleCommand<Localization.Comm
 
         long databaseTime = time != -1 ? time + System.currentTimeMillis() : -1;
 
-        Moderation mute = moderationDAO.insertModeration(fTarget, databaseTime, reason, fPlayer.getId(), Moderation.Type.MUTE);
+        Moderation mute = moderationDAO.insert(fTarget, databaseTime, reason, fPlayer.getId(), Moderation.Type.MUTE);
         if (mute == null) return;
 
         if (!fPlayerManager.get(fTarget.getUuid()).isUnknown()) {
-            fPlayerManager.get(fTarget.getUuid()).updateMutes(moderationDAO.getValidModerations(Moderation.Type.MUTE));
+            fPlayerManager.get(fTarget.getUuid()).updateMutes(moderationDAO.getValid(Moderation.Type.MUTE));
         }
 
         builder(fTarget)

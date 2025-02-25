@@ -87,9 +87,9 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
         }
 
         String placeholder = switch (params) {
-            case "world_prefix" -> fPlayer.getWorldPrefix();
-            case "stream_prefix" -> fPlayer.getStreamPrefix();
-            case "afk_suffix" -> fPlayer.getAfkSuffix();
+            case "world_prefix" -> fPlayer.getSettingValue(FPlayer.Setting.WORLD_PREFIX);
+            case "stream_prefix" -> fPlayer.getSettingValue(FPlayer.Setting.STREAM_PREFIX);
+            case "afk_suffix" -> fPlayer.getSettingValue(FPlayer.Setting.AFK_SUFFIX);
             case "player" -> fPlayer.getName();
             case "ip" -> fPlayer.getIp();
             case "ping" -> String.valueOf(fPlayerManager.getPing(fPlayer));

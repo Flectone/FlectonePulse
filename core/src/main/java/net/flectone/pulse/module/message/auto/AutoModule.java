@@ -62,7 +62,7 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
     @Async
     public void send(FPlayer fPlayer, String name, Message.Auto.Type type, Sound sound) {
         if (checkModulePredicates(fPlayer)) return;
-        if (!fPlayer.is(FPlayer.Setting.AUTO)) return;
+        if (!fPlayer.isSetting(FPlayer.Setting.AUTO)) return;
 
         List<String> messages = resolveLocalization(fPlayer).getTypes().get(name);
         if (messages == null) return;

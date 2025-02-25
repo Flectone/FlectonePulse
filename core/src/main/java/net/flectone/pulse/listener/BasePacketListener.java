@@ -12,9 +12,8 @@ import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServer
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSettings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.manager.FPlayerManager;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.mail.MailModule;
@@ -25,6 +24,7 @@ import net.flectone.pulse.module.message.greeting.GreetingModule;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.PacketEventsUtil;
 
 import java.util.UUID;
@@ -32,7 +32,7 @@ import java.util.UUID;
 @Singleton
 public class BasePacketListener extends AbstractPacketListener {
 
-    private final FPlayerDAO fPlayerDAO;
+    private final SettingDAO settingDAO;
     private final FPlayerManager fPlayerManager;
     private final TaskScheduler taskScheduler;
     private final PacketEventsUtil packetEventsUtil;
@@ -48,11 +48,11 @@ public class BasePacketListener extends AbstractPacketListener {
     @Inject private MaintenanceModule maintenanceModule;
 
     @Inject
-    public BasePacketListener(FPlayerDAO fPlayerDAO,
+    public BasePacketListener(SettingDAO settingDAO,
                               FPlayerManager fPlayerManager,
                               TaskScheduler taskScheduler,
                               PacketEventsUtil packetEventsUtil) {
-        this.fPlayerDAO = fPlayerDAO;
+        this.settingDAO = settingDAO;
         this.fPlayerManager = fPlayerManager;
         this.taskScheduler = taskScheduler;
         this.packetEventsUtil = packetEventsUtil;
@@ -105,20 +105,18 @@ public class BasePacketListener extends AbstractPacketListener {
 
         String locale = getLocale(fPlayer, event);
 
-        if (locale.equals(fPlayer.getLocale())) return;
+        if (locale.equals(fPlayer.getSettingValue(FPlayer.Setting.LOCALE))) return;
         if (!fPlayer.isUnknown()) {
             setLocale(fPlayer, locale);
             return;
         }
 
         // first time player joined, wait for it to be added
-        // this needs to change in the future
-
         taskScheduler.runAsyncLater(() -> {
             FPlayer newFPlayer = fPlayerManager.get(uuid);
 
             setLocale(newFPlayer, locale);
-        }, 20);
+        }, 40);
     }
 
     @Override
@@ -150,7 +148,7 @@ public class BasePacketListener extends AbstractPacketListener {
     }
 
     private void setLocale(FPlayer fPlayer, String locale) {
-        fPlayer.setLocale(locale);
-        fPlayerDAO.updateFPlayer(fPlayer);
+        fPlayer.setSetting(FPlayer.Setting.LOCALE, locale);
+        settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.LOCALE);
     }
 }
