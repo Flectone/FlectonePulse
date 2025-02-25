@@ -22,7 +22,6 @@ import java.util.Set;
 @Singleton
 public class FileManager {
 
-    @Getter private final Set<String> languages = Set.of("ru_ru", "en_us");
     private final Map<String, Localization> localizationMap = new HashMap<>();
 
     private final Path projectPath;
@@ -103,7 +102,7 @@ public class FileManager {
     }
 
     private void reloadLanguages() {
-        Set<String> newLanguages = new HashSet<>(languages);
+        Set<String> newLanguages = new HashSet<>(Set.of("ru_ru", "en_us"));
         newLanguages.add(config.getLanguage());
         newLanguages.forEach(this::loadLanguage);
     }
