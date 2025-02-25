@@ -167,7 +167,10 @@ public class FPlayer extends FEntity {
         COIN,
         AFK,
         POLL,
+
+        @Deprecated
         SPIT,
+
         GREETING,
         ROCKPAPERSCISSORS,
         DISCORD,
