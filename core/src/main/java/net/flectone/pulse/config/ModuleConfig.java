@@ -75,6 +75,7 @@ public interface ModuleConfig {
     interface MessageConfig {
 
         SubMessageConfig getAdvancement();
+        SubMessageConfig getAfk();
         SubMessageConfig getAnvil();
         SubMessageConfig getAuto();
         SubMessageConfig getBook();
@@ -82,7 +83,6 @@ public interface ModuleConfig {
         SubMessageConfig getBubble();
         SubMessageConfig getChat();
         SubMessageConfig getClear();
-        ContactMessageConfig getContact();
         SubMessageConfig getDeath();
         SubMessageConfig getDeop();
         SubMessageConfig getEnchant();
@@ -90,9 +90,11 @@ public interface ModuleConfig {
         SubMessageConfig getGamemode();
         SubMessageConfig getGreeting();
         SubMessageConfig getJoin();
+        SubMessageConfig getMark();
         ObjectiveMessageConfig getObjective();
         SubMessageConfig getOp();
         SubMessageConfig getQuit();
+        SubMessageConfig getRightclick();
         SubMessageConfig getScoreboard();
         SubMessageConfig getSeed();
         SubMessageConfig getSetblock();
@@ -102,16 +104,6 @@ public interface ModuleConfig {
         TabMessageConfig getTab();
 
         interface SubMessageConfig {}
-
-        interface ContactMessageConfig extends SubMessageConfig {
-
-            SubContactMessageConfig getAfk();
-            SubContactMessageConfig getMark();
-            SubContactMessageConfig getRightclick();
-
-            interface SubContactMessageConfig {}
-
-        }
 
         interface FormatMessageConfig extends SubMessageConfig {
 

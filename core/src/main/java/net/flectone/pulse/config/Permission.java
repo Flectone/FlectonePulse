@@ -642,6 +642,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
 
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/advancement/")})
         private Advancement advancement = new Advancement();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/afk/")})
+        private Afk afk = new Afk();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/anvil/")})
         private Anvil anvil = new Anvil();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/auto/")})
@@ -656,8 +658,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Chat chat = new Chat();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/clear/")})
         private Clear clear = new Clear();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/")})
-        private Contact contact = new Contact();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/death/")})
         private Death death = new Death();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/deop/")})
@@ -672,12 +672,16 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Greeting greeting = new Greeting();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/join/")})
         private Join join = new Join();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/mark/")})
+        private Mark mark = new Mark();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/objective/")})
         private Objective objective = new Objective();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/op/")})
         private Op op = new Op();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/quit/")})
         private Quit quit = new Quit();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/rightclick/")})
+        private Rightclick rightclick = new Rightclick();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/scoreboard/")})
         private Scoreboard scoreboard = new Scoreboard();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/seed/")})
@@ -698,6 +702,12 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private String name = "flectonepulse.module.message.advancement";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.advancement.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Afk implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.afk";
+            private net.flectone.pulse.config.Permission.Type type = net.flectone.pulse.config.Permission.Type.TRUE;
         }
 
         @Getter
@@ -771,43 +781,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private String name = "flectonepulse.module.message.clear";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.clear.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Contact implements ContactMessageConfig, IPermission {
-
-            private String name = "flectonepulse.module.message.contact";
-            private Type type = Type.TRUE;
-
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/afk/")})
-            private Afk afk = new Afk();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/mark/")})
-            private Mark mark = new Mark();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/rightclick/")})
-            private Rightclick rightclick = new Rightclick();
-
-            @Getter
-            public static final class Afk implements SubContactMessageConfig, IPermission {
-                private String name = "flectonepulse.module.message.contact.afk";
-                private net.flectone.pulse.config.Permission.Type type = net.flectone.pulse.config.Permission.Type.TRUE;
-            }
-
-            @Getter
-            public static final class Mark implements SubContactMessageConfig, IPermission {
-                private String name = "flectonepulse.module.message.contact.mark";
-                private Type type = Type.TRUE;
-                private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.contact.mark.cooldown.bypass", Type.OP);
-                private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.contact.mark.sound", Type.TRUE);
-            }
-
-            @Getter
-            public static final class Rightclick implements SubContactMessageConfig, IPermission {
-                private String name = "flectonepulse.module.message.contact.rightclick";
-                private Type type = Type.TRUE;
-                private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.contact.rightclick.cooldown.bypass", Type.OP);
-                private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.contact.rightclick.sound", Type.TRUE);
-            }
-
         }
 
         @Getter
@@ -1048,6 +1021,14 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         }
 
         @Getter
+        public static final class Mark implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.mark";
+            private Type type = Type.TRUE;
+            private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.mark.cooldown.bypass", Type.OP);
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.mark.sound", Type.TRUE);
+        }
+
+        @Getter
         public static final class Objective implements ObjectiveMessageConfig, IPermission {
 
             private String name = "flectonepulse.module.message.objective";
@@ -1084,6 +1065,14 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private String name = "flectonepulse.module.message.quit";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.quit.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Rightclick implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.rightclick";
+            private Type type = Type.TRUE;
+            private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.rightclick.cooldown.bypass", Type.OP);
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.rightclick.sound", Type.TRUE);
         }
 
         @Getter

@@ -99,6 +99,8 @@ import net.flectone.pulse.module.command.warnlist.BukkitWarnlistModule;
 import net.flectone.pulse.module.command.warnlist.WarnlistModule;
 import net.flectone.pulse.module.integration.BukkitIntegrationModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.message.afk.AfkModule;
+import net.flectone.pulse.module.message.afk.BukkitAfkModule;
 import net.flectone.pulse.module.message.anvil.AnvilModule;
 import net.flectone.pulse.module.message.anvil.BukkitAnvilModule;
 import net.flectone.pulse.module.message.book.BookModule;
@@ -109,16 +111,14 @@ import net.flectone.pulse.module.message.bubble.manager.BubbleManager;
 import net.flectone.pulse.module.message.bubble.manager.BukkitBubbleManager;
 import net.flectone.pulse.module.message.chat.BukkitChatModule;
 import net.flectone.pulse.module.message.chat.ChatModule;
-import net.flectone.pulse.module.message.contact.BukkitContactModule;
-import net.flectone.pulse.module.message.contact.ContactModule;
-import net.flectone.pulse.module.message.contact.afk.AfkModule;
-import net.flectone.pulse.module.message.contact.afk.BukkitAfkModule;
 import net.flectone.pulse.module.message.format.BukkitFormatModule;
 import net.flectone.pulse.module.message.format.FormatModule;
 import net.flectone.pulse.module.message.format.name.BukkitNameModule;
 import net.flectone.pulse.module.message.format.name.NameModule;
 import net.flectone.pulse.module.message.objective.BukkitObjectiveModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
+import net.flectone.pulse.module.message.rightclick.BukkitRightclickModule;
+import net.flectone.pulse.module.message.rightclick.RightclickModule;
 import net.flectone.pulse.module.message.scoreboard.BukkitScoreboardModule;
 import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.sign.BukkitSignModule;
@@ -198,7 +198,7 @@ public class BukkitInjector extends AbstractModule {
 
         // modules
         bind(IntegrationModule.class).to(BukkitIntegrationModule.class);
-        bind(ContactModule.class).to(BukkitContactModule.class);
+        bind(net.flectone.pulse.module.message.mark.MarkModule.class).to(net.flectone.pulse.module.message.mark.BukkitMarkModule.class);
         bind(NameModule.class).to(BukkitNameModule.class);
         bind(FormatModule.class).to(BukkitFormatModule.class);
         bind(ObjectiveModule.class).to(BukkitObjectiveModule.class);
@@ -209,6 +209,7 @@ public class BukkitInjector extends AbstractModule {
         bind(BubbleModule.class).to(BukkitBubbleModule.class);
         bind(ChatModule.class).to(BukkitChatModule.class);
         bind(SignModule.class).to(BukkitSignModule.class);
+        bind(RightclickModule.class).to(BukkitRightclickModule.class);
 
         //commands
         bind(net.flectone.pulse.module.command.afk.AfkModule.class).to(net.flectone.pulse.module.command.afk.BukkitAfkModule.class);

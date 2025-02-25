@@ -19,7 +19,7 @@ import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.message.bubble.manager.BubbleManager;
-import net.flectone.pulse.module.message.contact.mark.manager.MarkManager;
+import net.flectone.pulse.module.message.mark.manager.MarkManager;
 import net.flectone.pulse.platform.BukkitLibraryResolver;
 import net.flectone.pulse.platform.LibraryResolver;
 import net.flectone.pulse.registry.ListenerRegistry;

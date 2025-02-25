@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.contact.mark;
+package net.flectone.pulse.module.message.mark;
 
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.google.inject.Inject;
@@ -8,14 +8,13 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.module.message.contact.mark.listener.MarkListener;
-import net.flectone.pulse.module.message.contact.mark.manager.MarkManager;
-import net.flectone.pulse.module.message.contact.mark.model.FMark;
+import net.flectone.pulse.module.message.mark.listener.MarkListener;
+import net.flectone.pulse.module.message.mark.manager.MarkManager;
+import net.flectone.pulse.module.message.mark.model.FMark;
 import net.flectone.pulse.platform.SoundPlayer;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -24,28 +23,28 @@ import org.bukkit.event.EventPriority;
 import org.jetbrains.annotations.NotNull;
 
 @Singleton
-public class MarkModule extends AbstractModuleMessage<Localization.Message.Contact> {
+public class BukkitMarkModule extends MarkModule {
 
-    @Getter private final Message.Contact.Mark message;
-    private final Permission.Message.Contact.Mark permission;
+    @Getter private final Message.Mark message;
+    private final Permission.Message.Mark permission;
 
     private final MarkManager markManager;
     private final BukkitListenerRegistry bukkitListenerManager;
     private final SoundPlayer soundPlayer;
 
     @Inject
-    public MarkModule(FileManager fileManager,
-                      MarkManager markManager,
-                      BukkitListenerRegistry bukkitListenerManager,
-                      SoundPlayer soundPlayer) {
-        super(localization -> localization.getMessage().getContact());
+    public BukkitMarkModule(FileManager fileManager,
+                            MarkManager markManager,
+                            BukkitListenerRegistry bukkitListenerManager,
+                            SoundPlayer soundPlayer) {
+        super(Localization::getMessage);
 
         this.markManager = markManager;
         this.bukkitListenerManager = bukkitListenerManager;
         this.soundPlayer = soundPlayer;
 
-        message = fileManager.getMessage().getContact().getMark();
-        permission = fileManager.getPermission().getMessage().getContact().getMark();
+        message = fileManager.getMessage().getMark();
+        permission = fileManager.getPermission().getMessage().getMark();
 
         addPredicate(this::checkCooldown);
     }

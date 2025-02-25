@@ -12,7 +12,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.command.stream.StreamModule;
 import net.flectone.pulse.module.message.brand.BrandModule;
-import net.flectone.pulse.module.message.contact.afk.BukkitAfkModule;
+import net.flectone.pulse.module.message.afk.BukkitAfkModule;
 import net.flectone.pulse.module.message.format.name.BukkitNameModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;

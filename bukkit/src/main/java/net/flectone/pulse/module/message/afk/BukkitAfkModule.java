@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.contact.afk;
+package net.flectone.pulse.module.message.afk;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -9,7 +9,7 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.message.contact.afk.listener.AfkListener;
+import net.flectone.pulse.module.message.afk.listener.AfkListener;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.Pair;
 import org.bukkit.Bukkit;
@@ -28,7 +28,7 @@ public class BukkitAfkModule extends AfkModule {
 
     private final Map<UUID, Pair<Integer, Vector>> PLAYER_BLOCK = new HashMap<>();
 
-    @Getter private final Message.Contact.Afk message;
+    @Getter private final Message.Afk message;
 
     private final FPlayerDAO fPlayerDAO;
     private final BukkitListenerRegistry bukkitListenerManager;
@@ -43,7 +43,7 @@ public class BukkitAfkModule extends AfkModule {
         this.fPlayerDAO = fPlayerDAO;
         this.bukkitListenerManager = bukkitListenerManager;
 
-        message = fileManager.getMessage().getContact().getAfk();
+        message = fileManager.getMessage().getAfk();
     }
 
     @Override

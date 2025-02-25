@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.contact.rightclick;
+package net.flectone.pulse.module.message.rightclick;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -8,34 +8,33 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.module.message.contact.rightclick.listener.RightclickPacketListener;
+import net.flectone.pulse.module.message.rightclick.listener.RightclickPacketListener;
+import net.flectone.pulse.registry.ListenerRegistry;
 
 import java.util.Optional;
 import java.util.UUID;
 
 
 @Singleton
-public class RightclickModule extends AbstractModuleMessage<Localization.Message.Contact.Rightclick> {
+public class BukkitRightclickModule extends RightclickModule {
 
-    private final Message.Contact.Rightclick message;
-    private final Permission.Message.Contact.Rightclick permission;
+    private final Message.Rightclick message;
+    private final Permission.Message.Rightclick permission;
 
     private final FPlayerManager fPlayerManager;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
-    public RightclickModule(FileManager fileManager,
-                            FPlayerManager fPlayerManager,
-                            ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getContact().getRightclick());
+    public BukkitRightclickModule(FileManager fileManager,
+                                  FPlayerManager fPlayerManager,
+                                  ListenerRegistry listenerRegistry) {
+        super(localization -> localization.getMessage().getRightclick());
         this.fPlayerManager = fPlayerManager;
         this.listenerRegistry = listenerRegistry;
 
-        message = fileManager.getMessage().getContact().getRightclick();
-        permission = fileManager.getPermission().getMessage().getContact().getRightclick();
+        message = fileManager.getMessage().getRightclick();
+        permission = fileManager.getPermission().getMessage().getRightclick();
 
         addPredicate(this::checkCooldown);
     }
@@ -70,7 +69,7 @@ public class RightclickModule extends AbstractModuleMessage<Localization.Message
 
         builder(optionalFTarget.get())
                 .receiver(fPlayer)
-                .format(Localization.Message.Contact.Rightclick::getFormat)
+                .format(Localization.Message.Rightclick::getFormat)
                 .destination(message.getDestination())
                 .sound(getSound())
                 .sendBuilt();

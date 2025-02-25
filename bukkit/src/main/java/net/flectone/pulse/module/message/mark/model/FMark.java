@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.contact.mark.model;
+package net.flectone.pulse.module.message.mark.model;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
@@ -31,15 +31,15 @@ public class FMark extends FPacketEntity {
 
     private final int range;
     private final int duration;
-    private final Message.Contact.Mark.Legacy legacy;
-    private final Message.Contact.Mark.Modern modern;
+    private final Message.Mark.Legacy legacy;
+    private final Message.Mark.Modern modern;
 
     private Entity entity;
 
     public FMark(int range,
                  int duration,
-                 Message.Contact.Mark.Legacy legacy,
-                 Message.Contact.Mark.Modern modern) {
+                 Message.Mark.Legacy legacy,
+                 Message.Mark.Modern modern) {
         this.range = range;
         this.duration = duration;
         this.legacy = legacy;

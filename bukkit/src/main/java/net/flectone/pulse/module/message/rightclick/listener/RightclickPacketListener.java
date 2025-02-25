@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.contact.rightclick.listener;
+package net.flectone.pulse.module.message.rightclick.listener;
 
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
@@ -6,16 +6,16 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientIn
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.AbstractPacketListener;
-import net.flectone.pulse.module.message.contact.rightclick.RightclickModule;
+import net.flectone.pulse.module.message.rightclick.BukkitRightclickModule;
 
 @Singleton
 public class RightclickPacketListener extends AbstractPacketListener {
 
-    private final RightclickModule rightClickModule;
+    private final BukkitRightclickModule rightClickModule;
 
     @Inject
-    public RightclickPacketListener(RightclickModule rightClickModule) {
-        this.rightClickModule = rightClickModule;
+    public RightclickPacketListener(BukkitRightclickModule rightClickModuleBukkit) {
+        this.rightClickModule = rightClickModuleBukkit;
     }
 
     @Override

@@ -1,10 +1,10 @@
-package net.flectone.pulse.module.message.contact.afk.listener;
+package net.flectone.pulse.module.message.afk.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.message.contact.afk.AfkModule;
+import net.flectone.pulse.module.message.afk.AfkModule;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;

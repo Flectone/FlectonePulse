@@ -15,11 +15,11 @@ public abstract class AfkModule extends AbstractModuleCommand<Localization.Comma
     private final Command.Afk command;
     private final Permission.Command.Afk permission;
 
-    private final net.flectone.pulse.module.message.contact.afk.AfkModule afkModule;
+    private final net.flectone.pulse.module.message.afk.AfkModule afkModule;
     private final CommandUtil commandUtil;
 
     public AfkModule(FileManager fileManager,
-                     net.flectone.pulse.module.message.contact.afk.AfkModule afkModule,
+                     net.flectone.pulse.module.message.afk.AfkModule afkModule,
                      CommandUtil commandUtil) {
         super(Localization::getCommand, fPlayer -> fPlayer.is(FPlayer.Setting.AFK));
 

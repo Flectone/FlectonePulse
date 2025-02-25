@@ -3,7 +3,6 @@ package net.flectone.pulse.util;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import me.imdanix.text.MiniTranslator;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.HashMap;
@@ -88,13 +87,6 @@ public class ColorUtil {
         legacyHexMap.put("&d", "#FF55FF");
         legacyHexMap.put("&e", "#FFFF55");
         legacyHexMap.put("&f", "#FFFFFF");
-    }
-
-    public String toMiniMessage(String message) {
-        return MiniTranslator.toMini(message
-                        .replace("§", "&")
-                        .replaceAll("(?<![:&])#", "&#")
-                );
     }
 
     public int parseHexToArgb(String hex) {

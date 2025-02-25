@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.contact.mark.manager;
+package net.flectone.pulse.module.message.mark.manager;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -6,7 +6,7 @@ import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.message.contact.mark.model.FMark;
+import net.flectone.pulse.module.message.mark.model.FMark;
 import net.flectone.pulse.util.RandomUtil;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.megavex.scoreboardlibrary.api.team.ScoreboardTeam;

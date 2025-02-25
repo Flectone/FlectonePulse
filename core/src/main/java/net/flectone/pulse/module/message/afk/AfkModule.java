@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.contact.afk;
+package net.flectone.pulse.module.message.afk;
 
 import com.google.inject.Inject;
 import net.flectone.pulse.annotation.Async;
@@ -19,10 +19,10 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class AfkModule extends AbstractModuleMessage<Localization.Message.Contact.Afk> {
+public abstract class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> {
 
-    private final Message.Contact.Afk message;
-    private final Permission.Message.Contact.Afk permission;
+    private final Message.Afk message;
+    private final Permission.Message.Afk permission;
 
     private final FPlayerDAO fPlayerDAO;
     private final TaskScheduler taskScheduler;
@@ -32,13 +32,13 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
     public AfkModule(FileManager fileManager,
                      FPlayerDAO fPlayerDAO,
                      TaskScheduler taskScheduler) {
-        super(localization -> localization.getMessage().getContact().getAfk());
+        super(localization -> localization.getMessage().getAfk());
 
         this.fPlayerDAO = fPlayerDAO;
         this.taskScheduler = taskScheduler;
 
-        message = fileManager.getMessage().getContact().getAfk();
-        permission = fileManager.getPermission().getMessage().getContact().getAfk();
+        message = fileManager.getMessage().getAfk();
+        permission = fileManager.getPermission().getMessage().getAfk();
     }
 
     @Override

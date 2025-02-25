@@ -377,10 +377,10 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.clear.single = "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><number></fcolor:2> предметов у игрока <display_name>";
         message.clear.multiple = "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><number></fcolor:2> предметов у <fcolor:2><count></fcolor:2> игроков";
 
-        message.contact.afk.formatTrue.global = "<gradient:#ffd500:#FFFF00>⌚ <player> отошёл";
-        message.contact.afk.formatTrue.local = "<gradient:#ffd500:#FFFF00>⌚ Ты отошёл от игры";
-        message.contact.afk.formatFalse.global = "<gradient:#ffd500:#FFFF00>⌚ <player> вернулся";
-        message.contact.afk.formatFalse.local = "<gradient:#ffd500:#FFFF00>⌚ Ты вернулся в игру";
+        message.afk.formatTrue.global = "<gradient:#ffd500:#FFFF00>⌚ <player> отошёл";
+        message.afk.formatTrue.local = "<gradient:#ffd500:#FFFF00>⌚ Ты отошёл от игры";
+        message.afk.formatFalse.global = "<gradient:#ffd500:#FFFF00>⌚ <player> вернулся";
+        message.afk.formatFalse.local = "<gradient:#ffd500:#FFFF00>⌚ Ты вернулся в игру";
 
         message.death.types.put("death.attack.anvil", "<color:#778899>🪦 <fcolor:1><display_name> раздавлен упавшей наковальней");
         message.death.types.put("death.attack.anvil.player", "<color:#778899>🪦 <fcolor:1><display_name> был раздавлен упавшей наковальней, пока боролся с <killer>");
@@ -1377,6 +1377,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
             return null;
         }
 
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/afk/")})
+        private Afk afk = new Afk();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/auto/")})
         private Auto auto = new Auto();
 
@@ -1393,8 +1395,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Chat chat = new Chat();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/clear/")})
         private Clear clear = new Clear();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/")})
-        private Contact contact = new Contact();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/death/")})
         private Death death = new Death();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/deop/")})
@@ -1411,6 +1411,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Join join = new Join();
 
         @Override
+        public SubMessageConfig getMark() {
+            return null;
+        }
+
+        @Override
         public ObjectiveMessageConfig getObjective() {
             return null;
         }
@@ -1421,6 +1426,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Scoreboard scoreboard = new Scoreboard();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/quit/")})
         private Quit quit = new Quit();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/rightclick/")})
+        private Rightclick rightclick = new Rightclick();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/seed/")})
         private Seed seed = new Seed();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/setblock/")})
@@ -1482,6 +1489,26 @@ public final class Localization extends FileSerializable implements ModuleConfig
         }
 
         @Getter
+        public static final class Afk implements SubMessageConfig, Localizable {
+            private String suffix = " <color:#FFFF00>⌚</color>";
+            private Format formatTrue = new Format(
+                    "<gradient:#ffd500:#FFFF00>⌚ <player> is now afk",
+                    "<gradient:#ffd500:#FFFF00>⌚ Now you're afk"
+            );
+            private Format formatFalse = new Format(
+                    "<gradient:#ffd500:#FFFF00>⌚ <player> isn't afk now",
+                    "<gradient:#ffd500:#FFFF00>⌚ Now you're not afk"
+            );
+
+            @Getter
+            @AllArgsConstructor
+            public static final class Format {
+                private String global;
+                private String local;
+            }
+        }
+
+        @Getter
         public static final class Auto implements SubMessageConfig, Localizable {
             private Map<String, List<String>> types = new LinkedHashMap<>(){
                 {
@@ -1528,46 +1555,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
         public static final class Clear implements SubMessageConfig, Localizable {
             private String single = "<fcolor:1>🌊 Removed <fcolor:2><number></fcolor:2> item(s) from player <display_name>";
             private String multiple = "<fcolor:1>🌊 Removed <fcolor:2><number></fcolor:2> item(s) from <fcolor:2><count></fcolor:2> players";
-        }
-
-        @Getter
-        public static final class Contact implements ContactMessageConfig, Localizable {
-
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/afk/")})
-            private Afk afk = new Afk();
-
-            @Override
-            public SubContactMessageConfig getMark() {
-                return null;
-            }
-
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/contact/rightclick/")})
-            private Rightclick rightclick = new Rightclick();
-
-            @Getter
-            public static final class Afk implements SubContactMessageConfig, Localizable {
-                private String suffix = " <color:#FFFF00>⌚</color>";
-                private Format formatTrue = new Format(
-                        "<gradient:#ffd500:#FFFF00>⌚ <player> is now afk",
-                        "<gradient:#ffd500:#FFFF00>⌚ Now you're afk"
-                );
-                private Format formatFalse = new Format(
-                        "<gradient:#ffd500:#FFFF00>⌚ <player> isn't afk now",
-                        "<gradient:#ffd500:#FFFF00>⌚ Now you're not afk"
-                );
-
-                @Getter
-                @AllArgsConstructor
-                public static final class Format {
-                    private String global;
-                    private String local;
-                }
-            }
-
-            @Getter
-            public static final class Rightclick implements SubContactMessageConfig, Localizable {
-                private String format = "<fcolor:1>◁ <display_name> ▷";
-            }
         }
 
         @Getter
@@ -1874,6 +1861,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Quit implements SubMessageConfig, Localizable {
             private String format = "<color:#ff4e4e>← <display_name>";
+        }
+
+        @Getter
+        public static final class Rightclick implements SubMessageConfig, Localizable {
+            private String format = "<fcolor:1>◁ <display_name> ▷";
         }
 
         @Getter

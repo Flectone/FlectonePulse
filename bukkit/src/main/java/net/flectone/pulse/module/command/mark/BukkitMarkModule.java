@@ -12,9 +12,9 @@ public class BukkitMarkModule extends MarkModule {
 
     @Inject
     public BukkitMarkModule(FileManager fileManager,
-                            net.flectone.pulse.module.message.contact.mark.MarkModule markModule,
+                            net.flectone.pulse.module.message.mark.BukkitMarkModule bukkitMarkModule,
                             CommandUtil commandUtil) {
-        super(fileManager, markModule::mark, commandUtil);
+        super(fileManager, bukkitMarkModule::mark, commandUtil);
     }
 
     @Override

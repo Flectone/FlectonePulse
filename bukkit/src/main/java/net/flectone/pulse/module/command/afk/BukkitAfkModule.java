@@ -11,7 +11,7 @@ public class BukkitAfkModule extends AfkModule {
 
     @Inject
     public BukkitAfkModule(FileManager fileManager,
-                           net.flectone.pulse.module.message.contact.afk.AfkModule afkModule,
+                           net.flectone.pulse.module.message.afk.AfkModule afkModule,
                            CommandUtil commandUtil) {
         super(fileManager, afkModule, commandUtil);
     }

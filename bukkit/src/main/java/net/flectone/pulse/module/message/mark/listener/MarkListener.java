@@ -1,10 +1,10 @@
-package net.flectone.pulse.module.message.contact.mark.listener;
+package net.flectone.pulse.module.message.mark.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.message.contact.mark.MarkModule;
+import net.flectone.pulse.module.message.mark.BukkitMarkModule;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -18,13 +18,13 @@ import org.bukkit.inventory.ItemStack;
 public class MarkListener implements Listener {
 
     private final FPlayerManager fPlayerManager;
-    private final MarkModule markModule;
+    private final BukkitMarkModule markModule;
 
     @Inject
     public MarkListener(FPlayerManager fPlayerManager,
-                        MarkModule markModule) {
+                        BukkitMarkModule bukkitMarkModule) {
         this.fPlayerManager = fPlayerManager;
-        this.markModule = markModule;
+        this.markModule = bukkitMarkModule;
     }
 
     @EventHandler

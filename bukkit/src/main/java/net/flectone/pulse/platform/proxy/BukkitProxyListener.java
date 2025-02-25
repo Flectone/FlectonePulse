@@ -49,7 +49,7 @@ import net.flectone.pulse.module.integration.twitch.listener.ChannelMessageListe
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
 import net.flectone.pulse.module.message.advancement.model.Advancement;
 import net.flectone.pulse.module.message.chat.BukkitChatModule;
-import net.flectone.pulse.module.message.contact.afk.BukkitAfkModule;
+import net.flectone.pulse.module.message.afk.BukkitAfkModule;
 import net.flectone.pulse.module.message.death.DeathModule;
 import net.flectone.pulse.module.message.death.model.Death;
 import net.flectone.pulse.module.message.join.JoinModule;
