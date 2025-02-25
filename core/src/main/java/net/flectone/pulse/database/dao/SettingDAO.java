@@ -115,8 +115,6 @@ public class SettingDAO {
     }
 
     public void MIGRATION_0_6_0() {
-        fLogger.warning("1");
-
         try (Connection connection = database.getConnection()){
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM `player`");
 
