@@ -9,14 +9,20 @@ import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.database.dao.SettingDAO;
-import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.util.SystemUtil;
+import net.flectone.pulse.util.logging.FLogger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Singleton
 public class Database {
@@ -164,6 +170,19 @@ public class Database {
     }
 
     private void MIGRATION_0_6_0() {
+        if (config.getType() == Config.Database.Type.SQLITE) {
+            String databaseName = systemUtil.substituteEnvVars(config.getName()) + ".db";
+
+            String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss").format(new Date());
+            String copiedDatabaseName = databaseName + "_backup_" + timeStamp;
+
+            try {
+                Files.copy(projectPath.resolve(databaseName), projectPath.resolve(copiedDatabaseName));
+            } catch (IOException e) {
+                fLogger.warning(e);
+            }
+        }
+
         settingDAO.MIGRATION_0_6_0();
 
         try (Connection connection = getConnection()) {
