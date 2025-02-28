@@ -81,7 +81,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     private Kick kick = new Kick();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/mail/")})
     private Mail mail = new Mail();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/maintenace/")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/maintenance/")})
     private Maintenance maintenance = new Maintenance();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/mark/")})
     private Mark mark = new Mark();

@@ -674,7 +674,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Kick kick = new Kick();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/mail/")})
         private Mail mail = new Mail();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/maintenace/")})
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/maintenance/")})
         private Maintenance maintenance = new Maintenance();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/me/")})
         private Me me = new Me();
