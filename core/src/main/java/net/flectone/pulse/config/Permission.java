@@ -940,7 +940,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                     private Type type = Type.TRUE;
                     private PermissionEntry bypass = new PermissionEntry("flectonepulse.module.message.format.moderation.swear.bypass", Type.OP);
                     private PermissionEntry see = new PermissionEntry("flectonepulse.module.message.format.moderation.swear.see", Type.OP);
-                    private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.format.moderation.swear.sound", Type.TRUE);
                 }
 
             }
