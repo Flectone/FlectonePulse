@@ -161,12 +161,12 @@ public class BukkitFPlayerManager extends FPlayerManager {
         fPlayer.setOnline(false);
 
         afkModule.remove("quit", fPlayer);
-
-        settingDAO.save(fPlayer);
-
         nameModule.remove(fPlayer);
         belowNameModule.remove(fPlayer);
         tabnameModule.remove(fPlayer);
+
+        settingDAO.save(fPlayer);
+        fPlayerDAO.save(fPlayer);
     }
 
     @Override
