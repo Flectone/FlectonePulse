@@ -135,6 +135,16 @@ public class FPlayerDAO {
         return getFPlayer("SELECT DISTINCT * FROM `player` WHERE `id` = ?", id, SQLType.INTEGER);
     }
 
+    public void updateAllToOffline() {
+        try (Connection connection = database.getConnection()) {
+            String SQL_UPDATE_TO_OFFLINE = "UPDATE `player` SET `online` = false";
+            PreparedStatement statement = connection.prepareStatement(SQL_UPDATE_TO_OFFLINE);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            fLogger.warning(e);
+        }
+    }
+
     private void updateAndWarn(int id, UUID uuid, String name) {
         fLogger.warning("Found player " + name + " with different UUID or name, will now use UUID: " + uuid.toString() + " and name: " + name);
         update(id, true, uuid, name);

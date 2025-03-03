@@ -127,7 +127,7 @@ public class BukkitFPlayerManager extends FPlayerManager {
             settingDAO.load(fPlayer);
         }
 
-        fPlayer.setOnline(true);
+        fPlayer.setOnline(Bukkit.getPlayer(uuid) != null);
         colorsDAO.load(fPlayer);
         ignoreDAO.load(fPlayer);
 

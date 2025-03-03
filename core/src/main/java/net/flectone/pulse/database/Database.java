@@ -8,6 +8,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
 import net.flectone.pulse.config.Config;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.util.SystemUtil;
@@ -37,8 +38,8 @@ public class Database {
 
     private HikariDataSource dataSource;
 
-    @Inject
-    private SettingDAO settingDAO;
+    @Inject private FPlayerDAO fPlayerDAO;
+    @Inject private SettingDAO settingDAO;
 
     @Inject
     public Database(FileManager fileManager,
@@ -72,6 +73,10 @@ public class Database {
 
             if (fileManager.isOlderThan(fileManager.getPreInitVersion(), "0.6.0")) {
                 MIGRATION_0_6_0();
+            }
+
+            if (config.getType() == Config.Database.Type.SQLITE) {
+                fPlayerDAO.updateAllToOffline();
             }
 
             init();
