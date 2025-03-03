@@ -2,7 +2,6 @@ package net.flectone.pulse.database.dao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.database.SQLType;
@@ -86,7 +85,6 @@ public class FPlayerDAO {
         return false;
     }
 
-    @Async
     public void insertOrIgnore(FPlayer fPlayer) {
         try (Connection connection = database.getConnection()) {
             String SQLITE_INSERT_OR_IGNORE = "INSERT OR IGNORE INTO `player` (`id`, `uuid`, `name`) VALUES (?, ?, ?)";
