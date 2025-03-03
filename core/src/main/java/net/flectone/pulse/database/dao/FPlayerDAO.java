@@ -24,6 +24,8 @@ public class FPlayerDAO {
     private final Database database;
     private final FLogger fLogger;
 
+    @Inject private SettingDAO settingDAO;
+
     @Inject
     public FPlayerDAO(FileManager fileManager,
                       Database database,
@@ -166,7 +168,7 @@ public class FPlayerDAO {
 
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                return getFPlayerFromResultSet(resultSet);
+                return getFPlayerFromResultSet(resultSet, true);
             }
 
         } catch (SQLException e) {
@@ -185,7 +187,7 @@ public class FPlayerDAO {
 
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                fPlayers.add(getFPlayerFromResultSet(resultSet));
+                fPlayers.add(getFPlayerFromResultSet(resultSet, false));
             }
 
         } catch (SQLException e) {
@@ -196,7 +198,7 @@ public class FPlayerDAO {
     }
 
     @NotNull
-    private FPlayer getFPlayerFromResultSet(ResultSet resultSet) throws SQLException {
+    private FPlayer getFPlayerFromResultSet(ResultSet resultSet, boolean loadSetting) throws SQLException {
         int id = resultSet.getInt("id");
         boolean isOnline = resultSet.getInt("online") == 1;
         UUID uuid = UUID.fromString(resultSet.getString("uuid"));
@@ -204,6 +206,10 @@ public class FPlayerDAO {
 
         FPlayer fPlayer = new FPlayer(id, name, uuid);
         fPlayer.setOnline(isOnline);
+
+        if (loadSetting) {
+            settingDAO.load(fPlayer);
+        }
 
         return fPlayer;
     }
