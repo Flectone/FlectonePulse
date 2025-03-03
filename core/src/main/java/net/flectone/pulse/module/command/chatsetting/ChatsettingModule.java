@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.command.chatsetting;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.google.inject.Inject;
 import lombok.Getter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -15,15 +16,15 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.PermissionUtil;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 public abstract class ChatsettingModule extends AbstractModuleCommand<Localization.Command.Chatsetting> {
 
-    private final Message.Chat chat;
+    private final Message.Chat chatMessage;
+    private final Permission.Message.Chat chatPermission;
     @Getter private final Command.Chatsetting command;
     @Getter private final Permission.Command.Chatsetting permission;
 
@@ -47,12 +48,16 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
         this.permissionUtil = permissionUtil;
         this.inventoryController = inventoryController;
 
-        chat = fileManager.getMessage().getChat();
+        chatMessage = fileManager.getMessage().getChat();
+        chatPermission = fileManager.getPermission().getMessage().getChat();
         command = fileManager.getCommand().getChatsetting();
         permission = fileManager.getPermission().getCommand().getChatsetting();
 
         addPredicate(this::checkCooldown);
     }
+
+    @Inject
+    private FLogger fLogger;
 
     @Override
     public void onCommand(FPlayer fPlayer, Object arguments) {
@@ -94,19 +99,25 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
                             case CHAT -> {
                                 newSettingIndex = 0;
 
-                                Set<String> chats = chat.getTypes().keySet();
+                                boolean needNextChat = fPlayer.getSettingValue(FPlayer.Setting.CHAT) == null;
+                                boolean chatChanged = false;
+                                for (String chatName : chatMessage.getTypes().keySet()) {
+                                    String permission = chatPermission.getTypes().get(chatName).getName();
+                                    if (!permissionUtil.has(fPlayer, permission)) continue;
 
-                                if (fPlayer.isSetting(FPlayer.Setting.CHAT)) {
-                                    for (Iterator<String> it = chats.iterator(); it.hasNext(); ) {
-                                        String chat = it.next();
-                                        if (chat.equals(fPlayer.getSettingValue(FPlayer.Setting.CHAT))) {
-                                            chat = it.hasNext() ? it.next() : null;
-                                            fPlayer.setSetting(FPlayer.Setting.CHAT, chat);
-                                            break;
-                                        }
+                                    if (needNextChat) {
+                                        fPlayer.setSetting(FPlayer.Setting.CHAT, chatName);
+                                        chatChanged = true;
+                                        break;
                                     }
-                                } else {
-                                    fPlayer.setSetting(FPlayer.Setting.CHAT, chats.iterator().next());
+
+                                    if (chatName.equalsIgnoreCase(fPlayer.getSettingValue(FPlayer.Setting.CHAT))) {
+                                        needNextChat = true;
+                                    }
+                                }
+
+                                if (!chatChanged && needNextChat) {
+                                    fPlayer.setSetting(FPlayer.Setting.CHAT, null);
                                 }
 
                             }
