@@ -20,7 +20,10 @@ public class BukkitPermissionUtil extends PermissionUtil {
 
     @Override
     public void register(String name, String type) {
-        if (Bukkit.getPluginManager().getPermission(name) != null) return;
+        if (Bukkit.getPluginManager().getPermission(name) != null) {
+            // does not always work correctly, requires a full restart
+            Bukkit.getPluginManager().removePermission(name);
+        }
 
         Bukkit.getPluginManager().addPermission(new Permission(name, PermissionDefault.getByName(type)));
     }
