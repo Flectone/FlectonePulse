@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.IgnoreDAO;
 import net.flectone.pulse.database.dao.MailDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.FCommand;
@@ -22,9 +23,10 @@ public class BukkitMailModule extends MailModule {
                             TellModule tellModule,
                             IntegrationModule integrationModule,
                             FPlayerDAO fPlayerDAO,
+                            IgnoreDAO ignoreDAO,
                             MailDAO mailDAO,
                             BukkitCommandUtil commandUtil) {
-        super(fileManager, tellModule, integrationModule, fPlayerDAO, mailDAO, commandUtil);
+        super(fileManager, tellModule, integrationModule, fPlayerDAO, ignoreDAO, mailDAO, commandUtil);
 
         this.commandUtil = commandUtil;
     }

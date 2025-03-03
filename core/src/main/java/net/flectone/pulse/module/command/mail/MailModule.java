@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.mail;
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.IgnoreDAO;
 import net.flectone.pulse.database.dao.MailDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -27,6 +28,7 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
     private final TellModule tellModule;
     private final IntegrationModule integrationModule;
     private final FPlayerDAO fPlayerDAO;
+    private final IgnoreDAO ignoreDAO;
     private final MailDAO mailDAO;
     private final CommandUtil commandUtil;
 
@@ -34,6 +36,7 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
                       TellModule tellModule,
                       IntegrationModule integrationModule,
                       FPlayerDAO fPlayerDAO,
+                      IgnoreDAO ignoreDAO,
                       MailDAO mailDAO,
                       CommandUtil commandUtil) {
         super(localization -> localization.getCommand().getMail(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.MAIL));
@@ -41,6 +44,7 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
         this.tellModule = tellModule;
         this.integrationModule = integrationModule;
         this.fPlayerDAO = fPlayerDAO;
+        this.ignoreDAO = ignoreDAO;
         this.mailDAO = mailDAO;
         this.commandUtil = commandUtil;
 
@@ -77,9 +81,10 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
             return;
         }
 
-        if (checkDisable(fPlayer, fReceiver, DisableAction.HE)) {
-            return;
-        }
+        ignoreDAO.load(fReceiver);
+
+        if (checkIgnore(fPlayer, fReceiver)) return;
+        if (checkDisable(fPlayer, fReceiver, DisableAction.HE)) return;
 
         String string = commandUtil.getString(1, arguments);
 

@@ -6,6 +6,7 @@ import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.arguments.UUIDArgument;
 import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.IgnoreDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.module.command.FCommand;
@@ -21,9 +22,10 @@ public class BukkitRockpaperscissorsModule extends RockpaperscissorsModule {
     public BukkitRockpaperscissorsModule(FileManager fileManager,
                                          ProxyConnector proxyConnector,
                                          FPlayerDAO FPlayerDAO,
+                                         IgnoreDAO ignoreDAO,
                                          BukkitCommandUtil commandUtil,
                                          IntegrationModule integrationModule) {
-        super(fileManager, proxyConnector, FPlayerDAO, commandUtil, integrationModule);
+        super(fileManager, proxyConnector, FPlayerDAO, ignoreDAO, commandUtil, integrationModule);
 
         this.commandUtil = commandUtil;
     }

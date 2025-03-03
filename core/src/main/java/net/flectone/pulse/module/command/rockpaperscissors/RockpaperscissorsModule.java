@@ -5,6 +5,7 @@ import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.database.dao.IgnoreDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.model.FEntity;
@@ -30,18 +31,21 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
 
     private final ProxyConnector proxyConnector;
     private final FPlayerDAO fPlayerDAO;
+    private final IgnoreDAO ignoreDAO;
     private final CommandUtil commandUtil;
     private final IntegrationModule integrationModule;
 
     public RockpaperscissorsModule(FileManager fileManager,
                                    ProxyConnector proxyConnector,
                                    FPlayerDAO fPlayerDAO,
+                                   IgnoreDAO ignoreDAO,
                                    CommandUtil commandUtil,
                                    IntegrationModule integrationModule) {
         super(localization -> localization.getCommand().getRockpaperscissors(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.ROCKPAPERSCISSORS));
 
         this.proxyConnector = proxyConnector;
         this.fPlayerDAO = fPlayerDAO;
+        this.ignoreDAO = ignoreDAO;
         this.commandUtil = commandUtil;
         this.integrationModule = integrationModule;
 
@@ -72,9 +76,10 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
             return;
         }
 
-        if (checkDisable(fPlayer, fReceiver, DisableAction.HE)) {
-            return;
-        }
+        ignoreDAO.load(fReceiver);
+
+        if (checkIgnore(fPlayer, fReceiver)) return;
+        if (checkDisable(fPlayer, fReceiver, DisableAction.HE)) return;
 
         String move = commandUtil.getString(1, arguments);
         UUID uuid = commandUtil.getByClassOrDefault(2, UUID.class, UUID.randomUUID(), arguments);

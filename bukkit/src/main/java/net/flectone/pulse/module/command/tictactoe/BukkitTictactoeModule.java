@@ -7,6 +7,7 @@ import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.IgnoreDAO;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.connector.ProxyConnector;
@@ -24,13 +25,14 @@ public class BukkitTictactoeModule extends TictactoeModule {
     @Inject
     public BukkitTictactoeModule(FileManager fileManager,
                                  FPlayerDAO fPlayerDAO,
+                                 IgnoreDAO ignoreDAO,
                                  TictactoeManager tictactoeManager,
                                  FPlayerManager fPlayerManager,
                                  ProxyConnector proxyConnector,
                                  IntegrationModule integrationModule,
                                  BukkitCommandUtil commandUtil,
                                  Gson gson) {
-        super(fileManager, fPlayerDAO, tictactoeManager, proxyConnector, integrationModule, commandUtil, gson);
+        super(fileManager, fPlayerDAO, ignoreDAO, tictactoeManager, proxyConnector, integrationModule, commandUtil, gson);
 
         this.fPlayerManager = fPlayerManager;
         this.commandUtil = commandUtil;
