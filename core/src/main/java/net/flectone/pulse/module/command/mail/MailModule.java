@@ -2,12 +2,12 @@ package net.flectone.pulse.module.command.mail;
 
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.IgnoreDAO;
-import net.flectone.pulse.database.dao.MailDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.IgnoreDAO;
+import net.flectone.pulse.database.dao.MailDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -18,7 +18,6 @@ import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 
 import java.util.List;
-import java.util.Optional;
 
 public abstract class MailModule extends AbstractModuleCommand<Localization.Command.Mail> {
 
@@ -62,18 +61,13 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
         String playerName = commandUtil.getString(0, arguments);
         if (playerName == null) return;
 
-        Optional<FPlayer> optionalPlayer = fPlayerDAO.getFPlayers().stream()
-                .filter(offlinePlayer -> playerName.equalsIgnoreCase(offlinePlayer.getName()))
-                .findAny();
-
-        if (optionalPlayer.isEmpty()) {
+        FPlayer fReceiver = fPlayerDAO.getFPlayer(playerName);
+        if (fReceiver.isUnknown()) {
             builder(fPlayer)
                     .format(Localization.Command.Mail::getNullPlayer)
                     .sendBuilt();
             return;
         }
-
-        FPlayer fReceiver = fPlayerDAO.getFPlayer(optionalPlayer.get().getUuid());
 
         if (fReceiver.isOnline() && !integrationModule.isVanished(fReceiver)) {
             if (!tellModule.isEnable()) return;

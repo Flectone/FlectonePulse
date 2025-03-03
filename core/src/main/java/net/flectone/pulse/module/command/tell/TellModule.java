@@ -1,14 +1,14 @@
 package net.flectone.pulse.module.command.tell;
 
 import lombok.Getter;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.IgnoreDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.connector.ProxyConnector;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.IgnoreDAO;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -18,7 +18,6 @@ import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
@@ -81,18 +80,13 @@ public abstract class TellModule extends AbstractModuleCommand<Localization.Comm
             return;
         }
 
-        Optional<FPlayer> optionalFReceiver = fPlayerDAO.getOnlineFPlayers().stream()
-                .filter(filterPlayer -> filterPlayer.getName().equalsIgnoreCase(playerName))
-                .findAny();
-
-        if (optionalFReceiver.isEmpty()) {
+        FPlayer fReceiver = fPlayerDAO.getFPlayer(playerName);
+        if (fReceiver.isUnknown() || !fReceiver.isOnline()) {
             builder(fPlayer)
                     .format(Localization.Command.Tell::getNullPlayer)
                     .sendBuilt();
             return;
         }
-
-        FPlayer fReceiver = fPlayerDAO.getFPlayer(optionalFReceiver.get().getId());
 
         ignoreDAO.load(fReceiver);
 
