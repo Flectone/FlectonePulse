@@ -10,27 +10,38 @@ import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.PermissionUtil;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 @Singleton
 public class SwearModule extends AbstractModuleMessage<Localization.Message.Format.Moderation.Swear> {
+
 
     private final Message.Format.Moderation.Swear message;
     private final Permission.Message.Format.Moderation.Swear permission;
 
     private final PermissionUtil permissionUtil;
+    private final FLogger fLogger;
 
     @Inject private ComponentUtil componentUtil;
 
+    private Pattern combinedPattern;
+
     @Inject
     public SwearModule(FileManager fileManager,
-                       PermissionUtil permissionUtil) {
+                       PermissionUtil permissionUtil,
+                       FLogger fLogger) {
         super(localization -> localization.getMessage().getFormat().getModeration().getSwear());
 
         this.permissionUtil = permissionUtil;
+        this.fLogger = fLogger;
 
         message = fileManager.getMessage().getFormat().getModeration().getSwear();
         permission = fileManager.getPermission().getMessage().getFormat().getModeration().getSwear();
@@ -42,6 +53,12 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
 
         registerPermission(permission.getBypass());
         registerPermission(permission.getSee());
+
+        try {
+            combinedPattern = Pattern.compile(String.join("|", this.message.getTrigger()));
+        } catch (PatternSyntaxException e) {
+            fLogger.warning(e);
+        }
     }
 
     @Override
@@ -52,9 +69,17 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
     public String replace(FEntity sender, String message) {
         if (checkModulePredicates(sender)) return message;
         if (permissionUtil.has(sender, permission.getBypass())) return message;
+        if (combinedPattern == null) return message;
 
-        String regex = String.join("|", this.message.getTrigger());
-        return message.replaceAll(regex, "<swear:\"$1\">");
+        StringBuilder result = new StringBuilder();
+        Matcher matcher = combinedPattern.matcher(message);
+        while (matcher.find()) {
+
+            matcher.appendReplacement(result, "<swear:\"" + matcher.group(0) + "\">");
+        }
+        matcher.appendTail(result);
+
+        return result.toString();
     }
 
     public TagResolver swearTag(FEntity sender, FEntity receiver) {
@@ -65,6 +90,8 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
             if (swearTag == null) return Tag.selfClosingInserting(Component.empty());
 
             String swear = swearTag.value();
+            if (swear.isBlank()) return Tag.selfClosingInserting(Component.empty());
+
             String message = resolveLocalization(receiver).getSymbol().repeat(swear.length());
 
             Component component = componentUtil.builder(sender, receiver, message).build();
