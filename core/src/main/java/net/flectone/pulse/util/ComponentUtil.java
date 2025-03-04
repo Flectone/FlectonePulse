@@ -287,7 +287,7 @@ public class ComponentUtil {
                 message = fixationModule.replace(sender, message);
             }
 
-            if (!userMessage || permissionUtil.has(receiver, formatModule.getPermission().getAll().getName())) {
+            if (!userMessage || permissionUtil.has(sender, formatModule.getPermission().getAll().getName())) {
                 tagResolverList.add(colorModule.colorTag(colorModule.getMessage().isUseRecipientColors() ? receiver : sender));
 
                 tagResolverList.add(worldModule.worldTag(sender));
