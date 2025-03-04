@@ -1195,6 +1195,7 @@ public final class Permission extends FileSerializable implements ModuleConfig {
 
     public enum Type {
         TRUE,
+        @Deprecated
         FALSE,
         OP,
         NOT_OP
