@@ -96,7 +96,7 @@ public final class FlectoneMiniTranslator {
         StringBuilder builder = new StringBuilder();
         boolean defCloseValue = options.contains(Option.CLOSE_COLORS);
         boolean fastReset = options.contains(Option.FAST_RESET);
-        boolean closeLastTag = true;
+        boolean closeLastTag = defCloseValue;
 
         for (int index = 0, nextIndex = text.indexOf('&'); index < text.length(); index++, nextIndex = text.indexOf('&', index)) {
             if (nextIndex == -1) {
