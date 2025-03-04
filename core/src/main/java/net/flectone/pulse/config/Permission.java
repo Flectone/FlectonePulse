@@ -903,7 +903,7 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                 private String name = "flectonepulse.module.message.format.mention";
                 private Type type = Type.TRUE;
                 private PermissionEntry group = new PermissionEntry("flectonepulse.module.message.format.mention.group", Type.OP);
-                private PermissionEntry bypass = new PermissionEntry("flectonepulse.module.message.format.mention.bypass", Type.NOT_OP);
+                private PermissionEntry bypass = new PermissionEntry("flectonepulse.module.message.format.mention.bypass", Type.FALSE);
                 private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.format.mention.sound", Type.TRUE);
             }
 
@@ -1195,7 +1195,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
 
     public enum Type {
         TRUE,
-        @Deprecated
         FALSE,
         OP,
         NOT_OP
