@@ -233,15 +233,24 @@ public final class FlectoneMiniTranslator {
     }
 
     private static boolean isHexColorStandalone(String text, int index) {
-        if (index > 0 && "<:&".indexOf(text.charAt(index - 1)) != -1) {
+        if (index > 0 && text.charAt(index - 1) == '&') {
             return false;
         }
 
-        if (index + 7 > text.length() || !HEX_COLOR.matcher(text.substring(index + 1, index + 7)).matches()) {
-            return false;
+
+        if (index > 0 && text.charAt(index - 1) == '<') {
+            if (index + 7 < text.length() && text.charAt(index + 7) == '>') {
+                return false;
+            }
         }
 
-        return index + 7 == text.length() || text.charAt(index + 7) == '>' || "<:".indexOf(text.charAt(index + 7)) == -1;
+        if (index > 0 && text.charAt(index - 1) == ':') {
+            if (index + 7 < text.length() && ">:".indexOf(text.charAt(index + 7)) != -1) {
+                return false;
+            }
+        }
+
+        return index + 7 <= text.length() && HEX_COLOR.matcher(text.substring(index + 1, index + 7)).matches();
     }
 
     private static String replaceDoubleHashHexColor(String text) {
