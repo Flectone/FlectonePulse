@@ -3,7 +3,6 @@ package net.flectone.pulse.module.integration;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -21,7 +20,10 @@ import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.vault.VaultModule;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.ServerUtil;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.Set;
@@ -224,7 +226,8 @@ public class BukkitIntegrationModule extends IntegrationModule {
             return injector.getInstance(SuperVanishModule.class).isVanished(sender);
         }
 
-        return false;
+        Player player = Bukkit.getPlayer(sender.getUuid());
+        return player != null && player.hasMetadata("vanished");
     }
 
     @Override
