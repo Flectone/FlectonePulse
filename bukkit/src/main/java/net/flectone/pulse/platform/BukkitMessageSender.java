@@ -6,14 +6,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FPlayerManager;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Toast;
 import net.flectone.pulse.module.integration.BukkitIntegrationModule;
-import net.flectone.pulse.util.serializer.BrandPacketSerializer;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.PacketEventsUtil;
+import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.util.serializer.BrandPacketSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
@@ -109,16 +109,20 @@ public class BukkitMessageSender extends MessageSender {
 
         String jsonToast = jsonObject.toString();
 
-        taskScheduler.runSync(() -> Bukkit.getUnsafe().loadAdvancement(key, jsonToast));
+        taskScheduler.runSync(() -> {
+            if (Bukkit.getServer().getAdvancement(key) != null) return;
+
+            Bukkit.getUnsafe().loadAdvancement(key, jsonToast);
+        });
     }
 
     private void grantToast(NamespacedKey key, Player player) {
-        taskScheduler.runSync(() -> {
+        taskScheduler.runSyncLater(() -> {
             Advancement advancement = Bukkit.getAdvancement(key);
             if (advancement == null) return;
 
             player.getAdvancementProgress(advancement).awardCriteria("trigger");
-        });
+        }, 2);
     }
 
     private void revokeToast(NamespacedKey key, Player player) {
@@ -127,6 +131,6 @@ public class BukkitMessageSender extends MessageSender {
             if (advancement == null) return;
 
             player.getAdvancementProgress(advancement).revokeCriteria("trigger");
-        }, 10);
+        }, 4);
     }
 }
