@@ -22,10 +22,14 @@ import org.bukkit.advancement.Advancement;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Singleton
 public class BukkitMessageSender extends MessageSender {
+
+    private final Map<UUID, Long> playerCacheMap = new HashMap<>();
 
     private final Plugin plugin;
     private final TaskScheduler taskScheduler;
@@ -58,11 +62,21 @@ public class BukkitMessageSender extends MessageSender {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;
 
-        NamespacedKey namespacedKey = new NamespacedKey(plugin, UUID.randomUUID() + fPlayer.getName());
+        long lastCache = playerCacheMap.containsKey(fPlayer.getUuid())
+                // cooldown 60 seconds
+                ? Math.abs(playerCacheMap.get(fPlayer.getUuid()) - System.currentTimeMillis()) > 60 * 1000
+                    ? System.currentTimeMillis()
+                    : playerCacheMap.get(fPlayer.getUuid())
+                : System.currentTimeMillis();
+
+        String key = fPlayer.getUuid().toString() + lastCache;
+        NamespacedKey namespacedKey = new NamespacedKey(plugin, key);
 
         createToast(namespacedKey, title, toast);
         grantToast(namespacedKey, player);
         revokeToast(namespacedKey, player);
+
+        playerCacheMap.put(fPlayer.getUuid(), lastCache);
     }
 
     private void createToast(NamespacedKey key, Component title, Toast toast) {
