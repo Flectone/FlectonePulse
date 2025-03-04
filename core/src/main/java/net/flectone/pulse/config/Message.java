@@ -9,7 +9,6 @@ import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.module.message.format.world.WorldMode;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
-import net.flectone.pulse.util.AdvancementType;
 import net.flectone.pulse.util.Range;
 import net.flectone.pulse.util.TagType;
 
@@ -392,7 +391,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         public static final class Mention implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
             private String trigger = "@";
-            private Destination destination = new Destination(Destination.Type.TOAST, new Toast("minecraft:bell", AdvancementType.TASK));
+            private Destination destination = new Destination(Destination.Type.ACTION_BAR);
             private Sound sound = new Sound(true, 0.1f, 0.1f, SoundCategory.NEUTRAL.name(), Sounds.ENTITY_EXPERIENCE_ORB_PICKUP.getName().toString());
         }
 
