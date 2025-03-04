@@ -3,19 +3,20 @@ package net.flectone.pulse.module.message.chat;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
-import net.flectone.pulse.registry.BukkitListenerRegistry;
+import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.module.command.spy.BukkitSpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BukkitBubbleModule;
 import net.flectone.pulse.module.message.chat.listener.ChatListener;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.PermissionUtil;
 import net.flectone.pulse.util.Range;
@@ -43,6 +44,7 @@ public class BukkitChatModule extends ChatModule {
     private final TimeUtil timeUtil;
 
     @Inject private BukkitBubbleModule bubbleModule;
+    @Inject private BukkitSpyModule spyModule;
 
     @Inject
     public BukkitChatModule(FileManager fileManager,
@@ -171,6 +173,8 @@ public class BukkitChatModule extends ChatModule {
                 .filter(filter)
                 .map(FEntity::getUuid)
                 .toList();
+
+        spyModule.checkChat(fPlayer, chatName, finalMessage);
 
         int countRecipients = recipients.size();
 

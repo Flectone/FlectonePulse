@@ -132,14 +132,21 @@ public class BukkitSpyModule extends SpyModule {
     public void check(AsyncPlayerChatEvent event) {
         if (!isEnable()) return;
 
-        Map<String, List<String>> categories = getCommand().getCategories();
-        if (categories.get("action") == null) return;
-        if (!categories.get("action").contains("chat")) return;
-
         FPlayer fPlayer = fPlayerManager.get(event.getPlayer());
 
         String message = event.getMessage();
-        spy(fPlayer, "chat", message);
+
+        checkChat(fPlayer, "chat", message);
+    }
+
+    public void checkChat(FPlayer fPlayer, String chat, String message) {
+        if (!isEnable()) return;
+
+        Map<String, List<String>> categories = getCommand().getCategories();
+        if (categories.get("action") == null) return;
+        if (!categories.get("action").contains(chat)) return;
+
+        spy(fPlayer, chat, message);
     }
 
     @Override
