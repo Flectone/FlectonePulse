@@ -196,7 +196,7 @@ public class SettingDAO {
     }
 
     private void insertOldSetting(Connection connection, int id, boolean[] settings, int index, FPlayer.Setting setting) throws SQLException {
-        if (settings.length < index) return;
+        if (settings.length <= index) return;
         if (!settings[index]) return;
 
         insert(connection, id, setting, "");
