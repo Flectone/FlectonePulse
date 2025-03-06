@@ -64,9 +64,10 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
         if (checkModulePredicates(fPlayer)) return;
 
         String input = commandUtil.getString(0, arguments);
-        String[] words = input.split(" ");
 
         if (permissionUtil.has(fPlayer, permission.getOther())) {
+            String[] words = input.split(" ");
+
             String player = words[0];
             if (!player.startsWith("#")
                     && !player.startsWith("&")
