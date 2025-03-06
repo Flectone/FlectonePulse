@@ -68,7 +68,6 @@ public class BasePacketListener extends AbstractPacketListener {
 
         int entityId = user.getEntityId();
         String name = user.getName();
-        String ip = user.getAddress().getHostString();
 
         taskScheduler.runAsync(() -> {
             FPlayer fPlayer = fPlayerManager.createAndPut(uuid, entityId, name);

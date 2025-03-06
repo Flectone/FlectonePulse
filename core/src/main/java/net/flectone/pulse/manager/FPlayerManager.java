@@ -59,6 +59,7 @@ public abstract class FPlayerManager {
     public abstract void saveAndRemove(FPlayer fPlayer);
     public abstract String getWorldName(FPlayer fPlayer);
     public abstract String getWorldEnvironment(FPlayer fPlayer);
+    public abstract String getIp(FPlayer fPlayer);
     public abstract Object getItem(@NotNull UUID uuid);
     public abstract Component getPlayerListHeader(FPlayer fPlayer);
     public abstract Component getPlayerListFooter(FPlayer fPlayer);

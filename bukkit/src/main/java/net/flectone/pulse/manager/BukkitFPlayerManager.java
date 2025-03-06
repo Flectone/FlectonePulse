@@ -32,6 +32,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.net.InetSocketAddress;
 import java.util.UUID;
 
 @Singleton
@@ -127,13 +128,12 @@ public class BukkitFPlayerManager extends FPlayerManager {
             settingDAO.load(fPlayer);
         }
 
-        fPlayer.setOnline(true);
         colorsDAO.load(fPlayer);
         ignoreDAO.load(fPlayer);
-
         fPlayer.updateMutes(moderationDAO.get(fPlayer, Moderation.Type.MUTE));
 
-        fPlayer.setIp(ip);
+        fPlayer.setOnline(true);
+        fPlayer.setIp(getIp(fPlayer));
         fPlayer.setCurrentName(name);
         fPlayer.setEntityId(entityId);
 
@@ -191,6 +191,17 @@ public class BukkitFPlayerManager extends FPlayerManager {
         if (player == null) return "";
 
         return player.getWorld().getEnvironment().toString().toLowerCase();
+    }
+
+    @Override
+    public String getIp(FPlayer fPlayer) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        if (player == null) return null;
+
+        InetSocketAddress address = player.getAddress();
+        if (address == null) return null;
+
+        return address.getHostString();
     }
 
     @Override
@@ -281,7 +292,7 @@ public class BukkitFPlayerManager extends FPlayerManager {
     @Override
     public void loadOnlinePlayers() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            put(player.getUniqueId(), player.getEntityId(), player.getName(), player.getAddress().getHostString());
+            createAndPut(player.getUniqueId(), player.getEntityId(), player.getName());
         }
     }
 }
