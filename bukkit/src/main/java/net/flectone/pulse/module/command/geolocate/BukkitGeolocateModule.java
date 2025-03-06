@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.StringArgument;
 import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.util.BukkitCommandUtil;
-import net.flectone.pulse.util.PacketEventsUtil;
 
 @Singleton
 public class BukkitGeolocateModule extends GeolocateModule {
@@ -17,9 +17,9 @@ public class BukkitGeolocateModule extends GeolocateModule {
     @Inject
     public BukkitGeolocateModule(FileManager fileManager,
                                  FPlayerDAO fPlayerDAO,
-                                 BukkitCommandUtil commandUtil,
-                                 PacketEventsUtil packetEventsUtil) {
-        super(fileManager, fPlayerDAO, commandUtil, packetEventsUtil);
+                                 FPlayerManager fPlayerManager,
+                                 BukkitCommandUtil commandUtil) {
+        super(fileManager, fPlayerDAO, fPlayerManager, commandUtil);
 
         this.commandManager = commandUtil;
     }

@@ -1,17 +1,16 @@
 package net.flectone.pulse.module.command.geolocate;
 
-import com.github.retrooper.packetevents.protocol.player.User;
 import lombok.Getter;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.PacketEventsUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,18 +27,18 @@ public abstract class GeolocateModule extends AbstractModuleCommand<Localization
     @Getter private final Permission.Command.Geolocate permission;
 
     private final FPlayerDAO fPlayerDAO;
+    private final FPlayerManager fPlayerManager;
     private final CommandUtil commandUtil;
-    private final PacketEventsUtil packetEventsUtil;
 
     public GeolocateModule(FileManager fileManager,
                            FPlayerDAO fPlayerDAO,
-                           CommandUtil commandUtil,
-                           PacketEventsUtil packetEventsUtil) {
+                           FPlayerManager fPlayerManager,
+                           CommandUtil commandUtil) {
         super(localization -> localization.getCommand().getGeolocate(), null);
 
         this.fPlayerDAO = fPlayerDAO;
+        this.fPlayerManager = fPlayerManager;
         this.commandUtil = commandUtil;
-        this.packetEventsUtil = packetEventsUtil;
 
         command = fileManager.getCommand().getGeolocate();
         permission = fileManager.getPermission().getCommand().getGeolocate();
@@ -63,10 +62,9 @@ public abstract class GeolocateModule extends AbstractModuleCommand<Localization
             return;
         }
 
-        User user = packetEventsUtil.getUser(fTarget);
-        String ip = user == null ? fTarget.getIp() : user.getAddress().getHostString();
+        String ip = fTarget.isOnline() ? fPlayerManager.getIp(fTarget) : fTarget.getIp();
 
-        List<String> request = readResponse(HTTP_URL.replace("<ip>", ip));
+        List<String> request = ip == null ? List.of() : readResponse(HTTP_URL.replace("<ip>", ip));
         if (request.isEmpty() || request.get(0).equals("fail")) {
             builder(fPlayer)
                     .format(Localization.Command.Geolocate::getNullOrError)
