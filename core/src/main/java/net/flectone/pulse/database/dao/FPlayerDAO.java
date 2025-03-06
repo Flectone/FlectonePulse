@@ -48,7 +48,7 @@ public class FPlayerDAO {
             if (resultSet.next()) {
                 UUID playerDatabaseUUID = UUID.fromString(resultSet.getString("uuid"));
                 if (!uuid.equals(playerDatabaseUUID)) {
-                    updateAndWarn(resultSet.getInt("id"), uuid, name);
+                    updateAndWarn(resultSet.getInt("id"), uuid, name, resultSet.getString("ip"));
                 }
 
                 return false;
@@ -65,7 +65,7 @@ public class FPlayerDAO {
             if (resultSet.next()) {
                 String playerDatabaseNAME = resultSet.getString("name");
                 if (!name.equalsIgnoreCase(playerDatabaseNAME)) {
-                    updateAndWarn(resultSet.getInt("id"), uuid, name);
+                    updateAndWarn(resultSet.getInt("id"), uuid, name, resultSet.getString("ip"));
                 }
 
                 return false;
@@ -102,7 +102,7 @@ public class FPlayerDAO {
     public void save(FPlayer fPlayer) {
         if (fPlayer.isUnknown()) return;
 
-        update(fPlayer.getId(), fPlayer.isOnline(), fPlayer.getUuid(), fPlayer.getCurrentName());
+        update(fPlayer.getId(), fPlayer.isOnline(), fPlayer.getUuid(), fPlayer.getCurrentName(), fPlayer.getIp());
     }
 
     @NotNull
@@ -145,19 +145,20 @@ public class FPlayerDAO {
         }
     }
 
-    private void updateAndWarn(int id, UUID uuid, String name) {
+    private void updateAndWarn(int id, UUID uuid, String name, String ip) {
         fLogger.warning("Found player " + name + " with different UUID or name, will now use UUID: " + uuid.toString() + " and name: " + name);
-        update(id, true, uuid, name);
+        update(id, true, uuid, name, ip);
     }
 
-    private void update(int id, boolean online, UUID uuid, String name) {
+    private void update(int id, boolean online, UUID uuid, String name, String ip) {
         try (Connection connection = database.getConnection()) {
-            String SQL_UPDATE_BY_ID = "UPDATE `player` SET `online` = ?, `uuid` = ?, `name` = ? WHERE `id` = ?";
+            String SQL_UPDATE_BY_ID = "UPDATE `player` SET `online` = ?, `uuid` = ?, `name` = ?, `ip` = ? WHERE `id` = ?";
             PreparedStatement statement = connection.prepareStatement(SQL_UPDATE_BY_ID);
             statement.setInt(1, online ? 1 : 0);
             statement.setString(2, uuid.toString());
             statement.setString(3, name);
-            statement.setInt(4, id);
+            statement.setString(4, ip);
+            statement.setInt(5, id);
             statement.executeUpdate();
         } catch (SQLException e) {
             fLogger.warning(e);
