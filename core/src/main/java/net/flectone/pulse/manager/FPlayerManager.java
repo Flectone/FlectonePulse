@@ -55,8 +55,8 @@ public abstract class FPlayerManager {
 
     public abstract FPlayer convertToFPlayer(Object player);
     public abstract Object convertToPlayer(FPlayer fPlayer);
-    public abstract FPlayer put(UUID uuid, int entityId, String name, String ip);
-    public abstract void remove(FPlayer fPlayer);
+    public abstract FPlayer createAndPut(UUID uuid, int entityId, String name);
+    public abstract void saveAndRemove(FPlayer fPlayer);
     public abstract String getWorldName(FPlayer fPlayer);
     public abstract String getWorldEnvironment(FPlayer fPlayer);
     public abstract Object getItem(@NotNull UUID uuid);

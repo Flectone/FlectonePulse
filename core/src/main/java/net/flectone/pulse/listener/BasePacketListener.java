@@ -71,7 +71,7 @@ public class BasePacketListener extends AbstractPacketListener {
         String ip = user.getAddress().getHostString();
 
         taskScheduler.runAsync(() -> {
-            FPlayer fPlayer = fPlayerManager.put(uuid, entityId, name, ip);
+            FPlayer fPlayer = fPlayerManager.createAndPut(uuid, entityId, name);
 
             joinModule.send(fPlayer, true);
             greetingModule.send(fPlayer);
@@ -87,7 +87,7 @@ public class BasePacketListener extends AbstractPacketListener {
             FPlayer fPlayer = fPlayerManager.get(event.getUser().getUUID());
             if (!fPlayer.isOnline()) return;
 
-            fPlayerManager.remove(fPlayer);
+            fPlayerManager.saveAndRemove(fPlayer);
             bubbleManager.remove(fPlayer);
             quitModule.send(fPlayer);
         });

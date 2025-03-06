@@ -116,7 +116,7 @@ public class BukkitFPlayerManager extends FPlayerManager {
     }
 
     @Override
-    public FPlayer put(UUID uuid, int entityId, String name, String ip) {
+    public FPlayer createAndPut(UUID uuid, int entityId, String name) {
         boolean isInserted = fPlayerDAO.insert(uuid, name);
         FPlayer fPlayer = fPlayerDAO.getFPlayer(uuid);
 
@@ -157,7 +157,7 @@ public class BukkitFPlayerManager extends FPlayerManager {
     }
 
     @Override
-    public void remove(FPlayer fPlayer) {
+    public void saveAndRemove(FPlayer fPlayer) {
         fPlayer.setOnline(false);
 
         afkModule.remove("quit", fPlayer);
