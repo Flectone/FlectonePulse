@@ -123,14 +123,7 @@ public class FLogger extends Logger {
     }
 
     public void warning(Exception e) {
-        int lineNumber = e.getStackTrace()[0].getLineNumber();
-        String className = e.getStackTrace()[0].getClassName();
-
-        log(buildLogRecord(Level.WARNING, "[" + className + ":" + lineNumber + "] "  + e.getLocalizedMessage()));
-
-        for (StackTraceElement stackTraceElement : e.getStackTrace()) {
-            log(buildLogRecord(Level.WARNING, "\tat " + stackTraceElement));
-        }
+        super.log(Level.WARNING, "An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues", e);
     }
 
     public void warningTree(Component component) {
