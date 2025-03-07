@@ -128,18 +128,17 @@ public class BukkitFPlayerManager extends FPlayerManager {
             settingDAO.load(fPlayer);
         }
 
-        colorsDAO.load(fPlayer);
-        ignoreDAO.load(fPlayer);
-        fPlayer.updateMutes(moderationDAO.get(fPlayer, Moderation.Type.MUTE));
-
         fPlayer.setOnline(true);
         fPlayer.setIp(getIp(fPlayer));
         fPlayer.setCurrentName(name);
         fPlayer.setEntityId(entityId);
+        fPlayerDAO.save(fPlayer);
+
+        colorsDAO.load(fPlayer);
+        ignoreDAO.load(fPlayer);
+        fPlayer.updateMutes(moderationDAO.get(fPlayer, Moderation.Type.MUTE));
 
         put(fPlayer);
-
-        taskScheduler.runAsync(() -> fPlayerDAO.save(fPlayer));
 
         worldModule.update(fPlayer);
         afkModule.remove("", fPlayer);
