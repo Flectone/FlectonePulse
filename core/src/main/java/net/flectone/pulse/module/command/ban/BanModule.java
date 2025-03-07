@@ -79,7 +79,7 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
             } else {
                 reason = commandUtil.getString(1, arguments);
             }
-        } catch (ClassCastException | NullPointerException e) {
+        } catch (ClassCastException | NullPointerException | IllegalArgumentException e) {
             time = -1;
             reason = commandUtil.getString(1, arguments);
         }
