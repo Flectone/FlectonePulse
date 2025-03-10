@@ -24,6 +24,7 @@ import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.MetadataValue;
 
 import java.util.Collections;
 import java.util.Set;
@@ -227,7 +228,11 @@ public class BukkitIntegrationModule extends IntegrationModule {
         }
 
         Player player = Bukkit.getPlayer(sender.getUuid());
-        return player != null && player.hasMetadata("vanished");
+        if (player == null) return false;
+
+        return player.getMetadata("vanished")
+                .stream()
+                .anyMatch(MetadataValue::asBoolean);
     }
 
     @Override
