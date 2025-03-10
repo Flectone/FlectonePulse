@@ -87,11 +87,13 @@ public class FloodModule extends AbstractModule {
             return text;
         }
 
-        StringBuilder stringBuilder = new StringBuilder();
         String[] words = text.split(" ");
+        if (words.length == 0) return text;
+
         String prevWord = words[0];
         int count = 1;
 
+        StringBuilder stringBuilder = new StringBuilder();
         for (int i = 1; i < words.length; i++) {
             String currentWord = words[i];
             if (currentWord.equalsIgnoreCase(prevWord)) {
@@ -102,6 +104,7 @@ public class FloodModule extends AbstractModule {
                 count = 1;
             }
         }
+
         appendWord(stringBuilder, prevWord, count);
 
         return stringBuilder.toString().trim();
