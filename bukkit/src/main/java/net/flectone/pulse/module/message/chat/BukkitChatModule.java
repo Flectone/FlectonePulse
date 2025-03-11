@@ -177,20 +177,20 @@ public class BukkitChatModule extends ChatModule {
         spyModule.checkChat(fPlayer, chatName, finalMessage);
 
         int countRecipients = recipients.size();
-
         if (playerChat.isNullRecipient() && countRecipients < 2) {
+            taskScheduler.runAsyncLater(() -> {
+                Set<UUID> onlinePlayers = fPlayerDAO.getOnlineFPlayers()
+                        .stream()
+                        .map(FEntity::getUuid)
+                        .collect(Collectors.toSet());
 
-            Set<UUID> onlinePlayers = fPlayerDAO.getOnlineFPlayers()
-                    .stream()
-                    .map(FEntity::getUuid)
-                    .collect(Collectors.toSet());
-
-            if ((onlinePlayers.containsAll(recipients) && onlinePlayers.size() <= countRecipients)
-                    || chatRange > -1) {
-                taskScheduler.runAsyncLater(() -> builder(fPlayer)
-                        .format(Localization.Message.Chat::getNullRecipient)
-                        .sendBuilt(), 5);
-            }
+                if ((onlinePlayers.containsAll(recipients) && onlinePlayers.size() <= countRecipients)
+                        || chatRange > -1) {
+                    builder(fPlayer)
+                            .format(Localization.Message.Chat::getNullRecipient)
+                            .sendBuilt();
+                }
+            }, 5);
         }
 
         event.setMessage(finalMessage);
