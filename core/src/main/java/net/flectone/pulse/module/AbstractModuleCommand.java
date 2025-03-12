@@ -59,7 +59,7 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
     public abstract void createCommand();
 
     @Override
-    public Predicate<FPlayer> rangeFilter(FEntity sender, double range) {
+    public Predicate<FPlayer> rangeFilter(FEntity sender, int range) {
         Predicate<FPlayer> filter = super.rangeFilter(sender, range);
 
         if (range == Range.PLAYER) {

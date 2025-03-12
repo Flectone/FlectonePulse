@@ -160,7 +160,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         return false;
     }
 
-    public Predicate<FPlayer> rangeFilter(FEntity sender, double range) {
+    public Predicate<FPlayer> rangeFilter(FEntity sender, int range) {
         if (range == Range.PLAYER) {
             return sender::equals;
         }
