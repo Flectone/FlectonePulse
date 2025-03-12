@@ -175,6 +175,20 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
                     return distance != -1.0 && distance <= range;
                 }
 
+                if (range == Range.WORLD_NAME) {
+                    String worldName = fPlayerManager.getWorldName(fPlayer);
+                    if (worldName.isEmpty()) return true;
+
+                    return permissionUtil.has(fReceiver, "flectonepulse.world.name." + worldName);
+                }
+
+                if (range == Range.WORLD_TYPE) {
+                    String worldType = fPlayerManager.getWorldEnvironment(fPlayer);
+                    if (worldType.isEmpty()) return true;
+
+                    return permissionUtil.has(fReceiver, "flectonepulse.world.type." + worldType);
+                }
+
                 return true;
             };
         }
