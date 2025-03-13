@@ -130,20 +130,7 @@ public class BukkitChatModule extends ChatModule {
         Player sender = Bukkit.getPlayer(fPlayer.getUuid());
         if (sender == null) return;
 
-        Predicate<FPlayer> filter = rangeFilter(fPlayer, playerChat.getRange()).and(fReceiver -> {
-            if (!permissionUtil.has(fReceiver, permission.getTypes().get(chatName))) return false;
-
-            Player receiver = Bukkit.getPlayer(fReceiver.getUuid());
-            if (receiver == null) return true;
-
-            if (playerChat.getRange() != Range.PROXY && playerChat.getRange() != Range.SERVER) {
-
-                if (!receiver.getWorld().equals(sender.getWorld())) return false;
-                return !(receiver.getLocation().distance(sender.getLocation()) > playerChat.getRange());
-            }
-
-            return true;
-        });
+        Predicate<FPlayer> chatPermissionFilter = fReceiver -> permissionUtil.has(fReceiver, permission.getTypes().get(chatName));
 
         int chatRange = playerChat.getRange();
 
@@ -157,7 +144,7 @@ public class BukkitChatModule extends ChatModule {
                 .tag(MessageTag.CHAT)
                 .destination(playerChat.getDestination())
                 .range(chatRange)
-                .filter(filter)
+                .filter(chatPermissionFilter)
                 .format(message -> message.getTypes().get(chatName))
                 .message(finalMessage)
                 .proxy(output -> {
@@ -170,7 +157,7 @@ public class BukkitChatModule extends ChatModule {
 
         List<UUID> recipients = fPlayerManager.getFPlayers()
                 .stream()
-                .filter(filter)
+                .filter(chatPermissionFilter)
                 .map(FEntity::getUuid)
                 .toList();
 
