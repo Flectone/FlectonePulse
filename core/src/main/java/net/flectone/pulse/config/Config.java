@@ -51,7 +51,8 @@ public final class Config extends FileSerializable {
             "Paper Async Command Builder",
             "Caught previously unhandled exception :",
             "Error received from Telegram GetUpdates Request",
-            "OkHttp TaskRunner"
+            "OkHttp TaskRunner",
+            "Exception in thread \"ForkJoinPool"
     ));
 
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/config#database")})
