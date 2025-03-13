@@ -136,7 +136,10 @@ public class BukkitChatModule extends ChatModule {
 
         // in local chat you can mention it too,
         // but I don't want to full support InteractiveChat
-        String finalMessage = chatRange == Range.PROXY || chatRange == Range.SERVER
+        String finalMessage = chatRange == Range.PROXY
+                || chatRange == Range.SERVER
+                || chatRange == Range.WORLD_NAME
+                || chatRange == Range.WORLD_TYPE
                 ? integrationModule.checkMention(fPlayer, eventMessage)
                 : eventMessage;
 
