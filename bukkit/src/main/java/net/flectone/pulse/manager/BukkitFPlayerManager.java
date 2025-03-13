@@ -234,7 +234,7 @@ public class BukkitFPlayerManager extends FPlayerManager {
 
         Player secondPlayer = Bukkit.getPlayer(second.getUuid());
         if (secondPlayer == null) return -1.0;
-        if (!firstPlayer.getLocation().getWorld().equals(secondPlayer.getLocation().getWorld())) return -1;
+        if (!firstPlayer.getLocation().getWorld().equals(secondPlayer.getLocation().getWorld())) return -1.0;
 
         return firstPlayer.getLocation().distance(secondPlayer.getLocation());
     }
