@@ -363,6 +363,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
             }
         });
 
+        message.bed.noSleep = "<fcolor:1>\uD83D\uDECC Вы можете спать только ночью или во время грозы";
+        message.bed.notSafe = "<fcolor:1>\uD83D\uDECC Вы не можете уснуть, пока рядом есть монстры";
+        message.bed.obstructed = "<fcolor:1>\uD83D\uDECC Эта кровать заблокирована";
+        message.bed.occupied = "<fcolor:1>\uD83D\uDECC Эта кровать занята";
+        message.bed.tooFarAway = "<fcolor:1>\uD83D\uDECC Вы не можете уснуть, кровать слишком далеко";
+
         message.brand.values.clear();
         message.brand.values.addAll(Arrays.asList("<white>Майнкрафт", "<aqua>Майнкрафт"));
 
@@ -1383,6 +1389,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Afk afk = new Afk();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/auto/")})
         private Auto auto = new Auto();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/bed/")})
+        private Bed bed = new Bed();
 
         @Override
         public SubMessageConfig getBook() {
@@ -1526,6 +1534,15 @@ public final class Localization extends FileSerializable implements ModuleConfig
                     });
                 }
             };
+        }
+
+        @Getter
+        public static final class Bed implements SubMessageConfig, Localizable {
+            private String noSleep = "<fcolor:1>\uD83D\uDECC You can sleep only at night or during thunderstorms";
+            private String notSafe = "<fcolor:1>\uD83D\uDECC You may not rest now; there are monsters nearby";
+            private String obstructed = "<fcolor:1>\uD83D\uDECC This bed is obstructed";
+            private String occupied = "<fcolor:1>\uD83D\uDECC This bed is occupied";
+            private String tooFarAway = "<fcolor:1>\uD83D\uDECC You may not rest now; the bed is too far away";
         }
 
         @Getter

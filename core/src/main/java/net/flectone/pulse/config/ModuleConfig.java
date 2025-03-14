@@ -78,6 +78,7 @@ public interface ModuleConfig {
         SubMessageConfig getAfk();
         SubMessageConfig getAnvil();
         SubMessageConfig getAuto();
+        SubMessageConfig getBed();
         SubMessageConfig getBook();
         SubMessageConfig getBrand();
         SubMessageConfig getBubble();

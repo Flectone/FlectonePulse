@@ -648,6 +648,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Anvil anvil = new Anvil();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/auto/")})
         private Auto auto = new Auto();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/bed/")})
+        private Bed bed = new Bed();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/book/")})
         private Book book = new Book();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/brand/")})
@@ -728,6 +730,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                     put("announcement", new PermissionEntry("flectonepulse.module.message.auto.sound", Type.TRUE));
                 }
             };
+        }
+
+        @Getter
+        public static final class Bed implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.bed";
+            private Type type = Type.TRUE;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.bed.sound", Type.TRUE);
         }
 
         @Getter

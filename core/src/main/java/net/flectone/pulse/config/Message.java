@@ -50,6 +50,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Anvil anvil = new Anvil();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/auto/")})
     private Auto auto = new Auto();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/bed/")})
+    private Bed bed = new Bed();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/book/")})
     private Book book = new Book();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/brand/")})
@@ -143,6 +145,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             private Ticker ticker = new Ticker(true, 9000);
             private Sound sound = new Sound();
         }
+    }
+
+    @Getter
+    public static final class Bed implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Destination destination = new Destination(Destination.Type.ACTION_BAR);
+        private Sound sound = new Sound();
     }
 
     @Getter
