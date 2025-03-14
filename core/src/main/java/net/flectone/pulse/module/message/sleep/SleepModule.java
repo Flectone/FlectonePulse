@@ -10,7 +10,7 @@ import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.module.MinecraftMessage;
+import net.flectone.pulse.util.MinecraftMessage;
 import net.flectone.pulse.module.message.sleep.listener.SleepPacketListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import org.jetbrains.annotations.NotNull;

@@ -10,11 +10,11 @@ import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.util.MinecraftMessage;
 import net.flectone.pulse.module.message.bed.listener.BedPacketListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.UUID;
 
 @Singleton
@@ -58,7 +58,7 @@ public class BedModule extends AbstractModuleMessage<Localization.Message.Bed> {
         FPlayer fPlayer = fPlayerManager.get(receiver);
         if (checkModulePredicates(fPlayer)) return;
 
-        MessageType messageType = MessageType.fromString(key);
+        MinecraftMessage messageType = MinecraftMessage.fromString(key);
 
         builder(fPlayer)
                 .destination(message.getDestination())
@@ -74,29 +74,5 @@ public class BedModule extends AbstractModuleMessage<Localization.Message.Bed> {
                 .sound(getSound())
                 .sendBuilt();
     }
-
-    public enum MessageType {
-        NO_SLEEP("block.minecraft.bed.no_sleep"),
-        NOT_SAFE("block.minecraft.bed.not_safe"),
-        OBSTRUCTED("block.minecraft.bed.obstructed"),
-        OCCUPIED("block.minecraft.bed.occupied"),
-        TOO_FAR_AWAY("block.minecraft.bed.too_far_away"),
-        UNKNOWN("unknown");
-
-        private final String key;
-
-        MessageType(String key) {
-            this.key = key;
-        }
-
-        public static MessageType fromString(String string) {
-            return Arrays.stream(MessageType.values())
-                    .filter(type -> type.key.equalsIgnoreCase(string))
-                    .findAny()
-                    .orElse(UNKNOWN);
-        }
-
-    }
-
 }
 
