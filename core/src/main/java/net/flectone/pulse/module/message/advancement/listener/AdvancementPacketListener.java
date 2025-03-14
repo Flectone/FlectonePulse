@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.listener.AbstractPacketListener;
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
 import net.flectone.pulse.module.message.advancement.model.Advancement;
-import net.flectone.pulse.util.AdvancementType;
+import net.flectone.pulse.util.MinecraftTranslationKeys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -34,24 +34,19 @@ public class AdvancementPacketListener extends AbstractPacketListener {
         if (translatableComponent == null) return;
         if (!advancementModule.isEnable()) return;
 
-        String key = translatableComponent.key();
-        if (cancelMessageNotDelivered(event, key)) return;
+        MinecraftTranslationKeys typeMessage = MinecraftTranslationKeys.fromString(translatableComponent.key());
+        if (cancelMessageNotDelivered(event, typeMessage)) return;
 
-        if (key.startsWith("commands.advancement")) {
-            processCommand(key, translatableComponent, event);
-            return;
-        }
-
-        if (key.startsWith("chat.type.advancement")) {
-            processAdvancement(key, translatableComponent, event);
+        switch (typeMessage) {
+            case CHAT_TYPE_ADVANCEMENT_TASK, CHAT_TYPE_ADVANCEMENT_GOAL, CHAT_TYPE_ADVANCEMENT_CHALLENGE ->
+                processAdvancement(typeMessage, translatableComponent, event);
+            case COMMANDS_ADVANCEMENT_GRANT_ONE_TO_ONE_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_MANY_TO_ONE_SUCCESS,
+                 COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS, COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS ->
+                processCommand(typeMessage,  translatableComponent, event);
         }
     }
 
-    private void processAdvancement(String key, TranslatableComponent translatableComponent, PacketSendEvent event) {
-        String stringType = key.substring(key.lastIndexOf(".") + 1);
-        AdvancementType type = AdvancementType.fromString(stringType);
-        if (type == null) return;
-
+    private void processAdvancement(MinecraftTranslationKeys type, TranslatableComponent translatableComponent, PacketSendEvent event) {
         List<Component> translationArguments = translatableComponent.args();
         if (translationArguments.size() < 2) return;
         if (!(translationArguments.get(0) instanceof TextComponent targetComponent)) return;
@@ -85,8 +80,9 @@ public class AdvancementPacketListener extends AbstractPacketListener {
         advancementModule.send(uuid, target, advancement);
     }
 
-    private void processCommand(String key, TranslatableComponent translatableComponent, PacketSendEvent event) {
-        boolean revoke = key.startsWith("commands.advancement.revoke");
+    private void processCommand(MinecraftTranslationKeys type, TranslatableComponent translatableComponent, PacketSendEvent event) {
+        boolean revoke = type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS
+                || type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS;
         if (revoke && !advancementModule.getMessage().isRevoke()) return;
         if (!revoke && !advancementModule.getMessage().isGrant()) return;
         if (translatableComponent.args().size() < 2) return;
@@ -103,8 +99,8 @@ public class AdvancementPacketListener extends AbstractPacketListener {
         Advancement advancement = null;
         AdvancementModule.Relation relation;
 
-        switch (key) {
-            case "commands.advancement.revoke.one.to.one.success", "commands.advancement.grant.one.to.one.success" -> {
+        switch (type) {
+            case COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_ONE_TO_ONE_SUCCESS -> {
                 if (argument instanceof TranslatableComponent argumentIn) {
                     if (argumentIn.args().isEmpty()) return;
                     if (argumentIn.args().get(0) instanceof TranslatableComponent titleComponent) {
@@ -116,11 +112,11 @@ public class AdvancementPacketListener extends AbstractPacketListener {
                         if (hoverEvent == null) return;
                         if (!(hoverEvent.value() instanceof TranslatableComponent description)) return;
 
-                        AdvancementType type = NamedTextColor.DARK_PURPLE.equals(description.color())
-                                ? AdvancementType.CHALLENGE
-                                : AdvancementType.TASK;
+                        MinecraftTranslationKeys advancementType = NamedTextColor.DARK_PURPLE.equals(description.color())
+                                ? MinecraftTranslationKeys.CHAT_TYPE_ADVANCEMENT_CHALLENGE
+                                : MinecraftTranslationKeys.CHAT_TYPE_ADVANCEMENT_TASK;
 
-                        advancement = new Advancement(titleKey, descriptionKey, type);
+                        advancement = new Advancement(titleKey, descriptionKey, advancementType);
 
                     } else if (argumentIn.args().get(0) instanceof TextComponent titleComponent) {
 
@@ -134,11 +130,11 @@ public class AdvancementPacketListener extends AbstractPacketListener {
                         String title = titleComponent.content();
                         String description = childrenComponent.content();
 
-                        AdvancementType type = NamedTextColor.DARK_PURPLE.equals(descriptionComponent.color())
-                                ? AdvancementType.CHALLENGE
-                                : AdvancementType.TASK;
+                        MinecraftTranslationKeys advancementType = NamedTextColor.DARK_PURPLE.equals(descriptionComponent.color())
+                                ? MinecraftTranslationKeys.CHAT_TYPE_ADVANCEMENT_CHALLENGE
+                                : MinecraftTranslationKeys.CHAT_TYPE_ADVANCEMENT_TASK;
 
-                        advancement = new Advancement(title, description, type);
+                        advancement = new Advancement(title, description, advancementType);
                     } else return;
 
                     relation = AdvancementModule.Relation.ONE_TO_ONE_ADVANCEMENT;
@@ -147,7 +143,7 @@ public class AdvancementPacketListener extends AbstractPacketListener {
                     relation = AdvancementModule.Relation.ONE_TO_ONE_TEXT;
                 } else return;
             }
-            case "commands.advancement.revoke.many.to.one.success", "commands.advancement.grant.many.to.one.success" -> {
+            case COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_MANY_TO_ONE_SUCCESS -> {
                 if (!(argument instanceof TextComponent textComponent)) return;
 
                 content = textComponent.content();

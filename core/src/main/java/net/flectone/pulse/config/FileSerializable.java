@@ -9,7 +9,6 @@ import net.elytrium.serializer.annotations.Transient;
 import net.elytrium.serializer.custom.ClassSerializer;
 import net.elytrium.serializer.language.object.YamlSerializable;
 import net.flectone.pulse.model.*;
-import net.flectone.pulse.util.AdvancementType;
 import net.kyori.adventure.bossbar.BossBar;
 
 import java.nio.file.Path;
@@ -170,7 +169,7 @@ public abstract class FileSerializable extends YamlSerializable {
                             String stringIcon = icon == null ? "minecraft:diamond" : String.valueOf(icon);
 
                             Object style = map.get("style");
-                            AdvancementType toastStyle = style == null ? AdvancementType.TASK : AdvancementType.valueOf(String.valueOf(style));
+                            Toast.Type toastStyle = style == null ? Toast.Type.TASK : Toast.Type.valueOf(String.valueOf(style));
 
                             yield new Destination(Destination.Type.TOAST, new Toast(stringIcon, toastStyle));
                         }

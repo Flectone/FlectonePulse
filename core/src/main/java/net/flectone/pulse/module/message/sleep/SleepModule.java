@@ -10,10 +10,9 @@ import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.util.MinecraftMessage;
 import net.flectone.pulse.module.message.sleep.listener.SleepPacketListener;
 import net.flectone.pulse.registry.ListenerRegistry;
-import org.jetbrains.annotations.NotNull;
+import net.flectone.pulse.util.MinecraftTranslationKeys;
 
 import java.util.UUID;
 
@@ -54,21 +53,19 @@ public class SleepModule extends AbstractModuleMessage<Localization.Message.Slee
     }
 
     @Async
-    public void send(UUID receiver, @NotNull String key, String sleepCount, String allCount) {
+    public void send(UUID receiver, MinecraftTranslationKeys key, String sleepCount, String allCount) {
         FPlayer fPlayer = fPlayerManager.get(receiver);
         if (checkModulePredicates(fPlayer)) return;
-
-        MinecraftMessage messageType = MinecraftMessage.fromString(key);
 
         builder(fPlayer)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(bed -> switch (messageType) {
-                    case NOT_POSSIBLE -> bed.getNotPossible();
-                    case PLAYERS_SLEEPING -> bed.getPlayersSleeping()
+                .format(bed -> switch (key) {
+                    case SLEEP_NOT_POSSIBLE -> bed.getNotPossible();
+                    case SLEEP_PLAYERS_SLEEPING -> bed.getPlayersSleeping()
                             .replace("<sleep_count>", sleepCount)
                             .replace("<all_count>", allCount);
-                    case SKIPPING_NIGHT -> bed.getSkippingNight();
+                    case SLEEP_SKIPPING_NIGHT -> bed.getSkippingNight();
                     default -> "";
                 })
                 .sound(getSound())

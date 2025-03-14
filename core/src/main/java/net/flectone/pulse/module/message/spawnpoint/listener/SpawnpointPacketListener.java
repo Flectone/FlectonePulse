@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.AbstractPacketListener;
 import net.flectone.pulse.module.message.spawnpoint.SpawnpointModule;
+import net.flectone.pulse.util.MinecraftTranslationKeys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -28,7 +29,7 @@ public class SpawnpointPacketListener extends AbstractPacketListener {
         TranslatableComponent translatableComponent = getTranslatableComponent(event);
         if (translatableComponent == null) return;
 
-        String key = translatableComponent.key();
+        MinecraftTranslationKeys key = MinecraftTranslationKeys.fromString(translatableComponent.key());
         if (cancelMessageNotDelivered(event, key)) return;
         if (!key.startsWith("commands.spawnpoint.success")) return;
 
@@ -52,19 +53,9 @@ public class SpawnpointPacketListener extends AbstractPacketListener {
         String world = worldComponent.content();
 
         if (!(translationArguments.get(5) instanceof TextComponent targetComponent)) return;
-
-        String target = null;
-        String count = null;
-
-        switch (key) {
-            case "commands.spawnpoint.success.single" -> target = targetComponent.content();
-            case "commands.spawnpoint.success.multiple" -> count = targetComponent.content();
-            default -> {
-                return;
-            }
-        }
+        String value = targetComponent.content();
 
         event.setCancelled(true);
-        spawnpointModule.send(event.getUser().getUUID(), x, y, z, angle, world, target, count);
+        spawnpointModule.send(event.getUser().getUUID(), key, x, y, z, angle, world, value);
     }
 }

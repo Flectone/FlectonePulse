@@ -8,12 +8,11 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.enchant.listener.EnchantPacketListener;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.util.MinecraftTranslationKeys;
 
 import java.util.UUID;
 
@@ -54,23 +53,22 @@ public class EnchantModule extends AbstractModuleMessage<Localization.Message.En
     }
 
     @Async
-    public void send(UUID receiver, @NotNull String enchant, @NotNull String level, @Nullable String target, @Nullable String count) {
-        if (target == null && count == null) return;
-
+    public void send(UUID receiver, MinecraftTranslationKeys key, String enchant, String level, String value) {
         FPlayer fPlayer = fPlayerManager.get(receiver);
         if (checkModulePredicates(fPlayer)) return;
 
         FPlayer fTarget = fPlayer;
 
-        if (target != null) {
-            fTarget = fPlayerManager.getOnline(target);
+        if (key == MinecraftTranslationKeys.COMMANDS_ENCHANT_SUCCESS_SINGLE) {
+            fTarget = fPlayerManager.getOnline(value);
             if (fTarget.isUnknown()) return;
         }
 
         builder(fTarget)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> (count == null ? s.getSingle() : s.getMultiple().replace("<count>", count))
+                .format(s -> (key == MinecraftTranslationKeys.COMMANDS_ENCHANT_SUCCESS_SINGLE
+                        ? s.getSingle() : s.getMultiple().replace("<count>", value))
                         .replace("<enchant>", enchant)
                         .replace("<level>", level)
                 )

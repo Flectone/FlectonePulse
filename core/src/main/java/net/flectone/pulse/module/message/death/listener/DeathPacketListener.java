@@ -9,6 +9,7 @@ import net.flectone.pulse.listener.AbstractPacketListener;
 import net.flectone.pulse.module.message.death.DeathModule;
 import net.flectone.pulse.module.message.death.model.Death;
 import net.flectone.pulse.module.message.death.model.Item;
+import net.flectone.pulse.util.MinecraftTranslationKeys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -43,7 +44,7 @@ public class DeathPacketListener extends AbstractPacketListener {
         TranslatableComponent translatableComponent = getTranslatableComponent(event);
         if (translatableComponent == null) return;
 
-        String key = translatableComponent.key();
+        MinecraftTranslationKeys key = MinecraftTranslationKeys.fromString(translatableComponent.key());
         if (cancelMessageNotDelivered(event, key)) return;
         if (!key.startsWith("death.")) return;
 

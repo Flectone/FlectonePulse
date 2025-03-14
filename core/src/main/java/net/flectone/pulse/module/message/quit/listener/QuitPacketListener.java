@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.AbstractPacketListener;
 import net.flectone.pulse.module.message.quit.QuitModule;
+import net.flectone.pulse.util.MinecraftTranslationKeys;
 import net.kyori.adventure.text.TranslatableComponent;
 
 @Singleton
@@ -24,9 +25,9 @@ public class QuitPacketListener extends AbstractPacketListener {
         TranslatableComponent translatableComponent = getTranslatableComponent(event);
         if (translatableComponent == null) return;
 
-        String key = translatableComponent.key();
+        MinecraftTranslationKeys key = MinecraftTranslationKeys.fromString(translatableComponent.key());
         if (cancelMessageNotDelivered(event, key)) return;
-        if (!key.startsWith("multiplayer.player.left")) return;
+        if (key != MinecraftTranslationKeys.MULTIPLAYER_PLAYER_LEFT) return;
         if (!quitModule.isEnable()) return;
 
         event.setCancelled(true);

@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.AbstractPacketListener;
 import net.flectone.pulse.module.message.clear.ClearModule;
+import net.flectone.pulse.util.MinecraftTranslationKeys;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 
@@ -25,28 +26,19 @@ public class ClearPacketListener extends AbstractPacketListener {
         TranslatableComponent translatableComponent = getTranslatableComponent(event);
         if (translatableComponent == null) return;
 
-        String key = translatableComponent.key();
+        MinecraftTranslationKeys key = MinecraftTranslationKeys.fromString(translatableComponent.key());
         if (cancelMessageNotDelivered(event, key)) return;
         if (!key.startsWith("commands.clear.success")) return;
         if (translatableComponent.args().size() < 2) return;
         if (!clearModule.isEnable()) return;
 
-        String number;
-        String count = null;
-        String target = null;
-
         if (!(translatableComponent.args().get(0) instanceof TextComponent numberComponent)) return;
-        number = numberComponent.content();
+        String number = numberComponent.content();
 
         if (!(translatableComponent.args().get(1) instanceof TextComponent targetComponent)) return;
-
-        if (key.equals("commands.clear.success.multiple")) {
-            count = targetComponent.content();
-        } else {
-            target = targetComponent.content();
-        }
+        String value = targetComponent.content();
 
         event.setCancelled(true);
-        clearModule.send(event.getUser().getUUID(), target, number, count);
+        clearModule.send(event.getUser().getUUID(), key, number, value);
     }
 }

@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.AbstractPacketListener;
 import net.flectone.pulse.module.message.enchant.EnchantModule;
+import net.flectone.pulse.util.MinecraftTranslationKeys;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 
@@ -25,7 +26,7 @@ public class EnchantPacketListener extends AbstractPacketListener {
         TranslatableComponent translatableComponent = getTranslatableComponent(event);
         if (translatableComponent == null) return;
 
-        String key = translatableComponent.key();
+        MinecraftTranslationKeys key = MinecraftTranslationKeys.fromString(translatableComponent);
         if (cancelMessageNotDelivered(event, key)) return;
         if (!key.startsWith("commands.enchant.success")) return;
         if (translatableComponent.args().size() < 2) return;
@@ -40,25 +41,11 @@ public class EnchantPacketListener extends AbstractPacketListener {
 
         String levelKey = levelComponent.key();
 
-        String count = null;
-        String target = null;
-
-        switch (key) {
-            case "commands.enchant.success.single" -> {
-                if (!(translatableComponent.args().get(1) instanceof TextComponent targetComponent)) return;
-                target = targetComponent.content();
-            }
-            case "commands.enchant.success.multiple" -> {
-                if (!(translatableComponent.args().get(1) instanceof TextComponent textComponent)) return;
-                count = textComponent.content();
-            }
-            default -> {
-                return;
-            }
-        }
+        if (!(translatableComponent.args().get(1) instanceof TextComponent targetComponent)) return;
+        String value = targetComponent.content();
 
         event.setCancelled(true);
 
-        enchantModule.send(event.getUser().getUUID(), enchantKey, levelKey, target, count);
+        enchantModule.send(event.getUser().getUUID(), key, enchantKey, levelKey, value);
     }
 }

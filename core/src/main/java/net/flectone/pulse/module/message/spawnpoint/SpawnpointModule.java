@@ -8,11 +8,11 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.spawnpoint.listener.SpawnpointPacketListener;
-import org.jetbrains.annotations.Nullable;
+import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.util.MinecraftTranslationKeys;
 
 import java.util.UUID;
 
@@ -53,23 +53,22 @@ public class SpawnpointModule extends AbstractModuleMessage<Localization.Message
     }
 
     @Async
-    public void send(UUID receiver, String x, String y, String z, String angle, String world, @Nullable String target, @Nullable String count) {
-        if (target == null && count == null) return;
-
+    public void send(UUID receiver, MinecraftTranslationKeys key, String x, String y, String z, String angle, String world, String value) {
         FPlayer fPlayer = fPlayerManager.get(receiver);
         if (checkModulePredicates(fPlayer)) return;
 
         FPlayer fTarget = fPlayer;
 
-        if (target != null) {
-            fTarget = fPlayerManager.getOnline(target);
+        if (key == MinecraftTranslationKeys.COMMANDS_SPAWNPOINT_SUCCESS_SINGLE) {
+            fTarget = fPlayerManager.getOnline(value);
             if (fTarget.isUnknown()) return;
         }
 
         builder(fTarget)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> (count == null ? s.getSingle() : s.getMultiple().replace("<count>", count))
+                .format(s -> (key == MinecraftTranslationKeys.COMMANDS_SPAWNPOINT_SUCCESS_SINGLE
+                        ? s.getSingle() : s.getMultiple().replace("<count>", value))
                         .replace("<x>", x)
                         .replace("<y>", y)
                         .replace("<z>", z)

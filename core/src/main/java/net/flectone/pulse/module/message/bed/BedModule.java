@@ -10,10 +10,9 @@ import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.util.MinecraftMessage;
+import net.flectone.pulse.util.MinecraftTranslationKeys;
 import net.flectone.pulse.module.message.bed.listener.BedPacketListener;
 import net.flectone.pulse.registry.ListenerRegistry;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -54,21 +53,19 @@ public class BedModule extends AbstractModuleMessage<Localization.Message.Bed> {
     }
 
     @Async
-    public void send(UUID receiver, @NotNull String key) {
+    public void send(UUID receiver, MinecraftTranslationKeys key) {
         FPlayer fPlayer = fPlayerManager.get(receiver);
         if (checkModulePredicates(fPlayer)) return;
-
-        MinecraftMessage messageType = MinecraftMessage.fromString(key);
 
         builder(fPlayer)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(bed -> switch (messageType) {
-                    case NO_SLEEP -> bed.getNoSleep();
-                    case NOT_SAFE -> bed.getNotSafe();
-                    case OBSTRUCTED -> bed.getObstructed();
-                    case OCCUPIED -> bed.getOccupied();
-                    case TOO_FAR_AWAY -> bed.getTooFarAway();
+                .format(bed -> switch (key) {
+                    case BLOCK_MINECRAFT_BED_NO_SLEEP -> bed.getNoSleep();
+                    case BLOCK_MINECRAFT_BED_NOT_SAFE -> bed.getNotSafe();
+                    case BLOCK_MINECRAFT_BED_OBSTRUCTED -> bed.getObstructed();
+                    case BLOCK_MINECRAFT_BED_OCCUPIED -> bed.getOccupied();
+                    case BLOCK_MINECRAFT_BED_TOO_FAR_AWAY -> bed.getTooFarAway();
                     default -> "";
                 })
                 .sound(getSound())

@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.AbstractPacketListener;
 import net.flectone.pulse.module.message.deop.DeopModule;
+import net.flectone.pulse.util.MinecraftTranslationKeys;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 
@@ -25,15 +26,14 @@ public class DeopPacketListener extends AbstractPacketListener {
         TranslatableComponent translatableComponent = getTranslatableComponent(event);
         if (translatableComponent == null) return;
 
-        String key = translatableComponent.key();
+        MinecraftTranslationKeys key = MinecraftTranslationKeys.fromString(translatableComponent);
         if (cancelMessageNotDelivered(event, key)) return;
-        if (!key.startsWith("commands.deop.success")) return;
+        if (key != MinecraftTranslationKeys.COMMANDS_DEOP_SUCCESS) return;
         if (translatableComponent.args().isEmpty()) return;
         if (!deopModule.isEnable()) return;
         if (!(translatableComponent.args().get(0) instanceof TextComponent targetComponent)) return;
 
         event.setCancelled(true);
-
         deopModule.send(event.getUser().getUUID(), targetComponent.content());
     }
 }

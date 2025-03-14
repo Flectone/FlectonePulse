@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.AbstractPacketListener;
 import net.flectone.pulse.module.message.sleep.SleepModule;
+import net.flectone.pulse.util.MinecraftTranslationKeys;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 
@@ -25,7 +26,7 @@ public class SleepPacketListener extends AbstractPacketListener {
         TranslatableComponent translatableComponent = getTranslatableComponent(event);
         if (translatableComponent == null) return;
 
-        String key = translatableComponent.key();
+        MinecraftTranslationKeys key = MinecraftTranslationKeys.fromString(translatableComponent.key());
         if (cancelMessageNotDelivered(event, key)) return;
         if (!key.startsWith("sleep.")) return;
         if (!sleepModule.isEnable()) return;
@@ -33,7 +34,7 @@ public class SleepPacketListener extends AbstractPacketListener {
         String sleepCount = "";
         String allCount = "";
 
-        if (key.startsWith("sleep.players_sleeping") && translatableComponent.args().size() == 2) {
+        if (key == MinecraftTranslationKeys.SLEEP_PLAYERS_SLEEPING && translatableComponent.args().size() == 2) {
             if ((translatableComponent.args().get(0) instanceof TextComponent sleepComponent)) {
                 sleepCount = sleepComponent.content();
             }

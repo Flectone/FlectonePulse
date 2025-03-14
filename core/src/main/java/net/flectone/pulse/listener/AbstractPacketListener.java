@@ -5,13 +5,14 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
+import net.flectone.pulse.util.MinecraftTranslationKeys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 
 public abstract class AbstractPacketListener implements PacketListener {
 
-    protected boolean cancelMessageNotDelivered(PacketSendEvent event, String key) {
-        if (!key.equals("multiplayer.message_not_delivered")) return false;
+    protected boolean cancelMessageNotDelivered(PacketSendEvent event, MinecraftTranslationKeys minecraftTranslationKeys) {
+        if (minecraftTranslationKeys != MinecraftTranslationKeys.MULTIPLAYER_MESSAGE_NOT_DELIVERED) return false;
         event.setCancelled(true);
         return true;
     }

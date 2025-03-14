@@ -130,9 +130,10 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
 
     public String convert(Localization.Message.Advancement message, Advancement advancement) {
         String string = switch (advancement.type()) {
-            case TASK -> message.getTask().getFormat();
-            case GOAL -> message.getGoal().getFormat();
-            case CHALLENGE -> message.getChallenge().getFormat();
+            case CHAT_TYPE_ADVANCEMENT_TASK -> message.getTask().getFormat();
+            case CHAT_TYPE_ADVANCEMENT_GOAL -> message.getGoal().getFormat();
+            case CHAT_TYPE_ADVANCEMENT_CHALLENGE -> message.getChallenge().getFormat();
+            default -> "";
         };
 
         return string
@@ -147,9 +148,10 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
             Localization.Message.Advancement localization = resolveLocalization(receiver);
 
             String title = switch (advancement.type()) {
-                case TASK -> localization.getTask().getTag();
-                case GOAL -> localization.getGoal().getTag();
-                case CHALLENGE -> localization.getChallenge().getTag();
+                case CHAT_TYPE_ADVANCEMENT_TASK -> localization.getTask().getTag();
+                case CHAT_TYPE_ADVANCEMENT_GOAL -> localization.getGoal().getTag();
+                case CHAT_TYPE_ADVANCEMENT_CHALLENGE -> localization.getChallenge().getTag();
+                default -> "";
             };
 
             Component component = componentUtil.builder(sender, receiver, title
