@@ -688,6 +688,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Seed seed = new Seed();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/setblock/")})
         private Setblock setblock = new Setblock();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/setspawn/")})
+        private Setspawn setspawn = new Setspawn();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/sign/")})
         private Sign sign = new Sign();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/spawnpoint/")})
@@ -1092,6 +1094,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private String name = "flectonepulse.module.message.setblock";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.setblock.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Setspawn implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.setspawn";
+            private Type type = Type.TRUE;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.setspawn.sound", Type.TRUE);
         }
 
         @Getter

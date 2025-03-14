@@ -90,6 +90,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Seed seed = new Seed();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/setblock/")})
     private Setblock setblock = new Setblock();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/setspawn/")})
+    private Setspawn setspawn = new Setspawn();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/sign/")})
     private Sign sign = new Sign();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/spawnpoint/")})
@@ -611,6 +613,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
     @Getter
     public static final class Setblock implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Destination destination = new Destination();
+        private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Setspawn implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
         private Sound sound = new Sound();

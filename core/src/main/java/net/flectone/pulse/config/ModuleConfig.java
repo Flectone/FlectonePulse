@@ -98,6 +98,7 @@ public interface ModuleConfig {
         SubMessageConfig getScoreboard();
         SubMessageConfig getSeed();
         SubMessageConfig getSetblock();
+        SubMessageConfig getSetspawn();
         SubMessageConfig getSign();
         SubMessageConfig getSpawnpoint();
         StatusMessageConfig getStatus();

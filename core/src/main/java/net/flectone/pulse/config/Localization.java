@@ -545,6 +545,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.setblock.format = "<fcolor:1>⏹ Изменён блок в точке <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2>";
 
+        message.setspawn.format = "<fcolor:1>\uD83D\uDECC Точка возрождения установлена";
+
         message.spawnpoint.single = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2> [<fcolor:2><angle></fcolor:2>] в <fcolor:2><world></fcolor:2> для <display_name>";
         message.spawnpoint.multiple = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2> [<fcolor:2><angle></fcolor:2>] в <fcolor:2><world></fcolor:2> для <fcolor:2><count></fcolor:2> игроков";
 
@@ -1432,6 +1434,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Seed seed = new Seed();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/setblock/")})
         private Setblock setblock = new Setblock();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/setspawn/")})
+        private Setspawn setspawn = new Setspawn();
 
         @Override
         public SubMessageConfig getSign() {
@@ -1876,6 +1880,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Setblock implements SubMessageConfig, Localizable {
             private String format = "<fcolor:1>⏹ Changed the block at <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2>";
+        }
+
+        @Getter
+        public static final class Setspawn implements SubMessageConfig, Localizable {
+            private String format = "<fcolor:1>\uD83D\uDECC Respawn point set";
         }
 
         @Getter
