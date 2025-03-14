@@ -304,7 +304,7 @@ public class ComponentUtil {
             }
 
             try {
-                return miniMessage.deserialize(message, tagResolverList.toArray(new TagResolver[0]));
+                return miniMessage.deserialize(message.replace("§", "&"), tagResolverList.toArray(new TagResolver[0]));
             } catch (Exception e) {
                 fLogger.warning(e);
             }
