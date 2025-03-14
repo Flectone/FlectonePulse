@@ -96,6 +96,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Setspawn setspawn = new Setspawn();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/sign/")})
     private Sign sign = new Sign();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/sleep/")})
+    private Sleep sleep = new Sleep();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/spawnpoint/")})
     private Spawnpoint spawnpoint = new Spawnpoint();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/")})
@@ -637,6 +639,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Sign implements SubMessageConfig, Config.IEnable {
         private boolean enable = false;
+    }
+
+    @Getter
+    public static final class Sleep implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Destination destination = new Destination(Destination.Type.ACTION_BAR);
+        private Sound sound = new Sound();
     }
 
     @Getter

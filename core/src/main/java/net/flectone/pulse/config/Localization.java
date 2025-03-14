@@ -553,6 +553,10 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.setspawn.format = "<fcolor:1>\uD83D\uDECC Точка возрождения установлена";
 
+        message.sleep.notPossible = "<fcolor:1>\uD83D\uDECC Никакой отдых не поможет пропустить эту ночь";
+        message.sleep.playersSleeping = "<fcolor:1>\uD83D\uDECC <fcolor:2><sleep_count></fcolor:2> из <fcolor:2><all_count></fcolor:2> игроков спят";
+        message.sleep.skippingNight = "<fcolor:1>\uD83D\uDECC Вы проспите всю ночь";
+
         message.spawnpoint.single = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2> [<fcolor:2><angle></fcolor:2>] в <fcolor:2><world></fcolor:2> для <display_name>";
         message.spawnpoint.multiple = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2> [<fcolor:2><angle></fcolor:2>] в <fcolor:2><world></fcolor:2> для <fcolor:2><count></fcolor:2> игроков";
 
@@ -1450,6 +1454,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
             return null;
         }
 
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/sleep/")})
+        private Sleep sleep = new Sleep();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/spawnpoint/")})
         private Spawnpoint spawnpoint = new Spawnpoint();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/")})
@@ -1902,6 +1908,13 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Setspawn implements SubMessageConfig, Localizable {
             private String format = "<fcolor:1>\uD83D\uDECC Respawn point set";
+        }
+
+        @Getter
+        public static final class Sleep implements SubMessageConfig, Localizable {
+            private String notPossible = "<fcolor:1>\uD83D\uDECC No amount of rest can pass this night";
+            private String playersSleeping = "<fcolor:1>\uD83D\uDECC <fcolor:2><sleep_count></fcolor:2>/<fcolor:2><all_count></fcolor:2> players sleeping";
+            private String skippingNight = "<fcolor:1>\uD83D\uDECC Sleeping through this night";
         }
 
         @Getter
