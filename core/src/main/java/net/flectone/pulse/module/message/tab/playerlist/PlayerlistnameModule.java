@@ -88,6 +88,9 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
                 .build();
 
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)) {
+            User user = packetEventsUtil.getUser(fPlayer);
+            if (user == null) return;
+
             WrapperPlayServerPlayerInfoUpdate.PlayerInfo playerInfo = new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
                     user.getProfile(),
                     true,
