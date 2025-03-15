@@ -690,14 +690,12 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Seed seed = new Seed();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/setblock/")})
         private Setblock setblock = new Setblock();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/setspawn/")})
-        private Setspawn setspawn = new Setspawn();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/sign/")})
         private Sign sign = new Sign();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/sleep/")})
         private Sleep sleep = new Sleep();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/spawnpoint/")})
-        private Spawnpoint spawnpoint = new Spawnpoint();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/spawn/")})
+        private Spawn spawn = new Spawn();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/")})
         private Status status = new Status();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/")})
@@ -1108,13 +1106,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         }
 
         @Getter
-        public static final class Setspawn implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.setspawn";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.setspawn.sound", Type.TRUE);
-        }
-
-        @Getter
         public static final class Sign implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.sign";
             private Type type = Type.TRUE;
@@ -1128,10 +1119,10 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         }
 
         @Getter
-        public static final class Spawnpoint implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.spawnpoint";
+        public static final class Spawn implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.spawn";
             private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.spawnpoint.sound", Type.TRUE);
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.spawn.sound", Type.TRUE);
         }
 
         @Getter

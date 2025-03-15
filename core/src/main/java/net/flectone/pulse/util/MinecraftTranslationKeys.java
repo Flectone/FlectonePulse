@@ -12,6 +12,7 @@ public enum MinecraftTranslationKeys {
     BLOCK_MINECRAFT_BED_OCCUPIED("block.minecraft.bed.occupied"),
     BLOCK_MINECRAFT_BED_TOO_FAR_AWAY("block.minecraft.bed.too_far_away"),
     BLOCK_MINECRAFT_SET_SPAWN("block.minecraft.set_spawn"),
+    BLOCK_MINECRAFT_SPAWN_NOT_VALID("block.minecraft.spawn.not_valid"),
 
     CHAT_TYPE_ADVANCEMENT_CHALLENGE("chat.type.advancement.challenge"),
     CHAT_TYPE_ADVANCEMENT_GOAL("chat.type.advancement.goal"),

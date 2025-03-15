@@ -1,10 +1,10 @@
-package net.flectone.pulse.module.message.spawnpoint.listener;
+package net.flectone.pulse.module.message.spawn.listener;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.AbstractPacketListener;
-import net.flectone.pulse.module.message.spawnpoint.SpawnpointModule;
+import net.flectone.pulse.module.message.spawn.SpawnModule;
 import net.flectone.pulse.util.MinecraftTranslationKeys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -15,11 +15,11 @@ import java.util.List;
 @Singleton
 public class SpawnpointPacketListener extends AbstractPacketListener {
 
-    private final SpawnpointModule spawnpointModule;
+    private final SpawnModule spawnModule;
 
     @Inject
-    public SpawnpointPacketListener(SpawnpointModule spawnpointModule) {
-        this.spawnpointModule = spawnpointModule;
+    public SpawnpointPacketListener(SpawnModule spawnModule) {
+        this.spawnModule = spawnModule;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class SpawnpointPacketListener extends AbstractPacketListener {
 
         List<Component> translationArguments = translatableComponent.args();
         if (translationArguments.size() < 6) return;
-        if (!spawnpointModule.isEnable()) return;
+        if (!spawnModule.isEnable()) return;
 
         if (!(translationArguments.get(0) instanceof TextComponent xComponent)) return;
         String x = xComponent.content();
@@ -56,6 +56,6 @@ public class SpawnpointPacketListener extends AbstractPacketListener {
         String value = targetComponent.content();
 
         event.setCancelled(true);
-        spawnpointModule.send(event.getUser().getUUID(), key, x, y, z, angle, world, value);
+        spawnModule.send(event.getUser().getUUID(), key, x, y, z, angle, world, value);
     }
 }

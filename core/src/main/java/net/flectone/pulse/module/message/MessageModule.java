@@ -31,10 +31,9 @@ import net.flectone.pulse.module.message.rightclick.RightclickModule;
 import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.seed.SeedModule;
 import net.flectone.pulse.module.message.setblock.SetblockModule;
-import net.flectone.pulse.module.message.setspawn.SetspawnModule;
 import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.module.message.sleep.SleepModule;
-import net.flectone.pulse.module.message.spawnpoint.SpawnpointModule;
+import net.flectone.pulse.module.message.spawn.SpawnModule;
 import net.flectone.pulse.module.message.status.StatusModule;
 import net.flectone.pulse.module.message.tab.TabModule;
 
@@ -79,10 +78,9 @@ public class MessageModule extends AbstractModule {
         addChildren(ScoreboardModule.class);
         addChildren(SeedModule.class);
         addChildren(SetblockModule.class);
-        addChildren(SetspawnModule.class);
         addChildren(SignModule.class);
         addChildren(SleepModule.class);
-        addChildren(SpawnpointModule.class);
+        addChildren(SpawnModule.class);
         addChildren(StatusModule.class);
         addChildren(TabModule.class);
     }

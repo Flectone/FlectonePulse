@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.spawnpoint;
+package net.flectone.pulse.module.message.spawn;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -10,32 +10,34 @@ import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.module.message.spawnpoint.listener.SpawnpointPacketListener;
+import net.flectone.pulse.module.message.spawn.listener.ChangeGameStatePacketListener;
+import net.flectone.pulse.module.message.spawn.listener.SetSpawnPacketListener;
+import net.flectone.pulse.module.message.spawn.listener.SpawnpointPacketListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.util.MinecraftTranslationKeys;
 
 import java.util.UUID;
 
 @Singleton
-public class SpawnpointModule extends AbstractModuleMessage<Localization.Message.Spawnpoint> {
+public class SpawnModule extends AbstractModuleMessage<Localization.Message.Spawn> {
 
-    private final Message.Spawnpoint message;
-    private final Permission.Message.Spawnpoint permission;
+    private final Message.Spawn message;
+    private final Permission.Message.Spawn permission;
 
     private final FPlayerManager fPlayerManager;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
-    public SpawnpointModule(FileManager fileManager,
-                            FPlayerManager fPlayerManager,
-                            ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getSpawnpoint());
+    public SpawnModule(FileManager fileManager,
+                       FPlayerManager fPlayerManager,
+                       ListenerRegistry listenerRegistry) {
+        super(localization -> localization.getMessage().getSpawn());
 
         this.fPlayerManager = fPlayerManager;
         this.listenerRegistry = listenerRegistry;
 
-        message = fileManager.getMessage().getSpawnpoint();
-        permission = fileManager.getPermission().getMessage().getSpawnpoint();
+        message = fileManager.getMessage().getSpawn();
+        permission = fileManager.getPermission().getMessage().getSpawn();
     }
 
     @Override
@@ -44,12 +46,28 @@ public class SpawnpointModule extends AbstractModuleMessage<Localization.Message
 
         createSound(message.getSound(), permission.getSound());
 
+        listenerRegistry.register(ChangeGameStatePacketListener.class);
+        listenerRegistry.register(SetSpawnPacketListener.class);
         listenerRegistry.register(SpawnpointPacketListener.class);
     }
 
     @Override
     public boolean isConfigEnable() {
         return message.isEnable();
+    }
+
+    @Async
+    public void send(UUID receiver, MinecraftTranslationKeys key) {
+        FPlayer fPlayer = fPlayerManager.get(receiver);
+        if (checkModulePredicates(fPlayer)) return;
+
+        builder(fPlayer)
+                .destination(message.getDestination())
+                .receiver(fPlayer)
+                .format(spawn -> key == MinecraftTranslationKeys.BLOCK_MINECRAFT_SET_SPAWN
+                        ? spawn.getSet() : spawn.getNotValid())
+                .sound(getSound())
+                .sendBuilt();
     }
 
     @Async
@@ -78,5 +96,4 @@ public class SpawnpointModule extends AbstractModuleMessage<Localization.Message
                 .sound(getSound())
                 .sendBuilt();
     }
-
 }

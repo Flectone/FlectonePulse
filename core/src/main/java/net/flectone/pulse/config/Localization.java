@@ -551,14 +551,14 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.setblock.format = "<fcolor:1>⏹ Изменён блок в точке <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2>";
 
-        message.setspawn.format = "<fcolor:1>\uD83D\uDECC Точка возрождения установлена";
-
         message.sleep.notPossible = "<fcolor:1>\uD83D\uDECC Никакой отдых не поможет пропустить эту ночь";
         message.sleep.playersSleeping = "<fcolor:1>\uD83D\uDECC <fcolor:2><sleep_count></fcolor:2> из <fcolor:2><all_count></fcolor:2> игроков спят";
         message.sleep.skippingNight = "<fcolor:1>\uD83D\uDECC Вы проспите всю ночь";
 
-        message.spawnpoint.single = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2> [<fcolor:2><angle></fcolor:2>] в <fcolor:2><world></fcolor:2> для <display_name>";
-        message.spawnpoint.multiple = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2> [<fcolor:2><angle></fcolor:2>] в <fcolor:2><world></fcolor:2> для <fcolor:2><count></fcolor:2> игроков";
+        message.spawn.notValid = "<fcolor:1>\uD83D\uDECC У вас нет кровати или заряженного якоря возрождения, либо доступ к ним затруднён";
+        message.spawn.set = "<fcolor:1>\uD83D\uDECC Точка возрождения установлена";
+        message.spawn.single = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2> [<fcolor:2><angle></fcolor:2>] в <fcolor:2><world></fcolor:2> для <display_name>";
+        message.spawn.multiple = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2> [<fcolor:2><angle></fcolor:2>] в <fcolor:2><world></fcolor:2> для <fcolor:2><count></fcolor:2> игроков";
 
         message.status.motd.values.clear();
         message.status.motd.values.addAll(List.of(
@@ -1446,8 +1446,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Seed seed = new Seed();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/setblock/")})
         private Setblock setblock = new Setblock();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/setspawn/")})
-        private Setspawn setspawn = new Setspawn();
 
         @Override
         public SubMessageConfig getSign() {
@@ -1456,8 +1454,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/sleep/")})
         private Sleep sleep = new Sleep();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/spawnpoint/")})
-        private Spawnpoint spawnpoint = new Spawnpoint();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/spawn/")})
+        private Spawn spawn = new Spawn();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/")})
         private Status status = new Status();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/")})
@@ -1906,11 +1904,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
         }
 
         @Getter
-        public static final class Setspawn implements SubMessageConfig, Localizable {
-            private String format = "<fcolor:1>\uD83D\uDECC Respawn point set";
-        }
-
-        @Getter
         public static final class Sleep implements SubMessageConfig, Localizable {
             private String notPossible = "<fcolor:1>\uD83D\uDECC No amount of rest can pass this night";
             private String playersSleeping = "<fcolor:1>\uD83D\uDECC <fcolor:2><sleep_count></fcolor:2>/<fcolor:2><all_count></fcolor:2> players sleeping";
@@ -1918,7 +1911,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
         }
 
         @Getter
-        public static final class Spawnpoint implements SubMessageConfig, Localizable {
+        public static final class Spawn implements SubMessageConfig, Localizable {
+            private String notValid = "<fcolor:1>\uD83D\uDECC You have no home bed or charged respawn anchor, or it was obstructed";
+            private String set = "<fcolor:1>\uD83D\uDECC Respawn point set";
             private String single = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2> [<fcolor:2><angle></fcolor:2>] in <fcolor:2><world></fcolor:2> for <display_name>";
             private String multiple = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2> [<fcolor:2><angle></fcolor:2>] in <fcolor:2><world></fcolor:2> for <fcolor:2><count></fcolor:2> players";
         }
