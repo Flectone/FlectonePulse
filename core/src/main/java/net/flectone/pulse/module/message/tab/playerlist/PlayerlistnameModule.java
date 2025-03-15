@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.tab.playerlist;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate;
 import com.google.inject.Inject;
@@ -79,13 +80,16 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
     }
 
     private void updatePlayerlistname(FPlayer fPlayer, FPlayer fReceiver) {
+        User user = packetEventsUtil.getUser(fPlayer);
+        if (user == null) return;
+
         Component name = componentUtil.builder(fPlayer, fReceiver, resolveLocalization(fReceiver).getFormat())
                 .userMessage(false)
                 .build();
 
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)) {
             WrapperPlayServerPlayerInfoUpdate.PlayerInfo playerInfo = new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
-                    packetEventsUtil.getUser(fPlayer).getProfile(),
+                    user.getProfile(),
                     true,
                     fPlayerManager.getPing(fPlayer),
                     fPlayerManager.getGamemode(fPlayer),
@@ -100,7 +104,7 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
 
         WrapperPlayServerPlayerInfo.PlayerData playerData = new WrapperPlayServerPlayerInfo.PlayerData(
                 name,
-                packetEventsUtil.getUser(fPlayer).getProfile(),
+                user.getProfile(),
                 fPlayerManager.getGamemode(fPlayer),
                 fPlayerManager.getPing(fPlayer)
         );
