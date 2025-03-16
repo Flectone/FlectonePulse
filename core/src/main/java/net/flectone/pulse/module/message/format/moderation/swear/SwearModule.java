@@ -74,8 +74,7 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
         StringBuilder result = new StringBuilder();
         Matcher matcher = combinedPattern.matcher(message);
         while (matcher.find()) {
-
-            matcher.appendReplacement(result, "<swear:\"" + matcher.group(0) + "\">");
+            matcher.appendReplacement(result, "<swear:'" + matcher.group(0) + "'>");
         }
         matcher.appendTail(result);
 

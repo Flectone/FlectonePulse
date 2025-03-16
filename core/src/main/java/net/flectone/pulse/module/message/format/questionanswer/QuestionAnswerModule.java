@@ -97,7 +97,7 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
             Cooldown cooldown = cooldownMap.get(entry.getKey());
             if (cooldown != null && cooldown.isCooldown(sender.getUuid())) continue;
 
-            message += "<question:\"" + entry.getKey() + "\">";
+            message += "<question:'" + entry.getKey() + "'>";
         }
 
         return message;
