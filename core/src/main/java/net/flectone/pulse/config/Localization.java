@@ -293,7 +293,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.tictactoe.wrongMove = "<color:#ff7171><b>⁉</b> Такой ход невозможен";
         command.tictactoe.formatMove = "<fcolor:2>Ход <player> </fcolor:2>";
         command.tictactoe.lastMove = "<fcolor:2>Последний ход (<move>)</fcolor:2>";
-        command.tictactoe.formatWin = "<color:#98FB98><player> выйграл</color:#98FB98>";
+        command.tictactoe.formatWin = "<color:#98FB98><player> выиграл</color:#98FB98>";
         command.tictactoe.formatDraw = "<color:#98FB98>Ничья \uD83D\uDC6C</color:#98FB98>";
         command.tictactoe.symbol.empty = "<hover:show_text:\"<fcolor:1>Ход <move>\"><click:run_command:\"/tictactoe %d <move>\">☐</click></hover>";
 
@@ -314,7 +314,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.rockpaperscissors.sender = "<fcolor:2>✂ <fcolor:1>Теперь ходит <display_name>";
         command.rockpaperscissors.receiver = "<fcolor:2>✂ <display_name> <fcolor:1>предложил сыграть в камень-ножницы-бумага";
         command.rockpaperscissors.formatDraw = "<color:#98FB98>✂ Ничья! Вы оба выбрали <b><move>";
-        command.rockpaperscissors.formatWin = "<color:#98FB98>✂ Выйграл <display_name>! <b><sender_move></b> на <b><receiver_move></b>";
+        command.rockpaperscissors.formatWin = "<color:#98FB98>✂ Выиграл <display_name>! <b><sender_move></b> на <b><receiver_move></b>";
         command.rockpaperscissors.strategies.clear();
         command.rockpaperscissors.strategies.putAll(Map.of(
                 "paper", "бумага",
