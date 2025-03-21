@@ -249,11 +249,13 @@ public class BukkitProxyListener implements PluginMessageListener {
                     FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
                     if (muteModule.checkModulePredicates(fModerator)) return;
 
-                    if (!fPlayerManager.get(fEntity.getUuid()).isUnknown()) {
-                        fPlayerManager.get(fEntity.getUuid()).updateMutes(moderationDAO.getValid(Moderation.Type.MUTE));
-                    }
-
                     Moderation mute = gson.fromJson(input.readUTF(), Moderation.class);
+
+                    FPlayer localFTarget = fPlayerManager.get(fEntity.getUuid());
+
+                    if (!localFTarget.isUnknown()) {
+                        localFTarget.addMute(mute);
+                    }
 
                     muteModule.builder(fEntity)
                             .range(Range.SERVER)
@@ -284,8 +286,11 @@ public class BukkitProxyListener implements PluginMessageListener {
                     FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
                     if (unmuteModule.checkModulePredicates(fPlayer)) return;
 
-                    if (!fPlayerManager.get(fEntity.getUuid()).isUnknown()) {
-                        fPlayerManager.get(fEntity.getUuid()).updateMutes(moderationDAO.getValid(Moderation.Type.MUTE));
+                    FPlayer localFTarget = fPlayerManager.get(fEntity.getUuid());
+
+                    if (!localFTarget.isUnknown()) {
+                        localFTarget.clearMutes();
+                        localFTarget.addMutes(moderationDAO.getValid(Moderation.Type.MUTE));
                     }
 
                     unmuteModule.builder(fEntity)

@@ -39,8 +39,21 @@ public class FPlayer extends FEntity {
         setDefaultSettings();
     }
 
-    public void updateMutes(List<Moderation> mutes) {
+    public void clearMutes() {
         this.mutes.clear();
+    }
+
+    public void clearMutes(List<Moderation> mutes) {
+        this.mutes.removeIf(mute -> mutes.stream()
+                .anyMatch(moderation -> moderation.equals(mute))
+        );
+    }
+
+    public void addMute(Moderation mute) {
+        this.mutes.add(mute);
+    }
+
+    public void addMutes(List<Moderation> mutes) {
         this.mutes.addAll(mutes);
     }
 
@@ -125,7 +138,8 @@ public class FPlayer extends FEntity {
 
         return mutes
                 .stream()
-                .filter(mute -> mute.isValid() && !mute.isExpired())
+                .filter(Moderation::isValid)
+                .filter(mute -> !mute.isExpired())
                 .findAny();
     }
 

@@ -81,8 +81,10 @@ public abstract class MuteModule extends AbstractModuleCommand<Localization.Comm
         Moderation mute = moderationDAO.insert(fTarget, databaseTime, reason, fPlayer.getId(), Moderation.Type.MUTE);
         if (mute == null) return;
 
-        if (!fPlayerManager.get(fTarget.getUuid()).isUnknown()) {
-            fPlayerManager.get(fTarget.getUuid()).updateMutes(moderationDAO.getValid(Moderation.Type.MUTE));
+        FPlayer localFTarget = fPlayerManager.get(fTarget.getUuid());
+
+        if (!localFTarget.isUnknown()) {
+            localFTarget.addMute(mute);
         }
 
         builder(fTarget)

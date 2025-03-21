@@ -51,6 +51,9 @@ public class Moderation {
         return (Math.abs(date - time) + 500) / 1000 * 1000;
     }
 
+    public boolean equals(Moderation moderation) {
+        return this.id == moderation.getId();
+    }
 
     public enum Type {
         MUTE,

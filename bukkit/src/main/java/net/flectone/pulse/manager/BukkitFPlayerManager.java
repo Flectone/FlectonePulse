@@ -130,7 +130,7 @@ public class BukkitFPlayerManager extends FPlayerManager {
 
         colorsDAO.load(fPlayer);
         ignoreDAO.load(fPlayer);
-        fPlayer.updateMutes(moderationDAO.get(fPlayer, Moderation.Type.MUTE));
+        fPlayer.addMutes(moderationDAO.get(fPlayer, Moderation.Type.MUTE));
 
         fPlayer.setOnline(true);
         fPlayer.setIp(getIp(fPlayer));

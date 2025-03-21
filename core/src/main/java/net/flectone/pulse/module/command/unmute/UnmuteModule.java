@@ -2,11 +2,11 @@ package net.flectone.pulse.module.command.unmute;
 
 import com.google.gson.Gson;
 import lombok.Getter;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
@@ -91,8 +91,10 @@ public abstract class UnmuteModule extends AbstractModuleCommand<Localization.Co
             moderationDAO.setInvalid(mute);
         }
 
-        if (!fPlayerManager.get(fTarget.getUuid()).isUnknown()) {
-            fPlayerManager.get(fTarget.getUuid()).updateMutes(moderationDAO.getValid(Moderation.Type.MUTE));
+        FPlayer localFTarget = fPlayerManager.get(fTarget.getUuid());
+
+        if (!localFTarget.isUnknown()) {
+            localFTarget.clearMutes(mutes);
         }
 
         builder(fTarget)
