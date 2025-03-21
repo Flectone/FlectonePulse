@@ -58,11 +58,6 @@ public class CommandModule extends AbstractModule {
     public CommandModule(FileManager fileManager) {
         command = fileManager.getCommand();
         permission = fileManager.getPermission().getCommand();
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
 
         addChildren(AfkModule.class);
         addChildren(BallModule.class);
@@ -105,6 +100,11 @@ public class CommandModule extends AbstractModule {
         addChildren(UnwarnModule.class);
         addChildren(WarnModule.class);
         addChildren(WarnlistModule.class);
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
     }
 
     @Override

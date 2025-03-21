@@ -60,6 +60,18 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
 
         message = fileManager.getMessage().getFormat();
         permission = fileManager.getPermission().getMessage().getFormat();
+
+        addChildren(ColorModule.class);
+        addChildren(EmojiModule.class);
+        addChildren(FixationModule.class);
+        addChildren(ImageModule.class);
+        addChildren(MentionModule.class);
+        addChildren(ModerationModule.class);
+        addChildren(NameModule.class);
+        addChildren(QuestionAnswerModule.class);
+        addChildren(SpoilerModule.class);
+        addChildren(TranslateModule.class);
+        addChildren(WorldModule.class);
     }
 
     @Override
@@ -93,18 +105,6 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
         putKyoriTag(TagType.NBT, StandardTags.nbt());
         putKyoriTag(TagType.PRIDE, StandardTags.pride());
         putKyoriTag(TagType.SHADOW_COLOR, StandardTags.shadowColor());
-
-        addChildren(ColorModule.class);
-        addChildren(EmojiModule.class);
-        addChildren(FixationModule.class);
-        addChildren(ImageModule.class);
-        addChildren(MentionModule.class);
-        addChildren(ModerationModule.class);
-        addChildren(NameModule.class);
-        addChildren(QuestionAnswerModule.class);
-        addChildren(SpoilerModule.class);
-        addChildren(TranslateModule.class);
-        addChildren(WorldModule.class);
     }
 
     @Override

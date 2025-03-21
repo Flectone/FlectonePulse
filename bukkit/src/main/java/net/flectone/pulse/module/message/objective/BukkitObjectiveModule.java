@@ -12,13 +12,13 @@ public class BukkitObjectiveModule extends ObjectiveModule {
     @Inject
     public BukkitObjectiveModule(FileManager fileManager) {
         super(fileManager);
+
+        addChildren(BelownameModule.class);
+        addChildren(TabnameModule.class);
     }
 
     @Override
     public void reload() {
         super.reload();
-
-        addChildren(BelownameModule.class);
-        addChildren(TabnameModule.class);
     }
 }

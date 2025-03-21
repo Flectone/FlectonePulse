@@ -18,7 +18,6 @@ import org.bukkit.entity.Player;
 @Singleton
 public class BukkitFormatModule extends FormatModule {
 
-    private final PermissionUtil permissionUtil;
     private final ComponentUtil componentUtil;
 
     @Inject
@@ -30,7 +29,6 @@ public class BukkitFormatModule extends FormatModule {
                               ItemUtil itemUtil) {
         super(fileManager, serverUtil, fPlayerManager, permissionUtil, itemUtil);
 
-        this.permissionUtil = permissionUtil;
         this.componentUtil = componentUtil;
     }
 

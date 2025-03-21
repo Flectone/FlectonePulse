@@ -29,17 +29,17 @@ public abstract class IntegrationModule extends AbstractModule {
 
         integration = fileManager.getIntegration();
         permission = fileManager.getPermission().getIntegration();
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
 
         addChildren(DeeplModule.class);
         addChildren(DiscordModule.class);
         addChildren(TelegramModule.class);
         addChildren(TwitchModule.class);
         addChildren(YandexModule.class);
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
     }
 
     @Override

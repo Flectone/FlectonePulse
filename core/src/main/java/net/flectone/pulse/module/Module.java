@@ -19,15 +19,15 @@ public class Module extends AbstractModule {
     public Module(FileManager fileManager) {
         config = fileManager.getConfig().getModule();
         permission = fileManager.getPermission();
+
+        addChildren(CommandModule.class);
+        addChildren(IntegrationModule.class);
+        addChildren(MessageModule.class);
     }
 
     @Override
     public void reload() {
         registerModulePermission(permission.getModule());
-
-        addChildren(CommandModule.class);
-        addChildren(IntegrationModule.class);
-        addChildren(MessageModule.class);
     }
 
     @Override

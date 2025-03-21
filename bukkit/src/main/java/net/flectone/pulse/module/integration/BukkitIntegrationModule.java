@@ -53,6 +53,8 @@ public class BukkitIntegrationModule extends IntegrationModule {
     public void reload() {
         super.reload();
 
+        if (!isEnable()) return;
+
         if (serverUtil.hasProject("PlaceholderAPI")) {
             addChildren(PlaceholderAPIModule.class);
         }

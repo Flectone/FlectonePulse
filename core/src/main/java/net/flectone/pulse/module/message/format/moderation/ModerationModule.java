@@ -20,15 +20,15 @@ public class ModerationModule extends AbstractModule {
     public ModerationModule(FileManager fileManager) {
         message = fileManager.getMessage().getFormat().getModeration();
         permission = fileManager.getPermission().getMessage().getFormat().getModeration();
+
+        addChildren(CapsModule.class);
+        addChildren(FloodModule.class);
+        addChildren(SwearModule.class);
     }
 
     @Override
     public void reload() {
         registerModulePermission(permission);
-
-        addChildren(CapsModule.class);
-        addChildren(FloodModule.class);
-        addChildren(SwearModule.class);
     }
 
     @Override

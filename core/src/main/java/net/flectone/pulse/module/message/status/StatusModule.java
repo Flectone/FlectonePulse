@@ -77,16 +77,16 @@ public class StatusModule extends AbstractModule {
 
         message = fileManager.getMessage().getStatus();
         permission = fileManager.getPermission().getMessage().getStatus();
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
 
         addChildren(MOTDModule.class);
         addChildren(IconModule.class);
         addChildren(PlayersModule.class);
         addChildren(VersionModule.class);
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
 
         listenerRegistry.register(StatusPacketListener.class);
     }
