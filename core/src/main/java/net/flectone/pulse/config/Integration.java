@@ -57,6 +57,8 @@ public final class Integration extends FileSerializable implements ModuleConfig.
     private Skinsrestorer skinsrestorer = new Skinsrestorer();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/supervanish/")})
     private Supervanish supervanish = new Supervanish();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/tab/")})
+    private TAB TAB = new TAB();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/telegram/")})
     private Telegram telegram = new Telegram();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/triton/")})
@@ -145,6 +147,12 @@ public final class Integration extends FileSerializable implements ModuleConfig.
     @Getter
     public static final class Supervanish implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = true;
+    }
+
+    @Getter
+    public static final class TAB implements SubIntegrationConfig, Config.IEnable {
+        private boolean enable = true;
+        private boolean enableOwnScoreboard = false;
     }
 
     @Getter

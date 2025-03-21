@@ -10,7 +10,9 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleListMessage;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.List;
 
@@ -21,13 +23,16 @@ public class FooterModule extends AbstractModuleListMessage<Localization.Message
     private final Permission.Message.Tab.Footer permission;
 
     private final TaskScheduler taskScheduler;
+    private final IntegrationModule integrationModule;
 
     @Inject
     public FooterModule(FileManager fileManager,
-                        TaskScheduler taskScheduler) {
+                        TaskScheduler taskScheduler,
+                        IntegrationModule integrationModule) {
         super(module -> module.getMessage().getTab().getFooter());
 
         this.taskScheduler = taskScheduler;
+        this.integrationModule = integrationModule;
 
         message = fileManager.getMessage().getTab().getFooter();
         permission = fileManager.getPermission().getMessage().getTab().getFooter();
@@ -35,6 +40,8 @@ public class FooterModule extends AbstractModuleListMessage<Localization.Message
 
     @Override
     public void reload() {
+        if (integrationModule.isOtherScoreboardEnabled()) return;
+
         registerModulePermission(permission);
 
         Ticker ticker = message.getTicker();
@@ -43,9 +50,14 @@ public class FooterModule extends AbstractModuleListMessage<Localization.Message
         }
     }
 
+    @Inject
+    private FLogger fLogger;
+
     @Async
     public void send(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
+
+        fLogger.warning("3");
 
         String format = getNextMessage(fPlayer, message.isRandom());
         if (format == null) return;

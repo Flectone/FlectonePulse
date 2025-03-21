@@ -14,6 +14,7 @@ import net.flectone.pulse.module.integration.plasmovoice.PlasmoVoiceModule;
 import net.flectone.pulse.module.integration.simplevoice.SimpleVoiceModule;
 import net.flectone.pulse.module.integration.skinsrestorer.SkinsRestorerModule;
 import net.flectone.pulse.module.integration.supervanish.SuperVanishModule;
+import net.flectone.pulse.module.integration.tab.TABModule;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.triton.TritonModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
@@ -88,6 +89,10 @@ public class BukkitIntegrationModule extends IntegrationModule {
             } catch (ClassNotFoundException e) {
                 fLogger.warning("Update PlasmoVoice to the latest version");
             }
+        }
+
+        if (serverUtil.hasProject("TAB")) {
+            addChildren(TABModule.class);
         }
 
         if (serverUtil.hasProject("Triton")) {
@@ -233,6 +238,17 @@ public class BukkitIntegrationModule extends IntegrationModule {
         return player.getMetadata("vanished")
                 .stream()
                 .anyMatch(MetadataValue::asBoolean);
+    }
+
+    @Override
+    public boolean isOtherScoreboardEnabled() {
+        if (getChildren().contains(TABModule.class)) {
+            TABModule tabModule = injector.getInstance(TABModule.class);
+
+            return tabModule.isEnable() && !tabModule.getIntegration().isEnableOwnScoreboard();
+        }
+
+        return false;
     }
 
     @Override

@@ -10,6 +10,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleListMessage;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.scheduler.TaskScheduler;
 
 import java.util.List;
@@ -21,13 +22,16 @@ public class HeaderModule extends AbstractModuleListMessage<Localization.Message
     private final Permission.Message.Tab.Header permission;
 
     private final TaskScheduler taskScheduler;
+    private final IntegrationModule integrationModule;
 
     @Inject
     public HeaderModule(FileManager fileManager,
-                        TaskScheduler taskScheduler) {
+                        TaskScheduler taskScheduler,
+                        IntegrationModule integrationModule) {
         super(module -> module.getMessage().getTab().getHeader());
 
         this.taskScheduler = taskScheduler;
+        this.integrationModule = integrationModule;
 
         message = fileManager.getMessage().getTab().getHeader();
         permission = fileManager.getPermission().getMessage().getTab().getHeader();
@@ -35,6 +39,8 @@ public class HeaderModule extends AbstractModuleListMessage<Localization.Message
 
     @Override
     public void reload() {
+        if (integrationModule.isOtherScoreboardEnabled()) return;
+
         registerModulePermission(permission);
 
         Ticker ticker = message.getTicker();

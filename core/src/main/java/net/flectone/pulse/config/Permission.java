@@ -537,6 +537,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Skinsrestorer skinsrestorer = new Skinsrestorer();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/supervanish/")})
         private Supervanish supervanish = new Supervanish();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/tab/")})
+        private TAB TAB = new TAB();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/telegram/")})
         private Telegram telegram = new Telegram();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/triton/")})
@@ -600,6 +602,12 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         @Getter
         public static final class Supervanish implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.supervanish";
+            private Type type = Type.TRUE;
+        }
+
+        @Getter
+        public static final class TAB implements SubIntegrationConfig, IPermission {
+            private String name = "flectonepulse.module.integration.tab";
             private Type type = Type.TRUE;
         }
 

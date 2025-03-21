@@ -27,6 +27,7 @@ public class BukkitNameModule extends NameModule {
     private final TeamManager teamManager;
     private final ComponentUtil componentUtil;
     private final FPlayerManager fPlayerManager;
+    private final IntegrationModule integrationModule;
 
     @Inject
     public BukkitNameModule(FileManager fileManager,
@@ -40,6 +41,7 @@ public class BukkitNameModule extends NameModule {
         this.teamManager = teamManager;
         this.fPlayerManager = fPlayerManager;
         this.componentUtil = componentUtil;
+        this.integrationModule = integrationModule;
 
         message = fileManager.getMessage().getFormat().getName_();
     }
@@ -49,6 +51,7 @@ public class BukkitNameModule extends NameModule {
     public void add(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
         if (!message.isTeam()) return;
+        if (integrationModule.isOtherScoreboardEnabled()) return;
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;
@@ -83,6 +86,7 @@ public class BukkitNameModule extends NameModule {
     public void remove(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
         if (!message.isTeam()) return;
+        if (integrationModule.isOtherScoreboardEnabled()) return;
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;
