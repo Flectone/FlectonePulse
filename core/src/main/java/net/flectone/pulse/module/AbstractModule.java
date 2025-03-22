@@ -73,7 +73,7 @@ public abstract class AbstractModule {
     }
 
     public void reloadWithChildren() {
-        reloadWithChildren(this.getClass());
+        reloadWithChildren(this.getClass(), AbstractModule::isConfigEnable);
     }
 
     private Map<String, Integer> collectModuleStatuses(Class<? extends AbstractModule> clazz) {
@@ -90,15 +90,15 @@ public abstract class AbstractModule {
         return modules;
     }
 
-    private void reloadWithChildren(Class<? extends AbstractModule> clazz) {
+    private void reloadWithChildren(Class<? extends AbstractModule> clazz, Predicate<AbstractModule> predicate) {
         AbstractModule module = injector.getInstance(clazz);
-        module.setEnable(module.isConfigEnable());
+        module.setEnable(predicate.test(module));
 
         if (module.isEnable()) {
             module.reload();
-            module.getChildren().forEach(this::reloadWithChildren);
+            module.getChildren().forEach(subModule -> reloadWithChildren(subModule, AbstractModule::isConfigEnable));
         } else {
-            module.getChildren().forEach(subModule -> injector.getInstance(subModule).setEnable(false));
+            module.getChildren().forEach(subModule -> reloadWithChildren(subModule, m -> false));
         }
     }
 }
