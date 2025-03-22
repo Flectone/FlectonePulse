@@ -115,8 +115,12 @@ import net.flectone.pulse.module.message.format.BukkitFormatModule;
 import net.flectone.pulse.module.message.format.FormatModule;
 import net.flectone.pulse.module.message.format.name.BukkitNameModule;
 import net.flectone.pulse.module.message.format.name.NameModule;
+import net.flectone.pulse.module.message.join.BukkitJoinModule;
+import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.objective.BukkitObjectiveModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
+import net.flectone.pulse.module.message.quit.BukkitQuitModule;
+import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.rightclick.BukkitRightclickModule;
 import net.flectone.pulse.module.message.rightclick.RightclickModule;
 import net.flectone.pulse.module.message.scoreboard.BukkitScoreboardModule;
@@ -210,6 +214,11 @@ public class BukkitInjector extends AbstractModule {
         bind(ChatModule.class).to(BukkitChatModule.class);
         bind(SignModule.class).to(BukkitSignModule.class);
         bind(RightclickModule.class).to(BukkitRightclickModule.class);
+
+        if (!BukkitServerUtil.IS_PAPER) {
+            bind(JoinModule.class).to(BukkitJoinModule.class);
+            bind(QuitModule.class).to(BukkitQuitModule.class);
+        }
 
         //commands
         bind(net.flectone.pulse.module.command.afk.AfkModule.class).to(net.flectone.pulse.module.command.afk.BukkitAfkModule.class);
