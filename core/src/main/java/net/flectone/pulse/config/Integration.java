@@ -121,7 +121,7 @@ public final class Integration extends FileSerializable implements ModuleConfig.
     @Getter
     public static final class Luckperms implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = true;
-        private boolean tabSort = false;
+        private boolean tabSort = true;
     }
 
     @Getter
