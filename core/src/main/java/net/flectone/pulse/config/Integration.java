@@ -152,7 +152,6 @@ public final class Integration extends FileSerializable implements ModuleConfig.
     @Getter
     public static final class TAB implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = true;
-        private boolean enableOwnScoreboard = false;
     }
 
     @Getter

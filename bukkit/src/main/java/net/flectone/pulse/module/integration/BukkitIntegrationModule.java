@@ -34,26 +34,16 @@ import java.util.function.UnaryOperator;
 @Singleton
 public class BukkitIntegrationModule extends IntegrationModule {
 
-    private final FLogger fLogger;
     private final Injector injector;
-
-    @Inject private ServerUtil serverUtil;
 
     @Inject
     public BukkitIntegrationModule(FileManager fileManager,
                                    FLogger fLogger,
+                                   ServerUtil serverUtil,
                                    Injector injector) {
         super(fileManager, injector);
 
-        this.fLogger = fLogger;
         this.injector = injector;
-    }
-
-    @Override
-    public void reload() {
-        super.reload();
-
-        if (!isEnable()) return;
 
         if (serverUtil.hasProject("PlaceholderAPI")) {
             addChildren(PlaceholderAPIModule.class);
@@ -243,11 +233,9 @@ public class BukkitIntegrationModule extends IntegrationModule {
     }
 
     @Override
-    public boolean isOtherScoreboardEnabled() {
+    public boolean isOtherTAB() {
         if (getChildren().contains(TABModule.class)) {
-            TABModule tabModule = injector.getInstance(TABModule.class);
-
-            return tabModule.isEnable() && !tabModule.getIntegration().isEnableOwnScoreboard();
+            return injector.getInstance(TABModule.class).isHooked();
         }
 
         return false;

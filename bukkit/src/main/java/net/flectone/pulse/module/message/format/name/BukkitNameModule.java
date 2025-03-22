@@ -51,7 +51,7 @@ public class BukkitNameModule extends NameModule {
     public void add(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
         if (!message.isTeam()) return;
-        if (integrationModule.isOtherScoreboardEnabled()) return;
+        if (message.isDisableTeamOnOtherScoreboard() && integrationModule.isOtherTAB()) return;
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;
@@ -86,7 +86,7 @@ public class BukkitNameModule extends NameModule {
     public void remove(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
         if (!message.isTeam()) return;
-        if (integrationModule.isOtherScoreboardEnabled()) return;
+        if (message.isDisableTeamOnOtherScoreboard() && integrationModule.isOtherTAB()) return;
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;

@@ -6,7 +6,6 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
@@ -18,12 +17,9 @@ public class TabModule extends AbstractModule {
     private final Permission.Message.Tab permission;
 
     @Inject
-    public TabModule(FileManager fileManager,
-                     IntegrationModule integrationModule) {
+    public TabModule(FileManager fileManager) {
         message = fileManager.getMessage().getTab();
         permission = fileManager.getPermission().getMessage().getTab();
-
-        if (integrationModule.isOtherScoreboardEnabled()) return;
 
         addChildren(FooterModule.class);
         addChildren(HeaderModule.class);

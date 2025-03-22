@@ -69,7 +69,7 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public abstract boolean isVanished(FEntity sender);
 
-    public abstract boolean isOtherScoreboardEnabled();
+    public abstract boolean isOtherTAB();
 
     public abstract String getTritonLocale(FPlayer fPlayer);
 
