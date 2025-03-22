@@ -21,6 +21,7 @@ import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.PermissionUtil;
 import net.flectone.pulse.util.Range;
 import net.flectone.pulse.util.TimeUtil;
+import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
@@ -143,7 +144,7 @@ public class BukkitChatModule extends ChatModule {
                 ? integrationModule.checkMention(fPlayer, eventMessage)
                 : eventMessage;
 
-        builder(fPlayer)
+        Builder builder = builder(fPlayer)
                 .tag(MessageTag.CHAT)
                 .destination(playerChat.getDestination())
                 .range(chatRange)
@@ -155,18 +156,20 @@ public class BukkitChatModule extends ChatModule {
                     output.writeUTF(finalMessage);
                 })
                 .integration(s -> s.replace("<message>", finalMessage))
-                .sound(soundMap.get(chatName))
-                .sendBuilt();
+                .sound(soundMap.get(chatName));
 
-        List<UUID> recipients = fPlayerManager.getFPlayers()
-                .stream()
-                .filter(chatPermissionFilter)
+        List<FPlayer> recipients = builder.build();
+
+        builder.send(recipients);
+
+        List<UUID> recipientsUUID = recipients.stream()
+                .filter(filterFPlayer -> !filterFPlayer.isUnknown())
                 .map(FEntity::getUuid)
                 .toList();
 
         spyModule.checkChat(fPlayer, chatName, finalMessage);
 
-        int countRecipients = recipients.size();
+        int countRecipients = recipientsUUID.size();
         if (playerChat.isNullRecipient() && countRecipients < 2) {
             taskScheduler.runAsyncLater(() -> {
                 Set<UUID> onlinePlayers = fPlayerDAO.getOnlineFPlayers()
@@ -174,7 +177,7 @@ public class BukkitChatModule extends ChatModule {
                         .map(FEntity::getUuid)
                         .collect(Collectors.toSet());
 
-                if ((onlinePlayers.containsAll(recipients) && onlinePlayers.size() <= countRecipients)
+                if ((onlinePlayers.containsAll(recipientsUUID) && onlinePlayers.size() <= countRecipients)
                         || chatRange > -1) {
                     builder(fPlayer)
                             .format(Localization.Message.Chat::getNullRecipient)
@@ -189,6 +192,8 @@ public class BukkitChatModule extends ChatModule {
 
         bubbleModule.add(fPlayer, eventMessage);
     }
+
+    @Inject private FLogger fLogger;
 
     @Async
     public void send(FEntity fPlayer, String chatName, String string) {
