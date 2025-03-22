@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.manager.FPlayerManager;
@@ -35,15 +36,15 @@ public class BukkitServerUtil implements ServerUtil {
 
     private final Plugin plugin;
     private final FPlayerManager fPlayerManager;
-    private final IntegrationModule integrationModule;
+    private final Injector injector;
 
     @Inject
     public BukkitServerUtil(Plugin plugin,
                             FPlayerManager fPlayerManager,
-                            IntegrationModule integrationModule) {
+                            Injector injector) {
         this.plugin = plugin;
         this.fPlayerManager = fPlayerManager;
-        this.integrationModule = integrationModule;
+        this.injector = injector;
     }
 
     @Override
@@ -103,6 +104,8 @@ public class BukkitServerUtil implements ServerUtil {
 
     @Override
     public int getOnlineCount() {
+        IntegrationModule integrationModule = injector.getInstance(IntegrationModule.class);
+
         return (int) fPlayerManager.getFPlayers().stream()
                 .filter(fPlayer -> !fPlayer.isUnknown())
                 .filter(fPlayer -> !integrationModule.isVanished(fPlayer))
