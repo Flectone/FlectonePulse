@@ -61,8 +61,15 @@ public class BukkitFormatModule extends FormatModule {
         Player player = Bukkit.getPlayer(sender.getUuid());
         if (player == null) return TagResolver.resolver("stats", ((argumentQueue, context) -> Tag.selfClosingInserting(Component.empty())));
 
-        AttributeInstance armor = player.getAttribute(Attribute.GENERIC_ARMOR);
-        AttributeInstance damage = player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
+        AttributeInstance armor;
+        AttributeInstance damage;
+
+        try {
+            armor = player.getAttribute(Attribute.GENERIC_ARMOR);
+            damage = player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return TagResolver.empty();
+        }
 
         return TagResolver.resolver("stats", (argumentQueue, context) -> {
 
