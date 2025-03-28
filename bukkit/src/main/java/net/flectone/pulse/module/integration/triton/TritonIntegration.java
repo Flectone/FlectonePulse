@@ -5,10 +5,9 @@ import com.google.inject.Singleton;
 import com.rexcantor64.triton.api.TritonAPI;
 import com.rexcantor64.triton.api.events.PlayerChangeLanguageSpigotEvent;
 import com.rexcantor64.triton.api.players.LanguagePlayer;
-import net.flectone.pulse.database.dao.SettingDAO;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,16 +16,13 @@ import org.jetbrains.annotations.Nullable;
 @Singleton
 public class TritonIntegration implements Listener, FIntegration {
 
-    private final FPlayerManager fPlayerManager;
-    private final SettingDAO settingDAO;
+    private final FPlayerService fPlayerService;
     private final FLogger fLogger;
 
     @Inject
-    public TritonIntegration(FPlayerManager fPlayerManager,
-                             SettingDAO settingDAO,
+    public TritonIntegration(FPlayerService fPlayerService,
                              FLogger fLogger) {
-        this.fPlayerManager = fPlayerManager;
-        this.settingDAO = settingDAO;
+        this.fPlayerService = fPlayerService;
         this.fLogger = fLogger;
     }
 
@@ -39,10 +35,9 @@ public class TritonIntegration implements Listener, FIntegration {
     public void onPlayerChangeLanguageSpigotEvent(PlayerChangeLanguageSpigotEvent event) {
         if (event.isCancelled()) return;
 
-        FPlayer fPlayer = fPlayerManager.get(event.getLanguagePlayer().getUUID());
-        fPlayer.setSetting(FPlayer.Setting.LOCALE, event.getNewLanguage().getLanguageId());
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getLanguagePlayer().getUUID());
 
-        settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.LOCALE);
+        fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.LOCALE, event.getNewLanguage().getLanguageId());
     }
 
     @Nullable

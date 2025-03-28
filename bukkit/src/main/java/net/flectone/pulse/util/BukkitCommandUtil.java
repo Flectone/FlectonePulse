@@ -10,9 +10,9 @@ import dev.jorel.commandapi.arguments.CustomArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.executors.CommandArguments;
 import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.service.FPlayerService;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
@@ -23,13 +23,13 @@ import java.util.concurrent.CompletableFuture;
 @Singleton
 public class BukkitCommandUtil extends CommandUtil {
 
-    private final FPlayerDAO fPlayerDAO;
+    private final FPlayerService fPlayerService;
     private final IntegrationModule integrationModule;
 
     @Inject
-    public BukkitCommandUtil(FPlayerDAO fPlayerDAO,
+    public BukkitCommandUtil(FPlayerService fPlayerService,
                              IntegrationModule integrationModule) {
-        this.fPlayerDAO = fPlayerDAO;
+        this.fPlayerService = fPlayerService;
         this.integrationModule = integrationModule;
     }
 
@@ -129,14 +129,14 @@ public class BukkitCommandUtil extends CommandUtil {
     public ArgumentSuggestions<CommandSender> argumentFPlayers(boolean offlinePlayers) {
         return ArgumentSuggestions.stringCollectionAsync(info -> CompletableFuture.supplyAsync(() -> {
             if (offlinePlayers) {
-                return fPlayerDAO.getFPlayers().stream()
+                return fPlayerService.findAllFPlayers().stream()
                         .filter(player -> !integrationModule.isVanished(player))
                         .filter(player -> !player.isUnknown())
                         .map(FEntity::getName)
                         .toList();
             }
 
-            return fPlayerDAO.getOnlineFPlayers().stream()
+            return fPlayerService.findOnlineFPlayers().stream()
                     .filter(player -> !integrationModule.isVanished(player))
                     .map(FEntity::getName)
                     .toList();

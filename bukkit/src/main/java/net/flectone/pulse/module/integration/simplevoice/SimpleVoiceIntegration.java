@@ -8,33 +8,33 @@ import de.maxhenkel.voicechat.api.events.EntitySoundPacketEvent;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.MessageSender;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.ModerationUtil;
+import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
+    private final ModerationUtil moderationUtil;
     private final MessageSender messageSender;
     private final ComponentUtil componentUtil;
-    private final ModerationUtil moderationUtil;
     private final FLogger fLogger;
 
     @Inject
-    public SimpleVoiceIntegration(FPlayerManager fPlayerManager,
+    public SimpleVoiceIntegration(FPlayerService fPlayerService,
+                                  ModerationUtil moderationUtil,
                                   MessageSender messageSender,
                                   ComponentUtil componentUtil,
-                                  ModerationUtil moderationUtil,
                                   FLogger fLogger) {
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
+        this.moderationUtil = moderationUtil;
         this.messageSender = messageSender;
         this.componentUtil = componentUtil;
-        this.moderationUtil = moderationUtil;
         this.fLogger = fLogger;
     }
 
@@ -59,10 +59,10 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
         if (event.getReceiverConnection() == null) return;
 
         Player sender = event.getSenderConnection().getPlayer();
-        FPlayer fSender = fPlayerManager.get(sender.getUuid());
+        FPlayer fSender = fPlayerService.getFPlayer(sender.getUuid());
 
         Player receiver = event.getReceiverConnection().getPlayer();
-        FPlayer fReceiver = fPlayerManager.get(receiver.getUuid());
+        FPlayer fReceiver = fPlayerService.getFPlayer(receiver.getUuid());
 
         if (!fReceiver.isIgnored(fSender)) return;
 
@@ -74,13 +74,12 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
 
         Player player = event.getSenderConnection().getPlayer();
 
-        FPlayer fPlayer = fPlayerManager.get(player.getUuid());
+        FPlayer fPlayer = fPlayerService.getFPlayer(player.getUuid());
         if (!fPlayer.isMuted()) return;
 
         event.cancel();
 
         String message = moderationUtil.buildMuteMessage(fPlayer);
-
         messageSender.sendActionBar(fPlayer, componentUtil.builder(fPlayer, message).build());
     }
 }

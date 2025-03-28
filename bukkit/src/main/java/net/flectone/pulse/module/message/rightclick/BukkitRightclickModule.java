@@ -6,13 +6,12 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.rightclick.listener.RightclickPacketListener;
 import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.service.FPlayerService;
 
-import java.util.Optional;
 import java.util.UUID;
 
 
@@ -22,15 +21,15 @@ public class BukkitRightclickModule extends RightclickModule {
     private final Message.Rightclick message;
     private final Permission.Message.Rightclick permission;
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public BukkitRightclickModule(FileManager fileManager,
-                                  FPlayerManager fPlayerManager,
+                                  FPlayerService fPlayerService,
                                   ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getRightclick());
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
 
         message = fileManager.getMessage().getRightclick();
@@ -56,18 +55,13 @@ public class BukkitRightclickModule extends RightclickModule {
 
     @Async
     public void send(UUID uuid, int targetId) {
-        FPlayer fPlayer = fPlayerManager.get(uuid);
-
+        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
         if (checkModulePredicates(fPlayer)) return;
 
-        Optional<FPlayer> optionalFTarget = fPlayerManager.getFPlayers()
-                .stream()
-                .filter(filter -> filter.getEntityId() == targetId)
-                .findAny();
+        FPlayer fTarget = fPlayerService.getFPlayer(targetId);
+        if (fTarget.isUnknown()) return;
 
-        if (optionalFTarget.isEmpty()) return;
-
-        builder(optionalFTarget.get())
+        builder(fTarget)
                 .receiver(fPlayer)
                 .format(Localization.Message.Rightclick::getFormat)
                 .destination(message.getDestination())

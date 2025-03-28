@@ -2,16 +2,17 @@ package net.flectone.pulse.module.message.objective.belowname;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.service.FPlayerService;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveDisplaySlot;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
 import net.megavex.scoreboardlibrary.api.objective.ScoreboardObjective;
@@ -25,7 +26,8 @@ public class BelownameModule extends AbstractModule {
     private final Permission.Message.Objective.Belowname permission;
 
     private final ObjectiveManager objectiveManager;
-    private final FPlayerManager fPlayerManager;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
 
     private ObjectiveMode objectiveValueType;
@@ -34,10 +36,12 @@ public class BelownameModule extends AbstractModule {
     @Inject
     public BelownameModule(FileManager fileManager,
                            ObjectiveManager objectiveManager,
-                           FPlayerManager fPlayerManager,
+                           PlatformPlayerAdapter platformPlayerAdapter,
+                           FPlayerService fPlayerService,
                            TaskScheduler taskScheduler) {
         this.objectiveManager = objectiveManager;
-        this.fPlayerManager = fPlayerManager;
+        this.platformPlayerAdapter = platformPlayerAdapter;
+        this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
 
         message = fileManager.getMessage().getObjective().getBelowname();
@@ -55,7 +59,7 @@ public class BelownameModule extends AbstractModule {
 
         Ticker ticker = message.getTicker();
         if (ticker.isEnable()) {
-            taskScheduler.runAsyncTicker(this::add, ticker.getPeriod());
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::add), ticker.getPeriod());
         }
     }
 
@@ -71,7 +75,7 @@ public class BelownameModule extends AbstractModule {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;
 
-        scoreboardObjective.score(fPlayer.getName(), fPlayerManager.getObjectiveScore(fPlayer.getUuid(), objectiveValueType));
+        scoreboardObjective.score(fPlayer.getName(), platformPlayerAdapter.getObjectiveScore(fPlayer.getUuid(), objectiveValueType));
         objectiveManager.addPlayer(player);
     }
 

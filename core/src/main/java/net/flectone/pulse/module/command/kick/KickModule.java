@@ -2,17 +2,16 @@ package net.flectone.pulse.module.command.kick;
 
 import com.google.gson.Gson;
 import lombok.Getter;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.*;
 
 import java.util.function.BiFunction;
@@ -22,30 +21,27 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
     @Getter private final Command.Kick command;
     @Getter private final Permission.Command.Kick permission;
 
-    private final FPlayerDAO fPlayerDAO;
-    private final ModerationDAO moderationDAO;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
+    private final ModerationService moderationService;
+    private final ModerationUtil moderationUtil;
     private final CommandUtil commandUtil;
     private final ComponentUtil componentUtil;
-    private final ModerationUtil moderationUtil;
     private final Gson gson;
 
     public KickModule(FileManager fileManager,
-                      FPlayerDAO fPlayerDAO,
-                      ModerationDAO moderationDAO,
-                      FPlayerManager fPlayerManager,
+                      FPlayerService fPlayerService,
+                      ModerationService moderationService,
+                      ModerationUtil moderationUtil,
                       CommandUtil commandUtil,
                       ComponentUtil componentUtil,
-                      ModerationUtil moderationUtil,
                       Gson gson) {
         super(localization -> localization.getCommand().getKick(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.KICK));
 
-        this.fPlayerDAO = fPlayerDAO;
-        this.moderationDAO = moderationDAO;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
+        this.moderationService = moderationService;
+        this.moderationUtil = moderationUtil;
         this.commandUtil = commandUtil;
         this.componentUtil = componentUtil;
-        this.moderationUtil = moderationUtil;
         this.gson = gson;
 
         command = fileManager.getCommand().getKick();
@@ -61,7 +57,7 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
 
         String playerName = commandUtil.getString(0, arguments);
 
-        FPlayer fTarget = fPlayerDAO.getFPlayer(playerName);
+        FPlayer fTarget = fPlayerService.getFPlayer(playerName);
         if (!fTarget.isOnline()) {
             builder(fPlayer)
                     .format(Localization.Command.Kick::getNullPlayer)
@@ -70,8 +66,7 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
         }
 
         String reason = commandUtil.getString(1, arguments);
-
-        Moderation kick = moderationDAO.insert(fTarget, -1, reason, fPlayer.getId(), Moderation.Type.KICK);
+        Moderation kick = moderationService.kick(fTarget, reason, fPlayer.getId());
         if (kick == null) return;
 
         kick(fPlayer, fTarget, kick);
@@ -91,7 +86,7 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
     }
 
     public BiFunction<FPlayer, Localization.Command.Kick, String> buildFormat(Moderation kick) {
-        return (fReceiver, message) ->  moderationUtil.replacePlaceholders(message.getServer(), fReceiver, kick);
+        return (fReceiver, message) -> moderationUtil.replacePlaceholders(message.getServer(), fReceiver, kick);
     }
 
     public void kick(FEntity fModerator, FPlayer fReceiver, Moderation kick) {
@@ -99,7 +94,7 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
 
         String format = moderationUtil.replacePlaceholders(resolveLocalization(fReceiver).getPerson(), fReceiver, kick);
 
-        fPlayerManager.kick(fReceiver, componentUtil.builder(fReceiver, format).build());
+        fPlayerService.kick(fReceiver, componentUtil.builder(fReceiver, format).build());
     }
 
     @Override

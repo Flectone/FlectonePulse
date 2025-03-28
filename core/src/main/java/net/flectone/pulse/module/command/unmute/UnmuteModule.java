@@ -5,13 +5,12 @@ import lombok.Getter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.ModerationDAO;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.MessageTag;
 
@@ -23,23 +22,20 @@ public abstract class UnmuteModule extends AbstractModuleCommand<Localization.Co
     @Getter private final Command.Unmute command;
     @Getter private final Permission.Command.Unmute permission;
 
-    private final FPlayerDAO fPlayerDAO;
-    private final ModerationDAO moderationDAO;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
+    private final ModerationService moderationService;
     private final CommandUtil commandUtil;
     private final Gson gson;
 
     public UnmuteModule(FileManager fileManager,
-                        FPlayerDAO fPlayerDAO,
-                        ModerationDAO moderationDAO,
-                        FPlayerManager fPlayerManager,
+                        FPlayerService fPlayerService,
+                        ModerationService moderationService,
                         CommandUtil commandUtil,
                         Gson gson) {
         super(localization -> localization.getCommand().getUnmute(), null);
 
-        this.fPlayerDAO = fPlayerDAO;
-        this.moderationDAO = moderationDAO;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
+        this.moderationService = moderationService;
         this.commandUtil = commandUtil;
         this.gson = gson;
 
@@ -61,7 +57,7 @@ public abstract class UnmuteModule extends AbstractModuleCommand<Localization.Co
     public void unmute(FPlayer fPlayer, String target, int id) {
         if (checkModulePredicates(fPlayer)) return;
 
-        FPlayer fTarget = fPlayerDAO.getFPlayer(target);
+        FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
             builder(fPlayer)
                     .format(Localization.Command.Unmute::getNullPlayer)
@@ -72,9 +68,9 @@ public abstract class UnmuteModule extends AbstractModuleCommand<Localization.Co
         List<Moderation> mutes = new ArrayList<>();
 
         if (id == -1) {
-            mutes.addAll(moderationDAO.getValid(fTarget, Moderation.Type.MUTE));
+            mutes.addAll(moderationService.getValid(fTarget, Moderation.Type.MUTE));
         } else {
-            moderationDAO.getValid(fTarget, Moderation.Type.MUTE).stream()
+            moderationService.getValid(fTarget, Moderation.Type.MUTE).stream()
                     .filter(moderation -> moderation.getId() == id)
                     .findAny()
                     .ifPresent(mutes::add);
@@ -88,13 +84,11 @@ public abstract class UnmuteModule extends AbstractModuleCommand<Localization.Co
         }
 
         for (Moderation mute : mutes) {
-            moderationDAO.setInvalid(mute);
+            moderationService.setInvalid(mute);
         }
 
-        FPlayer localFTarget = fPlayerManager.get(fTarget.getUuid());
-
-        if (!localFTarget.isUnknown()) {
-            localFTarget.clearMutes(mutes);
+        if (fTarget.isOnline()) {
+            fTarget.clearMutes(mutes);
         }
 
         builder(fTarget)

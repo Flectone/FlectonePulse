@@ -2,25 +2,27 @@ package net.flectone.pulse.util;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
+import net.flectone.pulse.service.FPlayerService;
+
+import java.util.Optional;
 
 @Singleton
 public class ModerationUtil {
 
     private final FileManager fileManager;
-    private final FPlayerDAO fPlayerDAO;
+    private final FPlayerService fPlayerService;
     private final TimeUtil timeUtil;
 
     @Inject
     public ModerationUtil(FileManager fileManager,
-                          FPlayerDAO fPlayerDAO,
+                          FPlayerService fPlayerService,
                           TimeUtil timeUtil) {
         this.fileManager = fileManager;
-        this.fPlayerDAO = fPlayerDAO;
+        this.fPlayerService = fPlayerService;
         this.timeUtil = timeUtil;
     }
 
@@ -34,8 +36,8 @@ public class ModerationUtil {
             case KICK -> localization.getCommand().getKick().getReasons();
         };
 
-        FPlayer fModerator = fPlayerDAO.getFPlayer(moderation.getModerator());
-        FPlayer fTarget = fPlayerDAO.getFPlayer(moderation.getPlayer());
+        FPlayer fModerator = fPlayerService.getFPlayer(moderation.getModerator());
+        FPlayer fTarget = fPlayerService.getFPlayer(moderation.getPlayer());
 
         return string
                 .replace("<player>", fTarget.getName())
@@ -54,9 +56,10 @@ public class ModerationUtil {
     }
 
     public String buildMuteMessage(FPlayer fPlayer) {
-        if (!fPlayer.isMuted()) return "";
+        Optional<Moderation> mute = fPlayer.getMute();
+        if (mute.isEmpty()) return "";
 
         String format = fileManager.getLocalization(fPlayer).getCommand().getMute().getPerson();
-        return replacePlaceholders(format, fPlayer, fPlayer.getMute().get());
+        return replacePlaceholders(format, fPlayer, mute.get());
     }
 }

@@ -5,10 +5,10 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.ComponentUtil;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.megavex.scoreboardlibrary.api.team.ScoreboardTeam;
@@ -26,20 +26,20 @@ public class BukkitNameModule extends NameModule {
     private final FileManager fileManager;
     private final TeamManager teamManager;
     private final ComponentUtil componentUtil;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final IntegrationModule integrationModule;
 
     @Inject
     public BukkitNameModule(FileManager fileManager,
                             TeamManager teamManager,
-                            FPlayerManager fPlayerManager,
+                            FPlayerService fPlayerService,
                             ComponentUtil componentUtil,
                             IntegrationModule integrationModule) {
         super(fileManager, integrationModule);
 
         this.fileManager = fileManager;
         this.teamManager = teamManager;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.componentUtil = componentUtil;
         this.integrationModule = integrationModule;
 
@@ -56,7 +56,7 @@ public class BukkitNameModule extends NameModule {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;
 
-        String teamName = fPlayerManager.getSortedName(fPlayer);
+        String teamName = fPlayerService.getSortedName(fPlayer);
 
         ScoreboardTeam playerTeam = teamManager.createIfAbsent(teamName);
         TeamDisplay teamDisplay = playerTeam.defaultDisplay();

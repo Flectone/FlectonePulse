@@ -2,16 +2,17 @@ package net.flectone.pulse.module.message.objective.tabname;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.service.FPlayerService;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveDisplaySlot;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
 import net.megavex.scoreboardlibrary.api.objective.ScoreboardObjective;
@@ -25,7 +26,8 @@ public class TabnameModule extends AbstractModule {
     private final Permission.Message.Objective.Tabname permission;
 
     private final ObjectiveManager objectiveManager;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
 
     private ObjectiveMode objectiveValueType;
@@ -34,10 +36,12 @@ public class TabnameModule extends AbstractModule {
     @Inject
     public TabnameModule(FileManager fileManager,
                          ObjectiveManager objectiveManager,
-                         FPlayerManager fPlayerManager,
+                         FPlayerService fPlayerService,
+                         PlatformPlayerAdapter platformPlayerAdapter,
                          TaskScheduler taskScheduler) {
         this.objectiveManager = objectiveManager;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
+        this.platformPlayerAdapter = platformPlayerAdapter;
         this.taskScheduler = taskScheduler;
 
         config = fileManager.getMessage().getObjective().getTabname();
@@ -55,7 +59,7 @@ public class TabnameModule extends AbstractModule {
 
         Ticker ticker = config.getTicker();
         if (ticker.isEnable()) {
-            taskScheduler.runAsyncTicker(this::add, ticker.getPeriod());
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::add), ticker.getPeriod());
         }
     }
 
@@ -71,7 +75,7 @@ public class TabnameModule extends AbstractModule {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;
 
-        scoreboardObjective.score(fPlayer.getName(), fPlayerManager.getObjectiveScore(fPlayer.getUuid(), objectiveValueType));
+        scoreboardObjective.score(fPlayer.getName(), platformPlayerAdapter.getObjectiveScore(fPlayer.getUuid(), objectiveValueType));
         objectiveManager.addPlayer(player);
     }
 

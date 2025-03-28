@@ -1,17 +1,15 @@
 package net.flectone.pulse.module.command.chatcolor;
 
 import lombok.Getter;
-import net.flectone.pulse.database.dao.ColorsDAO;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
-import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.connector.ProxyConnector;
+import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.ColorUtil;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.MessageTag;
@@ -27,26 +25,20 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
     @Getter private final Command.Chatcolor command;
     @Getter private final Permission.Command.Chatcolor permission;
 
-    private final FPlayerDAO fPlayerDAO;
-    private final ColorsDAO colorsDAO;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final PermissionUtil permissionUtil;
     private final ProxyConnector proxyConnector;
     private final CommandUtil commandUtil;
     private final ColorUtil colorUtil;
 
     public ChatcolorModule(FileManager fileManager,
-                           FPlayerDAO fPlayerDAO,
-                           ColorsDAO colorsDAO,
-                           FPlayerManager fPlayerManager,
+                           FPlayerService fPlayerService,
                            PermissionUtil permissionUtil,
                            ProxyConnector proxyConnector,
                            CommandUtil commandUtil,
                            ColorUtil colorUtil) {
         super(localization -> localization.getCommand().getChatcolor(), null);
-        this.fPlayerDAO = fPlayerDAO;
-        this.colorsDAO = colorsDAO;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.permissionUtil = permissionUtil;
         this.proxyConnector = proxyConnector;
         this.commandUtil = commandUtil;
@@ -73,7 +65,7 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
                     && !player.startsWith("&")
                     && !player.equalsIgnoreCase("clear")) {
 
-                FPlayer fTarget = fPlayerDAO.getFPlayer(player);
+                FPlayer fTarget = fPlayerService.getFPlayer(player);
 
                 if (fTarget.isUnknown()) {
                     builder(fPlayer)
@@ -82,7 +74,7 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
                     return;
                 }
 
-                colorsDAO.load(fTarget);
+                fPlayerService.loadColors(fTarget);
 
                 proxyConnector.sendMessage(fTarget, MessageTag.COMMAND_CHATCOLOR, byteArrayDataOutput ->
                         byteArrayDataOutput.writeUTF(input)
@@ -140,9 +132,9 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
             x++;
         }
 
-        colorsDAO.save(fPlayer);
+        fPlayerService.saveColors(fPlayer);
 
-        FPlayer onlineFPlayer = fPlayerManager.get(fPlayer.getUuid());
+        FPlayer onlineFPlayer = fPlayerService.getFPlayer(fPlayer.getUuid());
         if (!onlineFPlayer.isUnknown()) {
             if (fPlayer.getColors().isEmpty()) {
                 onlineFPlayer.getColors().clear();

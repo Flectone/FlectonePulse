@@ -7,6 +7,8 @@ import com.google.inject.Singleton;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
 import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
+import net.flectone.pulse.adapter.BukkitPlayerAdapter;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.config.Config;
@@ -14,11 +16,7 @@ import net.flectone.pulse.connector.BukkitProxyConnector;
 import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.controller.BukkitInventoryController;
 import net.flectone.pulse.controller.InventoryController;
-import net.flectone.pulse.manager.BukkitFPlayerManager;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.module.command.ball.BallModule;
-import net.flectone.pulse.module.command.ball.BukkitBallModule;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.ban.BukkitBanModule;
 import net.flectone.pulse.module.command.banlist.BanlistModule;
@@ -130,7 +128,9 @@ import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.platform.BukkitMessageSender;
 import net.flectone.pulse.platform.LibraryResolver;
 import net.flectone.pulse.platform.MessageSender;
+import net.flectone.pulse.registry.BukkitCommandRegistry;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.scheduler.BukkitTaskScheduler;
 import net.flectone.pulse.scheduler.TaskScheduler;
@@ -187,7 +187,7 @@ public class BukkitInjector extends AbstractModule {
         bind(FileManager.class).toInstance(fileManager);
 
         bind(TaskScheduler.class).to(BukkitTaskScheduler.class);
-        bind(FPlayerManager.class).to(BukkitFPlayerManager.class);
+        bind(PlatformPlayerAdapter.class).to(BukkitPlayerAdapter.class);
         bind(ListenerRegistry.class).to(BukkitListenerRegistry.class);
         bind(InventoryController.class).to(BukkitInventoryController.class);
         bind(PermissionUtil.class).to(BukkitPermissionUtil.class);
@@ -221,8 +221,10 @@ public class BukkitInjector extends AbstractModule {
         }
 
         //commands
+        bind(CommandRegistry.class).to(BukkitCommandRegistry.class);
+
         bind(net.flectone.pulse.module.command.afk.AfkModule.class).to(net.flectone.pulse.module.command.afk.BukkitAfkModule.class);
-        bind(BallModule.class).to(BukkitBallModule.class);
+//        bind(BallModule.class).to(BukkitBallModule.class);
         bind(BanModule.class).to(BukkitBanModule.class);
         bind(BanlistModule.class).to(BukkitBanlistModule.class);
         bind(BroadcastModule.class).to(BukkitBroadcastModule.class);
@@ -299,7 +301,6 @@ public class BukkitInjector extends AbstractModule {
         bind(ScoreboardLibrary.class).toInstance(scoreboardLibrary);
         bind(ObjectiveManager.class).toInstance(scoreboardLibrary.createObjectiveManager());
         bind(TeamManager.class).toInstance(scoreboardLibrary.createTeamManager());
-        bind(BukkitFPlayerManager.class).asEagerSingleton();
 
         if (fileManager.getConfig().getDatabase().getType() == Config.Database.Type.MYSQL) {
             bind(InputStream.class).annotatedWith(Names.named("SQLFile")).toInstance(plugin.getResource("sqls/mysql.sql"));

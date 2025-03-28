@@ -3,9 +3,9 @@ package net.flectone.pulse.module;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.inject.Inject;
 import lombok.Getter;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.scheduler.TaskScheduler;
@@ -13,6 +13,8 @@ import net.flectone.pulse.model.*;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.MessageSender;
 import net.flectone.pulse.platform.SoundPlayer;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
@@ -28,12 +30,14 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
 
     private final Function<Localization, M> messageResolver;
 
-    @Inject private FPlayerManager fPlayerManager;
+    @Inject private FPlayerService fPlayerService;
+    @Inject private ModerationService moderationService;
+    @Inject private PlatformPlayerAdapter platformPlayerAdapter;
     @Inject private PermissionUtil permissionUtil;
     @Inject private FileManager fileManager;
     @Inject private ComponentUtil componentUtil;
-    @Inject private TimeUtil timeUtil;
     @Inject private ModerationUtil moderationUtil;
+    @Inject private TimeUtil timeUtil;
     @Inject private ProxyConnector proxyConnector;
     @Inject private IntegrationModule integrationModule;
     @Inject private MessageSender messageSender;
@@ -170,20 +174,20 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
                 if (fReceiver.isIgnored(fPlayer)) return false;
 
                 if (range > 0) {
-                    double distance = fPlayerManager.distance(fPlayer, fReceiver);
+                    double distance = platformPlayerAdapter.distance(fPlayer, fReceiver);
 
                     return distance != -1.0 && distance <= range;
                 }
 
                 if (range == Range.WORLD_NAME) {
-                    String worldName = fPlayerManager.getWorldName(fPlayer);
+                    String worldName = platformPlayerAdapter.getWorldName(fPlayer);
                     if (worldName.isEmpty()) return true;
 
                     return permissionUtil.has(fReceiver, "flectonepulse.world.name." + worldName);
                 }
 
                 if (range == Range.WORLD_TYPE) {
-                    String worldType = fPlayerManager.getWorldEnvironment(fPlayer);
+                    String worldType = platformPlayerAdapter.getWorldEnvironment(fPlayer);
                     if (worldType.isEmpty()) return true;
 
                     return permissionUtil.has(fReceiver, "flectonepulse.world.type." + worldType);
@@ -330,7 +334,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
                 return new ArrayList<>();
             }
 
-            return fPlayerManager.getFPlayersWithConsole().stream()
+            return fPlayerService.getFPlayersWithConsole().stream()
                     .filter(builderFilter)
                     .filter(rangeFilter(fReceiver, range))
                     .toList();

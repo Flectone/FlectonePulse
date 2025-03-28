@@ -1,22 +1,20 @@
 package net.flectone.pulse.module.command.chatsetting;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
-import com.google.inject.Inject;
 import lombok.Getter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.controller.InventoryController;
-import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.inventory.Inventory;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.PermissionUtil;
-import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 
 import java.util.List;
@@ -28,21 +26,21 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
     @Getter private final Command.Chatsetting command;
     @Getter private final Permission.Command.Chatsetting permission;
 
-    private final SettingDAO settingDAO;
+    private final FPlayerService fPlayerService;
     private final ComponentUtil componentUtil;
     private final CommandUtil commandUtil;
     private final PermissionUtil permissionUtil;
     private final InventoryController inventoryController;
 
     public ChatsettingModule(FileManager fileManager,
-                             SettingDAO settingDAO,
+                             FPlayerService fPlayerService,
                              ComponentUtil componentUtil,
                              CommandUtil commandUtil,
                              PermissionUtil permissionUtil,
                              InventoryController inventoryController) {
         super(localization -> localization.getCommand().getChatsetting(), null);
 
-        this.settingDAO = settingDAO;
+        this.fPlayerService = fPlayerService;
         this.componentUtil = componentUtil;
         this.commandUtil = commandUtil;
         this.permissionUtil = permissionUtil;
@@ -56,9 +54,6 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
         addPredicate(this::checkCooldown);
     }
 
-    @Inject
-    private FLogger fLogger;
-
     @Override
     public void onCommand(FPlayer fPlayer, Object arguments) {
         if (checkModulePredicates(fPlayer)) return;
@@ -69,7 +64,7 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
         Inventory.Builder inventoryBuilder = new Inventory.Builder()
                 .name(header)
                 .size(54)
-                .addCloseConsumer(inventory -> settingDAO.save(fPlayer));
+                .addCloseConsumer(inventory -> fPlayerService.saveSettings(fPlayer));
 
         for (var entry : command.getItems().entrySet()) {
             FPlayer.Setting setting = entry.getKey();

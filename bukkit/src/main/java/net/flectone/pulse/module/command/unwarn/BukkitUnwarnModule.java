@@ -6,11 +6,11 @@ import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.command.FCommand;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.CommandUtil;
 
 import java.util.concurrent.CompletableFuture;
@@ -18,17 +18,17 @@ import java.util.concurrent.CompletableFuture;
 @Singleton
 public class BukkitUnwarnModule extends UnwarnModule {
 
-    private final ModerationDAO moderationDAO;
+    private final ModerationService moderationService;
 
     @Inject
     public BukkitUnwarnModule(FileManager fileManager,
-                              FPlayerDAO fPlayerDAO,
-                              ModerationDAO moderationDAO,
+                              FPlayerService fPlayerService,
+                              ModerationService moderationService,
                               CommandUtil commandUtil,
                               Gson gson) {
-        super(fileManager, fPlayerDAO, moderationDAO, commandUtil, gson);
+        super(fileManager, fPlayerService, moderationService, commandUtil, gson);
 
-        this.moderationDAO = moderationDAO;
+        this.moderationService = moderationService;
     }
 
     @Override
@@ -41,8 +41,7 @@ public class BukkitUnwarnModule extends UnwarnModule {
                 .withPermission(getPermission())
                 .then(new StringArgument(prompt)
                         .includeSuggestions(ArgumentSuggestions.stringCollectionAsync(info ->
-                                CompletableFuture.supplyAsync(() ->
-                                        moderationDAO.getValidPlayersNames(Moderation.Type.WARN))))
+                                CompletableFuture.supplyAsync(() -> moderationService.getValidNames(Moderation.Type.WARN))))
                         .then(new IntegerArgument(promptNumber).setOptional(true)
                                 .executes(this::executesFPlayer)
                         )

@@ -4,12 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.BukkitCommandUtil;
 import net.flectone.pulse.util.TimeUtil;
 import org.bukkit.Bukkit;
@@ -27,11 +27,11 @@ public class BukkitOnlineModule extends OnlineModule {
 
     @Inject
     public BukkitOnlineModule(FileManager fileManager,
-                              FPlayerDAO fPlayerDAO,
+                              FPlayerService fPlayerService,
                               BukkitCommandUtil commandUtil,
                               TimeUtil timeUtil,
                               IntegrationModule integrationModule) {
-        super(fileManager, fPlayerDAO, commandUtil);
+        super(fileManager, fPlayerService, commandUtil);
 
         this.timeUtil = timeUtil;
         this.commandUtil = commandUtil;

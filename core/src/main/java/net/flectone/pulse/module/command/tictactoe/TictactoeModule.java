@@ -8,14 +8,13 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.connector.ProxyConnector;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.IgnoreDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tictactoe.manager.TictactoeManager;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
@@ -27,8 +26,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
     @Getter private final Command.Tictactoe command;
     @Getter private final Permission.Command.Tictactoe permission;
 
-    private final FPlayerDAO fPlayerDAO;
-    private final IgnoreDAO ignoreDAO;
+    private final FPlayerService fPlayerService;
     private final TictactoeManager tictactoeManager;
     private final ProxyConnector proxyConnector;
     private final IntegrationModule integrationModule;
@@ -37,8 +35,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
 
     @Inject
     public TictactoeModule(FileManager fileManager,
-                           FPlayerDAO fPlayerDAO,
-                           IgnoreDAO ignoreDAO,
+                           FPlayerService fPlayerService,
                            TictactoeManager tictactoeManager,
                            ProxyConnector proxyConnector,
                            IntegrationModule integrationModule,
@@ -46,8 +43,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
                            Gson gson) {
         super(localization -> localization.getCommand().getTictactoe(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TICTACTOE));
 
-        this.fPlayerDAO = fPlayerDAO;
-        this.ignoreDAO = ignoreDAO;
+        this.fPlayerService = fPlayerService;
         this.tictactoeManager = tictactoeManager;
         this.proxyConnector = proxyConnector;
         this.integrationModule = integrationModule;
@@ -68,7 +64,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
         String receiverName = commandUtil.getString(0, arguments);
         boolean isHard = commandUtil.getByClassOrDefault(1, Boolean.class, true, arguments);
 
-        FPlayer fReceiver = fPlayerDAO.getFPlayer(receiverName);
+        FPlayer fReceiver = fPlayerService.getFPlayer(receiverName);
         if (!fReceiver.isOnline() || integrationModule.isVanished(fReceiver)) {
             builder(fPlayer)
                     .format(Localization.Command.Tictactoe::getNullPlayer)
@@ -83,7 +79,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
             return;
         }
 
-        ignoreDAO.load(fReceiver);
+        fPlayerService.loadIgnores(fPlayer);
 
         if (checkIgnore(fPlayer, fReceiver)) return;
         if (checkDisable(fPlayer, fReceiver, DisableAction.HE)) return;
@@ -151,7 +147,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
             return;
         }
 
-        FPlayer fReceiver = fPlayerDAO.getFPlayer(ticTacToe.getNextPlayer());
+        FPlayer fReceiver = fPlayerService.getFPlayer(ticTacToe.getNextPlayer());
         if (!fReceiver.isOnline() || integrationModule.isVanished(fReceiver)) {
             ticTacToe.setEnded(true);
             builder(fPlayer)

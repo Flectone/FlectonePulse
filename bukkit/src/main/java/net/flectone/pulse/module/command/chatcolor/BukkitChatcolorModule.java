@@ -5,12 +5,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
-import net.flectone.pulse.database.dao.ColorsDAO;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.manager.FPlayerManager;
-import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.connector.ProxyConnector;
+import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.FCommand;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.ColorUtil;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.PermissionUtil;
@@ -26,14 +24,12 @@ public class BukkitChatcolorModule extends ChatcolorModule {
 
     @Inject
     public BukkitChatcolorModule(FileManager fileManager,
-                                 FPlayerDAO fPlayerDAO,
-                                 ColorsDAO colorsDAO,
-                                 FPlayerManager fPlayerManager,
+                                 FPlayerService fPlayerService,
                                  PermissionUtil permissionUtil,
                                  ProxyConnector proxyConnector,
                                  CommandUtil commandUtil,
                                  ColorUtil colorUtil) {
-        super(fileManager, fPlayerDAO, colorsDAO, fPlayerManager, permissionUtil, proxyConnector, commandUtil, colorUtil);
+        super(fileManager, fPlayerService, permissionUtil, proxyConnector, commandUtil, colorUtil);
 
         this.colorUtil = colorUtil;
     }

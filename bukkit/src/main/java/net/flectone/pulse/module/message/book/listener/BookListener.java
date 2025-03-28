@@ -2,9 +2,9 @@ package net.flectone.pulse.module.message.book.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.book.BukkitBookModule;
+import net.flectone.pulse.service.FPlayerService;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerEditBookEvent;
@@ -13,13 +13,13 @@ import org.bukkit.inventory.meta.BookMeta;
 @Singleton
 public class BookListener implements Listener {
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final BukkitBookModule bookModule;
 
     @Inject
-    public BookListener(FPlayerManager fPlayerManager,
+    public BookListener(FPlayerService fPlayerService,
                         BukkitBookModule bookModule) {
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.bookModule = bookModule;
     }
 
@@ -27,7 +27,7 @@ public class BookListener implements Listener {
     public void playerEditBookEvent(PlayerEditBookEvent event) {
         if (event.isCancelled()) return;
 
-        FPlayer fPlayer = fPlayerManager.get(event.getPlayer());
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
 
         BookMeta bookMeta = event.getNewBookMeta();
 

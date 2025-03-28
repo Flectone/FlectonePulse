@@ -140,7 +140,7 @@ public class FPlayer extends FEntity {
                 .stream()
                 .filter(Moderation::isValid)
                 .filter(mute -> !mute.isExpired())
-                .findAny();
+                .findFirst();
     }
 
     public boolean equals(FPlayer fPlayer) {

@@ -2,9 +2,9 @@ package net.flectone.pulse.module.message.mark.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.mark.BukkitMarkModule;
+import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -17,13 +17,13 @@ import org.bukkit.inventory.ItemStack;
 @Singleton
 public class MarkListener implements Listener {
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final BukkitMarkModule markModule;
 
     @Inject
-    public MarkListener(FPlayerManager fPlayerManager,
+    public MarkListener(FPlayerService fPlayerService,
                         BukkitMarkModule bukkitMarkModule) {
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.markModule = bukkitMarkModule;
     }
 
@@ -35,7 +35,7 @@ public class MarkListener implements Listener {
         String targetItem = markModule.getMessage().getItem().toLowerCase();
 
         Player player = event.getPlayer();
-        FPlayer fPlayer = fPlayerManager.get(player);
+        FPlayer fPlayer = fPlayerService.getFPlayer(player);
 
         ItemStack itemStack = player.getInventory().getItemInMainHand();
         itemStack = itemStack.getType().equals(Material.AIR) ? player.getInventory().getItemInOffHand() : itemStack;

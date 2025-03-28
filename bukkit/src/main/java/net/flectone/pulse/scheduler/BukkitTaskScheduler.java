@@ -6,7 +6,7 @@ import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.plugin.Plugin;
 
 @Singleton
-public class BukkitTaskScheduler extends TaskScheduler {
+public class BukkitTaskScheduler implements TaskScheduler {
 
     private final Plugin plugin;
     private final com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler taskScheduler;
@@ -41,6 +41,11 @@ public class BukkitTaskScheduler extends TaskScheduler {
                 fLogger.warning(e);
             }
         }, tick, period);
+    }
+
+    @Override
+    public void runAsyncTimer(RunnableException runnable, long tick) {
+        runAsyncTimer(runnable, tick, tick);
     }
 
     @Override

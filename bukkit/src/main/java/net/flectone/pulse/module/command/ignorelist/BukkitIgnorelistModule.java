@@ -3,10 +3,10 @@ package net.flectone.pulse.module.command.ignorelist;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.IntegerArgument;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.platform.MessageSender;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.TimeUtil;
@@ -16,12 +16,12 @@ public class BukkitIgnorelistModule extends IgnorelistModule {
 
     @Inject
     public BukkitIgnorelistModule(FileManager fileManager,
-                                  FPlayerDAO fPlayerDAO,
+                                  FPlayerService fPlayerService,
                                   MessageSender messageSender,
                                   ComponentUtil componentUtil,
                                   CommandUtil commandUtil,
                                   TimeUtil timeUtil) {
-        super(fileManager, fPlayerDAO, messageSender, componentUtil, commandUtil, timeUtil);
+        super(fileManager, fPlayerService, messageSender, componentUtil, commandUtil, timeUtil);
     }
 
     @Override

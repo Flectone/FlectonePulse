@@ -6,35 +6,31 @@ import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.IgnoreDAO;
-import net.flectone.pulse.manager.FPlayerManager;
-import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.connector.ProxyConnector;
+import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.module.command.tictactoe.manager.TictactoeManager;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.BukkitCommandUtil;
 
 @Singleton
 public class BukkitTictactoeModule extends TictactoeModule {
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final BukkitCommandUtil commandUtil;
 
     @Inject
     public BukkitTictactoeModule(FileManager fileManager,
-                                 FPlayerDAO fPlayerDAO,
-                                 IgnoreDAO ignoreDAO,
+                                 FPlayerService fPlayerService,
                                  TictactoeManager tictactoeManager,
-                                 FPlayerManager fPlayerManager,
                                  ProxyConnector proxyConnector,
                                  IntegrationModule integrationModule,
                                  BukkitCommandUtil commandUtil,
                                  Gson gson) {
-        super(fileManager, fPlayerDAO, ignoreDAO, tictactoeManager, proxyConnector, integrationModule, commandUtil, gson);
+        super(fileManager, fPlayerService, tictactoeManager, proxyConnector, integrationModule, commandUtil, gson);
 
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.commandUtil = commandUtil;
     }
 
@@ -56,7 +52,7 @@ public class BukkitTictactoeModule extends TictactoeModule {
                 .then(new IntegerArgument(promptId + " 1")
                         .then(new StringArgument(promptId + " 2")
                                 .executesPlayer((player, args) -> {
-                                    move(fPlayerManager.get(player), args);
+                                    move(fPlayerService.getFPlayer(player), args);
                                 })
                         )
                 )

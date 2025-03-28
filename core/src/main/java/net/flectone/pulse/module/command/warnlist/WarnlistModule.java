@@ -2,8 +2,6 @@ package net.flectone.pulse.module.command.warnlist;
 
 import com.google.inject.Inject;
 import lombok.Getter;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
@@ -13,6 +11,8 @@ import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
 import net.flectone.pulse.platform.MessageSender;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.ModerationUtil;
@@ -26,30 +26,30 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
     @Getter private final Command.Warnlist command;
     @Getter private final Permission.Command.Warnlist permission;
 
-    private final FPlayerDAO fPlayerDAO;
-    private final ModerationDAO moderationDAO;
+    private final FPlayerService fPlayerService;
+    private final ModerationService moderationService;
+    private final ModerationUtil moderationUtil;
     private final UnwarnModule unwarnModule;
     private final ComponentUtil componentUtil;
     private final CommandUtil commandUtil;
-    private final ModerationUtil moderationUtil;
     private final MessageSender messageSender;
 
     @Inject
     public WarnlistModule(FileManager fileManager,
-                          FPlayerDAO fPlayerDAO,
-                          ModerationDAO moderationDAO,
+                          FPlayerService fPlayerService,
+                          ModerationService moderationService,
+                          ModerationUtil moderationUtil,
                           UnwarnModule unwarnModule,
                           ComponentUtil componentUtil,
                           CommandUtil commandUtil,
-                          ModerationUtil moderationUtil,
                           MessageSender messageSender) {
         super(localization -> localization.getCommand().getWarnlist(), null);
 
-        this.fPlayerDAO = fPlayerDAO;
-        this.moderationDAO = moderationDAO;
+        this.fPlayerService = fPlayerService;
+        this.moderationService = moderationService;
+        this.moderationUtil = moderationUtil;
         this.unwarnModule = unwarnModule;
         this.componentUtil = componentUtil;
-        this.moderationUtil = moderationUtil;
         this.messageSender = messageSender;
         this.commandUtil = commandUtil;
 
@@ -74,7 +74,7 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
         FPlayer targetFPlayer = null;
 
         if (optionalObject.isPresent() && optionalObject.get() instanceof String playerName) {
-            targetFPlayer = fPlayerDAO.getFPlayer(playerName);
+            targetFPlayer = fPlayerService.getFPlayer(playerName);
 
             if (targetFPlayer.isUnknown()) {
                 builder(fPlayer)
@@ -95,8 +95,8 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
         }
 
         List<Moderation> moderationList = targetFPlayer == null
-                ? moderationDAO.getValid(Moderation.Type.WARN)
-                : moderationDAO.get(targetFPlayer, Moderation.Type.WARN);
+                ? moderationService.getValid(Moderation.Type.WARN)
+                : moderationService.getValid(targetFPlayer, Moderation.Type.WARN);
 
         if (moderationList.isEmpty()) {
             builder(fPlayer)
@@ -128,7 +128,7 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
 
         for (Moderation moderation : finalModerationList) {
 
-            FPlayer fTarget = fPlayerDAO.getFPlayer(moderation.getPlayer());
+            FPlayer fTarget = fPlayerService.getFPlayer(moderation.getPlayer());
 
             String line = localizationType.getLine().replace("<command>", "/" + unwarnModule.getName(unwarnModule.getCommand()) + " <player> <id>");
             line = moderationUtil.replacePlaceholders(line, fPlayer, moderation);

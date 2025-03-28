@@ -2,10 +2,10 @@ package net.flectone.pulse.module.message.format;
 
 import com.google.inject.Inject;
 import lombok.Getter;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -21,6 +21,8 @@ import net.flectone.pulse.module.message.format.questionanswer.QuestionAnswerMod
 import net.flectone.pulse.module.message.format.spoiler.SpoilerModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
@@ -39,24 +41,16 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
     private final Message.Format message;
     @Getter private final Permission.Message.Format permission;
 
-    private final ServerUtil serverUtil;
-    private final FPlayerManager fPlayerManager;
-    private final PermissionUtil permissionUtil;
-    private final ItemUtil itemUtil;
-
+    @Inject private ServerUtil serverUtil;
+    @Inject private FPlayerService fPlayerService;
+    @Inject private PlatformPlayerAdapter platformPlayerAdapter;
+    @Inject private SkinService skinService;
+    @Inject private PermissionUtil permissionUtil;
+    @Inject private ItemUtil itemUtil;
     @Inject private ComponentUtil componentUtil;
 
-    public FormatModule(FileManager fileManager,
-                        ServerUtil serverUtil,
-                        FPlayerManager fPlayerManager,
-                        PermissionUtil permissionUtil,
-                        ItemUtil itemUtil) {
+    public FormatModule(FileManager fileManager) {
         super(localization -> localization.getMessage().getFormat());
-
-        this.serverUtil = serverUtil;
-        this.fPlayerManager = fPlayerManager;
-        this.permissionUtil = permissionUtil;
-        this.itemUtil = itemUtil;
 
         message = fileManager.getMessage().getFormat();
         permission = fileManager.getPermission().getMessage().getFormat();
@@ -152,7 +146,8 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
 
         return TagResolver.resolver("ping", (argumentQueue, context) -> {
 
-            String string = resolveLocalization(fReceiver).getTags().get(TagType.PING).replace("<ping>", String.valueOf(fPlayerManager.getPing(fPlayer)));
+            int ping = fPlayerService.getPing(fPlayer);
+            String string = resolveLocalization(fReceiver).getTags().get(TagType.PING).replace("<ping>", String.valueOf(ping));
 
             Component component = componentUtil.builder(sender, fReceiver, string).build();
 
@@ -168,7 +163,8 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
 
         return TagResolver.resolver("skin", (argumentQueue, context) -> {
 
-            String string = resolveLocalization(fReceiver).getTags().get(TagType.SKIN).replace("<message>", fPlayerManager.getBodyURL(sender));
+            String url = skinService.getBodyUrl(sender);
+            String string = resolveLocalization(fReceiver).getTags().get(TagType.SKIN).replace("<message>", url);
             Component component = componentUtil.builder(sender, fReceiver, string).build();
 
             return Tag.selfClosingInserting(component);
@@ -178,7 +174,7 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
     public TagResolver itemTag(FEntity sender, FEntity fReceiver) {
         if (!isCorrectTag(TagType.ITEM, sender)) return TagResolver.empty();
 
-        Object itemStackObject = fPlayerManager.getItem(sender.getUuid());
+        Object itemStackObject = platformPlayerAdapter.getItem(sender.getUuid());
 
         return TagResolver.resolver("item", (argumentQueue, context) -> {
             String string = resolveLocalization(fReceiver).getTags().get(TagType.ITEM);

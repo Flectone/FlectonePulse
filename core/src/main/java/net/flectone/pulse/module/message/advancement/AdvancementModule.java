@@ -8,7 +8,6 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FEntity;
@@ -17,6 +16,7 @@ import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.advancement.listener.AdvancementPacketListener;
 import net.flectone.pulse.module.message.advancement.model.Advancement;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.MessageTag;
 import net.kyori.adventure.text.Component;
@@ -33,21 +33,21 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
     @Getter private final Message.Advancement message;
     private final Permission.Message.Advancement permission;
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
     private final ComponentUtil componentUtil;
     private final Gson gson;
 
     @Inject
     public AdvancementModule(FileManager fileManager,
-                             FPlayerManager fPlayerManager,
+                             FPlayerService fPlayerService,
                              ListenerRegistry listenerRegistry,
                              IntegrationModule integrationModule,
                              ComponentUtil componentUtil,
                              Gson gson) {
         super(localization -> localization.getMessage().getAdvancement());
 
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
         this.componentUtil = componentUtil;
         this.gson = gson;
@@ -74,11 +74,11 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
 
     @Async
     public void send(UUID uuid, String target, Advancement advancement) {
-        FPlayer fTarget = fPlayerManager.getOnline(target);
+        FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) return;
         if (checkModulePredicates(fTarget)) return;
 
-        FPlayer fReceiver = fPlayerManager.get(uuid);
+        FPlayer fReceiver = fPlayerService.getFPlayer(uuid);
         if (!fTarget.equals(fReceiver)) return;
 
         builder(fTarget)
@@ -102,10 +102,10 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
                      @Nullable String content) {
         if (advancement == null && content == null) return;
 
-        FPlayer fPlayer = fPlayerManager.get(uuid);
+        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
         if (checkModulePredicates(fPlayer)) return;
 
-        FPlayer fTarget = fPlayerManager.getOnline(target);
+        FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) return;
 
         Builder builder = builder(fTarget)

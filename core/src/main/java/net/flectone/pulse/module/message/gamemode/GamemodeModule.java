@@ -6,12 +6,12 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.gamemode.listener.GamemodePacketListener;
+import net.flectone.pulse.service.FPlayerService;
 
 import java.util.UUID;
 
@@ -21,16 +21,16 @@ public class GamemodeModule extends AbstractModuleMessage<Localization.Message.G
     private final Message.Gamemode message;
     private final Permission.Message.Gamemode permission;
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public GamemodeModule(FileManager fileManager,
-                          FPlayerManager fPlayerManager,
+                          FPlayerService fPlayerService,
                           ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getGamemode());
 
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
 
         message = fileManager.getMessage().getGamemode();
@@ -53,10 +53,10 @@ public class GamemodeModule extends AbstractModuleMessage<Localization.Message.G
 
     @Async
     public void send(UUID receiver, String key, String target) {
-        FPlayer fPlayer = fPlayerManager.get(receiver);
+        FPlayer fPlayer = fPlayerService.getFPlayer(receiver);
         if (checkModulePredicates(fPlayer)) return;
 
-        FPlayer fTarget = fPlayerManager.getOnline(target);
+        FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) return;
 
         boolean isSelf = fPlayer.equals(fTarget);

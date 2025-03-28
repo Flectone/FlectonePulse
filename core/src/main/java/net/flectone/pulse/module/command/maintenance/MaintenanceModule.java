@@ -8,17 +8,15 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
-import net.flectone.pulse.database.dao.ColorsDAO;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.maintenance.listener.MaintenancePacketListener;
+import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.*;
 import net.kyori.adventure.text.Component;
 
@@ -31,11 +29,9 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
     @Getter private final Permission.Command.Maintenance permission;
 
     private final FileManager fileManager;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final PermissionUtil permissionUtil;
     private final ListenerRegistry listenerRegistry;
-    private final FPlayerDAO fPlayerDAO;
-    private final ColorsDAO colorsDAO;
     private final Path iconPath;
     private final FileUtil fileUtil;
     private final ComponentUtil componentUtil;
@@ -45,11 +41,9 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
     private String icon;
 
     public MaintenanceModule(FileManager fileManager,
-                             FPlayerManager fPlayerManager,
+                             FPlayerService fPlayerService,
                              PermissionUtil permissionUtil,
                              ListenerRegistry listenerRegistry,
-                             FPlayerDAO fPlayerDAO,
-                             ColorsDAO colorsDAO,
                              Path projectPath,
                              FileUtil fileUtil,
                              CommandUtil commandUtil,
@@ -58,12 +52,10 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         super(module -> module.getCommand().getMaintenance(), null);
 
         this.fileManager = fileManager;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.permissionUtil = permissionUtil;
         this.commandUtil = commandUtil;
         this.listenerRegistry = listenerRegistry;
-        this.fPlayerDAO = fPlayerDAO;
-        this.colorsDAO = colorsDAO;
         this.iconPath = projectPath.resolve("images");
         this.fileUtil = fileUtil;
         this.componentUtil = componentUtil;
@@ -111,8 +103,8 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         if (!isEnable()) return;
         if (!command.isTurnedOn()) return;
 
-        FPlayer fPlayer = fPlayerDAO.getFPlayer(user.getAddress().getAddress());
-        colorsDAO.load(fPlayer);
+        FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
+        fPlayerService.loadColors(fPlayer);
 
         JsonObject responseJson = new JsonObject();
 
@@ -135,7 +127,7 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
 
         String messageKick = resolveLocalization().getKick();
 
-        FPlayer fPlayer = fPlayerDAO.getFPlayer(userProfile.getUUID());
+        FPlayer fPlayer = fPlayerService.getFPlayer(userProfile.getUUID());
         if (permissionUtil.has(fPlayer, permission.getJoin())) return false;
 
         Component reason = componentUtil.builder(fPlayer, messageKick).build();
@@ -197,12 +189,12 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
     }
 
     private void kickOnlinePlayers(FPlayer fSender) {
-        fPlayerManager.getFPlayers()
+        fPlayerService.getFPlayers()
                 .stream()
                 .filter(filter -> !permissionUtil.has(filter, permission.getJoin()))
                 .forEach(fReceiver -> {
                     Component component = componentUtil.builder(fSender, fReceiver, resolveLocalization(fReceiver).getKick()).build();
-                    fPlayerManager.kick(fReceiver, component);
+                    fPlayerService.kick(fReceiver, component);
                 });
     }
 }

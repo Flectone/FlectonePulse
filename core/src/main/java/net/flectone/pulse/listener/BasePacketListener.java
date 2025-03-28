@@ -12,8 +12,6 @@ import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServer
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSettings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.database.dao.SettingDAO;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.mail.MailModule;
@@ -25,6 +23,7 @@ import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.PacketEventsUtil;
 
 import java.util.UUID;
@@ -32,8 +31,7 @@ import java.util.UUID;
 @Singleton
 public class BasePacketListener extends AbstractPacketListener {
 
-    private final SettingDAO settingDAO;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final PacketEventsUtil packetEventsUtil;
 
@@ -48,12 +46,10 @@ public class BasePacketListener extends AbstractPacketListener {
     @Inject private MaintenanceModule maintenanceModule;
 
     @Inject
-    public BasePacketListener(SettingDAO settingDAO,
-                              FPlayerManager fPlayerManager,
+    public BasePacketListener(FPlayerService fPlayerService,
                               TaskScheduler taskScheduler,
                               PacketEventsUtil packetEventsUtil) {
-        this.settingDAO = settingDAO;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.packetEventsUtil = packetEventsUtil;
     }
@@ -70,7 +66,7 @@ public class BasePacketListener extends AbstractPacketListener {
         String name = user.getName();
 
         taskScheduler.runAsync(() -> {
-            FPlayer fPlayer = fPlayerManager.createAndPut(uuid, entityId, name);
+            FPlayer fPlayer = fPlayerService.addAndGetFPlayer(uuid, entityId, name);
 
             joinModule.send(fPlayer, true);
             greetingModule.send(fPlayer);
@@ -83,10 +79,10 @@ public class BasePacketListener extends AbstractPacketListener {
         if (event.getUser().getUUID() == null) return;
 
         taskScheduler.runAsync(() -> {
-            FPlayer fPlayer = fPlayerManager.get(event.getUser().getUUID());
+            FPlayer fPlayer = fPlayerService.getFPlayer(event.getUser().getUUID());
             if (!fPlayer.isOnline()) return;
 
-            fPlayerManager.saveAndRemove(fPlayer);
+            fPlayerService.clearAndSave(fPlayer);
             bubbleManager.remove(fPlayer);
             quitModule.send(fPlayer);
         });
@@ -100,21 +96,20 @@ public class BasePacketListener extends AbstractPacketListener {
                 && packetType != PacketType.Configuration.Client.CLIENT_SETTINGS) return;
 
         UUID uuid = event.getUser().getUUID();
-        FPlayer fPlayer = fPlayerManager.get(uuid);
+        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
         String locale = getLocale(fPlayer, event);
 
         if (locale.equals(fPlayer.getSettingValue(FPlayer.Setting.LOCALE))) return;
         if (!fPlayer.isUnknown()) {
-            setLocale(fPlayer, locale);
+            fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.LOCALE, locale);
             return;
         }
 
         // first time player joined, wait for it to be added
         taskScheduler.runAsyncLater(() -> {
-            FPlayer newFPlayer = fPlayerManager.get(uuid);
-
-            setLocale(newFPlayer, locale);
+            FPlayer newFPlayer = fPlayerService.getFPlayer(uuid);
+            fPlayerService.saveOrUpdateSetting(newFPlayer, FPlayer.Setting.LOCALE, locale);
         }, 40);
     }
 
@@ -144,10 +139,5 @@ public class BasePacketListener extends AbstractPacketListener {
         }
 
         return locale;
-    }
-
-    private void setLocale(FPlayer fPlayer, String locale) {
-        fPlayer.setSetting(FPlayer.Setting.LOCALE, locale);
-        settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.LOCALE);
     }
 }

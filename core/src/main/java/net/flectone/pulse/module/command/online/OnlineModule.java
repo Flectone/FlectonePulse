@@ -1,13 +1,13 @@
 package net.flectone.pulse.module.command.online;
 
 import lombok.Getter;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 
@@ -18,15 +18,15 @@ public abstract class OnlineModule extends AbstractModuleCommand<Localization.Co
     @Getter private final Command.Online command;
     @Getter private final Permission.Command.Online permission;
 
-    private final FPlayerDAO fPlayerDAO;
+    private final FPlayerService fPlayerService;
     private final CommandUtil commandUtil;
 
     public OnlineModule(FileManager fileManager,
-                        FPlayerDAO fPlayerDAO,
+                        FPlayerService fPlayerService,
                         CommandUtil commandUtil) {
         super(localization -> localization.getCommand().getOnline(), null);
 
-        this.fPlayerDAO = fPlayerDAO;
+        this.fPlayerService = fPlayerService;
         this.commandUtil = commandUtil;
 
         command = fileManager.getCommand().getOnline();
@@ -42,7 +42,7 @@ public abstract class OnlineModule extends AbstractModuleCommand<Localization.Co
 
         String target = commandUtil.getString(1, arguments);
 
-        FPlayer targetFPlayer = fPlayerDAO.getFPlayer(target);
+        FPlayer targetFPlayer = fPlayerService.getFPlayer(target);
         if (targetFPlayer.isUnknown()) {
             builder(fPlayer)
                     .format(Localization.Command.Online::getNullPlayer)

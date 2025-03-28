@@ -3,13 +3,13 @@ package net.flectone.pulse.module.integration.plasmovoice;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.platform.MessageSender;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.ModerationUtil;
+import net.flectone.pulse.util.logging.FLogger;
 import su.plo.voice.api.addon.AddonInitializer;
 import su.plo.voice.api.addon.AddonLoaderScope;
 import su.plo.voice.api.addon.annotation.Addon;
@@ -26,22 +26,22 @@ import java.util.UUID;
 @Addon(id = "flectonepulse", scope = AddonLoaderScope.SERVER, version = BuildConfig.PROJECT_VERSION, authors = BuildConfig.PROJECT_AUTHOR)
 public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
+    private final ModerationUtil moderationUtil;
     private final MessageSender messageSender;
     private final ComponentUtil componentUtil;
-    private final ModerationUtil moderationUtil;
     private final FLogger fLogger;
 
     @Inject
-    public PlasmoVoiceIntegration(FPlayerManager fPlayerManager,
+    public PlasmoVoiceIntegration(FPlayerService fPlayerService,
+                                  ModerationUtil moderationUtil,
                                   MessageSender messageSender,
                                   ComponentUtil componentUtil,
-                                  ModerationUtil moderationUtil,
                                   FLogger fLogger) {
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
+        this.moderationUtil = moderationUtil;
         this.messageSender = messageSender;
         this.componentUtil = componentUtil;
-        this.moderationUtil = moderationUtil;
         this.fLogger = fLogger;
     }
 
@@ -56,11 +56,11 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
         if (!(source.getSourceInfo() instanceof PlayerSourceInfo sourceInfo)) return;
 
         UUID senderUUID = sourceInfo.getPlayerInfo().getPlayerId();
-        FPlayer fSender = fPlayerManager.get(senderUUID);
+        FPlayer fSender = fPlayerService.getFPlayer(senderUUID);
 
         source.addFilter(voicePlayer -> {
             UUID receiverUUID = voicePlayer.getInstance().getUuid();
-            FPlayer fReceiver = fPlayerManager.get(receiverUUID);
+            FPlayer fReceiver = fPlayerService.getFPlayer(receiverUUID);
 
             return !fReceiver.isIgnored(fSender);
         });
@@ -71,15 +71,13 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
         if (!(event.getPacket() instanceof PlayerAudioPacket)) return;
 
         UUID senderUUID = event.getConnection().getPlayer().getInstance().getUuid();
-
-        FPlayer fPlayer = fPlayerManager.get(senderUUID);
+        FPlayer fPlayer = fPlayerService.getFPlayer(senderUUID);
 
         if (!fPlayer.isMuted()) return;
 
         event.setCancelled(true);
 
         String message = moderationUtil.buildMuteMessage(fPlayer);
-
         messageSender.sendActionBar(fPlayer, componentUtil.builder(fPlayer, message).build());
     }
 

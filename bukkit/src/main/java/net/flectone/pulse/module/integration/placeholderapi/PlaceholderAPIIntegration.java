@@ -6,8 +6,8 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Message;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FEntity;
@@ -25,18 +25,18 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
 
     private final Message.Format.Color color;
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final ServerUtil serverUtil;
     private final FLogger fLogger;
 
     @Inject
-    public PlaceholderAPIIntegration(FPlayerManager fPlayerManager,
+    public PlaceholderAPIIntegration(FPlayerService fPlayerService,
                                      TaskScheduler taskScheduler,
                                      FileManager fileManager,
                                      ServerUtil serverUtil,
                                      FLogger fLogger) {
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.serverUtil = serverUtil;
         this.fLogger = fLogger;
@@ -75,7 +75,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     public String onPlaceholderRequest(@Nullable Player player, @NotNull String params) {
         if (player == null) return null;
 
-        FPlayer fPlayer = fPlayerManager.get(player);
+        FPlayer fPlayer = fPlayerService.getFPlayer(player);
 
         params = params.toLowerCase();
 
@@ -92,7 +92,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             case "afk_suffix" -> fPlayer.getSettingValue(FPlayer.Setting.AFK_SUFFIX);
             case "player" -> fPlayer.getName();
             case "ip" -> fPlayer.getIp();
-            case "ping" -> String.valueOf(fPlayerManager.getPing(fPlayer));
+            case "ping" -> String.valueOf(fPlayerService.getPing(fPlayer));
             case "online" -> String.valueOf(serverUtil.getOnlineCount());
             case "tps" -> serverUtil.getTPS();
             default -> null;

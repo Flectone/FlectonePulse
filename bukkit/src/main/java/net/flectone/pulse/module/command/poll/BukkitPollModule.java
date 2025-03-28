@@ -4,31 +4,31 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.*;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.FCommand;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.BukkitCommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 
 @Singleton
 public class BukkitPollModule extends PollModule {
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final BukkitCommandUtil commandUtil;
 
     @Inject
     public BukkitPollModule(FileManager fileManager,
                             ProxyConnector proxyConnector,
                             TaskScheduler taskScheduler,
-                            FPlayerManager fPlayerManager,
+                            FPlayerService fPlayerService,
                             BukkitCommandUtil commandUtil,
                             ComponentUtil componentUtil,
                             Gson gson) {
         super(fileManager, proxyConnector, taskScheduler, commandUtil, componentUtil, gson);
 
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.commandUtil = commandUtil;
     }
 
@@ -57,7 +57,7 @@ public class BukkitPollModule extends PollModule {
                                                                 .withoutValueList()
                                                                 .build()
                                                                 .executes((commandSender, commandArguments) -> {
-                                                                    onCommandCreate(fPlayerManager.convertToFPlayer(commandSender), commandArguments);
+                                                                    onCommandCreate(fPlayerService.getFPlayer(commandSender), commandArguments);
                                                                 })
                                                         )
                                                 )

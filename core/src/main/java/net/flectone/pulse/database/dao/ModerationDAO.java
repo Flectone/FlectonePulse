@@ -165,9 +165,7 @@ public class ModerationDAO {
     }
 
     @Async
-    public void setInvalid(Moderation moderation) {
-        moderation.setInvalid();
-
+    public void updateValid(Moderation moderation) {
         try (Connection connection = database.getConnection()) {
             String SQL_UPDATE_VALID = "UPDATE `moderation` SET `valid` = ? WHERE `id` = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_VALID);

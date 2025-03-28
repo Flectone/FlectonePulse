@@ -4,10 +4,10 @@ import lombok.Getter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.PermissionUtil;
@@ -19,17 +19,17 @@ public abstract class SpyModule extends AbstractModuleCommand<Localization.Comma
     @Getter private final Command.Spy command;
     @Getter private final Permission.Command.Spy permission;
 
-    private final SettingDAO settingDAO;
     private final CommandUtil commandUtil;
+    private final FPlayerService fPlayerService;
     private final PermissionUtil permissionUtil;
 
     public SpyModule(FileManager fileManager,
-                     SettingDAO settingDAO,
+                     FPlayerService fPlayerService,
                      CommandUtil commandUtil,
                      PermissionUtil permissionUtil) {
         super(localization -> localization.getCommand().getSpy(), null);
 
-        this.settingDAO = settingDAO;
+        this.fPlayerService = fPlayerService;
         this.commandUtil = commandUtil;
         this.permissionUtil = permissionUtil;
 
@@ -43,11 +43,9 @@ public abstract class SpyModule extends AbstractModuleCommand<Localization.Comma
         if (checkModulePredicates(fPlayer)) return;
 
         if (fPlayer.isSetting(FPlayer.Setting.SPY)) {
-            fPlayer.removeSetting(FPlayer.Setting.SPY);
-            settingDAO.delete(fPlayer, FPlayer.Setting.SPY);
+            fPlayerService.deleteSetting(fPlayer, FPlayer.Setting.SPY);
         } else {
-            fPlayer.setSetting(FPlayer.Setting.SPY);
-            settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.SPY);
+            fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.SPY, "");
         }
 
         builder(fPlayer)

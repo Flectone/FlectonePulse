@@ -4,7 +4,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
-import net.flectone.pulse.manager.FPlayerManager;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.PacketEventsUtil;
@@ -19,17 +19,17 @@ public abstract class MessageSender {
 
     private final BrandPacketSerializer packetSerializer;
     private final TaskScheduler taskScheduler;
-    private final FPlayerManager fPlayerManager;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PacketEventsUtil packetEventsUtil;
     private final FLogger fLogger;
 
     public MessageSender(TaskScheduler taskScheduler,
-                         FPlayerManager fPlayerManager,
+                         PlatformPlayerAdapter platformPlayerAdapter,
                          BrandPacketSerializer packetSerializer,
                          PacketEventsUtil packetEventsUtil,
                          FLogger fLogger) {
         this.taskScheduler = taskScheduler;
-        this.fPlayerManager = fPlayerManager;
+        this.platformPlayerAdapter = platformPlayerAdapter;
         this.packetSerializer = packetSerializer;
         this.packetEventsUtil = packetEventsUtil;
         this.fLogger = fLogger;
@@ -43,8 +43,8 @@ public abstract class MessageSender {
             case SUBTITLE -> sendTitle(fPlayer, subcomponent, component, destination.getTimes());
             case ACTION_BAR -> sendActionBar(fPlayer, component, destination.getTimes().stayTicks());
             case BOSS_BAR -> sendBoosBar(fPlayer, component, destination.getBossBar());
-            case TAB_HEADER -> sendPlayerListHeaderAndFooter(fPlayer, component, fPlayerManager.getPlayerListFooter(fPlayer));
-            case TAB_FOOTER -> sendPlayerListHeaderAndFooter(fPlayer, fPlayerManager.getPlayerListHeader(fPlayer), component);
+            case TAB_HEADER -> sendPlayerListHeaderAndFooter(fPlayer, component, platformPlayerAdapter.getPlayerListFooter(fPlayer));
+            case TAB_FOOTER -> sendPlayerListHeaderAndFooter(fPlayer, platformPlayerAdapter.getPlayerListHeader(fPlayer), component);
             case TOAST -> sendToast(fPlayer, component, destination.getToast());
             case BRAND -> sendBrand(fPlayer, component);
             default -> sendMessage(fPlayer, component);

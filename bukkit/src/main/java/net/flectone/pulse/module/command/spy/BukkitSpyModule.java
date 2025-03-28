@@ -3,12 +3,11 @@ package net.flectone.pulse.module.command.spy;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.database.dao.SettingDAO;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.PermissionUtil;
 import org.bukkit.entity.Player;
@@ -29,19 +28,18 @@ import java.util.Map;
 @Singleton
 public class BukkitSpyModule extends SpyModule {
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final BukkitListenerRegistry bukkitListenerManager;
 
     @Inject
     public BukkitSpyModule(FileManager fileManager,
-                           SettingDAO settingDAO,
-                           FPlayerManager fPlayerManager,
+                           FPlayerService fPlayerService,
                            CommandUtil commandUtil,
                            PermissionUtil permissionUtil,
                            BukkitListenerRegistry bukkitListenerManager) {
-        super(fileManager, settingDAO, commandUtil, permissionUtil);
+        super(fileManager, fPlayerService, commandUtil, permissionUtil);
 
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.bukkitListenerManager = bukkitListenerManager;
     }
 
@@ -66,7 +64,7 @@ public class BukkitSpyModule extends SpyModule {
 
         if (!categories.get("command").contains(action)) return;
 
-        FPlayer fPlayer = fPlayerManager.get(event.getPlayer());
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
         spy(fPlayer, action, event.getMessage());
     }
 
@@ -84,7 +82,7 @@ public class BukkitSpyModule extends SpyModule {
         if (event.getCurrentItem().getItemMeta() == null) return;
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
-        FPlayer fPlayer = fPlayerManager.get(player);
+        FPlayer fPlayer = fPlayerService.getFPlayer(player);
 
         ItemStack itemStack = event.getCurrentItem();
         ItemMeta itemMeta = itemStack.getItemMeta();
@@ -105,7 +103,7 @@ public class BukkitSpyModule extends SpyModule {
         if (!categories.get("action").contains("book")) return;
 
         Player player = event.getPlayer();
-        FPlayer fPlayer = fPlayerManager.get(player);
+        FPlayer fPlayer = fPlayerService.getFPlayer(player);
 
         BookMeta bookMeta = event.getNewBookMeta();
         spy(fPlayer, "book", String.join(" ", bookMeta.getPages()));
@@ -122,7 +120,7 @@ public class BukkitSpyModule extends SpyModule {
         if (categories.get("action") == null) return;
         if (!categories.get("action").contains("sign")) return;
 
-        FPlayer fPlayer = fPlayerManager.get(event.getPlayer());
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
 
         String message = String.join(" ", event.getLines());
         spy(fPlayer, "sign", message);
@@ -132,7 +130,7 @@ public class BukkitSpyModule extends SpyModule {
     public void check(AsyncPlayerChatEvent event) {
         if (!isEnable()) return;
 
-        FPlayer fPlayer = fPlayerManager.get(event.getPlayer());
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
 
         String message = event.getMessage();
 

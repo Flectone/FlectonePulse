@@ -6,12 +6,12 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.format.image.model.FImage;
+import net.flectone.pulse.service.SkinService;
+import net.flectone.pulse.util.logging.FLogger;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,15 +22,15 @@ public class GreetingModule extends AbstractModuleMessage<Localization.Message.G
     private final Message.Greeting message;
     private final Permission.Message.Greeting permission;
 
-    private final FPlayerManager fPlayerManager;
+    private final SkinService skinService;
     private final FLogger fLogger;
 
     @Inject
     public GreetingModule(FileManager fileManager,
-                          FPlayerManager fPlayerManager,
+                          SkinService skinService,
                           FLogger fLogger) {
         super(localization -> localization.getMessage().getGreeting());
-        this.fPlayerManager = fPlayerManager;
+        this.skinService = skinService;
         this.fLogger = fLogger;
 
         message = fileManager.getMessage().getGreeting();
@@ -53,7 +53,7 @@ public class GreetingModule extends AbstractModuleMessage<Localization.Message.G
     public void send(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
-        FImage fImage = new FImage(fPlayerManager.getAvatarURL(fPlayer));
+        FImage fImage = new FImage(skinService.getAvatarUrl(fPlayer));
 
         try {
             List<String> pixels = fImage.convertImageUrl();

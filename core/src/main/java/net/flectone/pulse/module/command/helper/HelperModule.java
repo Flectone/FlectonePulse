@@ -1,15 +1,14 @@
 package net.flectone.pulse.module.command.helper;
 
 import lombok.Getter;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
-import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.connector.ProxyConnector;
+import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
@@ -23,22 +22,19 @@ public abstract class HelperModule extends AbstractModuleCommand<Localization.Co
     @Getter private final Command.Helper command;
     @Getter private final Permission.Command.Helper permission;
 
-    private final FPlayerDAO fPlayerDAO;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final ProxyConnector proxyConnector;
     private final PermissionUtil permissionUtil;
     private final CommandUtil commandUtil;
 
     public HelperModule(FileManager fileManager,
-                        FPlayerDAO fPlayerDAO,
-                        FPlayerManager fPlayerManager,
+                        FPlayerService fPlayerService,
                         ProxyConnector proxyConnector,
                         PermissionUtil permissionUtil,
                         CommandUtil commandUtil) {
         super(localization -> localization.getCommand().getHelper(), null);
 
-        this.fPlayerDAO = fPlayerDAO;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.proxyConnector = proxyConnector;
         this.permissionUtil = permissionUtil;
         this.commandUtil = commandUtil;
@@ -57,9 +53,9 @@ public abstract class HelperModule extends AbstractModuleCommand<Localization.Co
 
         Predicate<FPlayer> filter = getFilterSee();
 
-        List<FPlayer> recipients = fPlayerManager.getFPlayers().stream().filter(filter).toList();
+        List<FPlayer> recipients = fPlayerService.getFPlayers().stream().filter(filter).toList();
         if (recipients.isEmpty()) {
-            boolean nullHelper = !proxyConnector.isEnable() || fPlayerDAO.getOnlineFPlayers().stream()
+            boolean nullHelper = !proxyConnector.isEnable() || fPlayerService.findOnlineFPlayers().stream()
                     .noneMatch(online -> permissionUtil.has(online, permission.getSee()));
 
             if (nullHelper) {

@@ -5,13 +5,13 @@ import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServer
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.PacketEventsUtil;
 import net.flectone.pulse.util.PermissionUtil;
@@ -26,26 +26,26 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
     @Getter private final Message.Status.Players message;
     private final Permission.Message.Status.Players permission;
 
+    private final FPlayerService fPlayerService;
     private final PermissionUtil permissionUtil;
     private final ServerUtil serverUtil;
     private final ComponentUtil componentUtil;
     private final PacketEventsUtil packetEventsUtil;
-    private final FPlayerDAO fPlayerDAO;
 
     @Inject
     public PlayersModule(FileManager fileManager,
+                         FPlayerService fPlayerService,
                          PermissionUtil permissionUtil,
                          ServerUtil serverUtil,
                          ComponentUtil componentUtil,
-                         PacketEventsUtil packetEventsUtil,
-                         FPlayerDAO fPlayerDAO) {
+                         PacketEventsUtil packetEventsUtil) {
         super(module -> module.getMessage().getStatus().getPlayers());
 
+        this.fPlayerService = fPlayerService;
         this.permissionUtil = permissionUtil;
         this.serverUtil = serverUtil;
         this.componentUtil = componentUtil;
         this.packetEventsUtil = packetEventsUtil;
-        this.fPlayerDAO = fPlayerDAO;
 
         message = fileManager.getMessage().getStatus().getPlayers();
         permission = fileManager.getPermission().getMessage().getStatus().getPlayers();
@@ -61,7 +61,7 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
         if (!isEnable()) return false;
         if (!message.isControl()) return false;
 
-        FPlayer fPlayer = fPlayerDAO.getFPlayer(userProfile.getUUID());
+        FPlayer fPlayer = fPlayerService.getFPlayer(userProfile.getUUID());
 
         if (checkModulePredicates(fPlayer)) return false;
         if (permissionUtil.has(fPlayer, permission.getBypass())) return false;

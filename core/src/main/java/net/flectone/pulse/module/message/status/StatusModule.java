@@ -8,15 +8,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.database.dao.ColorsDAO;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -25,6 +20,8 @@ import net.flectone.pulse.module.message.status.listener.StatusPacketListener;
 import net.flectone.pulse.module.message.status.motd.MOTDModule;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
 import net.flectone.pulse.module.message.status.version.VersionModule;
+import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.ServerUtil;
 
@@ -37,41 +34,34 @@ public class StatusModule extends AbstractModule {
     private final Message.Status message;
     private final Permission.Message.Status permission;
 
-    private final FPlayerDAO fPlayerDAO;
-    private final ColorsDAO colorsDAO;
     private final MOTDModule MOTDModule;
     private final IconModule iconModule;
     private final PlayersModule playersModule;
     private final VersionModule versionModule;
     private final ComponentUtil componentUtil;
     private final ServerUtil bukkitUtil;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
 
     @Inject
     public StatusModule(FileManager fileManager,
-                        FPlayerDAO fPlayerDAO,
-                        ColorsDAO colorsDAO,
                         MOTDModule MOTDModule,
                         IconModule iconModule,
                         PlayersModule playersModule,
                         VersionModule versionModule,
-                        FLogger fLogger,
                         ComponentUtil componentUtil,
                         ServerUtil bukkitUtil,
-                        FPlayerManager fPlayerManager,
+                        FPlayerService fPlayerService,
                         ListenerRegistry listenerRegistry,
                         IntegrationModule integrationModule) {
-        this.fPlayerDAO = fPlayerDAO;
-        this.colorsDAO = colorsDAO;
         this.MOTDModule = MOTDModule;
         this.iconModule = iconModule;
         this.playersModule = playersModule;
         this.versionModule = versionModule;
         this.componentUtil = componentUtil;
         this.bukkitUtil = bukkitUtil;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
         this.integrationModule = integrationModule;
 
@@ -97,8 +87,8 @@ public class StatusModule extends AbstractModule {
     }
 
     public void send(User user) {
-        FPlayer fPlayer = fPlayerDAO.getFPlayer(user.getAddress().getAddress());
-        colorsDAO.load(fPlayer);
+        FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
+        fPlayerService.loadColors(fPlayer);
 
         if (checkModulePredicates(fPlayer)) return;
 
@@ -172,7 +162,7 @@ public class StatusModule extends AbstractModule {
         List<Localization.Message.Status.Players.Sample> samples = playersModule.getSamples(fPlayer);
         samples = samples == null ? List.of(new Localization.Message.Status.Players.Sample()) : samples;
 
-        Collection<FPlayer> onlineFPlayers = fPlayerManager.getFPlayers().stream()
+        Collection<FPlayer> onlineFPlayers = fPlayerService.getFPlayers().stream()
                 .filter(filter -> !integrationModule.isVanished(filter))
                 .toList();
 

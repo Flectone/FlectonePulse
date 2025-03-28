@@ -1,7 +1,6 @@
 package net.flectone.pulse.module.command.ignorelist;
 
 import lombok.Getter;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
@@ -10,6 +9,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.platform.MessageSender;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.TimeUtil;
@@ -22,21 +22,21 @@ public abstract class IgnorelistModule extends AbstractModuleCommand<Localizatio
     @Getter private final Command.Ignorelist command;
     @Getter private final Permission.Command.Ignorelist permission;
 
-    private final FPlayerDAO fPlayerDAO;
+    private final FPlayerService fPlayerService;
     private final MessageSender messageSender;
     private final ComponentUtil componentUtil;
     private final CommandUtil commandUtil;
     private final TimeUtil timeUtil;
 
     public IgnorelistModule(FileManager fileManager,
-                            FPlayerDAO fPlayerDAO,
+                            FPlayerService fPlayerService,
                             MessageSender messageSender,
                             ComponentUtil componentUtil,
                             CommandUtil commandUtil,
                             TimeUtil timeUtil) {
         super(localization -> localization.getCommand().getIgnorelist(), null);
 
-        this.fPlayerDAO = fPlayerDAO;
+        this.fPlayerService = fPlayerService;
         this.messageSender = messageSender;
         this.componentUtil = componentUtil;
         this.commandUtil = commandUtil;
@@ -88,7 +88,7 @@ public abstract class IgnorelistModule extends AbstractModuleCommand<Localizatio
 
         for (Ignore ignore : finalIgnoreList) {
 
-            FPlayer fTarget = fPlayerDAO.getFPlayer(ignore.target());
+            FPlayer fTarget = fPlayerService.getFPlayer(ignore.target());
             String line = localization.getLine()
                     .replace("<command>", "/ignore " + fTarget.getName())
                     .replace("<date>", timeUtil.formatDate(ignore.date()));

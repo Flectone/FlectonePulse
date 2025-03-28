@@ -7,16 +7,17 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.PacketEventsUtil;
 import net.kyori.adventure.text.Component;
@@ -27,20 +28,23 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
     private final Message.Tab.Playerlistname message;
     private final Permission.Message.Tab.Playerlistname permission;
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ComponentUtil componentUtil;
     private final PacketEventsUtil packetEventsUtil;
     private final TaskScheduler taskScheduler;
 
     @Inject
-    public PlayerlistnameModule(FPlayerManager fPlayerManager,
+    public PlayerlistnameModule(FPlayerService fPlayerService,
+                                PlatformPlayerAdapter platformPlayerAdapter,
                                 FileManager fileManager,
                                 ComponentUtil componentUtil,
                                 PacketEventsUtil packetEventsUtil,
                                 TaskScheduler taskScheduler) {
         super(module -> module.getMessage().getTab().getPlayerlistname());
 
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
+        this.platformPlayerAdapter = platformPlayerAdapter;
         this.componentUtil = componentUtil;
         this.packetEventsUtil = packetEventsUtil;
         this.taskScheduler = taskScheduler;
@@ -55,7 +59,7 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
 
         Ticker ticker = message.getTicker();
         if (ticker.isEnable()) {
-            taskScheduler.runAsyncTicker(this::send, ticker.getPeriod());
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::send), ticker.getPeriod());
         }
     }
 
@@ -63,13 +67,13 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
     public void update() {
         if (!isEnable()) return;
 
-        fPlayerManager.getFPlayers().stream().filter(FPlayer::isOnline).forEach(this::send);
+        fPlayerService.getFPlayers().stream().filter(FPlayer::isOnline).forEach(this::send);
     }
 
     public void send(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
-        fPlayerManager.getFPlayers().stream()
+        fPlayerService.getFPlayers().stream()
                 .filter(FPlayer::isOnline)
                 .forEach(fReceiver -> updatePlayerlistname(fPlayer, fReceiver));
     }
@@ -91,8 +95,8 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
             WrapperPlayServerPlayerInfoUpdate.PlayerInfo playerInfo = new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
                     user.getProfile(),
                     true,
-                    fPlayerManager.getPing(fPlayer),
-                    fPlayerManager.getGamemode(fPlayer),
+                    fPlayerService.getPing(fPlayer),
+                    platformPlayerAdapter.getGamemode(fPlayer),
                     name,
                     null
             );
@@ -105,8 +109,8 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
         WrapperPlayServerPlayerInfo.PlayerData playerData = new WrapperPlayServerPlayerInfo.PlayerData(
                 name,
                 user.getProfile(),
-                fPlayerManager.getGamemode(fPlayer),
-                fPlayerManager.getPing(fPlayer)
+                platformPlayerAdapter.getGamemode(fPlayer),
+                fPlayerService.getPing(fPlayer)
         );
 
         packetEventsUtil.sendPacket(fReceiver, new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_DISPLAY_NAME, playerData));

@@ -2,9 +2,9 @@ package net.flectone.pulse.module.message.sign.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.sign.BukkitSignModule;
+import net.flectone.pulse.service.FPlayerService;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
@@ -12,13 +12,13 @@ import org.bukkit.event.block.SignChangeEvent;
 @Singleton
 public class SignListener implements Listener {
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final BukkitSignModule signModule;
 
     @Inject
-    public SignListener(FPlayerManager fPlayerManager,
+    public SignListener(FPlayerService fPlayerService,
                         BukkitSignModule signModule) {
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.signModule = signModule;
     }
 
@@ -26,7 +26,7 @@ public class SignListener implements Listener {
     public void signChangeEvent(SignChangeEvent event) {
         if (event.isCancelled()) return;
 
-        FPlayer fPlayer = fPlayerManager.get(event.getPlayer());
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
 
         for (int x = 0; x < event.getLines().length; x++) {
             String string = event.getLine(x);

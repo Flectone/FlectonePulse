@@ -6,7 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.manager.FPlayerManager;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Toast;
 import net.flectone.pulse.module.integration.BukkitIntegrationModule;
@@ -39,11 +39,11 @@ public class BukkitMessageSender extends MessageSender {
     public BukkitMessageSender(Plugin plugin,
                                TaskScheduler taskScheduler,
                                BukkitIntegrationModule integrationModule,
-                               FPlayerManager fPlayerManager,
+                               PlatformPlayerAdapter platformPlayerAdapter,
                                BrandPacketSerializer packetSerializer,
                                PacketEventsUtil packetEventsUtil,
                                FLogger fLogger) {
-        super(taskScheduler, fPlayerManager, packetSerializer, packetEventsUtil, fLogger);
+        super(taskScheduler, platformPlayerAdapter, packetSerializer, packetEventsUtil, fLogger);
 
         this.plugin = plugin;
         this.taskScheduler = taskScheduler;

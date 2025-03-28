@@ -7,13 +7,9 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import net.flectone.pulse.database.dao.ColorsDAO;
-import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.manager.FPlayerManager;
-import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.connector.ProxyConnector;
-import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
@@ -48,12 +44,15 @@ import net.flectone.pulse.module.integration.telegram.listener.MessageListener;
 import net.flectone.pulse.module.integration.twitch.listener.ChannelMessageListener;
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
 import net.flectone.pulse.module.message.advancement.model.Advancement;
-import net.flectone.pulse.module.message.chat.BukkitChatModule;
 import net.flectone.pulse.module.message.afk.BukkitAfkModule;
+import net.flectone.pulse.module.message.chat.BukkitChatModule;
 import net.flectone.pulse.module.message.death.DeathModule;
 import net.flectone.pulse.module.message.death.model.Death;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
+import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.Range;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -66,28 +65,25 @@ import java.util.*;
 @Singleton
 public class BukkitProxyListener implements PluginMessageListener {
 
-    private final ColorsDAO colorsDAO;
-    private final ModerationDAO moderationDAO;
     private final FileManager fileManager;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
+    private final ModerationService moderationService;
     private final TaskScheduler taskScheduler;
     private final ProxyConnector proxyConnector;
     private final Gson gson;
     private final Injector injector;
 
     @Inject
-    public BukkitProxyListener(ColorsDAO colorsDAO,
-                               ModerationDAO moderationDAO,
-                               FileManager fileManager,
-                               FPlayerManager fPlayerManager,
+    public BukkitProxyListener(FileManager fileManager,
+                               FPlayerService fPlayerService,
+                               ModerationService moderationService,
                                TaskScheduler taskScheduler,
                                ProxyConnector proxyConnector,
                                Gson gson,
                                Injector injector) {
-        this.colorsDAO = colorsDAO;
-        this.moderationDAO = moderationDAO;
         this.fileManager = fileManager;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
+        this.moderationService = moderationService;
         this.taskScheduler = taskScheduler;
         this.proxyConnector = proxyConnector;
         this.gson = gson;
@@ -185,7 +181,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                             .sendBuilt();
                 }
 
-                case COMMAND_CHATCOLOR -> colorsDAO.load(fPlayerManager.get(fEntity.getUuid()));
+                case COMMAND_CHATCOLOR -> fPlayerService.loadColors(fPlayerService.getFPlayer(fEntity.getUuid()));
 
                 case COMMAND_COIN -> {
                     CoinModule coinModule = injector.getInstance(CoinModule.class);
@@ -251,7 +247,7 @@ public class BukkitProxyListener implements PluginMessageListener {
 
                     Moderation mute = gson.fromJson(input.readUTF(), Moderation.class);
 
-                    FPlayer localFTarget = fPlayerManager.get(fEntity.getUuid());
+                    FPlayer localFTarget = fPlayerService.getFPlayer(fEntity.getUuid());
 
                     if (!localFTarget.isUnknown()) {
                         localFTarget.addMute(mute);
@@ -286,11 +282,11 @@ public class BukkitProxyListener implements PluginMessageListener {
                     FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
                     if (unmuteModule.checkModulePredicates(fPlayer)) return;
 
-                    FPlayer localFTarget = fPlayerManager.get(fEntity.getUuid());
+                    FPlayer localFTarget = fPlayerService.getFPlayer(fEntity.getUuid());
 
                     if (!localFTarget.isUnknown()) {
                         localFTarget.clearMutes();
-                        localFTarget.addMutes(moderationDAO.getValid(Moderation.Type.MUTE));
+                        localFTarget.addMutes(moderationService.getValid(Moderation.Type.MUTE));
                     }
 
                     unmuteModule.builder(fEntity)
@@ -368,7 +364,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                     UUID receiverUUID = UUID.fromString(input.readUTF());
                     String message = input.readUTF();
 
-                    FPlayer fReceiver = fPlayerManager.get(receiverUUID);
+                    FPlayer fReceiver = fPlayerService.getFPlayer(receiverUUID);
                     if (fReceiver.isUnknown()) return;
 
                     IntegrationModule integrationModule = injector.getInstance(IntegrationModule.class);

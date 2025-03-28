@@ -5,11 +5,11 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
@@ -28,15 +28,15 @@ public abstract class StreamModule extends AbstractModuleCommand<Localization.Co
     @Getter private final Command.Stream command;
     @Getter private final Permission.Command.Stream permission;
 
-    private final SettingDAO settingDAO;
+    private final FPlayerService fPlayerService;
     private final CommandUtil commandUtil;
 
     public StreamModule(FileManager fileManager,
-                        SettingDAO settingDAO,
+                        FPlayerService fPlayerService,
                         CommandUtil commandUtil) {
         super(localization -> localization.getCommand().getStream(), null);
 
-        this.settingDAO = settingDAO;
+        this.fPlayerService = fPlayerService;
         this.commandUtil = commandUtil;
 
         command = fileManager.getCommand().getStream();
@@ -107,19 +107,13 @@ public abstract class StreamModule extends AbstractModuleCommand<Localization.Co
         if (fPlayer.isUnknown()) return;
 
         if (isStart) {
-            fPlayer.setSetting(FPlayer.Setting.STREAM, "");
-            fPlayer.setSetting(FPlayer.Setting.STREAM_PREFIX, resolveLocalization().getPrefixTrue());
-
-            settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.STREAM);
-            settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.STREAM_PREFIX);
+            fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.STREAM, "");
+            fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.STREAM_PREFIX, resolveLocalization().getPrefixTrue());
             return;
         }
 
-        fPlayer.removeSetting(FPlayer.Setting.STREAM);
-        fPlayer.setSetting(FPlayer.Setting.STREAM_PREFIX, resolveLocalization().getPrefixFalse());
-
-        settingDAO.delete(fPlayer, FPlayer.Setting.STREAM);
-        settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.STREAM_PREFIX);
+        fPlayerService.deleteSetting(fPlayer, FPlayer.Setting.STREAM);
+        fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.STREAM_PREFIX, resolveLocalization().getPrefixFalse());
     }
 
     public TagResolver streamTag(@NotNull FEntity sender) {

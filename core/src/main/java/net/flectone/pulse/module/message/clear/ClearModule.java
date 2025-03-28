@@ -6,12 +6,12 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.clear.listener.ClearPacketListener;
 import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MinecraftTranslationKeys;
 
 import java.util.UUID;
@@ -22,16 +22,16 @@ public class ClearModule extends AbstractModuleMessage<Localization.Message.Clea
     private final Message.Clear message;
     private final Permission.Message.Clear permission;
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public ClearModule(FileManager fileManager,
-                       FPlayerManager fPlayerManager,
+                       FPlayerService fPlayerService,
                        ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getClear());
 
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
 
         message = fileManager.getMessage().getClear();
@@ -54,13 +54,13 @@ public class ClearModule extends AbstractModuleMessage<Localization.Message.Clea
 
     @Async
     public void send(UUID receiver, MinecraftTranslationKeys key, String count, String value) {
-        FPlayer fPlayer = fPlayerManager.get(receiver);
+        FPlayer fPlayer = fPlayerService.getFPlayer(receiver);
         if (checkModulePredicates(fPlayer)) return;
 
         FPlayer fTarget = fPlayer;
 
         if (key == MinecraftTranslationKeys.COMMANDS_CLEAR_SUCCESS_SINGLE) {
-            fTarget = fPlayerManager.getOnline(value);
+            fTarget = fPlayerService.getFPlayer(value);
             if (fTarget.isUnknown()) return;
         }
 

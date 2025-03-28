@@ -1,16 +1,15 @@
-package net.flectone.pulse.manager;
+package net.flectone.pulse.adapter;
 
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import net.flectone.pulse.database.dao.*;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.command.stream.StreamModule;
+import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.brand.BrandModule;
-import net.flectone.pulse.module.message.afk.BukkitAfkModule;
-import net.flectone.pulse.module.message.format.name.BukkitNameModule;
+import net.flectone.pulse.module.message.format.name.NameModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
 import net.flectone.pulse.module.message.objective.belowname.BelownameModule;
@@ -19,61 +18,32 @@ import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.ComponentUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.UUID;
 
 @Singleton
-public class BukkitFPlayerManager extends FPlayerManager {
+public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
 
-    private final ColorsDAO colorsDAO;
-    private final FPlayerDAO fPlayerDAO;
-    private final SettingDAO settingDAO;
-    private final IgnoreDAO ignoreDAO;
-    private final ModerationDAO moderationDAO;
-    private final TaskScheduler taskScheduler;
-
-    @Inject private WorldModule worldModule;
-    @Inject private BukkitAfkModule afkModule;
-    @Inject private StreamModule streamModule;
-    @Inject private BukkitNameModule nameModule;
-    @Inject private BelownameModule belowNameModule;
-    @Inject private TabnameModule tabnameModule;
-    @Inject private ScoreboardModule scoreboardModule;
-    @Inject private PlayerlistnameModule playerListNameModule;
-    @Inject private FooterModule footerModule;
-    @Inject private HeaderModule headerModule;
-    @Inject private BrandModule brandModule;
-    @Inject private ComponentUtil componentUtil;
+    private final Injector injector;
 
     @Inject
-    public BukkitFPlayerManager(FileManager fileManager,
-                                ColorsDAO colorsDAO,
-                                FPlayerDAO fPlayerDAO,
-                                SettingDAO settingDAO,
-                                IgnoreDAO ignoreDAO,
-                                ModerationDAO moderationDAO,
-                                TaskScheduler taskScheduler) {
-        super(fileManager);
-
-        this.colorsDAO = colorsDAO;
-        this.fPlayerDAO = fPlayerDAO;
-        this.settingDAO = settingDAO;
-        this.ignoreDAO = ignoreDAO;
-        this.moderationDAO = moderationDAO;
-        this.taskScheduler = taskScheduler;
+    public BukkitPlayerAdapter(Injector injector) {
+        this.injector = injector;
     }
 
     @NotNull
@@ -85,88 +55,42 @@ public class BukkitFPlayerManager extends FPlayerManager {
     }
 
     @Override
-    public @NotNull FPlayer getOnline(String playerName) {
-        Player player = Bukkit.getPlayer(playerName);
-        if (player == null) return FPlayer.UNKNOWN;
-
-        return get(player);
-    }
-
-    @Override
-    public int getEntityId(FPlayer fPlayer) {
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+    public int getEntityId(UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
         if (player == null) return 0;
 
         return player.getEntityId();
     }
 
     @Override
-    public FPlayer convertToFPlayer(Object sender) {
-        if (!(sender instanceof CommandSender commandSender)) return FPlayer.UNKNOWN;
+    public String getName(UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null) return "";
 
-        return commandSender instanceof Player player
-                ? get(player)
-                : commandSender instanceof ConsoleCommandSender
-                        ? get(FPlayer.UNKNOWN.getUuid())
-                        : new FPlayer(commandSender.getName());
+        return player.getName();
     }
 
     @Override
-    public Object convertToPlayer(FPlayer fPlayer) {
+    public UUID getUUID(Object player) {
+        if (player instanceof Player onlinePlayer) {
+            return onlinePlayer.getUniqueId();
+        }
+
+        return null;
+    }
+
+    @Override
+    public Object convertToPlatformPlayer(FPlayer fPlayer) {
         return Bukkit.getPlayer(fPlayer.getUuid());
     }
 
     @Override
-    public FPlayer createAndPut(UUID uuid, int entityId, String name) {
-        boolean isInserted = fPlayerDAO.insert(uuid, name);
-        FPlayer fPlayer = fPlayerDAO.getFPlayer(uuid);
-
-        if (isInserted) {
-            fPlayer.setDefaultSettings();
-            settingDAO.save(fPlayer);
-        } else {
-            settingDAO.load(fPlayer);
+    public String getName(Object player) {
+        if (player instanceof CommandSender commandSender) {
+            return commandSender.getName();
         }
 
-        colorsDAO.load(fPlayer);
-        ignoreDAO.load(fPlayer);
-        fPlayer.addMutes(moderationDAO.get(fPlayer, Moderation.Type.MUTE));
-
-        fPlayer.setOnline(true);
-        fPlayer.setIp(getIp(fPlayer));
-        fPlayer.setCurrentName(name);
-        fPlayer.setEntityId(entityId);
-
-        put(fPlayer);
-
-        taskScheduler.runAsync(() -> fPlayerDAO.save(fPlayer));
-
-        worldModule.update(fPlayer);
-        afkModule.remove("", fPlayer);
-        streamModule.setStreamPrefix(fPlayer, fPlayer.isSetting(FPlayer.Setting.STREAM));
-        nameModule.add(fPlayer);
-        belowNameModule.add(fPlayer);
-        tabnameModule.add(fPlayer);
-        playerListNameModule.update();
-        scoreboardModule.send(fPlayer);
-        footerModule.send(fPlayer);
-        headerModule.send(fPlayer);
-        brandModule.send(fPlayer);
-
-        return fPlayer;
-    }
-
-    @Override
-    public void saveAndRemove(FPlayer fPlayer) {
-        fPlayer.setOnline(false);
-
-        afkModule.remove("quit", fPlayer);
-        nameModule.remove(fPlayer);
-        belowNameModule.remove(fPlayer);
-        tabnameModule.remove(fPlayer);
-
-        settingDAO.save(fPlayer);
-        fPlayerDAO.save(fPlayer);
+        return null;
     }
 
     @Override
@@ -234,7 +158,10 @@ public class BukkitFPlayerManager extends FPlayerManager {
 
         Player secondPlayer = Bukkit.getPlayer(second.getUuid());
         if (secondPlayer == null) return -1.0;
-        if (!firstPlayer.getLocation().getWorld().equals(secondPlayer.getLocation().getWorld())) return -1.0;
+
+        World world = firstPlayer.getLocation().getWorld();
+        if (world == null) return -1.0;
+        if (!world.equals(secondPlayer.getLocation().getWorld())) return -1.0;
 
         return firstPlayer.getLocation().distance(secondPlayer.getLocation());
     }
@@ -259,9 +186,9 @@ public class BukkitFPlayerManager extends FPlayerManager {
 
     @Override
     public Component getPlayerListHeader(FPlayer fPlayer) {
-        String header = headerModule.getCurrentMessage(fPlayer);
+        String header = injector.getInstance(HeaderModule.class).getCurrentMessage(fPlayer);
         if (header != null) {
-            return componentUtil.builder(fPlayer, header).build();
+            return injector.getInstance(ComponentUtil.class).builder(fPlayer, header).build();
         }
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
@@ -275,9 +202,9 @@ public class BukkitFPlayerManager extends FPlayerManager {
 
     @Override
     public Component getPlayerListFooter(FPlayer fPlayer) {
-        String footer = footerModule.getCurrentMessage(fPlayer);
+        String footer = injector.getInstance(FooterModule.class).getCurrentMessage(fPlayer);
         if (footer != null) {
-            return componentUtil.builder(fPlayer, footer).build();
+            return injector.getInstance(ComponentUtil.class).builder(fPlayer, footer).build();
         }
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
@@ -290,9 +217,37 @@ public class BukkitFPlayerManager extends FPlayerManager {
     }
 
     @Override
-    public void loadOnlinePlayers() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            createAndPut(player.getUniqueId(), player.getEntityId(), player.getName());
-        }
+    public List<UUID> getOnlinePlayers() {
+        return Bukkit.getOnlinePlayers().stream()
+                .map(Entity::getUniqueId)
+                .toList();
+    }
+
+    @Override
+    public boolean isConsole(Object player) {
+        return player instanceof ConsoleCommandSender;
+    }
+
+    @Override
+    public void clear(FPlayer fPlayer) {
+        injector.getInstance(AfkModule.class).remove("quit", fPlayer);
+        injector.getInstance(NameModule.class).remove(fPlayer);
+        injector.getInstance(BelownameModule.class).remove(fPlayer);
+        injector.getInstance(TabnameModule.class).remove(fPlayer);
+    }
+
+    @Override
+    public void update(FPlayer fPlayer) {
+        injector.getInstance(WorldModule.class).update(fPlayer);
+        injector.getInstance(AfkModule.class).remove("", fPlayer);
+        injector.getInstance(StreamModule.class).setStreamPrefix(fPlayer, fPlayer.isSetting(FPlayer.Setting.STREAM));
+        injector.getInstance(NameModule.class).add(fPlayer);
+        injector.getInstance(BelownameModule.class).add(fPlayer);
+        injector.getInstance(TabnameModule.class).add(fPlayer);
+        injector.getInstance(PlayerlistnameModule.class).update();
+        injector.getInstance(ScoreboardModule.class).send(fPlayer);
+        injector.getInstance(FooterModule.class).send(fPlayer);
+        injector.getInstance(HeaderModule.class).send(fPlayer);
+        injector.getInstance(BrandModule.class).send(fPlayer);
     }
 }

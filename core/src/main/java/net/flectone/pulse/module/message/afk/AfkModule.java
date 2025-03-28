@@ -5,13 +5,13 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.Range;
 import net.kyori.adventure.text.Component;
@@ -26,18 +26,12 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
     private final Message.Afk message;
     private final Permission.Message.Afk permission;
 
-    private final SettingDAO settingDAO;
-    private final TaskScheduler taskScheduler;
-
+    @Inject private FPlayerService fPlayerService;
+    @Inject private TaskScheduler taskScheduler;
     @Inject private IntegrationModule integrationModule;
 
-    public AfkModule(FileManager fileManager,
-                     SettingDAO settingDAO,
-                     TaskScheduler taskScheduler) {
+    public AfkModule(FileManager fileManager) {
         super(localization -> localization.getMessage().getAfk());
-
-        this.settingDAO = settingDAO;
-        this.taskScheduler = taskScheduler;
 
         message = fileManager.getMessage().getAfk();
         permission = fileManager.getPermission().getMessage().getAfk();
@@ -48,7 +42,7 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
         registerModulePermission(permission);
 
         if (message.getTicker().isEnable()) {
-            taskScheduler.runAsyncTicker(this::check, message.getTicker().getPeriod());
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::check), message.getTicker().getPeriod());
         }
     }
 
@@ -58,16 +52,15 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
     }
 
     public abstract void remove(@NotNull String action, FPlayer fPlayer);
+
     public abstract void check(@NotNull FPlayer fPlayer);
 
     @Async
     public void setAfk(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
-        fPlayer.setSetting(FPlayer.Setting.AFK_SUFFIX, resolveLocalization().getSuffix());
+        fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.AFK_SUFFIX, resolveLocalization().getSuffix());
         send(fPlayer);
-
-        settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.AFK_SUFFIX);
     }
 
     @Async

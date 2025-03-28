@@ -2,10 +2,10 @@ package net.flectone.pulse.module.message.format;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
-import net.flectone.pulse.util.*;
+import net.flectone.pulse.util.ComponentUtil;
+import net.flectone.pulse.util.TagType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -22,12 +22,8 @@ public class BukkitFormatModule extends FormatModule {
 
     @Inject
     public BukkitFormatModule(FileManager fileManager,
-                              ServerUtil serverUtil,
-                              FPlayerManager fPlayerManager,
-                              PermissionUtil permissionUtil,
-                              ComponentUtil componentUtil,
-                              ItemUtil itemUtil) {
-        super(fileManager, serverUtil, fPlayerManager, permissionUtil, itemUtil);
+                              ComponentUtil componentUtil) {
+        super(fileManager);
 
         this.componentUtil = componentUtil;
     }

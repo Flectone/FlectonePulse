@@ -2,6 +2,7 @@ package net.flectone.pulse.database;
 
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.zaxxer.hikari.HikariConfig;
@@ -30,6 +31,7 @@ public class Database {
 
     private final Config.Database config;
 
+    private final Injector injector;
     private final FileManager fileManager;
     private final Path projectPath;
     private final InputStream SQLFile;
@@ -38,16 +40,15 @@ public class Database {
 
     private HikariDataSource dataSource;
 
-    @Inject private FPlayerDAO fPlayerDAO;
-    @Inject private SettingDAO settingDAO;
-
     @Inject
     public Database(FileManager fileManager,
+                    Injector injector,
                     @Named("projectPath") Path projectPath,
                     @Named("SQLFile") InputStream SQLFile,
                     SystemUtil systemUtil,
                     FLogger fLogger) {
 
+        this.injector = injector;
         this.fileManager = fileManager;
         this.projectPath = projectPath;
         this.SQLFile = SQLFile;
@@ -76,7 +77,7 @@ public class Database {
             }
 
             if (config.getType() == Config.Database.Type.SQLITE) {
-                fPlayerDAO.updateAllToOffline();
+                injector.getInstance(FPlayerDAO.class).updateAllToOffline();
             }
 
             init();
@@ -117,6 +118,8 @@ public class Database {
 
                 hikariConfig.setMaximumPoolSize(5);
                 hikariConfig.setMinimumIdle(1);
+                hikariConfig.setConnectionTimeout(30000);
+                hikariConfig.addDataSourceProperty("busy_timeout", 30000);
                 hikariConfig.addDataSourceProperty("journal_mode", "WAL");
                 hikariConfig.addDataSourceProperty("synchronous", "NORMAL");
                 hikariConfig.addDataSourceProperty("journal_size_limit", "6144000");
@@ -188,7 +191,7 @@ public class Database {
             }
         }
 
-        settingDAO.MIGRATION_0_6_0();
+        injector.getInstance(SettingDAO.class).MIGRATION_0_6_0();
 
         try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement;

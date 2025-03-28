@@ -9,8 +9,8 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPacketEntity;
@@ -41,7 +41,7 @@ public class BukkitBubbleManager implements BubbleManager {
     private final List<FBubble> fBubbleList = new ArrayList<>();
 
     private final TaskScheduler taskScheduler;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final FileManager fileManager;
     private final ComponentUtil componentUtil;
     private final RandomUtil randomUtil;
@@ -50,14 +50,14 @@ public class BukkitBubbleManager implements BubbleManager {
 
     @Inject
     public BukkitBubbleManager(TaskScheduler taskScheduler,
-                               FPlayerManager fPlayerManager,
+                               FPlayerService fPlayerService,
                                FileManager fileManager,
                                RandomUtil randomUtil,
                                ComponentUtil componentUtil,
                                ColorUtil colorUtil,
                                IntegrationModule integrationModule) {
         this.taskScheduler = taskScheduler;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.fileManager = fileManager;
         this.randomUtil = randomUtil;
         this.componentUtil = componentUtil;
@@ -130,7 +130,7 @@ public class BukkitBubbleManager implements BubbleManager {
                 .filter(receiver -> receiver.canSee(player))
                 .filter(receiver -> receiver.getLocation().distance(player.getLocation()) <= distance)
                 .forEach(receiver -> {
-                    FPlayer fReceiver = fPlayerManager.get(receiver);
+                    FPlayer fReceiver = fPlayerService.getFPlayer(receiver);
                     if (fReceiver.isIgnored(fPlayer)) return;
 
                     Component component = componentUtil.builder(fPlayer, fReceiver, localizationBubble.getFormat())
@@ -194,7 +194,7 @@ public class BukkitBubbleManager implements BubbleManager {
         if (player.getGameMode() == GameMode.SPECTATOR
                 || player.hasPotionEffect(PotionEffectType.INVISIBILITY)
                 || !player.getPassengers().isEmpty()
-                || integrationModule.isVanished(fPlayerManager.get(player.getUniqueId()))) {
+                || integrationModule.isVanished(fPlayerService.getFPlayer(player.getUniqueId()))) {
             return;
         }
 

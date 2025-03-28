@@ -4,12 +4,13 @@ import com.google.inject.Inject;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.Range;
+import org.incendo.cloud.context.CommandContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
 
     private final Predicate<FPlayer> commandPredicate;
 
-    @Inject private FPlayerManager fPlayerManager;
+    @Inject private FPlayerService fPlayerService;
     @Inject private FileManager fileManager;
 
     public AbstractModuleCommand(Function<Localization, M> messageFunction, Predicate<FPlayer> commandPredicate) {
@@ -31,7 +32,7 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
 
     @Async
     protected void executesFPlayer(Object commandSender, Object arguments) {
-        FPlayer fPlayer = fPlayerManager.convertToFPlayer(commandSender);
+        FPlayer fPlayer = fPlayerService.getFPlayer(commandSender);
 
         onCommand(fPlayer, arguments);
     }

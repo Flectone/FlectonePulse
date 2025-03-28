@@ -3,16 +3,15 @@ package net.flectone.pulse.module.message.deop;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.deop.listener.DeopPacketListener;
+import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.service.FPlayerService;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -23,20 +22,17 @@ public class DeopModule extends AbstractModuleMessage<Localization.Message.Deop>
     private final Message.Deop message;
     private final Permission.Message.Deop permission;
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
-    private final FPlayerDAO fPlayerDAO;
 
     @Inject
     public DeopModule(FileManager fileManager,
-                      FPlayerManager fPlayerManager,
-                      ListenerRegistry listenerRegistry,
-                      FPlayerDAO fPlayerDAO) {
+                      FPlayerService fPlayerService,
+                      ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getDeop());
 
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
-        this.fPlayerDAO = fPlayerDAO;
 
         message = fileManager.getMessage().getDeop();
         permission = fileManager.getPermission().getMessage().getDeop();
@@ -58,10 +54,11 @@ public class DeopModule extends AbstractModuleMessage<Localization.Message.Deop>
 
     @Async
     public void send(UUID receiver, @NotNull String target) {
-        FPlayer fPlayer = fPlayerManager.get(receiver);
+        FPlayer fPlayer = fPlayerService.getFPlayer(receiver);
         if (checkModulePredicates(fPlayer)) return;
 
-        FPlayer fTarget = fPlayerDAO.getFPlayer(target);
+        FPlayer fTarget = fPlayerService.getFPlayer(target);
+        if (fTarget.isUnknown()) return;
 
         builder(fTarget)
                 .destination(message.getDestination())

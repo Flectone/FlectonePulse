@@ -1,18 +1,17 @@
 package net.flectone.pulse.module.command.rockpaperscissors;
 
 import lombok.Getter;
-import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.database.dao.IgnoreDAO;
-import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.connector.ProxyConnector;
+import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissors;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
@@ -30,22 +29,19 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
     @Getter private final Permission.Command.Rockpaperscissors permission;
 
     private final ProxyConnector proxyConnector;
-    private final FPlayerDAO fPlayerDAO;
-    private final IgnoreDAO ignoreDAO;
+    private final FPlayerService fPlayerService;
     private final CommandUtil commandUtil;
     private final IntegrationModule integrationModule;
 
     public RockpaperscissorsModule(FileManager fileManager,
                                    ProxyConnector proxyConnector,
-                                   FPlayerDAO fPlayerDAO,
-                                   IgnoreDAO ignoreDAO,
+                                   FPlayerService fPlayerService,
                                    CommandUtil commandUtil,
                                    IntegrationModule integrationModule) {
         super(localization -> localization.getCommand().getRockpaperscissors(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.ROCKPAPERSCISSORS));
 
         this.proxyConnector = proxyConnector;
-        this.fPlayerDAO = fPlayerDAO;
-        this.ignoreDAO = ignoreDAO;
+        this.fPlayerService = fPlayerService;
         this.commandUtil = commandUtil;
         this.integrationModule = integrationModule;
 
@@ -61,7 +57,7 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
         if (checkMute(fPlayer)) return;
 
         String player = commandUtil.getString(0, arguments);
-        FPlayer fReceiver = fPlayerDAO.getFPlayer(player);
+        FPlayer fReceiver = fPlayerService.getFPlayer(player);
         if (!fReceiver.isOnline() || integrationModule.isVanished(fReceiver)) {
             builder(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::getNullPlayer)
@@ -76,7 +72,7 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
             return;
         }
 
-        ignoreDAO.load(fReceiver);
+        fPlayerService.loadIgnores(fReceiver);
 
         if (checkIgnore(fPlayer, fReceiver)) return;
         if (checkDisable(fPlayer, fReceiver, DisableAction.HE)) return;
@@ -164,7 +160,7 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
         RockPaperScissors rockPaperScissors = gameMap.get(id);
         if (rockPaperScissors == null) return;
 
-        FPlayer fReceiver = fPlayerDAO.getFPlayer(rockPaperScissors.getSender());
+        FPlayer fReceiver = fPlayerService.getFPlayer(rockPaperScissors.getSender());
 
         gameMap.remove(id);
 
@@ -210,7 +206,7 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
         RockPaperScissors rockPaperScissors = gameMap.get(id);
         if (rockPaperScissors == null) return;
 
-        FPlayer fReceiver = fPlayerDAO.getFPlayer(rockPaperScissors.getReceiver());
+        FPlayer fReceiver = fPlayerService.getFPlayer(rockPaperScissors.getReceiver());
 
         rockPaperScissors.setSenderMove(move);
 

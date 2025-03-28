@@ -2,8 +2,6 @@ package net.flectone.pulse.module.command.warn;
 
 import com.google.gson.Gson;
 import lombok.Getter;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
@@ -12,6 +10,8 @@ import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
@@ -25,24 +25,24 @@ public abstract class WarnModule extends AbstractModuleCommand<Localization.Comm
     @Getter private final Command.Warn command;
     @Getter private final Permission.Command.Warn permission;
 
-    private final FPlayerDAO fPlayerDAO;
-    private final ModerationDAO moderationDAO;
-    private final CommandUtil commandUtil;
+    private final FPlayerService fPlayerService;
+    private final ModerationService moderationService;
     private final ModerationUtil moderationUtil;
+    private final CommandUtil commandUtil;
     private final Gson gson;
 
     public WarnModule(FileManager fileManager,
-                      FPlayerDAO fPlayerDAO,
-                      ModerationDAO moderationDAO,
-                      CommandUtil commandUtil,
+                      FPlayerService fPlayerService,
+                      ModerationService moderationService,
                       ModerationUtil moderationUtil,
+                      CommandUtil commandUtil,
                       Gson gson) {
         super(localization -> localization.getCommand().getWarn(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.WARN));
 
-        this.fPlayerDAO = fPlayerDAO;
-        this.moderationDAO = moderationDAO;
-        this.commandUtil = commandUtil;
+        this.fPlayerService = fPlayerService;
+        this.moderationService = moderationService;
         this.moderationUtil = moderationUtil;
+        this.commandUtil = commandUtil;
         this.gson = gson;
 
         command = fileManager.getCommand().getWarn();
@@ -68,7 +68,7 @@ public abstract class WarnModule extends AbstractModuleCommand<Localization.Comm
 
         String reason = commandUtil.getString(2, arguments);
 
-        FPlayer fTarget = fPlayerDAO.getFPlayer(target);
+        FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
             builder(fPlayer)
                     .format(Localization.Command.Warn::getNullPlayer)
@@ -76,9 +76,9 @@ public abstract class WarnModule extends AbstractModuleCommand<Localization.Comm
             return;
         }
 
-        long databaseTime = time != -1 ? time + System.currentTimeMillis() : -1;
+        long databaseTime = time + System.currentTimeMillis();
 
-        Moderation warn = moderationDAO.insert(fTarget, databaseTime, reason, fPlayer.getId(), Moderation.Type.WARN);
+        Moderation warn = moderationService.warn(fTarget, databaseTime, reason, fPlayer.getId());
         if (warn == null) return;
 
         builder(fTarget)
@@ -96,7 +96,7 @@ public abstract class WarnModule extends AbstractModuleCommand<Localization.Comm
 
         send(fPlayer, fTarget, warn);
 
-        List<Moderation> warns = moderationDAO.get(fTarget, Moderation.Type.WARN);
+        List<Moderation> warns = moderationService.getValid(fTarget, Moderation.Type.WARN);
         if (warns.isEmpty()) return;
 
         int countWarns = warns.stream()
@@ -110,7 +110,7 @@ public abstract class WarnModule extends AbstractModuleCommand<Localization.Comm
     }
 
     public BiFunction<FPlayer, Localization.Command.Warn, String> buildFormat(Moderation warn) {
-        return (fReceiver, message) ->  moderationUtil.replacePlaceholders(message.getServer(), fReceiver, warn);
+        return (fReceiver, message) -> moderationUtil.replacePlaceholders(message.getServer(), fReceiver, warn);
     }
 
     public void send(FEntity fModerator, FPlayer fReceiver, Moderation warn) {

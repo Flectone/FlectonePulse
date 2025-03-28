@@ -7,9 +7,10 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSoundEffect;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.manager.FPlayerManager;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Sound;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.PacketEventsUtil;
 
 import java.util.Arrays;
@@ -18,13 +19,16 @@ import java.util.Optional;
 @Singleton
 public class SoundPlayer {
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PacketEventsUtil packetEventsUtil;
 
     @Inject
-    public SoundPlayer(FPlayerManager fPlayerManager,
+    public SoundPlayer(FPlayerService fPlayerService,
+                       PlatformPlayerAdapter platformPlayerAdapter,
                        PacketEventsUtil packetEventsUtil) {
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
+        this.platformPlayerAdapter = platformPlayerAdapter;
         this.packetEventsUtil = packetEventsUtil;
     }
 
@@ -53,9 +57,9 @@ public class SoundPlayer {
         com.github.retrooper.packetevents.protocol.sound.Sound packetSound = Sounds.getByName(sound.getName());
         if (packetSound == null) return;
 
-        fPlayerManager.getFPlayers().stream()
+        fPlayerService.getFPlayers().stream()
                 .filter(fReceiver -> {
-                    double distance = fPlayerManager.distance(fPlayer, fReceiver);
+                    double distance = platformPlayerAdapter.distance(fPlayer, fReceiver);
                     return distance >= 0 && distance <= 16;
                 })
                 .forEach(fReceiver -> packetEventsUtil.sendPacket(fReceiver, new WrapperPlayServerSoundEffect(packetSound, category.get(),

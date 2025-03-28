@@ -5,12 +5,11 @@ import com.google.inject.Singleton;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.arguments.UUIDArgument;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.IgnoreDAO;
-import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.connector.ProxyConnector;
+import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.BukkitCommandUtil;
 
 @Singleton
@@ -21,11 +20,10 @@ public class BukkitRockpaperscissorsModule extends RockpaperscissorsModule {
     @Inject
     public BukkitRockpaperscissorsModule(FileManager fileManager,
                                          ProxyConnector proxyConnector,
-                                         FPlayerDAO FPlayerDAO,
-                                         IgnoreDAO ignoreDAO,
+                                         FPlayerService fPlayerService,
                                          BukkitCommandUtil commandUtil,
                                          IntegrationModule integrationModule) {
-        super(fileManager, proxyConnector, FPlayerDAO, ignoreDAO, commandUtil, integrationModule);
+        super(fileManager, proxyConnector, fPlayerService, commandUtil, integrationModule);
 
         this.commandUtil = commandUtil;
     }

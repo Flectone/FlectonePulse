@@ -2,8 +2,6 @@ package net.flectone.pulse.module.command.unwarn;
 
 import com.google.gson.Gson;
 import lombok.Getter;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
@@ -11,6 +9,8 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.MessageTag;
 
@@ -22,20 +22,20 @@ public abstract class UnwarnModule extends AbstractModuleCommand<Localization.Co
     @Getter private final Command.Unwarn command;
     @Getter private final Permission.Command.Unwarn permission;
 
-    private final FPlayerDAO fPlayerDAO;
-    private final ModerationDAO moderationDAO;
+    private final FPlayerService fPlayerService;
+    private final ModerationService moderationService;
     private final CommandUtil commandUtil;
     private final Gson gson;
 
     public UnwarnModule(FileManager fileManager,
-                        FPlayerDAO fPlayerDAO,
-                        ModerationDAO moderationDAO,
+                        FPlayerService fPlayerService,
+                        ModerationService moderationService,
                         CommandUtil commandUtil,
                         Gson gson) {
         super(localization -> localization.getCommand().getUnwarn(), null);
 
-        this.fPlayerDAO = fPlayerDAO;
-        this.moderationDAO = moderationDAO;
+        this.fPlayerService = fPlayerService;
+        this.moderationService = moderationService;
         this.commandUtil = commandUtil;
         this.gson = gson;
 
@@ -57,7 +57,7 @@ public abstract class UnwarnModule extends AbstractModuleCommand<Localization.Co
     public void unwarn(FPlayer fPlayer, String target, int id) {
         if (checkModulePredicates(fPlayer)) return;
 
-        FPlayer fTarget = fPlayerDAO.getFPlayer(target);
+        FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
             builder(fPlayer)
                     .format(Localization.Command.Unwarn::getNullPlayer)
@@ -68,9 +68,9 @@ public abstract class UnwarnModule extends AbstractModuleCommand<Localization.Co
         List<Moderation> warns = new ArrayList<>();
 
         if (id == -1) {
-            warns.addAll(moderationDAO.getValid(fTarget, Moderation.Type.WARN));
+            warns.addAll(moderationService.getValid(fTarget, Moderation.Type.WARN));
         } else {
-            moderationDAO.getValid(fTarget, Moderation.Type.WARN).stream()
+            moderationService.getValid(fTarget, Moderation.Type.WARN).stream()
                     .filter(warn -> warn.getId() == id)
                     .findAny()
                     .ifPresent(warns::add);
@@ -84,7 +84,7 @@ public abstract class UnwarnModule extends AbstractModuleCommand<Localization.Co
         }
 
         for (Moderation warn : warns) {
-            moderationDAO.setInvalid(warn);
+            moderationService.setInvalid(warn);
         }
 
         builder(fTarget)

@@ -2,9 +2,9 @@ package net.flectone.pulse.module.message.anvil.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.anvil.BukkitAnvilModule;
+import net.flectone.pulse.service.FPlayerService;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,13 +16,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 @Singleton
 public class AnvilListener implements Listener {
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final BukkitAnvilModule anvilModule;
 
     @Inject
-    public AnvilListener(FPlayerManager fPlayerManager,
+    public AnvilListener(FPlayerService fPlayerService,
                          BukkitAnvilModule anvilModule) {
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.anvilModule = anvilModule;
     }
 
@@ -35,11 +35,11 @@ public class AnvilListener implements Listener {
         if (event.getCurrentItem().getItemMeta() == null) return;
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
-        FPlayer fPlayer = fPlayerManager.get(player);
+        FPlayer fPlayer = fPlayerService.getFPlayer(player);
 
         ItemStack itemStack = event.getCurrentItem();
-
         ItemMeta itemMeta = itemStack.getItemMeta();
+
         if (anvilModule.format(fPlayer, itemMeta)) {
             itemStack.setItemMeta(itemMeta);
         }

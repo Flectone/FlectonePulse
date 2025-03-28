@@ -6,12 +6,12 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.sleep.listener.SleepPacketListener;
 import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MinecraftTranslationKeys;
 
 import java.util.UUID;
@@ -22,16 +22,16 @@ public class SleepModule extends AbstractModuleMessage<Localization.Message.Slee
     private final Message.Sleep message;
     private final Permission.Message.Sleep permission;
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public SleepModule(FileManager fileManager,
-                       FPlayerManager fPlayerManager,
+                       FPlayerService fPlayerService,
                        ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getSleep());
 
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
 
         message = fileManager.getMessage().getSleep();
@@ -54,7 +54,7 @@ public class SleepModule extends AbstractModuleMessage<Localization.Message.Slee
 
     @Async
     public void send(UUID receiver, MinecraftTranslationKeys key, String sleepCount, String allCount) {
-        FPlayer fPlayer = fPlayerManager.get(receiver);
+        FPlayer fPlayer = fPlayerService.getFPlayer(receiver);
         if (checkModulePredicates(fPlayer)) return;
 
         builder(fPlayer)

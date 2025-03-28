@@ -4,11 +4,10 @@ import lombok.Getter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 
@@ -26,18 +25,15 @@ public abstract class GeolocateModule extends AbstractModuleCommand<Localization
     @Getter private final Command.Geolocate command;
     @Getter private final Permission.Command.Geolocate permission;
 
-    private final FPlayerDAO fPlayerDAO;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final CommandUtil commandUtil;
 
     public GeolocateModule(FileManager fileManager,
-                           FPlayerDAO fPlayerDAO,
-                           FPlayerManager fPlayerManager,
+                           FPlayerService fPlayerService,
                            CommandUtil commandUtil) {
         super(localization -> localization.getCommand().getGeolocate(), null);
 
-        this.fPlayerDAO = fPlayerDAO;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.commandUtil = commandUtil;
 
         command = fileManager.getCommand().getGeolocate();
@@ -53,7 +49,7 @@ public abstract class GeolocateModule extends AbstractModuleCommand<Localization
 
         String playerName = commandUtil.getString(0, arguments);
 
-        FPlayer fTarget = fPlayerDAO.getFPlayer(playerName);
+        FPlayer fTarget = fPlayerService.getFPlayer(playerName);
 
         if (fTarget.isUnknown()) {
             builder(fPlayer)
@@ -62,7 +58,7 @@ public abstract class GeolocateModule extends AbstractModuleCommand<Localization
             return;
         }
 
-        String ip = fTarget.isOnline() ? fPlayerManager.getIp(fTarget) : fTarget.getIp();
+        String ip = fTarget.isOnline() ? fPlayerService.getIp(fTarget) : fTarget.getIp();
 
         List<String> request = ip == null ? List.of() : readResponse(HTTP_URL.replace("<ip>", ip));
         if (request.isEmpty() || request.get(0).equals("fail")) {

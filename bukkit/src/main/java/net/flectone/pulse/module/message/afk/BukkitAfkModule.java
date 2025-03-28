@@ -5,12 +5,11 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
-import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.afk.listener.AfkListener;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
-import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -30,17 +29,15 @@ public class BukkitAfkModule extends AfkModule {
 
     @Getter private final Message.Afk message;
 
-    private final SettingDAO settingDAO;
     private final BukkitListenerRegistry bukkitListenerManager;
+
+    @Inject private FPlayerService fPlayerService;
 
     @Inject
     public BukkitAfkModule(FileManager fileManager,
-                           SettingDAO settingDAO,
-                           TaskScheduler taskScheduler,
                            BukkitListenerRegistry bukkitListenerManager) {
-        super(fileManager, settingDAO, taskScheduler);
+        super(fileManager);
 
-        this.settingDAO = settingDAO;
         this.bukkitListenerManager = bukkitListenerManager;
 
         message = fileManager.getMessage().getAfk();
@@ -61,7 +58,7 @@ public class BukkitAfkModule extends AfkModule {
         if (action.isEmpty()) {
             fPlayer.removeSetting(FPlayer.Setting.AFK_SUFFIX);
             PLAYER_BLOCK.remove(fPlayer.getUuid());
-            settingDAO.delete(fPlayer, FPlayer.Setting.AFK_SUFFIX);
+            fPlayerService.deleteSetting(fPlayer, FPlayer.Setting.AFK_SUFFIX);
             return;
         }
 
@@ -99,9 +96,8 @@ public class BukkitAfkModule extends AfkModule {
         if (timeVector == null || !timeVector.getValue().equals(getVector(player))) {
 
             if (fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX)) {
-                fPlayer.removeSetting(FPlayer.Setting.AFK_SUFFIX);
+                fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.AFK_SUFFIX, null);
                 send(fPlayer);
-                settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.AFK_SUFFIX);
             }
 
             PLAYER_BLOCK.put(fPlayer.getUuid(), new Pair<>(time, getVector(player)));

@@ -13,8 +13,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSp
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import lombok.Getter;
 import net.flectone.pulse.config.Message;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.model.FPacketEntity;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.RandomUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -46,7 +46,7 @@ public class FMark extends FPacketEntity {
         this.modern = modern;
     }
 
-    public void create(FPlayerManager fPlayerManager, Location location, RandomUtil randomUtil) {
+    public void create(FPlayerService fPlayerService, Location location, RandomUtil randomUtil) {
         id = randomUtil.nextInt(Integer.MAX_VALUE);
         uuid = UUID.randomUUID();
 
@@ -57,14 +57,14 @@ public class FMark extends FPacketEntity {
                 .stream()
                 .filter(receiver -> receiver.getWorld().equals(world))
                 .filter(receiver -> receiver.getLocation().distance(location) <= 100.0)
-                .map(fPlayerManager::get)
+                .map(fPlayerService::getFPlayer)
                 .toList()
         );
 
         alive = true;
     }
 
-    public void create(FPlayerManager fPlayerManager, Entity entity) {
+    public void create(FPlayerService fPlayerService, Entity entity) {
         id = entity.getEntityId();
         uuid = entity.getUniqueId();
         this.entity = entity;
@@ -72,7 +72,7 @@ public class FMark extends FPacketEntity {
                 .stream()
                 .filter(receiver -> receiver.getWorld().equals(entity.getWorld()))
                 .filter(receiver -> receiver.getLocation().distance(entity.getLocation()) <= 100.0)
-                .map(fPlayerManager::get).map(fPlayerManager::get)
+                .map(fPlayerService::getFPlayer)
                 .toList()
         );
         alive = true;

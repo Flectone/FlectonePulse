@@ -2,7 +2,7 @@ package net.flectone.pulse.module.message.join;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.manager.FPlayerManager;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.join.listener.JoinListener;
@@ -18,10 +18,10 @@ public class BukkitJoinModule extends JoinModule {
     @Inject
     public BukkitJoinModule(FileManager fileManager,
                             ListenerRegistry listenerRegistry,
-                            FPlayerManager fPlayerManager,
+                            PlatformPlayerAdapter platformPlayerAdapter,
                             IntegrationModule integrationModule,
                             BukkitListenerRegistry bukkitListenerRegistry) {
-        super(fileManager, listenerRegistry, fPlayerManager, integrationModule);
+        super(fileManager, listenerRegistry, platformPlayerAdapter, integrationModule);
 
         this.bukkitListenerRegistry = bukkitListenerRegistry;
     }

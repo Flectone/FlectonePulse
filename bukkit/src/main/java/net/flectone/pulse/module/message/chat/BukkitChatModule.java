@@ -5,8 +5,6 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.model.FEntity;
@@ -17,6 +15,7 @@ import net.flectone.pulse.module.message.bubble.BukkitBubbleModule;
 import net.flectone.pulse.module.message.chat.listener.ChatListener;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.PermissionUtil;
 import net.flectone.pulse.util.Range;
@@ -36,8 +35,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class BukkitChatModule extends ChatModule {
 
-    private final FPlayerDAO fPlayerDAO;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final PermissionUtil permissionUtil;
     private final TaskScheduler taskScheduler;
     private final BukkitListenerRegistry bukkitListenerManager;
@@ -49,8 +47,7 @@ public class BukkitChatModule extends ChatModule {
 
     @Inject
     public BukkitChatModule(FileManager fileManager,
-                            FPlayerDAO fPlayerDAO,
-                            FPlayerManager fPlayerManager,
+                            FPlayerService fPlayerService,
                             TaskScheduler taskScheduler,
                             BukkitListenerRegistry bukkitListenerManager,
                             IntegrationModule integrationModule,
@@ -58,8 +55,7 @@ public class BukkitChatModule extends ChatModule {
                             TimeUtil timeUtil) {
         super(fileManager);
 
-        this.fPlayerDAO = fPlayerDAO;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.bukkitListenerManager = bukkitListenerManager;
         this.integrationModule = integrationModule;
@@ -172,7 +168,7 @@ public class BukkitChatModule extends ChatModule {
         int countRecipients = recipientsUUID.size();
         if (playerChat.isNullRecipient() && countRecipients < 2) {
             taskScheduler.runAsyncLater(() -> {
-                Set<UUID> onlinePlayers = fPlayerDAO.getOnlineFPlayers()
+                Set<UUID> onlinePlayers = fPlayerService.findOnlineFPlayers()
                         .stream()
                         .map(FEntity::getUuid)
                         .collect(Collectors.toSet());

@@ -4,17 +4,16 @@ import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerDisconnect;
 import com.google.gson.Gson;
 import lombok.Getter;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.*;
 import net.kyori.adventure.text.Component;
 
@@ -25,36 +24,33 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
     @Getter private final Command.Ban command;
     @Getter private final Permission.Command.Ban permission;
 
-    private final FPlayerDAO fPlayerDAO;
-    private final ModerationDAO moderationDAO;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
+    private final ModerationService moderationService;
+    private final ModerationUtil moderationUtil;
     private final PermissionUtil permissionUtil;
     private final CommandUtil commandUtil;
     private final ComponentUtil componentUtil;
     private final PacketEventsUtil packetEventsUtil;
-    private final ModerationUtil moderationUtil;
     private final Gson gson;
 
-    public BanModule(FPlayerDAO fPlayerDAO,
-                     ModerationDAO moderationDAO,
-                     FileManager fileManager,
-                     FPlayerManager fPlayerManager,
+    public BanModule(FileManager fileManager,
+                     FPlayerService fPlayerService,
+                     ModerationService moderationService,
+                     ModerationUtil moderationUtil,
                      PermissionUtil permissionUtil,
                      CommandUtil commandUtil,
                      ComponentUtil componentUtil,
                      PacketEventsUtil packetEventsUtil,
-                     ModerationUtil moderationUtil,
                      Gson gson) {
         super(localization -> localization.getCommand().getBan(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.BAN));
 
-        this.fPlayerDAO = fPlayerDAO;
-        this.moderationDAO = moderationDAO;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
+        this.moderationService = moderationService;
+        this.moderationUtil = moderationUtil;
         this.permissionUtil = permissionUtil;
         this.commandUtil = commandUtil;
         this.componentUtil = componentUtil;
         this.packetEventsUtil = packetEventsUtil;
-        this.moderationUtil = moderationUtil;
         this.gson = gson;
 
         command = fileManager.getCommand().getBan();
@@ -101,7 +97,7 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
     public void ban(FPlayer fPlayer, String target, long time, String reason) {
         if (checkModulePredicates(fPlayer)) return;
 
-        FPlayer fTarget = fPlayerDAO.getFPlayer(target);
+        FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
             builder(fPlayer)
                     .format(Localization.Command.Ban::getNullPlayer)
@@ -111,7 +107,7 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
 
         long databaseTime = time != -1 ? time + System.currentTimeMillis() : -1;
 
-        Moderation ban = moderationDAO.insert(fTarget, databaseTime, reason, fPlayer.getId(), Moderation.Type.BAN);
+        Moderation ban = moderationService.ban(fTarget, databaseTime, reason, fPlayer.getId());
         if (ban == null) return;
 
         kick(fPlayer, fTarget, ban);
@@ -147,21 +143,21 @@ public abstract class BanModule extends AbstractModuleCommand<Localization.Comma
         String formatPlayer = localization.getPerson();
         formatPlayer = moderationUtil.replacePlaceholders(formatPlayer, fTarget, ban);
 
-        fPlayerManager.kick(fTarget, componentUtil.builder(fModerator, fTarget, formatPlayer).build());
+        fPlayerService.kick(fTarget, componentUtil.builder(fModerator, fTarget, formatPlayer).build());
     }
 
     public boolean isKicked(UserProfile userProfile) {
         if (!isEnable()) return false;
 
-        FPlayer fPlayer = fPlayerDAO.getFPlayer(userProfile.getUUID());
+        FPlayer fPlayer = fPlayerService.getFPlayer(userProfile.getUUID());
 
-        for (Moderation ban : moderationDAO.getValid(fPlayer, Moderation.Type.BAN)) {
-            FPlayer fModerator = fPlayerDAO.getFPlayer(ban.getModerator());
+        for (Moderation ban : moderationService.getValid(fPlayer, Moderation.Type.BAN)) {
+            FPlayer fModerator = fPlayerService.getFPlayer(ban.getModerator());
 
             Localization.Command.Ban localization = resolveLocalization();
 
             String formatPlayer = localization.getPerson();
-            formatPlayer =  moderationUtil.replacePlaceholders(formatPlayer, fPlayer, ban);
+            formatPlayer = moderationUtil.replacePlaceholders(formatPlayer, fPlayer, ban);
 
             Component reason = componentUtil.builder(fModerator, fPlayer, formatPlayer).build();
             packetEventsUtil.sendPacket(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));

@@ -2,17 +2,17 @@ package net.flectone.pulse.module.message.format.world;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.database.dao.SettingDAO;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.world.listener.WorldPacketListener;
 import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -24,17 +24,17 @@ public class WorldModule extends AbstractModule {
     private final Message.Format.World message;
     private final Permission.Message.Format.World permission;
 
-    private final SettingDAO settingDAO;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public WorldModule(FileManager fileManager,
-                       SettingDAO settingDAO,
-                       FPlayerManager fPlayerManager,
+                       FPlayerService fPlayerService,
+                       PlatformPlayerAdapter platformPlayerAdapter,
                        ListenerRegistry listenerRegistry) {
-        this.settingDAO = settingDAO;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
+        this.platformPlayerAdapter = platformPlayerAdapter;
         this.listenerRegistry = listenerRegistry;
 
         message = fileManager.getMessage().getFormat().getWorld();
@@ -58,15 +58,14 @@ public class WorldModule extends AbstractModule {
         if (checkModulePredicates(fPlayer)) return;
 
         String newWorldPrefix = message.getMode() == WorldMode.TYPE
-                ? message.getValues().get(fPlayerManager.getWorldEnvironment(fPlayer))
-                : message.getValues().get(fPlayerManager.getWorldName(fPlayer));
+                ? message.getValues().get(platformPlayerAdapter.getWorldEnvironment(fPlayer))
+                : message.getValues().get(platformPlayerAdapter.getWorldName(fPlayer));
 
         String fPlayerWorldPrefix = fPlayer.getSettingValue(FPlayer.Setting.WORLD_PREFIX);
         if (newWorldPrefix == null && fPlayerWorldPrefix == null) return;
         if (newWorldPrefix != null && newWorldPrefix.equalsIgnoreCase(fPlayerWorldPrefix)) return;
 
-        fPlayer.setSetting(FPlayer.Setting.WORLD_PREFIX, newWorldPrefix);
-        settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.WORLD_PREFIX);
+        fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.WORLD_PREFIX, newWorldPrefix);
     }
 
     public TagResolver worldTag(@NotNull FEntity sender) {

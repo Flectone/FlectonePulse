@@ -5,14 +5,12 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.connector.ProxyConnector;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.IgnoreDAO;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
@@ -29,25 +27,19 @@ public abstract class TellModule extends AbstractModuleCommand<Localization.Comm
     @Getter private final Command.Tell command;
     @Getter private final Permission.Command.Tell permission;
 
-    private final FPlayerDAO fPlayerDAO;
-    private final IgnoreDAO ignoreDAO;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final ProxyConnector proxyConnector;
     private final IntegrationModule integrationModule;
     private final CommandUtil commandUtil;
 
     public TellModule(FileManager fileManager,
-                      FPlayerDAO fPlayerDAO,
-                      IgnoreDAO ignoreDAO,
-                      FPlayerManager fPlayerManager,
+                      FPlayerService fPlayerService,
                       ProxyConnector proxyConnector,
                       IntegrationModule integrationModule,
                       CommandUtil commandUtil) {
         super(localization -> localization.getCommand().getTell(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELL));
 
-        this.fPlayerDAO = fPlayerDAO;
-        this.ignoreDAO = ignoreDAO;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.proxyConnector = proxyConnector;
         this.integrationModule = integrationModule;
         this.commandUtil = commandUtil;
@@ -80,7 +72,7 @@ public abstract class TellModule extends AbstractModuleCommand<Localization.Comm
             return;
         }
 
-        FPlayer fReceiver = fPlayerDAO.getFPlayer(playerName);
+        FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
         if (fReceiver.isUnknown() || !fReceiver.isOnline()) {
             builder(fPlayer)
                     .format(Localization.Command.Tell::getNullPlayer)
@@ -88,7 +80,7 @@ public abstract class TellModule extends AbstractModuleCommand<Localization.Comm
             return;
         }
 
-        ignoreDAO.load(fReceiver);
+        fPlayerService.loadIgnores(fPlayer);
 
         if (checkIgnore(fPlayer, fReceiver)) return;
         if (checkDisable(fPlayer, fReceiver, DisableAction.HE)) return;
@@ -104,7 +96,7 @@ public abstract class TellModule extends AbstractModuleCommand<Localization.Comm
 
         if (isSent) return;
 
-        FPlayer fNewReceiver = fPlayerManager.get(fReceiver.getUuid());
+        FPlayer fNewReceiver = fPlayerService.getFPlayer(fReceiver.getUuid());
         if (integrationModule.isVanished(fNewReceiver)) {
             builder(fPlayer)
                     .format(Localization.Command.Tell::getNullPlayer)

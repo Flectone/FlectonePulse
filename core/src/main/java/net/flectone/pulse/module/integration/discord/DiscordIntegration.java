@@ -19,17 +19,17 @@ import discord4j.rest.util.MultipartRequest;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.discord.listener.MessageCreateListener;
+import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.SystemUtil;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import java.awt.*;
@@ -48,7 +48,7 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
 
     private final FileManager fileManager;
     private final TaskScheduler taskScheduler;
-    private final FPlayerManager fPlayerManager;
+    private final SkinService skinService;
     private final MessageCreateListener messageCreateListener;
     private final ComponentUtil componentUtil;
     private final SystemUtil systemUtil;
@@ -61,14 +61,14 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
     @Inject
     public DiscordIntegration(FileManager fileManager,
                               TaskScheduler taskScheduler,
-                              FPlayerManager fPlayerManager,
+                              SkinService skinService,
                               ComponentUtil componentUtil,
                               SystemUtil systemUtil,
                               MessageCreateListener messageCreateListener,
                               FLogger fLogger) {
         this.fileManager = fileManager;
         this.taskScheduler = taskScheduler;
-        this.fPlayerManager = fPlayerManager;
+        this.skinService = skinService;
         this.componentUtil = componentUtil;
         this.systemUtil = systemUtil;
         this.messageCreateListener = messageCreateListener;
@@ -86,7 +86,7 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
         Localization.Integration.Discord.ChannelEmbed messageChannelEmbed = localization.getMessageChannel().get(messageTag);
         if (messageChannelEmbed == null) return;
 
-        String skin = fPlayerManager.getSkin(sender);
+        String skin = skinService.getSkin(sender);
         UnaryOperator<String> replaceString = s -> discordString.apply(s)
                 .replace("<skin>", skin);
 

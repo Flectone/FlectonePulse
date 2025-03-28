@@ -3,10 +3,10 @@ package net.flectone.pulse.module.message.mark.manager;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.mark.model.FMark;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.RandomUtil;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.megavex.scoreboardlibrary.api.team.ScoreboardTeam;
@@ -31,17 +31,17 @@ public class MarkManager {
 
     private final TeamManager teamManager;
     private final TaskScheduler taskScheduler;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final RandomUtil randomUtil;
 
     @Inject
     public MarkManager(TeamManager teamManager,
                        TaskScheduler taskScheduler,
-                       FPlayerManager fPlayerManager,
+                       FPlayerService fPlayerManager,
                        RandomUtil randomUtil) {
         this.teamManager = teamManager;
         this.taskScheduler = taskScheduler;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerManager;
         this.randomUtil = randomUtil;
     }
 
@@ -49,7 +49,7 @@ public class MarkManager {
         Location location = getRayTracedLocation(fPlayer, fMark.getRange());
         if (location == null) return false;
 
-        fMark.create(fPlayerManager, location, randomUtil);
+        fMark.create(fPlayerService, location, randomUtil);
 
         ScoreboardTeam scoreboardTeam = teamManager.createIfAbsent(color.toString());
         TeamDisplay teamDisplay = scoreboardTeam.defaultDisplay();

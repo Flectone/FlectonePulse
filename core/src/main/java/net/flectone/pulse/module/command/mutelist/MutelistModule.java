@@ -1,8 +1,6 @@
 package net.flectone.pulse.module.command.mutelist;
 
 import lombok.Getter;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
@@ -12,6 +10,8 @@ import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unmute.UnmuteModule;
 import net.flectone.pulse.platform.MessageSender;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.ModerationUtil;
@@ -25,30 +25,30 @@ public abstract class MutelistModule extends AbstractModuleCommand<Localization.
     @Getter private final Command.Mutelist command;
     @Getter private final Permission.Command.Mutelist permission;
 
-    private final FPlayerDAO fPlayerDAO;
-    private final ModerationDAO moderationDAO;
+    private final FPlayerService fPlayerService;
+    private final ModerationService moderationService;
+    private final ModerationUtil moderationUtil;
     private final UnmuteModule unmuteModule;
     private final ComponentUtil componentUtil;
     private final CommandUtil commandUtil;
-    private final ModerationUtil moderationUtil;
     private final MessageSender messageSender;
 
     public MutelistModule(FileManager fileManager,
-                          FPlayerDAO fPlayerDAO,
-                          ModerationDAO moderationDAO,
+                          FPlayerService fPlayerService,
+                          ModerationService moderationService,
+                          ModerationUtil moderationUtil,
                           UnmuteModule unmuteModule,
                           ComponentUtil componentUtil,
                           CommandUtil commandUtil,
-                          ModerationUtil moderationUtil,
                           MessageSender messageSender) {
         super(localization -> localization.getCommand().getMutelist(), null);
 
-        this.fPlayerDAO = fPlayerDAO;
-        this.moderationDAO = moderationDAO;
+        this.fPlayerService = fPlayerService;
+        this.moderationService = moderationService;
+        this.moderationUtil = moderationUtil;
         this.unmuteModule = unmuteModule;
         this.componentUtil = componentUtil;
         this.commandUtil = commandUtil;
-        this.moderationUtil = moderationUtil;
         this.messageSender = messageSender;
 
         command = fileManager.getCommand().getMutelist();
@@ -73,7 +73,7 @@ public abstract class MutelistModule extends AbstractModuleCommand<Localization.
         FPlayer targetFPlayer = null;
 
         if (optionalObject.isPresent() && optionalObject.get() instanceof String playerName) {
-            targetFPlayer = fPlayerDAO.getFPlayer(playerName);
+            targetFPlayer = fPlayerService.getFPlayer(playerName);
 
             if (targetFPlayer.isUnknown()) {
                 builder(fPlayer)
@@ -94,8 +94,8 @@ public abstract class MutelistModule extends AbstractModuleCommand<Localization.
         }
 
         List<Moderation> moderationList = targetFPlayer == null
-                ? moderationDAO.getValid(Moderation.Type.MUTE)
-                : moderationDAO.get(targetFPlayer, Moderation.Type.MUTE);
+                ? moderationService.getValid(Moderation.Type.MUTE)
+                : moderationService.getValid(targetFPlayer, Moderation.Type.MUTE);
 
         if (moderationList.isEmpty()) {
             builder(fPlayer)
@@ -127,7 +127,7 @@ public abstract class MutelistModule extends AbstractModuleCommand<Localization.
 
         for (Moderation moderation : finalModerationList) {
 
-            FPlayer fTarget = fPlayerDAO.getFPlayer(moderation.getPlayer());
+            FPlayer fTarget = fPlayerService.getFPlayer(moderation.getPlayer());
 
             String line = localizationType.getLine().replace("<command>", "/" + unmuteModule.getName(unmuteModule.getCommand()) + " <player> <id>");
             line = moderationUtil.replacePlaceholders(line, fPlayer, moderation);

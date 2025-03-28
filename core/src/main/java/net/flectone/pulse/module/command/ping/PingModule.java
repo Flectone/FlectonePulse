@@ -4,11 +4,11 @@ import lombok.Getter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.CommandUtil;
 
 import java.util.Optional;
@@ -18,17 +18,17 @@ public abstract class PingModule extends AbstractModuleCommand<Localization.Comm
     @Getter private final Command.Ping command;
     @Getter private final Permission.Command.Ping permission;
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final CommandUtil commandUtil;
     private final IntegrationModule integrationModule;
 
     public PingModule(FileManager fileManager,
-                      FPlayerManager fPlayerManager,
+                      FPlayerService fPlayerService,
                       CommandUtil commandUtil,
                       IntegrationModule integrationModule) {
         super(localization -> localization.getCommand().getPing(), null);
 
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.commandUtil = commandUtil;
         this.integrationModule = integrationModule;
 
@@ -44,7 +44,7 @@ public abstract class PingModule extends AbstractModuleCommand<Localization.Comm
 
         Optional<Object> target = commandUtil.getOptional(0, arguments);
 
-        FPlayer fTarget = target.map(object -> fPlayerManager.getOnline(String.valueOf(object))).orElse(fPlayer);
+        FPlayer fTarget = target.map(object -> fPlayerService.getFPlayer(String.valueOf(object))).orElse(fPlayer);
         if (fTarget.isUnknown() || (!fPlayer.equals(fTarget) && integrationModule.isVanished(fTarget))) {
             builder(fPlayer)
                     .format(Localization.Command.Ping::getNullPlayer)

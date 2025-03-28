@@ -5,10 +5,10 @@ import lombok.Getter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.CommandUtil;
 
 import java.util.Collection;
@@ -19,16 +19,16 @@ public abstract class ClearchatModule extends AbstractModuleCommand<Localization
     @Getter private final Command.Clearchat command;
     @Getter private final Permission.Command.Clearchat permission;
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final CommandUtil commandUtil;
 
     @Inject
-    public ClearchatModule(FPlayerManager fPlayerManager,
+    public ClearchatModule(FPlayerService fPlayerService,
                            FileManager fileManager,
                            CommandUtil commandUtil) {
         super(localization -> localization.getCommand().getClearchat(), null);
 
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.commandUtil = commandUtil;
 
         command = fileManager.getCommand().getClearchat();
@@ -44,13 +44,13 @@ public abstract class ClearchatModule extends AbstractModuleCommand<Localization
         Optional<Object> object = commandUtil.getOptional(0, arguments);
 
         if (object.isPresent() && object.get() instanceof Collection<?> collection) {
-            collection.forEach(player -> clearChat(fPlayerManager.get(player)));
+            collection.forEach(player -> clearChat(fPlayerService.getFPlayer(player)));
             return;
         }
 
         String string = object.map(o -> (String) o).orElse("");
 
-        FPlayer fReceiver = fPlayerManager.getOnline(string);
+        FPlayer fReceiver = fPlayerService.getFPlayer(string);
         if (fReceiver.isUnknown()) {
             builder(fPlayer)
                     .format(Localization.Command.Clearchat::getNullPlayer)

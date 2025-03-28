@@ -11,8 +11,6 @@ import lombok.Setter;
 import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.database.Database;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.Module;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
@@ -24,6 +22,7 @@ import net.flectone.pulse.platform.BukkitLibraryResolver;
 import net.flectone.pulse.platform.LibraryResolver;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MetricsUtil;
 import net.flectone.pulse.util.logging.FLogger;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
@@ -104,7 +103,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
             return;
         }
 
-        injector.getInstance(FPlayerManager.class).reload();
+        injector.getInstance(FPlayerService.class).reload();
         injector.getInstance(ProxyConnector.class).reload();
 
         if (fileManager.getConfig().isMetrics()) {
@@ -124,12 +123,14 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         injector.getInstance(InventoryController.class).closeAll();
 
-        FPlayerDAO fPlayerDAO = injector.getInstance(FPlayerDAO.class);
+        FPlayerService fPlayerService = injector.getInstance(FPlayerService.class);
 
-        injector.getInstance(FPlayerManager.class).getFPlayers().forEach(fPlayer -> {
+        fPlayerService.getFPlayers().forEach(fPlayer -> {
             fPlayer.setOnline(false);
-            fPlayerDAO.save(fPlayer);
+            fPlayerService.saveOrUpdateFPlayer(fPlayer);
         });
+
+        fPlayerService.clear();
 
         injector.getInstance(ScoreboardLibrary.class).close();
         injector.getInstance(Database.class).disconnect();
@@ -185,7 +186,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         }
 
         injector.getInstance(ProxyConnector.class).reload();
-        injector.getInstance(FPlayerManager.class).reload();
+        injector.getInstance(FPlayerService.class).reload();
         injector.getInstance(Module.class).reloadWithChildren();
 
         fLogger.logReloaded();

@@ -10,7 +10,6 @@ import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FEntity;
@@ -20,6 +19,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.death.listener.DeathPacketListener;
 import net.flectone.pulse.module.message.death.model.Death;
 import net.flectone.pulse.module.message.death.model.Item;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.PacketEventsUtil;
@@ -37,7 +37,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
 
     private final ComponentUtil componentUtil;
     private final PacketEventsUtil packetEventsUtil;
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
     private final Gson gson;
 
@@ -45,7 +45,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
     public DeathModule(FileManager fileManager,
                        ComponentUtil componentUtil,
                        PacketEventsUtil packetEventsUtil,
-                       FPlayerManager fPlayerManager,
+                       FPlayerService fPlayerService,
                        ListenerRegistry listenerRegistry,
                        IntegrationModule integrationModule,
                        Gson gson) {
@@ -53,7 +53,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
 
         this.componentUtil = componentUtil;
         this.packetEventsUtil = packetEventsUtil;
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
         this.gson = gson;
 
@@ -82,7 +82,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
         FEntity fTarget = convertDeath(death);
         if (fTarget == null) return;
 
-        FPlayer fReceiver = fPlayerManager.get(receiver);
+        FPlayer fReceiver = fPlayerService.getFPlayer(receiver);
 
         if (!death.isPlayer()) {
             builder(fTarget)
@@ -119,7 +119,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
 
     @Sync
     public void sendPersonalDeath(FPlayer fPlayer, Component component) {
-        packetEventsUtil.sendPacket(fPlayer, new WrapperPlayServerDeathCombatEvent(fPlayerManager.getEntityId(fPlayer), null, component));
+        packetEventsUtil.sendPacket(fPlayer, new WrapperPlayServerDeathCombatEvent(fPlayerService.getEntityId(fPlayer), null, component));
     }
 
     private FEntity convertDeath(Death death) {
@@ -127,7 +127,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
             return new FEntity(death.getTargetName(), death.getTargetUUID(), death.getTargetType() == null ? death.getTargetName() : death.getTargetType());
         }
 
-        FPlayer fTarget = fPlayerManager.getOnline(death.getTargetName());
+        FPlayer fTarget = fPlayerService.getFPlayer(death.getTargetName());
         if (fTarget.isUnknown()) return null;
         if (checkModulePredicates(fTarget)) return null;
 

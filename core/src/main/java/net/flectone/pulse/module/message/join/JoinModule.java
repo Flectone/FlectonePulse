@@ -3,11 +3,11 @@ package net.flectone.pulse.module.message.join;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
@@ -23,18 +23,18 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
     private final Permission.Message.Join permission;
 
     private final ListenerRegistry listenerRegistry;
-    private final FPlayerManager fPlayerManager;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final IntegrationModule integrationModule;
 
     @Inject
     public JoinModule(FileManager fileManager,
                       ListenerRegistry listenerRegistry,
-                      FPlayerManager fPlayerManager,
+                      PlatformPlayerAdapter platformPlayerAdapter,
                       IntegrationModule integrationModule) {
         super(localization -> localization.getMessage().getJoin());
 
         this.listenerRegistry = listenerRegistry;
-        this.fPlayerManager = fPlayerManager;
+        this.platformPlayerAdapter = platformPlayerAdapter;
         this.integrationModule =  integrationModule;
 
         message = fileManager.getMessage().getJoin();
@@ -60,7 +60,7 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
         if (checkModulePredicates(fPlayer)) return;
         if (checkVanish && integrationModule.isVanished(fPlayer)) return;
 
-        boolean hasPlayedBefore = fPlayerManager.hasPlayedBefore(fPlayer);
+        boolean hasPlayedBefore = platformPlayerAdapter.hasPlayedBefore(fPlayer);
 
         builder(fPlayer)
                 .tag(MessageTag.JOIN)

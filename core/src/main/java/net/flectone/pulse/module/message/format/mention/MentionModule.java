@@ -5,12 +5,12 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.PermissionUtil;
 import net.kyori.adventure.text.Component;
@@ -28,7 +28,7 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
     private final Message.Format.Mention message;
     private final Permission.Message.Format.Mention permission;
 
-    private final FPlayerManager fPlayerManager;
+    private final FPlayerService fPlayerService;
     private final PermissionUtil permissionUtil;
     private final IntegrationModule integrationModule;
 
@@ -36,12 +36,12 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
 
     @Inject
     public MentionModule(FileManager fileManager,
-                         FPlayerManager fPlayerManager,
+                         FPlayerService fPlayerService,
                          PermissionUtil permissionUtil,
                          IntegrationModule integrationModule) {
         super(localization -> localization.getMessage().getFormat().getMention());
 
-        this.fPlayerManager = fPlayerManager;
+        this.fPlayerService = fPlayerService;
         this.permissionUtil = permissionUtil;
         this.integrationModule = integrationModule;
 
@@ -76,7 +76,7 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
 
             String wordWithoutPrefix = word.replaceFirst(this.message.getTrigger(), "");
 
-            boolean isMention = !fPlayerManager.getOnline(wordWithoutPrefix).isUnknown()
+            boolean isMention = !fPlayerService.getFPlayer(wordWithoutPrefix).isUnknown()
                     || integrationModule.getGroups().contains(wordWithoutPrefix)
                     && permissionUtil.has(sender, permission.getGroup());
 
@@ -112,7 +112,7 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
                 }
 
             } else {
-                FPlayer mentionFPlayer = fPlayerManager.getOnline(mention);
+                FPlayer mentionFPlayer = fPlayerService.getFPlayer(mention);
                 if (mentionFPlayer.equals(receiver) && !permissionUtil.has(mentionFPlayer, permission.getBypass())) {
                     sendMention(processId, mentionFPlayer);
                 }

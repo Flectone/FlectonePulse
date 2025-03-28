@@ -2,17 +2,16 @@ package net.flectone.pulse.module.command.mute;
 
 import com.google.gson.Gson;
 import lombok.Getter;
-import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.ModerationDAO;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FPlayerManager;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.ModerationUtil;
@@ -24,27 +23,24 @@ public abstract class MuteModule extends AbstractModuleCommand<Localization.Comm
     @Getter private final Command.Mute command;
     @Getter private final Permission.Command.Mute permission;
 
-    private final FPlayerDAO fPlayerDAO;
-    private final ModerationDAO moderationDAO;
-    private final FPlayerManager fPlayerManager;
-    private final CommandUtil commandUtil;
+    private final FPlayerService fPlayerService;
+    private final ModerationService moderationService;
     private final ModerationUtil moderationUtil;
+    private final CommandUtil commandUtil;
     private final Gson gson;
 
     public MuteModule(FileManager fileManager,
-                      FPlayerDAO fPlayerDAO,
-                      ModerationDAO moderationDAO,
-                      FPlayerManager fPlayerManager,
-                      CommandUtil commandUtil,
+                      FPlayerService fPlayerService,
+                      ModerationService moderationService,
                       ModerationUtil moderationUtil,
+                      CommandUtil commandUtil,
                       Gson gson) {
         super(localization -> localization.getCommand().getMute(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.MUTE));
 
-        this.fPlayerDAO = fPlayerDAO;
-        this.moderationDAO = moderationDAO;
-        this.fPlayerManager = fPlayerManager;
-        this.commandUtil = commandUtil;
+        this.fPlayerService = fPlayerService;
+        this.moderationService = moderationService;
         this.moderationUtil = moderationUtil;
+        this.commandUtil = commandUtil;
         this.gson = gson;
 
         command = fileManager.getCommand().getMute();
@@ -68,7 +64,7 @@ public abstract class MuteModule extends AbstractModuleCommand<Localization.Comm
         }
 
         String reason =  commandUtil.getString(2, arguments);
-        FPlayer fTarget = fPlayerDAO.getFPlayer(target);
+        FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
             builder(fPlayer)
                     .format(Localization.Command.Mute::getNullPlayer)
@@ -76,15 +72,12 @@ public abstract class MuteModule extends AbstractModuleCommand<Localization.Comm
             return;
         }
 
-        long databaseTime = time != -1 ? time + System.currentTimeMillis() : -1;
+        long databaseTime = time + System.currentTimeMillis();
 
-        Moderation mute = moderationDAO.insert(fTarget, databaseTime, reason, fPlayer.getId(), Moderation.Type.MUTE);
+        Moderation mute = moderationService.mute(fTarget, databaseTime, reason, fPlayer.getId());
         if (mute == null) return;
-
-        FPlayer localFTarget = fPlayerManager.get(fTarget.getUuid());
-
-        if (!localFTarget.isUnknown()) {
-            localFTarget.addMute(mute);
+        if (fTarget.isOnline()) {
+            fTarget.addMute(mute);
         }
 
         builder(fTarget)
