@@ -10,14 +10,13 @@ import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPacketEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.model.FBubble;
-import net.flectone.pulse.util.ColorUtil;
+import net.flectone.pulse.color.ColorConverter;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.RandomUtil;
 import net.kyori.adventure.text.Component;
@@ -45,7 +44,7 @@ public class BukkitBubbleManager implements BubbleManager {
     private final FileManager fileManager;
     private final ComponentUtil componentUtil;
     private final RandomUtil randomUtil;
-    private final ColorUtil colorUtil;
+    private final ColorConverter colorConverter;
     private final IntegrationModule integrationModule;
 
     @Inject
@@ -54,14 +53,14 @@ public class BukkitBubbleManager implements BubbleManager {
                                FileManager fileManager,
                                RandomUtil randomUtil,
                                ComponentUtil componentUtil,
-                               ColorUtil colorUtil,
+                               ColorConverter colorConverter,
                                IntegrationModule integrationModule) {
         this.taskScheduler = taskScheduler;
         this.fPlayerService = fPlayerService;
         this.fileManager = fileManager;
         this.randomUtil = randomUtil;
         this.componentUtil = componentUtil;
-        this.colorUtil = colorUtil;
+        this.colorConverter = colorConverter;
         this.integrationModule = integrationModule;
     }
 
@@ -120,7 +119,7 @@ public class BukkitBubbleManager implements BubbleManager {
         long duration = calculateDuration(message, messageBubble);
 
         boolean hasShadow = modernBubble.isHasShadow();
-        int background = isTextDisplay ? colorUtil.parseHexToArgb(modernBubble.getBackground()) : 0;
+        int background = isTextDisplay ? colorConverter.parseHexToArgb(modernBubble.getBackground()) : 0;
         float scale = modernBubble.getScale();
         float height = modernBubble.getHeight();
 

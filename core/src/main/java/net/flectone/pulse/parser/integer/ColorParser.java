@@ -7,7 +7,7 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.util.ColorUtil;
+import net.flectone.pulse.color.ColorConverter;
 import net.flectone.pulse.util.PermissionUtil;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.context.CommandInput;
@@ -26,17 +26,17 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
     private final Message.Format.Color colorMessage;
     private final Permission.Command.Chatcolor chatcolorPermission;
     private final PermissionUtil permissionUtil;
-    private final ColorUtil colorUtil;
+    private final ColorConverter colorConverter;
     private final StringParser<FPlayer> stringParser;
 
     @Inject
     public ColorParser(FileManager fileManager,
                        PermissionUtil permissionUtil,
-                       ColorUtil colorUtil) {
+                       ColorConverter colorConverter) {
         this.colorMessage = fileManager.getMessage().getFormat().getColor();
         this.chatcolorPermission = fileManager.getPermission().getCommand().getChatcolor();
         this.permissionUtil = permissionUtil;
-        this.colorUtil = colorUtil;
+        this.colorConverter = colorConverter;
         this.stringParser = new StringParser<>(StringParser.StringMode.SINGLE);
     }
 
@@ -72,13 +72,13 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
             suggestions.add("&");
         } else if (current.startsWith("#") && current.length() <= 6 ||
                 (current.startsWith("&") && current.length() == 1)) {
-            colorUtil.getHexSymbolList()
+            colorConverter.getHexSymbolList()
                     .stream()
                     .map(s -> current + s)
                     .forEach(suggestions::add);
         }
 
-        colorUtil.getMinecraftList()
+        colorConverter.getMinecraftList()
                 .stream()
                 .filter(s -> s.startsWith(current))
                 .forEach(suggestions::add);

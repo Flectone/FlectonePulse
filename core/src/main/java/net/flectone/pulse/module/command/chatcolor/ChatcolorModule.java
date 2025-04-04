@@ -12,7 +12,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.ColorUtil;
+import net.flectone.pulse.color.ColorConverter;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.PermissionUtil;
 import org.incendo.cloud.context.CommandContext;
@@ -31,7 +31,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
     private final PermissionUtil permissionUtil;
     private final ProxyConnector proxyConnector;
     private final CommandRegistry commandRegistry;
-    private final ColorUtil colorUtil;
+    private final ColorConverter colorConverter;
 
     @Inject
     public ChatcolorModule(FileManager fileManager,
@@ -39,13 +39,13 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
                            PermissionUtil permissionUtil,
                            ProxyConnector proxyConnector,
                            CommandRegistry commandRegistry,
-                           ColorUtil colorUtil) {
+                           ColorConverter colorConverter) {
         super(localization -> localization.getCommand().getChatcolor(), null);
         this.fPlayerService = fPlayerService;
         this.permissionUtil = permissionUtil;
         this.proxyConnector = proxyConnector;
         this.commandRegistry = commandRegistry;
-        this.colorUtil = colorUtil;
+        this.colorConverter = colorConverter;
 
         color = fileManager.getMessage().getFormat().getColor();
         command = fileManager.getCommand().getChatcolor();
@@ -161,9 +161,9 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
             if (inputColor.startsWith("#") && inputColor.length() == 7) {
                 // all right
             } else if (inputColor.startsWith("&")) {
-                inputColor = colorUtil.getLegacyHexMap().get(inputColor);
+                inputColor = colorConverter.getLegacyHexMap().get(inputColor);
             } else {
-                inputColor = colorUtil.getMinecraftHexMap().get(inputColor);
+                inputColor = colorConverter.getMinecraftHexMap().get(inputColor);
             }
 
             if (inputColor == null) {

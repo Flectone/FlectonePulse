@@ -1,4 +1,4 @@
-package net.flectone.pulse.util;
+package net.flectone.pulse.color;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -11,7 +11,7 @@ import java.util.Map;
 
 @Getter
 @Singleton
-public class ColorUtil {
+public class ColorConverter {
 
     private final int DEFAULT_ARGB = 0x40000000;
 
@@ -42,7 +42,7 @@ public class ColorUtil {
     private final FLogger fLogger;
 
     @Inject
-    public ColorUtil(FLogger fLogger) {
+    public ColorConverter(FLogger fLogger) {
         this.fLogger = fLogger;
 
         minecraftHexMap.put("black", "#000000");
