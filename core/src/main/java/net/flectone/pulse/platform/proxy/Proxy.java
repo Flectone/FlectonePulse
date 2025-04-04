@@ -45,14 +45,14 @@ public class Proxy {
         switch (proxyMessageTag) {
             case COMMAND_ME, COMMAND_BROADCAST, COMMAND_DO, COMMAND_HELPER, COMMAND_CHATCOLOR,
                  COMMAND_STREAM, DEATH, ADVANCEMENT, COMMAND_DICE, COMMAND_UNBAN,
-                 COMMAND_UNMUTE, COMMAND_UNWARN -> output.writeUTF(input.readUTF());
+                 COMMAND_UNMUTE, COMMAND_UNWARN, COMMAND_POLL_CREATE_MESSAGE -> output.writeUTF(input.readUTF());
 
             case COMMAND_BALL, COMMAND_TRY -> {
                 output.writeInt(input.readInt());
                 output.writeUTF(input.readUTF());
             }
 
-            case COMMAND_POLL_CREATE_MESSAGE, FROM_TWITCH_TO_MINECRAFT, FROM_TELEGRAM_TO_MINECRAFT -> {
+            case FROM_TWITCH_TO_MINECRAFT, FROM_TELEGRAM_TO_MINECRAFT -> {
                 output.writeUTF(input.readUTF());
                 output.writeUTF(input.readUTF());
                 output.writeUTF(input.readUTF());
