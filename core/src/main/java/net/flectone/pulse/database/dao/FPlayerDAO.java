@@ -212,9 +212,11 @@ public class FPlayerDAO {
         boolean isOnline = resultSet.getInt("online") == 1;
         UUID uuid = UUID.fromString(resultSet.getString("uuid"));
         String name = resultSet.getString("name");
+        String ip = resultSet.getString("ip");
 
         FPlayer fPlayer = new FPlayer(id, name, uuid);
         fPlayer.setOnline(isOnline);
+        fPlayer.setIp(ip);
 
         if (loadSetting) {
             settingDAO.load(fPlayer);
