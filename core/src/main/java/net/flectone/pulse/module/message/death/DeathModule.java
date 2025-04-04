@@ -125,6 +125,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
     }
 
     private FEntity convertDeath(Death death) {
+        if (death == null) return null;
         if (!death.isPlayer()) {
             return new FEntity(death.getTargetName(), death.getTargetUUID(), death.getTargetType() == null ? death.getTargetName() : death.getTargetType());
         }
