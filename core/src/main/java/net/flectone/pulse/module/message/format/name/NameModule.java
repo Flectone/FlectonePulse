@@ -2,15 +2,15 @@ package net.flectone.pulse.module.message.format.name;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.util.ComponentUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -26,7 +26,7 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
 
     private final IntegrationModule integrationModule;
 
-    @Inject private ComponentUtil componentUtil;
+    @Inject private MessageFormatter messageFormatter;
 
     @Inject
     public NameModule(FileManager fileManager,
@@ -58,7 +58,7 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
             String suffix = integrationModule.getSuffix(fPlayer);
             if (suffix == null || suffix.isEmpty()) return Tag.selfClosingInserting(Component.empty());
 
-            String text = componentUtil.builder(fPlayer, fReceiver, suffix)
+            String text = messageFormatter.builder(fPlayer, fReceiver, suffix)
                     .serialize();
 
 
@@ -75,7 +75,7 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
             String prefix = integrationModule.getPrefix(fPlayer);
             if (prefix == null || prefix.isEmpty()) return Tag.selfClosingInserting(Component.empty());
 
-            String text = componentUtil.builder(fPlayer, fReceiver, prefix)
+            String text = messageFormatter.builder(fPlayer, fReceiver, prefix)
                     .serialize();
 
             return Tag.preProcessParsed(text);
@@ -104,7 +104,7 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
                 }
 
                 String displayName = resolveLocalization(fReceiver).getDisplay();
-                Component name = componentUtil.builder(sender, fReceiver, displayName)
+                Component name = messageFormatter.builder(sender, fReceiver, displayName)
                         .build();
 
                 return Tag.selfClosingInserting(name);

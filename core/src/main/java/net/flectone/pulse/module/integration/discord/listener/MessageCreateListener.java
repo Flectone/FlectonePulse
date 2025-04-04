@@ -7,7 +7,7 @@ import discord4j.core.object.entity.Attachment;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import lombok.Getter;
-import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPlayer;

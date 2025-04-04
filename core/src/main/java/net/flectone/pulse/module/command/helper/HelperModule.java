@@ -3,10 +3,11 @@ package net.flectone.pulse.module.command.helper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.connector.ProxyConnector;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Command;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -14,7 +15,6 @@ import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.PermissionUtil;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
@@ -28,21 +28,21 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
     private final Permission.Command.Helper permission;
 
     private final FPlayerService fPlayerService;
-    private final ProxyConnector proxyConnector;
-    private final PermissionUtil permissionUtil;
+    private final ProxySender proxySender;
+    private final PermissionChecker permissionChecker;
     private final CommandRegistry commandRegistry;
 
     @Inject
     public HelperModule(FileManager fileManager,
                         FPlayerService fPlayerService,
-                        ProxyConnector proxyConnector,
-                        PermissionUtil permissionUtil,
+                        ProxySender proxySender,
+                        PermissionChecker permissionChecker,
                         CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getHelper(), null);
 
         this.fPlayerService = fPlayerService;
-        this.proxyConnector = proxyConnector;
-        this.permissionUtil = permissionUtil;
+        this.proxySender = proxySender;
+        this.permissionChecker = permissionChecker;
         this.commandRegistry = commandRegistry;
 
         command = fileManager.getCommand().getHelper();
@@ -85,8 +85,8 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
 
         List<FPlayer> recipients = fPlayerService.getFPlayers().stream().filter(filter).toList();
         if (recipients.isEmpty()) {
-            boolean nullHelper = !proxyConnector.isEnable() || fPlayerService.findOnlineFPlayers().stream()
-                    .noneMatch(online -> permissionUtil.has(online, permission.getSee()));
+            boolean nullHelper = !proxySender.isEnable() || fPlayerService.findOnlineFPlayers().stream()
+                    .noneMatch(online -> permissionChecker.check(online, permission.getSee()));
 
             if (nullHelper) {
                 builder(fPlayer)
@@ -118,6 +118,6 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
     }
 
     public Predicate<FPlayer> getFilterSee() {
-        return fPlayer -> permissionUtil.has(fPlayer, permission.getSee());
+        return fPlayer -> permissionChecker.check(fPlayer, permission.getSee());
     }
 }

@@ -9,7 +9,7 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.proxy.Proxy;
+import net.flectone.pulse.processor.ProxyMessageProcessor;
 import org.slf4j.Logger;
 
 @Plugin(
@@ -47,7 +47,7 @@ public class FlectonePulseVelocity implements FlectonePulse {
     public void onPluginMessageEvent(PluginMessageEvent event) {
         if (!event.getIdentifier().equals(IDENTIFIER)) return;
 
-        byte[] data = Proxy.create(event.getData());
+        byte[] data = ProxyMessageProcessor.create(event.getData());
         if (data == null) return;
 
         proxyServer.getAllServers().stream()

@@ -4,9 +4,11 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Command;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -30,26 +32,26 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
 
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
-    private final ModerationUtil moderationUtil;
+    private final ModerationMessageFormatter moderationMessageFormatter;
     private final CommandRegistry commandRegistry;
-    private final ComponentUtil componentUtil;
+    private final MessageFormatter messageFormatter;
     private final Gson gson;
 
     @Inject
     public KickModule(FileManager fileManager,
                       FPlayerService fPlayerService,
                       ModerationService moderationService,
-                      ModerationUtil moderationUtil,
+                      ModerationMessageFormatter moderationMessageFormatter,
                       CommandRegistry commandRegistry,
-                      ComponentUtil componentUtil,
+                      MessageFormatter messageFormatter,
                       Gson gson) {
         super(localization -> localization.getCommand().getKick(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.KICK));
 
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
-        this.moderationUtil = moderationUtil;
+        this.moderationMessageFormatter = moderationMessageFormatter;
         this.commandRegistry = commandRegistry;
-        this.componentUtil = componentUtil;
+        this.messageFormatter = messageFormatter;
         this.gson = gson;
 
         command = fileManager.getCommand().getKick();
@@ -116,20 +118,20 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
                     output.writeUTF(gson.toJson(fTarget));
                     output.writeUTF(gson.toJson(kick));
                 })
-                .integration(s -> moderationUtil.replacePlaceholders(s, FPlayer.UNKNOWN, kick))
+                .integration(s -> moderationMessageFormatter.replacePlaceholders(s, FPlayer.UNKNOWN, kick))
                 .sound(getSound())
                 .sendBuilt();
     }
 
     public BiFunction<FPlayer, Localization.Command.Kick, String> buildFormat(Moderation kick) {
-        return (fReceiver, message) -> moderationUtil.replacePlaceholders(message.getServer(), fReceiver, kick);
+        return (fReceiver, message) -> moderationMessageFormatter.replacePlaceholders(message.getServer(), fReceiver, kick);
     }
 
     public void kick(FEntity fModerator, FPlayer fReceiver, Moderation kick) {
         if (checkModulePredicates(fModerator)) return;
 
-        String format = moderationUtil.replacePlaceholders(resolveLocalization(fReceiver).getPerson(), fReceiver, kick);
+        String format = moderationMessageFormatter.replacePlaceholders(resolveLocalization(fReceiver).getPerson(), fReceiver, kick);
 
-        fPlayerService.kick(fReceiver, componentUtil.builder(fReceiver, format).build());
+        fPlayerService.kick(fReceiver, messageFormatter.builder(fReceiver, format).build());
     }
 }

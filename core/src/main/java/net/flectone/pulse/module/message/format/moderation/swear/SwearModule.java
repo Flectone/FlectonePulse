@@ -2,14 +2,14 @@ package net.flectone.pulse.module.message.format.moderation.swear;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.util.ComponentUtil;
-import net.flectone.pulse.util.PermissionUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -29,20 +29,20 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
     private final Message.Format.Moderation.Swear message;
     private final Permission.Message.Format.Moderation.Swear permission;
 
-    private final PermissionUtil permissionUtil;
+    private final PermissionChecker permissionChecker;
     private final FLogger fLogger;
 
-    @Inject private ComponentUtil componentUtil;
+    @Inject private MessageFormatter messageFormatter;
 
     private Pattern combinedPattern;
 
     @Inject
     public SwearModule(FileManager fileManager,
-                       PermissionUtil permissionUtil,
+                       PermissionChecker permissionChecker,
                        FLogger fLogger) {
         super(localization -> localization.getMessage().getFormat().getModeration().getSwear());
 
-        this.permissionUtil = permissionUtil;
+        this.permissionChecker = permissionChecker;
         this.fLogger = fLogger;
 
         message = fileManager.getMessage().getFormat().getModeration().getSwear();
@@ -70,7 +70,7 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
 
     public String replace(FEntity sender, String message) {
         if (checkModulePredicates(sender)) return message;
-        if (permissionUtil.has(sender, permission.getBypass())) return message;
+        if (permissionChecker.check(sender, permission.getBypass())) return message;
         if (combinedPattern == null) return message;
 
         StringBuilder result = new StringBuilder();
@@ -96,9 +96,9 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
 
             String message = resolveLocalization(receiver).getSymbol().repeat(swear.length());
 
-            Component component = componentUtil.builder(sender, receiver, message).build();
+            Component component = messageFormatter.builder(sender, receiver, message).build();
 
-            if (permissionUtil.has(receiver, permission.getSee())) {
+            if (permissionChecker.check(receiver, permission.getSee())) {
                 component = component.hoverEvent(HoverEvent.showText(Component.text(swear)));
             }
 

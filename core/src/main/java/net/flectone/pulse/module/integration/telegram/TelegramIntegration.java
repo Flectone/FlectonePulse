@@ -3,15 +3,15 @@ package net.flectone.pulse.module.integration.telegram;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.Integration;
-import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.configuration.Integration;
+import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.telegram.listener.MessageListener;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.SystemUtil;
+import net.flectone.pulse.resolver.SystemVariableResolver;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethod;
@@ -27,7 +27,7 @@ public class TelegramIntegration implements FIntegration {
     private final Integration.Telegram integration;
 
     private final FileManager fileManager;
-    private final SystemUtil systemUtil;
+    private final SystemVariableResolver systemVariableResolver;
     private final FLogger fLogger;
 
     private TelegramBotsLongPollingApplication botsApplication;
@@ -37,11 +37,11 @@ public class TelegramIntegration implements FIntegration {
 
     @Inject
     public TelegramIntegration(FileManager fileManager,
-                               SystemUtil systemUtil,
+                               SystemVariableResolver systemVariableResolver,
                                FLogger fLogger) {
 
         this.fileManager = fileManager;
-        this.systemUtil = systemUtil;
+        this.systemVariableResolver = systemVariableResolver;
         this.fLogger = fLogger;
 
         integration = fileManager.getIntegration().getTelegram();
@@ -52,7 +52,7 @@ public class TelegramIntegration implements FIntegration {
     public void hook() {
         disconnect();
 
-        String token = systemUtil.substituteEnvVars(integration.getToken());
+        String token = systemVariableResolver.substituteEnvVars(integration.getToken());
         if (token.isEmpty()) return;
 
         try (TelegramBotsLongPollingApplication botsApplication = new TelegramBotsLongPollingApplication()) {

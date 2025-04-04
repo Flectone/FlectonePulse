@@ -3,12 +3,12 @@ package net.flectone.pulse.parser.integer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.color.ColorConverter;
-import net.flectone.pulse.util.PermissionUtil;
+import net.flectone.pulse.converter.ColorConverter;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.context.CommandInput;
 import org.incendo.cloud.parser.ArgumentParseResult;
@@ -25,17 +25,17 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
 
     private final Message.Format.Color colorMessage;
     private final Permission.Command.Chatcolor chatcolorPermission;
-    private final PermissionUtil permissionUtil;
+    private final PermissionChecker permissionChecker;
     private final ColorConverter colorConverter;
     private final StringParser<FPlayer> stringParser;
 
     @Inject
     public ColorParser(FileManager fileManager,
-                       PermissionUtil permissionUtil,
+                       PermissionChecker permissionChecker,
                        ColorConverter colorConverter) {
         this.colorMessage = fileManager.getMessage().getFormat().getColor();
         this.chatcolorPermission = fileManager.getPermission().getCommand().getChatcolor();
-        this.permissionUtil = permissionUtil;
+        this.permissionChecker = permissionChecker;
         this.colorConverter = colorConverter;
         this.stringParser = new StringParser<>(StringParser.StringMode.SINGLE);
     }
@@ -55,7 +55,7 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
         String current = args.length == 0 || currentInput.endsWith(" ") ? "" : args[args.length - 1];
 
         int maxColors = colorMessage.getValues().size();
-        boolean hasOtherPermission = permissionUtil.has(context.sender(), chatcolorPermission.getOther());
+        boolean hasOtherPermission = permissionChecker.check(context.sender(), chatcolorPermission.getOther());
         if (!hasOtherPermission && args.length >= maxColors ||
                 hasOtherPermission && args.length >= maxColors + 1) {
             return Collections.emptyList();

@@ -4,15 +4,19 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.inject.Inject;
 import lombok.Getter;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.formatter.ModerationMessageFormatter;
+import net.flectone.pulse.formatter.TimeFormatter;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.connector.ProxyConnector;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.message.MessageSender;
-import net.flectone.pulse.sound.SoundPlayer;
+import net.flectone.pulse.sender.MessageSender;
+import net.flectone.pulse.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.*;
@@ -33,12 +37,12 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
     @Inject private FPlayerService fPlayerService;
     @Inject private ModerationService moderationService;
     @Inject private PlatformPlayerAdapter platformPlayerAdapter;
-    @Inject private PermissionUtil permissionUtil;
+    @Inject private PermissionChecker permissionChecker;
     @Inject private FileManager fileManager;
-    @Inject private ComponentUtil componentUtil;
-    @Inject private ModerationUtil moderationUtil;
-    @Inject private TimeUtil timeUtil;
-    @Inject private ProxyConnector proxyConnector;
+    @Inject private MessageFormatter messageFormatter;
+    @Inject private ModerationMessageFormatter moderationMessageFormatter;
+    @Inject private TimeFormatter timeFormatter;
+    @Inject private ProxySender proxySender;
     @Inject private IntegrationModule integrationModule;
     @Inject private MessageSender messageSender;
     @Inject private SoundPlayer soundPlayer;
@@ -63,7 +67,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
     }
 
     public void playSound(FPlayer fPlayer) {
-        if (!permissionUtil.has(fPlayer, sound.getPermission())) return;
+        if (!permissionChecker.check(fPlayer, sound.getPermission())) return;
 
         soundPlayer.play(sound, fPlayer);
     }
@@ -99,13 +103,13 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         if (getCooldown() == null) return false;
         if (!getCooldown().isEnable()) return false;
         if (!(entity instanceof FPlayer fPlayer)) return false;
-        if (permissionUtil.has(fPlayer, getCooldown().getPermissionBypass())) return false;
+        if (permissionChecker.check(fPlayer, getCooldown().getPermissionBypass())) return false;
         if (!getCooldown().isCooldown(fPlayer.getUuid())) return false;
 
         long timeLeft = getCooldown().getTimeLeft(fPlayer);
 
         builder(fPlayer)
-                .format(s -> timeUtil.format(fPlayer, timeLeft, getCooldownMessage(fPlayer)))
+                .format(s -> timeFormatter.format(fPlayer, timeLeft, getCooldownMessage(fPlayer)))
                 .sendBuilt();
 
         return true;
@@ -116,7 +120,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         if (!fPlayer.isMuted()) return false;
 
         builder(fPlayer)
-                .format(s -> moderationUtil.buildMuteMessage(fPlayer))
+                .format(s -> moderationMessageFormatter.buildMuteMessage(fPlayer))
                 .sendBuilt();
 
         return true;
@@ -183,14 +187,14 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
                     String worldName = platformPlayerAdapter.getWorldName(fPlayer);
                     if (worldName.isEmpty()) return true;
 
-                    return permissionUtil.has(fReceiver, "flectonepulse.world.name." + worldName);
+                    return permissionChecker.check(fReceiver, "flectonepulse.world.name." + worldName);
                 }
 
                 if (range == Range.WORLD_TYPE) {
                     String worldType = platformPlayerAdapter.getWorldEnvironment(fPlayer);
                     if (worldType.isEmpty()) return true;
 
-                    return permissionUtil.has(fReceiver, "flectonepulse.world.type." + worldType);
+                    return permissionChecker.check(fReceiver, "flectonepulse.world.type." + worldType);
                 }
 
                 return true;
@@ -212,9 +216,9 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         private Consumer<ByteArrayDataOutput> proxyOutput = null;
         private UnaryOperator<String> integrationString = null;
         private BiFunction<FPlayer, M, String> format = null;
-        private UnaryOperator<ComponentUtil.Builder> formatComponentBuilder = null;
+        private UnaryOperator<MessageFormatter.Builder> formatComponentBuilder = null;
         private BiFunction<FPlayer, M, String> message = null;
-        private UnaryOperator<ComponentUtil.Builder> messageComponentBuilder = null;
+        private UnaryOperator<MessageFormatter.Builder> messageComponentBuilder = null;
         private Function<FPlayer, TagResolver[]> tagResolvers = null;
 
         public Builder(FEntity fEntity) {
@@ -307,12 +311,12 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             return this;
         }
 
-        public Builder formatBuilder(UnaryOperator<ComponentUtil.Builder> formatComponentBuilder) {
+        public Builder formatBuilder(UnaryOperator<MessageFormatter.Builder> formatComponentBuilder) {
             this.formatComponentBuilder = formatComponentBuilder;
             return this;
         }
 
-        public Builder messageBuilder(UnaryOperator<ComponentUtil.Builder> messageComponentBuilder) {
+        public Builder messageBuilder(UnaryOperator<MessageFormatter.Builder> messageComponentBuilder) {
             this.messageComponentBuilder = messageComponentBuilder;
             return this;
         }
@@ -363,7 +367,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
                 messageSender.send(fReceiver, component, subcomponent, destination);
 
                 if (sound != null) {
-                    if (!permissionUtil.has(fPlayer, sound.getPermission())) return;
+                    if (!permissionChecker.check(fPlayer, sound.getPermission())) return;
 
                     soundPlayer.play(sound, fReceiver);
                 }
@@ -381,14 +385,14 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         private Component buildSubcomponent(FPlayer fReceiver) {
             return destination.getSubtext().isEmpty()
                     ? Component.empty()
-                    : componentUtil.builder(fPlayer, fReceiver, destination.getSubtext()).build();
+                    : messageFormatter.builder(fPlayer, fReceiver, destination.getSubtext()).build();
         }
 
         private Component buildFormatComponent(FPlayer fReceiver) {
             String format = resolveString(fReceiver, this.format);
             if (format == null) return Component.empty();
 
-            ComponentUtil.Builder formatBuilder = componentUtil
+            MessageFormatter.Builder formatBuilder = messageFormatter
                     .builder(fPlayer, fReceiver, format)
                     .translate(resolveString(fReceiver, this.message), format.contains("message_to_translate"))
                     .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(fReceiver));
@@ -404,7 +408,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             String message = resolveString(fReceiver, this.message);
             if (message == null) return Component.empty();
 
-            ComponentUtil.Builder messageBuilder = componentUtil.builder(fPlayer, fReceiver, message);
+            MessageFormatter.Builder messageBuilder = messageFormatter.builder(fPlayer, fReceiver, message);
 
             if (messageComponentBuilder != null) {
                 messageBuilder = messageComponentBuilder.apply(messageBuilder);
@@ -422,7 +426,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             if (integrationString == null) return;
             if (range != Range.SERVER && range != Range.PROXY) return;
 
-            Component component = componentUtil.builder(fPlayer, FPlayer.UNKNOWN, resolveString(FPlayer.UNKNOWN, format))
+            Component component = messageFormatter.builder(fPlayer, FPlayer.UNKNOWN, resolveString(FPlayer.UNKNOWN, format))
                     .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(FPlayer.UNKNOWN))
                     .build();
 
@@ -430,7 +434,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             if (message != null) {
                 component = component.replaceText(TextReplacementConfig.builder()
                         .match("<message>")
-                        .replacement(componentUtil
+                        .replacement(messageFormatter
                                 .builder(fPlayer, FPlayer.UNKNOWN, message)
                                 .userMessage(true)
                                 .mention(false)
@@ -456,7 +460,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             if (proxyOutput == null) return false;
             if (range != Range.PROXY) return false;
 
-            return proxyConnector.sendMessage(fPlayer, tag, proxyOutput);
+            return proxySender.sendMessage(fPlayer, tag, proxyOutput);
         }
 
         private String resolveString(FPlayer fPlayer, BiFunction<FPlayer, M, String> stringResolver) {

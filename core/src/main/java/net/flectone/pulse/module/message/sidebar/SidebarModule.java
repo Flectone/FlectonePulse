@@ -1,9 +1,9 @@
 package net.flectone.pulse.module.message.sidebar;
 
 import lombok.Getter;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;

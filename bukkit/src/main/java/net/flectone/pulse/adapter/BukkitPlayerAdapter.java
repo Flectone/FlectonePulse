@@ -18,7 +18,7 @@ import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
-import net.flectone.pulse.util.ComponentUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
@@ -207,7 +207,7 @@ public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
     public Component getPlayerListHeader(FPlayer fPlayer) {
         String header = injector.getInstance(HeaderModule.class).getCurrentMessage(fPlayer);
         if (header != null) {
-            return injector.getInstance(ComponentUtil.class).builder(fPlayer, header).build();
+            return injector.getInstance(MessageFormatter.class).builder(fPlayer, header).build();
         }
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
@@ -223,7 +223,7 @@ public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
     public Component getPlayerListFooter(FPlayer fPlayer) {
         String footer = injector.getInstance(FooterModule.class).getCurrentMessage(fPlayer);
         if (footer != null) {
-            return injector.getInstance(ComponentUtil.class).builder(fPlayer, footer).build();
+            return injector.getInstance(MessageFormatter.class).builder(fPlayer, footer).build();
         }
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());

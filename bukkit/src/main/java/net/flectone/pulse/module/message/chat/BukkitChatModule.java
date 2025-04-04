@@ -3,8 +3,9 @@ package net.flectone.pulse.module.message.chat;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.model.FEntity;
@@ -17,9 +18,8 @@ import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.PermissionUtil;
 import net.flectone.pulse.util.Range;
-import net.flectone.pulse.util.TimeUtil;
+import net.flectone.pulse.formatter.TimeFormatter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
@@ -35,11 +35,11 @@ import java.util.stream.Collectors;
 public class BukkitChatModule extends ChatModule {
 
     private final FPlayerService fPlayerService;
-    private final PermissionUtil permissionUtil;
+    private final PermissionChecker permissionChecker;
     private final TaskScheduler taskScheduler;
     private final BukkitListenerRegistry bukkitListenerManager;
     private final IntegrationModule integrationModule;
-    private final TimeUtil timeUtil;
+    private final TimeFormatter timeFormatter;
 
     @Inject private BukkitBubbleModule bubbleModule;
     @Inject private SpyModule spyModule;
@@ -50,16 +50,16 @@ public class BukkitChatModule extends ChatModule {
                             TaskScheduler taskScheduler,
                             BukkitListenerRegistry bukkitListenerManager,
                             IntegrationModule integrationModule,
-                            PermissionUtil permissionUtil,
-                            TimeUtil timeUtil) {
+                            PermissionChecker permissionChecker,
+                            TimeFormatter timeFormatter) {
         super(fileManager);
 
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.bukkitListenerManager = bukkitListenerManager;
         this.integrationModule = integrationModule;
-        this.permissionUtil = permissionUtil;
-        this.timeUtil = timeUtil;
+        this.permissionChecker = permissionChecker;
+        this.timeFormatter = timeFormatter;
     }
 
     @Override
@@ -104,12 +104,12 @@ public class BukkitChatModule extends ChatModule {
             Cooldown cooldown = cooldownMap.get(chatName);
             if (cooldown != null
                     && cooldown.isEnable()
-                    && !permissionUtil.has(fPlayer, cooldown.getPermissionBypass())
+                    && !permissionChecker.check(fPlayer, cooldown.getPermissionBypass())
                     && cooldown.isCooldown(fPlayer.getUuid())) {
                 long timeLeft = cooldownMap.get(chatName).getTimeLeft(fPlayer);
 
                 builder(fPlayer)
-                        .format(timeUtil.format(fPlayer, timeLeft, getCooldownMessage(fPlayer)))
+                        .format(timeFormatter.format(fPlayer, timeLeft, getCooldownMessage(fPlayer)))
                         .sendBuilt();
                 event.getRecipients().clear();
                 event.setCancelled(true);
@@ -126,7 +126,7 @@ public class BukkitChatModule extends ChatModule {
         Player sender = Bukkit.getPlayer(fPlayer.getUuid());
         if (sender == null) return;
 
-        Predicate<FPlayer> chatPermissionFilter = fReceiver -> permissionUtil.has(fReceiver, permission.getTypes().get(chatName));
+        Predicate<FPlayer> chatPermissionFilter = fReceiver -> permissionChecker.check(fReceiver, permission.getTypes().get(chatName));
 
         int chatRange = playerChat.getRange();
 
@@ -202,7 +202,7 @@ public class BukkitChatModule extends ChatModule {
         Message.Chat.Type playerChat = optionalChat.get().getValue();
 
         Predicate<FPlayer> filter = rangeFilter(fPlayer, playerChat.getRange()).and(fReceiver -> {
-            if (!permissionUtil.has(fReceiver, permission.getTypes().get(playerChatName))) return false;
+            if (!permissionChecker.check(fReceiver, permission.getTypes().get(playerChatName))) return false;
 
             return Bukkit.getPlayer(fReceiver.getUuid()) != null;
         });

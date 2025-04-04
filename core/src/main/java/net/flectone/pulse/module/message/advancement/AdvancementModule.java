@@ -5,9 +5,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FEntity;
@@ -17,7 +17,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.advancement.listener.AdvancementPacketListener;
 import net.flectone.pulse.module.message.advancement.model.Advancement;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.ComponentUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
 import net.flectone.pulse.util.MessageTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -37,7 +37,7 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
 
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
-    private final ComponentUtil componentUtil;
+    private final MessageFormatter messageFormatter;
     private final Gson gson;
 
     @Inject
@@ -45,13 +45,13 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
                              FPlayerService fPlayerService,
                              ListenerRegistry listenerRegistry,
                              IntegrationModule integrationModule,
-                             ComponentUtil componentUtil,
+                             MessageFormatter messageFormatter,
                              Gson gson) {
         super(localization -> localization.getMessage().getAdvancement());
 
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
-        this.componentUtil = componentUtil;
+        this.messageFormatter = messageFormatter;
         this.gson = gson;
 
         message = fileManager.getMessage().getAdvancement();
@@ -157,7 +157,7 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
                 default -> "";
             };
 
-            Component component = componentUtil.builder(sender, receiver, title
+            Component component = messageFormatter.builder(sender, receiver, title
                             .replace("<title>", advancement.title())
                             .replace("<description>", advancement.description())
                     )

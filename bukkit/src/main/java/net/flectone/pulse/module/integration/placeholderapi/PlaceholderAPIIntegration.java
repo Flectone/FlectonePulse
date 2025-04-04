@@ -5,7 +5,8 @@ import com.google.inject.Singleton;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.config.Message;
+import net.flectone.pulse.adapter.PlatformServerAdapter;
+import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
@@ -13,7 +14,6 @@ import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.util.ServerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -27,18 +27,18 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
 
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
-    private final ServerUtil serverUtil;
+    private final PlatformServerAdapter platformServerAdapter;
     private final FLogger fLogger;
 
     @Inject
     public PlaceholderAPIIntegration(FPlayerService fPlayerService,
                                      TaskScheduler taskScheduler,
                                      FileManager fileManager,
-                                     ServerUtil serverUtil,
+                                     PlatformServerAdapter platformServerAdapter,
                                      FLogger fLogger) {
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
-        this.serverUtil = serverUtil;
+        this.platformServerAdapter = platformServerAdapter;
         this.fLogger = fLogger;
 
         color = fileManager.getMessage().getFormat().getColor();
@@ -93,8 +93,8 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             case "player" -> fPlayer.getName();
             case "ip" -> fPlayer.getIp();
             case "ping" -> String.valueOf(fPlayerService.getPing(fPlayer));
-            case "online" -> String.valueOf(serverUtil.getOnlineCount());
-            case "tps" -> serverUtil.getTPS();
+            case "online" -> String.valueOf(platformServerAdapter.getOnlineCount());
+            case "tps" -> platformServerAdapter.getTPS();
             default -> null;
         };
 

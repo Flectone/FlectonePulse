@@ -2,17 +2,17 @@ package net.flectone.pulse.module.message.format.mention;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.ComponentUtil;
-import net.flectone.pulse.util.PermissionUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -31,20 +31,20 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
     private final Permission.Message.Format.Mention permission;
 
     private final FPlayerService fPlayerService;
-    private final PermissionUtil permissionUtil;
+    private final PermissionChecker permissionChecker;
     private final IntegrationModule integrationModule;
 
-    @Inject private ComponentUtil componentUtil;
+    @Inject private MessageFormatter messageFormatter;
 
     @Inject
     public MentionModule(FileManager fileManager,
                          FPlayerService fPlayerService,
-                         PermissionUtil permissionUtil,
+                         PermissionChecker permissionChecker,
                          IntegrationModule integrationModule) {
         super(localization -> localization.getMessage().getFormat().getMention());
 
         this.fPlayerService = fPlayerService;
-        this.permissionUtil = permissionUtil;
+        this.permissionChecker = permissionChecker;
         this.integrationModule = integrationModule;
 
         message = fileManager.getMessage().getFormat().getMention();
@@ -80,7 +80,7 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
 
             boolean isMention = !fPlayerService.getFPlayer(wordWithoutPrefix).isUnknown()
                     || integrationModule.getGroups().contains(wordWithoutPrefix)
-                    && permissionUtil.has(sender, permission.getGroup());
+                    && permissionChecker.check(sender, permission.getGroup());
 
             if (!isMention) continue;
 
@@ -107,8 +107,8 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
             if (integrationModule.getGroups().contains(mention)) {
                 for (String group : integrationModule.getGroups()) {
                     if (!(receiver instanceof FPlayer mentionFPlayer)) break;
-                    if (permissionUtil.has(mentionFPlayer, permission.getBypass())) break;
-                    if (!permissionUtil.has(receiver, "group." + group)) continue;
+                    if (permissionChecker.check(mentionFPlayer, permission.getBypass())) break;
+                    if (!permissionChecker.check(receiver, "group." + group)) continue;
 
                     sendMention(processId, mentionFPlayer);
                     break;
@@ -116,7 +116,7 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
 
             } else {
                 FPlayer mentionFPlayer = fPlayerService.getFPlayer(mention);
-                if (mentionFPlayer.equals(receiver) && !permissionUtil.has(mentionFPlayer, permission.getBypass())) {
+                if (mentionFPlayer.equals(receiver) && !permissionChecker.check(mentionFPlayer, permission.getBypass())) {
                     sendMention(processId, mentionFPlayer);
                 }
             }
@@ -125,7 +125,7 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
                     .replace("<player>", mention)
                     .replace("<target>", mention);
 
-            return Tag.selfClosingInserting(componentUtil.builder(receiver, format).build());
+            return Tag.selfClosingInserting(messageFormatter.builder(receiver, format).build());
         });
     }
 

@@ -10,7 +10,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.minecraft.server.MinecraftServer;
 
 @Singleton
-public class FabricServerUtil implements ServerUtil {
+public class FabricplatformServerAdapter implements platformServerAdapter {
 
     @Inject
     private MinecraftServer minecraftServer;
@@ -20,7 +20,7 @@ public class FabricServerUtil implements ServerUtil {
     private IntegrationModule integrationModule;
 
     @Inject
-    public FabricServerUtil() {
+    public FabricplatformServerAdapter() {
 
     }
 

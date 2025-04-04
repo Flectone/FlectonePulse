@@ -5,9 +5,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.adapter.PlatformServerAdapter;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Command;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -18,7 +18,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.ModerationUtil;
+import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.util.Pair;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -36,7 +36,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
-    private final ModerationUtil moderationUtil;
+    private final ModerationMessageFormatter moderationMessageFormatter;
     private final CommandRegistry commandRegistry;
     private final PlatformServerAdapter platformServerAdapter;
     private final Gson gson;
@@ -45,7 +45,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
     public WarnModule(FileManager fileManager,
                       FPlayerService fPlayerService,
                       ModerationService moderationService,
-                      ModerationUtil moderationUtil,
+                      ModerationMessageFormatter moderationMessageFormatter,
                       CommandRegistry commandRegistry,
                       PlatformServerAdapter platformServerAdapter,
                       Gson gson) {
@@ -53,7 +53,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
-        this.moderationUtil = moderationUtil;
+        this.moderationMessageFormatter = moderationMessageFormatter;
         this.commandRegistry = commandRegistry;
         this.platformServerAdapter = platformServerAdapter;
         this.gson = gson;
@@ -136,7 +136,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
                     output.writeUTF(gson.toJson(fPlayer));
                     output.writeUTF(gson.toJson(warn));
                 })
-                .integration(s -> moderationUtil.replacePlaceholders(s, FPlayer.UNKNOWN, warn))
+                .integration(s -> moderationMessageFormatter.replacePlaceholders(s, FPlayer.UNKNOWN, warn))
                 .sound(getSound())
                 .sendBuilt();
 
@@ -156,14 +156,14 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
     }
 
     public BiFunction<FPlayer, Localization.Command.Warn, String> buildFormat(Moderation warn) {
-        return (fReceiver, message) -> moderationUtil.replacePlaceholders(message.getServer(), fReceiver, warn);
+        return (fReceiver, message) -> moderationMessageFormatter.replacePlaceholders(message.getServer(), fReceiver, warn);
     }
 
     public void send(FEntity fModerator, FPlayer fReceiver, Moderation warn) {
         if (checkModulePredicates(fModerator)) return;
 
         builder(fReceiver)
-                .format(s -> moderationUtil.replacePlaceholders(s.getPerson(), fReceiver, warn))
+                .format(s -> moderationMessageFormatter.replacePlaceholders(s.getPerson(), fReceiver, warn))
                 .sound(getSound())
                 .sendBuilt();
     }

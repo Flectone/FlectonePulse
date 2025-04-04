@@ -3,14 +3,14 @@ package net.flectone.pulse.module.command.flectonepulse;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.FlectonePulse;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Command;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
-import net.flectone.pulse.util.TimeUtil;
+import net.flectone.pulse.formatter.TimeFormatter;
 import net.flectone.pulse.util.logging.FLogger;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -29,13 +29,13 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     private final FlectonePulse flectonePulse;
     private final FileManager fileManager;
     private final CommandRegistry commandRegistry;
-    private final TimeUtil timeUtil;
+    private final TimeFormatter timeFormatter;
     private final FLogger fLogger;
 
     @Inject
     public FlectonepulseModule(FileManager fileManager,
                                CommandRegistry commandRegistry,
-                               TimeUtil timeUtil,
+                               TimeFormatter timeFormatter,
                                FlectonePulse flectonePulse,
                                FLogger fLogger) {
         super(localization -> localization.getCommand().getFlectonepulse(), null);
@@ -43,7 +43,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
         this.flectonePulse = flectonePulse;
         this.fileManager = fileManager;
         this.commandRegistry = commandRegistry;
-        this.timeUtil = timeUtil;
+        this.timeFormatter = timeFormatter;
         this.fLogger = fLogger;
 
         command = fileManager.getCommand().getFlectonepulse();
@@ -102,7 +102,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
             Instant end = Instant.now();
 
-            String formattedTime = timeUtil.format(fPlayer, Duration.between(start, end).toMillis());
+            String formattedTime = timeFormatter.format(fPlayer, Duration.between(start, end).toMillis());
 
             builder(fPlayer)
                     .destination(command.getDestination())

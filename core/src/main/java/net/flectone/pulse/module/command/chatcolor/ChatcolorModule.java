@@ -2,19 +2,19 @@ package net.flectone.pulse.module.command.chatcolor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.connector.ProxyConnector;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Command;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.color.ColorConverter;
+import net.flectone.pulse.converter.ColorConverter;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.PermissionUtil;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
@@ -28,22 +28,22 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
     private final Permission.Command.Chatcolor permission;
 
     private final FPlayerService fPlayerService;
-    private final PermissionUtil permissionUtil;
-    private final ProxyConnector proxyConnector;
+    private final PermissionChecker permissionChecker;
+    private final ProxySender proxySender;
     private final CommandRegistry commandRegistry;
     private final ColorConverter colorConverter;
 
     @Inject
     public ChatcolorModule(FileManager fileManager,
                            FPlayerService fPlayerService,
-                           PermissionUtil permissionUtil,
-                           ProxyConnector proxyConnector,
+                           PermissionChecker permissionChecker,
+                           ProxySender proxySender,
                            CommandRegistry commandRegistry,
                            ColorConverter colorConverter) {
         super(localization -> localization.getCommand().getChatcolor(), null);
         this.fPlayerService = fPlayerService;
-        this.permissionUtil = permissionUtil;
-        this.proxyConnector = proxyConnector;
+        this.permissionChecker = permissionChecker;
+        this.proxySender = proxySender;
         this.commandRegistry = commandRegistry;
         this.colorConverter = colorConverter;
 
@@ -119,7 +119,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
 
         FPlayer fTarget = fPlayer;
 
-        if (permissionUtil.has(fPlayer, permission.getOther()) && inputColors.length > 1) {
+        if (permissionChecker.check(fPlayer, permission.getOther()) && inputColors.length > 1) {
             String player = inputColors[0];
             if (!player.startsWith("#") && !player.startsWith("&") && !player.equalsIgnoreCase("clear")) {
                 fTarget = fPlayerService.getFPlayer(player);
@@ -132,7 +132,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
                 }
 
                 String[] finalInputColors = inputColors;
-                proxyConnector.sendMessage(fTarget, MessageTag.COMMAND_CHATCOLOR, byteArrayDataOutput ->
+                proxySender.sendMessage(fTarget, MessageTag.COMMAND_CHATCOLOR, byteArrayDataOutput ->
                         byteArrayDataOutput.writeUTF(String.join(" ", finalInputColors))
                 );
 

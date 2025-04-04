@@ -2,12 +2,12 @@ package net.flectone.pulse.module.message.format.emoji;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.util.ComponentUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -23,7 +23,7 @@ public class EmojiModule extends AbstractModule {
     private final Message.Format.Emoji message;
     private final Permission.Message.Format.Emoji permission;
 
-    @Inject private ComponentUtil componentUtil;
+    @Inject private MessageFormatter messageFormatter;
 
     @Inject
     public EmojiModule(FileManager fileManager) {
@@ -55,7 +55,7 @@ public class EmojiModule extends AbstractModule {
 
             if (emojis == null) return Tag.selfClosingInserting(Component.empty());
 
-            Component component = componentUtil.builder(fPlayer, receiver, emojis.getValue())
+            Component component = messageFormatter.builder(fPlayer, receiver, emojis.getValue())
                     .emoji(false)
                     .build();
 

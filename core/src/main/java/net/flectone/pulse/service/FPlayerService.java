@@ -6,16 +6,17 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDi
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.config.Config;
+import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.model.Mail;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.repository.*;
 import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.util.PacketEventsUtil;
+import net.flectone.pulse.sender.PacketSender;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +33,8 @@ public class FPlayerService {
     private final SocialRepository socialRepository;
     private final ModerationService moderationService;
     private final IntegrationModule integrationModule;
-    private final PacketEventsUtil packetEventsUtil;
+    private final PacketSender packetSender;
+    private final PacketProvider packetProvider;
     private final TaskScheduler taskScheduler;
 
     @Inject
@@ -42,7 +44,8 @@ public class FPlayerService {
                           SocialRepository socialRepository,
                           ModerationService moderationService,
                           IntegrationModule integrationModule,
-                          PacketEventsUtil packetEventsUtil,
+                          PacketSender packetSender,
+                          PacketProvider packetProvider,
                           TaskScheduler taskScheduler) {
         this.config = fileManager.getConfig();
         this.platformPlayerAdapter = platformPlayerAdapter;
@@ -50,7 +53,8 @@ public class FPlayerService {
         this.socialRepository = socialRepository;
         this.moderationService = moderationService;
         this.integrationModule = integrationModule;
-        this.packetEventsUtil = packetEventsUtil;
+        this.packetSender = packetSender;
+        this.packetProvider = packetProvider;
         this.taskScheduler = taskScheduler;
     }
 
@@ -111,7 +115,7 @@ public class FPlayerService {
         Object platformPlayer = platformPlayerAdapter.convertToPlatformPlayer(player);
         if (platformPlayer == null) return 0;
 
-        return packetEventsUtil.getPing(platformPlayer);
+        return packetProvider.getPing(platformPlayer);
     }
 
     public String getIp(FPlayer fPlayer) {
@@ -195,7 +199,7 @@ public class FPlayerService {
 
     public void kick(FPlayer fPlayer, Component reason) {
         WrapperPlayServerDisconnect packet = new WrapperPlayServerDisconnect(reason);
-        packetEventsUtil.sendPacket(fPlayer, packet);
+        packetSender.send(fPlayer, packet);
     }
 
     public void loadColors(FPlayer fPlayer) {

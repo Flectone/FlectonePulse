@@ -24,7 +24,7 @@ import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.PacketEventsUtil;
+import net.flectone.pulse.sender.PacketSender;
 
 import java.util.UUID;
 
@@ -33,7 +33,7 @@ public class BasePacketListener extends AbstractPacketListener {
 
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
-    private final PacketEventsUtil packetEventsUtil;
+    private final PacketSender packetSender;
 
     @Inject private QuitModule quitModule;
     @Inject private JoinModule joinModule;
@@ -48,10 +48,10 @@ public class BasePacketListener extends AbstractPacketListener {
     @Inject
     public BasePacketListener(FPlayerService fPlayerService,
                               TaskScheduler taskScheduler,
-                              PacketEventsUtil packetEventsUtil) {
+                              PacketSender packetSender) {
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
-        this.packetEventsUtil = packetEventsUtil;
+        this.packetSender = packetSender;
     }
 
     @Override
@@ -128,7 +128,7 @@ public class BasePacketListener extends AbstractPacketListener {
         if (banModule.isEnable() && banModule.isKicked(userProfile)) return;
         if (maintenanceModule.isEnable() && maintenanceModule.isKicked(userProfile)) return;
 
-        packetEventsUtil.sendPacket(userProfile.getUUID(), new WrapperLoginServerLoginSuccess(userProfile));
+        packetSender.send(userProfile.getUUID(), new WrapperLoginServerLoginSuccess(userProfile));
     }
 
     private String getLocale(FPlayer fPlayer, PacketReceiveEvent event) {

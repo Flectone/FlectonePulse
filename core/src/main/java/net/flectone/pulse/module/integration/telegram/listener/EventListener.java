@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.integration.telegram.listener;
 
-import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 

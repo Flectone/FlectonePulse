@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -20,7 +21,6 @@ import net.flectone.pulse.module.integration.triton.TritonModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.vault.VaultModule;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.ServerUtil;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -39,41 +39,41 @@ public class BukkitIntegrationModule extends IntegrationModule {
     @Inject
     public BukkitIntegrationModule(FileManager fileManager,
                                    FLogger fLogger,
-                                   ServerUtil serverUtil,
+                                   PlatformServerAdapter platformServerAdapter,
                                    Injector injector) {
         super(fileManager, injector);
 
         this.injector = injector;
 
-        if (serverUtil.hasProject("PlaceholderAPI")) {
+        if (platformServerAdapter.hasProject("PlaceholderAPI")) {
             addChildren(PlaceholderAPIModule.class);
         }
 
-        if (serverUtil.hasProject("Vault")) {
+        if (platformServerAdapter.hasProject("Vault")) {
             addChildren(VaultModule.class);
         }
 
-        if (serverUtil.hasProject("InteractiveChat")) {
+        if (platformServerAdapter.hasProject("InteractiveChat")) {
             addChildren(InteractiveChatModule.class);
         }
 
-        if (serverUtil.hasProject("LuckPerms")) {
+        if (platformServerAdapter.hasProject("LuckPerms")) {
             addChildren(LuckPermsModule.class);
         }
 
-        if (serverUtil.hasProject("SuperVanish") || serverUtil.hasProject("PremiumVanish")) {
+        if (platformServerAdapter.hasProject("SuperVanish") || platformServerAdapter.hasProject("PremiumVanish")) {
             addChildren(SuperVanishModule.class);
         }
 
-        if (serverUtil.hasProject("SkinsRestorer")) {
+        if (platformServerAdapter.hasProject("SkinsRestorer")) {
             addChildren(SkinsRestorerModule.class);
         }
 
-        if (serverUtil.hasProject("VoiceChat")) {
+        if (platformServerAdapter.hasProject("VoiceChat")) {
             addChildren(SimpleVoiceModule.class);
         }
 
-        if (serverUtil.hasProject("PlasmoVoice")) {
+        if (platformServerAdapter.hasProject("PlasmoVoice")) {
             try {
                 Class.forName("su.plo.voice.api.server.event.audio.source.ServerSourceCreatedEvent");
 
@@ -83,11 +83,11 @@ public class BukkitIntegrationModule extends IntegrationModule {
             }
         }
 
-        if (serverUtil.hasProject("TAB")) {
+        if (platformServerAdapter.hasProject("TAB")) {
             addChildren(TABModule.class);
         }
 
-        if (serverUtil.hasProject("Triton")) {
+        if (platformServerAdapter.hasProject("Triton")) {
             addChildren(TritonModule.class);
         }
     }

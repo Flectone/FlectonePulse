@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
-import net.flectone.pulse.util.ComponentUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
 import net.flectone.pulse.util.TagType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -20,14 +20,14 @@ import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 @Singleton
 public class BukkitFormatModule extends FormatModule {
 
-    private final ComponentUtil componentUtil;
+    private final MessageFormatter messageFormatter;
 
     @Inject
     public BukkitFormatModule(FileManager fileManager,
-                              ComponentUtil componentUtil) {
+                              MessageFormatter messageFormatter) {
         super(fileManager);
 
-        this.componentUtil = componentUtil;
+        this.messageFormatter = messageFormatter;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class BukkitFormatModule extends FormatModule {
                     .replace("<y>", String.valueOf(location.getBlockY()))
                     .replace("<z>", String.valueOf(location.getBlockZ()));
 
-            Component component = componentUtil.builder(sender, fReceiver, string).build();
+            Component component = messageFormatter.builder(sender, fReceiver, string).build();
 
             return Tag.selfClosingInserting(component);
         });
@@ -78,7 +78,7 @@ public class BukkitFormatModule extends FormatModule {
                     .replace("<food>", player.getFoodLevel() + ".0")
                     .replace("<attack>", String.valueOf(damage != null ? Math.round(damage.getValue() * 10.0)/10.0 : 0.0));
 
-            Component component = componentUtil.builder(sender, fReceiver, string).build();
+            Component component = messageFormatter.builder(sender, fReceiver, string).build();
 
             return Tag.selfClosingInserting(component);
         });

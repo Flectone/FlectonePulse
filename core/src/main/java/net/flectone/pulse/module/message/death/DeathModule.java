@@ -7,9 +7,9 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FEntity;
@@ -20,9 +20,9 @@ import net.flectone.pulse.module.message.death.listener.DeathPacketListener;
 import net.flectone.pulse.module.message.death.model.Death;
 import net.flectone.pulse.module.message.death.model.Item;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.ComponentUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.PacketEventsUtil;
+import net.flectone.pulse.sender.PacketSender;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -37,24 +37,24 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
     @Getter private final Message.Death message;
     private final Permission.Message.Death permission;
 
-    private final ComponentUtil componentUtil;
-    private final PacketEventsUtil packetEventsUtil;
+    private final MessageFormatter messageFormatter;
+    private final PacketSender packetSender;
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
     private final Gson gson;
 
     @Inject
     public DeathModule(FileManager fileManager,
-                       ComponentUtil componentUtil,
-                       PacketEventsUtil packetEventsUtil,
+                       MessageFormatter messageFormatter,
+                       PacketSender packetSender,
                        FPlayerService fPlayerService,
                        ListenerRegistry listenerRegistry,
                        IntegrationModule integrationModule,
                        Gson gson) {
         super(localization -> localization.getMessage().getDeath());
 
-        this.componentUtil = componentUtil;
-        this.packetEventsUtil = packetEventsUtil;
+        this.messageFormatter = messageFormatter;
+        this.packetSender = packetSender;
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
         this.gson = gson;
@@ -112,7 +112,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
 
         if (!death.isPlayer()) return;
 
-        Component component = componentUtil.builder(fTarget, fReceiver, resolveLocalization(fReceiver).getTypes().get(death.getKey()))
+        Component component = messageFormatter.builder(fTarget, fReceiver, resolveLocalization(fReceiver).getTypes().get(death.getKey()))
                 .tagResolvers(killerTag(fReceiver, death.getKiller()), byItemTag(death.getItem()))
                 .build();
 
@@ -121,7 +121,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
 
     @Sync
     public void sendPersonalDeath(FPlayer fPlayer, Component component) {
-        packetEventsUtil.sendPacket(fPlayer, new WrapperPlayServerDeathCombatEvent(fPlayerService.getEntityId(fPlayer), null, component));
+        packetSender.send(fPlayer, new WrapperPlayServerDeathCombatEvent(fPlayerService.getEntityId(fPlayer), null, component));
     }
 
     private FEntity convertDeath(Death death) {
@@ -160,7 +160,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
         if (entity == null) return emptyTagResolver(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) ->
-                Tag.selfClosingInserting(componentUtil.builder(entity, receiver, "<display_name>").build())
+                Tag.selfClosingInserting(messageFormatter.builder(entity, receiver, "<display_name>").build())
         );
     }
 }

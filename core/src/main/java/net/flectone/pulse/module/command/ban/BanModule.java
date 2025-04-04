@@ -6,15 +6,19 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Command;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.sender.PacketSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.*;
@@ -34,10 +38,10 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final CommandRegistry commandRegistry;
-    private final ModerationUtil moderationUtil;
-    private final PermissionUtil permissionUtil;
-    private final ComponentUtil componentUtil;
-    private final PacketEventsUtil packetEventsUtil;
+    private final ModerationMessageFormatter moderationMessageFormatter;
+    private final PermissionChecker permissionChecker;
+    private final MessageFormatter messageFormatter;
+    private final PacketSender packetSender;
     private final Gson gson;
 
     @Inject
@@ -45,20 +49,20 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
                      FPlayerService fPlayerService,
                      ModerationService moderationService,
                      CommandRegistry commandRegistry,
-                     ModerationUtil moderationUtil,
-                     PermissionUtil permissionUtil,
-                     ComponentUtil componentUtil,
-                     PacketEventsUtil packetEventsUtil,
+                     ModerationMessageFormatter moderationMessageFormatter,
+                     PermissionChecker permissionChecker,
+                     MessageFormatter messageFormatter,
+                     PacketSender packetSender,
                      Gson gson) {
         super(localization -> localization.getCommand().getBan(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.BAN));
 
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.commandRegistry = commandRegistry;
-        this.moderationUtil = moderationUtil;
-        this.permissionUtil = permissionUtil;
-        this.componentUtil = componentUtil;
-        this.packetEventsUtil = packetEventsUtil;
+        this.moderationMessageFormatter = moderationMessageFormatter;
+        this.permissionChecker = permissionChecker;
+        this.messageFormatter = messageFormatter;
+        this.packetSender = packetSender;
         this.gson = gson;
 
         command = fileManager.getCommand().getBan();
@@ -146,7 +150,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
                     output.writeUTF(gson.toJson(fPlayer));
                     output.writeUTF(gson.toJson(ban));
                 })
-                .integration(s -> moderationUtil.replacePlaceholders(s, FPlayer.UNKNOWN, ban))
+                .integration(s -> moderationMessageFormatter.replacePlaceholders(s, FPlayer.UNKNOWN, ban))
                 .sound(getSound())
                 .sendBuilt();
     }
@@ -155,7 +159,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         return (fReceiver, message) -> {
             String format = message.getServer();
 
-            return moderationUtil.replacePlaceholders(format, fReceiver, ban);
+            return moderationMessageFormatter.replacePlaceholders(format, fReceiver, ban);
         };
     }
 
@@ -166,9 +170,9 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         Localization.Command.Ban localization = resolveLocalization(fTarget);
 
         String formatPlayer = localization.getPerson();
-        formatPlayer = moderationUtil.replacePlaceholders(formatPlayer, fTarget, ban);
+        formatPlayer = moderationMessageFormatter.replacePlaceholders(formatPlayer, fTarget, ban);
 
-        fPlayerService.kick(fTarget, componentUtil.builder(fModerator, fTarget, formatPlayer).build());
+        fPlayerService.kick(fTarget, messageFormatter.builder(fModerator, fTarget, formatPlayer).build());
     }
 
     public boolean isKicked(UserProfile userProfile) {
@@ -182,18 +186,18 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
             Localization.Command.Ban localization = resolveLocalization();
 
             String formatPlayer = localization.getPerson();
-            formatPlayer = moderationUtil.replacePlaceholders(formatPlayer, fPlayer, ban);
+            formatPlayer = moderationMessageFormatter.replacePlaceholders(formatPlayer, fPlayer, ban);
 
-            Component reason = componentUtil.builder(fModerator, fPlayer, formatPlayer).build();
-            packetEventsUtil.sendPacket(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
+            Component reason = messageFormatter.builder(fModerator, fPlayer, formatPlayer).build();
+            packetSender.send(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
 
             if (command.isShowConnectionAttempts()) {
                 builder(fPlayer)
                         .range(Range.SERVER)
-                        .filter(filter -> permissionUtil.has(filter, getModulePermission()))
+                        .filter(filter -> permissionChecker.check(filter, getModulePermission()))
                         .format((fReceiver, message) -> {
                             String format = message.getConnectionAttempt();
-                            return moderationUtil.replacePlaceholders(format, fReceiver, ban);
+                            return moderationMessageFormatter.replacePlaceholders(format, fReceiver, ban);
                         })
                         .sendBuilt();
             }

@@ -1,7 +1,7 @@
 package net.flectone.pulse;
 
 import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.proxy.Proxy;
+import net.flectone.pulse.processor.ProxyMessageProcessor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -39,7 +39,7 @@ public final class FlectonePulseBungeecord extends Plugin implements Listener, F
     public void onPluginMessageEvent(PluginMessageEvent event) {
         if (!event.getTag().equals(CHANNEL)) return;
 
-        byte[] data = Proxy.create(event.getData());
+        byte[] data = ProxyMessageProcessor.create(event.getData());
         if (data == null) return;
 
         ProxyServer.getInstance().getServers().values().stream()

@@ -2,10 +2,10 @@ package net.flectone.pulse.module.command.rockpaperscissors;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.connector.ProxyConnector;
+import net.flectone.pulse.configuration.Command;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -31,20 +31,20 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     private final Command.Rockpaperscissors command;
     private final Permission.Command.Rockpaperscissors permission;
 
-    private final ProxyConnector proxyConnector;
+    private final ProxySender proxySender;
     private final FPlayerService fPlayerService;
     private final CommandRegistry commandRegistry;
     private final IntegrationModule integrationModule;
 
     @Inject
     public RockpaperscissorsModule(FileManager fileManager,
-                                   ProxyConnector proxyConnector,
+                                   ProxySender proxySender,
                                    FPlayerService fPlayerService,
                                    CommandRegistry commandRegistry,
                                    IntegrationModule integrationModule) {
         super(localization -> localization.getCommand().getRockpaperscissors(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.ROCKPAPERSCISSORS));
 
-        this.proxyConnector = proxyConnector;
+        this.proxySender = proxySender;
         this.fPlayerService = fPlayerService;
         this.commandRegistry = commandRegistry;
         this.integrationModule = integrationModule;
@@ -125,7 +125,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         RockPaperScissors rockPaperScissors = new RockPaperScissors(fPlayer.getUuid(), fReceiver.getUuid());
 
-        proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_CREATE, byteArrayDataOutput -> {
+        proxySender.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_CREATE, byteArrayDataOutput -> {
             byteArrayDataOutput.writeUTF(rockPaperScissors.getId().toString());
             byteArrayDataOutput.writeUTF(rockPaperScissors.getReceiver().toString());
         });
@@ -168,7 +168,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                 return;
             }
 
-            boolean isSent = proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_FINAL, byteArrayDataOutput -> {
+            boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_FINAL, byteArrayDataOutput -> {
                 byteArrayDataOutput.writeUTF(rockPaperScissors.getId().toString());
                 byteArrayDataOutput.writeUTF(move);
             });
@@ -185,7 +185,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                 .format((fResolver, s) -> s.getSender())
                 .sendBuilt();
 
-        boolean isSent = proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_MOVE, byteArrayDataOutput -> {
+        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_MOVE, byteArrayDataOutput -> {
             byteArrayDataOutput.writeUTF(rockPaperScissors.getId().toString());
             byteArrayDataOutput.writeUTF(move);
         });

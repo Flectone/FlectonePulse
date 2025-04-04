@@ -2,8 +2,8 @@ package net.flectone.pulse.module.command;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Command;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.command.afk.AfkModule;

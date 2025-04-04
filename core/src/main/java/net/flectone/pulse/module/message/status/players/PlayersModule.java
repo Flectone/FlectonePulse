@@ -5,17 +5,17 @@ import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServer
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.adapter.PlatformServerAdapter;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.ComponentUtil;
-import net.flectone.pulse.util.PacketEventsUtil;
-import net.flectone.pulse.util.PermissionUtil;
-import net.flectone.pulse.util.ServerUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.sender.PacketSender;
 import net.kyori.adventure.text.Component;
 
 import java.util.List;
@@ -27,25 +27,25 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
     private final Permission.Message.Status.Players permission;
 
     private final FPlayerService fPlayerService;
-    private final PermissionUtil permissionUtil;
-    private final ServerUtil serverUtil;
-    private final ComponentUtil componentUtil;
-    private final PacketEventsUtil packetEventsUtil;
+    private final PermissionChecker permissionChecker;
+    private final PlatformServerAdapter platformServerAdapter;
+    private final MessageFormatter messageFormatter;
+    private final PacketSender packetSender;
 
     @Inject
     public PlayersModule(FileManager fileManager,
                          FPlayerService fPlayerService,
-                         PermissionUtil permissionUtil,
-                         ServerUtil serverUtil,
-                         ComponentUtil componentUtil,
-                         PacketEventsUtil packetEventsUtil) {
+                         PermissionChecker permissionChecker,
+                         PlatformServerAdapter platformServerAdapter,
+                         MessageFormatter messageFormatter,
+                         PacketSender packetSender) {
         super(module -> module.getMessage().getStatus().getPlayers());
 
         this.fPlayerService = fPlayerService;
-        this.permissionUtil = permissionUtil;
-        this.serverUtil = serverUtil;
-        this.componentUtil = componentUtil;
-        this.packetEventsUtil = packetEventsUtil;
+        this.permissionChecker = permissionChecker;
+        this.platformServerAdapter = platformServerAdapter;
+        this.messageFormatter = messageFormatter;
+        this.packetSender = packetSender;
 
         message = fileManager.getMessage().getStatus().getPlayers();
         permission = fileManager.getPermission().getMessage().getStatus().getPlayers();
@@ -64,16 +64,16 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
         FPlayer fPlayer = fPlayerService.getFPlayer(userProfile.getUUID());
 
         if (checkModulePredicates(fPlayer)) return false;
-        if (permissionUtil.has(fPlayer, permission.getBypass())) return false;
+        if (permissionChecker.check(fPlayer, permission.getBypass())) return false;
 
-        int online = serverUtil.getOnlineCount();
+        int online = platformServerAdapter.getOnlineCount();
         if (online < message.getMax()) return false;
 
         String message = resolveLocalization(fPlayer).getFull();
 
-        Component reason = componentUtil.builder(fPlayer, message).build();
+        Component reason = messageFormatter.builder(fPlayer, message).build();
 
-        packetEventsUtil.sendPacket(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
+        packetSender.send(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
         return true;
     }
 

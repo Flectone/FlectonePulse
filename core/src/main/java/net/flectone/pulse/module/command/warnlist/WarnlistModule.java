@@ -2,20 +2,20 @@ package net.flectone.pulse.module.command.warnlist;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Command;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
-import net.flectone.pulse.message.MessageSender;
+import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.ComponentUtil;
-import net.flectone.pulse.util.ModerationUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -31,9 +31,9 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
 
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
-    private final ModerationUtil moderationUtil;
+    private final ModerationMessageFormatter moderationMessageFormatter;
     private final UnwarnModule unwarnModule;
-    private final ComponentUtil componentUtil;
+    private final MessageFormatter messageFormatter;
     private final CommandRegistry commandRegistry;
     private final MessageSender messageSender;
 
@@ -41,18 +41,18 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
     public WarnlistModule(FileManager fileManager,
                           FPlayerService fPlayerService,
                           ModerationService moderationService,
-                          ModerationUtil moderationUtil,
+                          ModerationMessageFormatter moderationMessageFormatter,
                           UnwarnModule unwarnModule,
-                          ComponentUtil componentUtil,
+                          MessageFormatter messageFormatter,
                           CommandRegistry commandRegistry,
                           MessageSender messageSender) {
         super(localization -> localization.getCommand().getWarnlist(), null);
 
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
-        this.moderationUtil = moderationUtil;
+        this.moderationMessageFormatter = moderationMessageFormatter;
         this.unwarnModule = unwarnModule;
-        this.componentUtil = componentUtil;
+        this.messageFormatter = messageFormatter;
         this.messageSender = messageSender;
         this.commandRegistry = commandRegistry;
 
@@ -151,7 +151,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
                 .toList();
 
         String header = localizationType.getHeader().replace("<count>", String.valueOf(size));
-        Component component = componentUtil.builder(fPlayer, header)
+        Component component = messageFormatter.builder(fPlayer, header)
                 .build()
                 .append(Component.newline());
 
@@ -160,10 +160,10 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
             FPlayer fTarget = fPlayerService.getFPlayer(moderation.getPlayer());
 
             String line = localizationType.getLine().replace("<command>", "/" + unwarnModule.getName(unwarnModule.getCommand()) + " <player> <id>");
-            line = moderationUtil.replacePlaceholders(line, fPlayer, moderation);
+            line = moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation);
 
             component = component
-                    .append(componentUtil.builder(fTarget, fPlayer, line).build())
+                    .append(messageFormatter.builder(fTarget, fPlayer, line).build())
                     .append(Component.newline());
         }
 
@@ -174,7 +174,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
                 .replace("<current_page>", String.valueOf(page))
                 .replace("<last_page>", String.valueOf(countPage));
 
-        component = component.append(componentUtil.builder(fPlayer, footer).build());
+        component = component.append(messageFormatter.builder(fPlayer, footer).build());
 
         messageSender.sendMessage(fPlayer, component);
 

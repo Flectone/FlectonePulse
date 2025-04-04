@@ -2,9 +2,10 @@ package net.flectone.pulse.module.message.format.questionanswer;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.scheduler.TaskScheduler;
@@ -13,7 +14,6 @@ import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.util.PermissionUtil;
 import net.flectone.pulse.util.Range;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -42,18 +42,18 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
     private final Permission.Message.Format.QuestionAnswer permission;
 
     private final TaskScheduler taskScheduler;
-    private final PermissionUtil permissionUtil;
+    private final PermissionChecker permissionChecker;
     private final FLogger fLogger;
 
     @Inject
     public QuestionAnswerModule(FileManager fileManager,
                                 TaskScheduler taskScheduler,
-                                PermissionUtil permissionUtil,
+                                PermissionChecker permissionChecker,
                                 FLogger fLogger) {
         super(localization -> localization.getMessage().getFormat().getQuestionAnswer());
 
         this.taskScheduler = taskScheduler;
-        this.permissionUtil = permissionUtil;
+        this.permissionChecker = permissionChecker;
         this.fLogger = fLogger;
 
         message = fileManager.getMessage().getFormat().getQuestionAnswer();
@@ -91,7 +91,7 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
 
         for (Map.Entry<String, Pattern> entry : patternMap.entrySet()) {
             Permission.Message.Format.QuestionAnswer.Question questionPermission = permission.getQuestions().get(entry.getKey());
-            if (questionPermission != null && !permissionUtil.has(sender, questionPermission.getAsk())) continue;
+            if (questionPermission != null && !permissionChecker.check(sender, questionPermission.getAsk())) continue;
 
             Matcher matcher = entry.getValue().matcher(message);
             if (!matcher.find()) continue;

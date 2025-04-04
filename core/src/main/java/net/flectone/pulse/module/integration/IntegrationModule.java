@@ -1,8 +1,8 @@
 package net.flectone.pulse.module.integration;
 
 import com.google.inject.Injector;
-import net.flectone.pulse.config.Integration;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Integration;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;

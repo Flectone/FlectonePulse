@@ -2,14 +2,14 @@ package net.flectone.pulse.module.message.format.image;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.image.model.FImage;
-import net.flectone.pulse.util.ComponentUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -36,7 +36,7 @@ public class ImageModule extends AbstractModule {
 
     private final TaskScheduler taskScheduler;
 
-    @Inject private ComponentUtil componentUtil;
+    @Inject private MessageFormatter messageFormatter;
 
     @Inject
     public ImageModule(FileManager fileManager,
@@ -75,7 +75,7 @@ public class ImageModule extends AbstractModule {
             List<StyleBuilderApplicable> styleBuilderApplicables = new ArrayList<>();
             styleBuilderApplicables.add(HoverEvent.showText(component));
             styleBuilderApplicables.add(ClickEvent.openUrl(link));
-            styleBuilderApplicables.add(componentUtil.builder(sender, receiver, message.getColor())
+            styleBuilderApplicables.add(messageFormatter.builder(sender, receiver, message.getColor())
                     .build()
                     .color()
             );

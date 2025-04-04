@@ -13,9 +13,13 @@ import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.config.Config;
-import net.flectone.pulse.connector.BukkitProxyConnector;
-import net.flectone.pulse.connector.ProxyConnector;
+import net.flectone.pulse.checker.BukkitPermissionChecker;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Config;
+import net.flectone.pulse.formatter.BukkitItemTextFormatter;
+import net.flectone.pulse.formatter.ItemTextFormatter;
+import net.flectone.pulse.sender.BukkitProxySender;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.controller.BukkitInventoryController;
 import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.manager.FileManager;
@@ -51,15 +55,14 @@ import net.flectone.pulse.module.message.sidebar.BukkitSidebarModule;
 import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.sign.BukkitSignModule;
 import net.flectone.pulse.module.message.sign.SignModule;
-import net.flectone.pulse.platform.BukkitMessageSender;
+import net.flectone.pulse.sender.BukkitMessageSender;
+import net.flectone.pulse.registry.*;
 import net.flectone.pulse.resolver.LibraryResolver;
-import net.flectone.pulse.message.MessageSender;
-import net.flectone.pulse.registry.BukkitCommandRegistry;
-import net.flectone.pulse.registry.BukkitListenerRegistry;
-import net.flectone.pulse.registry.CommandRegistry;
-import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.scheduler.BukkitTaskScheduler;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.service.BukkitMetricsService;
+import net.flectone.pulse.service.MetricsService;
 import net.flectone.pulse.util.*;
 import net.flectone.pulse.util.interceptor.AsyncInterceptor;
 import net.flectone.pulse.util.interceptor.SyncInterceptor;
@@ -112,19 +115,24 @@ public class BukkitInjector extends AbstractModule {
 
         bind(FileManager.class).toInstance(fileManager);
 
-        // adapters
+        // adapter
         bind(PlatformPlayerAdapter.class).to(BukkitPlayerAdapter.class);
-        bind(PlatformServerAdapter.class).to(BukkitServerAdapter.class);
+        bind(PlatformServerAdapter.class).to(net.flectone.pulse.adapter.BukkitServerAdapter.class);
+
+        // registry
+        bind(PermissionRegistry.class).to(BukkitPermissionRegistry.class);
+        bind(ListenerRegistry.class).to(BukkitListenerRegistry.class);
+        bind(CommandRegistry.class).to(BukkitCommandRegistry.class);
+
+        // checker
+        bind(PermissionChecker.class).to(BukkitPermissionChecker.class);
 
         bind(TaskScheduler.class).to(BukkitTaskScheduler.class);
 
-        bind(ListenerRegistry.class).to(BukkitListenerRegistry.class);
         bind(InventoryController.class).to(BukkitInventoryController.class);
-        bind(PermissionUtil.class).to(BukkitPermissionUtil.class);
-        bind(ProxyConnector.class).to(BukkitProxyConnector.class);
-        bind(ItemUtil.class).to(BukkitItemUtil.class);
-        bind(ServerUtil.class).to(BukkitServerUtil.class);
-        bind(MetricsUtil.class).to(BukkitMetricsUtil.class);
+        bind(ProxySender.class).to(BukkitProxySender.class);
+        bind(ItemTextFormatter.class).to(BukkitItemTextFormatter.class);
+        bind(MetricsService.class).to(BukkitMetricsService.class);
         bind(FileUtil.class).to(BukkitFileUtil.class);
         bind(BubbleManager.class).to(BukkitBubbleManager.class);
         bind(MessageSender.class).to(BukkitMessageSender.class);
@@ -144,12 +152,11 @@ public class BukkitInjector extends AbstractModule {
         bind(SignModule.class).to(BukkitSignModule.class);
         bind(RightclickModule.class).to(BukkitRightclickModule.class);
 
-        if (!BukkitServerUtil.IS_PAPER) {
+        if (!BukkitServerAdapter.IS_PAPER) {
             bind(JoinModule.class).to(BukkitJoinModule.class);
             bind(QuitModule.class).to(BukkitQuitModule.class);
         }
 
-        bind(CommandRegistry.class).to(BukkitCommandRegistry.class);
         bind(SpyModule.class).to(BukkitSpyModule.class);
 
         bind(LibraryResolver.class).toInstance(libraryResolver);

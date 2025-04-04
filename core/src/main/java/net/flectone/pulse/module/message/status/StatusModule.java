@@ -8,9 +8,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.adapter.PlatformServerAdapter;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
@@ -22,8 +23,7 @@ import net.flectone.pulse.module.message.status.players.PlayersModule;
 import net.flectone.pulse.module.message.status.version.VersionModule;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.ComponentUtil;
-import net.flectone.pulse.util.ServerUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
 
 import java.util.Collection;
 import java.util.List;
@@ -38,8 +38,8 @@ public class StatusModule extends AbstractModule {
     private final IconModule iconModule;
     private final PlayersModule playersModule;
     private final VersionModule versionModule;
-    private final ComponentUtil componentUtil;
-    private final ServerUtil bukkitUtil;
+    private final MessageFormatter messageFormatter;
+    private final PlatformServerAdapter platformServerAdapter;
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
@@ -50,8 +50,8 @@ public class StatusModule extends AbstractModule {
                         IconModule iconModule,
                         PlayersModule playersModule,
                         VersionModule versionModule,
-                        ComponentUtil componentUtil,
-                        ServerUtil bukkitUtil,
+                        MessageFormatter messageFormatter,
+                        PlatformServerAdapter platformServerAdapter,
                         FPlayerService fPlayerService,
                         ListenerRegistry listenerRegistry,
                         IntegrationModule integrationModule) {
@@ -59,8 +59,8 @@ public class StatusModule extends AbstractModule {
         this.iconModule = iconModule;
         this.playersModule = playersModule;
         this.versionModule = versionModule;
-        this.componentUtil = componentUtil;
-        this.bukkitUtil = bukkitUtil;
+        this.messageFormatter = messageFormatter;
+        this.platformServerAdapter = platformServerAdapter;
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
         this.integrationModule = integrationModule;
@@ -129,7 +129,7 @@ public class StatusModule extends AbstractModule {
 
     private JsonElement getDescriptionJson(FPlayer fPlayer) {
         JsonElement jsonElement = MOTDModule.next(fPlayer);
-        jsonElement = jsonElement == null ? bukkitUtil.getMOTD() : jsonElement;
+        jsonElement = jsonElement == null ? platformServerAdapter.getMOTD() : jsonElement;
         return jsonElement;
     }
 
@@ -143,12 +143,12 @@ public class StatusModule extends AbstractModule {
 
         int max = playersModule.isEnable()
                 ? playersModule.getMessage().getMax()
-                : bukkitUtil.getMax();
+                : platformServerAdapter.getMax();
         playersJson.addProperty("max", max);
 
         int online = playersModule.isEnable()
-                ? playersModule.getMessage().getOnline() == -69 ? bukkitUtil.getOnlineCount() : playersModule.getMessage().getOnline()
-                : bukkitUtil.getOnlineCount();
+                ? playersModule.getMessage().getOnline() == -69 ? platformServerAdapter.getOnlineCount() : playersModule.getMessage().getOnline()
+                : platformServerAdapter.getOnlineCount();
         playersJson.addProperty("online", online);
 
         playersJson.add("sample", getSampleJson(fPlayer));
@@ -179,7 +179,7 @@ public class StatusModule extends AbstractModule {
             }
 
             JsonObject playerObject = new JsonObject();
-            playerObject.addProperty("name", componentUtil.builder(fPlayer, sample.getName()).legacySerialize());
+            playerObject.addProperty("name", messageFormatter.builder(fPlayer, sample.getName()).legacySerialize());
             playerObject.addProperty("id", sample.getId() == null ? onlineFPlayers.stream().findAny().orElse(FPlayer.UNKNOWN).getUuid().toString() : sample.getId());
             jsonArray.add(playerObject);
         });

@@ -8,11 +8,11 @@ import com.google.inject.name.Named;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
-import net.flectone.pulse.config.Config;
+import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.util.SystemUtil;
+import net.flectone.pulse.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +35,7 @@ public class Database {
     private final FileManager fileManager;
     private final Path projectPath;
     private final InputStream SQLFile;
-    private final SystemUtil systemUtil;
+    private final SystemVariableResolver systemVariableResolver;
     private final FLogger fLogger;
 
     private HikariDataSource dataSource;
@@ -45,14 +45,14 @@ public class Database {
                     Injector injector,
                     @Named("projectPath") Path projectPath,
                     @Named("SQLFile") InputStream SQLFile,
-                    SystemUtil systemUtil,
+                    SystemVariableResolver systemVariableResolver,
                     FLogger fLogger) {
 
         this.injector = injector;
         this.fileManager = fileManager;
         this.projectPath = projectPath;
         this.SQLFile = SQLFile;
-        this.systemUtil = systemUtil;
+        this.systemVariableResolver = systemVariableResolver;
         this.fLogger = fLogger;
 
         config = fileManager.getConfig().getDatabase();
@@ -113,7 +113,7 @@ public class Database {
                 connectionURL = connectionURL +
                         projectPath.toString() +
                         File.separator +
-                        systemUtil.substituteEnvVars(config.getName()) +
+                        systemVariableResolver.substituteEnvVars(config.getName()) +
                         ".db";
 
                 hikariConfig.setMaximumPoolSize(5);
@@ -128,15 +128,15 @@ public class Database {
             case MYSQL -> {
                 connectionURL = connectionURL +
                         "//" +
-                        systemUtil.substituteEnvVars(config.getHost()) +
+                        systemVariableResolver.substituteEnvVars(config.getHost()) +
                         ":" +
-                        systemUtil.substituteEnvVars(config.getPort()) +
+                        systemVariableResolver.substituteEnvVars(config.getPort()) +
                         "/" +
-                        systemUtil.substituteEnvVars(config.getName()) +
+                        systemVariableResolver.substituteEnvVars(config.getName()) +
                         config.getParameters();
 
-                hikariConfig.setUsername(systemUtil.substituteEnvVars(config.getUser()));
-                hikariConfig.setPassword(systemUtil.substituteEnvVars(config.getPassword()));
+                hikariConfig.setUsername(systemVariableResolver.substituteEnvVars(config.getUser()));
+                hikariConfig.setPassword(systemVariableResolver.substituteEnvVars(config.getPassword()));
                 hikariConfig.setMaximumPoolSize(8);
                 hikariConfig.setMinimumIdle(2);
                 hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
@@ -179,7 +179,7 @@ public class Database {
 
     private void MIGRATION_0_6_0() {
         if (config.getType() == Config.Database.Type.SQLITE) {
-            String databaseName = systemUtil.substituteEnvVars(config.getName()) + ".db";
+            String databaseName = systemVariableResolver.substituteEnvVars(config.getName()) + ".db";
 
             String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss").format(new Date());
             String copiedDatabaseName = databaseName + "_backup_" + timeStamp;

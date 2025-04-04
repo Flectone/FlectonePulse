@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.message.mark;
 
-import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.kyori.adventure.text.format.NamedTextColor;

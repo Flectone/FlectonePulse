@@ -2,13 +2,13 @@ package net.flectone.pulse.module.message.format.spoiler;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.util.ComponentUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -23,7 +23,7 @@ public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Fo
     private final Message.Format.Spoiler message;
     private final Permission.Message.Format.Spoiler permission;
 
-    @Inject private ComponentUtil componentUtil;
+    @Inject private MessageFormatter messageFormatter;
 
     @Inject
     public SpoilerModule(FileManager fileManager) {
@@ -48,7 +48,7 @@ public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Fo
 
             String spoilerText = spoilerTag.value();
 
-            Component spoilerComponent = componentUtil.builder(sender, receiver, spoilerText)
+            Component spoilerComponent = messageFormatter.builder(sender, receiver, spoilerText)
                     .userMessage(userMessage)
                     .build();
 
@@ -57,14 +57,14 @@ public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Fo
             Localization.Message.Format.Spoiler localization = resolveLocalization(receiver);
 
             Component component = Component.text(localization.getSymbol().repeat(length))
-                    .hoverEvent(componentUtil.builder(sender, receiver, localization.getHover())
+                    .hoverEvent(messageFormatter.builder(sender, receiver, localization.getHover())
                             .build()
                             .replaceText(TextReplacementConfig.builder().match("<message>")
                                     .replacement(spoilerComponent)
                                     .build()
                             )
                     )
-                    .color(componentUtil.builder(sender, receiver, message.getColor())
+                    .color(messageFormatter.builder(sender, receiver, message.getColor())
                             .build()
                             .color()
                     );

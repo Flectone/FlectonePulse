@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.message.rightclick;
 
-import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.module.AbstractModuleMessage;
 
 import java.util.function.Function;

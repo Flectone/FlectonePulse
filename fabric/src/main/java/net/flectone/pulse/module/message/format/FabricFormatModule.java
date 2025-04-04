@@ -7,7 +7,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.util.ItemUtil;
 import net.flectone.pulse.util.PermissionUtil;
-import net.flectone.pulse.util.ServerUtil;
+import net.flectone.pulse.util.platformServerAdapter;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 @Singleton
@@ -15,11 +15,11 @@ public class FabricFormatModule extends FormatModule {
 
     @Inject
     public FabricFormatModule(FileManager fileManager,
-                              ServerUtil serverUtil,
+                              platformServerAdapter platformServerAdapter,
                               FPlayerManager fPlayerManager,
                               PermissionUtil permissionUtil,
                               ItemUtil itemUtil) {
-        super(fileManager, serverUtil, fPlayerManager, permissionUtil, itemUtil);
+        super(fileManager, platformServerAdapter, fPlayerManager, permissionUtil, itemUtil);
     }
 
     @Override

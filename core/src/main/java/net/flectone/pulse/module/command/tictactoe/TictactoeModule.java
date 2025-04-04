@@ -3,10 +3,10 @@ package net.flectone.pulse.module.command.tictactoe;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.connector.ProxyConnector;
+import net.flectone.pulse.configuration.Command;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -31,7 +31,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
     private final FPlayerService fPlayerService;
     private final TictactoeManager tictactoeManager;
-    private final ProxyConnector proxyConnector;
+    private final ProxySender proxySender;
     private final IntegrationModule integrationModule;
     private final CommandRegistry commandRegistry;
     private final Gson gson;
@@ -40,7 +40,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
     public TictactoeModule(FileManager fileManager,
                            FPlayerService fPlayerService,
                            TictactoeManager tictactoeManager,
-                           ProxyConnector proxyConnector,
+                           ProxySender proxySender,
                            IntegrationModule integrationModule,
                            CommandRegistry commandRegistry,
                            Gson gson) {
@@ -48,7 +48,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         this.fPlayerService = fPlayerService;
         this.tictactoeManager = tictactoeManager;
-        this.proxyConnector = proxyConnector;
+        this.proxySender = proxySender;
         this.integrationModule = integrationModule;
         this.commandRegistry = commandRegistry;
         this.gson = gson;
@@ -134,7 +134,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 .sound(getSound())
                 .sendBuilt();
 
-        boolean isSent = proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_TICTACTOE_CREATE, byteArrayDataOutput -> {
+        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_TICTACTOE_CREATE, byteArrayDataOutput -> {
             byteArrayDataOutput.writeUTF(gson.toJson(fReceiver));
             byteArrayDataOutput.writeInt(ticTacToe.getId());
             byteArrayDataOutput.writeBoolean(isHard);
@@ -219,7 +219,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 .format(getMoveMessage(ticTacToe, fReceiver, fPlayer, finalTypeTitle, move))
                 .sendBuilt();
 
-        boolean isSent = proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_TICTACTOE_MOVE, byteArrayDataOutput -> {
+        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_TICTACTOE_MOVE, byteArrayDataOutput -> {
             byteArrayDataOutput.writeUTF(gson.toJson(fReceiver));
             byteArrayDataOutput.writeUTF(ticTacToe.toString());
             byteArrayDataOutput.writeInt(finalTypeTitle);

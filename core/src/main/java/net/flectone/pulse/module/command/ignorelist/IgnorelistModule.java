@@ -2,18 +2,18 @@ package net.flectone.pulse.module.command.ignorelist;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Command;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
-import net.flectone.pulse.message.MessageSender;
+import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.ComponentUtil;
-import net.flectone.pulse.util.TimeUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.formatter.TimeFormatter;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -29,24 +29,24 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
 
     private final FPlayerService fPlayerService;
     private final MessageSender messageSender;
-    private final ComponentUtil componentUtil;
+    private final MessageFormatter messageFormatter;
     private final CommandRegistry commandRegistry;
-    private final TimeUtil timeUtil;
+    private final TimeFormatter timeFormatter;
 
     @Inject
     public IgnorelistModule(FileManager fileManager,
                             FPlayerService fPlayerService,
                             MessageSender messageSender,
-                            ComponentUtil componentUtil,
+                            MessageFormatter messageFormatter,
                             CommandRegistry commandRegistry,
-                            TimeUtil timeUtil) {
+                            TimeFormatter timeFormatter) {
         super(localization -> localization.getCommand().getIgnorelist(), null);
 
         this.fPlayerService = fPlayerService;
         this.messageSender = messageSender;
-        this.componentUtil = componentUtil;
+        this.messageFormatter = messageFormatter;
         this.commandRegistry = commandRegistry;
-        this.timeUtil = timeUtil;
+        this.timeFormatter = timeFormatter;
 
         command = fileManager.getCommand().getIgnorelist();
         permission = fileManager.getPermission().getCommand().getIgnorelist();
@@ -112,7 +112,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
                  .limit(perPage)
                  .toList();
         String header = localization.getHeader().replace("<count>", String.valueOf(size));
-        Component component = componentUtil.builder(fPlayer, header)
+        Component component = messageFormatter.builder(fPlayer, header)
                 .build()
                 .append(Component.newline());
 
@@ -121,10 +121,10 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
             FPlayer fTarget = fPlayerService.getFPlayer(ignore.target());
             String line = localization.getLine()
                     .replace("<command>", "/ignore " + fTarget.getName())
-                    .replace("<date>", timeUtil.formatDate(ignore.date()));
+                    .replace("<date>", timeFormatter.formatDate(ignore.date()));
 
             component = component
-                    .append(componentUtil.builder(fTarget, fPlayer, line).build())
+                    .append(messageFormatter.builder(fTarget, fPlayer, line).build())
                     .append(Component.newline());
         }
 
@@ -135,7 +135,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
                 .replace("<current_page>", String.valueOf(page))
                 .replace("<last_page>", String.valueOf(countPage));
 
-        component = component.append(componentUtil.builder(fPlayer, footer).build());
+        component = component.append(messageFormatter.builder(fPlayer, footer).build());
 
         messageSender.sendMessage(fPlayer, component);
 

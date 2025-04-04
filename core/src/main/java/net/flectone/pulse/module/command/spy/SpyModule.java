@@ -3,16 +3,16 @@ package net.flectone.pulse.module.command.spy;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Command;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.PermissionUtil;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
@@ -28,18 +28,18 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
     private final CommandRegistry commandRegistry;
     private final FPlayerService fPlayerService;
-    private final PermissionUtil permissionUtil;
+    private final PermissionChecker permissionChecker;
 
     @Inject
     public SpyModule(FileManager fileManager,
                      CommandRegistry commandRegistry,
                      FPlayerService fPlayerService,
-                     PermissionUtil permissionUtil) {
+                     PermissionChecker permissionChecker) {
         super(localization -> localization.getCommand().getSpy(), null);
 
         this.commandRegistry = commandRegistry;
         this.fPlayerService = fPlayerService;
-        this.permissionUtil = permissionUtil;
+        this.permissionChecker = permissionChecker;
 
         command = fileManager.getCommand().getSpy();
         permission = fileManager.getPermission().getCommand().getSpy();
@@ -100,7 +100,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
                 .range(command.getRange())
                 .destination(command.getDestination())
                 .filter(fReceiver -> !fPlayer.equals(fReceiver))
-                .filter(fReceiver -> permissionUtil.has(fReceiver, getModulePermission()))
+                .filter(fReceiver -> permissionChecker.check(fReceiver, getModulePermission()))
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.SPY))
                 .filter(FPlayer::isOnline)
                 .tag(MessageTag.COMMAND_SPY)

@@ -7,8 +7,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.scheduler.TaskScheduler;
@@ -16,8 +16,8 @@ import net.flectone.pulse.model.FPacketEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.model.FBubble;
-import net.flectone.pulse.color.ColorConverter;
-import net.flectone.pulse.util.ComponentUtil;
+import net.flectone.pulse.converter.ColorConverter;
+import net.flectone.pulse.formatter.MessageFormatter;
 import net.flectone.pulse.util.RandomUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
@@ -42,7 +42,7 @@ public class BukkitBubbleManager implements BubbleManager {
     private final TaskScheduler taskScheduler;
     private final FPlayerService fPlayerService;
     private final FileManager fileManager;
-    private final ComponentUtil componentUtil;
+    private final MessageFormatter messageFormatter;
     private final RandomUtil randomUtil;
     private final ColorConverter colorConverter;
     private final IntegrationModule integrationModule;
@@ -52,14 +52,14 @@ public class BukkitBubbleManager implements BubbleManager {
                                FPlayerService fPlayerService,
                                FileManager fileManager,
                                RandomUtil randomUtil,
-                               ComponentUtil componentUtil,
+                               MessageFormatter messageFormatter,
                                ColorConverter colorConverter,
                                IntegrationModule integrationModule) {
         this.taskScheduler = taskScheduler;
         this.fPlayerService = fPlayerService;
         this.fileManager = fileManager;
         this.randomUtil = randomUtil;
-        this.componentUtil = componentUtil;
+        this.messageFormatter = messageFormatter;
         this.colorConverter = colorConverter;
         this.integrationModule = integrationModule;
     }
@@ -132,13 +132,13 @@ public class BukkitBubbleManager implements BubbleManager {
                     FPlayer fReceiver = fPlayerService.getFPlayer(receiver);
                     if (fReceiver.isIgnored(fPlayer)) return;
 
-                    Component component = componentUtil.builder(fPlayer, fReceiver, localizationBubble.getFormat())
+                    Component component = messageFormatter.builder(fPlayer, fReceiver, localizationBubble.getFormat())
                             .mention(false)
                             .question(false)
                             .interactiveChat(false)
                             .build()
                             .replaceText(TextReplacementConfig.builder().match("<message>").replacement(
-                                                    componentUtil.builder(fPlayer, fReceiver, message)
+                                                    messageFormatter.builder(fPlayer, fReceiver, message)
                                                             .userMessage(true)
                                                             .mention(false)
                                                             .question(false)

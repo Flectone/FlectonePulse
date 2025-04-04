@@ -5,10 +5,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.connector.ProxyConnector;
+import net.flectone.pulse.configuration.Command;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -17,7 +17,7 @@ import net.flectone.pulse.module.command.poll.model.Poll;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.ComponentUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 import net.kyori.adventure.text.Component;
@@ -41,28 +41,28 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
     private final FileManager fileManager;
     private final FPlayerService fPlayerService;
-    private final ProxyConnector proxyConnector;
+    private final ProxySender proxySender;
     private final TaskScheduler taskScheduler;
     private final CommandRegistry commandRegistry;
-    private final ComponentUtil componentUtil;
+    private final MessageFormatter messageFormatter;
     private final Gson gson;
 
     @Inject
     public PollModule(FileManager fileManager,
                       FPlayerService fPlayerService,
-                      ProxyConnector proxyConnector,
+                      ProxySender proxySender,
                       TaskScheduler taskScheduler,
                       CommandRegistry commandRegistry,
-                      ComponentUtil componentUtil,
+                      MessageFormatter messageFormatter,
                       Gson gson) {
         super(localization -> localization.getCommand().getPoll(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.POLL));
 
         this.fileManager = fileManager;
         this.fPlayerService = fPlayerService;
-        this.proxyConnector = proxyConnector;
+        this.proxySender = proxySender;
         this.taskScheduler = taskScheduler;
         this.commandRegistry = commandRegistry;
-        this.componentUtil = componentUtil;
+        this.messageFormatter = messageFormatter;
         this.gson = gson;
 
         command = fileManager.getCommand().getPoll();
@@ -165,7 +165,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         String promptNumber = getPrompt().getNumber();
         int numberVote = commandContext.get(promptNumber);
 
-        boolean isSent = proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_POLL_VOTE, byteArrayDataOutput -> {
+        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_POLL_VOTE, byteArrayDataOutput -> {
             byteArrayDataOutput.writeInt(id);
             byteArrayDataOutput.writeInt(numberVote);
         });
@@ -286,7 +286,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
             int k = 0;
             for (String answer : poll.getAnswers()) {
 
-                Component answerComponent = componentUtil.builder(fPlayer, FPlayer.UNKNOWN, answer).build();
+                Component answerComponent = messageFormatter.builder(fPlayer, FPlayer.UNKNOWN, answer).build();
 
                 answersBuilder.append(message.getAnswerTemplate()
                         .replace("<id>", String.valueOf(poll.getId()))

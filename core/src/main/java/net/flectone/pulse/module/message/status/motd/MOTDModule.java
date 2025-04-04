@@ -3,13 +3,13 @@ package net.flectone.pulse.module.message.status.motd;
 import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleListMessage;
-import net.flectone.pulse.util.ComponentUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
 
 import java.util.List;
 
@@ -19,14 +19,14 @@ public class MOTDModule extends AbstractModuleListMessage<Localization.Message.S
     private final Message.Status.MOTD message;
     private final Permission.Message.Status.MOTD permission;
 
-    private final ComponentUtil componentUtil;
+    private final MessageFormatter messageFormatter;
 
     @Inject
     public MOTDModule(FileManager fileManager,
-                      ComponentUtil componentUtil) {
+                      MessageFormatter messageFormatter) {
         super(localization -> localization.getMessage().getStatus().getMotd());
 
-        this.componentUtil = componentUtil;
+        this.messageFormatter = messageFormatter;
 
         message = fileManager.getMessage().getStatus().getMotd();
         permission = fileManager.getPermission().getMessage().getStatus().getMotd();
@@ -44,7 +44,7 @@ public class MOTDModule extends AbstractModuleListMessage<Localization.Message.S
         String message = getNextMessage(fPlayer, this.message.isRandom());
         if (message == null) return null;
 
-        return componentUtil.builder(fPlayer, message).serializeToTree();
+        return messageFormatter.builder(fPlayer, message).serializeToTree();
     }
 
     @Override

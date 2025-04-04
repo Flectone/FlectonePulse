@@ -87,7 +87,7 @@ public class FabricInjector extends AbstractModule {
         bind(CommandUtil.class).to(FabricCommandUtil.class);
         bind(ProxyManager.class).to(FabricProxyManager.class);
         bind(ItemUtil.class).to(FabricItemUtil.class);
-        bind(ServerUtil.class).to(FabricServerUtil.class);
+        bind(platformServerAdapter.class).to(FabricplatformServerAdapter.class);
 //        bind(MetricsUtil.class).to(BukkitMetricsUtil.class);
         bind(FileUtil.class).to(FabricFileUtil.class);
         bind(BubbleManager.class).to(FabricBubbleManager.class);

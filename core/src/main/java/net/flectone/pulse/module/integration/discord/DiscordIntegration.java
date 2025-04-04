@@ -17,8 +17,8 @@ import discord4j.discordjson.json.*;
 import discord4j.rest.util.AllowedMentions;
 import discord4j.rest.util.MultipartRequest;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.Integration;
-import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.configuration.Integration;
+import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
@@ -26,9 +26,9 @@ import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.discord.listener.MessageCreateListener;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.SkinService;
-import net.flectone.pulse.util.ComponentUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.SystemUtil;
+import net.flectone.pulse.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
@@ -50,8 +50,8 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
     private final TaskScheduler taskScheduler;
     private final SkinService skinService;
     private final MessageCreateListener messageCreateListener;
-    private final ComponentUtil componentUtil;
-    private final SystemUtil systemUtil;
+    private final MessageFormatter messageFormatter;
+    private final SystemVariableResolver systemVariableResolver;
     private final FLogger fLogger;
 
     private DiscordClient discordClient;
@@ -62,15 +62,15 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
     public DiscordIntegration(FileManager fileManager,
                               TaskScheduler taskScheduler,
                               SkinService skinService,
-                              ComponentUtil componentUtil,
-                              SystemUtil systemUtil,
+                              MessageFormatter messageFormatter,
+                              SystemVariableResolver systemVariableResolver,
                               MessageCreateListener messageCreateListener,
                               FLogger fLogger) {
         this.fileManager = fileManager;
         this.taskScheduler = taskScheduler;
         this.skinService = skinService;
-        this.componentUtil = componentUtil;
-        this.systemUtil = systemUtil;
+        this.messageFormatter = messageFormatter;
+        this.systemVariableResolver = systemVariableResolver;
         this.messageCreateListener = messageCreateListener;
         this.fLogger = fLogger;
 
@@ -225,7 +225,7 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
     @Async
     @Override
     public void hook() {
-        String token = systemUtil.substituteEnvVars(integration.getToken());
+        String token = systemVariableResolver.substituteEnvVars(integration.getToken());
         if (token.isEmpty()) return;
 
         discordClient = DiscordClient.create(token);
@@ -279,7 +279,7 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
                     .blockOptional()
                     .ifPresent(channel -> {
                         String name = PlainTextComponentSerializer.plainText()
-                                .serialize(componentUtil.builder(entry.getValue()).build());
+                                .serialize(messageFormatter.builder(entry.getValue()).build());
 
                         channel.getRestChannel()
                                 .modify(ChannelModifyRequest.builder()

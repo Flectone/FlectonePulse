@@ -4,10 +4,11 @@ import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformServerAdapter;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Command;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
@@ -15,8 +16,7 @@ import net.flectone.pulse.model.inventory.Inventory;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.ComponentUtil;
-import net.flectone.pulse.util.PermissionUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -32,26 +32,26 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     private final Permission.Command.Chatsetting permission;
 
     private final FPlayerService fPlayerService;
-    private final ComponentUtil componentUtil;
+    private final MessageFormatter messageFormatter;
     private final CommandRegistry commandRegistry;
-    private final PermissionUtil permissionUtil;
+    private final PermissionChecker permissionChecker;
     private final InventoryController inventoryController;
     private final PlatformServerAdapter platformServerAdapter;
 
     @Inject
     public ChatsettingModule(FileManager fileManager,
                              FPlayerService fPlayerService,
-                             ComponentUtil componentUtil,
+                             MessageFormatter messageFormatter,
                              CommandRegistry commandRegistry,
-                             PermissionUtil permissionUtil,
+                             PermissionChecker permissionChecker,
                              InventoryController inventoryController,
                              PlatformServerAdapter platformServerAdapter) {
         super(localization -> localization.getCommand().getChatsetting(), null);
 
         this.fPlayerService = fPlayerService;
-        this.componentUtil = componentUtil;
+        this.messageFormatter = messageFormatter;
         this.commandRegistry = commandRegistry;
-        this.permissionUtil = permissionUtil;
+        this.permissionChecker = permissionChecker;
         this.inventoryController = inventoryController;
         this.platformServerAdapter = platformServerAdapter;
 
@@ -90,7 +90,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         if (checkModulePredicates(fPlayer)) return;
 
         Localization.Command.Chatsetting localization = resolveLocalization(fPlayer);
-        Component header = componentUtil.builder(fPlayer, localization.getHeader()).build();
+        Component header = messageFormatter.builder(fPlayer, localization.getHeader()).build();
 
         Inventory.Builder inventoryBuilder = new Inventory.Builder()
                 .name(header)
@@ -111,7 +111,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
             inventoryBuilder = inventoryBuilder
                     .addItem(slot, platformServerAdapter.buildItemStack(settingIndex, fPlayer, itemMessages, entry.getValue()))
                     .addClickHandler(slot, (itemStack, inventory) -> {
-                        if (!permissionUtil.has(fPlayer, permission.getItems().get(setting).getName())) {
+                        if (!permissionChecker.check(fPlayer, permission.getItems().get(setting).getName())) {
                             builder(fPlayer)
                                     .format(Localization.Command.Chatsetting::getNoPermission)
                                     .sendBuilt();
@@ -129,7 +129,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                                 boolean chatChanged = false;
                                 for (String chatName : chatMessage.getTypes().keySet()) {
                                     String permission = chatPermission.getTypes().get(chatName).getName();
-                                    if (!permissionUtil.has(fPlayer, permission)) continue;
+                                    if (!permissionChecker.check(fPlayer, permission)) continue;
 
                                     if (needNextChat) {
                                         fPlayer.setSetting(FPlayer.Setting.CHAT, chatName);

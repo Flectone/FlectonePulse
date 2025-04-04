@@ -3,15 +3,15 @@ package net.flectone.pulse.module.command.clearchat;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Command;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.PermissionUtil;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
@@ -27,18 +27,18 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
 
     private final FPlayerService fPlayerService;
     private final CommandRegistry commandRegistry;
-    private final PermissionUtil permissionUtil;
+    private final PermissionChecker permissionChecker;
 
     @Inject
     public ClearchatModule(FPlayerService fPlayerService,
                            FileManager fileManager,
                            CommandRegistry commandRegistry,
-                           PermissionUtil permissionUtil) {
+                           PermissionChecker permissionChecker) {
         super(localization -> localization.getCommand().getClearchat(), null);
 
         this.fPlayerService = fPlayerService;
         this.commandRegistry = commandRegistry;
-        this.permissionUtil = permissionUtil;
+        this.permissionChecker = permissionChecker;
 
         command = fileManager.getCommand().getClearchat();
         permission = fileManager.getPermission().getCommand().getClearchat();
@@ -72,7 +72,7 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
 
     private @NonNull BlockingSuggestionProvider<FPlayer> playerSuggestionPermission() {
         return (context, input) -> {
-            if (!permissionUtil.has(context.sender(), permission.getOther())) return Collections.emptyList();
+            if (!permissionChecker.check(context.sender(), permission.getOther())) return Collections.emptyList();
 
             return commandRegistry.playerParser().parser().suggestionProvider().suggestionsFuture(context, input).join();
         };
@@ -87,7 +87,7 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
 
         FPlayer fTarget = fPlayer;
 
-        if (optionalPlayer.isPresent() && permissionUtil.has(fPlayer, permission.getOther())) {
+        if (optionalPlayer.isPresent() && permissionChecker.check(fPlayer, permission.getOther())) {
             String player = optionalPlayer.get();
             if (player.equals("all") || player.equals("@a")) {
                 fPlayerService.findOnlineFPlayers().forEach(this::clearChat);

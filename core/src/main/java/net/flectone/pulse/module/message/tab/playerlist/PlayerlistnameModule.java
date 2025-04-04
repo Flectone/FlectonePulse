@@ -9,17 +9,18 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.ComponentUtil;
-import net.flectone.pulse.util.PacketEventsUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.sender.PacketSender;
 import net.kyori.adventure.text.Component;
 
 @Singleton
@@ -30,23 +31,26 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
 
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-    private final ComponentUtil componentUtil;
-    private final PacketEventsUtil packetEventsUtil;
+    private final MessageFormatter messageFormatter;
+    private final PacketSender packetSender;
+    private final PacketProvider packetProvider;
     private final TaskScheduler taskScheduler;
 
     @Inject
     public PlayerlistnameModule(FPlayerService fPlayerService,
                                 PlatformPlayerAdapter platformPlayerAdapter,
                                 FileManager fileManager,
-                                ComponentUtil componentUtil,
-                                PacketEventsUtil packetEventsUtil,
+                                MessageFormatter messageFormatter,
+                                PacketSender packetSender,
+                                PacketProvider packetProvider,
                                 TaskScheduler taskScheduler) {
         super(module -> module.getMessage().getTab().getPlayerlistname());
 
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
-        this.componentUtil = componentUtil;
-        this.packetEventsUtil = packetEventsUtil;
+        this.messageFormatter = messageFormatter;
+        this.packetSender = packetSender;
+        this.packetProvider = packetProvider;
         this.taskScheduler = taskScheduler;
 
         message = fileManager.getMessage().getTab().getPlayerlistname();
@@ -84,10 +88,10 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
     }
 
     private void updatePlayerlistname(FPlayer fPlayer, FPlayer fReceiver) {
-        User user = packetEventsUtil.getUser(fPlayer);
+        User user = packetProvider.getUser(fPlayer);
         if (user == null) return;
 
-        Component name = componentUtil.builder(fPlayer, fReceiver, resolveLocalization(fReceiver).getFormat())
+        Component name = messageFormatter.builder(fPlayer, fReceiver, resolveLocalization(fReceiver).getFormat())
                 .userMessage(false)
                 .build();
 
@@ -101,7 +105,7 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
                     null
             );
 
-            packetEventsUtil.sendPacket(fReceiver, new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_DISPLAY_NAME, playerInfo));
+            packetSender.send(fReceiver, new WrapperPlayServerPlayerInfoUpdate(WrapperPlayServerPlayerInfoUpdate.Action.UPDATE_DISPLAY_NAME, playerInfo));
             return;
         }
 
@@ -113,6 +117,6 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
                 fPlayerService.getPing(fPlayer)
         );
 
-        packetEventsUtil.sendPacket(fReceiver, new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_DISPLAY_NAME, playerData));
+        packetSender.send(fReceiver, new WrapperPlayServerPlayerInfo(WrapperPlayServerPlayerInfo.Action.UPDATE_DISPLAY_NAME, playerData));
     }
 }

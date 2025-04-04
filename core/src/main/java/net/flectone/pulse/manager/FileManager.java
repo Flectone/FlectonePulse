@@ -7,7 +7,7 @@ import com.google.inject.name.Named;
 import lombok.Getter;
 import net.elytrium.serializer.language.object.AbstractSerializable;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.config.*;
+import net.flectone.pulse.configuration.*;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.TagType;

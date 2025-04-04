@@ -2,14 +2,14 @@ package net.flectone.pulse.module.message.format.translate;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.util.ComponentUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -22,7 +22,7 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
     private final Message.Format.Translate message;
     private final Permission.Message.Format.Translate permission;
 
-    @Inject private ComponentUtil componentUtil;
+    @Inject private MessageFormatter messageFormatter;
 
     @Inject
     public TranslateModule(FileManager fileManager) {
@@ -77,7 +77,7 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
                     .replaceFirst("<language>", secondLang)
                     .replace("<message>", text);
 
-            return Tag.selfClosingInserting(componentUtil.builder(fPlayer, receiver, action)
+            return Tag.selfClosingInserting(messageFormatter.builder(fPlayer, receiver, action)
                     .interactiveChat(false)
                     .question(false)
                     .mention(false)

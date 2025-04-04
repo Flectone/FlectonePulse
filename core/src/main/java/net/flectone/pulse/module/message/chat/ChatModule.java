@@ -1,16 +1,16 @@
 package net.flectone.pulse.module.message.chat;
 
 import com.google.inject.Inject;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.util.PermissionUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +23,7 @@ public abstract class ChatModule extends AbstractModuleMessage<Localization.Mess
     protected final Message.Chat message;
     protected final Permission.Message.Chat permission;
 
-    @Inject private PermissionUtil permissionUtil;
+    @Inject private PermissionChecker permissionChecker;
 
     @Inject
     public ChatModule(FileManager fileManager) {
@@ -72,7 +72,7 @@ public abstract class ChatModule extends AbstractModuleMessage<Localization.Mess
             if (message.equals(chat.getTrigger())) continue;
 
             if (chat.getPriority() <= priority) continue;
-            if (!permissionUtil.has(fPlayer, permission.getTypes().get(chatName))) continue;
+            if (!permissionChecker.check(fPlayer, permission.getTypes().get(chatName))) continue;
 
             playerChat = chat;
             priority = chat.getPriority();

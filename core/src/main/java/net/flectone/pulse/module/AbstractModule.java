@@ -4,9 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.Setter;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FEntity;
-import net.flectone.pulse.util.PermissionUtil;
+import net.flectone.pulse.registry.PermissionRegistry;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,7 +21,8 @@ public abstract class AbstractModule {
     private final Set<Class<? extends AbstractModule>> children = new HashSet<>();
     private final Set<Predicate<FEntity>> predicates = new HashSet<>();
 
-    @Inject private PermissionUtil permissionUtil;
+    @Inject private PermissionRegistry permissionRegistry;
+    @Inject private PermissionChecker permissionChecker;
     @Inject private Injector injector;
 
     private String modulePermission;
@@ -29,10 +31,11 @@ public abstract class AbstractModule {
 
     public AbstractModule() {
         addPredicate(fPlayer -> !isEnable());
-        addPredicate(fPlayer -> !permissionUtil.has(fPlayer, modulePermission));
+        addPredicate(fPlayer -> !permissionChecker.check(fPlayer, modulePermission));
     }
 
     public abstract void reload();
+
     public abstract boolean isConfigEnable();
 
     public void registerModulePermission(Permission.IPermission permission) {
@@ -47,7 +50,7 @@ public abstract class AbstractModule {
     }
 
     public void registerPermission(String name, Permission.Type type) {
-        permissionUtil.register(name, type.name());
+        permissionRegistry.register(name, type.name());
     }
 
     public void addChildren(Class<? extends AbstractModule> clazz) {

@@ -9,7 +9,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.inventory.ClickType;
 import net.flectone.pulse.model.inventory.Inventory;
-import net.flectone.pulse.util.PacketEventsUtil;
+import net.flectone.pulse.sender.PacketSender;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +21,7 @@ public abstract class InventoryController {
 
     private final Map<UUID, Inventory> inventoryMap = new ConcurrentHashMap<>();
 
-    @Inject private PacketEventsUtil packetEventsUtil;
+    @Inject private PacketSender packetSender;
 
     public InventoryController() {
 
@@ -41,15 +41,15 @@ public abstract class InventoryController {
 
     public void closeAll() {
         WrapperPlayServerCloseWindow wrapper = new WrapperPlayServerCloseWindow();
-        inventoryMap.keySet().forEach(uuid -> packetEventsUtil.sendPacket(uuid, wrapper));
+        inventoryMap.keySet().forEach(uuid -> packetSender.send(uuid, wrapper));
         inventoryMap.clear();
     }
 
     public void open(FPlayer fPlayer, Inventory inventory) {
         inventoryMap.put(fPlayer.getUuid(), inventory);
 
-        packetEventsUtil.sendPacket(fPlayer, inventory.getWrapperWindow());
-        packetEventsUtil.sendPacket(fPlayer, inventory.getWrapperItems());
+        packetSender.send(fPlayer, inventory.getWrapperWindow());
+        packetSender.send(fPlayer, inventory.getWrapperItems());
     }
 
     public void click(Inventory inventory, int slot) {
@@ -69,7 +69,7 @@ public abstract class InventoryController {
         boolean isWindowClicked = isWindowClick(inventory, clickType, wrapper);
 
         if (isWindowClicked || clickType == ClickType.PICKUP) {
-            packetEventsUtil.sendPacket(uuid, new WrapperPlayServerWindowItems(wrapper.getWindowId(), 0, inventory.getWrapperItems().getItems(), null));
+            packetSender.send(uuid, new WrapperPlayServerWindowItems(wrapper.getWindowId(), 0, inventory.getWrapperItems().getItems(), null));
 
             if (isWindowClicked) {
                 click(inventory, wrapper.getSlot());
@@ -90,7 +90,7 @@ public abstract class InventoryController {
 
         inventory.setWrapperItems(wrapper);
 
-        packetEventsUtil.sendPacket(fPlayer, wrapper);
+        packetSender.send(fPlayer, wrapper);
     }
 
     public ClickType getClickType(WrapperPlayClientClickWindow wrapper) {

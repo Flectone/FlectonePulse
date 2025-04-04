@@ -4,9 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.configuration.Command;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -14,7 +14,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.TimeUtil;
+import net.flectone.pulse.formatter.TimeFormatter;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
@@ -32,7 +32,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final CommandRegistry commandRegistry;
     private final IntegrationModule integrationModule;
-    private final TimeUtil timeUtil;
+    private final TimeFormatter timeFormatter;
 
     @Inject
     public OnlineModule(FileManager fileManager,
@@ -40,14 +40,14 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
                         PlatformPlayerAdapter platformPlayerAdapter,
                         CommandRegistry commandRegistry,
                         IntegrationModule integrationModule,
-                        TimeUtil timeUtil) {
+                        TimeFormatter timeFormatter) {
         super(localization -> localization.getCommand().getOnline(), null);
 
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.commandRegistry = commandRegistry;
         this.integrationModule = integrationModule;
-        this.timeUtil = timeUtil;
+        this.timeFormatter = timeFormatter;
 
         command = fileManager.getCommand().getOnline();
         permission = fileManager.getPermission().getCommand().getOnline();
@@ -110,15 +110,15 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
                 .destination(command.getDestination())
                 .receiver(fPlayer)
                 .format(s -> switch (type) {
-                    case "first" -> timeUtil.format(
+                    case "first" -> timeFormatter.format(
                             fPlayer,
                             System.currentTimeMillis() - platformPlayerAdapter.getFirstPlayed(targetFPlayer),
                             s.getFormatFirst()
                     );
                     case "last" -> targetFPlayer.isOnline() && !integrationModule.isVanished(targetFPlayer)
                             ? s.getFormatCurrent()
-                            : timeUtil.format(fPlayer, System.currentTimeMillis() - platformPlayerAdapter.getLastPlayed(targetFPlayer), s.getFormatLast());
-                    case "total" -> timeUtil.format(fPlayer,
+                            : timeFormatter.format(fPlayer, System.currentTimeMillis() - platformPlayerAdapter.getLastPlayed(targetFPlayer), s.getFormatLast());
+                    case "total" -> timeFormatter.format(fPlayer,
                             platformPlayerAdapter.getAllTimePlayed(fPlayer),
                             s.getFormatTotal()
                     );

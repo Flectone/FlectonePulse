@@ -2,7 +2,7 @@ package net.flectone.pulse.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.flectone.pulse.util.TimeUtil;
+import net.flectone.pulse.formatter.TimeFormatter;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -34,7 +34,7 @@ public class Cooldown {
         Long time = PLAYER_DURATION.get(uuid);
 
         if (time == null || currentTime >= time) {
-            PLAYER_DURATION.put(uuid, currentTime + duration * TimeUtil.MULTIPLIER);
+            PLAYER_DURATION.put(uuid, currentTime + duration * TimeFormatter.MULTIPLIER);
             return false;
         }
 

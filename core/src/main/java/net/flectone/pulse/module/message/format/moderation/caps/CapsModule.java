@@ -2,12 +2,12 @@ package net.flectone.pulse.module.message.format.moderation.caps;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.util.PermissionUtil;
 
 @Singleton
 public class CapsModule extends AbstractModule {
@@ -15,12 +15,12 @@ public class CapsModule extends AbstractModule {
     private final Message.Format.Moderation.Caps message;
     private final Permission.Message.Format.Moderation.Caps permission;
 
-    private final PermissionUtil permissionUtil;
+    private final PermissionChecker permissionChecker;
 
     @Inject
     public CapsModule(FileManager fileManager,
-                      PermissionUtil permissionUtil) {
-        this.permissionUtil = permissionUtil;
+                      PermissionChecker permissionChecker) {
+        this.permissionChecker = permissionChecker;
 
         message = fileManager.getMessage().getFormat().getModeration().getCaps();
         permission = fileManager.getPermission().getMessage().getFormat().getModeration().getCaps();
@@ -38,7 +38,7 @@ public class CapsModule extends AbstractModule {
 
     public String replace(FEntity sender, String message) {
         if (checkModulePredicates(sender)) return message;
-        if (permissionUtil.has(sender, permission.getBypass())) return message;
+        if (permissionChecker.check(sender, permission.getBypass())) return message;
         if (message == null || message.isEmpty()) return message;
 
         return needApplyAntiCaps(message) ? message.toLowerCase() : message;

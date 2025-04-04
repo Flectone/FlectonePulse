@@ -12,7 +12,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import lombok.Getter;
-import net.flectone.pulse.config.Message;
+import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.model.FPacketEntity;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.RandomUtil;

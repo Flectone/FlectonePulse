@@ -11,9 +11,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.Getter;
-import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Command;
+import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -21,10 +22,9 @@ import net.flectone.pulse.module.command.maintenance.listener.MaintenancePacketL
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.ComponentUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
 import net.flectone.pulse.util.FileUtil;
-import net.flectone.pulse.util.PacketEventsUtil;
-import net.flectone.pulse.util.PermissionUtil;
+import net.flectone.pulse.sender.PacketSender;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -40,37 +40,37 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
 
     private final FileManager fileManager;
     private final FPlayerService fPlayerService;
-    private final PermissionUtil permissionUtil;
+    private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
     private final Path iconPath;
     private final FileUtil fileUtil;
-    private final ComponentUtil componentUtil;
+    private final MessageFormatter messageFormatter;
     private final CommandRegistry commandRegistry;
-    private final PacketEventsUtil packetEventsUtil;
+    private final PacketSender packetSender;
 
     private String icon;
 
     @Inject
     public MaintenanceModule(FileManager fileManager,
                              FPlayerService fPlayerService,
-                             PermissionUtil permissionUtil,
+                             PermissionChecker permissionChecker,
                              ListenerRegistry listenerRegistry,
                              @Named("projectPath") Path projectPath,
                              FileUtil fileUtil,
                              CommandRegistry commandRegistry,
-                             ComponentUtil componentUtil,
-                             PacketEventsUtil packetEventsUtil) {
+                             MessageFormatter messageFormatter,
+                             PacketSender packetSender) {
         super(module -> module.getCommand().getMaintenance(), null);
 
         this.fileManager = fileManager;
         this.fPlayerService = fPlayerService;
-        this.permissionUtil = permissionUtil;
+        this.permissionChecker = permissionChecker;
         this.commandRegistry = commandRegistry;
         this.listenerRegistry = listenerRegistry;
         this.iconPath = projectPath.resolve("images");
         this.fileUtil = fileUtil;
-        this.componentUtil = componentUtil;
-        this.packetEventsUtil = packetEventsUtil;
+        this.messageFormatter = messageFormatter;
+        this.packetSender = packetSender;
 
         command = fileManager.getCommand().getMaintenance();
         permission = fileManager.getPermission().getCommand().getMaintenance();
@@ -147,7 +147,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         responseJson.add("version", getVersionJson(localizationMaintenance.getServerVersion()));
         responseJson.add("players", getPlayersJson());
 
-        responseJson.add("description", componentUtil.builder(fPlayer, localizationMaintenance.getServerDescription()).serializeToTree());
+        responseJson.add("description", messageFormatter.builder(fPlayer, localizationMaintenance.getServerDescription()).serializeToTree());
         responseJson.addProperty("favicon", "data:image/png;base64," + (icon == null ? "" : icon));
         responseJson.addProperty("enforcesSecureChat", false);
 
@@ -162,10 +162,10 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         String messageKick = resolveLocalization().getKick();
 
         FPlayer fPlayer = fPlayerService.getFPlayer(userProfile.getUUID());
-        if (permissionUtil.has(fPlayer, permission.getJoin())) return false;
+        if (permissionChecker.check(fPlayer, permission.getJoin())) return false;
 
-        Component reason = componentUtil.builder(fPlayer, messageKick).build();
-        packetEventsUtil.sendPacket(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
+        Component reason = messageFormatter.builder(fPlayer, messageKick).build();
+        packetSender.send(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
         return true;
     }
 
@@ -192,9 +192,9 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     private void kickOnlinePlayers(FPlayer fSender) {
         fPlayerService.getFPlayers()
                 .stream()
-                .filter(filter -> !permissionUtil.has(filter, permission.getJoin()))
+                .filter(filter -> !permissionChecker.check(filter, permission.getJoin()))
                 .forEach(fReceiver -> {
-                    Component component = componentUtil.builder(fSender, fReceiver, resolveLocalization(fReceiver).getKick()).build();
+                    Component component = messageFormatter.builder(fSender, fReceiver, resolveLocalization(fReceiver).getKick()).build();
                     fPlayerService.kick(fReceiver, component);
                 });
     }

@@ -6,7 +6,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Setter;
-import net.flectone.pulse.connector.ProxyConnector;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.manager.FileManager;
@@ -16,13 +16,13 @@ import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.message.bubble.manager.BubbleManager;
 import net.flectone.pulse.module.message.mark.manager.MarkManager;
-import net.flectone.pulse.platform.BukkitLibraryResolver;
+import net.flectone.pulse.resolver.BukkitLibraryResolver;
 import net.flectone.pulse.resolver.LibraryResolver;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.MetricsUtil;
+import net.flectone.pulse.service.MetricsService;
 import net.flectone.pulse.util.logging.FLogger;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
@@ -95,10 +95,10 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         }
 
         injector.getInstance(FPlayerService.class).reload();
-        injector.getInstance(ProxyConnector.class).reload();
+        injector.getInstance(ProxySender.class).reload();
 
         if (fileManager.getConfig().isMetrics()) {
-            injector.getInstance(MetricsUtil.class).setup();
+            injector.getInstance(MetricsService.class).register();
         }
         
         injector.getInstance(ListenerRegistry.class).registerDefaultListeners();
@@ -130,7 +130,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(ListenerRegistry.class).unregisterAll();
         PacketEvents.getAPI().terminate();
 
-        injector.getInstance(ProxyConnector.class).disable();
+        injector.getInstance(ProxySender.class).disable();
 
         injector.getInstance(DiscordModule.class).disconnect();
         injector.getInstance(TwitchModule.class).disconnect();
@@ -169,7 +169,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
             Bukkit.getPluginManager().disablePlugin(this);
         }
 
-        injector.getInstance(ProxyConnector.class).reload();
+        injector.getInstance(ProxySender.class).reload();
         injector.getInstance(FPlayerService.class).reload();
         injector.getInstance(Module.class).reloadWithChildren();
 

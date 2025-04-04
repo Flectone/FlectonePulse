@@ -2,12 +2,12 @@ package net.flectone.pulse.module.message.format.moderation.flood;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.util.PermissionUtil;
 
 @Singleton
 public class FloodModule extends AbstractModule {
@@ -15,12 +15,12 @@ public class FloodModule extends AbstractModule {
     private final Message.Format.Moderation.Flood message;
     private final Permission.Message.Format.Moderation.Flood permission;
 
-    private final PermissionUtil permissionUtil;
+    private final PermissionChecker permissionChecker;
 
     @Inject
     public FloodModule(FileManager fileManager,
-                       PermissionUtil permissionUtil) {
-        this.permissionUtil = permissionUtil;
+                       PermissionChecker permissionChecker) {
+        this.permissionChecker = permissionChecker;
 
         message = fileManager.getMessage().getFormat().getModeration().getFlood();
         permission = fileManager.getPermission().getMessage().getFormat().getModeration().getFlood();
@@ -38,7 +38,7 @@ public class FloodModule extends AbstractModule {
 
     public String replace(FEntity sender, String message) {
         if (checkModulePredicates(sender)) return message;
-        if (permissionUtil.has(sender, permission.getBypass())) return message;
+        if (permissionChecker.check(sender, permission.getBypass())) return message;
         if (message == null || message.isEmpty()) return message;
 
         message = replaceRepeatedSymbols(message);
