@@ -1,6 +1,8 @@
 package net.flectone.pulse.module.command.dice;
 
 import com.google.gson.Gson;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -8,32 +10,37 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.util.CommandUtil;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.RandomUtil;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
-public abstract class DiceModule extends AbstractModuleCommand<Localization.Command.Dice> {
+@Singleton
+public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice> {
 
     @Getter private final Command.Dice command;
-    @Getter private final Permission.Command.Dice permission;
+    private final Permission.Command.Dice permission;
 
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
     private final RandomUtil randomUtil;
     private final Gson gson;
 
+    @Inject
     public DiceModule(FileManager fileManager,
-                      CommandUtil commandUtil,
+                      CommandRegistry commandRegistry,
                       RandomUtil randomUtil,
                       Gson gson) {
         super(localization -> localization.getCommand().getDice(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.DICE));
 
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
         this.randomUtil = randomUtil;
         this.gson = gson;
 
@@ -46,13 +53,38 @@ public abstract class DiceModule extends AbstractModuleCommand<Localization.Comm
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
-        if (checkModulePredicates(fPlayer)) return;
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
 
-        int number = commandUtil.getByClassOrDefault(0, Integer.class, 1, arguments);
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        String commandName = getName(command);
+        String promptMessage = getPrompt().getMessage();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .optional(promptMessage, commandRegistry.integerParser(command.getMin(), command.getMax()))
+                        .handler(this)
+        );
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+        if (checkModulePredicates(fPlayer)) return;
 
         int min = command.getMin();
         int max = command.getMax();
+
+        String promptMessage = getPrompt().getMessage();
+        Optional<Integer> optionalNumber = commandContext.optional(promptMessage);
+
+        int number = optionalNumber.orElse(min);
 
         List<Integer> cubes = new ArrayList<>();
         for (int i = 0; i < number; i++) {
@@ -105,22 +137,5 @@ public abstract class DiceModule extends AbstractModuleCommand<Localization.Comm
                     .replace("<sum>", String.valueOf(sum))
                     .replace("<message>", stringBuilder.toString().trim());
         };
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 }

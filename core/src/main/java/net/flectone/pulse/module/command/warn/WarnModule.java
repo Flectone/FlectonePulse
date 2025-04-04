@@ -1,7 +1,10 @@
 package net.flectone.pulse.module.command.warn;
 
 import com.google.gson.Gson;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.Getter;
+import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
@@ -10,39 +13,49 @@ import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.ModerationUtil;
+import net.flectone.pulse.util.Pair;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
-public abstract class WarnModule extends AbstractModuleCommand<Localization.Command.Warn> {
+@Singleton
+public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn> {
 
     @Getter private final Command.Warn command;
-    @Getter private final Permission.Command.Warn permission;
+    private final Permission.Command.Warn permission;
 
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationUtil moderationUtil;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
+    private final PlatformServerAdapter platformServerAdapter;
     private final Gson gson;
 
+    @Inject
     public WarnModule(FileManager fileManager,
                       FPlayerService fPlayerService,
                       ModerationService moderationService,
                       ModerationUtil moderationUtil,
-                      CommandUtil commandUtil,
+                      CommandRegistry commandRegistry,
+                      PlatformServerAdapter platformServerAdapter,
                       Gson gson) {
         super(localization -> localization.getCommand().getWarn(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.WARN));
 
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.moderationUtil = moderationUtil;
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
+        this.platformServerAdapter = platformServerAdapter;
         this.gson = gson;
 
         command = fileManager.getCommand().getWarn();
@@ -50,14 +63,44 @@ public abstract class WarnModule extends AbstractModuleCommand<Localization.Comm
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        String commandName = getName(command);
+        String promptPlayer = getPrompt().getPlayer();
+        String promptReason = getPrompt().getReason();
+        String promptTime = getPrompt().getTime();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .required(promptPlayer, commandRegistry.playerParser(command.isSuggestOfflinePlayers()))
+                        .optional(promptTime + " " + promptReason, commandRegistry.durationReasonParser())
+                        .handler(this)
+        );
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
         if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
         if (checkMute(fPlayer)) return;
 
-        String target = commandUtil.getString(0, arguments);
-        long time = commandUtil.getInteger(1, arguments) * 1000L;
+        String promptReason = getPrompt().getReason();
+        String promptTime = getPrompt().getTime();
+
+        Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptReason);
+        Pair<Long, String> timeReasonPair = optionalTime.orElse(new Pair<>(Duration.ofHours(1).toMillis(), null));
+
+        long time = timeReasonPair.left() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.left();
 
         if (time < 1) {
             builder(fPlayer)
@@ -66,7 +109,10 @@ public abstract class WarnModule extends AbstractModuleCommand<Localization.Comm
             return;
         }
 
-        String reason = commandUtil.getString(2, arguments);
+        String reason = timeReasonPair.right();
+
+        String promptPlayer = getPrompt().getPlayer();
+        String target = commandContext.get(promptPlayer);
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
@@ -106,7 +152,7 @@ public abstract class WarnModule extends AbstractModuleCommand<Localization.Comm
         String action = command.getActions().get(countWarns);
         if (action == null) return;
 
-        commandUtil.dispatch(action.replace("<target>", fTarget.getName()));
+        platformServerAdapter.dispatchCommand(action.replace("<target>", fTarget.getName()));
     }
 
     public BiFunction<FPlayer, Localization.Command.Warn, String> buildFormat(Moderation warn) {
@@ -120,22 +166,5 @@ public abstract class WarnModule extends AbstractModuleCommand<Localization.Comm
                 .format(s -> moderationUtil.replacePlaceholders(s.getPerson(), fReceiver, warn))
                 .sound(getSound())
                 .sendBuilt();
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 }

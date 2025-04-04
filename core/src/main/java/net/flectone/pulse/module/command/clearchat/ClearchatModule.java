@@ -1,35 +1,44 @@
 package net.flectone.pulse.module.command.clearchat;
 
 import com.google.inject.Inject;
-import lombok.Getter;
+import com.google.inject.Singleton;
+import lombok.NonNull;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.CommandUtil;
+import net.flectone.pulse.util.PermissionUtil;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
+import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
-public abstract class ClearchatModule extends AbstractModuleCommand<Localization.Command.Clearchat> {
+@Singleton
+public class ClearchatModule extends AbstractModuleCommand<Localization.Command.Clearchat> {
 
-    @Getter private final Command.Clearchat command;
-    @Getter private final Permission.Command.Clearchat permission;
+    private final Command.Clearchat command;
+    private final Permission.Command.Clearchat permission;
 
     private final FPlayerService fPlayerService;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
+    private final PermissionUtil permissionUtil;
 
     @Inject
     public ClearchatModule(FPlayerService fPlayerService,
                            FileManager fileManager,
-                           CommandUtil commandUtil) {
+                           CommandRegistry commandRegistry,
+                           PermissionUtil permissionUtil) {
         super(localization -> localization.getCommand().getClearchat(), null);
 
         this.fPlayerService = fPlayerService;
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
+        this.permissionUtil = permissionUtil;
 
         command = fileManager.getCommand().getClearchat();
         permission = fileManager.getPermission().getCommand().getClearchat();
@@ -38,27 +47,63 @@ public abstract class ClearchatModule extends AbstractModuleCommand<Localization
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        registerPermission(permission.getOther());
+
+        String commandName = getName(command);
+        String promptPlayer = getPrompt().getPlayer();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .optional(promptPlayer, commandRegistry.playerParser(), playerSuggestionPermission())
+                        .handler(this)
+        );
+    }
+
+    private @NonNull BlockingSuggestionProvider<FPlayer> playerSuggestionPermission() {
+        return (context, input) -> {
+            if (!permissionUtil.has(context.sender(), permission.getOther())) return Collections.emptyList();
+
+            return commandRegistry.playerParser().parser().suggestionProvider().suggestionsFuture(context, input).join();
+        };
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        Optional<Object> object = commandUtil.getOptional(0, arguments);
+        String promptPlayer = getPrompt().getPlayer();
+        Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
 
-        if (object.isPresent() && object.get() instanceof Collection<?> collection) {
-            collection.forEach(player -> clearChat(fPlayerService.getFPlayer(player)));
-            return;
+        FPlayer fTarget = fPlayer;
+
+        if (optionalPlayer.isPresent() && permissionUtil.has(fPlayer, permission.getOther())) {
+            String player = optionalPlayer.get();
+            if (player.equals("all") || player.equals("@a")) {
+                fPlayerService.findOnlineFPlayers().forEach(this::clearChat);
+                return;
+            }
+
+            fTarget = fPlayerService.getFPlayer(player);
+            if (fTarget.isUnknown()) {
+                builder(fPlayer)
+                        .format(Localization.Command.Clearchat::getNullPlayer)
+                        .sendBuilt();
+                return;
+            }
         }
 
-        String string = object.map(o -> (String) o).orElse("");
-
-        FPlayer fReceiver = fPlayerService.getFPlayer(string);
-        if (fReceiver.isUnknown()) {
-            builder(fPlayer)
-                    .format(Localization.Command.Clearchat::getNullPlayer)
-                    .sendBuilt();
-            return;
-        }
-
-        clearChat(fReceiver);
+        clearChat(fTarget);
     }
 
     private void clearChat(FPlayer fPlayer) {
@@ -72,24 +117,5 @@ public abstract class ClearchatModule extends AbstractModuleCommand<Localization
                 .format(Localization.Command.Clearchat::getFormat)
                 .sound(getSound())
                 .sendBuilt();
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        registerPermission(permission.getOther());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 }

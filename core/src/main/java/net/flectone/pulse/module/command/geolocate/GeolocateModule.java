@@ -1,15 +1,18 @@
 package net.flectone.pulse.module.command.geolocate;
 
-import lombok.Getter;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,23 +21,25 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class GeolocateModule extends AbstractModuleCommand<Localization.Command.Geolocate> {
+@Singleton
+public class GeolocateModule extends AbstractModuleCommand<Localization.Command.Geolocate> {
 
     private final String HTTP_URL = "http://ip-api.com/line/<ip>?fields=17031449";
 
-    @Getter private final Command.Geolocate command;
-    @Getter private final Permission.Command.Geolocate permission;
+    private final Command.Geolocate command;
+    private final Permission.Command.Geolocate permission;
 
     private final FPlayerService fPlayerService;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
 
+    @Inject
     public GeolocateModule(FileManager fileManager,
                            FPlayerService fPlayerService,
-                           CommandUtil commandUtil) {
+                           CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getGeolocate(), null);
 
         this.fPlayerService = fPlayerService;
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
 
         command = fileManager.getCommand().getGeolocate();
         permission = fileManager.getPermission().getCommand().getGeolocate();
@@ -44,10 +49,33 @@ public abstract class GeolocateModule extends AbstractModuleCommand<Localization
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        String commandName = getName(command);
+        String promptPlayer = getPrompt().getPlayer();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .required(promptPlayer, commandRegistry.playerParser(command.isSuggestOfflinePlayers()))
+                        .handler(this)
+        );
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String playerName = commandUtil.getString(0, arguments);
+        String promptPlayer = getPrompt().getPlayer();
+        String playerName = commandContext.get(promptPlayer);
 
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
 
@@ -100,22 +128,5 @@ public abstract class GeolocateModule extends AbstractModuleCommand<Localization
         } catch (IOException ignored) {}
 
         return arrayList;
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 }

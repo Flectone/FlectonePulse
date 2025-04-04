@@ -5,10 +5,9 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.command.FCommand;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.PermissionUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
@@ -34,10 +33,10 @@ public class BukkitSpyModule extends SpyModule {
     @Inject
     public BukkitSpyModule(FileManager fileManager,
                            FPlayerService fPlayerService,
-                           CommandUtil commandUtil,
+                           CommandRegistry commandRegistry,
                            PermissionUtil permissionUtil,
                            BukkitListenerRegistry bukkitListenerManager) {
-        super(fileManager, fPlayerService, commandUtil, permissionUtil);
+        super(fileManager, commandRegistry, fPlayerService, permissionUtil);
 
         this.fPlayerService = fPlayerService;
         this.bukkitListenerManager = bukkitListenerManager;
@@ -135,24 +134,5 @@ public class BukkitSpyModule extends SpyModule {
         String message = event.getMessage();
 
         checkChat(fPlayer, "chat", message);
-    }
-
-    public void checkChat(FPlayer fPlayer, String chat, String message) {
-        if (!isEnable()) return;
-
-        Map<String, List<String>> categories = getCommand().getCategories();
-        if (categories.get("action") == null) return;
-        if (!categories.get("action").contains(chat)) return;
-
-        spy(fPlayer, chat, message);
-    }
-
-    @Override
-    public void createCommand() {
-        new FCommand(getName(getCommand()))
-                .withAliases(getCommand().getAliases())
-                .withPermission(getPermission())
-                .executesPlayer(this::executesFPlayer)
-                .override();
     }
 }

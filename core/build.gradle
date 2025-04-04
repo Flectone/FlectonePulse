@@ -1,4 +1,7 @@
 dependencies {
+    compileOnly "org.incendo:cloud-core:$cloud_core_version"
+    compileOnly "org.incendo:cloud-minecraft-extras:$cloud_minecraft_extras_version"
+
     compileOnly "com.alessiodp.libby:libby-bukkit:$libby_version"
     compileOnly "net.elytrium:serializer:$elytrium_serializer_version"
     compileOnly "com.zaxxer:HikariCP:$HikariCP_version"

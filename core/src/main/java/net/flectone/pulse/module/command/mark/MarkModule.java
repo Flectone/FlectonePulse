@@ -1,32 +1,40 @@
 package net.flectone.pulse.module.command.mark;
 
-import lombok.Getter;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.util.CommandUtil;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
+import org.incendo.cloud.minecraft.extras.parser.TextColorParser;
 
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
-public abstract class MarkModule extends AbstractModuleCommand<Localization.Command> {
+@Singleton
+public class MarkModule extends AbstractModuleCommand<Localization.Command> {
 
-    @Getter private final Command.Mark command;
-    @Getter private final Permission.Command.Mark permission;
+    private final Command.Mark command;
+    private final Permission.Command.Mark permission;
 
     private final BiConsumer<FPlayer, NamedTextColor> markConsumer;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
 
+    @Inject
     public MarkModule(FileManager fileManager,
-                      BiConsumer<FPlayer, NamedTextColor> markConsumer,
-                      CommandUtil commandUtil) {
+                      net.flectone.pulse.module.message.mark.MarkModule markModule,
+                      CommandRegistry commandRegistry) {
         super(Localization::getCommand, null);
 
-        this.markConsumer = markConsumer;
-        this.commandUtil = commandUtil;
+        this.markConsumer = markModule::mark;
+        this.commandRegistry = commandRegistry;
 
         command = fileManager.getCommand().getMark();
         permission = fileManager.getPermission().getCommand().getMark();
@@ -36,13 +44,8 @@ public abstract class MarkModule extends AbstractModuleCommand<Localization.Comm
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
-        if (checkModulePredicates(fPlayer)) return;
-
-        NamedTextColor color = commandUtil.getByClassOrDefault(0, NamedTextColor.class, NamedTextColor.WHITE, arguments);
-
-        markConsumer.accept(fPlayer, color);
-        playSound(fPlayer);
+    public boolean isConfigEnable() {
+        return command.isEnable();
     }
 
     @Override
@@ -52,13 +55,26 @@ public abstract class MarkModule extends AbstractModuleCommand<Localization.Comm
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
+        String commandName = getName(command);
+        String promptColor = getPrompt().getColor();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .optional(promptColor, TextColorParser.textColorParser())
+                        .handler(this)
+        );
     }
 
     @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+        if (checkModulePredicates(fPlayer)) return;
+
+        String promptColor = getPrompt().getColor();
+        Optional<TextColor> optionalTextColor = commandContext.optional(promptColor);
+
+        NamedTextColor color = (NamedTextColor) optionalTextColor.orElse(NamedTextColor.WHITE);
+
+        markConsumer.accept(fPlayer, color);
+        playSound(fPlayer);
     }
 }

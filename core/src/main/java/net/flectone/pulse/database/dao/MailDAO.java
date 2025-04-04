@@ -6,7 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.command.mail.model.Mail;
+import net.flectone.pulse.model.Mail;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.*;
@@ -72,7 +72,7 @@ public class MailDAO {
         }
     }
 
-    public List<Mail> get(FPlayer fPlayer) {
+    public List<Mail> getReceiver(FPlayer fPlayer) {
         List<Mail> mails = new ArrayList<>();
 
         if (fPlayer.isUnknown()) return mails;
@@ -80,6 +80,33 @@ public class MailDAO {
         try (Connection connection = database.getConnection()) {
             String SQL_GET_BY_RECEIVER = "SELECT * FROM `mail` WHERE `receiver` = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_BY_RECEIVER);
+            preparedStatement.setInt(1, fPlayer.getId());
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                long date = resultSet.getLong("date");
+                int sender = resultSet.getInt("sender");
+                String message = resultSet.getString("message");
+
+                mails.add(new Mail(id, date, sender, fPlayer.getId(), message));
+            }
+        } catch (SQLException e) {
+            fLogger.warning(e);
+        }
+
+        return mails;
+    }
+
+    public List<Mail> getSender(FPlayer fPlayer) {
+        List<Mail> mails = new ArrayList<>();
+
+        if (fPlayer.isUnknown()) return mails;
+
+        try (Connection connection = database.getConnection()) {
+            String SQL_GET_BY_SENDER = "SELECT * FROM `mail` WHERE `sender` = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_BY_SENDER);
             preparedStatement.setInt(1, fPlayer.getId());
 
             ResultSet resultSet = preparedStatement.executeQuery();

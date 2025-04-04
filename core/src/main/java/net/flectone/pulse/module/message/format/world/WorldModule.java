@@ -18,6 +18,8 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 
+import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
+
 @Singleton
 public class WorldModule extends AbstractModule {
 
@@ -69,11 +71,11 @@ public class WorldModule extends AbstractModule {
     }
 
     public TagResolver worldTag(@NotNull FEntity sender) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
-        if (!(sender instanceof FPlayer fPlayer)) return TagResolver.empty();
+        String tag = "world_prefix";
+        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
+        if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver("world_prefix", (argumentQueue, context) -> {
-
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             String worldPrefix = fPlayer.getSettingValue(FPlayer.Setting.WORLD_PREFIX);
             if (worldPrefix == null) return Tag.selfClosingInserting(Component.empty());
 

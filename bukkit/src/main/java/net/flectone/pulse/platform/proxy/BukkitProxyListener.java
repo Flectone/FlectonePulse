@@ -317,15 +317,12 @@ public class BukkitProxyListener implements PluginMessageListener {
                     if (pollModule.checkModulePredicates(fEntity)) return;
 
                     Poll poll = gson.fromJson(input.readUTF(), Poll.class);
-                    pollModule.put(poll);
-
-                    String title = input.readUTF();
-                    Map<String, String> answerSet = gson.fromJson(input.readUTF(), new TypeToken<Map<String, String>>() {}.getType());
+                    pollModule.saveAndUpdateLast(poll);
 
                     pollModule.builder(fEntity)
                             .range(Range.SERVER)
-                            .format(pollModule.createFormat(fEntity, answerSet, poll))
-                            .message((fResolver, s) -> title)
+                            .format(pollModule.resolvePollFormat(fEntity, poll, PollModule.Status.START))
+                            .message((fResolver, s) -> poll.getTitle())
                             .sound(pollModule.getSound())
                             .sendBuilt();
                 }
@@ -486,7 +483,7 @@ public class BukkitProxyListener implements PluginMessageListener {
                     UUID id = UUID.fromString(input.readUTF());
                     String move = input.readUTF();
 
-                    injector.getInstance(RockpaperscissorsModule.class).finalMove(id, fPlayer, move);
+                    injector.getInstance(RockpaperscissorsModule.class).sendFinalMessage(id, fPlayer, move);
                 }
                 case FROM_DISCORD_TO_MINECRAFT -> {
                     String nickname = input.readUTF();

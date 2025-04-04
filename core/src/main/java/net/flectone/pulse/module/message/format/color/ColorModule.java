@@ -17,6 +17,8 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import java.util.HashMap;
 import java.util.Map;
 
+import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
+
 
 @Singleton
 public class ColorModule extends AbstractModule {
@@ -36,11 +38,14 @@ public class ColorModule extends AbstractModule {
     }
 
     public TagResolver colorTag(FEntity sender) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
+        String tag = "fcolor";
+        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
 
-        Map<String, String> playerColors = sender instanceof FPlayer fPlayer ? fPlayer.getColors() : new HashMap<>();
+        Map<String, String> playerColors = sender instanceof FPlayer fPlayer
+                ? fPlayer.getColors()
+                : new HashMap<>();
 
-        return TagResolver.resolver("fcolor", (argumentQueue, context) -> {
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             Tag.Argument colorArg = argumentQueue.peek();
             if (colorArg == null) return Tag.selfClosingInserting(Component.empty());
 

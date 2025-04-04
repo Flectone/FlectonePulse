@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.command.chatcolor;
 
-import lombok.Getter;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
@@ -9,39 +10,41 @@ import net.flectone.pulse.connector.ProxyConnector;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.ColorUtil;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.PermissionUtil;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-public abstract class ChatcolorModule extends AbstractModuleCommand<Localization.Command.Chatcolor> {
+@Singleton
+public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.Chatcolor> {
 
-    @Getter private final Message.Format.Color color;
-    @Getter private final Command.Chatcolor command;
-    @Getter private final Permission.Command.Chatcolor permission;
+    private final Message.Format.Color color;
+    private final Command.Chatcolor command;
+    private final Permission.Command.Chatcolor permission;
 
     private final FPlayerService fPlayerService;
     private final PermissionUtil permissionUtil;
     private final ProxyConnector proxyConnector;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
     private final ColorUtil colorUtil;
 
+    @Inject
     public ChatcolorModule(FileManager fileManager,
                            FPlayerService fPlayerService,
                            PermissionUtil permissionUtil,
                            ProxyConnector proxyConnector,
-                           CommandUtil commandUtil,
+                           CommandRegistry commandRegistry,
                            ColorUtil colorUtil) {
         super(localization -> localization.getCommand().getChatcolor(), null);
         this.fPlayerService = fPlayerService;
         this.permissionUtil = permissionUtil;
         this.proxyConnector = proxyConnector;
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
         this.colorUtil = colorUtil;
 
         color = fileManager.getMessage().getFormat().getColor();
@@ -52,102 +55,8 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
-        if (checkModulePredicates(fPlayer)) return;
-
-        String input = commandUtil.getString(0, arguments);
-
-        if (permissionUtil.has(fPlayer, permission.getOther())) {
-            String[] words = input.split(" ");
-
-            String player = words[0];
-            if (!player.startsWith("#")
-                    && !player.startsWith("&")
-                    && !player.equalsIgnoreCase("clear")) {
-
-                FPlayer fTarget = fPlayerService.getFPlayer(player);
-
-                if (fTarget.isUnknown()) {
-                    builder(fPlayer)
-                            .format(Localization.Command.Chatcolor::getNullPlayer)
-                            .sendBuilt();
-                    return;
-                }
-
-                fPlayerService.loadColors(fTarget);
-
-                proxyConnector.sendMessage(fTarget, MessageTag.COMMAND_CHATCOLOR, byteArrayDataOutput ->
-                        byteArrayDataOutput.writeUTF(input)
-                );
-
-                if (words.length > 1) {
-                    prepareInput(input.substring(player.length() + 1).trim(), fTarget);
-                }
-
-                return;
-            }
-        }
-
-        prepareInput(input, fPlayer);
-    }
-
-    private void prepareInput(String input, FPlayer fPlayer) {
-        Map<String, String> tagColorMap = color.getValues();
-
-        if (input.equalsIgnoreCase("clear")) {
-            fPlayer.getColors().clear();
-            setColors(fPlayer, new HashMap<>(), null);
-            return;
-        }
-
-        String[] colors = input.split(" ");
-
-        if (colors.length != tagColorMap.size()
-                || Arrays.stream(colors).anyMatch(color -> !color.startsWith("#")
-                && !color.startsWith("&")
-                && !colorUtil.getMinecraftList().contains(color)
-                || color.startsWith("#") && color.length() != 7
-                || color.startsWith("&") && color.length() != 2)) {
-
-            builder(fPlayer)
-                    .format(Localization.Command.Chatcolor::getNullColor)
-                    .sendBuilt();
-            return;
-        }
-
-        setColors(fPlayer, tagColorMap, colors);
-    }
-
-    private void setColors(FPlayer fPlayer, Map<String, String> tagColorMap, String[] colors) {
-        int x = 0;
-        for (Map.Entry<String, String> entry : tagColorMap.entrySet()) {
-
-            colors[x] = colors[x].startsWith("&")
-                    ? colorUtil.getLegacyHexMap().get(colors[x])
-                    : !colors[x].startsWith("#")
-                    ? colorUtil.getMinecraftHexMap().get(colors[x])
-                    : colors[x];
-
-            fPlayer.getColors().put(entry.getKey(), colors[x]);
-            x++;
-        }
-
-        fPlayerService.saveColors(fPlayer);
-
-        FPlayer onlineFPlayer = fPlayerService.getFPlayer(fPlayer.getUuid());
-        if (!onlineFPlayer.isUnknown()) {
-            if (fPlayer.getColors().isEmpty()) {
-                onlineFPlayer.getColors().clear();
-            } else {
-                onlineFPlayer.getColors().putAll(fPlayer.getColors());
-            }
-        }
-
-        builder(fPlayer)
-                .destination(command.getDestination())
-                .format((fResolver, s) -> s.getFormat())
-                .sound(getSound())
-                .sendBuilt();
+    public boolean isConfigEnable() {
+        return command.isEnable();
     }
 
     @Override
@@ -159,13 +68,130 @@ public abstract class ChatcolorModule extends AbstractModuleCommand<Localization
 
         registerPermission(permission.getOther());
 
-        getCommand().getAliases().forEach(commandUtil::unregister);
+        String commandName = getName(command);
+        String promptColor = getPrompt().getColor();
+        commandRegistry.registerCommand(manager -> {
+            var builder = manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                    .permission(permission.getName());
 
-        createCommand();
+            for (int i = 0; i < color.getValues().size(); i++) {
+                builder = builder.optional(promptColor + " " + (i + 1), commandRegistry.colorParser());
+            }
+
+            return builder.handler(this);
+        });
     }
 
     @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+        if (checkModulePredicates(fPlayer)) return;
+
+        String[] inputColors = null;
+
+        if (commandContext.rawInput().input().split(" ").length != 1) {
+            String promptColor = getPrompt().getColor();
+
+            List<String> inputList = new ArrayList<>();
+            for (int i = 0; i < color.getValues().size(); i++) {
+                Optional<String> optionalColor = commandContext.optional(promptColor + " " + (i + 1));
+                if (optionalColor.isEmpty()) continue;
+
+                inputList.add(optionalColor.get());
+            }
+
+            if (!inputList.isEmpty()) {
+                inputColors = inputList.toArray(new String[0]);
+            }
+        }
+
+        if (inputColors == null) {
+            builder(fPlayer)
+                    .format(Localization.Command.Chatcolor::getNullColor)
+                    .sendBuilt();
+            return;
+        }
+
+        if (inputColors[0].equalsIgnoreCase("clear")) {
+            fPlayer.getColors().clear();
+            setColors(fPlayer, null);
+            return;
+        }
+
+        FPlayer fTarget = fPlayer;
+
+        if (permissionUtil.has(fPlayer, permission.getOther()) && inputColors.length > 1) {
+            String player = inputColors[0];
+            if (!player.startsWith("#") && !player.startsWith("&") && !player.equalsIgnoreCase("clear")) {
+                fTarget = fPlayerService.getFPlayer(player);
+
+                if (fTarget.isUnknown()) {
+                    builder(fPlayer)
+                            .format(Localization.Command.Chatcolor::getNullPlayer)
+                            .sendBuilt();
+                    return;
+                }
+
+                String[] finalInputColors = inputColors;
+                proxyConnector.sendMessage(fTarget, MessageTag.COMMAND_CHATCOLOR, byteArrayDataOutput ->
+                        byteArrayDataOutput.writeUTF(String.join(" ", finalInputColors))
+                );
+
+                if (inputColors[1].equalsIgnoreCase("clear")) {
+                    fTarget.getColors().clear();
+                    setColors(fTarget, null);
+                    return;
+                }
+
+                inputColors = Arrays.copyOfRange(inputColors, 1, inputColors.length);
+            }
+        }
+
+        Map<String, String> defaultColors = color.getValues();
+        Iterator<String> mapKeyIterator = defaultColors.keySet().iterator();
+
+        Map<String, String> newColors = new HashMap<>();
+
+        for (int i = 0; i < inputColors.length; i++) {
+            if (i >= defaultColors.size()) {
+                break;
+            }
+
+            String inputColor = inputColors[i];
+
+            if (inputColor.startsWith("#") && inputColor.length() == 7) {
+                // all right
+            } else if (inputColor.startsWith("&")) {
+                inputColor = colorUtil.getLegacyHexMap().get(inputColor);
+            } else {
+                inputColor = colorUtil.getMinecraftHexMap().get(inputColor);
+            }
+
+            if (inputColor == null) {
+                builder(fPlayer)
+                        .format(Localization.Command.Chatcolor::getNullColor)
+                        .sendBuilt();
+                return;
+            }
+
+            newColors.put(mapKeyIterator.next(), inputColor);
+        }
+
+        setColors(fTarget, newColors);
+    }
+
+    private void setColors(FPlayer fPlayer, Map<String, String> newColors) {
+        fPlayer.getColors().clear();
+
+        if (newColors != null) {
+            fPlayer.getColors().putAll(newColors);
+        }
+
+        fPlayerService.saveColors(fPlayer);
+
+        builder(fPlayer)
+                .destination(command.getDestination())
+                .format((fResolver, s) -> s.getFormat())
+                .sound(getSound())
+                .sendBuilt();
     }
 }

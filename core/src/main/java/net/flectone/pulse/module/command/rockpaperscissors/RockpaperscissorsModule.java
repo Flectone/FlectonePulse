@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.command.rockpaperscissors;
 
-import lombok.Getter;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
@@ -11,38 +12,41 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissors;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
+import org.incendo.cloud.parser.standard.UUIDParser;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiFunction;
 
-public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Localization.Command.Rockpaperscissors> {
+@Singleton
+public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.Command.Rockpaperscissors> {
 
     private final Map<UUID, RockPaperScissors> gameMap = new HashMap<>();
 
-    @Getter private final Command.Rockpaperscissors command;
-    @Getter private final Permission.Command.Rockpaperscissors permission;
+    private final Command.Rockpaperscissors command;
+    private final Permission.Command.Rockpaperscissors permission;
 
     private final ProxyConnector proxyConnector;
     private final FPlayerService fPlayerService;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
     private final IntegrationModule integrationModule;
 
+    @Inject
     public RockpaperscissorsModule(FileManager fileManager,
                                    ProxyConnector proxyConnector,
                                    FPlayerService fPlayerService,
-                                   CommandUtil commandUtil,
+                                   CommandRegistry commandRegistry,
                                    IntegrationModule integrationModule) {
         super(localization -> localization.getCommand().getRockpaperscissors(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.ROCKPAPERSCISSORS));
 
         this.proxyConnector = proxyConnector;
         this.fPlayerService = fPlayerService;
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
         this.integrationModule = integrationModule;
 
         command = fileManager.getCommand().getRockpaperscissors();
@@ -50,13 +54,42 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        gameMap.clear();
+
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        String commandName = getName(command);
+        String promptPlayer = getPrompt().getPlayer();
+        String promptMove = getPrompt().getMove();
+        String promptUUID = getPrompt().getId();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .required(promptPlayer, commandRegistry.playerParser())
+                        .optional(promptMove, commandRegistry.nativeSingleMessageParser())
+                        .optional(promptUUID, UUIDParser.uuidParser())
+                        .handler(this)
+        );
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
         if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
         if (checkMute(fPlayer)) return;
 
-        String player = commandUtil.getString(0, arguments);
+        String promptPlayer = getPrompt().getPlayer();
+        String player = commandContext.get(promptPlayer);
         FPlayer fReceiver = fPlayerService.getFPlayer(player);
         if (!fReceiver.isOnline() || integrationModule.isVanished(fReceiver)) {
             builder(fPlayer)
@@ -77,62 +110,16 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
         if (checkIgnore(fPlayer, fReceiver)) return;
         if (checkDisable(fPlayer, fReceiver, DisableAction.HE)) return;
 
-        String move = commandUtil.getString(1, arguments);
-        UUID uuid = commandUtil.getByClassOrDefault(2, UUID.class, UUID.randomUUID(), arguments);
+        String promptMove = getPrompt().getMove();
+        Optional<String> optionalMove = commandContext.optional(promptMove);
+        String move = optionalMove.orElse(null);
+
+        String promptUUID = getPrompt().getId();
+        Optional<UUID> optionalUUID = commandContext.optional(promptUUID);
+        UUID uuid = optionalUUID.orElse(null);
 
         if (move != null && uuid != null) {
-            var strategy = command.getStrategies().get(move);
-
-            if (strategy == null) {
-                builder(fPlayer)
-                        .format(Localization.Command.Rockpaperscissors::getWrongMove)
-                        .sendBuilt();
-                return;
-            }
-
-            RockPaperScissors rockPaperScissors = gameMap.get(uuid);
-
-            if (rockPaperScissors == null) {
-                builder(fPlayer)
-                        .format(Localization.Command.Rockpaperscissors::getNullGame)
-                        .sendBuilt();
-                return;
-            }
-
-            if (rockPaperScissors.getSenderMove() != null) {
-                if (rockPaperScissors.getSender().equals(fPlayer.getUuid())) {
-                    builder(fPlayer)
-                            .format(Localization.Command.Rockpaperscissors::getAlready)
-                            .sendBuilt();
-                    return;
-                }
-
-                boolean isSent = proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_FINAL, byteArrayDataOutput -> {
-                    byteArrayDataOutput.writeUTF(rockPaperScissors.getId().toString());
-                    byteArrayDataOutput.writeUTF(move);
-                });
-
-                if (isSent) return;
-
-                finalMove(rockPaperScissors.getId(), fPlayer, move);
-
-                return;
-            }
-
-            builder(fReceiver)
-                    .receiver(fPlayer)
-                    .format((fResolver, s) -> s.getSender())
-                    .sendBuilt();
-
-            boolean isSent = proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_MOVE, byteArrayDataOutput -> {
-                byteArrayDataOutput.writeUTF(rockPaperScissors.getId().toString());
-                byteArrayDataOutput.writeUTF(move);
-            });
-
-            if (isSent) return;
-
-            move(rockPaperScissors.getId(), fPlayer, move);
-
+            finalMove(fPlayer, fReceiver, move, uuid);
             return;
         }
 
@@ -154,7 +141,61 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
                 .sendBuilt();
     }
 
-    public void finalMove(UUID id, FPlayer fPlayer, String move) {
+    public void finalMove(FPlayer fPlayer, FPlayer fReceiver, String move, UUID uuid) {
+        List<String> strategy = command.getStrategies().get(move);
+
+        if (strategy == null) {
+            builder(fPlayer)
+                    .format(Localization.Command.Rockpaperscissors::getWrongMove)
+                    .sendBuilt();
+            return;
+        }
+
+        RockPaperScissors rockPaperScissors = gameMap.get(uuid);
+
+        if (rockPaperScissors == null) {
+            builder(fPlayer)
+                    .format(Localization.Command.Rockpaperscissors::getNullGame)
+                    .sendBuilt();
+            return;
+        }
+
+        if (rockPaperScissors.getSenderMove() != null) {
+            if (rockPaperScissors.getSender().equals(fPlayer.getUuid())) {
+                builder(fPlayer)
+                        .format(Localization.Command.Rockpaperscissors::getAlready)
+                        .sendBuilt();
+                return;
+            }
+
+            boolean isSent = proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_FINAL, byteArrayDataOutput -> {
+                byteArrayDataOutput.writeUTF(rockPaperScissors.getId().toString());
+                byteArrayDataOutput.writeUTF(move);
+            });
+
+            if (isSent) return;
+
+            sendFinalMessage(rockPaperScissors.getId(), fPlayer, move);
+
+            return;
+        }
+
+        builder(fReceiver)
+                .receiver(fPlayer)
+                .format((fResolver, s) -> s.getSender())
+                .sendBuilt();
+
+        boolean isSent = proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_MOVE, byteArrayDataOutput -> {
+            byteArrayDataOutput.writeUTF(rockPaperScissors.getId().toString());
+            byteArrayDataOutput.writeUTF(move);
+        });
+
+        if (isSent) return;
+
+        move(rockPaperScissors.getId(), fPlayer, move);
+    }
+
+    public void sendFinalMessage(UUID id, FPlayer fPlayer, String move) {
         if (checkModulePredicates(fPlayer)) return;
 
         RockPaperScissors rockPaperScissors = gameMap.get(id);
@@ -228,24 +269,5 @@ public abstract class RockpaperscissorsModule extends AbstractModuleCommand<Loca
 
         RockPaperScissors rockPaperScissors = new RockPaperScissors(id, fPlayer.getUuid(), receiver);
         gameMap.put(id, rockPaperScissors);
-    }
-
-    @Override
-    public void reload() {
-        gameMap.clear();
-
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 }

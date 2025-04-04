@@ -7,6 +7,7 @@ import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import feign.Logger;
+import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
@@ -15,7 +16,6 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.twitch.listener.ChannelMessageListener;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.SystemUtil;
 
@@ -29,7 +29,7 @@ public class TwitchIntegration implements FIntegration {
     private final Localization.Integration.Twitch localization;
 
     private final ChannelMessageListener channelMessageListener;
-    private final CommandUtil commandUtil;
+    private final PlatformServerAdapter platformServerAdapter;
     private final SystemUtil systemUtil;
     private final FLogger fLogger;
 
@@ -38,13 +38,13 @@ public class TwitchIntegration implements FIntegration {
 
     @Inject
     public TwitchIntegration(FileManager fileManager,
-                             CommandUtil commandUtil,
+                             PlatformServerAdapter platformServerAdapter,
                              SystemUtil systemUtil,
                              ChannelMessageListener channelMessageListener,
                              FLogger fLogger) {
 
         this.channelMessageListener = channelMessageListener;
-        this.commandUtil = commandUtil;
+        this.platformServerAdapter = platformServerAdapter;
         this.systemUtil = systemUtil;
         this.fLogger = fLogger;
 
@@ -88,7 +88,7 @@ public class TwitchIntegration implements FIntegration {
             List<String> commands = integration.getFollowChannel().get(channelName);
             if (commands == null) return;
 
-            commands.forEach(commandUtil::dispatch);
+            commands.forEach(platformServerAdapter::dispatchCommand);
         });
 
         if (!integration.getMessageChannel().isEmpty()) {

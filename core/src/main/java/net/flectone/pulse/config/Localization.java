@@ -104,7 +104,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.stream.not = "<color:#ff7171><b>⁉</b> Ты не включил трансляцию";
         command.stream.formatEnd = "<fcolor:2>★ Спасибо за трансляцию на нашем сервере!";
         command.stream.already = "<color:#ff7171><b>⁉</b> Ты уже включил трансляцию";
-        command.stream.formatStart = "<br><color:#ff4e4e>\uD83D\uDD14 <fcolor:1>Объявление <color:#ff4e4e>\uD83D\uDD14<br><br><fcolor:1><display_name> начал трансляцию<br><br><urls><br>";
+        command.stream.formatStart = "<br><color:#ff4e4e>│ 🔔 <fcolor:1>Объявление <br><color:#ff4e4e>│<br><color:#ff4e4e>│ <fcolor:1><display_name> начал трансляцию<br><color:#ff4e4e>│<br><urls><br>";
 
         command.kick.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.kick.reasons.clear();
@@ -123,15 +123,16 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         command.reply.nullReceiver = "<color:#ff7171><b>⁉</b> Некому отвечать";
 
-        command.poll.formatStart = "<br><color:#fce303>🗐 Создано голосование #<id> <br>❓ <message> <br><answers>";
-        command.poll.formatOver = "<br><color:#fce303>🗐 Голосование #<id> завершено <br>❓ <message> <br>Результат: <br><answers>";
-        command.poll.voteTrue = "<color:#4eff52>👍 Ты выбрал <answer_id> в голосовании #<id>. Всего таких голосов <count>";
-        command.poll.voteFalse = "<color:#ff4e4e>\uD83D\uDD93 Ты передумал об <answer_id> в голосовании #<id>. Всего таких голосов <count> без тебя";
-        command.poll.countAnswers = "<color:#4eff52><bold><count></bold> за [<answer_key>] - <answer_value> <br>";
-        command.poll.voteButton = "<color:#4eff52><hover:show_text:\"<color:#4eff52>Проголосовать за <bold><answer_key>\"><click:run_command:\"/poll vote <id> <number>\">[<answer_key>] - <answer_value> <br>";
         command.poll.expired = "<color:#ff7171><b>⁉</b> Голосование завершено";
         command.poll.already = "<color:#ff7171><b>⁉</b> Ты уже проголосовал в этом голосовании";
         command.poll.nullPoll = "<color:#ff7171><b>⁉</b> Голосование не найдено";
+        command.poll.voteTrue = "<color:#4eff52>👍 Ты выбрал <answer_id> в голосовании #<id>. Всего таких голосов <count>";
+        command.poll.voteFalse = "<color:#ff4e4e>\uD83D\uDD93 Ты передумал об <answer_id> в голосовании #<id>. Всего таких голосов <count> без тебя";
+        command.poll.format = "<br><color:#fce303>│ <status> <br>│ <message> <br>├─────────────<br><answers>";
+        command.poll.status.start = "Создано новое голосование #<b><id></b>";
+        command.poll.status.run = "Идёт голосование #<b><id></b>";
+        command.poll.status.end = "Голосование #<b><id></b> завершено";
+        command.poll.answerTemplate = "<color:#fce303>│ <count> → <color:#4eff52><hover:show_text:\"<color:#4eff52>Проголосовать за <bold><answer>\"><click:run_command:\"/pollvote <id> <number>\"><answer> [👍]<br>";
 
         command.ignore.myself = "<color:#ff7171><b>⁉</b> Нельзя игнорировать самого себя";
         command.ignore.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
@@ -287,7 +288,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.tictactoe.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.tictactoe.myself = "<color:#ff7171><b>⁉</b> Ты не можешь играть с самим собой";
         command.tictactoe.sender = "<fcolor:1>☐ Предложение сыграть в крестики-нолики отправлено для <display_name>";
-        command.tictactoe.formatCreate = "<click:run_command:\"/tictactoe %d create\"><fcolor:1>☐ Есть предложение сыграть в крестики-нолики от <display_name>, принять? [+]";
+        command.tictactoe.receiver = "<click:run_command:\"/tictactoemove %d create\"><fcolor:1>☐ Есть предложение сыграть в крестики-нолики от <display_name>, принять? [+]";
         command.tictactoe.wrongGame = "<color:#ff7171><b>⁉</b> Этой игры не существует";
         command.tictactoe.wrongByPlayer = "<color:#ff7171><b>⁉</b> Игра закончена, потому что один из игроков не в сети";
         command.tictactoe.wrongMove = "<color:#ff7171><b>⁉</b> Такой ход невозможен";
@@ -295,10 +296,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.tictactoe.lastMove = "<fcolor:2>Последний ход (<move>)</fcolor:2>";
         command.tictactoe.formatWin = "<color:#98FB98><player> выиграл</color:#98FB98>";
         command.tictactoe.formatDraw = "<color:#98FB98>Ничья \uD83D\uDC6C</color:#98FB98>";
-        command.tictactoe.symbol.empty = "<hover:show_text:\"<fcolor:1>Ход <move>\"><click:run_command:\"/tictactoe %d <move>\">☐</click></hover>";
+        command.tictactoe.symbol.blank = "<hover:show_text:\"<fcolor:1>Ход <move>\"><click:run_command:\"/tictactoemove %d <move>\">☐</click></hover>";
 
-        command.maintenance.already = "<color:#ff7171><b>⁉</b> Технические работы уже идут";
-        command.maintenance.not = "<color:#ff7171><b>⁉</b> Технические работы не идут";
         command.maintenance.kick = "<color:#ff7171>★ На сервере ведутся технические работы";
         command.maintenance.serverDescription = "<color:#ff7171>В настоящее время проводятся технические работы";
         command.maintenance.serverVersion = "Технические работы";
@@ -326,6 +325,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.prompt.hard = "сложно?";
         command.prompt.accept = "принять";
         command.prompt.turn = "включить";
+        command.prompt.type = "type";
         command.prompt.category = "категория";
         command.prompt.reason = "причина";
         command.prompt.id = "айди";
@@ -636,6 +636,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String hard = "hard";
             private String accept = "accept";
             private String turn = "turn on";
+            private String type = "type";
             private String reason = "reason";
             private String category = "category";
             private String id = "id";
@@ -961,8 +962,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Maintenance implements SubCommandConfig, Localizable {
-            private String not = "<color:#ff7171><b>⁉</b> You have not maintenance";
-            private String already = "<color:#ff7171><b>⁉</b> You have already maintenance";
             private String serverDescription = "<color:#ff7171>The server is under maintenance";
             private String serverVersion = "Maintenance";
             private String kick = "<color:#ff7171>★ The server is under maintenance";
@@ -1023,15 +1022,21 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Poll implements SubCommandConfig, Localizable {
-            private String nullPoll = "<color:#ff7171><b>⁉</b> This poll does not exist";
-            private String expired = "<color:#ff7171><b>⁉</b> This poll has already ended";
-            private String already = "<color:#ff7171><b>⁉</b> You've already voted in this poll";
+            private String nullPoll = "<color:#ff7171><b>⁉</b> Poll not found";
+            private String expired = "<color:#ff7171><b>⁉</b> The poll has ended";
+            private String already = "<color:#ff7171><b>⁉</b> You have already voted in this poll";
             private String voteTrue = "<color:#4eff52>👍 You voted for <answer_id> in poll #<id>. There are <count> of you";
             private String voteFalse = "<color:#ff4e4e>🖓 You rejected <answer_id> in poll #<id>. There are <count> without you";
-            private String countAnswers = "<color:#4eff52><bold><count></bold> for [<answer_key>] - <answer_value> <br>";
-            private String voteButton = "<color:#4eff52><hover:show_text:\"<color:#4eff52>Vote for <bold><answer_key>\"><click:run_command:\"/poll vote <id> <number>\">[<answer_key>] - <answer_value> <br>";
-            private String formatStart = "<br><color:#fce303>🗐 There's a poll #<id> going on right now <br>❓ <message> <br><answers>";
-            private String formatOver = "<br><color:#fce303>🗐 Poll #<id> is over <br>❓ <message> <br>Votes: <br><answers>";
+            private String format = "<br><color:#fce303>│ <status> <br>│ <message> <br>├─────────────<br><answers>";
+            private String answerTemplate = "<color:#fce303>│ <count> → <color:#4eff52><hover:show_text:\"<color:#4eff52>Vote for <bold><answer>\"><click:run_command:\"/pollvote <id> <number>\"><answer> [👍]<br>";
+            private Status status = new Status();
+
+            @Getter
+            public static final class Status {
+                private String start = "New poll #<b><id></b> has been created";
+                private String run = "Poll #<b><id></b> is in progress";
+                private String end = "Poll #<b><id></b> has ended";
+            }
         }
 
         @Getter
@@ -1073,8 +1078,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String not = "<color:#ff7171><b>⁉</b> You don't stream";
             private String prefixTrue = "<color:#ff4e4e>⏻</color:#ff4e4e> ";
             private String prefixFalse = "";
-            private String urlTag = "<fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\"><url></hover></click>";
-            private String formatStart = "<br><color:#ff4e4e>\uD83D\uDD14 <fcolor:1>Announcement <color:#ff4e4e>\uD83D\uDD14 <br><br><fcolor:1><display_name> started stream <br><br><urls>";
+            private String urlTemplate = "<color:#ff4e4e>│ <fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\"><url></hover></click>";
+            private String formatStart = "<br><color:#ff4e4e>│ 🔔 <fcolor:1>Announcement <br><color:#ff4e4e>│<br><color:#ff4e4e>│ <fcolor:1><display_name> started streaming<br><color:#ff4e4e>│<br><urls><br>";
             private String formatEnd = "<fcolor:2>★ Thanks for streaming on our server!";
         }
 
@@ -1124,7 +1129,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             @Getter
             @NoArgsConstructor
             public static final class Symbol {
-                private String empty = "<hover:show_text:\"<fcolor:1>Move <move>\"><click:run_command:\"/tictactoe %d <move>\">☐</click></hover>";
+                private String blank = "<hover:show_text:\"<fcolor:1>Move <move>\"><click:run_command:\"/tictactoemove %d <move>\">☐</click></hover>";
                 private String first = "<fcolor:2>☑</fcolor:2>";
                 private String firstRemove = "<color:#ff7171>☑</color:#ff7171>";
                 private String firstWin = "<color:#98FB98>☑</color:#98FB98>";
@@ -1140,7 +1145,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String formatWin = "<color:#98FB98><player> won this game</color:#98FB98>";
             private String formatDraw = "<color:#98FB98>The game ended in a draw 👬</color:#98FB98>";
             private String sender = "<fcolor:1>☐ An offer to play was sent to <display_name>";
-            private String formatCreate = "<click:run_command:\"/tictactoe %d create\"><fcolor:1>☐ Received an invite to play tic-tac-toe with <display_name>, accept? [+]";
+            private String receiver = "<click:run_command:\"/tictactoemove %d create\"><fcolor:1>☐ Received an invite to play tic-tac-toe with <display_name>, accept? [+]";
         }
 
         @Getter

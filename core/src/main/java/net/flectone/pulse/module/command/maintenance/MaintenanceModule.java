@@ -7,6 +7,9 @@ import com.github.retrooper.packetevents.wrapper.status.server.WrapperStatusServ
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.Getter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -15,18 +18,25 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.maintenance.listener.MaintenancePacketListener;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.*;
+import net.flectone.pulse.util.ComponentUtil;
+import net.flectone.pulse.util.FileUtil;
+import net.flectone.pulse.util.PacketEventsUtil;
+import net.flectone.pulse.util.PermissionUtil;
 import net.kyori.adventure.text.Component;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
 
 import java.io.File;
 import java.nio.file.Path;
 
-public abstract class MaintenanceModule extends AbstractModuleCommand<Localization.Command.Maintenance> {
+@Singleton
+public class MaintenanceModule extends AbstractModuleCommand<Localization.Command.Maintenance> {
 
     @Getter private final Command.Maintenance command;
-    @Getter private final Permission.Command.Maintenance permission;
+    private final Permission.Command.Maintenance permission;
 
     private final FileManager fileManager;
     private final FPlayerService fPlayerService;
@@ -35,18 +45,19 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
     private final Path iconPath;
     private final FileUtil fileUtil;
     private final ComponentUtil componentUtil;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
     private final PacketEventsUtil packetEventsUtil;
 
     private String icon;
 
+    @Inject
     public MaintenanceModule(FileManager fileManager,
                              FPlayerService fPlayerService,
                              PermissionUtil permissionUtil,
                              ListenerRegistry listenerRegistry,
-                             Path projectPath,
+                             @Named("projectPath") Path projectPath,
                              FileUtil fileUtil,
-                             CommandUtil commandUtil,
+                             CommandRegistry commandRegistry,
                              ComponentUtil componentUtil,
                              PacketEventsUtil packetEventsUtil) {
         super(module -> module.getCommand().getMaintenance(), null);
@@ -54,7 +65,7 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         this.fileManager = fileManager;
         this.fPlayerService = fPlayerService;
         this.permissionUtil = permissionUtil;
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
         this.listenerRegistry = listenerRegistry;
         this.iconPath = projectPath.resolve("images");
         this.fileUtil = fileUtil;
@@ -68,31 +79,54 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        registerPermission(permission.getJoin());
+
+        listenerRegistry.register(MaintenancePacketListener.class);
+
+        File file = new File(iconPath.toString() + File.separator + "maintenance.png");
+
+        if (!file.exists()) {
+            fileUtil.saveResource("images" + File.separator + "maintenance.png");
+        }
+
+        icon = fileUtil.convertIcon(file);
+
+        if (command.isTurnedOn()) {
+            kickOnlinePlayers(FPlayer.UNKNOWN);
+        }
+
+        String commandName = getName(command);
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .handler(this)
+        );
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        boolean turned = commandUtil.getBoolean(0, arguments);
-        if (turned && command.isTurnedOn()) {
-            builder(fPlayer)
-                    .format(Localization.Command.Maintenance::getAlready)
-                    .sendBuilt();
-            return;
-        }
+        boolean turned = !command.isTurnedOn();
 
-        if (!turned && !command.isTurnedOn()) {
-            builder(fPlayer)
-                    .format(Localization.Command.Maintenance::getNot)
-                    .sendBuilt();
-            return;
-        }
+        command.setTurnedOn(turned);
+        fileManager.save();
 
         builder(fPlayer)
                 .destination(command.getDestination())
                 .format(s -> turned ? s.getFormatTrue() : s.getFormatFalse())
                 .sendBuilt();
-
-        command.setTurnedOn(turned);
-        fileManager.save();
 
         if (turned) {
             kickOnlinePlayers(fPlayer);
@@ -133,39 +167,6 @@ public abstract class MaintenanceModule extends AbstractModuleCommand<Localizati
         Component reason = componentUtil.builder(fPlayer, messageKick).build();
         packetEventsUtil.sendPacket(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
         return true;
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        registerPermission(permission.getJoin());
-
-        listenerRegistry.register(MaintenancePacketListener.class);
-
-        File file = new File(iconPath.toString() + File.separator + "maintenance.png");
-
-        if (!file.exists()) {
-            fileUtil.saveResource("images" + File.separator + "maintenance.png");
-        }
-
-        icon = fileUtil.convertIcon(file);
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-
-        if (command.isTurnedOn()) {
-            kickOnlinePlayers(FPlayer.UNKNOWN);
-        }
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 
     private JsonElement getVersionJson(String message) {

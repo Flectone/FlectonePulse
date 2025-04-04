@@ -9,7 +9,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.command.spy.BukkitSpyModule;
+import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BukkitBubbleModule;
 import net.flectone.pulse.module.message.chat.listener.ChatListener;
@@ -20,7 +20,6 @@ import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.PermissionUtil;
 import net.flectone.pulse.util.Range;
 import net.flectone.pulse.util.TimeUtil;
-import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
@@ -43,7 +42,7 @@ public class BukkitChatModule extends ChatModule {
     private final TimeUtil timeUtil;
 
     @Inject private BukkitBubbleModule bubbleModule;
-    @Inject private BukkitSpyModule spyModule;
+    @Inject private SpyModule spyModule;
 
     @Inject
     public BukkitChatModule(FileManager fileManager,

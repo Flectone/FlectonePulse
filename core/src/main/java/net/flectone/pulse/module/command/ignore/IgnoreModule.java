@@ -1,7 +1,7 @@
 package net.flectone.pulse.module.command.ignore;
 
 import com.google.inject.Inject;
-import lombok.Getter;
+import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
@@ -9,28 +9,31 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.Optional;
 
-public abstract class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ignore> {
+@Singleton
+public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ignore> {
 
-    @Getter private final Command.Ignore command;
-    @Getter private final Permission.Command.Ignore permission;
+    private final Command.Ignore command;
+    private final Permission.Command.Ignore permission;
 
     private final FPlayerService fPlayerService;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
 
     @Inject
     public IgnoreModule(FileManager fileManager,
                         FPlayerService fPlayerService,
-                        CommandUtil commandUtil) {
+                        CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getIgnore(), null);
 
         this.fPlayerService = fPlayerService;
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
 
         command = fileManager.getCommand().getIgnore();
         permission = fileManager.getPermission().getCommand().getIgnore();
@@ -40,55 +43,8 @@ public abstract class IgnoreModule extends AbstractModuleCommand<Localization.Co
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
-        if (checkCooldown(fPlayer)) return;
-        if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
-        if (checkModulePredicates(fPlayer)) return;
-
-        String target = commandUtil.getString(0, arguments);
-
-        ignore(fPlayer, target);
-    }
-
-    public void ignore(FPlayer fPlayer, String offlinePlayerName) {
-        if (checkModulePredicates(fPlayer)) return;
-
-        if (fPlayer.getName().equalsIgnoreCase(offlinePlayerName)) {
-            builder(fPlayer)
-                    .format(Localization.Command.Ignore::getMyself)
-                    .sendBuilt();
-            return;
-        }
-
-        FPlayer fIgnored = fPlayerService.getFPlayer(offlinePlayerName);
-        if (fIgnored.isUnknown()) {
-            builder(fPlayer)
-                    .format(Localization.Command.Ignore::getNullPlayer)
-                    .sendBuilt();
-            return;
-        }
-
-        Optional<Ignore> ignore = fPlayer.getIgnores()
-                .stream()
-                .filter(i -> i.target() == fIgnored.getId())
-                .findFirst();
-
-        if (ignore.isPresent()) {
-            fPlayer.getIgnores().remove(ignore.get());
-            fPlayerService.deleteIgnore(ignore.get());
-        } else {
-            Ignore newIgnore = fPlayerService.saveAndGetIgnore(fPlayer, fIgnored);
-            if (newIgnore == null) return;
-
-            fPlayer.getIgnores().add(newIgnore);
-        }
-
-        builder(fIgnored)
-                .destination(command.getDestination())
-                .receiver(fPlayer)
-                .format(s -> ignore.isEmpty() ? s.getFormatTrue() : s.getFormatFalse())
-                .sound(getSound())
-                .sendBuilt();
+    public boolean isConfigEnable() {
+        return command.isEnable();
     }
 
     @Override
@@ -98,13 +54,60 @@ public abstract class IgnoreModule extends AbstractModuleCommand<Localization.Co
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
+        String commandName = getName(command);
+        String promptPlayer = getPrompt().getPlayer();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .required(promptPlayer, commandRegistry.playerParser(command.isSuggestOfflinePlayers()))
+                        .handler(this)
+        );
     }
 
     @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+        if (checkCooldown(fPlayer)) return;
+        if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
+        if (checkModulePredicates(fPlayer)) return;
+
+        String prompt = getPrompt().getPlayer();
+        String targetName = commandContext.get(prompt);
+
+        if (fPlayer.getName().equalsIgnoreCase(targetName)) {
+            builder(fPlayer)
+                    .format(Localization.Command.Ignore::getMyself)
+                    .sendBuilt();
+            return;
+        }
+
+        FPlayer fTarget = fPlayerService.getFPlayer(targetName);
+        if (fTarget.isUnknown()) {
+            builder(fPlayer)
+                    .format(Localization.Command.Ignore::getNullPlayer)
+                    .sendBuilt();
+            return;
+        }
+
+        Optional<Ignore> ignore = fPlayer.getIgnores()
+                .stream()
+                .filter(i -> i.target() == fTarget.getId())
+                .findFirst();
+
+        if (ignore.isPresent()) {
+            fPlayer.getIgnores().remove(ignore.get());
+            fPlayerService.deleteIgnore(ignore.get());
+        } else {
+            Ignore newIgnore = fPlayerService.saveAndGetIgnore(fPlayer, fTarget);
+            if (newIgnore == null) return;
+
+            fPlayer.getIgnores().add(newIgnore);
+        }
+
+        builder(fTarget)
+                .destination(command.getDestination())
+                .receiver(fPlayer)
+                .format(s -> ignore.isEmpty() ? s.getFormatTrue() : s.getFormatFalse())
+                .sound(getSound())
+                .sendBuilt();
     }
 }

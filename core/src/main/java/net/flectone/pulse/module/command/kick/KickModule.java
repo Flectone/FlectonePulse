@@ -1,6 +1,8 @@
 package net.flectone.pulse.module.command.kick;
 
 import com.google.gson.Gson;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -10,29 +12,35 @@ import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.*;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
 
+import java.util.Optional;
 import java.util.function.BiFunction;
 
-public abstract class KickModule extends AbstractModuleCommand<Localization.Command.Kick> {
+@Singleton
+public class KickModule extends AbstractModuleCommand<Localization.Command.Kick> {
 
     @Getter private final Command.Kick command;
-    @Getter private final Permission.Command.Kick permission;
+    private final Permission.Command.Kick permission;
 
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationUtil moderationUtil;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
     private final ComponentUtil componentUtil;
     private final Gson gson;
 
+    @Inject
     public KickModule(FileManager fileManager,
                       FPlayerService fPlayerService,
                       ModerationService moderationService,
                       ModerationUtil moderationUtil,
-                      CommandUtil commandUtil,
+                      CommandRegistry commandRegistry,
                       ComponentUtil componentUtil,
                       Gson gson) {
         super(localization -> localization.getCommand().getKick(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.KICK));
@@ -40,7 +48,7 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.moderationUtil = moderationUtil;
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
         this.componentUtil = componentUtil;
         this.gson = gson;
 
@@ -49,13 +57,38 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        String commandName = getName(command);
+        String promptPlayer = getPrompt().getPlayer();
+        String promptMessage = getPrompt().getMessage();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .required(promptPlayer, commandRegistry.playerParser())
+                        .optional(promptMessage, commandRegistry.nativeMessageParser())
+                        .handler(this)
+        );
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkCooldown(fPlayer)) return;
         if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
         if (checkMute(fPlayer)) return;
         if (checkModulePredicates(fPlayer)) return;
 
-        String playerName = commandUtil.getString(0, arguments);
+        String promptPlayer = getPrompt().getPlayer();
+        String playerName = commandContext.get(promptPlayer);
 
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
         if (!fTarget.isOnline()) {
@@ -65,7 +98,10 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
             return;
         }
 
-        String reason = commandUtil.getString(1, arguments);
+        String promptMessage = getPrompt().getMessage();
+        Optional<String> optionalReason = commandContext.optional(promptMessage);
+        String reason = optionalReason.orElse(null);
+
         Moderation kick = moderationService.kick(fTarget, reason, fPlayer.getId());
         if (kick == null) return;
 
@@ -95,22 +131,5 @@ public abstract class KickModule extends AbstractModuleCommand<Localization.Comm
         String format = moderationUtil.replacePlaceholders(resolveLocalization(fReceiver).getPerson(), fReceiver, kick);
 
         fPlayerService.kick(fReceiver, componentUtil.builder(fReceiver, format).build());
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 }

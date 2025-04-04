@@ -1,7 +1,7 @@
 package net.flectone.pulse.module.command.warnlist;
 
 import com.google.inject.Inject;
-import lombok.Getter;
+import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
@@ -11,27 +11,30 @@ import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
 import net.flectone.pulse.platform.MessageSender;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.ModerationUtil;
 import net.kyori.adventure.text.Component;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.List;
 import java.util.Optional;
 
-public abstract class WarnlistModule extends AbstractModuleCommand<Localization.Command.Warnlist> {
+@Singleton
+public class WarnlistModule extends AbstractModuleCommand<Localization.Command.Warnlist> {
 
-    @Getter private final Command.Warnlist command;
-    @Getter private final Permission.Command.Warnlist permission;
+    private final Command.Warnlist command;
+    private final Permission.Command.Warnlist permission;
 
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationUtil moderationUtil;
     private final UnwarnModule unwarnModule;
     private final ComponentUtil componentUtil;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
     private final MessageSender messageSender;
 
     @Inject
@@ -41,7 +44,7 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
                           ModerationUtil moderationUtil,
                           UnwarnModule unwarnModule,
                           ComponentUtil componentUtil,
-                          CommandUtil commandUtil,
+                          CommandRegistry commandRegistry,
                           MessageSender messageSender) {
         super(localization -> localization.getCommand().getWarnlist(), null);
 
@@ -51,47 +54,73 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
         this.unwarnModule = unwarnModule;
         this.componentUtil = componentUtil;
         this.messageSender = messageSender;
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
 
         command = fileManager.getCommand().getWarnlist();
         permission = fileManager.getPermission().getCommand().getWarnlist();
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        String commandName = getName(command);
+        String promptPlayer = getPrompt().getPlayer();
+        String promptNumber = getPrompt().getNumber();
+
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .optional(promptPlayer, commandRegistry.warnedParser())
+                        .optional(promptNumber, commandRegistry.integerParser())
+                        .handler(this)
+        );
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
 
         Localization.Command.Warnlist localization = resolveLocalization(fPlayer);
         Localization.ListTypeMessage localizationType = localization.getGlobal();
 
-        String commandLine = "/" + command.getAliases().get(0);
-
-        int page = 1;
-
-        Optional<Object> optionalObject = commandUtil.getOptional(0, arguments);
+        String commandLine = "/" + getName(command);
 
         FPlayer targetFPlayer = null;
+        int page = 1;
 
-        if (optionalObject.isPresent() && optionalObject.get() instanceof String playerName) {
-            targetFPlayer = fPlayerService.getFPlayer(playerName);
+        String promptPlayer = getPrompt().getPlayer();
+        Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
+        if (optionalPlayer.isPresent()) {
+            String playerName = optionalPlayer.get();
 
-            if (targetFPlayer.isUnknown()) {
-                builder(fPlayer)
-                        .format((fResolver, s) -> s.getNullPlayer())
-                        .sendBuilt();
-                return;
+            try {
+                page = Integer.parseInt(playerName);
+            } catch (NumberFormatException e) {
+                String promptNumber = getPrompt().getNumber();
+                Optional<Integer> optionalNumber = commandContext.optional(promptNumber);
+                page = optionalNumber.orElse(page);
+
+                targetFPlayer = fPlayerService.getFPlayer(playerName);
+                if (targetFPlayer.isUnknown()) {
+                    builder(fPlayer)
+                            .format(Localization.Command.Warnlist::getNullPlayer)
+                            .sendBuilt();
+                    return;
+                }
+
+                commandLine += " " + playerName;
+                localizationType = localization.getPlayer();
             }
-
-            optionalObject = commandUtil.getOptional(1, arguments);
-
-            commandLine += " " + playerName;
-
-            localizationType = localization.getPlayer();
-        }
-
-        if (optionalObject.isPresent()) {
-            page = (int) optionalObject.get();
         }
 
         List<Moderation> moderationList = targetFPlayer == null
@@ -150,22 +179,5 @@ public abstract class WarnlistModule extends AbstractModuleCommand<Localization.
         messageSender.sendMessage(fPlayer, component);
 
         playSound(fPlayer);
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 }

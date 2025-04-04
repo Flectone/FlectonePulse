@@ -1,6 +1,9 @@
 package net.flectone.pulse.module.command.translateto;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.Getter;
+import lombok.NonNull;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
@@ -8,9 +11,13 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.util.CommandUtil;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
+import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
+import org.incendo.cloud.suggestion.Suggestion;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,20 +28,22 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
-public abstract class TranslatetoModule extends AbstractModuleCommand<Localization.Command.Translateto> {
+@Singleton
+public class TranslatetoModule extends AbstractModuleCommand<Localization.Command.Translateto> {
 
     @Getter private final Command.Translateto command;
-    @Getter private final Permission.Command.Translateto permission;
+    private final Permission.Command.Translateto permission;
 
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
     private final IntegrationModule integrationModule;
 
+    @Inject
     public TranslatetoModule(FileManager fileManager,
-                             CommandUtil commandUtil,
+                             CommandRegistry commandRegistry,
                              IntegrationModule integrationModule) {
         super(localization -> localization.getCommand().getTranslateto(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TRANSLATETO));
 
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
         this.integrationModule = integrationModule;
 
         command = fileManager.getCommand().getTranslateto();
@@ -46,12 +55,47 @@ public abstract class TranslatetoModule extends AbstractModuleCommand<Localizati
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        String commandName = getName(command);
+        String promptLanguage = getPrompt().getLanguage();
+        String promptMessage = getPrompt().getMessage();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .required(promptLanguage + " main", commandRegistry.singleMessageParser(), languageSuggestion())
+                        .required(promptLanguage + " target", commandRegistry.singleMessageParser(), languageSuggestion())
+                        .required(promptMessage, commandRegistry.nativeMessageParser())
+                        .permission(permission.getName())
+                        .handler(this)
+        );
+    }
+
+    private @NonNull BlockingSuggestionProvider<FPlayer> languageSuggestion() {
+        return (context, input) -> command.getLanguages()
+                .stream()
+                .map(Suggestion::suggestion)
+                .toList();
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String mainLang = commandUtil.getString(0, arguments);
-        String targetLang = commandUtil.getString(1, arguments);
-        String message = commandUtil.getString(2, arguments);
+        String promptLanguage = getPrompt().getLanguage();
+        String mainLang = commandContext.get(promptLanguage + " main");
+        String targetLang = commandContext.get(promptLanguage + " target");
+
+        String promptMessage = getPrompt().getMessage();
+        String message = commandContext.get(promptMessage);
 
         String translated = translate(fPlayer, mainLang, targetLang, message);
         if (translated.isEmpty()) {
@@ -117,22 +161,5 @@ public abstract class TranslatetoModule extends AbstractModuleCommand<Localizati
         } catch (IOException ignored) {}
 
         return "";
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 }

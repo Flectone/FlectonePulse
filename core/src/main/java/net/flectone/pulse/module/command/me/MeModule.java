@@ -1,5 +1,7 @@
 package net.flectone.pulse.module.command.me;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -7,22 +9,26 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.util.CommandUtil;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
 
-public abstract class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
+@Singleton
+public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
 
     @Getter private final Command.Me command;
-    @Getter private final Permission.Command.Me permission;
+    private final Permission.Command.Me permission;
 
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
 
+    @Inject
     public MeModule(FileManager fileManager,
-                    CommandUtil commandUtil) {
+                    CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getMe(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.ME));
 
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
 
         command = fileManager.getCommand().getMe();
         permission = fileManager.getPermission().getCommand().getMe();
@@ -33,10 +39,33 @@ public abstract class MeModule extends AbstractModuleCommand<Localization.Comman
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        String commandName = getName(command);
+        String promptMessage = getPrompt().getMessage();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .required(promptMessage, commandRegistry.nativeMessageParser())
+                        .handler(this)
+        );
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String string = commandUtil.getString(0, arguments);
+        String promptMessage = getPrompt().getMessage();
+        String string = commandContext.get(promptMessage);
 
         builder(fPlayer)
                 .tag(MessageTag.COMMAND_ME)
@@ -48,22 +77,5 @@ public abstract class MeModule extends AbstractModuleCommand<Localization.Comman
                 .integration(s -> s.replace("<message>", string))
                 .sound(getSound())
                 .sendBuilt();
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 }

@@ -78,5 +78,26 @@ public abstract class LibraryResolver {
                 )
                 .build()
         );
+
+        addLibrary(Library.builder()
+                .groupId("org{}incendo")
+                .artifactId("cloud-core")
+                .version(BuildConfig.CLOUD_CORE_VERSION)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("org{}incendo")
+                .artifactId("cloud-minecraft-extras")
+                .version(BuildConfig.CLOUD_MINECRAFT_EXTRAS_VERSION)
+                .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}elytrium{}serializer")
+                        .relocatedPattern("net.flectone.pulse.library.elytrium")
+                        .build()
+                )
+                .build()
+        );
     }
 }

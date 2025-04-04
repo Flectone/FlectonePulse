@@ -20,6 +20,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
+
 @Singleton
 public class SwearModule extends AbstractModuleMessage<Localization.Message.Format.Moderation.Swear> {
 
@@ -82,9 +84,10 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
     }
 
     public TagResolver swearTag(FEntity sender, FEntity receiver) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
+        String tag = "swear";
+        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver("swear", (argumentQueue, context) -> {
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             Tag.Argument swearTag = argumentQueue.peek();
             if (swearTag == null) return Tag.selfClosingInserting(Component.empty());
 

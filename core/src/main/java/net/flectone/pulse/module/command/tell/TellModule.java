@@ -1,5 +1,7 @@
 package net.flectone.pulse.module.command.tell;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -10,53 +12,83 @@ import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
-@Getter
-public abstract class TellModule extends AbstractModuleCommand<Localization.Command.Tell> {
+@Singleton
+public class TellModule extends AbstractModuleCommand<Localization.Command.Tell> {
 
-    private final HashMap<UUID, String> senderReceiverMap = new HashMap<>();
+    @Getter private final HashMap<UUID, String> senderReceiverMap = new HashMap<>();
 
-    @Getter private final Command.Tell command;
-    @Getter private final Permission.Command.Tell permission;
+    private final Command.Tell command;
+    private final Permission.Command.Tell permission;
 
     private final FPlayerService fPlayerService;
     private final ProxyConnector proxyConnector;
     private final IntegrationModule integrationModule;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
 
+    @Inject
     public TellModule(FileManager fileManager,
                       FPlayerService fPlayerService,
                       ProxyConnector proxyConnector,
                       IntegrationModule integrationModule,
-                      CommandUtil commandUtil) {
+                      CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getTell(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELL));
 
         this.fPlayerService = fPlayerService;
         this.proxyConnector = proxyConnector;
         this.integrationModule = integrationModule;
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
 
         command = fileManager.getCommand().getTell();
         permission = fileManager.getPermission().getCommand().getTell();
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        String commandName = getName(command);
+        String promptPlayer = getPrompt().getPlayer();
+        String promptMessage = getPrompt().getMessage();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .required(promptPlayer, commandRegistry.playerParser(command.isSuggestOfflinePlayers()))
+                        .required(promptMessage, commandRegistry.nativeMessageParser())
+                        .permission(permission.getName())
+                        .handler(this)
+        );
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
         if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
         if (checkMute(fPlayer)) return;
 
-        String playerName = commandUtil.getString(0, arguments);
-        String message = commandUtil.getString(1, arguments);
+        String promptPlayer = getPrompt().getPlayer();
+        String playerName = commandContext.get(promptPlayer);
+
+        String promptMessage = getPrompt().getMessage();
+        String message = commandContext.get(promptMessage);
 
         send(fPlayer, playerName, message);
     }
@@ -118,22 +150,5 @@ public abstract class TellModule extends AbstractModuleCommand<Localization.Comm
                 .sendBuilt();
 
         senderReceiverMap.put(fReceiver.getUuid(), fPlayer.getName());
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 }

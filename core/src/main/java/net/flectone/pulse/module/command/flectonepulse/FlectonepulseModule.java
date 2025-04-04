@@ -1,33 +1,40 @@
 package net.flectone.pulse.module.command.flectonepulse;
 
-import lombok.Getter;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import net.flectone.pulse.FlectonePulse;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.util.CommandUtil;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.util.TimeUtil;
+import net.flectone.pulse.util.logging.FLogger;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
+import org.incendo.cloud.suggestion.SuggestionProvider;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
 
-public abstract class FlectonepulseModule extends AbstractModuleCommand<Localization.Command.Flectonepulse> {
+@Singleton
+public class FlectonepulseModule extends AbstractModuleCommand<Localization.Command.Flectonepulse> {
 
-    @Getter private final Command.Flectonepulse command;
-    @Getter private final Permission.Command.Flectonepulse permission;
+    private final Command.Flectonepulse command;
+    private final Permission.Command.Flectonepulse permission;
 
     private final FlectonePulse flectonePulse;
     private final FileManager fileManager;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
     private final TimeUtil timeUtil;
     private final FLogger fLogger;
 
+    @Inject
     public FlectonepulseModule(FileManager fileManager,
-                               CommandUtil commandUtil,
+                               CommandRegistry commandRegistry,
                                TimeUtil timeUtil,
                                FlectonePulse flectonePulse,
                                FLogger fLogger) {
@@ -35,7 +42,7 @@ public abstract class FlectonepulseModule extends AbstractModuleCommand<Localiza
 
         this.flectonePulse = flectonePulse;
         this.fileManager = fileManager;
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
         this.timeUtil = timeUtil;
         this.fLogger = fLogger;
 
@@ -46,10 +53,35 @@ public abstract class FlectonepulseModule extends AbstractModuleCommand<Localiza
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        String commandName = getName(command);
+        String promptType = getPrompt().getType();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .literal("reload")
+                        .optional(promptType, commandRegistry.playerParser(), SuggestionProvider.suggestingStrings("text"))
+                        .handler(this)
+        );
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String type = commandUtil.getLiteral(1, arguments);
+        String promptType = getPrompt().getType();
+        Optional<String> optionalType = commandContext.optional(promptType);
+        String type = optionalType.orElse("all");
 
         if (type.equals("text")) {
             fileManager.reload();
@@ -86,22 +118,5 @@ public abstract class FlectonepulseModule extends AbstractModuleCommand<Localiza
                     .format(Localization.Command.Flectonepulse::getFormatFalse)
                     .sendBuilt();
         }
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 }

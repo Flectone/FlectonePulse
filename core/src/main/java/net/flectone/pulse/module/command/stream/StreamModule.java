@@ -1,6 +1,9 @@
 package net.flectone.pulse.module.command.stream;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.Getter;
+import lombok.NonNull;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -9,68 +12,118 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
+import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
+import org.incendo.cloud.suggestion.Suggestion;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
-public abstract class StreamModule extends AbstractModuleCommand<Localization.Command.Stream> {
+import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
+
+@Singleton
+public class StreamModule extends AbstractModuleCommand<Localization.Command.Stream> {
 
     @Getter private final Command.Stream command;
-    @Getter private final Permission.Command.Stream permission;
+    private final Permission.Command.Stream permission;
 
     private final FPlayerService fPlayerService;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
 
+    @Inject
     public StreamModule(FileManager fileManager,
                         FPlayerService fPlayerService,
-                        CommandUtil commandUtil) {
+                        CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getStream(), null);
 
         this.fPlayerService = fPlayerService;
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
 
         command = fileManager.getCommand().getStream();
         permission = fileManager.getPermission().getCommand().getStream();
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        String commandName = getName(command);
+        String promptType = getPrompt().getType();
+        String promptUrl = getPrompt().getUrl();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .required(promptType, commandRegistry.singleMessageParser(), typeSuggestion())
+                        .optional(promptUrl, commandRegistry.nativeMessageParser())
+                        .handler(this)
+        );
+    }
+
+    private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
+        return (context, input) -> List.of(
+                Suggestion.suggestion("start"),
+                Suggestion.suggestion("end")
+        );
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
         if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
         if (checkMute(fPlayer)) return;
 
-        boolean isStart = commandUtil.getFull(arguments).contains("start");
+        String promptType = getPrompt().getType();
+        String type = commandContext.get(promptType);
+        Boolean needStart = switch (type) {
+            case "start" -> true;
+            case "end" -> false;
+            default -> null;
+        };
+
+        if (needStart == null) return;
+
         boolean isStream = fPlayer.isSetting(FPlayer.Setting.STREAM);
 
-        if (isStream && isStart && !fPlayer.isUnknown()) {
+        if (isStream && needStart && !fPlayer.isUnknown()) {
             builder(fPlayer)
                     .format(Localization.Command.Stream::getAlready)
                     .sendBuilt();
             return;
         }
 
-        if (!isStream && !isStart) {
+        if (!isStream && !needStart) {
             builder(fPlayer)
                     .format(Localization.Command.Stream::getNot)
                     .sendBuilt();
             return;
         }
 
-        setStreamPrefix(fPlayer, isStart);
+        setStreamPrefix(fPlayer, needStart);
 
-        if (isStart) {
-            String rawString = commandUtil.getString(0, arguments);
+        if (needStart) {
+            String promptUrl = getPrompt().getUrl();
+            Optional<String> optionalUrl = commandContext.optional(promptUrl);
+            String rawString = optionalUrl.orElse("");
 
             builder(fPlayer)
                     .range(command.getRange())
@@ -93,7 +146,7 @@ public abstract class StreamModule extends AbstractModuleCommand<Localization.Co
     public Function<Localization.Command.Stream, String> replaceUrls(String string) {
         return message -> {
             List<String> urls = Arrays.stream(string.split(" "))
-                    .map(url -> message.getUrlTag().replace("<url>", url))
+                    .map(url -> message.getUrlTemplate().replace("<url>", url))
                     .toList();
 
             return message.getFormatStart()
@@ -117,31 +170,15 @@ public abstract class StreamModule extends AbstractModuleCommand<Localization.Co
     }
 
     public TagResolver streamTag(@NotNull FEntity sender) {
-        if (!isEnable()) return TagResolver.empty();
-        if (!(sender instanceof FPlayer fPlayer)) return TagResolver.empty();
+        String tag = "stream_prefix";
+        if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);
+        if (checkModulePredicates(fPlayer)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver("stream_prefix", (argumentQueue, context) -> {
-            if (checkModulePredicates(fPlayer)) return Tag.selfClosingInserting(Component.empty());
-            if (!fPlayer.isSetting(FPlayer.Setting.STREAM_PREFIX)) return Tag.selfClosingInserting(Component.empty());
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
+            String streamPrefix = fPlayer.getSettingValue(FPlayer.Setting.STREAM_PREFIX);
+            if (streamPrefix == null) return Tag.selfClosingInserting(Component.empty());
 
-            return Tag.preProcessParsed(Objects.requireNonNull(fPlayer.getSettingValue(FPlayer.Setting.STREAM_PREFIX)));
+            return Tag.preProcessParsed(streamPrefix);
         });
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 }

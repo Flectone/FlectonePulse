@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.command.banlist;
 
-import lombok.Getter;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
@@ -10,44 +11,48 @@ import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unban.UnbanModule;
 import net.flectone.pulse.platform.MessageSender;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.ModerationUtil;
 import net.kyori.adventure.text.Component;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.List;
 import java.util.Optional;
 
-public abstract class BanlistModule extends AbstractModuleCommand<Localization.Command.Banlist> {
+@Singleton
+public class BanlistModule extends AbstractModuleCommand<Localization.Command.Banlist> {
 
-    @Getter private final Command.Banlist command;
-    @Getter private final Permission.Command.Banlist permission;
+    private final Command.Banlist command;
+    private final Permission.Command.Banlist permission;
 
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
+    private final CommandRegistry commandRegistry;
     private final ModerationUtil moderationUtil;
     private final UnbanModule unbanModule;
-    private final CommandUtil commandUtil;
     private final ComponentUtil componentUtil;
     private final MessageSender messageSender;
 
+    @Inject
     public BanlistModule(FileManager fileManager,
                          FPlayerService fPlayerService,
                          ModerationService moderationService,
+                         CommandRegistry commandRegistry,
                          ModerationUtil moderationUtil,
                          UnbanModule unbanModule,
-                         CommandUtil commandUtil,
                          ComponentUtil componentUtil,
                          MessageSender messageSender) {
         super(localization -> localization.getCommand().getBanlist(), null);
 
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
+        this.commandRegistry = commandRegistry;
         this.moderationUtil = moderationUtil;
         this.unbanModule = unbanModule;
-        this.commandUtil = commandUtil;
         this.componentUtil = componentUtil;
         this.messageSender = messageSender;
 
@@ -58,37 +63,66 @@ public abstract class BanlistModule extends AbstractModuleCommand<Localization.C
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        String commandName = getName(command);
+        String promptPlayer = getPrompt().getPlayer();
+        String promptNumber = getPrompt().getNumber();
+
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .optional(promptPlayer, commandRegistry.bannedParser())
+                        .optional(promptNumber, commandRegistry.integerParser())
+                        .handler(this)
+        );
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
         Localization.Command.Banlist localization = resolveLocalization(fPlayer);
         Localization.ListTypeMessage localizationType = localization.getGlobal();
 
-        String commandLine = "/" + command.getAliases().get(0);
+        String commandLine = "/" + getName(command);
 
-        int page;
-
-        Optional<Object> optionalObject = commandUtil.getOptional(0, arguments);
-
+        int page = 1;
         FPlayer targetFPlayer = null;
 
-        if (optionalObject.isPresent() && optionalObject.get() instanceof String playerName) {
-            targetFPlayer = fPlayerService.getFPlayer(playerName);
+        String promptPlayer = getPrompt().getPlayer();
+        Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
+        if (optionalPlayer.isPresent()) {
+            String playerName = optionalPlayer.get();
 
-            if (targetFPlayer.isUnknown()) {
-                builder(fPlayer)
-                        .format(Localization.Command.Banlist::getNullPlayer)
-                        .sendBuilt();
-                return;
+            try {
+                page = Integer.parseInt(playerName);
+            } catch (NumberFormatException e) {
+                String promptNumber = getPrompt().getNumber();
+                Optional<Integer> optionalNumber = commandContext.optional(promptNumber);
+                page = optionalNumber.orElse(page);
+
+                targetFPlayer = fPlayerService.getFPlayer(playerName);
+                if (targetFPlayer.isUnknown()) {
+                    builder(fPlayer)
+                            .format(Localization.Command.Banlist::getNullPlayer)
+                            .sendBuilt();
+                    return;
+                }
+
+                commandLine += " " + playerName;
+                localizationType = localization.getPlayer();
             }
-
-            optionalObject = commandUtil.getOptional(1, arguments);
-
-            commandLine += " " + playerName;
-            localizationType = localization.getPlayer();
         }
-
-        page = optionalObject.map(o -> (int) o).orElse(1);
 
         List<Moderation> moderationList = targetFPlayer == null
                 ? moderationService.getValid(Moderation.Type.BAN)
@@ -145,22 +179,5 @@ public abstract class BanlistModule extends AbstractModuleCommand<Localization.C
         messageSender.sendMessage(fPlayer, component);
 
         playSound(fPlayer);
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 }

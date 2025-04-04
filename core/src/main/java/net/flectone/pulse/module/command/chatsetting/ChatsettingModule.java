@@ -1,7 +1,9 @@
 package net.flectone.pulse.module.command.chatsetting;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
-import lombok.Getter;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
@@ -11,40 +13,47 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.inventory.Inventory;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.PermissionUtil;
 import net.kyori.adventure.text.Component;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.List;
 
-public abstract class ChatsettingModule extends AbstractModuleCommand<Localization.Command.Chatsetting> {
+@Singleton
+public class ChatsettingModule extends AbstractModuleCommand<Localization.Command.Chatsetting> {
 
     private final Message.Chat chatMessage;
     private final Permission.Message.Chat chatPermission;
-    @Getter private final Command.Chatsetting command;
-    @Getter private final Permission.Command.Chatsetting permission;
+    private final Command.Chatsetting command;
+    private final Permission.Command.Chatsetting permission;
 
     private final FPlayerService fPlayerService;
     private final ComponentUtil componentUtil;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
     private final PermissionUtil permissionUtil;
     private final InventoryController inventoryController;
+    private final PlatformServerAdapter platformServerAdapter;
 
+    @Inject
     public ChatsettingModule(FileManager fileManager,
                              FPlayerService fPlayerService,
                              ComponentUtil componentUtil,
-                             CommandUtil commandUtil,
+                             CommandRegistry commandRegistry,
                              PermissionUtil permissionUtil,
-                             InventoryController inventoryController) {
+                             InventoryController inventoryController,
+                             PlatformServerAdapter platformServerAdapter) {
         super(localization -> localization.getCommand().getChatsetting(), null);
 
         this.fPlayerService = fPlayerService;
         this.componentUtil = componentUtil;
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
         this.permissionUtil = permissionUtil;
         this.inventoryController = inventoryController;
+        this.platformServerAdapter = platformServerAdapter;
 
         chatMessage = fileManager.getMessage().getChat();
         chatPermission = fileManager.getPermission().getMessage().getChat();
@@ -55,7 +64,29 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        permission.getItems().values().forEach(this::registerPermission);
+
+        String commandName = getName(command);
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .handler(this)
+        );
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
         Localization.Command.Chatsetting localization = resolveLocalization(fPlayer);
@@ -78,7 +109,7 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
             List<String> itemMessages = messages.get(settingIndex);
 
             inventoryBuilder = inventoryBuilder
-                    .addItem(slot, buildItemStack(settingIndex, fPlayer, itemMessages, entry.getValue()))
+                    .addItem(slot, platformServerAdapter.buildItemStack(settingIndex, fPlayer, itemMessages, entry.getValue()))
                     .addClickHandler(slot, (itemStack, inventory) -> {
                         if (!permissionUtil.has(fPlayer, permission.getItems().get(setting).getName())) {
                             builder(fPlayer)
@@ -125,7 +156,7 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
                             }
                         }
 
-                        ItemStack newItemStack = buildItemStack(newSettingIndex, fPlayer, itemMessages, entry.getValue());
+                        ItemStack newItemStack = platformServerAdapter.buildItemStack(newSettingIndex, fPlayer, itemMessages, entry.getValue());
                         inventoryController.changeItem(fPlayer, inventory, slot, newItemStack);
                     });
         }
@@ -133,26 +164,5 @@ public abstract class ChatsettingModule extends AbstractModuleCommand<Localizati
         inventoryController.open(fPlayer, inventoryBuilder.build());
 
         playSound(fPlayer);
-    }
-
-    public abstract ItemStack buildItemStack(int settingIndex, FPlayer fPlayer, List<String> itemMessages, Command.Chatsetting.SettingItem settingItem);
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        permission.getItems().values().forEach(this::registerPermission);
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 }

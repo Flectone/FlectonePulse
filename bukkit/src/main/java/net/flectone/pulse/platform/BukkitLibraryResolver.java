@@ -7,7 +7,6 @@ import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.util.BukkitServerUtil;
 import org.bukkit.plugin.Plugin;
 
 @Singleton
@@ -223,28 +222,11 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .build()
         );
 
-
-        String commandApiArtifact = "commandapi-bukkit-shade";
-
-        if (BukkitServerUtil.IS_PAPER && BukkitServerUtil.IS_1_20_5_OR_NEWER) {
-            commandApiArtifact += "-mojang-mapped";
-        }
-
         addLibrary(Library.builder()
-                .groupId("dev{}jorel")
-                .artifactId(commandApiArtifact)
-                .version(BuildConfig.COMMANDAPI_BUKKIT_VERSION)
+                .groupId("org{}incendo")
+                .artifactId("cloud-paper")
+                .version(BuildConfig.CLOUD_PAPER_VERSION)
                 .resolveTransitiveDependencies(true)
-                .relocate(Relocation.builder()
-                        .pattern("dev{}jorel")
-                        .relocatedPattern("net.flectone.pulse.library.commandapi")
-                        .build()
-                )
-                .relocate(Relocation.builder()
-                        .pattern("net{}kyori")
-                        .relocatedPattern("net.flectone.pulse.library")
-                        .build()
-                )
                 .build()
         );
     }

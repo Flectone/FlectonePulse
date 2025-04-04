@@ -4,8 +4,6 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import dev.jorel.commandapi.CommandAPI;
-import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Setter;
 import net.flectone.pulse.connector.ProxyConnector;
@@ -20,6 +18,7 @@ import net.flectone.pulse.module.message.bubble.manager.BubbleManager;
 import net.flectone.pulse.module.message.mark.manager.MarkManager;
 import net.flectone.pulse.platform.BukkitLibraryResolver;
 import net.flectone.pulse.platform.LibraryResolver;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
@@ -30,9 +29,6 @@ import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
 import net.megavex.scoreboardlibrary.api.team.TeamManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @Singleton
 public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
@@ -64,9 +60,6 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
                 .debug(false);
 
         PacketEvents.getAPI().load();
-
-        CommandAPI.onLoad(new CommandAPIBukkitConfig(this)
-                .silentLogs(true));
     }
 
     @Override
@@ -89,8 +82,6 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         // test
 //        PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(TestListener.class), PacketListenerPriority.NORMAL);
 
-        CommandAPI.onEnable();
-
         PacketEvents.getAPI().init();
 
         injector.getInstance(Module.class).reloadWithChildren();
@@ -109,7 +100,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         if (fileManager.getConfig().isMetrics()) {
             injector.getInstance(MetricsUtil.class).setup();
         }
-
+        
         injector.getInstance(ListenerRegistry.class).registerDefaultListeners();
 
         fLogger.logEnabled();
@@ -141,7 +132,6 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         injector.getInstance(ProxyConnector.class).disable();
 
-        CommandAPI.onDisable();
         injector.getInstance(DiscordModule.class).disconnect();
         injector.getInstance(TwitchModule.class).disconnect();
         injector.getInstance(TelegramModule.class).disconnect();
@@ -158,13 +148,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         injector.getInstance(InventoryController.class).closeAll();
 
-        CommandAPI.getRegisteredCommands().stream()
-                .filter(registeredCommand -> registeredCommand.shortDescription().isPresent()
-                        && registeredCommand.shortDescription().get().equals("flectonepulse"))
-                .flatMap(registeredCommand -> Arrays.stream(registeredCommand.aliases()))
-                .collect(Collectors.toSet())
-                .forEach(CommandAPI::unregister);
-
+        injector.getInstance(CommandRegistry.class).reload();
         injector.getInstance(ListenerRegistry.class).reload();
         injector.getInstance(TaskScheduler.class).reload();
         injector.getInstance(BubbleManager.class).reload();

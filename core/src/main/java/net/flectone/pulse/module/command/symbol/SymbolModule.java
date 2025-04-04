@@ -1,26 +1,38 @@
 package net.flectone.pulse.module.command.symbol;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.Getter;
+import lombok.NonNull;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.util.CommandUtil;
+import net.flectone.pulse.registry.CommandRegistry;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
+import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
+import org.incendo.cloud.suggestion.Suggestion;
 
-public abstract class SymbolModule extends AbstractModuleCommand<Localization.Command.Symbol> {
+import java.util.Arrays;
+import java.util.Collections;
+
+@Singleton
+public class SymbolModule extends AbstractModuleCommand<Localization.Command.Symbol> {
 
     @Getter private final Command.Symbol command;
     @Getter private final Permission.Command.Symbol permission;
 
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
 
+    @Inject
     public SymbolModule(FileManager fileManager,
-                        CommandUtil commandUtil) {
+                        CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getSymbol(), null);
 
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
 
         command = fileManager.getCommand().getSymbol();
         permission = fileManager.getPermission().getCommand().getSymbol();
@@ -29,17 +41,8 @@ public abstract class SymbolModule extends AbstractModuleCommand<Localization.Co
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
-        if (checkModulePredicates(fPlayer)) return;
-
-        String string = commandUtil.getString(1, arguments);
-
-        builder(fPlayer)
-                .destination(command.getDestination())
-                .format(s -> s.getFormat().replace("<message>", string))
-                .message(string)
-                .sound(getSound())
-                .sendBuilt();
+    public boolean isConfigEnable() {
+        return command.isEnable();
     }
 
     @Override
@@ -49,13 +52,56 @@ public abstract class SymbolModule extends AbstractModuleCommand<Localization.Co
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        getCommand().getAliases().forEach(commandUtil::unregister);
+        String commandName = getName(command);
+        String promptCategory = getPrompt().getCategory();
+        String promptMessage = getPrompt().getMessage();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .required(promptCategory, commandRegistry.singleMessageParser(), categorySuggestion())
+                        .required(promptMessage, commandRegistry.messageParser(), symbolSuggestion())
+                        .permission(permission.getName())
+                        .handler(this)
+        );
+    }
 
-        createCommand();
+    private @NonNull BlockingSuggestionProvider<FPlayer> categorySuggestion() {
+        return (context, input) -> command.getCategories()
+                .keySet()
+                .stream()
+                .map(Suggestion::suggestion)
+                .toList();
+    }
+
+    private @NonNull BlockingSuggestionProvider<FPlayer> symbolSuggestion() {
+        return (context, input) -> {
+            String inputString = input.input();
+            String[] words = inputString.split(" ");
+            if (words.length < 2) return Collections.emptyList();
+
+            String category = words[1];
+            if (!command.getCategories().containsKey(category)) return Collections.emptyList();
+
+            String rawInput = inputString.substring(words[0].length() + words[1].length() + 2);
+            String[] symbols = command.getCategories().get(category).split(" ");
+
+            return Arrays.stream(symbols)
+                    .map(symbol -> Suggestion.suggestion(rawInput + symbol))
+                    .toList();
+        };
     }
 
     @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+        if (checkModulePredicates(fPlayer)) return;
+
+        String promptMessage = getPrompt().getMessage();
+        String message = commandContext.get(promptMessage);
+
+        builder(fPlayer)
+                .destination(command.getDestination())
+                .format(s -> s.getFormat().replace("<message>", message))
+                .message(message)
+                .sound(getSound())
+                .sendBuilt();
     }
 }

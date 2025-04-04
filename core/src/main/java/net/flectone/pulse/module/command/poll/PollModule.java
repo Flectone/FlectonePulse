@@ -1,56 +1,67 @@
 package net.flectone.pulse.module.command.poll;
 
 import com.google.gson.Gson;
-import lombok.Getter;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import lombok.NonNull;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.connector.ProxyConnector;
-import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.poll.model.Poll;
-import net.flectone.pulse.util.CommandUtil;
+import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
+import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
+import org.incendo.cloud.suggestion.Suggestion;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.time.Duration;
+import java.util.*;
 import java.util.function.Function;
 
-public abstract class PollModule extends AbstractModuleCommand<Localization.Command.Poll> {
+@Singleton
+public class PollModule extends AbstractModuleCommand<Localization.Command.Poll> {
 
     private final HashMap<Integer, Poll> pollMap = new HashMap<>();
 
-    @Getter private final Command.Poll command;
-    @Getter private final Permission.Command.Poll permission;
+    private final Command.Poll command;
+    private final Permission.Command.Poll permission;
 
     private final FileManager fileManager;
+    private final FPlayerService fPlayerService;
     private final ProxyConnector proxyConnector;
     private final TaskScheduler taskScheduler;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
     private final ComponentUtil componentUtil;
     private final Gson gson;
 
+    @Inject
     public PollModule(FileManager fileManager,
+                      FPlayerService fPlayerService,
                       ProxyConnector proxyConnector,
                       TaskScheduler taskScheduler,
-                      CommandUtil commandUtil,
+                      CommandRegistry commandRegistry,
                       ComponentUtil componentUtil,
                       Gson gson) {
         super(localization -> localization.getCommand().getPoll(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.POLL));
 
         this.fileManager = fileManager;
+        this.fPlayerService = fPlayerService;
         this.proxyConnector = proxyConnector;
         this.taskScheduler = taskScheduler;
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
         this.componentUtil = componentUtil;
         this.gson = gson;
 
@@ -59,14 +70,100 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        registerPermission(permission.getCreate());
+
+        String commandName = getName(command);
+
+        String promptTime = getPrompt().getTime();
+        String promptRepeatTime = getPrompt().getRepeatTime();
+        String promptMultipleVote = getPrompt().getMultipleVote();
+        String promptMessage = getPrompt().getMessage();
+
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getCreate().getName())
+                        .required(promptTime, commandRegistry.durationParser())
+                        .required(promptRepeatTime, commandRegistry.durationParser())
+                        .required(promptMultipleVote, commandRegistry.booleanParser())
+                        .required(promptMessage, commandRegistry.messageParser(), mapSuggestion())
+                        .handler(commandContext -> executeCreate(commandContext.sender(), commandContext))
+        );
+
+        String promptId = getPrompt().getId();
+        String promptNumber = getPrompt().getNumber();
+
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName + "vote", CommandMeta.empty())
+                        .permission(permission.getName())
+                        .required(promptId, commandRegistry.integerParser())
+                        .required(promptNumber, commandRegistry.integerParser())
+                        .handler(this)
+        );
+
+        taskScheduler.runAsyncTimer(() -> {
+            Set<Integer> toRemove = new HashSet<>();
+
+            pollMap.forEach((id, poll) -> {
+                Status status = null;
+
+                if (poll.isEnded()) {
+                    toRemove.add(id);
+                    status = Status.END;
+                } else if (poll.repeat()) {
+                    status = Status.RUN;
+                }
+
+                if (status == null) return;
+
+                FPlayer fPlayer = fPlayerService.getFPlayer(poll.getCreator());
+                int range = command.getRange();
+
+                builder(fPlayer)
+                        .range(range)
+                        .tag(MessageTag.COMMAND_POLL_CREATE_MESSAGE)
+                        .format(resolvePollFormat(fPlayer, poll, status))
+                        .message((fResolver, s) -> poll.getTitle())
+                        .proxy(output -> output.writeUTF(gson.toJson(poll)))
+                        .integration()
+                        .sendBuilt();
+            });
+
+            toRemove.forEach(pollMap::remove);
+        }, 20L);
+    }
+
+    private @NonNull BlockingSuggestionProvider<FPlayer> mapSuggestion() {
+        return (context, input) -> {
+            String[] words = input.input().split(" ");
+            if (words.length < 6) return List.of(Suggestion.suggestion("title="));
+
+            String string = String.join(" ", Arrays.copyOfRange(words, 5, words.length));
+            if (!string.contains("title=")) return List.of(Suggestion.suggestion("title="), Suggestion.suggestion(string + ";"));
+
+            return List.of(Suggestion.suggestion(string + ";"));
+        };
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        Optional<Object> objectId = commandUtil.getOptional(0, arguments);
-        if (objectId.isEmpty() || !(objectId.get() instanceof Integer id)) return;
+        String promptId = getPrompt().getId();
+        int id = commandContext.get(promptId);
 
-        Optional<Object> objectNumberVote = commandUtil.getOptional(1, arguments);
-        if (objectNumberVote.isEmpty() || !(objectNumberVote.get() instanceof Integer numberVote)) return;
+        String promptNumber = getPrompt().getNumber();
+        int numberVote = commandContext.get(promptNumber);
 
         boolean isSent = proxyConnector.sendMessage(fPlayer, MessageTag.COMMAND_POLL_VOTE, byteArrayDataOutput -> {
             byteArrayDataOutput.writeInt(id);
@@ -79,42 +176,61 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
     }
 
     @Async
-    public void onCommandCreate(FPlayer fPlayer, Object arguments) {
+    public void executeCreate(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (!isEnable()) return;
         if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
         if (checkCooldown(fPlayer)) return;
         if (checkMute(fPlayer)) return;
 
-        int time = commandUtil.getInteger(0, arguments);
-        int repeatTime = commandUtil.getInteger(1, arguments);
-        boolean multipleVote = commandUtil.getBoolean(2, arguments);
-        String title = commandUtil.getText(3, arguments);
-        Map<String, String> answerSet = ((Map<String, String>) commandUtil.getOptional(4, arguments).get());
+        String promptTime = getPrompt().getTime();
+        long time = ((Duration) commandContext.get(promptTime)).toMillis();
 
-        Poll poll = new Poll(command.getLastId(), answerSet.size(), multipleVote);
-        put(poll);
+        String promptRepeatTime = getPrompt().getRepeatTime();
+        long repeatTime = ((Duration) commandContext.get(promptRepeatTime)).toMillis();
+
+        String promptMultipleVote = getPrompt().getMultipleVote();
+        boolean multipleVote = commandContext.get(promptMultipleVote);
+
+        String promptMessage = getPrompt().getMessage();
+        String rawPoll = commandContext.get(promptMessage);
+
+        boolean hasTitle = rawPoll.startsWith("title=");
+        if (hasTitle) {
+            rawPoll = rawPoll.substring(6);
+        }
+
+        String[] parts = rawPoll.split(";");
+        String title = hasTitle && parts.length > 0 ? parts[0] : "";
+
+        int firstAnswerIndex = hasTitle ? 1 : 0;
+        List<String> answers = parts.length > firstAnswerIndex
+                ? List.of(Arrays.copyOfRange(parts, firstAnswerIndex, parts.length))
+                : List.of();
+
+        Poll poll = new Poll(command.getLastId(),
+                fPlayer.getId(),
+                time + System.currentTimeMillis(),
+                repeatTime,
+                multipleVote,
+                title,
+                answers
+        );
+
+        saveAndUpdateLast(poll);
 
         int range = command.getRange();
 
-        Runnable sendRunnable = () -> sendMessage(fPlayer, poll, answerSet, range, title);
-
-        sendRunnable.run();
-
-        if (repeatTime != -1) {
-            recursiveSend(repeatTime * 20L, poll, sendRunnable);
-            taskScheduler.runAsync(() -> {});
-        }
-
-        taskScheduler.runAsyncLater(() -> {
-            Poll expiredPoll = pollMap.get(poll.getId());
-            expiredPoll.setExpired(true);
-
-            sendMessage(fPlayer, expiredPoll, answerSet, range, title);
-
-        }, time * 20L);
+        builder(fPlayer)
+                .range(range)
+                .tag(MessageTag.COMMAND_POLL_CREATE_MESSAGE)
+                .format(resolvePollFormat(fPlayer, poll, Status.START))
+                .message((fResolver, s) -> poll.getTitle())
+                .proxy(output -> output.writeUTF(gson.toJson(poll)))
+                .integration()
+                .sendBuilt();
     }
 
-    public void put(Poll poll) {
+    public void saveAndUpdateLast(Poll poll) {
         pollMap.put(poll.getId(), poll);
         command.setLastId(poll.getId() + 1);
         fileManager.getCommand().save();
@@ -131,7 +247,7 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
             return;
         }
 
-        if (poll.isExpired()) {
+        if (poll.isEnded()) {
             builder(fPlayer)
                     .format(Localization.Command.Poll::getExpired)
                     .sendBuilt();
@@ -151,104 +267,53 @@ public abstract class PollModule extends AbstractModuleCommand<Localization.Comm
         int pollID = poll.getId();
 
         builder(fPlayer)
-                .format(replaceAnswer(voteType, numberVote, pollID, count))
+                .format(resolveVote(voteType, numberVote, pollID, count))
                 .sound(getSound())
                 .sendBuilt();
     }
 
-    public Function<Localization.Command.Poll, String> replaceAnswer(int voteType, int answerID, int pollID, int count) {
+    public Function<Localization.Command.Poll, String> resolveVote(int voteType, int answerID, int pollID, int count) {
         return message -> (voteType == 1 ? message.getVoteTrue() : message.getVoteFalse())
                 .replace("<answer_id>", String.valueOf(answerID + 1))
                 .replace("<id>", String.valueOf(pollID))
                 .replace("<count>", String.valueOf(count));
     }
 
-    private void sendMessage(FPlayer fPlayer, Poll poll, Map<String, String> answerSet, int range, String title) {
-        builder(fPlayer)
-                .range(range)
-                .tag(MessageTag.COMMAND_POLL_CREATE_MESSAGE)
-                .format(createFormat(fPlayer, answerSet, poll))
-                .message((fResolver, s) -> title)
-                .proxy(output -> {
-                    output.writeUTF(gson.toJson(poll));
-                    output.writeUTF(title);
-                    output.writeUTF(gson.toJson(answerSet));
-                })
-                .integration(s -> {
-                    s = s.replace("<title>", title);
-
-                    for (var answer : answerSet.entrySet()) {
-                        s = s.replaceFirst("<answer_key>", answer.getKey())
-                                .replaceFirst("<answer_value>", answer.getValue());
-                    }
-
-                    return s;
-                })
-                .sendBuilt();
-    }
-
-    public Function<Localization.Command.Poll, String> createFormat(FEntity fPlayer,
-                                                                    Map<String, String> answerSet,
-                                                                    Poll poll) {
+    public Function<Localization.Command.Poll, String> resolvePollFormat(FEntity fPlayer, Poll poll, Status status) {
         return message -> {
             StringBuilder answersBuilder = new StringBuilder();
 
             int k = 0;
-            for (var answer : answerSet.entrySet()) {
+            for (String answer : poll.getAnswers()) {
 
-                String finalButton = message.getVoteButton();
+                Component answerComponent = componentUtil.builder(fPlayer, FPlayer.UNKNOWN, answer).build();
 
-                if (poll.isExpired()) {
-                    finalButton = message.getCountAnswers().replace("<count>", String.valueOf(poll.getCountAnswers()[k]));
-                }
-
-                Component answerKey = componentUtil.builder(fPlayer, FPlayer.UNKNOWN, answer.getKey())
-                        .build();
-
-                Component answerValue = componentUtil.builder(fPlayer, FPlayer.UNKNOWN, answer.getValue())
-                        .build();
-
-                answersBuilder.append(finalButton
+                answersBuilder.append(message.getAnswerTemplate()
                         .replace("<id>", String.valueOf(poll.getId()))
                         .replace("<number>", String.valueOf(k))
-                        .replace("<answer_key>", PlainTextComponentSerializer.plainText().serialize(answerKey))
-                        .replace("<answer_value>", PlainTextComponentSerializer.plainText().serialize(answerValue))
+                        .replace("<answer>", PlainTextComponentSerializer.plainText().serialize(answerComponent))
+                        .replace("<count>", String.valueOf(poll.getCountAnswers()[k]))
                 );
 
                 k++;
             }
 
-            return (poll.isExpired() ? message.getFormatOver() : message.getFormatStart())
+            String messageStatus = switch (status) {
+                case START -> message.getStatus().getStart();
+                case RUN -> message.getStatus().getRun();
+                case END -> message.getStatus().getEnd();
+            };
+
+            return message.getFormat()
+                    .replace("<status>", messageStatus)
                     .replace("<id>", String.valueOf(poll.getId()))
                     .replace("<answers>", answersBuilder.toString());
         };
     }
 
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        registerPermission(permission.getCreate());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
-    }
-
-    public void recursiveSend(long repeatTime, Poll poll, Runnable runnable) {
-        taskScheduler.runAsyncLater(() -> {
-            if (poll.isExpired()) return;
-            runnable.run();
-
-            recursiveSend(repeatTime, poll, runnable);
-        }, repeatTime);
+    public enum Status {
+        START,
+        RUN,
+        END
     }
 }

@@ -1,57 +1,86 @@
 package net.flectone.pulse.module.command.mail;
 
-import lombok.Getter;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.Mail;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.List;
 
-public abstract class MailModule extends AbstractModuleCommand<Localization.Command.Mail> {
+@Singleton
+public class MailModule extends AbstractModuleCommand<Localization.Command.Mail> {
 
-    @Getter private final Command.Mail command;
-    @Getter private final Permission.Command.Mail permission;
+    private final Command.Mail command;
+    private final Permission.Command.Mail permission;
 
     private final TellModule tellModule;
     private final IntegrationModule integrationModule;
     private final FPlayerService fPlayerService;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
 
+    @Inject
     public MailModule(FileManager fileManager,
                       TellModule tellModule,
                       IntegrationModule integrationModule,
                       FPlayerService fPlayerService,
-                      CommandUtil commandUtil) {
+                      CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getMail(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.MAIL));
 
         this.tellModule = tellModule;
         this.integrationModule = integrationModule;
         this.fPlayerService = fPlayerService;
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
 
         command = fileManager.getCommand().getMail();
         permission = fileManager.getPermission().getCommand().getMail();
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        String commandName = getName(command);
+        String promptPlayer = getPrompt().getPlayer();
+        String promptMessage = getPrompt().getMessage();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .required(promptPlayer, commandRegistry.playerParser(true))
+                        .required(promptMessage, commandRegistry.nativeMessageParser())
+                        .handler(this)
+        );
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkCooldown(fPlayer)) return;
         if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
         if (checkMute(fPlayer)) return;
         if (checkModulePredicates(fPlayer)) return;
 
-        String playerName = commandUtil.getString(0, arguments);
-        if (playerName == null) return;
+        String promptPlayer = getPrompt().getPlayer();
+        String playerName = commandContext.get(promptPlayer);
 
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
         if (fReceiver.isUnknown()) {
@@ -63,7 +92,7 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
 
         if (fReceiver.isOnline() && !integrationModule.isVanished(fReceiver)) {
             if (!tellModule.isEnable()) return;
-            tellModule.onCommand(fPlayer, arguments);
+            tellModule.execute(fPlayer, commandContext);
             return;
         }
 
@@ -72,16 +101,17 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
         if (checkIgnore(fPlayer, fReceiver)) return;
         if (checkDisable(fPlayer, fReceiver, DisableAction.HE)) return;
 
-        String string = commandUtil.getString(1, arguments);
+        String promptMessage = getPrompt().getMessage();
+        String message = commandContext.get(promptMessage);
 
-        Mail mail = fPlayerService.saveAndGetMail(fPlayer, fReceiver, string);
+        Mail mail = fPlayerService.saveAndGetMail(fPlayer, fReceiver, message);
         if (mail == null) return;
 
         builder(fReceiver)
                 .destination(command.getDestination())
                 .receiver(fPlayer)
                 .format(s -> s.getSender().replaceFirst("<id>", String.valueOf(mail.id())))
-                .message(string)
+                .message(message)
                 .sendBuilt();
     }
 
@@ -89,7 +119,7 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
     public void send(FPlayer fReceiver) {
         if (checkModulePredicates(fReceiver)) return;
 
-        List<Mail> mails = fPlayerService.getMails(fReceiver);
+        List<Mail> mails = fPlayerService.getReceiverMails(fReceiver);
         if (mails.isEmpty()) return;
 
         for (Mail mail : mails) {
@@ -105,20 +135,5 @@ public abstract class MailModule extends AbstractModuleCommand<Localization.Comm
         }
     }
 
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
-    }
 }

@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.command.ignorelist;
 
-import lombok.Getter;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
@@ -9,37 +10,42 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.platform.MessageSender;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.ComponentUtil;
 import net.flectone.pulse.util.TimeUtil;
 import net.kyori.adventure.text.Component;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.List;
+import java.util.Optional;
 
-public abstract class IgnorelistModule extends AbstractModuleCommand<Localization.Command.Ignorelist> {
+@Singleton
+public class IgnorelistModule extends AbstractModuleCommand<Localization.Command.Ignorelist> {
 
-    @Getter private final Command.Ignorelist command;
-    @Getter private final Permission.Command.Ignorelist permission;
+    private final Command.Ignorelist command;
+    private final Permission.Command.Ignorelist permission;
 
     private final FPlayerService fPlayerService;
     private final MessageSender messageSender;
     private final ComponentUtil componentUtil;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
     private final TimeUtil timeUtil;
 
+    @Inject
     public IgnorelistModule(FileManager fileManager,
                             FPlayerService fPlayerService,
                             MessageSender messageSender,
                             ComponentUtil componentUtil,
-                            CommandUtil commandUtil,
+                            CommandRegistry commandRegistry,
                             TimeUtil timeUtil) {
         super(localization -> localization.getCommand().getIgnorelist(), null);
 
         this.fPlayerService = fPlayerService;
         this.messageSender = messageSender;
         this.componentUtil = componentUtil;
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
         this.timeUtil = timeUtil;
 
         command = fileManager.getCommand().getIgnorelist();
@@ -49,7 +55,29 @@ public abstract class IgnorelistModule extends AbstractModuleCommand<Localizatio
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        String commandName = getName(command);
+        String promptNumber = getPrompt().getNumber();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .optional(promptNumber, commandRegistry.integerParser())
+                        .handler(this)
+        );
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
         List<Ignore> ignoreList = fPlayer.getIgnores();
@@ -66,7 +94,9 @@ public abstract class IgnorelistModule extends AbstractModuleCommand<Localizatio
         int perPage = command.getPerPage();
         int countPage = (int) Math.ceil((double) size / perPage);
 
-        Integer page = commandUtil.getByClassOrDefault(0, Integer.class, 1, arguments);
+        String prompt = getPrompt().getNumber();
+        Optional<Integer> optionalPage = commandContext.optional(prompt);
+        Integer page = optionalPage.orElse(1);
 
         if (page > countPage || page < 1) {
             builder(fPlayer)
@@ -110,22 +140,5 @@ public abstract class IgnorelistModule extends AbstractModuleCommand<Localizatio
         messageSender.sendMessage(fPlayer, component);
 
         playSound(fPlayer);
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 }

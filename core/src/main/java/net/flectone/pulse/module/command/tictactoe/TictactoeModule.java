@@ -2,8 +2,7 @@ package net.flectone.pulse.module.command.tictactoe;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import lombok.Getter;
-import net.flectone.pulse.annotation.Async;
+import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
@@ -14,23 +13,27 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tictactoe.manager.TictactoeManager;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.CommandUtil;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
 
+import java.util.Optional;
 import java.util.function.BiFunction;
 
-public abstract class TictactoeModule extends AbstractModuleCommand<Localization.Command.Tictactoe> {
+@Singleton
+public class TictactoeModule extends AbstractModuleCommand<Localization.Command.Tictactoe> {
 
-    @Getter private final Command.Tictactoe command;
-    @Getter private final Permission.Command.Tictactoe permission;
+    private final Command.Tictactoe command;
+    private final Permission.Command.Tictactoe permission;
 
     private final FPlayerService fPlayerService;
     private final TictactoeManager tictactoeManager;
     private final ProxyConnector proxyConnector;
     private final IntegrationModule integrationModule;
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
     private final Gson gson;
 
     @Inject
@@ -39,7 +42,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
                            TictactoeManager tictactoeManager,
                            ProxyConnector proxyConnector,
                            IntegrationModule integrationModule,
-                           CommandUtil commandUtil,
+                           CommandRegistry commandRegistry,
                            Gson gson) {
         super(localization -> localization.getCommand().getTictactoe(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TICTACTOE));
 
@@ -47,7 +50,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
         this.tictactoeManager = tictactoeManager;
         this.proxyConnector = proxyConnector;
         this.integrationModule = integrationModule;
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
         this.gson = gson;
 
         command = fileManager.getCommand().getTictactoe();
@@ -55,14 +58,53 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        String commandName = getName(command);
+        String promptPlayer = getPrompt().getPlayer();
+        String promptHard = getPrompt().getHard();
+
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .required(promptPlayer, commandRegistry.playerParser())
+                        .optional(promptHard, commandRegistry.booleanParser())
+                        .permission(permission.getName())
+                        .handler(this)
+        );
+
+        String promptId = getPrompt().getId();
+        String promptMove = getPrompt().getMove();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName + "move")
+                        .required(promptId, commandRegistry.integerParser())
+                        .required(promptMove, commandRegistry.singleMessageParser())
+                        .permission(permission.getName())
+                        .handler(commandContext -> executeMove(commandContext.sender(), commandContext))
+        );
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
         if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
         if (checkMute(fPlayer)) return;
 
-        String receiverName = commandUtil.getString(0, arguments);
-        boolean isHard = commandUtil.getByClassOrDefault(1, Boolean.class, true, arguments);
+        String promptPlayer = getPrompt().getPlayer();
+        String receiverName = commandContext.get(promptPlayer);
+
+        String promptHard = getPrompt().getHard();
+        Optional<Boolean> optionalBoolean = commandContext.optional(promptHard);
+        boolean isHard = optionalBoolean.orElse(true);
 
         FPlayer fReceiver = fPlayerService.getFPlayer(receiverName);
         if (!fReceiver.isOnline() || integrationModule.isVanished(fReceiver)) {
@@ -110,7 +152,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
 
         builder(fPlayer)
                 .receiver(fReceiver)
-                .format(message -> String.format(message.getFormatCreate(), ticTacToe.getId()))
+                .format(message -> String.format(message.getReceiver(), ticTacToe.getId()))
                 .sound(getSound())
                 .sendBuilt();
     }
@@ -127,10 +169,12 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
                 .sendBuilt();
     }
 
-    @Async
-    public void move(FPlayer fPlayer, Object arguments) {
-        int tictactoeID = commandUtil.getInteger(0, arguments);
-        String move = commandUtil.getByClassOrDefault(1, String.class, "create", arguments);
+    public void executeMove(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+        String promptId = getPrompt().getId();
+        int tictactoeID = commandContext.get(promptId);
+
+        String promptMove = getPrompt().getMove();
+        String move = commandContext.get(promptMove);
 
         TicTacToe ticTacToe = tictactoeManager.get(tictactoeID);
         if (ticTacToe == null || ticTacToe.isEnded() || !ticTacToe.contains(fPlayer) || (move.equals("create") && ticTacToe.isCreated())) {
@@ -197,7 +241,7 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
                                                                                       String move) {
         return (fResolver, message) -> {
 
-            String symbolEmpty = message.getSymbol().getEmpty();
+            String symbolEmpty = message.getSymbol().getBlank();
             String symbolFirst = message.getSymbol().getFirst();
             String symbolFirstRemove = message.getSymbol().getFirstRemove();
             String symbolFirstWin = message.getSymbol().getFirstWin();
@@ -229,22 +273,5 @@ public abstract class TictactoeModule extends AbstractModuleCommand<Localization
                     String.format(symbolEmpty, ticTacToe.getId())
             );
         };
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 }

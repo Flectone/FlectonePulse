@@ -5,9 +5,7 @@ dependencies {
 
     compileOnly "com.github.Anon8281:UniversalScheduler:$UniversalScheduler_version"
 
-    compileOnly "dev.jorel:commandapi-bukkit-shade:$commandapi_bukkit_version"
-    compileOnly "dev.jorel:commandapi-bukkit-shade-mojang-mapped:$commandapi_bukkit_version"
-
+    compileOnly "org.incendo:cloud-paper:$cloud_paper_version"
     compileOnly "net.elytrium:serializer:$elytrium_serializer_version"
 
     compileOnly "org.spigotmc:spigot-api:$spigot_version"

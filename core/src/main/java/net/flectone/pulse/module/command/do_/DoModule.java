@@ -1,5 +1,7 @@
 package net.flectone.pulse.module.command.do_;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -7,22 +9,26 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.util.CommandUtil;
+import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.meta.CommandMeta;
 
-public abstract class DoModule extends AbstractModuleCommand<Localization.Command.Do> {
+@Singleton
+public class DoModule extends AbstractModuleCommand<Localization.Command.Do> {
 
     @Getter private final Command.Do command;
-    @Getter private final Permission.Command.Do permission;
+    private final Permission.Command.Do permission;
 
-    private final CommandUtil commandUtil;
+    private final CommandRegistry commandRegistry;
 
+    @Inject
     public DoModule(FileManager fileManager,
-                    CommandUtil commandUtil) {
+                    CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getDo(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.DO));
 
-        this.commandUtil = commandUtil;
+        this.commandRegistry = commandRegistry;
 
         command = fileManager.getCommand().getDo();
         permission = fileManager.getPermission().getCommand().getDo();
@@ -33,10 +39,33 @@ public abstract class DoModule extends AbstractModuleCommand<Localization.Comman
     }
 
     @Override
-    public void onCommand(FPlayer fPlayer, Object arguments) {
+    public boolean isConfigEnable() {
+        return command.isEnable();
+    }
+
+    @Override
+    public void reload() {
+        registerModulePermission(permission);
+
+        createCooldown(command.getCooldown(), permission.getCooldownBypass());
+        createSound(command.getSound(), permission.getSound());
+
+        String commandName = getName(command);
+        String promptMessage = getPrompt().getMessage();
+        commandRegistry.registerCommand(manager ->
+                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+                        .permission(permission.getName())
+                        .required(promptMessage, commandRegistry.nativeMessageParser())
+                        .handler(this)
+        );
+    }
+
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String message = commandUtil.getString(0, arguments);
+        String prompt = getPrompt().getMessage();
+        String message = commandContext.get(prompt);
 
         builder(fPlayer)
                 .range(command.getRange())
@@ -48,22 +77,5 @@ public abstract class DoModule extends AbstractModuleCommand<Localization.Comman
                 .integration(s -> s.replace("<message>", message))
                 .sound(getSound())
                 .sendBuilt();
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
-
-        getCommand().getAliases().forEach(commandUtil::unregister);
-
-        createCommand();
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return command.isEnable();
     }
 }
