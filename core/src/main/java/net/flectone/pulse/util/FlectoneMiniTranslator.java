@@ -24,6 +24,8 @@ package net.flectone.pulse.util;
     SOFTWARE.
  */
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,6 +43,8 @@ import java.util.regex.Pattern;
 /**
  * A "translator" from legacy minecraft formatting (e.g. &a &4 &l) to MiniMessage-acceptable format
  */
+
+@Singleton
 public final class FlectoneMiniTranslator {
     private static final Set<Option> DEF_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
             Option.COLOR,
@@ -54,14 +58,15 @@ public final class FlectoneMiniTranslator {
     private static final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
     private static final Pattern LEGACY_HEX_COLOR = Pattern.compile("&([\\da-fA-F])".repeat(6));
 
-    private FlectoneMiniTranslator() {}
+    @Inject
+    public FlectoneMiniTranslator() {}
 
     /**
      * Translate text to MiniMessage format with default options (everything but {@link Option#CLOSE_COLORS})
      * @param text text to translate
      * @return translated string
      */
-    public static @NotNull String toMini(@NotNull String text) {
+    public @NotNull String toMini(@NotNull String text) {
         return toMini(text, DEF_OPTIONS);
     }
 
@@ -71,7 +76,7 @@ public final class FlectoneMiniTranslator {
      * @param options options to use
      * @return translated string
      */
-    public static @NotNull String toMini(@NotNull String text, @NotNull Option @NotNull ... options) {
+    public @NotNull String toMini(@NotNull String text, @NotNull Option @NotNull ... options) {
         return toMini(text, EnumSet.copyOf(Arrays.asList(options)));
     }
 
@@ -81,7 +86,7 @@ public final class FlectoneMiniTranslator {
      * @param options options to use
      * @return translated string
      */
-    public static @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
+    public @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
         text = text.replace("§", "&");
 
         if (options.contains(Option.COLOR_DOUBLE_HASH)) {
@@ -209,7 +214,7 @@ public final class FlectoneMiniTranslator {
         return builder.toString();
     }
 
-    private static String replaceHexColorStandalone(String text) {
+    private String replaceHexColorStandalone(String text) {
         StringBuilder result = new StringBuilder();
         int index = 0;
 
@@ -232,7 +237,7 @@ public final class FlectoneMiniTranslator {
         return result.toString();
     }
 
-    private static boolean isHexColorStandalone(String text, int index) {
+    private boolean isHexColorStandalone(String text, int index) {
         if (index > 0 && text.charAt(index - 1) == '&') {
             return false;
         }
@@ -253,7 +258,7 @@ public final class FlectoneMiniTranslator {
         return index + 7 <= text.length() && HEX_COLOR.matcher(text.substring(index + 1, index + 7)).matches();
     }
 
-    private static String replaceDoubleHashHexColor(String text) {
+    private String replaceDoubleHashHexColor(String text) {
         StringBuilder result = new StringBuilder();
         int index = 0;
 
@@ -284,7 +289,7 @@ public final class FlectoneMiniTranslator {
         return result.toString();
     }
 
-    private static void handleClosing(List<String> order, StringBuilder builder, boolean closeLast, boolean fastReset) {
+    private void handleClosing(List<String> order, StringBuilder builder, boolean closeLast, boolean fastReset) {
         if (fastReset && order.size() > 1) {
             builder.append("<reset>");
         } else for (int i = order.size() - 1, until = closeLast ? 0 : 1; i >= until; i--) {
@@ -293,7 +298,7 @@ public final class FlectoneMiniTranslator {
         order.clear();
     }
 
-    private static @Nullable String tagByChar(char ch, Collection<Option> options) {
+    private @Nullable String tagByChar(char ch, Collection<Option> options) {
         if (isColorChar(ch)) {
             if (!options.contains(Option.COLOR)) return null;
             return switch (ch) {
@@ -318,7 +323,7 @@ public final class FlectoneMiniTranslator {
         return null;
     }
 
-    private static @Nullable String colorByChar(char ch) {
+    private @Nullable String colorByChar(char ch) {
         return switch (ch) {
             case '0' -> "black";
             case '1' -> "dark_blue";
@@ -341,7 +346,7 @@ public final class FlectoneMiniTranslator {
         };
     }
 
-    private static boolean isColorChar(char ch) {
+    private boolean isColorChar(char ch) {
         return switch (ch) {
             case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                  'a', 'b', 'c', 'd', 'e', 'f',
@@ -351,7 +356,7 @@ public final class FlectoneMiniTranslator {
         };
     }
 
-    private static boolean isFormatChar(char ch) {
+    private boolean isFormatChar(char ch) {
         return switch (ch) {
             case 'k', 'l', 'm', 'n', 'o',
                  'K', 'L', 'M', 'N', 'O',

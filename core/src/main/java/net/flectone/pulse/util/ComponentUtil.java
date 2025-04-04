@@ -39,6 +39,7 @@ public class ComponentUtil {
 
     private final PermissionUtil permissionUtil;
     private final MiniMessage miniMessage;
+    private final FlectoneMiniTranslator flectoneMiniTranslator;
     private final FLogger fLogger;
 
     @Inject private IntegrationModule integrationModule;
@@ -62,9 +63,11 @@ public class ComponentUtil {
     @Inject
     public ComponentUtil(PermissionUtil permissionUtil,
                          MiniMessage miniMessage,
+                         FlectoneMiniTranslator flectoneMiniTranslator,
                          FLogger fLogger) {
         this.permissionUtil = permissionUtil;
         this.miniMessage = miniMessage;
+        this.flectoneMiniTranslator = flectoneMiniTranslator;
         this.fLogger = fLogger;
     }
 
@@ -299,7 +302,7 @@ public class ComponentUtil {
                 tagResolverList.add(nameModule.vaultPrefixTag(sender, receiver));
 
                 if (colors) {
-                    message = FlectoneMiniTranslator.toMini(message);
+                    message = flectoneMiniTranslator.toMini(message);
                 }
             }
 
