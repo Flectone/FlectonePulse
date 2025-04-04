@@ -1,34 +1,39 @@
 package net.flectone.pulse.module.command.poll.model;
 
 import lombok.Getter;
-import lombok.Setter;
 import net.flectone.pulse.model.FEntity;
 
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 public class Poll {
 
     private final int id;
-    private final int countVotes;
+    private final int creator;
+    private final long endTime;
+    private final long repeatTime;
     private final boolean multipleVote;
+    private final String title;
+    private final List<String> answers = new ArrayList<>();
+    private final Map<UUID, boolean[]> votesMap = new HashMap<>();
 
-    @Setter
-    private boolean expired;
+    private long nextRepeat;
 
-    private final HashMap<UUID, boolean[]> votesMap = new HashMap<>();
-
-    public Poll(int id, int countVotes, boolean multipleVote) {
+    public Poll(int id, int creator, long endTime, long repeatTime, boolean multipleVote, String title, List<String> answers) {
         this.id = id;
-        this.countVotes = countVotes;
+        this.creator = creator;
+        this.endTime = endTime;
+        this.repeatTime = repeatTime;
+        this.nextRepeat = System.currentTimeMillis() + repeatTime;
         this.multipleVote = multipleVote;
+        this.title = title;
+        this.answers.addAll(answers);
     }
 
     public int vote(FEntity fPlayer, int numberVote) {
-        boolean[] votes = votesMap.getOrDefault(fPlayer.getUuid(), new boolean[countVotes]);
+        boolean[] votes = votesMap.getOrDefault(fPlayer.getUuid(), new boolean[answers.size()]);
 
-        for (int x = 0; x < countVotes; x++) {
+        for (int x = 0; x < answers.size(); x++) {
             if (votes[x] && !multipleVote) return -1;
         }
 
@@ -38,7 +43,7 @@ public class Poll {
     }
 
     public int[] getCountAnswers() {
-        int[] countAnswers = new int[countVotes];
+        int[] countAnswers = new int[answers.size()];
 
         for (boolean[] answers : votesMap.values()) {
             for (int x = 0; x < answers.length; x++) {
@@ -49,5 +54,16 @@ public class Poll {
         }
 
         return countAnswers;
+    }
+
+    public boolean isEnded() {
+        return System.currentTimeMillis() >= endTime;
+    }
+
+    public boolean repeat() {
+        if (System.currentTimeMillis() < nextRepeat) return false;
+
+        nextRepeat = System.currentTimeMillis() + repeatTime;
+        return true;
     }
 }
