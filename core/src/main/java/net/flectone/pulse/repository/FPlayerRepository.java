@@ -39,6 +39,11 @@ public class FPlayerRepository {
         this.colorsDAO = colorsDAO;
     }
 
+    public void invalid(UUID uuid) {
+        onlinePlayers.remove(uuid);
+        offlinePlayersCache.invalidate(uuid);
+    }
+
     public FPlayer get(int id) {
         Optional<FPlayer> onlinePlayer = onlinePlayers.values()
                 .stream()
