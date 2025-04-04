@@ -11,7 +11,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
-import net.flectone.pulse.module.command.mail.model.Mail;
+import net.flectone.pulse.model.Mail;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.repository.*;
 import net.flectone.pulse.scheduler.TaskScheduler;
@@ -73,23 +73,38 @@ public class FPlayerService {
     }
 
     public FPlayer addAndGetFPlayer(UUID uuid, int entityId, String name) {
+        // insert to database
         boolean isInserted = fPlayerRepository.save(uuid, name);
-        FPlayer fPlayer = fPlayerRepository.get(uuid);
 
-        loadFPlayerData(fPlayer, !isInserted);
+        // player can be in the cache and be unknown
+        FPlayer player = fPlayerRepository.get(uuid);
+        if (player.isUnknown()) {
+            fPlayerRepository.invalid(uuid);
+            player = fPlayerRepository.get(uuid);
+        }
 
-        fPlayer.setOnline(true);
-        fPlayer.setIp(platformPlayerAdapter.getIp(fPlayer));
-        fPlayer.setCurrentName(name);
-        fPlayer.setEntityId(entityId);
+        FPlayer finalPlayer = player;
 
-        fPlayerRepository.add(fPlayer);
+        // load player data
+        loadOrSaveDefaultSetting(finalPlayer, !isInserted);
+        loadColors(finalPlayer);
+        loadIgnores(finalPlayer);
+        moderationService.load(finalPlayer, Moderation.Type.MUTE);
+        finalPlayer.setOnline(true);
+        finalPlayer.setIp(platformPlayerAdapter.getIp(finalPlayer));
+        finalPlayer.setCurrentName(name);
+        finalPlayer.setEntityId(entityId);
 
-        taskScheduler.runAsync(() -> fPlayerRepository.saveOrUpdate(fPlayer));
+        // add player to online cache and remove from offline
+        fPlayerRepository.add(finalPlayer);
 
-        platformPlayerAdapter.update(fPlayer);
+        // update old database data
+        taskScheduler.runAsync(() -> fPlayerRepository.saveOrUpdate(finalPlayer));
 
-        return fPlayer;
+        // send info for modules
+        platformPlayerAdapter.update(finalPlayer);
+
+        return finalPlayer;
     }
 
     public int getPing(FPlayer player) {
@@ -183,13 +198,6 @@ public class FPlayerService {
         packetEventsUtil.sendPacket(fPlayer, packet);
     }
 
-    public void loadFPlayerData(FPlayer fPlayer, boolean load) {
-        loadOrSaveDefaultSetting(fPlayer, load);
-        loadColors(fPlayer);
-        loadIgnores(fPlayer);
-        moderationService.load(fPlayer, Moderation.Type.MUTE);
-    }
-
     public void loadColors(FPlayer fPlayer) {
         fPlayerRepository.loadColors(fPlayer);
     }
@@ -206,8 +214,12 @@ public class FPlayerService {
         fPlayerRepository.loadSettings(fPlayer);
     }
 
-    public List<Mail> getMails(FPlayer fPlayer) {
-        return socialRepository.getMails(fPlayer);
+    public List<Mail> getReceiverMails(FPlayer fPlayer) {
+        return socialRepository.getReceiverMails(fPlayer);
+    }
+
+    public List<Mail> getSenderMails(FPlayer fPlayer) {
+        return socialRepository.getSenderMails(fPlayer);
     }
 
     public Ignore saveAndGetIgnore(FPlayer fPlayer, FPlayer fTarget) {
