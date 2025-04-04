@@ -53,6 +53,12 @@ public abstract class PlatformPlayerAdapter {
 
     public abstract boolean hasPlayedBefore(FPlayer fPlayer);
 
+    public abstract long getFirstPlayed(FPlayer fPlayer);
+
+    public abstract long getLastPlayed(FPlayer fPlayer);
+
+    public abstract long getAllTimePlayed(FPlayer fPlayer);
+
     public abstract void clear(FPlayer fPlayer);
 
     public abstract void update(FPlayer fPlayer);

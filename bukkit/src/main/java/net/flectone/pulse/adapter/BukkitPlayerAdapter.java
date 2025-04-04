@@ -21,9 +21,7 @@ import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.util.ComponentUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.command.CommandSender;
@@ -99,6 +97,27 @@ public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
         if (player == null) return false;
 
         return player.hasPlayedBefore();
+    }
+
+    @Override
+    public long getFirstPlayed(FPlayer fPlayer) {
+        OfflinePlayer player = Bukkit.getOfflinePlayer(fPlayer.getUuid());
+
+        return player.getFirstPlayed();
+    }
+
+    @Override
+    public long getLastPlayed(FPlayer fPlayer) {
+        OfflinePlayer player = Bukkit.getOfflinePlayer(fPlayer.getUuid());
+
+        return player.getLastPlayed();
+    }
+
+    @Override
+    public long getAllTimePlayed(FPlayer fPlayer) {
+        OfflinePlayer player = Bukkit.getOfflinePlayer(fPlayer.getUuid());
+
+        return player.getStatistic(Statistic.PLAY_ONE_MINUTE) * 60L;
     }
 
     @Override
