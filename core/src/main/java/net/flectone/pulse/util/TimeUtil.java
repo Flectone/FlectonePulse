@@ -31,9 +31,51 @@ public class TimeUtil {
         if (message.getFormat().isEmpty()) return "";
 
         String formattedTime = DurationFormatUtils.formatDuration(time, message.getFormat(), false);
-        formattedTime = formattedTime.replaceAll("(?<!\\d)0(\\.\\d+)?\\p{L}", "").trim();
 
-        return formattedTime.isEmpty() ? message.getZero() : formattedTime;
+        StringBuilder result = new StringBuilder();
+        for (String part : formattedTime.split(" ")) {
+            if (isZeroComponent(part)) continue;
+
+            result.append(simplify(part)).append(" ");
+        }
+
+        String finalResult = result.toString().trim();
+        return finalResult.isEmpty() ? message.getZero() : finalResult;
+    }
+
+    private boolean isZeroComponent(String part) {
+        int unitIndex = 0;
+        while (unitIndex < part.length() && (Character.isDigit(part.charAt(unitIndex))
+                || part.charAt(unitIndex) == '.')
+                || part.charAt(unitIndex) == ',') {
+            unitIndex++;
+        }
+
+        try {
+            double value = Double.parseDouble(part.substring(0, unitIndex));
+            return value == 0.0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private String simplify(String part) {
+        int unitIndex = 0;
+        while (unitIndex < part.length() && (Character.isDigit(part.charAt(unitIndex))
+                || part.charAt(unitIndex) == '.')
+                || part.charAt(unitIndex) == ',') {
+            unitIndex++;
+        }
+
+        String numberPart = part.substring(0, unitIndex);
+        if (numberPart.contains(".") || numberPart.contains(",")) {
+            numberPart = numberPart
+                    .replaceAll("0+$", "")
+                    .replaceAll("[.,]$", "");
+        }
+
+        String unit = part.substring(unitIndex);
+        return numberPart + unit;
     }
 
     public String format(FPlayer fPlayer, long time, String message) {
