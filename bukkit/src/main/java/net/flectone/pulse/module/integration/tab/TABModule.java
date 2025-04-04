@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
@@ -24,7 +25,8 @@ public class TABModule extends AbstractModule {
                      TABIntegration tabIntegration,
                      HeaderModule headerModule,
                      FooterModule footerModule,
-                     PlayerlistnameModule playerlistnameModule) {
+                     PlayerlistnameModule playerlistnameModule,
+                     ScoreboardModule scoreboardModule) {
         integration = fileManager.getIntegration().getTAB();
         permission = fileManager.getPermission().getIntegration().getTAB();
 
@@ -35,6 +37,7 @@ public class TABModule extends AbstractModule {
         headerModule.addPredicate(fPlayer -> messageTab.getHeader().isDisableOnOtherTab() && isHooked());
         footerModule.addPredicate(fPlayer -> messageTab.getFooter().isDisableOnOtherTab() && isHooked());
         playerlistnameModule.addPredicate(fPlayer -> messageTab.getPlayerlistname().isDisableOnOtherTab() && isHooked());
+        scoreboardModule.addPredicate(fPlayer -> fileManager.getMessage().getFormat().getScoreboard().isDisableOnOtherScoreboard() && isHooked());
     }
 
     @Override

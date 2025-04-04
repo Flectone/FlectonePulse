@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.format.name;
+package net.flectone.pulse.module.message.format.scoreboard;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -7,7 +7,6 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.ComponentUtil;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -19,39 +18,34 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 @Singleton
-public class BukkitNameModule extends NameModule {
+public class BukkitScoreboardModule extends ScoreboardModule {
 
-    private final Message.Format.Name message;
+    private final Message.Format.Scoreboard message;
 
     private final FileManager fileManager;
     private final TeamManager teamManager;
     private final ComponentUtil componentUtil;
     private final FPlayerService fPlayerService;
-    private final IntegrationModule integrationModule;
 
     @Inject
-    public BukkitNameModule(FileManager fileManager,
-                            TeamManager teamManager,
-                            FPlayerService fPlayerService,
-                            ComponentUtil componentUtil,
-                            IntegrationModule integrationModule) {
-        super(fileManager, integrationModule);
+    public BukkitScoreboardModule(FileManager fileManager,
+                                  TeamManager teamManager,
+                                  FPlayerService fPlayerService,
+                                  ComponentUtil componentUtil) {
+        super(fileManager);
 
         this.fileManager = fileManager;
         this.teamManager = teamManager;
         this.fPlayerService = fPlayerService;
         this.componentUtil = componentUtil;
-        this.integrationModule = integrationModule;
 
-        message = fileManager.getMessage().getFormat().getName_();
+        message = fileManager.getMessage().getFormat().getScoreboard();
     }
 
     @Async
     @Override
     public void add(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
-        if (!message.isTeam()) return;
-        if (message.isDisableTeamOnOtherScoreboard() && integrationModule.isOtherTAB()) return;
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;
@@ -65,7 +59,7 @@ public class BukkitNameModule extends NameModule {
             teamDisplay.playerColor((NamedTextColor) componentUtil.builder(fPlayer, message.getColor()).build().color());
         }
 
-        teamDisplay.nameTagVisibility(message.isVisible() ? NameTagVisibility.ALWAYS : NameTagVisibility.HIDE_FOR_OTHER_TEAMS);
+        teamDisplay.nameTagVisibility(message.isNameVisible() ? NameTagVisibility.ALWAYS : NameTagVisibility.HIDE_FOR_OTHER_TEAMS);
 
         Localization.Message.Format.Name localization = fileManager.getLocalization().getMessage().getFormat().getName_();
 
@@ -85,8 +79,6 @@ public class BukkitNameModule extends NameModule {
     @Override
     public void remove(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
-        if (!message.isTeam()) return;
-        if (message.isDisableTeamOnOtherScoreboard() && integrationModule.isOtherTAB()) return;
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;

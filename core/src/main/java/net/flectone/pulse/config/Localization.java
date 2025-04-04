@@ -1743,6 +1743,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 return null;
             }
 
+            @Override
+            public SubFormatMessageConfig getScoreboard() {
+                return null;
+            }
+
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/mention/")})
             private Mention mention = new Mention();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/")})

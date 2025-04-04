@@ -116,6 +116,7 @@ public interface ModuleConfig {
             ModerationFormatMessageConfig getModeration();
             SubFormatMessageConfig getName_();
             SubFormatMessageConfig getQuestionAnswer();
+            SubFormatMessageConfig getScoreboard();
             SubFormatMessageConfig getSpoiler();
             SubFormatMessageConfig getTranslate();
             SubFormatMessageConfig getWorld();

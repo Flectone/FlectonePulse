@@ -886,6 +886,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private Name name_ = new Name();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/questionanswer/")})
             private QuestionAnswer questionAnswer = new QuestionAnswer();
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/scoreboard/")})
+            private Scoreboard scoreboard = new Scoreboard();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/spoiler/")})
             private Spoiler spoiler = new Spoiler();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/translate/")})
@@ -966,6 +968,12 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             @Getter
             public static final class Name implements SubFormatMessageConfig, IPermission {
                 private String name = "flectonepulse.module.format.name";
+                private Type type = Type.TRUE;
+            }
+
+            @Getter
+            public static final class Scoreboard implements SubFormatMessageConfig, IPermission {
+                private String name = "flectonepulse.module.format.scoreboard";
                 private Type type = Type.TRUE;
             }
 

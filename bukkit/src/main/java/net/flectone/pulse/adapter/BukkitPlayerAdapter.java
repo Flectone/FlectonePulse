@@ -9,7 +9,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.stream.StreamModule;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.brand.BrandModule;
-import net.flectone.pulse.module.message.format.name.NameModule;
+import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
 import net.flectone.pulse.module.message.objective.belowname.BelownameModule;
@@ -250,7 +250,7 @@ public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
     @Override
     public void clear(FPlayer fPlayer) {
         injector.getInstance(AfkModule.class).remove("quit", fPlayer);
-        injector.getInstance(NameModule.class).remove(fPlayer);
+        injector.getInstance(ScoreboardModule.class).remove(fPlayer);
         injector.getInstance(BelownameModule.class).remove(fPlayer);
         injector.getInstance(TabnameModule.class).remove(fPlayer);
     }
@@ -260,7 +260,7 @@ public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
         injector.getInstance(WorldModule.class).update(fPlayer);
         injector.getInstance(AfkModule.class).remove("", fPlayer);
         injector.getInstance(StreamModule.class).setStreamPrefix(fPlayer, fPlayer.isSetting(FPlayer.Setting.STREAM));
-        injector.getInstance(NameModule.class).add(fPlayer);
+        injector.getInstance(ScoreboardModule.class).add(fPlayer);
         injector.getInstance(BelownameModule.class).add(fPlayer);
         injector.getInstance(TabnameModule.class).add(fPlayer);
         injector.getInstance(PlayerlistnameModule.class).update();

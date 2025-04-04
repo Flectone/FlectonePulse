@@ -37,8 +37,8 @@ import net.flectone.pulse.module.message.chat.BukkitChatModule;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.format.BukkitFormatModule;
 import net.flectone.pulse.module.message.format.FormatModule;
-import net.flectone.pulse.module.message.format.name.BukkitNameModule;
-import net.flectone.pulse.module.message.format.name.NameModule;
+import net.flectone.pulse.module.message.format.scoreboard.BukkitScoreboardModule;
+import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.join.BukkitJoinModule;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.objective.BukkitObjectiveModule;
@@ -132,8 +132,8 @@ public class BukkitInjector extends AbstractModule {
         // modules
         bind(IntegrationModule.class).to(BukkitIntegrationModule.class);
         bind(net.flectone.pulse.module.message.mark.MarkModule.class).to(net.flectone.pulse.module.message.mark.BukkitMarkModule.class);
-        bind(NameModule.class).to(BukkitNameModule.class);
         bind(FormatModule.class).to(BukkitFormatModule.class);
+        bind(ScoreboardModule.class).to(BukkitScoreboardModule.class);
         bind(ObjectiveModule.class).to(BukkitObjectiveModule.class);
         bind(SidebarModule.class).to(BukkitSidebarModule.class);
         bind(AnvilModule.class).to(BukkitAnvilModule.class);

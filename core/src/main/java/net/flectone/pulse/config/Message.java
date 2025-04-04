@@ -309,6 +309,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         private Name name_ = new Name();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/questionanswer/")})
         private QuestionAnswer questionAnswer = new QuestionAnswer();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/scoreboard/")})
+        private Scoreboard scoreboard = new Scoreboard();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/spoiler/")})
         private Spoiler spoiler = new Spoiler();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/translate/")})
@@ -447,10 +449,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         @Getter
         public static final class Name implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
-            private boolean team = false;
-            private boolean disableTeamOnOtherScoreboard = true;
-            private boolean visible = true;
-            private String color = "<white>";
         }
 
         @Getter
@@ -476,6 +474,14 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
                     this.target = target;
                 }
             }
+        }
+
+        @Getter
+        public static final class Scoreboard implements SubFormatMessageConfig, Config.IEnable {
+            private boolean enable = true;
+            private boolean disableOnOtherScoreboard = true;
+            private boolean nameVisible = false;
+            private String color = "<white>";
         }
 
         @Getter

@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.message.format.name;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -17,7 +18,8 @@ import org.jetbrains.annotations.NotNull;
 
 import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
-public abstract class NameModule extends AbstractModuleMessage<Localization.Message.Format.Name> {
+@Singleton
+public class NameModule extends AbstractModuleMessage<Localization.Message.Format.Name> {
 
     private final Message.Format.Name message;
     private final Permission.Message.Format.Name permission;
@@ -26,6 +28,7 @@ public abstract class NameModule extends AbstractModuleMessage<Localization.Mess
 
     @Inject private ComponentUtil componentUtil;
 
+    @Inject
     public NameModule(FileManager fileManager,
                       IntegrationModule integrationModule) {
         super(localization -> localization.getMessage().getFormat().getName_());
@@ -45,9 +48,6 @@ public abstract class NameModule extends AbstractModuleMessage<Localization.Mess
     public boolean isConfigEnable() {
         return message.isEnable();
     }
-
-    public abstract void add(FPlayer fPlayer);
-    public abstract void remove(FPlayer fPlayer);
 
     public TagResolver vaultSuffixTag(FEntity sender, FEntity fReceiver) {
         String tag = "vault_suffix";
