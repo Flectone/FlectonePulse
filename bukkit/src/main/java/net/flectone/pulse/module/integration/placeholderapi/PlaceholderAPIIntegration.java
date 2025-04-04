@@ -115,7 +115,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             if (receiver == null) return message;
 
             return PlaceholderAPI.setRelationalPlaceholders(offlinePlayer.getPlayer(), receiver, message);
-        } catch (NullPointerException ignored) {}
+        } catch (NullPointerException | ClassCastException ignored) {}
 
         return message;
     }
