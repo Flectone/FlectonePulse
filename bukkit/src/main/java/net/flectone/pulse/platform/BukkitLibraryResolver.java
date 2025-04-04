@@ -6,6 +6,7 @@ import com.alessiodp.libby.logging.adapters.JDKLogAdapter;
 import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
+import net.flectone.pulse.resolver.LibraryResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.plugin.Plugin;
 

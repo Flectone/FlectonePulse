@@ -10,7 +10,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.platform.LibraryResolver;
+import net.flectone.pulse.resolver.LibraryResolver;
 
 @Singleton
 public class YandexModule extends AbstractModule {

@@ -1,7 +1,7 @@
 package net.flectone.pulse;
 
 import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.platform.proxy.Proxy;
+import net.flectone.pulse.proxy.Proxy;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;

@@ -1,4 +1,4 @@
-package net.flectone.pulse.platform;
+package net.flectone.pulse.message;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;

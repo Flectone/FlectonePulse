@@ -1,4 +1,4 @@
-package net.flectone.pulse.platform.proxy;
+package net.flectone.pulse.proxy;
 
 import com.google.common.io.ByteArrayDataOutput;
 import net.flectone.pulse.model.FEntity;

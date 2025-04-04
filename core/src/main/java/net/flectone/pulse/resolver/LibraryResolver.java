@@ -1,4 +1,4 @@
-package net.flectone.pulse.platform;
+package net.flectone.pulse.resolver;
 
 import com.alessiodp.libby.Library;
 import com.alessiodp.libby.LibraryManager;

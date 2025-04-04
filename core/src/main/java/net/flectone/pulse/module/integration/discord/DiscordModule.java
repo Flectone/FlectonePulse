@@ -13,7 +13,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.platform.LibraryResolver;
+import net.flectone.pulse.resolver.LibraryResolver;
 import net.flectone.pulse.util.MessageTag;
 
 import java.util.function.UnaryOperator;

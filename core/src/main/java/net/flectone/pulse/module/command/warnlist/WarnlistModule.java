@@ -10,7 +10,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
-import net.flectone.pulse.platform.MessageSender;
+import net.flectone.pulse.message.MessageSender;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;

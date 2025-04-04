@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.message.MessageSender;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Toast;

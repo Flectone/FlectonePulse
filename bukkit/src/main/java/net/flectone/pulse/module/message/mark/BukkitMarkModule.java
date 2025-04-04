@@ -13,7 +13,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.mark.listener.MarkListener;
 import net.flectone.pulse.module.message.mark.manager.MarkManager;
 import net.flectone.pulse.module.message.mark.model.FMark;
-import net.flectone.pulse.platform.SoundPlayer;
+import net.flectone.pulse.sound.SoundPlayer;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
