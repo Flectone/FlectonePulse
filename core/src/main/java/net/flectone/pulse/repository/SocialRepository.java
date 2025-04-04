@@ -6,7 +6,7 @@ import net.flectone.pulse.database.dao.IgnoreDAO;
 import net.flectone.pulse.database.dao.MailDAO;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
-import net.flectone.pulse.module.command.mail.model.Mail;
+import net.flectone.pulse.model.Mail;
 
 import java.util.List;
 
@@ -27,8 +27,12 @@ public class SocialRepository {
         ignoreDAO.load(fPlayer);
     }
 
-    public List<Mail> getMails(FPlayer fPlayer) {
-        return mailDAO.get(fPlayer);
+    public List<Mail> getReceiverMails(FPlayer fPlayer) {
+        return mailDAO.getReceiver(fPlayer);
+    }
+
+    public List<Mail> getSenderMails(FPlayer fPlayer) {
+        return mailDAO.getSender(fPlayer);
     }
 
     public Ignore saveAndGetIgnore(FPlayer fPlayer, FPlayer fTarget) {
