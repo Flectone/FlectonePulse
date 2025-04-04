@@ -97,6 +97,7 @@ public class DeathPacketListener extends AbstractPacketListener {
 
     private Death getDeath(TranslatableComponent translatableComponent, int index) {
         if (translatableComponent.args().size() < index + 1) return null;
+
         if (translatableComponent.args().get(index) instanceof TranslatableComponent targetComponent) {
             HoverEvent<?> hoverEvent = targetComponent.hoverEvent();
             if (hoverEvent == null) return null;
@@ -131,10 +132,19 @@ public class DeathPacketListener extends AbstractPacketListener {
             }
 
             if (hoverComponent.children().isEmpty()) return death;
-            if (!(hoverComponent.children().get(0) instanceof TextComponent textComponent)) return death;
+            if (!(hoverComponent.children().get(0) instanceof TextComponent)) return death;
 
             death = new Death(translatableComponent.key());
-            death.setTargetName(textComponent.content());
+
+            StringBuilder targetNameBuilder = new StringBuilder();
+            for (int i = 0; i < hoverComponent.children().size(); i++) {
+                if (hoverComponent.children().get(i) instanceof TextComponent textComponent) {
+                    targetNameBuilder.append(textComponent.content());
+                }
+            }
+
+            death.setTargetName(targetNameBuilder.toString());
+
             death.setTargetUUID(showEntity.id());
             death.setTargetType("entity.minecraft." + showEntity.type().key().value());
             return death;
