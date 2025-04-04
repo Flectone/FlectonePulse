@@ -188,8 +188,6 @@ public class BukkitChatModule extends ChatModule {
         bubbleModule.add(fPlayer, eventMessage);
     }
 
-    @Inject private FLogger fLogger;
-
     @Async
     public void send(FEntity fPlayer, String chatName, String string) {
         if (checkModulePredicates(fPlayer)) return;

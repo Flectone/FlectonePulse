@@ -182,9 +182,6 @@ public class BukkitBubbleManager implements BubbleManager {
         return duration;
     }
 
-    @Inject
-    private FLogger fLogger;
-
     @Sync
     public void teleport(Deque<FBubble> bubbleDeque) {
 
