@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.scoreboard;
+package net.flectone.pulse.module.message.sidebar;
 
 import lombok.Getter;
 import net.flectone.pulse.config.Localization;
@@ -11,24 +11,24 @@ import net.flectone.pulse.module.AbstractModuleListMessage;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 
-public abstract class ScoreboardModule extends AbstractModuleListMessage<Localization.Message.Scoreboard> {
+public abstract class SidebarModule extends AbstractModuleListMessage<Localization.Message.Sidebar> {
 
-    @Getter private final Message.Scoreboard message;
-    private final Permission.Message.Scoreboard permission;
+    @Getter private final Message.Sidebar message;
+    private final Permission.Message.Sidebar permission;
 
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
 
-    public ScoreboardModule(FileManager fileManager,
-                            FPlayerService fPlayerService,
-                            TaskScheduler taskScheduler) {
-        super(localization -> localization.getMessage().getScoreboard());
+    public SidebarModule(FileManager fileManager,
+                         FPlayerService fPlayerService,
+                         TaskScheduler taskScheduler) {
+        super(localization -> localization.getMessage().getSidebar());
 
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
 
-        message = fileManager.getMessage().getScoreboard();
-        permission = fileManager.getPermission().getMessage().getScoreboard();
+        message = fileManager.getMessage().getSidebar();
+        permission = fileManager.getPermission().getMessage().getSidebar();
     }
 
     @Override

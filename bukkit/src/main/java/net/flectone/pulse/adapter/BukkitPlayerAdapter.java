@@ -14,7 +14,7 @@ import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
 import net.flectone.pulse.module.message.objective.belowname.BelownameModule;
 import net.flectone.pulse.module.message.objective.tabname.TabnameModule;
-import net.flectone.pulse.module.message.scoreboard.ScoreboardModule;
+import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
@@ -264,7 +264,7 @@ public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
         injector.getInstance(BelownameModule.class).add(fPlayer);
         injector.getInstance(TabnameModule.class).add(fPlayer);
         injector.getInstance(PlayerlistnameModule.class).update();
-        injector.getInstance(ScoreboardModule.class).send(fPlayer);
+        injector.getInstance(SidebarModule.class).send(fPlayer);
         injector.getInstance(FooterModule.class).send(fPlayer);
         injector.getInstance(HeaderModule.class).send(fPlayer);
         injector.getInstance(BrandModule.class).send(fPlayer);

@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.scoreboard;
+package net.flectone.pulse.module.message.sidebar;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

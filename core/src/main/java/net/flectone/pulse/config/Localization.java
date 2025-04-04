@@ -525,8 +525,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.op.format = "<fcolor:1>\uD83E\uDD16 <display_name> назначен оператором сервера";
 
-        message.scoreboard.values.clear();
-        message.scoreboard.values.addAll(new LinkedList<>(){
+        message.sidebar.values.clear();
+        message.sidebar.values.addAll(new LinkedList<>(){
             {
                 push(new LinkedList<>(){
                     {
@@ -1441,8 +1441,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/op/")})
         private Op op = new Op();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/scoreboard/")})
-        private Scoreboard scoreboard = new Scoreboard();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/quit/")})
         private Quit quit = new Quit();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/rightclick/")})
@@ -1451,6 +1449,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Seed seed = new Seed();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/setblock/")})
         private Setblock setblock = new Setblock();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/sidebar/")})
+        private Sidebar sidebar = new Sidebar();
 
         @Override
         public SubMessageConfig getSign() {
@@ -1865,7 +1865,27 @@ public final class Localization extends FileSerializable implements ModuleConfig
         }
 
         @Getter
-        public static final class Scoreboard implements SubMessageConfig, Localizable {
+        public static final class Quit implements SubMessageConfig, Localizable {
+            private String format = "<color:#ff4e4e>← <display_name>";
+        }
+
+        @Getter
+        public static final class Rightclick implements SubMessageConfig, Localizable {
+            private String format = "<fcolor:1>◁ <display_name> ▷";
+        }
+
+        @Getter
+        public static final class Seed implements SubMessageConfig, Localizable {
+            private String format = "<fcolor:1>🌐 Seed: [<fcolor:2><hover:show_text:'<fcolor:2>Click to Copy to Clipboard'><click:copy_to_clipboard:<seed>><seed></click></fcolor:2>]";
+        }
+
+        @Getter
+        public static final class Setblock implements SubMessageConfig, Localizable {
+            private String format = "<fcolor:1>⏹ Changed the block at <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2>";
+        }
+
+        @Getter
+        public static final class Sidebar implements SubMessageConfig, Localizable {
             private List<List<String>> values = new LinkedList<>(){
                 {
                     push(new LinkedList<>(){
@@ -1886,26 +1906,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
                     });
                 }
             };
-        }
-
-        @Getter
-        public static final class Quit implements SubMessageConfig, Localizable {
-            private String format = "<color:#ff4e4e>← <display_name>";
-        }
-
-        @Getter
-        public static final class Rightclick implements SubMessageConfig, Localizable {
-            private String format = "<fcolor:1>◁ <display_name> ▷";
-        }
-
-        @Getter
-        public static final class Seed implements SubMessageConfig, Localizable {
-            private String format = "<fcolor:1>🌐 Seed: [<fcolor:2><hover:show_text:'<fcolor:2>Click to Copy to Clipboard'><click:copy_to_clipboard:<seed>><seed></click></fcolor:2>]";
-        }
-
-        @Getter
-        public static final class Setblock implements SubMessageConfig, Localizable {
-            private String format = "<fcolor:1>⏹ Changed the block at <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2>";
         }
 
         @Getter

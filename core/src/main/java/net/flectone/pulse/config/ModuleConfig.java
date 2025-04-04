@@ -96,9 +96,9 @@ public interface ModuleConfig {
         SubMessageConfig getOp();
         SubMessageConfig getQuit();
         SubMessageConfig getRightclick();
-        SubMessageConfig getScoreboard();
         SubMessageConfig getSeed();
         SubMessageConfig getSetblock();
+        SubMessageConfig getSidebar();
         SubMessageConfig getSpawn();
         SubMessageConfig getSign();
         StatusMessageConfig getStatus();

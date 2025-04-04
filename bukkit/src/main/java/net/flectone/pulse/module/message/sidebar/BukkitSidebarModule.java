@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.scoreboard;
+package net.flectone.pulse.module.message.sidebar;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Singleton
-public class BukkitScoreboardModule extends ScoreboardModule {
+public class BukkitSidebarModule extends SidebarModule {
 
     private final Map<UUID, Sidebar> sidebarMap = new HashMap<>();
 
@@ -27,11 +27,11 @@ public class BukkitScoreboardModule extends ScoreboardModule {
     private final ComponentUtil componentUtil;
 
     @Inject
-    public BukkitScoreboardModule(FileManager fileManager,
-                                  TaskScheduler taskScheduler,
-                                  FPlayerService fPlayerService,
-                                  ScoreboardLibrary scoreboardLibrary,
-                                  ComponentUtil componentUtil) {
+    public BukkitSidebarModule(FileManager fileManager,
+                               TaskScheduler taskScheduler,
+                               FPlayerService fPlayerService,
+                               ScoreboardLibrary scoreboardLibrary,
+                               ComponentUtil componentUtil) {
         super(fileManager, fPlayerService, taskScheduler);
 
         this.scoreboardLibrary = scoreboardLibrary;
