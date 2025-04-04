@@ -15,6 +15,8 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
+import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
+
 @Singleton
 public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Format.Spoiler> {
 
@@ -37,9 +39,10 @@ public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Fo
     }
 
     public TagResolver spoilerTag(FEntity sender, FEntity receiver, boolean userMessage) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
+        String tag = "spoiler";
+        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver("spoiler", (argumentQueue, context) -> {
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             Tag.Argument spoilerTag = argumentQueue.peek();
             if (spoilerTag == null) return Tag.selfClosingInserting(Component.empty());
 

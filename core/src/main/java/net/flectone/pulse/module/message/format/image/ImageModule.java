@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
+
 @Singleton
 public class ImageModule extends AbstractModule {
 
@@ -56,9 +58,10 @@ public class ImageModule extends AbstractModule {
     }
 
     public TagResolver imageTag(FEntity sender, FEntity receiver) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
+        String tag = "image";
+        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver("image", (argumentQueue, context) -> {
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             final Tag.Argument argument = argumentQueue.peek();
             if (argument == null) return Tag.selfClosingInserting(Component.empty());
 

@@ -15,6 +15,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
+import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
+
 @Singleton
 public class EmojiModule extends AbstractModule {
 
@@ -35,9 +37,10 @@ public class EmojiModule extends AbstractModule {
     }
 
     public TagResolver emojiTag(FEntity fPlayer, FEntity receiver) {
-        if (checkModulePredicates(fPlayer)) return TagResolver.empty();
+        String tag = "emoji";
+        if (checkModulePredicates(fPlayer)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver("emoji", (argumentQueue, context) -> {
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             Tag.Argument emojiTag = argumentQueue.peek();
             if (emojiTag == null) return Tag.selfClosingInserting(Component.empty());
 
@@ -46,7 +49,7 @@ public class EmojiModule extends AbstractModule {
             var emojis = message.getValues()
                     .entrySet()
                     .stream()
-                    .filter(tag -> tag.getKey().equals(currentEmoji))
+                    .filter(entry -> entry.getKey().equals(currentEmoji))
                     .findAny()
                     .orElse(null);
 

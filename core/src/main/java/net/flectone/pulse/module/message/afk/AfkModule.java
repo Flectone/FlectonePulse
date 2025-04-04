@@ -19,7 +19,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
+import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 public abstract class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> {
 
@@ -103,13 +103,15 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
     }
 
     public TagResolver afkTag(@NotNull FEntity sender) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
-        if (!(sender instanceof FPlayer fPlayer)) return TagResolver.empty();
+        String tag = "afk_suffix";
+        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
+        if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver("afk_suffix", (argumentQueue, context) -> {
-            if (!fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX)) return Tag.selfClosingInserting(Component.empty());
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
+            String afkSuffix = fPlayer.getSettingValue(FPlayer.Setting.AFK_SUFFIX);
+            if (afkSuffix == null) return Tag.selfClosingInserting(Component.empty());
 
-            return Tag.preProcessParsed(Objects.requireNonNull(fPlayer.getSettingValue(FPlayer.Setting.AFK_SUFFIX)));
+            return Tag.preProcessParsed(afkSuffix);
         });
     }
 }

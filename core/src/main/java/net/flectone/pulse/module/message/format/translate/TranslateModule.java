@@ -14,14 +14,15 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
+import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
+
 @Singleton
 public class TranslateModule extends AbstractModuleMessage<Localization.Message.Format.Translate> {
 
     private final Message.Format.Translate message;
     private final Permission.Message.Format.Translate permission;
 
-    @Inject
-    private ComponentUtil componentUtil;
+    @Inject private ComponentUtil componentUtil;
 
     @Inject
     public TranslateModule(FileManager fileManager) {
@@ -37,9 +38,10 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
     }
 
     public TagResolver translateTag(FEntity fPlayer, FEntity receiver) {
-        if (checkModulePredicates(fPlayer)) return TagResolver.empty();
+        String tag = "translateto";
+        if (checkModulePredicates(fPlayer)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver("translateto", (argumentQueue, context) -> {
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             if (!(receiver instanceof FPlayer fReceiver) || fReceiver.isUnknown()) return Tag.selfClosingInserting(Component.empty());
             if (!argumentQueue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 

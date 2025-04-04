@@ -27,6 +27,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
+
 @Singleton
 public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Message.Format.QuestionAnswer> {
 
@@ -104,9 +106,10 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
     }
 
     public TagResolver questionAnswerTag(UUID processId, FEntity sender, FEntity receiver) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
+        String tag = "question";
+        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver("question", (argumentQueue, context) -> {
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             Tag.Argument questionTag = argumentQueue.peek();
             if (questionTag == null) return Tag.selfClosingInserting(Component.empty());
 

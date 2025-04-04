@@ -15,7 +15,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
+import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 public abstract class NameModule extends AbstractModuleMessage<Localization.Message.Format.Name> {
 
@@ -50,10 +50,11 @@ public abstract class NameModule extends AbstractModuleMessage<Localization.Mess
     public abstract void remove(FPlayer fPlayer);
 
     public TagResolver vaultSuffixTag(FEntity sender, FEntity fReceiver) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
-        if (!(sender instanceof FPlayer fPlayer)) return TagResolver.empty();
+        String tag = "vault_suffix";
+        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
+        if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver(Set.of("vault_suffix"), (argumentQueue, context) -> {
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             String suffix = integrationModule.getSuffix(fPlayer);
             if (suffix == null || suffix.isEmpty()) return Tag.selfClosingInserting(Component.empty());
 
@@ -66,10 +67,11 @@ public abstract class NameModule extends AbstractModuleMessage<Localization.Mess
     }
 
     public TagResolver vaultPrefixTag(FEntity sender, FEntity fReceiver) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
-        if (!(sender instanceof FPlayer fPlayer)) return TagResolver.empty();
+        String tag = "vault_prefix";
+        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
+        if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver(Set.of("vault_prefix"), (argumentQueue, context) -> {
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             String prefix = integrationModule.getPrefix(fPlayer);
             if (prefix == null || prefix.isEmpty()) return Tag.selfClosingInserting(Component.empty());
 
@@ -81,15 +83,19 @@ public abstract class NameModule extends AbstractModuleMessage<Localization.Mess
     }
 
     public TagResolver playerTag(@NotNull FEntity player) {
-        if (checkModulePredicates(player)) return TagResolver.empty();
+        String tag = "player";
+        if (checkModulePredicates(player)) return emptyTagResolver(tag);;
 
-        return TagResolver.resolver("player", (argumentQueue, context) -> Tag.preProcessParsed(player.getName()));
+        return TagResolver.resolver(tag, (argumentQueue, context) ->
+                Tag.preProcessParsed(player.getName())
+        );
     }
 
     public TagResolver displayTag(FEntity sender, FEntity fReceiver) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
+        String tag = "display_name";
+        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver("display_name", (argumentQueue, context) -> {
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             if (sender instanceof FPlayer fPlayer) {
                 if (fPlayer.isUnknown()) {
                     return Tag.preProcessParsed(resolveLocalization(fReceiver).getUnknown()

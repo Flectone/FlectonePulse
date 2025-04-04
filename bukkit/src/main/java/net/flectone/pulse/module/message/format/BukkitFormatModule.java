@@ -15,6 +15,8 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 
+import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
+
 @Singleton
 public class BukkitFormatModule extends FormatModule {
 
@@ -30,15 +32,15 @@ public class BukkitFormatModule extends FormatModule {
 
     @Override
     public TagResolver coordsTag(FEntity sender, FEntity fReceiver) {
-        if (!isCorrectTag(TagType.COORDS, sender)) return TagResolver.empty();
+        String tag = "coords";
+        if (!isCorrectTag(TagType.COORDS, sender)) return emptyTagResolver(tag);
 
         Player player = Bukkit.getPlayer(sender.getUuid());
-        if (player == null) return TagResolver.resolver("coords", ((argumentQueue, context) -> Tag.selfClosingInserting(Component.empty())));
+        if (player == null) return emptyTagResolver(tag);
 
         Location location = player.getLocation();
 
-        return TagResolver.resolver("coords", (argumentQueue, context) -> {
-
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             String string = resolveLocalization(fReceiver).getTags().get(TagType.COORDS)
                     .replace("<x>", String.valueOf(location.getBlockX()))
                     .replace("<y>", String.valueOf(location.getBlockY()))
@@ -52,10 +54,11 @@ public class BukkitFormatModule extends FormatModule {
 
     @Override
     public TagResolver statsTag(FEntity sender, FEntity fReceiver) {
-        if (!isCorrectTag(TagType.STATS, sender)) return TagResolver.empty();
+        String tag = "stats";
+        if (!isCorrectTag(TagType.STATS, sender)) return emptyTagResolver(tag);
 
         Player player = Bukkit.getPlayer(sender.getUuid());
-        if (player == null) return TagResolver.resolver("stats", ((argumentQueue, context) -> Tag.selfClosingInserting(Component.empty())));
+        if (player == null) return emptyTagResolver(tag);
 
         AttributeInstance armor;
         AttributeInstance damage;
@@ -64,11 +67,10 @@ public class BukkitFormatModule extends FormatModule {
             armor = player.getAttribute(Attribute.GENERIC_ARMOR);
             damage = player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
         } catch (ArrayIndexOutOfBoundsException e) {
-            return TagResolver.empty();
+            return emptyTagResolver(tag);
         }
 
-        return TagResolver.resolver("stats", (argumentQueue, context) -> {
-
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             String string = resolveLocalization(fReceiver).getTags().get(TagType.STATS)
                     .replace("<hp>", String.valueOf(Math.round(player.getHealth() * 10.0)/10.0))
                     .replace("<armor>", String.valueOf(armor != null ? Math.round(armor.getValue() * 10.0)/10.0 : 0.0))

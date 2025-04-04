@@ -20,6 +20,8 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
+import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
+
 @Singleton
 public class MentionModule extends AbstractModuleMessage<Localization.Message.Format.Mention> {
 
@@ -90,9 +92,10 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
     }
 
     public TagResolver mentionTag(UUID processId, FEntity sender, FEntity receiver) {
-        if (checkModulePredicates(sender)) return TagResolver.empty();
+        String tag = "mention";
+        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver("mention", (argumentQueue, context) -> {
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             Tag.Argument mentionTag = argumentQueue.peek();
             if (mentionTag == null) return Tag.selfClosingInserting(Component.empty());
 

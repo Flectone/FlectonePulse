@@ -33,6 +33,8 @@ import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import java.util.HashMap;
 import java.util.Map;
 
+import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
+
 
 public abstract class FormatModule extends AbstractModuleMessage<Localization.Message.Format> {
 
@@ -115,10 +117,10 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
     }
 
     public TagResolver tpsTag(FEntity sender, FEntity fReceiver) {
-        if (!isCorrectTag(TagType.TPS, sender)) return TagResolver.empty();
+        String tag = "tps";
+        if (!isCorrectTag(TagType.TPS, sender)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver("tps", (argumentQueue, context) -> {
-
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             String string = resolveLocalization(fReceiver).getTags().get(TagType.TPS).replace("<tps>", String.valueOf(serverUtil.getTPS()));
 
             Component component = componentUtil.builder(sender, fReceiver, string).build();
@@ -128,10 +130,10 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
     }
 
     public TagResolver onlineTag(FEntity sender, FEntity fReceiver) {
-        if (!isCorrectTag(TagType.ONLINE, sender)) return TagResolver.empty();
+        String tag = "online";
+        if (!isCorrectTag(TagType.ONLINE, sender)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver("online", (argumentQueue, context) -> {
-
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             String string = resolveLocalization(fReceiver).getTags().get(TagType.ONLINE).replace("<online>", String.valueOf(serverUtil.getOnlineCount()));
 
             Component component = componentUtil.builder(sender, fReceiver, string).build();
@@ -141,11 +143,11 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
     }
 
     public TagResolver pingTag(FEntity sender, FEntity fReceiver) {
-        if (!(sender instanceof FPlayer fPlayer)) return TagResolver.empty();
-        if (!isCorrectTag(TagType.PING, sender)) return TagResolver.empty();
+        String tag = "ping";
+        if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);
+        if (!isCorrectTag(TagType.PING, sender)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver("ping", (argumentQueue, context) -> {
-
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             int ping = fPlayerService.getPing(fPlayer);
             String string = resolveLocalization(fReceiver).getTags().get(TagType.PING).replace("<ping>", String.valueOf(ping));
 
@@ -159,9 +161,10 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
     public abstract TagResolver statsTag(FEntity sender, FEntity fReceiver);
 
     public TagResolver skinTag(FEntity sender, FEntity fReceiver) {
-        if (!isCorrectTag(TagType.SKIN, sender)) return TagResolver.empty();
+        String tag = "skin";
+        if (!isCorrectTag(TagType.SKIN, sender)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver("skin", (argumentQueue, context) -> {
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
 
             String url = skinService.getBodyUrl(sender);
             String string = resolveLocalization(fReceiver).getTags().get(TagType.SKIN).replace("<message>", url);
@@ -172,11 +175,12 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
     }
 
     public TagResolver itemTag(FEntity sender, FEntity fReceiver) {
-        if (!isCorrectTag(TagType.ITEM, sender)) return TagResolver.empty();
+        String tag = "item";
+        if (!isCorrectTag(TagType.ITEM, sender)) return emptyTagResolver(tag);
 
         Object itemStackObject = platformPlayerAdapter.getItem(sender.getUuid());
 
-        return TagResolver.resolver("item", (argumentQueue, context) -> {
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             String string = resolveLocalization(fReceiver).getTags().get(TagType.ITEM);
             return Tag.selfClosingInserting(componentUtil.builder(sender, fReceiver, string)
                     .build()
@@ -190,9 +194,10 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
     }
 
     public TagResolver urlTag(FEntity sender, FEntity fReceiver) {
-        if (!isCorrectTag(TagType.URL, sender)) return TagResolver.empty();
+        String tag = "url";
+        if (!isCorrectTag(TagType.URL, sender)) return emptyTagResolver(tag);
 
-        return TagResolver.resolver("url", (argumentQueue, context) -> {
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
 
             Tag.Argument urlArgument = argumentQueue.peek();
             if (urlArgument == null) return Tag.selfClosingInserting(Component.empty());

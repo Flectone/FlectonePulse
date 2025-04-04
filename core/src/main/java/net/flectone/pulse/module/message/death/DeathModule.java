@@ -29,6 +29,8 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.util.UUID;
 
+import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
+
 @Singleton
 public class DeathModule extends AbstractModuleMessage<Localization.Message.Death> {
 
@@ -135,10 +137,11 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
     }
 
     public TagResolver byItemTag(Item item) {
-        return TagResolver.resolver("by_item", (argumentQueue, context) -> {
-            if (!isEnable()) return Tag.selfClosingInserting(Component.empty());
-            if (item == null) return Tag.selfClosingInserting(Component.empty());
+        String tag = "by_item";
+        if (!isEnable()) return emptyTagResolver(tag);
+        if (item == null) return emptyTagResolver(tag);
 
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             Component component = Component.text(item.getName());
             if (item.getHoverEvent() != null) {
                 component = component.hoverEvent(item.getHoverEvent());
@@ -149,13 +152,14 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
     }
 
     public TagResolver killerTag(FPlayer receiver, Death killer) {
-        return TagResolver.resolver("killer", (argumentQueue, context) -> {
-            if (!isEnable()) return Tag.selfClosingInserting(Component.empty());
+        String tag = "killer";
+        if (!isEnable()) return emptyTagResolver(tag);
 
-            FEntity entity = convertDeath(killer);
-            if (entity == null) return Tag.inserting(Component.empty());
+        FEntity entity = convertDeath(killer);
+        if (entity == null) return emptyTagResolver(tag);
 
-            return Tag.selfClosingInserting(componentUtil.builder(entity, receiver, "<display_name>").build());
-        });
+        return TagResolver.resolver(tag, (argumentQueue, context) ->
+                Tag.selfClosingInserting(componentUtil.builder(entity, receiver, "<display_name>").build())
+        );
     }
 }

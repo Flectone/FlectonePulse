@@ -27,6 +27,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
+import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
+
 @Singleton
 public class AdvancementModule extends AbstractModuleMessage<Localization.Message.Advancement> {
 
@@ -142,9 +144,10 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
     }
 
     public TagResolver advancementTag(FEntity sender, FPlayer receiver, @NotNull Advancement advancement) {
-        return TagResolver.resolver("advancement", (argumentQueue, context) -> {
-            if (!isEnable()) return Tag.selfClosingInserting(Component.empty());
+        String tag = "advancement";
+        if (!isEnable()) return emptyTagResolver(tag);
 
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
             Localization.Message.Advancement localization = resolveLocalization(receiver);
 
             String title = switch (advancement.type()) {
