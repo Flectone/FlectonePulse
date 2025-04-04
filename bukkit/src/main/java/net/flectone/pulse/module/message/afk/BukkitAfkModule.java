@@ -96,7 +96,9 @@ public class BukkitAfkModule extends AfkModule {
         if (timeVector == null || !timeVector.getValue().equals(getVector(player))) {
 
             if (fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX)) {
-                fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.AFK_SUFFIX, null);
+                fPlayer.removeSetting(FPlayer.Setting.AFK_SUFFIX);
+                PLAYER_BLOCK.remove(fPlayer.getUuid());
+                fPlayerService.deleteSetting(fPlayer, FPlayer.Setting.AFK_SUFFIX);
                 send(fPlayer);
             }
 
