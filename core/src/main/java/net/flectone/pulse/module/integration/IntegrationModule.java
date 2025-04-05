@@ -4,6 +4,7 @@ import com.google.inject.Injector;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
@@ -71,7 +72,7 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public abstract boolean isMuted(FPlayer fPlayer);
 
-    public abstract Object getMute(FPlayer fPlayer);
+    public abstract ExternalModeration getMute(FPlayer fPlayer);
 
     public abstract String getTritonLocale(FPlayer fPlayer);
 

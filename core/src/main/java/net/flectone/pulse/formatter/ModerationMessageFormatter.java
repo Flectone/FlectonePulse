@@ -6,7 +6,7 @@ import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.LiteBansModeration;
+import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.service.FPlayerService;
@@ -80,7 +80,7 @@ public class ModerationMessageFormatter {
         );
     }
 
-    public String replacePlaceholder(String message, FPlayer fReceiver, LiteBansModeration moderation) {
+    public String replacePlaceholder(String message, FPlayer fReceiver, ExternalModeration moderation) {
         Localization localization = fileManager.getLocalization(fReceiver);
 
         String date = timeFormatter.formatDate(moderation.date());
@@ -113,13 +113,10 @@ public class ModerationMessageFormatter {
                 yield replacePlaceholders(format, fPlayer, mutes.get(0));
             }
             case EXTERNAL -> {
-                Object mute = integrationModule.getMute(fPlayer);
+                ExternalModeration mute = integrationModule.getMute(fPlayer);
                 if (mute == null) yield format;
-                if (mute instanceof LiteBansModeration moderation) {
-                    yield replacePlaceholder(format, fPlayer, moderation);
-                }
 
-                yield format;
+                yield replacePlaceholder(format, fPlayer, mute);
             }
             default -> "";
         };

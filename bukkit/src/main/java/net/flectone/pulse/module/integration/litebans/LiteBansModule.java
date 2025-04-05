@@ -7,7 +7,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.model.LiteBansModeration;
+import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.banlist.BanlistModule;
 import net.flectone.pulse.module.command.kick.KickModule;
@@ -78,7 +78,7 @@ public class LiteBansModule extends AbstractModule {
         return liteBansIntegration.isMuted(fEntity);
     }
 
-    public LiteBansModeration getMute(FEntity fEntity) {
+    public ExternalModeration getMute(FEntity fEntity) {
         if (checkModulePredicates(fEntity)) return null;
 
         return liteBansIntegration.getMute(fEntity);
