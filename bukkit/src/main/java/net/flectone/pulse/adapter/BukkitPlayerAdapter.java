@@ -61,6 +61,15 @@ public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
     }
 
     @Override
+    public UUID getPlayerByEntityId(int id) {
+        return Bukkit.getOnlinePlayers().stream()
+                .filter(player -> player.getEntityId() == id)
+                .findFirst()
+                .map(Entity::getUniqueId)
+                .orElse(null);
+    }
+
+    @Override
     public String getName(UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) return "";

@@ -17,6 +17,8 @@ public abstract class PlatformPlayerAdapter {
         return getEntityId(fPlayer.getUuid());
     }
 
+    public abstract UUID getPlayerByEntityId(int id);
+
     public abstract String getName(UUID uuid);
 
     public String getName(FPlayer fPlayer) {
