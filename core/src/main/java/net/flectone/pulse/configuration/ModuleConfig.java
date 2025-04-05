@@ -55,6 +55,7 @@ public interface ModuleConfig {
 
     interface IntegrationConfig {
 
+        SubIntegrationConfig getAdvancedban();
         SubIntegrationConfig getDeepl();
         SubIntegrationConfig getDiscord();
         SubIntegrationConfig getLitebans();

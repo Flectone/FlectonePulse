@@ -5,8 +5,10 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.module.integration.advancedban.AdvancedBanModule;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.interactivechat.InteractiveChatModule;
 import net.flectone.pulse.module.integration.litebans.LiteBansModule;
@@ -45,6 +47,10 @@ public class BukkitIntegrationModule extends IntegrationModule {
         super(fileManager, injector);
 
         this.injector = injector;
+
+        if (platformServerAdapter.hasProject("AdvancedBan")) {
+            addChildren(AdvancedBanModule.class);
+        }
 
         if (platformServerAdapter.hasProject("PlaceholderAPI")) {
             addChildren(PlaceholderAPIModule.class);
@@ -243,13 +249,21 @@ public class BukkitIntegrationModule extends IntegrationModule {
             return injector.getInstance(LiteBansModule.class).isMuted(fPlayer);
         }
 
+        if (getChildren().contains(AdvancedBanModule.class)) {
+            return injector.getInstance(AdvancedBanModule.class).isMuted(fPlayer);
+        }
+
         return false;
     }
 
     @Override
-    public Object getMute(FPlayer fPlayer) {
+    public ExternalModeration getMute(FPlayer fPlayer) {
         if (getChildren().contains(LiteBansModule.class)) {
             return injector.getInstance(LiteBansModule.class).getMute(fPlayer);
+        }
+
+        if (getChildren().contains(AdvancedBanModule.class)) {
+            return injector.getInstance(AdvancedBanModule.class).getMute(fPlayer);
         }
 
         return null;

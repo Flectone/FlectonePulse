@@ -519,6 +519,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private String name = "flectonepulse.module.integration";
         private Type type = Type.TRUE;
 
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/advancedban/")})
+        private Advancedban advancedban = new Advancedban();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/deepl/")})
         private Deepl deepl = new Deepl();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/discord/")})
@@ -551,6 +553,12 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Vault vault = new Vault();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/yandex/")})
         private Yandex yandex = new Yandex();
+
+        @Getter
+        public static final class Advancedban implements SubIntegrationConfig, IPermission {
+            private String name = "flectonepulse.module.integration.advancedban";
+            private Type type = Type.TRUE;
+        }
 
         @Getter
         public static final class Deepl implements SubIntegrationConfig, IPermission {

@@ -39,6 +39,8 @@ public final class Integration extends FileSerializable implements ModuleConfig.
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/")})
     private boolean enable = true;
 
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/advancedban/")})
+    private Advancedban advancedban = new Advancedban();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/deepl/")})
     private Deepl deepl = new Deepl();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/discord/")})
@@ -71,6 +73,15 @@ public final class Integration extends FileSerializable implements ModuleConfig.
     private Vault vault = new Vault();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/yandex/")})
     private Yandex yandex = new Yandex();
+
+    @Getter
+    public static final class Advancedban implements SubIntegrationConfig, Config.IEnable {
+        private boolean enable = true;
+        private boolean disableFlectonepulseBan = true;
+        private boolean disableFlectonepulseMute = true;
+        private boolean disableFlectonepulseWarn = true;
+        private boolean disableFlectonepulseKick = true;
+    }
 
     @Getter
     public static final class Deepl implements SubIntegrationConfig, Config.IEnable {

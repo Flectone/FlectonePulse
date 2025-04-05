@@ -1225,6 +1225,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Twitch twitch = new Twitch();
 
         @Override
+        public SubIntegrationConfig getAdvancedban() {
+            return null;
+        }
+
+        @Override
         public SubIntegrationConfig getDeepl() {
             return null;
         }

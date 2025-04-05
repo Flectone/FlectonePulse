@@ -21,3 +21,4 @@ softdepend:
   - PacketEvents
   - TAB
   - LiteBans
+  - AdvancedBan
