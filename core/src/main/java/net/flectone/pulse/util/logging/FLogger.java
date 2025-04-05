@@ -37,8 +37,6 @@ public class FLogger extends Logger {
 
     private final Consumer<LogRecord> logConsumer;
 
-    private LogFilter logFilter;
-
     public FLogger(Consumer<LogRecord> logConsumer) {
         super("", null);
 
@@ -53,17 +51,6 @@ public class FLogger extends Logger {
         setLevel(Level.ALL);
 
         logConsumer = super::log;
-    }
-
-    public void enableFilter() {
-        this.logFilter = new LogFilter();
-    }
-
-    public void reload(List<String> messages) {
-        if (logFilter == null) return;
-
-        logFilter.getMessages().clear();
-        logFilter.getMessages().addAll(messages);
     }
 
     @Override
