@@ -58,7 +58,7 @@ public class FPlayerRepository {
         if (cachedPlayer.isPresent()) return cachedPlayer.get();
 
         FPlayer dbPlayer = fPlayerDAO.getFPlayer(id);
-        offlinePlayersCache.put(dbPlayer.getUuid(), dbPlayer);
+        saveToCache(dbPlayer);
 
         return dbPlayer;
     }
@@ -79,7 +79,7 @@ public class FPlayerRepository {
         if (cachedPlayer.isPresent()) return cachedPlayer.get();
 
         FPlayer dbPlayer = fPlayerDAO.getFPlayer(inetAddress);
-        offlinePlayersCache.put(dbPlayer.getUuid(), dbPlayer);
+        saveToCache(dbPlayer);
 
         return dbPlayer;
     }
@@ -92,7 +92,7 @@ public class FPlayerRepository {
         if (cachedPlayer != null) return cachedPlayer;
 
         FPlayer dbPlayer = fPlayerDAO.getFPlayer(uuid);
-        offlinePlayersCache.put(uuid, dbPlayer);
+        saveToCache(dbPlayer);
 
         return dbPlayer;
     }
@@ -111,9 +111,17 @@ public class FPlayerRepository {
         if (cachedPlayer.isPresent()) return cachedPlayer.get();
 
         FPlayer dbPlayer = fPlayerDAO.getFPlayer(playerName);
-        offlinePlayersCache.put(dbPlayer.getUuid(), dbPlayer);
+        saveToCache(dbPlayer);
 
         return dbPlayer;
+    }
+
+    private void saveToCache(FPlayer fPlayer) {
+        if (fPlayer.isOnline()) {
+            onlinePlayers.put(fPlayer.getUuid(), fPlayer);
+        } else {
+            offlinePlayersCache.put(fPlayer.getUuid(), fPlayer);
+        }
     }
 
     public boolean save(UUID uuid, String name) {
