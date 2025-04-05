@@ -118,7 +118,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         private boolean enable = true;
         private int range = Range.SERVER;
         private int delay = 3000;
-        private List<String> ignore = new ArrayList<>();
+        private List<String> ignore = new ArrayList<>(List.of("afk"));
         private Destination destination = new Destination();
         private Ticker ticker = new Ticker(true, 20);
     }
