@@ -85,7 +85,7 @@ public class ProxyMessageProcessor {
                 output.writeUTF(input.readUTF());
             }
 
-            case JOIN, AFK -> output.writeBoolean(input.readBoolean());
+            case QUIT, JOIN, AFK -> output.writeBoolean(input.readBoolean());
 
             default -> {}
         }
