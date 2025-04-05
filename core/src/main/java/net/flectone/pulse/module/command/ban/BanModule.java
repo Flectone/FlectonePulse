@@ -76,6 +76,8 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
     @Override
     public void reload() {
+        if (checkModulePredicates(FPlayer.UNKNOWN)) return;
+
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

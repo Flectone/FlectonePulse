@@ -69,6 +69,8 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
 
     @Override
     public void reload() {
+        if (checkModulePredicates(FPlayer.UNKNOWN)) return;
+
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

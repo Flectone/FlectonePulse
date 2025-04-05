@@ -57,6 +57,7 @@ public interface ModuleConfig {
 
         SubIntegrationConfig getDeepl();
         SubIntegrationConfig getDiscord();
+        SubIntegrationConfig getLitebans();
         SubIntegrationConfig getLuckperms();
         SubIntegrationConfig getPlaceholderapi();
         SubIntegrationConfig getPlasmovoice();

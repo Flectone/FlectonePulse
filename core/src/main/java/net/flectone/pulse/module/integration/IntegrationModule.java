@@ -69,9 +69,9 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public abstract boolean isVanished(FEntity sender);
 
-    public abstract boolean isOtherTAB();
-
     public abstract boolean isMuted(FPlayer fPlayer);
+
+    public abstract Object getMute(FPlayer fPlayer);
 
     public abstract String getTritonLocale(FPlayer fPlayer);
 

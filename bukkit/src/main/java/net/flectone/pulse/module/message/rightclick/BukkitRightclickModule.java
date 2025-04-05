@@ -11,6 +11,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.rightclick.listener.RightclickPacketListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.UUID;
 
@@ -53,14 +54,18 @@ public class BukkitRightclickModule extends RightclickModule {
         return message.isEnable();
     }
 
+    @Inject private FLogger fLogger;
+
     @Async
     public void send(UUID uuid, int targetId) {
+        fLogger.warning("1");
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
         if (checkModulePredicates(fPlayer)) return;
 
+        fLogger.warning("2");
         FPlayer fTarget = fPlayerService.getFPlayer(targetId);
         if (fTarget.isUnknown()) return;
-
+        fLogger.warning("3");
         builder(fTarget)
                 .receiver(fPlayer)
                 .format(Localization.Message.Rightclick::getFormat)

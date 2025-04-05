@@ -20,3 +20,4 @@ softdepend:
   - ProtocolLib
   - PacketEvents
   - TAB
+  - LiteBans

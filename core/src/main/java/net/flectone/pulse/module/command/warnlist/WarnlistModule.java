@@ -67,6 +67,8 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
 
     @Override
     public void reload() {
+        if (checkModulePredicates(FPlayer.UNKNOWN)) return;
+
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

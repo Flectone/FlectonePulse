@@ -9,6 +9,7 @@ import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.interactivechat.InteractiveChatModule;
+import net.flectone.pulse.module.integration.litebans.LiteBansModule;
 import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.module.integration.placeholderapi.PlaceholderAPIModule;
 import net.flectone.pulse.module.integration.plasmovoice.PlasmoVoiceModule;
@@ -55,6 +56,10 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
         if (platformServerAdapter.hasProject("InteractiveChat")) {
             addChildren(InteractiveChatModule.class);
+        }
+
+        if (platformServerAdapter.hasProject("LiteBans")) {
+            addChildren(LiteBansModule.class);
         }
 
         if (platformServerAdapter.hasProject("LuckPerms")) {
@@ -233,17 +238,21 @@ public class BukkitIntegrationModule extends IntegrationModule {
     }
 
     @Override
-    public boolean isOtherTAB() {
-        if (getChildren().contains(TABModule.class)) {
-            return injector.getInstance(TABModule.class).isHooked();
+    public boolean isMuted(FPlayer fPlayer) {
+        if (getChildren().contains(LiteBansModule.class)) {
+            return injector.getInstance(LiteBansModule.class).isMuted(fPlayer);
         }
 
         return false;
     }
 
     @Override
-    public boolean isMuted(FPlayer fPlayer) {
-        return false;
+    public Object getMute(FPlayer fPlayer) {
+        if (getChildren().contains(LiteBansModule.class)) {
+            return injector.getInstance(LiteBansModule.class).getMute(fPlayer);
+        }
+
+        return null;
     }
 
     @Override

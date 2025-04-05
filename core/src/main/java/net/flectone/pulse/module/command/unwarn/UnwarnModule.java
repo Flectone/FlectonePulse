@@ -57,6 +57,8 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
 
     @Override
     public void reload() {
+        if (checkModulePredicates(FPlayer.UNKNOWN)) return;
+
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

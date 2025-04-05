@@ -63,6 +63,8 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
     @Override
     public void reload() {
+        if (checkModulePredicates(FPlayer.UNKNOWN)) return;
+
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

@@ -57,6 +57,8 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
 
     @Override
     public void reload() {
+        if (checkModulePredicates(FPlayer.UNKNOWN)) return;
+
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

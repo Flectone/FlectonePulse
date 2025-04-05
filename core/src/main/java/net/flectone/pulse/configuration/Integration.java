@@ -45,6 +45,8 @@ public final class Integration extends FileSerializable implements ModuleConfig.
     private Discord discord = new Discord();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/interactivechat/")})
     private Interactivechat interactivechat = new Interactivechat();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/litebans/")})
+    private Litebans litebans = new Litebans();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/luckperms/")})
     private Luckperms luckperms = new Luckperms();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/placeholderapi/")})
@@ -119,6 +121,15 @@ public final class Integration extends FileSerializable implements ModuleConfig.
     }
 
     @Getter
+    public static final class Litebans implements SubIntegrationConfig, Config.IEnable {
+        private boolean enable = true;
+        private boolean disableFlectonepulseBan = true;
+        private boolean disableFlectonepulseMute = true;
+        private boolean disableFlectonepulseWarn = true;
+        private boolean disableFlectonepulseKick = true;
+    }
+
+    @Getter
     public static final class Luckperms implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = true;
         private boolean tabSort = true;
@@ -152,6 +163,10 @@ public final class Integration extends FileSerializable implements ModuleConfig.
     @Getter
     public static final class TAB implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = true;
+        private boolean disableFlectonepulseScoreboard = true;
+        private boolean disableFlectonepulseHeader = true;
+        private boolean disableFlectonepulseFooter = true;
+        private boolean disableFlectonepulsePlayerlistname = false;
     }
 
     @Getter

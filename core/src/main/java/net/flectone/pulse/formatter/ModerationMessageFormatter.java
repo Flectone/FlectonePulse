@@ -6,9 +6,11 @@ import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.LiteBansModeration;
 import net.flectone.pulse.model.Moderation;
-import net.flectone.pulse.repository.ModerationRepository;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.service.ModerationService;
 
 import java.util.List;
 
@@ -18,17 +20,20 @@ public class ModerationMessageFormatter {
     private final FileManager fileManager;
     private final FPlayerService fPlayerService;
     private final TimeFormatter timeFormatter;
-    private final ModerationRepository moderationRepository;
+    private final ModerationService moderationService;
+    private final IntegrationModule integrationModule;
 
     @Inject
     public ModerationMessageFormatter(FileManager fileManager,
                                       FPlayerService fPlayerService,
                                       TimeFormatter timeFormatter,
-                                      ModerationRepository moderationRepository) {
+                                      ModerationService moderationService,
+                                      IntegrationModule integrationModule) {
         this.fileManager = fileManager;
         this.fPlayerService = fPlayerService;
         this.timeFormatter = timeFormatter;
-        this.moderationRepository = moderationRepository;
+        this.moderationService = moderationService;
+        this.integrationModule = integrationModule;
     }
 
     public String replacePlaceholders(String message,
@@ -75,15 +80,46 @@ public class ModerationMessageFormatter {
         );
     }
 
+    public String replacePlaceholder(String message, FPlayer fReceiver, LiteBansModeration moderation) {
+        Localization localization = fileManager.getLocalization(fReceiver);
+
+        String date = timeFormatter.formatDate(moderation.date());
+        String time = moderation.permanent()
+                ? localization.getTime().getPermanent()
+                : timeFormatter.format(fReceiver, moderation.time());
+        String timeLeft = moderation.permanent()
+                ? localization.getTime().getPermanent()
+                : timeFormatter.format(fReceiver, moderation.time() - System.currentTimeMillis());
+
+        return replacePlaceholders(message,
+                moderation.playerName(),
+                moderation.moderatorName(),
+                String.valueOf(moderation.moderationId()),
+                moderation.reason(),
+                date,
+                time,
+                timeLeft
+        );
+    }
+
     public String buildMuteMessage(FPlayer fPlayer, MuteChecker.Status status) {
         String format = fileManager.getLocalization(fPlayer).getCommand().getMute().getPerson();
 
         return switch (status) {
             case LOCAL -> {
-                List<Moderation> mutes = moderationRepository.getValid(fPlayer, Moderation.Type.MUTE);
+                List<Moderation> mutes = moderationService.getValidMutes(fPlayer);
                 if (mutes.isEmpty()) yield format;
 
                 yield replacePlaceholders(format, fPlayer, mutes.get(0));
+            }
+            case EXTERNAL -> {
+                Object mute = integrationModule.getMute(fPlayer);
+                if (mute == null) yield format;
+                if (mute instanceof LiteBansModeration moderation) {
+                    yield replacePlaceholder(format, fPlayer, moderation);
+                }
+
+                yield format;
             }
             default -> "";
         };
