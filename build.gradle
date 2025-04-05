@@ -34,6 +34,8 @@ subprojects {
                 relocate("me.imdanix.text", "net.flectone.pulse.library.minitranslator")
             }
 
+            outputs.cacheIf { true }
+
             minimize()
         }
     }
