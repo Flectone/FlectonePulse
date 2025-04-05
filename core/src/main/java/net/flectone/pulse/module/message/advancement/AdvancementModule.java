@@ -124,7 +124,7 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
                 .sound(getSound());
 
         if (relation == Relation.ONE_TO_ONE_ADVANCEMENT && advancement != null) {
-            builder.tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fResolver, advancement)});
+            builder.tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fPlayer, advancement)});
         }
 
         builder.sendBuilt();
