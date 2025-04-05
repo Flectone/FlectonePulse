@@ -479,7 +479,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         @Getter
         public static final class Scoreboard implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
-            private boolean disableOnOtherScoreboard = true;
             private boolean nameVisible = false;
             private String color = "<white>";
         }
@@ -716,7 +715,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         @Getter
         public static final class Footer implements SubTabMessageConfig, Config.IEnable {
             private boolean enable = true;
-            private boolean disableOnOtherTab = true;
             private boolean random = true;
             private Destination destination = new Destination(Destination.Type.TAB_FOOTER);
             private Ticker ticker = new Ticker(true, 100);
@@ -725,7 +723,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         @Getter
         public static final class Header implements SubTabMessageConfig, Config.IEnable {
             private boolean enable = true;
-            private boolean disableOnOtherTab = true;
             private boolean random = true;
             private Destination destination = new Destination(Destination.Type.TAB_HEADER);
             private Ticker ticker = new Ticker(true, 100);
@@ -734,7 +731,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         @Getter
         public static final class Playerlistname implements SubTabMessageConfig, Config.IEnable {
             private boolean enable = true;
-            private boolean disableOnOtherTab = false;
             private Ticker ticker = new Ticker(true, 100);
         }
     }
