@@ -99,6 +99,7 @@ public class ColorsDAO {
 
     public void load(FPlayer fPlayer) {
         if (fPlayer.isUnknown()) return;
+        fPlayer.getColors().clear();
 
         try (Connection connection = database.getConnection()) {
             String SQL_GET_BY_PLAYER_ID = "SELECT * FROM `player_color` LEFT JOIN `color` ON `player_color`.`color` = `color`.`id` WHERE `player_color`.`player` = ?";
