@@ -112,7 +112,6 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         }
 
         if (inputColors[0].equalsIgnoreCase("clear")) {
-            fPlayer.getColors().clear();
             setColors(fPlayer, null);
             return;
         }
@@ -137,7 +136,6 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
                 );
 
                 if (inputColors[1].equalsIgnoreCase("clear")) {
-                    fTarget.getColors().clear();
                     setColors(fTarget, null);
                     return;
                 }
