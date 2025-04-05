@@ -22,6 +22,7 @@ import net.flectone.pulse.module.message.format.mention.MentionModule;
 import net.flectone.pulse.module.message.format.moderation.ModerationModule;
 import net.flectone.pulse.module.message.format.name.NameModule;
 import net.flectone.pulse.module.message.format.questionanswer.QuestionAnswerModule;
+import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.format.spoiler.SpoilerModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
@@ -69,6 +70,7 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
         addChildren(ModerationModule.class);
         addChildren(NameModule.class);
         addChildren(QuestionAnswerModule.class);
+        addChildren(ScoreboardModule.class);
         addChildren(SpoilerModule.class);
         addChildren(TranslateModule.class);
         addChildren(WorldModule.class);
