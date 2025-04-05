@@ -23,6 +23,7 @@ import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MetricsService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.logging.FLogger;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
@@ -171,6 +172,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         injector.getInstance(ProxySender.class).reload();
         injector.getInstance(FPlayerService.class).reload();
+        injector.getInstance(ModerationService.class).reload();
         injector.getInstance(Module.class).reloadWithChildren();
 
         fLogger.logReloaded();

@@ -19,6 +19,10 @@ public class ModerationService {
         this.moderationRepository = moderationRepository;
     }
 
+    public void reload() {
+        moderationRepository.invalidateAll();
+    }
+
     public void invalidate(UUID uuid) {
         moderationRepository.invalidateAll(uuid);
     }

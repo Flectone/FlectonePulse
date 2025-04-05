@@ -46,6 +46,10 @@ public class ModerationRepository {
         moderationCache.invalidate(new CacheKey(playerId, type));
     }
 
+    public void invalidateAll() {
+        moderationCache.invalidateAll();
+    }
+
     public void invalidateAll(UUID playerId) {
         for (Moderation.Type type : Moderation.Type.values()) {
             invalidate(playerId, type);
