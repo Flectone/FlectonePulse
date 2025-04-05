@@ -180,7 +180,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
         FPlayer fPlayer = fPlayerService.getFPlayer(userProfile.getUUID());
 
-        for (Moderation ban : moderationService.getValid(fPlayer, Moderation.Type.BAN)) {
+        for (Moderation ban : moderationService.getValidBans(fPlayer)) {
             FPlayer fModerator = fPlayerService.getFPlayer(ban.getModerator());
 
             Localization.Command.Ban localization = resolveLocalization();

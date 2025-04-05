@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration.plasmovoice;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
+import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.sender.MessageSender;
@@ -28,6 +29,7 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
 
     private final FPlayerService fPlayerService;
     private final ModerationMessageFormatter moderationMessageFormatter;
+    private final MuteChecker muteChecker;
     private final MessageSender messageSender;
     private final MessageFormatter messageFormatter;
     private final FLogger fLogger;
@@ -35,11 +37,13 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
     @Inject
     public PlasmoVoiceIntegration(FPlayerService fPlayerService,
                                   ModerationMessageFormatter moderationMessageFormatter,
+                                  MuteChecker muteChecker,
                                   MessageSender messageSender,
                                   MessageFormatter messageFormatter,
                                   FLogger fLogger) {
         this.fPlayerService = fPlayerService;
         this.moderationMessageFormatter = moderationMessageFormatter;
+        this.muteChecker = muteChecker;
         this.messageSender = messageSender;
         this.messageFormatter = messageFormatter;
         this.fLogger = fLogger;
@@ -73,11 +77,12 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
         UUID senderUUID = event.getConnection().getPlayer().getInstance().getUuid();
         FPlayer fPlayer = fPlayerService.getFPlayer(senderUUID);
 
-        if (!fPlayer.isMuted()) return;
+        MuteChecker.Status status = muteChecker.check(fPlayer);
+        if (status == MuteChecker.Status.NONE) return;
 
         event.setCancelled(true);
 
-        String message = moderationMessageFormatter.buildMuteMessage(fPlayer);
+        String message = moderationMessageFormatter.buildMuteMessage(fPlayer, status);
         messageSender.sendActionBar(fPlayer, messageFormatter.builder(fPlayer, message).build());
     }
 

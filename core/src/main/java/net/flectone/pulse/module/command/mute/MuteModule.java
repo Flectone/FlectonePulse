@@ -119,9 +119,6 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
         Moderation mute = moderationService.mute(fTarget, databaseTime, reason, fPlayer.getId());
         if (mute == null) return;
-        if (fTarget.isOnline()) {
-            fTarget.addMute(mute);
-        }
 
         builder(fTarget)
                 .range(command.getRange())

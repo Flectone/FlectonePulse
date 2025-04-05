@@ -8,6 +8,7 @@ import de.maxhenkel.voicechat.api.events.EntitySoundPacketEvent;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import net.flectone.pulse.BuildConfig;
+import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.sender.MessageSender;
@@ -21,6 +22,7 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
 
     private final FPlayerService fPlayerService;
     private final ModerationMessageFormatter moderationMessageFormatter;
+    private final MuteChecker muteChecker;
     private final MessageSender messageSender;
     private final MessageFormatter messageFormatter;
     private final FLogger fLogger;
@@ -28,11 +30,13 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
     @Inject
     public SimpleVoiceIntegration(FPlayerService fPlayerService,
                                   ModerationMessageFormatter moderationMessageFormatter,
+                                  MuteChecker muteChecker,
                                   MessageSender messageSender,
                                   MessageFormatter messageFormatter,
                                   FLogger fLogger) {
         this.fPlayerService = fPlayerService;
         this.moderationMessageFormatter = moderationMessageFormatter;
+        this.muteChecker = muteChecker;
         this.messageSender = messageSender;
         this.messageFormatter = messageFormatter;
         this.fLogger = fLogger;
@@ -75,11 +79,12 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
         Player player = event.getSenderConnection().getPlayer();
 
         FPlayer fPlayer = fPlayerService.getFPlayer(player.getUuid());
-        if (!fPlayer.isMuted()) return;
+        MuteChecker.Status status = muteChecker.check(fPlayer);
+        if (status == MuteChecker.Status.NONE) return;
 
         event.cancel();
 
-        String message = moderationMessageFormatter.buildMuteMessage(fPlayer);
+        String message = moderationMessageFormatter.buildMuteMessage(fPlayer, status);
         messageSender.sendActionBar(fPlayer, messageFormatter.builder(fPlayer, message).build());
     }
 }

@@ -103,9 +103,9 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
         List<Moderation> mutes = new ArrayList<>();
 
         if (id == -1) {
-            mutes.addAll(moderationService.getValid(fTarget, Moderation.Type.MUTE));
+            mutes.addAll(moderationService.getValidMutes(fTarget));
         } else {
-            moderationService.getValid(fTarget, Moderation.Type.MUTE).stream()
+            moderationService.getValidMutes(fTarget).stream()
                     .filter(moderation -> moderation.getId() == id)
                     .findAny()
                     .ifPresent(mutes::add);
@@ -118,13 +118,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
             return;
         }
 
-        for (Moderation mute : mutes) {
-            moderationService.setInvalid(mute);
-        }
-
-        if (fTarget.isOnline()) {
-            fTarget.clearMutes(mutes);
-        }
+        moderationService.remove(fTarget, mutes);
 
         builder(fTarget)
                 .tag(MessageTag.COMMAND_UNMUTE)

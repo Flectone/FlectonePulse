@@ -71,6 +71,8 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public abstract boolean isOtherTAB();
 
+    public abstract boolean isMuted(FPlayer fPlayer);
+
     public abstract String getTritonLocale(FPlayer fPlayer);
 
     public String deeplTranslate(FPlayer sender, String source, String target, String text) {

@@ -2,13 +2,15 @@ package net.flectone.pulse.formatter;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
+import net.flectone.pulse.repository.ModerationRepository;
 import net.flectone.pulse.service.FPlayerService;
 
-import java.util.Optional;
+import java.util.List;
 
 @Singleton
 public class ModerationMessageFormatter {
@@ -16,17 +18,38 @@ public class ModerationMessageFormatter {
     private final FileManager fileManager;
     private final FPlayerService fPlayerService;
     private final TimeFormatter timeFormatter;
+    private final ModerationRepository moderationRepository;
 
     @Inject
     public ModerationMessageFormatter(FileManager fileManager,
                                       FPlayerService fPlayerService,
-                                      TimeFormatter timeFormatter) {
+                                      TimeFormatter timeFormatter,
+                                      ModerationRepository moderationRepository) {
         this.fileManager = fileManager;
         this.fPlayerService = fPlayerService;
         this.timeFormatter = timeFormatter;
+        this.moderationRepository = moderationRepository;
     }
 
-    public String replacePlaceholders(String string, FPlayer fReceiver, Moderation moderation) {
+    public String replacePlaceholders(String message,
+                                      String playerName,
+                                      String moderatorName,
+                                      String moderationId,
+                                      String reason,
+                                      String date,
+                                      String time,
+                                      String timeLeft) {
+        return message
+                .replace("<player>", playerName)
+                .replace("<moderator>", moderatorName)
+                .replace("<id>", moderationId)
+                .replace("<reason>", reason)
+                .replace("<date>", date)
+                .replace("<time>", time)
+                .replace("<time_left>", timeLeft);
+    }
+
+    public String replacePlaceholders(String message, FPlayer fReceiver, Moderation moderation) {
         Localization localization = fileManager.getLocalization(fReceiver);
 
         Localization.ReasonMap constantReasons = switch (moderation.getType()) {
@@ -36,30 +59,33 @@ public class ModerationMessageFormatter {
             case KICK -> localization.getCommand().getKick().getReasons();
         };
 
-        FPlayer fModerator = fPlayerService.getFPlayer(moderation.getModerator());
         FPlayer fTarget = fPlayerService.getFPlayer(moderation.getPlayer());
+        FPlayer fModerator = fPlayerService.getFPlayer(moderation.getModerator());
+        String reason = constantReasons.getConstant(moderation.getReason());
+        String date = timeFormatter.formatDate(moderation.getDate());
+        String time = moderation.isPermanent()
+                ? localization.getTime().getPermanent()
+                : timeFormatter.format(fReceiver, moderation.getOriginalTime());
+        String timeLeft = moderation.isPermanent()
+                ? localization.getTime().getPermanent()
+                : timeFormatter.format(fReceiver, moderation.getRemainingTime());
 
-        return string
-                .replace("<player>", fTarget.getName())
-                .replace("<id>", String.valueOf(moderation.getId()))
-                .replace("<moderator>", fModerator.getName())
-                .replace("<reason>", constantReasons.getConstant(moderation.getReason()))
-                .replace("<date>", timeFormatter.formatDate(moderation.getDate()))
-                .replace("<time>", moderation.isPermanent()
-                        ? localization.getTime().getPermanent()
-                        : timeFormatter.format(fReceiver, moderation.getOriginalTime())
-                )
-                .replace("<time_left>", moderation.isPermanent()
-                        ? localization.getTime().getPermanent()
-                        : timeFormatter.format(fReceiver, moderation.getRemainingTime())
-                );
+        return replacePlaceholders(message, fTarget.getName(), fModerator.getName(),
+                String.valueOf(moderation.getId()), reason, date, time, timeLeft
+        );
     }
 
-    public String buildMuteMessage(FPlayer fPlayer) {
-        Optional<Moderation> mute = fPlayer.getMute();
-        if (mute.isEmpty()) return "";
-
+    public String buildMuteMessage(FPlayer fPlayer, MuteChecker.Status status) {
         String format = fileManager.getLocalization(fPlayer).getCommand().getMute().getPerson();
-        return replacePlaceholders(format, fPlayer, mute.get());
+
+        return switch (status) {
+            case LOCAL -> {
+                List<Moderation> mutes = moderationRepository.getValid(fPlayer, Moderation.Type.MUTE);
+                if (mutes.isEmpty()) yield format;
+
+                yield replacePlaceholders(format, fPlayer, mutes.get(0));
+            }
+            default -> "";
+        };
     }
 }

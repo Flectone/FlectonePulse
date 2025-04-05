@@ -4,6 +4,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.inject.Inject;
 import lombok.Getter;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
@@ -38,6 +39,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
     @Inject private ModerationService moderationService;
     @Inject private PlatformPlayerAdapter platformPlayerAdapter;
     @Inject private PermissionChecker permissionChecker;
+    @Inject private MuteChecker muteChecker;
     @Inject private FileManager fileManager;
     @Inject private MessageFormatter messageFormatter;
     @Inject private ModerationMessageFormatter moderationMessageFormatter;
@@ -117,10 +119,12 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
 
     public boolean checkMute(@NotNull FEntity entity) {
         if (!(entity instanceof FPlayer fPlayer)) return false;
-        if (!fPlayer.isMuted()) return false;
+
+        MuteChecker.Status status = muteChecker.check(fPlayer);
+        if (status == MuteChecker.Status.NONE) return false;
 
         builder(fPlayer)
-                .format(s -> moderationMessageFormatter.buildMuteMessage(fPlayer))
+                .format(s -> moderationMessageFormatter.buildMuteMessage(fPlayer, status))
                 .sendBuilt();
 
         return true;

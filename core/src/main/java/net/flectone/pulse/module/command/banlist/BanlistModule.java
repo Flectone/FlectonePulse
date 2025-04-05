@@ -125,8 +125,8 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         }
 
         List<Moderation> moderationList = targetFPlayer == null
-                ? moderationService.getValid(Moderation.Type.BAN)
-                : moderationService.getValid(targetFPlayer, Moderation.Type.BAN);
+                ? moderationService.getValidBans()
+                : moderationService.getValidBans(targetFPlayer);
 
         if (moderationList.isEmpty()) {
             builder(fPlayer)

@@ -103,9 +103,9 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
         List<Moderation> warns = new ArrayList<>();
 
         if (id == -1) {
-            warns.addAll(moderationService.getValid(fTarget, Moderation.Type.WARN));
+            warns.addAll(moderationService.getValidWarns(fTarget));
         } else {
-            moderationService.getValid(fTarget, Moderation.Type.WARN).stream()
+            moderationService.getValidWarns(fTarget).stream()
                     .filter(warn -> warn.getId() == id)
                     .findAny()
                     .ifPresent(warns::add);
@@ -118,9 +118,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
             return;
         }
 
-        for (Moderation warn : warns) {
-            moderationService.setInvalid(warn);
-        }
+        moderationService.remove(fTarget, warns);
 
         builder(fTarget)
                 .tag(MessageTag.COMMAND_UNWARN)

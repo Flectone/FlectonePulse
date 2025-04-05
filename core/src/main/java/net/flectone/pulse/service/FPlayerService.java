@@ -9,12 +9,12 @@ import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.Moderation;
-import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.model.Mail;
+import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.provider.PacketProvider;
-import net.flectone.pulse.repository.*;
+import net.flectone.pulse.repository.FPlayerRepository;
+import net.flectone.pulse.repository.SocialRepository;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.PacketSender;
 import net.kyori.adventure.text.Component;
@@ -87,13 +87,14 @@ public class FPlayerService {
             player = fPlayerRepository.get(uuid);
         }
 
+        moderationService.invalidate(uuid);
+
         FPlayer finalPlayer = player;
 
         // load player data
         loadOrSaveDefaultSetting(finalPlayer, !isInserted);
         loadColors(finalPlayer);
         loadIgnores(finalPlayer);
-        moderationService.load(finalPlayer, Moderation.Type.MUTE);
         finalPlayer.setOnline(true);
         finalPlayer.setIp(platformPlayerAdapter.getIp(finalPlayer));
         finalPlayer.setCurrentName(name);

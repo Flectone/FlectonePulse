@@ -16,7 +16,6 @@ public class FPlayer extends FEntity {
     private final int id;
     private final Map<String, String> colors = new HashMap<>();
     private final Map<Setting, String> settings = new HashMap<>();
-    private final List<Moderation> mutes = new ArrayList<>();
     private final List<Ignore> ignores = new ArrayList<>();
 
     private boolean online;
@@ -37,24 +36,6 @@ public class FPlayer extends FEntity {
         this(-1, name, FEntity.UNKNOWN_UUID, "unknown");
 
         setDefaultSettings();
-    }
-
-    public void clearMutes() {
-        this.mutes.clear();
-    }
-
-    public void clearMutes(List<Moderation> mutes) {
-        this.mutes.removeIf(mute -> mutes.stream()
-                .anyMatch(moderation -> moderation.equals(mute))
-        );
-    }
-
-    public void addMute(Moderation mute) {
-        this.mutes.add(mute);
-    }
-
-    public void addMutes(List<Moderation> mutes) {
-        this.mutes.addAll(mutes);
     }
 
     public void setIp(String ip) {
@@ -127,20 +108,6 @@ public class FPlayer extends FEntity {
 
     public void removeSetting(Setting setting) {
         settings.remove(setting);
-    }
-
-    public boolean isMuted() {
-        return getMute().isPresent();
-    }
-
-    public Optional<Moderation> getMute() {
-        if (mutes.isEmpty()) return Optional.empty();
-
-        return mutes
-                .stream()
-                .filter(Moderation::isValid)
-                .filter(mute -> !mute.isExpired())
-                .findFirst();
     }
 
     public boolean equals(FPlayer fPlayer) {

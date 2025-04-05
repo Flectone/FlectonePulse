@@ -124,8 +124,8 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
         }
 
         List<Moderation> moderationList = targetFPlayer == null
-                ? moderationService.getValid(Moderation.Type.WARN)
-                : moderationService.getValid(targetFPlayer, Moderation.Type.WARN);
+                ? moderationService.getValidWarns()
+                : moderationService.getValidWarns(targetFPlayer);
 
         if (moderationList.isEmpty()) {
             builder(fPlayer)

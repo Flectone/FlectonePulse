@@ -242,6 +242,11 @@ public class BukkitIntegrationModule extends IntegrationModule {
     }
 
     @Override
+    public boolean isMuted(FPlayer fPlayer) {
+        return false;
+    }
+
+    @Override
     public String getTritonLocale(FPlayer fPlayer) {
         if (!isEnable()) return null;
         if (!getChildren().contains(TritonModule.class)) return null;

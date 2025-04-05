@@ -149,6 +149,8 @@ public class BukkitProxyListener implements PluginMessageListener {
                 }
 
                 case COMMAND_BAN -> {
+                    moderationService.invalidate(fEntity.getUuid());
+
                     BanModule banModule = injector.getInstance(BanModule.class);
 
                     FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -240,18 +242,14 @@ public class BukkitProxyListener implements PluginMessageListener {
                             .sendBuilt();
                 }
                 case COMMAND_MUTE -> {
+                    moderationService.invalidate(fEntity.getUuid());
+
                     MuteModule muteModule = injector.getInstance(MuteModule.class);
 
                     FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
                     if (muteModule.checkModulePredicates(fModerator)) return;
 
                     Moderation mute = gson.fromJson(input.readUTF(), Moderation.class);
-
-                    FPlayer localFTarget = fPlayerService.getFPlayer(fEntity.getUuid());
-
-                    if (!localFTarget.isUnknown()) {
-                        localFTarget.addMute(mute);
-                    }
 
                     muteModule.builder(fEntity)
                             .range(Range.SERVER)
@@ -263,6 +261,8 @@ public class BukkitProxyListener implements PluginMessageListener {
                     muteModule.sendForTarget(fModerator, (FPlayer) fEntity, mute);
                 }
                 case COMMAND_UNBAN -> {
+                    moderationService.invalidate(fEntity.getUuid());
+
                     UnbanModule unbanModule = injector.getInstance(UnbanModule.class);
 
                     FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -277,17 +277,12 @@ public class BukkitProxyListener implements PluginMessageListener {
                             .sendBuilt();
                 }
                 case COMMAND_UNMUTE -> {
+                    moderationService.invalidate(fEntity.getUuid());
+
                     UnmuteModule unmuteModule = injector.getInstance(UnmuteModule.class);
 
                     FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
                     if (unmuteModule.checkModulePredicates(fPlayer)) return;
-
-                    FPlayer localFTarget = fPlayerService.getFPlayer(fEntity.getUuid());
-
-                    if (!localFTarget.isUnknown()) {
-                        localFTarget.clearMutes();
-                        localFTarget.addMutes(moderationService.getValid(Moderation.Type.MUTE));
-                    }
 
                     unmuteModule.builder(fEntity)
                             .destination(unmuteModule.getCommand().getDestination())
@@ -298,6 +293,8 @@ public class BukkitProxyListener implements PluginMessageListener {
                             .sendBuilt();
                 }
                 case COMMAND_UNWARN -> {
+                    moderationService.invalidate(fEntity.getUuid());
+
                     UnwarnModule unwarnModule = injector.getInstance(UnwarnModule.class);
 
                     FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -401,6 +398,8 @@ public class BukkitProxyListener implements PluginMessageListener {
                             .sendBuilt();
                 }
                 case COMMAND_WARN -> {
+                    moderationService.invalidate(fEntity.getUuid());
+
                     WarnModule warnModule = injector.getInstance(WarnModule.class);
 
                     FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);

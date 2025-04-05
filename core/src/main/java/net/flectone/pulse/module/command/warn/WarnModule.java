@@ -142,7 +142,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
         send(fPlayer, fTarget, warn);
 
-        List<Moderation> warns = moderationService.getValid(fTarget, Moderation.Type.WARN);
+        List<Moderation> warns = moderationService.getValidWarns(fTarget);
         if (warns.isEmpty()) return;
 
         int countWarns = warns.stream()

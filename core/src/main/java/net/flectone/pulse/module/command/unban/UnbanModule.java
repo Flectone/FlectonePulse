@@ -103,9 +103,10 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         List<Moderation> bans = new ArrayList<>();
 
         if (id == -1) {
-            bans.addAll(moderationService.getValid(fTarget, Moderation.Type.BAN));
+            bans.addAll(moderationService.getValidBans(fTarget));
         } else {
-            moderationService.getValid(fTarget, Moderation.Type.BAN).stream()
+            moderationService.getValidBans(fTarget)
+                    .stream()
                     .filter(moderation -> moderation.getId() == id)
                     .findAny()
                     .ifPresent(bans::add);
@@ -118,9 +119,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
             return;
         }
 
-        for (Moderation ban : bans) {
-            moderationService.setInvalid(ban);
-        }
+        moderationService.remove(fTarget, bans);
 
         builder(fTarget)
                 .tag(MessageTag.COMMAND_UNBAN)
