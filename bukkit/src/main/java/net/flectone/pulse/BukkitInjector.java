@@ -99,10 +99,11 @@ public class BukkitInjector extends AbstractModule {
 
     @Override
     protected void configure() {
+        // Bind project path
         Path projectPath = plugin.getDataFolder().toPath();
-
         bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
 
+        // Initialize and bind FileManager
         FileManager fileManager;
         try {
             fileManager = new FileManager(projectPath);
@@ -112,23 +113,20 @@ public class BukkitInjector extends AbstractModule {
             instance.setDisableSilently(true);
             return;
         }
-
         bind(FileManager.class).toInstance(fileManager);
 
-        // adapter
+        // Adapters
         bind(PlatformPlayerAdapter.class).to(BukkitPlayerAdapter.class);
         bind(PlatformServerAdapter.class).to(net.flectone.pulse.adapter.BukkitServerAdapter.class);
 
-        // registry
+        // Registries
         bind(PermissionRegistry.class).to(BukkitPermissionRegistry.class);
         bind(ListenerRegistry.class).to(BukkitListenerRegistry.class);
         bind(CommandRegistry.class).to(BukkitCommandRegistry.class);
 
-        // checker
+        // Checkers and utilities
         bind(PermissionChecker.class).to(BukkitPermissionChecker.class);
-
         bind(TaskScheduler.class).to(BukkitTaskScheduler.class);
-
         bind(InventoryController.class).to(BukkitInventoryController.class);
         bind(ProxySender.class).to(BukkitProxySender.class);
         bind(ItemTextFormatter.class).to(BukkitItemTextFormatter.class);
@@ -137,70 +135,35 @@ public class BukkitInjector extends AbstractModule {
         bind(BubbleManager.class).to(BukkitBubbleManager.class);
         bind(MessageSender.class).to(BukkitMessageSender.class);
 
-        // modules
-        bind(IntegrationModule.class).to(BukkitIntegrationModule.class);
-        bind(net.flectone.pulse.module.message.mark.MarkModule.class).to(net.flectone.pulse.module.message.mark.BukkitMarkModule.class);
-        bind(FormatModule.class).to(BukkitFormatModule.class);
-        bind(ScoreboardModule.class).to(BukkitScoreboardModule.class);
-        bind(ObjectiveModule.class).to(BukkitObjectiveModule.class);
-        bind(SidebarModule.class).to(BukkitSidebarModule.class);
-        bind(AnvilModule.class).to(BukkitAnvilModule.class);
-        bind(BookModule.class).to(BukkitBookModule.class);
-        bind(AfkModule.class).to(BukkitAfkModule.class);
-        bind(BubbleModule.class).to(BukkitBubbleModule.class);
-        bind(ChatModule.class).to(BukkitChatModule.class);
-        bind(SignModule.class).to(BukkitSignModule.class);
-        bind(RightclickModule.class).to(BukkitRightclickModule.class);
+        // Modules
+        bindModules();
 
-        if (!BukkitServerAdapter.IS_PAPER) {
-            bind(JoinModule.class).to(BukkitJoinModule.class);
-            bind(QuitModule.class).to(BukkitQuitModule.class);
-        }
-
-        bind(SpyModule.class).to(BukkitSpyModule.class);
-
+        // Libraries and serialization
         bind(LibraryResolver.class).toInstance(libraryResolver);
         bind(Gson.class).toInstance(GsonComponentSerializer.gson().serializer());
 
+        // Core bindings
         bind(FlectonePulse.class).toInstance(instance);
         bind(BukkitFlectonePulse.class).toInstance(instance);
         bind(FlectonePulseAPI.class).asEagerSingleton();
         bind(Plugin.class).toInstance(plugin);
         bind(FLogger.class).toInstance(fLogger);
 
-        bind(com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler.class).toInstance(UniversalScheduler.getScheduler(plugin));
+        // Scheduler
+        bind(com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler.class)
+                .toInstance(UniversalScheduler.getScheduler(plugin));
 
-        SyncInterceptor syncInterceptor = new SyncInterceptor();
-        requestInjection(syncInterceptor);
+        // Interceptors
+        setupInterceptors();
 
-        AsyncInterceptor asyncInterceptor = new AsyncInterceptor();
-        requestInjection(asyncInterceptor);
-
-        bindInterceptor(Matchers.any(),
-                Matchers.annotatedWith(Sync.class).or(Matchers.annotatedWith(Async.class)),
-                asyncInterceptor,
-                syncInterceptor
-        );
-
+        // MiniMessage
         bind(MiniMessage.class).toInstance(MiniMessage.builder().tags(TagResolver.builder().build()).build());
 
-        ScoreboardLibrary scoreboardLibrary;
-        try {
-            scoreboardLibrary = ScoreboardLibrary.loadScoreboardLibrary(plugin);
-        } catch (NoPacketAdapterAvailableException e) {
-            scoreboardLibrary = new NoopScoreboardLibrary();
-            fLogger.warning("No scoreboard packet adapter available!");
-        }
+        // Scoreboard
+        setupScoreboard();
 
-        bind(ScoreboardLibrary.class).toInstance(scoreboardLibrary);
-        bind(ObjectiveManager.class).toInstance(scoreboardLibrary.createObjectiveManager());
-        bind(TeamManager.class).toInstance(scoreboardLibrary.createTeamManager());
-
-        if (fileManager.getConfig().getDatabase().getType() == Config.Database.Type.MYSQL) {
-            bind(InputStream.class).annotatedWith(Names.named("SQLFile")).toInstance(plugin.getResource("sqls/mysql.sql"));
-        } else {
-            bind(InputStream.class).annotatedWith(Names.named("SQLFile")).toInstance(plugin.getResource("sqls/sqlite.sql"));
-        }
+        // Database SQL files
+        setupDatabaseBindings(fileManager);
 
 //        try {
 //            Package[] packs = Package.getPackages();
@@ -214,5 +177,66 @@ public class BukkitInjector extends AbstractModule {
 //        } catch (Exception e) {
 //            fLogger.warning(e);
 //        }
+    }
+
+    private void bindModules() {
+        bind(IntegrationModule.class).to(BukkitIntegrationModule.class);
+        bind(net.flectone.pulse.module.message.mark.MarkModule.class)
+                .to(net.flectone.pulse.module.message.mark.BukkitMarkModule.class);
+        bind(FormatModule.class).to(BukkitFormatModule.class);
+        bind(ScoreboardModule.class).to(BukkitScoreboardModule.class);
+        bind(ObjectiveModule.class).to(BukkitObjectiveModule.class);
+        bind(SidebarModule.class).to(BukkitSidebarModule.class);
+        bind(AnvilModule.class).to(BukkitAnvilModule.class);
+        bind(BookModule.class).to(BukkitBookModule.class);
+        bind(AfkModule.class).to(BukkitAfkModule.class);
+        bind(BubbleModule.class).to(BukkitBubbleModule.class);
+        bind(ChatModule.class).to(BukkitChatModule.class);
+        bind(SignModule.class).to(BukkitSignModule.class);
+        bind(RightclickModule.class).to(BukkitRightclickModule.class);
+        bind(SpyModule.class).to(BukkitSpyModule.class);
+
+        if (!BukkitServerAdapter.IS_PAPER) {
+            bind(JoinModule.class).to(BukkitJoinModule.class);
+            bind(QuitModule.class).to(BukkitQuitModule.class);
+        }
+    }
+
+    private void setupInterceptors() {
+        SyncInterceptor syncInterceptor = new SyncInterceptor();
+        requestInjection(syncInterceptor);
+
+        AsyncInterceptor asyncInterceptor = new AsyncInterceptor();
+        requestInjection(asyncInterceptor);
+
+        bindInterceptor(Matchers.any(),
+                Matchers.annotatedWith(Sync.class).or(Matchers.annotatedWith(Async.class)),
+                asyncInterceptor,
+                syncInterceptor
+        );
+    }
+
+    private void setupScoreboard() {
+        ScoreboardLibrary scoreboardLibrary;
+        try {
+            scoreboardLibrary = ScoreboardLibrary.loadScoreboardLibrary(plugin);
+        } catch (NoPacketAdapterAvailableException e) {
+            scoreboardLibrary = new NoopScoreboardLibrary();
+            fLogger.warning("No scoreboard packet adapter available!");
+        }
+
+        bind(ScoreboardLibrary.class).toInstance(scoreboardLibrary);
+        bind(ObjectiveManager.class).toInstance(scoreboardLibrary.createObjectiveManager());
+        bind(TeamManager.class).toInstance(scoreboardLibrary.createTeamManager());
+    }
+
+    private void setupDatabaseBindings(FileManager fileManager) {
+        if (fileManager.getConfig().getDatabase().getType() == Config.Database.Type.MYSQL) {
+            bind(InputStream.class).annotatedWith(Names.named("SQLFile"))
+                    .toInstance(plugin.getResource("sqls/mysql.sql"));
+        } else {
+            bind(InputStream.class).annotatedWith(Names.named("SQLFile"))
+                    .toInstance(plugin.getResource("sqls/sqlite.sql"));
+        }
     }
 }
