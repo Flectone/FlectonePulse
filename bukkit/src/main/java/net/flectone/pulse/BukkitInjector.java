@@ -18,6 +18,8 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.formatter.BukkitItemTextFormatter;
 import net.flectone.pulse.formatter.ItemTextFormatter;
+import net.flectone.pulse.module.message.mark.BukkitMarkModule;
+import net.flectone.pulse.module.message.mark.MarkModule;
 import net.flectone.pulse.sender.BukkitProxySender;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.controller.BukkitInventoryController;
@@ -117,7 +119,7 @@ public class BukkitInjector extends AbstractModule {
 
         // Adapters
         bind(PlatformPlayerAdapter.class).to(BukkitPlayerAdapter.class);
-        bind(PlatformServerAdapter.class).to(net.flectone.pulse.adapter.BukkitServerAdapter.class);
+        bind(PlatformServerAdapter.class).to(BukkitServerAdapter.class);
 
         // Registries
         bind(PermissionRegistry.class).to(BukkitPermissionRegistry.class);
@@ -181,8 +183,7 @@ public class BukkitInjector extends AbstractModule {
 
     private void bindModules() {
         bind(IntegrationModule.class).to(BukkitIntegrationModule.class);
-        bind(net.flectone.pulse.module.message.mark.MarkModule.class)
-                .to(net.flectone.pulse.module.message.mark.BukkitMarkModule.class);
+        bind(MarkModule.class).to(BukkitMarkModule.class);
         bind(FormatModule.class).to(BukkitFormatModule.class);
         bind(ScoreboardModule.class).to(BukkitScoreboardModule.class);
         bind(ObjectiveModule.class).to(BukkitObjectiveModule.class);
