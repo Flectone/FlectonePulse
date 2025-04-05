@@ -53,7 +53,7 @@ public class TictactoeManager {
             ticTacToe.setEnded(string.endsWith("1"));
 
             for (int i = 2; i < 5; i++) {
-                String[] column = values[i].split("-");
+                String[] column = values[i].split(";");
                 if (column.length != 3) return null;
 
                 ticTacToe.getField()[i-2][0] = Integer.parseInt(column[0]);

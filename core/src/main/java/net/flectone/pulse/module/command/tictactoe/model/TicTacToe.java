@@ -52,7 +52,7 @@ public class TicTacToe {
 
         for (int[] row : field) {
             for (int column : row) {
-                stringBuilder.append(column).append("-");
+                stringBuilder.append(column).append(";");
             }
             stringBuilder.append(",");
         }
