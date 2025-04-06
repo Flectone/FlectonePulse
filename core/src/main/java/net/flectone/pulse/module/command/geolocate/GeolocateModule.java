@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.geolocate;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
@@ -30,15 +31,18 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
     private final Permission.Command.Geolocate permission;
 
     private final FPlayerService fPlayerService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final CommandRegistry commandRegistry;
 
     @Inject
     public GeolocateModule(FileManager fileManager,
                            FPlayerService fPlayerService,
+                           PlatformPlayerAdapter platformPlayerAdapter,
                            CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getGeolocate(), null);
 
         this.fPlayerService = fPlayerService;
+        this.platformPlayerAdapter = platformPlayerAdapter;
         this.commandRegistry = commandRegistry;
 
         command = fileManager.getCommand().getGeolocate();
@@ -86,7 +90,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
             return;
         }
 
-        String ip = fTarget.isOnline() ? fPlayerService.getIp(fTarget) : fTarget.getIp();
+        String ip = platformPlayerAdapter.isOnline(fTarget) ? fPlayerService.getIp(fTarget) : fTarget.getIp();
 
         List<String> request = ip == null ? List.of() : readResponse(HTTP_URL.replace("<ip>", ip));
         if (request.isEmpty() || request.get(0).equals("fail")) {

@@ -109,6 +109,14 @@ public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
     }
 
     @Override
+    public boolean isOnline(FPlayer fPlayer) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        if (player == null) return false;
+
+        return player.isOnline();
+    }
+
+    @Override
     public long getFirstPlayed(FPlayer fPlayer) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(fPlayer.getUuid());
 

@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.ping;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
@@ -25,17 +26,20 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
     private final FPlayerService fPlayerService;
     private final CommandRegistry commandRegistry;
     private final IntegrationModule integrationModule;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Inject
     public PingModule(FileManager fileManager,
                       FPlayerService fPlayerService,
                       CommandRegistry commandRegistry,
-                      IntegrationModule integrationModule) {
+                      IntegrationModule integrationModule,
+                      PlatformPlayerAdapter platformPlayerAdapter) {
         super(localization -> localization.getCommand().getPing(), null);
 
         this.fPlayerService = fPlayerService;
         this.commandRegistry = commandRegistry;
         this.integrationModule = integrationModule;
+        this.platformPlayerAdapter = platformPlayerAdapter;
 
         command = fileManager.getCommand().getPing();
         permission = fileManager.getPermission().getCommand().getPing();
@@ -73,7 +77,8 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
         Optional<String> optionalTarget = commandContext.optional(promptPlayer);
 
         FPlayer fTarget = optionalTarget.isPresent() ? fPlayerService.getFPlayer(optionalTarget.get()) : fPlayer;
-        if (fTarget.isUnknown() || (!fPlayer.equals(fTarget) && integrationModule.isVanished(fTarget))) {
+        if (platformPlayerAdapter.isOnline(fPlayer)
+                || (!fPlayer.equals(fTarget) && integrationModule.isVanished(fTarget))) {
             builder(fPlayer)
                     .format(Localization.Command.Ping::getNullPlayer)
                     .sendBuilt();

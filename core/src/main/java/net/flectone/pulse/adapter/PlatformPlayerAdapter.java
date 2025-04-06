@@ -55,6 +55,8 @@ public abstract class PlatformPlayerAdapter {
 
     public abstract boolean hasPlayedBefore(FPlayer fPlayer);
 
+    public abstract boolean isOnline(FPlayer fPlayer);
+
     public abstract long getFirstPlayed(FPlayer fPlayer);
 
     public abstract long getLastPlayed(FPlayer fPlayer);
