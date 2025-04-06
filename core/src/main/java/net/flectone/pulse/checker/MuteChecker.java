@@ -3,29 +3,28 @@ package net.flectone.pulse.checker;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
-import net.flectone.pulse.repository.ModerationRepository;
+import net.flectone.pulse.service.ModerationService;
 
 @Singleton
 public class MuteChecker {
 
-    private final ModerationRepository moderationRepository;
+    private final ModerationService moderationService;
     private final IntegrationModule integrationModule;
     private final NewbieModule newbieModule;
 
     @Inject
-    public MuteChecker(ModerationRepository moderationRepository,
+    public MuteChecker(ModerationService moderationService,
                        IntegrationModule integrationModule,
                        NewbieModule newbieModule) {
-        this.moderationRepository = moderationRepository;
+        this.moderationService = moderationService;
         this.integrationModule = integrationModule;
         this.newbieModule = newbieModule;
     }
 
     public Status check(FPlayer fPlayer) {
-        if (!moderationRepository.getValid(fPlayer, Moderation.Type.MUTE).isEmpty()) {
+        if (!moderationService.getValidMutes(fPlayer).isEmpty()) {
             return Status.LOCAL;
         }
 
