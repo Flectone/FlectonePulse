@@ -7,6 +7,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.listener.AbstractPacketListener;
 import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.status.StatusModule;
 
 @Singleton
@@ -29,6 +30,7 @@ public class StatusPacketListener extends AbstractPacketListener {
         if (event.isCancelled()) return;
         if (event.getPacketType() != PacketType.Status.Client.REQUEST) return;
         if (maintenance.isTurnedOn()) return;
+        if (statusModule.checkModulePredicates(FPlayer.UNKNOWN)) return;
 
         event.setCancelled(true);
         statusModule.send(event.getUser());

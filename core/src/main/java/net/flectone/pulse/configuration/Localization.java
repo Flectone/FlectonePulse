@@ -1247,6 +1247,16 @@ public final class Localization extends FileSerializable implements ModuleConfig
         }
 
         @Override
+        public SubIntegrationConfig getMinimotd() {
+            return null;
+        }
+
+        @Override
+        public SubIntegrationConfig getMotd() {
+            return null;
+        }
+
+        @Override
         public SubIntegrationConfig getPlaceholderapi() {
             return null;
         }

@@ -22,3 +22,5 @@ softdepend:
   - TAB
   - LiteBans
   - AdvancedBan
+  - MOTD
+  - MiniMOTD

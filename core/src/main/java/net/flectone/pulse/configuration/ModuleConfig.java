@@ -60,6 +60,8 @@ public interface ModuleConfig {
         SubIntegrationConfig getDiscord();
         SubIntegrationConfig getLitebans();
         SubIntegrationConfig getLuckperms();
+        SubIntegrationConfig getMinimotd();
+        SubIntegrationConfig getMotd();
         SubIntegrationConfig getPlaceholderapi();
         SubIntegrationConfig getPlasmovoice();
         SubIntegrationConfig getSimplevoice();
