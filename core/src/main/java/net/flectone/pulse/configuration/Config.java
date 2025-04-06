@@ -7,7 +7,9 @@ import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.BuildConfig;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings({"FieldMayBeFinal", "unused"})
@@ -44,6 +46,14 @@ public final class Config extends FileSerializable {
     private boolean bungeecord = false;
     private boolean velocity = false;
     private Set<String> clusters = new HashSet<>();
+
+    private List<String> logFilter = new ArrayList<>(List.of(
+            "Paper Async Command Builder",
+            "Caught previously unhandled exception :",
+            "Error received from Telegram GetUpdates Request",
+            "OkHttp TaskRunner",
+            "Exception in thread \"ForkJoinPool"
+    ));
 
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/config#database")})
     private Database database = new Database();

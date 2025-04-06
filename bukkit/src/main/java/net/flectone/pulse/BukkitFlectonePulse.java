@@ -45,6 +45,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
     public void onLoad() {
         fLogger = new FLogger(this.getLogger());
 
+        fLogger.enableFilter();
         fLogger.logEnabling();
 
         libraryResolver = new BukkitLibraryResolver(this, fLogger);
@@ -75,6 +76,10 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
             return;
         }
 
+        FileManager fileManager = injector.getInstance(FileManager.class);
+
+        fLogger.reload(fileManager.getConfig().getLogFilter());
+
         // test
 //        PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(TestListener.class), PacketListenerPriority.NORMAL);
 
@@ -93,7 +98,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(FPlayerService.class).reload();
         injector.getInstance(ProxySender.class).reload();
 
-        if (injector.getInstance(FileManager.class).getConfig().isMetrics()) {
+        if (fileManager.getConfig().isMetrics()) {
             injector.getInstance(MetricsService.class).register();
         }
         
@@ -149,7 +154,11 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(TaskScheduler.class).reload();
         injector.getInstance(BubbleManager.class).reload();
         injector.getInstance(MarkManager.class).reload();
-        injector.getInstance(FileManager.class).reload();
+
+        FileManager fileManager = injector.getInstance(FileManager.class);
+        fileManager.reload();
+
+        fLogger.reload(fileManager.getConfig().getLogFilter());
 
         try {
             injector.getInstance(Database.class).disconnect();
