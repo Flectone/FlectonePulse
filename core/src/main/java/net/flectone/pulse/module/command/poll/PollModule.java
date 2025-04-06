@@ -146,9 +146,9 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     private @NonNull BlockingSuggestionProvider<FPlayer> mapSuggestion() {
         return (context, input) -> {
             String[] words = input.input().split(" ");
-            if (words.length < 6) return List.of(Suggestion.suggestion("title="));
+            if (words.length < 5) return List.of(Suggestion.suggestion("title="));
 
-            String string = String.join(" ", Arrays.copyOfRange(words, 5, words.length));
+            String string = String.join(" ", Arrays.copyOfRange(words, 4, words.length));
             if (!string.contains("title=")) return List.of(Suggestion.suggestion("title="), Suggestion.suggestion(string + ";"));
 
             return List.of(Suggestion.suggestion(string + ";"));
