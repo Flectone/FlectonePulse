@@ -22,21 +22,19 @@ public class ModerationMessageFormatter {
     private final FPlayerService fPlayerService;
     private final TimeFormatter timeFormatter;
     private final ModerationService moderationService;
-    private final IntegrationModule integrationModule;
 
+    @Inject private IntegrationModule integrationModule;
     @Inject private NewbieModule newbieModule;
 
     @Inject
     public ModerationMessageFormatter(FileManager fileManager,
                                       FPlayerService fPlayerService,
                                       TimeFormatter timeFormatter,
-                                      ModerationService moderationService,
-                                      IntegrationModule integrationModule) {
+                                      ModerationService moderationService) {
         this.fileManager = fileManager;
         this.fPlayerService = fPlayerService;
         this.timeFormatter = timeFormatter;
         this.moderationService = moderationService;
-        this.integrationModule = integrationModule;
     }
 
     public String replacePlaceholders(String message,
