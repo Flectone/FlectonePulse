@@ -97,7 +97,6 @@ public class FPlayerService {
         loadIgnores(finalPlayer);
         finalPlayer.setOnline(true);
         finalPlayer.setIp(platformPlayerAdapter.getIp(finalPlayer));
-        finalPlayer.setCurrentName(name);
         finalPlayer.setEntityId(entityId);
 
         // add player to online cache and remove from offline

@@ -102,7 +102,7 @@ public class FPlayerDAO {
     public void save(FPlayer fPlayer) {
         if (fPlayer.isUnknown()) return;
 
-        update(fPlayer.getId(), fPlayer.isOnline(), fPlayer.getUuid(), fPlayer.getCurrentName(), fPlayer.getIp());
+        update(fPlayer.getId(), fPlayer.isOnline(), fPlayer.getUuid(), fPlayer.getName(), fPlayer.getIp());
     }
 
     @NotNull

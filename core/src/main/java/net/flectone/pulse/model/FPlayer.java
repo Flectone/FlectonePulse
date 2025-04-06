@@ -1,7 +1,6 @@
 package net.flectone.pulse.model;
 
 import lombok.Getter;
-import lombok.Setter;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +19,6 @@ public class FPlayer extends FEntity {
 
     private boolean online;
     private String ip;
-    @Setter private String currentName;
 
     public FPlayer(int id, String name, UUID uuid, String type) {
         super(name, uuid, type);
