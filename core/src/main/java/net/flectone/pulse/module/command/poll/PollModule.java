@@ -134,8 +134,6 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                         .tag(MessageTag.COMMAND_POLL_CREATE_MESSAGE)
                         .format(resolvePollFormat(fPlayer, poll, status))
                         .message((fResolver, s) -> poll.getTitle())
-                        .proxy(output -> output.writeUTF(gson.toJson(poll)))
-                        .integration()
                         .sendBuilt();
             });
 
