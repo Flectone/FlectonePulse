@@ -496,6 +496,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.format.mention.person = "<fcolor:2>Тебя упомянули!";
 
+        message.format.moderation.newbie.reason = "Ты ещё слишком новичок";
+
         message.format.tags.put(TagType.URL, "<click:open_url:\"<message>\"><hover:show_text:\"<fcolor:2>Открыть ссылку <br><u><message>\"><fcolor:2><u>🗗 Ссылка</u></fcolor:2></hover></click>");
         message.format.tags.put(TagType.IMAGE, "<image:\"<message>\"><u>🖃 Картинка</u></image>");
         message.format.tags.put(TagType.SKIN, "<image:\"<message>\"><u>👨 Скин</u></image>");
@@ -1790,6 +1792,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
                     return null;
                 }
 
+                @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/newbie/")})
+                private Newbie newbie = new Newbie();
+
                 @Override
                 public SubModerationFormatMessageConfig getFlood() {
                     return null;
@@ -1797,6 +1802,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
                 @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/swear/")})
                 private Swear swear = new Swear();
+
+                @Getter
+                public static final class Newbie implements SubModerationFormatMessageConfig, Localizable {
+                    private String reason = "You're still too new";
+                }
 
                 @Getter
                 public static final class Swear implements SubModerationFormatMessageConfig, Localizable {

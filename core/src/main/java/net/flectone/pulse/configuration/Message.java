@@ -415,6 +415,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/caps/")})
             private Caps caps = new Caps();
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/newbie/")})
+            private Newbie newbie = new Newbie();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/flood/")})
             private Flood flood = new Flood();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/swear/")})
@@ -424,6 +426,12 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             public static final class Caps implements SubModerationFormatMessageConfig, Config.IEnable {
                 private boolean enable = false;
                 private double trigger = 0.7;
+            }
+
+            @Getter
+            public static final class Newbie implements SubModerationFormatMessageConfig, Config.IEnable {
+                private boolean enable = false;
+                private long timeout = 3600;
             }
 
             @Getter

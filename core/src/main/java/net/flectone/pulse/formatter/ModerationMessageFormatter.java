@@ -9,6 +9,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 
@@ -22,6 +23,8 @@ public class ModerationMessageFormatter {
     private final TimeFormatter timeFormatter;
     private final ModerationService moderationService;
     private final IntegrationModule integrationModule;
+
+    @Inject private NewbieModule newbieModule;
 
     @Inject
     public ModerationMessageFormatter(FileManager fileManager,
@@ -80,7 +83,7 @@ public class ModerationMessageFormatter {
         );
     }
 
-    public String replacePlaceholder(String message, FPlayer fReceiver, ExternalModeration moderation) {
+    public String replacePlaceholders(String message, FPlayer fReceiver, ExternalModeration moderation) {
         Localization localization = fileManager.getLocalization(fReceiver);
 
         String date = timeFormatter.formatDate(moderation.date());
@@ -116,7 +119,13 @@ public class ModerationMessageFormatter {
                 ExternalModeration mute = integrationModule.getMute(fPlayer);
                 if (mute == null) yield format;
 
-                yield replacePlaceholder(format, fPlayer, mute);
+                yield replacePlaceholders(format, fPlayer, mute);
+            }
+            case NEWBIE -> {
+                ExternalModeration mute = newbieModule.getModeration(fPlayer);
+                if (mute == null) yield format;
+
+                yield replacePlaceholders(format, fPlayer, mute);
             }
             default -> "";
         };
