@@ -13,6 +13,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.MessageTag;
@@ -35,6 +36,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final CommandRegistry commandRegistry;
+    private final ProxySender proxySender;
     private final Gson gson;
 
     @Inject
@@ -43,6 +45,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
                       ModerationService moderationService,
                       ModerationMessageFormatter moderationMessageFormatter,
                       CommandRegistry commandRegistry,
+                      ProxySender proxySender,
                       Gson gson) {
         super(localization -> localization.getCommand().getMute(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.MUTE));
 
@@ -50,6 +53,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         this.moderationService = moderationService;
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.commandRegistry = commandRegistry;
+        this.proxySender = proxySender;
         this.gson = gson;
 
         command = fileManager.getCommand().getMute();
@@ -121,6 +125,8 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
         Moderation mute = moderationService.mute(fTarget, databaseTime, reason, fPlayer.getId());
         if (mute == null) return;
+
+        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_MUTE, byteArrayDataOutput -> {});
 
         builder(fTarget)
                 .range(command.getRange())

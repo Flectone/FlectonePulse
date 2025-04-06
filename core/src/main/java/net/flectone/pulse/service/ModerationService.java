@@ -27,6 +27,18 @@ public class ModerationService {
         moderationRepository.invalidateAll(uuid);
     }
 
+    public void invalidateMutes(UUID uuid) {
+        moderationRepository.invalidate(uuid, Moderation.Type.MUTE);
+    }
+
+    public void invalidateBans(UUID uuid) {
+        moderationRepository.invalidate(uuid, Moderation.Type.BAN);
+    }
+
+    public void invalidateWarns(UUID uuid) {
+        moderationRepository.invalidate(uuid, Moderation.Type.WARN);
+    }
+
     public Moderation ban(FPlayer fPlayer, long time, String reason, int moderator) {
         return add(fPlayer, time, reason, moderator, Moderation.Type.BAN);
     }

@@ -38,7 +38,14 @@ public enum MessageTag {
     ADVANCEMENT,
     DEATH,
     JOIN,
-    QUIT;
+    QUIT,
+
+    // only for invalidation cache
+    SYSTEM_ONLINE,
+    SYSTEM_OFFLINE,
+    SYSTEM_BAN,
+    SYSTEM_MUTE,
+    SYSTEM_WARN;
 
     public String toProxyTag() {
         return "FlectonePulse:" + this.name();

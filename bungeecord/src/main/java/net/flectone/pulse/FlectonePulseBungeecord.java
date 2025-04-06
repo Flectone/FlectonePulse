@@ -1,9 +1,12 @@
 package net.flectone.pulse;
 
+import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.processor.ProxyMessageProcessor;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
+import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
@@ -41,6 +44,24 @@ public final class FlectonePulseBungeecord extends Plugin implements Listener, F
 
         byte[] data = ProxyMessageProcessor.create(event.getData());
         if (data == null) return;
+
+        ProxyServer.getInstance().getServers().values().stream()
+                .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
+                .forEach(serverInfo -> serverInfo.sendData(CHANNEL, data));
+    }
+
+    @EventHandler
+    public void onLoginEvent(PostLoginEvent event) {
+        byte[] data = ProxyMessageProcessor.create(MessageTag.SYSTEM_ONLINE, event.getPlayer().getUniqueId());
+
+        ProxyServer.getInstance().getServers().values().stream()
+                .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())
+                .forEach(serverInfo -> serverInfo.sendData(CHANNEL, data));
+    }
+
+    @EventHandler
+    public void onDisconnectEvent(PlayerDisconnectEvent event) {
+        byte[] data = ProxyMessageProcessor.create(MessageTag.SYSTEM_OFFLINE, event.getPlayer().getUniqueId());
 
         ProxyServer.getInstance().getServers().values().stream()
                 .filter(serverInfo -> !serverInfo.getPlayers().isEmpty())

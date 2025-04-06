@@ -7,8 +7,8 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -51,6 +51,7 @@ import net.flectone.pulse.module.message.death.model.Death;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.MessageTag;
@@ -60,7 +61,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Singleton
 public class BukkitProxyListener implements PluginMessageListener {
@@ -68,6 +72,7 @@ public class BukkitProxyListener implements PluginMessageListener {
     private final FileManager fileManager;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
     private final ProxySender proxySender;
     private final Gson gson;
@@ -77,6 +82,7 @@ public class BukkitProxyListener implements PluginMessageListener {
     public BukkitProxyListener(FileManager fileManager,
                                FPlayerService fPlayerService,
                                ModerationService moderationService,
+                               PlatformPlayerAdapter platformPlayerAdapter,
                                TaskScheduler taskScheduler,
                                ProxySender proxySender,
                                Gson gson,
@@ -84,6 +90,7 @@ public class BukkitProxyListener implements PluginMessageListener {
         this.fileManager = fileManager;
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
+        this.platformPlayerAdapter = platformPlayerAdapter;
         this.taskScheduler = taskScheduler;
         this.proxySender = proxySender;
         this.gson = gson;
@@ -101,7 +108,37 @@ public class BukkitProxyListener implements PluginMessageListener {
             MessageTag tag = MessageTag.fromProxyString(input.readUTF());
             if (tag == null) return;
 
+            if (tag == MessageTag.SYSTEM_ONLINE) {
+                fPlayerService.invalidateOffline(UUID.fromString(input.readUTF()));
+                return;
+            }
+
+            if (tag == MessageTag.SYSTEM_OFFLINE) {
+                fPlayerService.invalidateOnline(UUID.fromString(input.readUTF()));
+                return;
+            }
+
             int clustersCount = input.readInt();
+            boolean isPlayer = input.readBoolean();
+            FEntity fEntity = gson.fromJson(input.readUTF(), isPlayer ? FPlayer.class : FEntity.class);
+
+            switch (tag) {
+                case SYSTEM_BAN -> {
+                    moderationService.invalidateBans(fEntity.getUuid());
+                    return;
+                }
+
+                case SYSTEM_MUTE -> {
+                    moderationService.invalidateMutes(fEntity.getUuid());
+                    return;
+                }
+
+                case SYSTEM_WARN -> {
+                    moderationService.invalidateWarns(fEntity.getUuid());
+                    return;
+                }
+            }
+
             Set<String> proxyClusters = new HashSet<>(clustersCount);
             while (clustersCount != 0) {
                 proxyClusters.add(input.readUTF());
@@ -110,10 +147,6 @@ public class BukkitProxyListener implements PluginMessageListener {
 
             Set<String> configClusters = fileManager.getConfig().getClusters();
             if (!configClusters.isEmpty() && configClusters.stream().noneMatch(proxyClusters::contains)) return;
-
-            boolean isPlayer = input.readBoolean();
-
-            FEntity fEntity = gson.fromJson(input.readUTF(), isPlayer ? FPlayer.class : FEntity.class);
 
             switch (tag) {
 
@@ -149,8 +182,6 @@ public class BukkitProxyListener implements PluginMessageListener {
                 }
 
                 case COMMAND_BAN -> {
-                    moderationService.invalidate(fEntity.getUuid());
-
                     BanModule banModule = injector.getInstance(BanModule.class);
 
                     FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -242,8 +273,6 @@ public class BukkitProxyListener implements PluginMessageListener {
                             .sendBuilt();
                 }
                 case COMMAND_MUTE -> {
-                    moderationService.invalidate(fEntity.getUuid());
-
                     MuteModule muteModule = injector.getInstance(MuteModule.class);
 
                     FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -261,8 +290,6 @@ public class BukkitProxyListener implements PluginMessageListener {
                     muteModule.sendForTarget(fModerator, (FPlayer) fEntity, mute);
                 }
                 case COMMAND_UNBAN -> {
-                    moderationService.invalidate(fEntity.getUuid());
-
                     UnbanModule unbanModule = injector.getInstance(UnbanModule.class);
 
                     FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -277,8 +304,6 @@ public class BukkitProxyListener implements PluginMessageListener {
                             .sendBuilt();
                 }
                 case COMMAND_UNMUTE -> {
-                    moderationService.invalidate(fEntity.getUuid());
-
                     UnmuteModule unmuteModule = injector.getInstance(UnmuteModule.class);
 
                     FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -293,8 +318,6 @@ public class BukkitProxyListener implements PluginMessageListener {
                             .sendBuilt();
                 }
                 case COMMAND_UNWARN -> {
-                    moderationService.invalidate(fEntity.getUuid());
-
                     UnwarnModule unwarnModule = injector.getInstance(UnwarnModule.class);
 
                     FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -398,8 +421,6 @@ public class BukkitProxyListener implements PluginMessageListener {
                             .sendBuilt();
                 }
                 case COMMAND_WARN -> {
-                    moderationService.invalidate(fEntity.getUuid());
-
                     WarnModule warnModule = injector.getInstance(WarnModule.class);
 
                     FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);

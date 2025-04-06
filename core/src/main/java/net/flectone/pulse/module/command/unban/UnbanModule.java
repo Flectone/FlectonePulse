@@ -12,6 +12,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.MessageTag;
@@ -31,6 +32,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final CommandRegistry commandRegistry;
+    private final ProxySender proxySender;
     private final Gson gson;
 
     @Inject
@@ -38,12 +40,14 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
                        FPlayerService fPlayerService,
                        ModerationService moderationService,
                        CommandRegistry commandRegistry,
+                       ProxySender proxySender,
                        Gson gson) {
         super(localization -> localization.getCommand().getUnban(), null);
 
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.commandRegistry = commandRegistry;
+        this.proxySender = proxySender;
         this.gson = gson;
 
         command = fileManager.getCommand().getUnban();
@@ -122,6 +126,8 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         }
 
         moderationService.remove(fTarget, bans);
+
+        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_BAN, byteArrayDataOutput -> {});
 
         builder(fTarget)
                 .tag(MessageTag.COMMAND_UNBAN)

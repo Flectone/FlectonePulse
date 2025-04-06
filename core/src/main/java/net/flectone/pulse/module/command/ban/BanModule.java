@@ -19,6 +19,7 @@ import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.sender.PacketSender;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.*;
@@ -42,6 +43,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     private final PermissionChecker permissionChecker;
     private final MessageFormatter messageFormatter;
     private final PacketSender packetSender;
+    private final ProxySender proxySender;
     private final Gson gson;
 
     @Inject
@@ -53,6 +55,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
                      PermissionChecker permissionChecker,
                      MessageFormatter messageFormatter,
                      PacketSender packetSender,
+                     ProxySender proxySender,
                      Gson gson) {
         super(localization -> localization.getCommand().getBan(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.BAN));
 
@@ -63,6 +66,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         this.permissionChecker = permissionChecker;
         this.messageFormatter = messageFormatter;
         this.packetSender = packetSender;
+        this.proxySender = proxySender;
         this.gson = gson;
 
         command = fileManager.getCommand().getBan();
@@ -140,6 +144,8 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
         Moderation ban = moderationService.ban(fTarget, databaseTime, reason, fPlayer.getId());
         if (ban == null) return;
+
+        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_BAN, byteArrayDataOutput -> {});
 
         kick(fPlayer, fTarget, ban);
 

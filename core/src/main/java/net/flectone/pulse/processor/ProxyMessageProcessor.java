@@ -8,9 +8,18 @@ import net.flectone.pulse.util.MessageTag;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @UtilityClass
 public class ProxyMessageProcessor {
+
+    public byte[] create(MessageTag tag, UUID uuid) {
+        ByteArrayDataOutput output = ByteStreams.newDataOutput();
+        output.writeUTF(tag.toProxyTag());
+        output.writeUTF(uuid.toString());
+
+        return output.toByteArray();
+    }
 
     public byte[] create(byte[] data) {
         ByteArrayDataInput input = ByteStreams.newDataInput(data);

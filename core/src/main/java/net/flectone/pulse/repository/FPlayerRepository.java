@@ -136,9 +136,18 @@ public class FPlayerRepository {
         fPlayerDAO.insertOrIgnore(fPlayer);
     }
 
-    public void remove(FPlayer fPlayer) {
-        onlinePlayers.remove(fPlayer.getUuid());
-        offlinePlayersCache.put(fPlayer.getUuid(), fPlayer);
+    public void removeOffline(UUID uuid) {
+        offlinePlayersCache.invalidate(uuid);
+    }
+
+    public void removeOnline(UUID uuid) {
+        FPlayer fPlayer = onlinePlayers.get(uuid);
+        if (fPlayer != null) {
+            fPlayer.setOnline(false);
+            offlinePlayersCache.put(uuid, fPlayer);
+        }
+
+        onlinePlayers.remove(uuid);
     }
 
     public void add(FPlayer fPlayer) {

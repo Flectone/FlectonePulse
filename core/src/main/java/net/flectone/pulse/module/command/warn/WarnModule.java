@@ -14,6 +14,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.DisableAction;
@@ -39,6 +40,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final CommandRegistry commandRegistry;
     private final PlatformServerAdapter platformServerAdapter;
+    private final ProxySender proxySender;
     private final Gson gson;
 
     @Inject
@@ -48,6 +50,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
                       ModerationMessageFormatter moderationMessageFormatter,
                       CommandRegistry commandRegistry,
                       PlatformServerAdapter platformServerAdapter,
+                      ProxySender proxySender,
                       Gson gson) {
         super(localization -> localization.getCommand().getWarn(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.WARN));
 
@@ -56,6 +59,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.commandRegistry = commandRegistry;
         this.platformServerAdapter = platformServerAdapter;
+        this.proxySender = proxySender;
         this.gson = gson;
 
         command = fileManager.getCommand().getWarn();
@@ -128,6 +132,8 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
         Moderation warn = moderationService.warn(fTarget, databaseTime, reason, fPlayer.getId());
         if (warn == null) return;
+
+        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_WARN, byteArrayDataOutput -> {});
 
         builder(fTarget)
                 .range(command.getRange())

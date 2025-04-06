@@ -134,9 +134,17 @@ public class FPlayerService {
         return paddedRank + paddedName;
     }
 
+    public void invalidateOffline(UUID uuid) {
+        fPlayerRepository.removeOffline(uuid);
+    }
+
+    public void invalidateOnline(UUID uuid) {
+        fPlayerRepository.removeOnline(uuid);
+    }
+
     public void clearAndSave(FPlayer fPlayer) {
         fPlayer.setOnline(false);
-
+        invalidateOnline(fPlayer.getUuid());
         platformPlayerAdapter.clear(fPlayer);
         saveOrUpdateFPlayer(fPlayer);
     }

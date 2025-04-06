@@ -2,14 +2,17 @@ package net.flectone.pulse;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
+import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
-import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.processor.ProxyMessageProcessor;
+import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.util.logging.FLogger;
 import org.slf4j.Logger;
 
 @Plugin(
@@ -62,6 +65,24 @@ public class FlectonePulseVelocity implements FlectonePulse {
         proxyServer.getChannelRegistrar().unregister(IDENTIFIER);
 
         fLogger.logDisabled();
+    }
+
+    @Subscribe
+    public void onLoginEvent(PostLoginEvent event) {
+        byte[] data = ProxyMessageProcessor.create(MessageTag.SYSTEM_ONLINE, event.getPlayer().getUniqueId());
+
+        proxyServer.getAllServers().stream()
+                .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
+                .forEach(serverInfo -> serverInfo.sendPluginMessage(IDENTIFIER, data));
+    }
+
+    @Subscribe
+    public void onDisconnectEvent(DisconnectEvent event) {
+        byte[] data = ProxyMessageProcessor.create(MessageTag.SYSTEM_OFFLINE, event.getPlayer().getUniqueId());
+
+        proxyServer.getAllServers().stream()
+                .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
+                .forEach(serverInfo -> serverInfo.sendPluginMessage(IDENTIFIER, data));
     }
 
     @Override
