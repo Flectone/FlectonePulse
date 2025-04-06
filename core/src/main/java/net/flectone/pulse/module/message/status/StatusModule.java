@@ -88,9 +88,9 @@ public class StatusModule extends AbstractModule {
 
     public void send(User user) {
         FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
-        fPlayerService.loadColors(fPlayer);
-
         if (checkModulePredicates(fPlayer)) return;
+
+        fPlayerService.loadColors(fPlayer);
 
         JsonObject responseJson = new JsonObject();
 
