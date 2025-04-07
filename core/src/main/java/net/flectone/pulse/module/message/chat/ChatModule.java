@@ -25,7 +25,6 @@ public abstract class ChatModule extends AbstractModuleMessage<Localization.Mess
 
     @Inject private PermissionChecker permissionChecker;
 
-    @Inject
     public ChatModule(FileManager fileManager) {
         super(localization -> localization.getMessage().getChat());
 

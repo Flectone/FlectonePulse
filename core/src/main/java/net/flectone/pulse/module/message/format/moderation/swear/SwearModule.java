@@ -31,19 +31,20 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
 
     private final PermissionChecker permissionChecker;
     private final FLogger fLogger;
-
-    @Inject private MessageFormatter messageFormatter;
+    private final MessageFormatter messageFormatter;
 
     private Pattern combinedPattern;
 
     @Inject
     public SwearModule(FileManager fileManager,
                        PermissionChecker permissionChecker,
-                       FLogger fLogger) {
+                       FLogger fLogger,
+                       MessageFormatter messageFormatter) {
         super(localization -> localization.getMessage().getFormat().getModeration().getSwear());
 
         this.permissionChecker = permissionChecker;
         this.fLogger = fLogger;
+        this.messageFormatter = messageFormatter;
 
         message = fileManager.getMessage().getFormat().getModeration().getSwear();
         permission = fileManager.getPermission().getMessage().getFormat().getModeration().getSwear();

@@ -5,6 +5,8 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCloseWindow;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.inventory.ClickType;
@@ -17,14 +19,19 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class InventoryController {
+@Singleton
+public class InventoryController {
 
     private final Map<UUID, Inventory> inventoryMap = new ConcurrentHashMap<>();
 
-    @Inject private PacketSender packetSender;
+    private final PacketSender packetSender;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
 
-    public InventoryController() {
-
+    @Inject
+    public InventoryController(PacketSender packetSender,
+                               PlatformPlayerAdapter platformPlayerAdapter) {
+        this.packetSender = packetSender;
+        this.platformPlayerAdapter = platformPlayerAdapter;
     }
 
     public Inventory get(UUID uuid) {
@@ -76,10 +83,8 @@ public abstract class InventoryController {
             }
         }
 
-        update(uuid);
+        platformPlayerAdapter.updateInventory(uuid);
     }
-
-    public abstract void update(UUID uuid);
 
     public void changeItem(FPlayer fPlayer, Inventory inventory, int slot, ItemStack newItemStack) {
         List<ItemStack> itemStacks = inventory.getWrapperItems().getItems();

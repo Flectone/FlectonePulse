@@ -1,6 +1,7 @@
 package net.flectone.pulse.checker;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -11,16 +12,16 @@ import net.flectone.pulse.service.ModerationService;
 public class MuteChecker {
 
     private final ModerationService moderationService;
-    private final IntegrationModule integrationModule;
-    private final NewbieModule newbieModule;
+    private final Provider<IntegrationModule> integrationModuleProvider;
+    private final Provider<NewbieModule> newbieModule;
 
     @Inject
     public MuteChecker(ModerationService moderationService,
-                       IntegrationModule integrationModule,
-                       NewbieModule newbieModule) {
+                       Provider<IntegrationModule> integrationModuleProvider,
+                       Provider<NewbieModule> newbieModuleProvider) {
         this.moderationService = moderationService;
-        this.integrationModule = integrationModule;
-        this.newbieModule = newbieModule;
+        this.integrationModuleProvider = integrationModuleProvider;
+        this.newbieModule = newbieModuleProvider;
     }
 
     public Status check(FPlayer fPlayer) {
@@ -28,12 +29,12 @@ public class MuteChecker {
             return Status.LOCAL;
         }
 
-        if (integrationModule.isMuted(fPlayer)) {
-            return Status.EXTERNAL;
+        if (newbieModule.get().isNewBie(fPlayer)) {
+            return Status.NEWBIE;
         }
 
-        if (newbieModule.isNewBie(fPlayer)) {
-            return Status.NEWBIE;
+        if (integrationModuleProvider.get().isMuted(fPlayer)) {
+            return Status.EXTERNAL;
         }
 
         return Status.NONE;

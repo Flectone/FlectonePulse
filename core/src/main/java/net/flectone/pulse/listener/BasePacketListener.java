@@ -11,6 +11,7 @@ import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSettings;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.ban.BanModule;
@@ -34,24 +35,41 @@ public class BasePacketListener extends AbstractPacketListener {
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final PacketSender packetSender;
-
-    @Inject private QuitModule quitModule;
-    @Inject private JoinModule joinModule;
-    @Inject private GreetingModule greetingModule;
-    @Inject private MailModule mailModule;
-    @Inject private IntegrationModule integrationModule;
-    @Inject private BubbleManager bubbleManager;
-    @Inject private BanModule banModule;
-    @Inject private PlayersModule playersModule;
-    @Inject private MaintenanceModule maintenanceModule;
+    private final Provider<QuitModule> quitModuleProvider;
+    private final Provider<JoinModule> joinModuleProvider;
+    private final Provider<GreetingModule> greetingModuleProvider;
+    private final Provider<MailModule> mailModuleProvider;
+    private final Provider<IntegrationModule> integrationModuleProvider;
+    private final Provider<BubbleManager> bubbleManagerProvider;
+    private final Provider<BanModule> banModuleProvider;
+    private final Provider<PlayersModule> playersModuleProvider;
+    private final Provider<MaintenanceModule> maintenanceModuleProvider;
 
     @Inject
     public BasePacketListener(FPlayerService fPlayerService,
                               TaskScheduler taskScheduler,
-                              PacketSender packetSender) {
+                              PacketSender packetSender,
+                              Provider<QuitModule> quitModuleProvider,
+                              Provider<JoinModule> joinModuleProvider,
+                              Provider<GreetingModule> greetingModuleProvider,
+                              Provider<MailModule> mailModuleProvider,
+                              Provider<IntegrationModule> integrationModuleProvider,
+                              Provider<BubbleManager> bubbleManagerProvider,
+                              Provider<BanModule> banModuleProvider,
+                              Provider<PlayersModule> playersModuleProvider,
+                              Provider<MaintenanceModule> maintenanceModuleProvider) {
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.packetSender = packetSender;
+        this.quitModuleProvider = quitModuleProvider;
+        this.joinModuleProvider = joinModuleProvider;
+        this.greetingModuleProvider = greetingModuleProvider;
+        this.mailModuleProvider = mailModuleProvider;
+        this.integrationModuleProvider = integrationModuleProvider;
+        this.bubbleManagerProvider = bubbleManagerProvider;
+        this.banModuleProvider = banModuleProvider;
+        this.playersModuleProvider = playersModuleProvider;
+        this.maintenanceModuleProvider = maintenanceModuleProvider;
     }
 
     @Override
@@ -68,9 +86,9 @@ public class BasePacketListener extends AbstractPacketListener {
         taskScheduler.runAsync(() -> {
             FPlayer fPlayer = fPlayerService.addAndGetFPlayer(uuid, entityId, name);
 
-            joinModule.send(fPlayer, true);
-            greetingModule.send(fPlayer);
-            mailModule.send(fPlayer);
+            joinModuleProvider.get().send(fPlayer, true);
+            greetingModuleProvider.get().send(fPlayer);
+            mailModuleProvider.get().send(fPlayer);
         });
     }
 
@@ -83,8 +101,8 @@ public class BasePacketListener extends AbstractPacketListener {
             if (!fPlayer.isOnline()) return;
 
             fPlayerService.clearAndSave(fPlayer);
-            bubbleManager.remove(fPlayer);
-            quitModule.send(fPlayer);
+            bubbleManagerProvider.get().remove(fPlayer);
+            quitModuleProvider.get().send(fPlayer);
         });
     }
 
@@ -117,7 +135,12 @@ public class BasePacketListener extends AbstractPacketListener {
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() != PacketType.Login.Server.LOGIN_SUCCESS) return;
         if (event.isCancelled()) return;
-        if (!playersModule.isEnable() && !banModule.isEnable() && !maintenanceModule.isEnable()) return;
+
+        PlayersModule playersModule = playersModuleProvider.get();
+        BanModule banModule = banModuleProvider.get();
+        MaintenanceModule maintenanceModule = maintenanceModuleProvider.get();
+
+        if (!playersModuleProvider.get().isEnable() && !banModuleProvider.get().isEnable() && !maintenanceModuleProvider.get().isEnable()) return;
 
         event.setCancelled(true);
 
@@ -132,7 +155,7 @@ public class BasePacketListener extends AbstractPacketListener {
     }
 
     private String getLocale(FPlayer fPlayer, PacketReceiveEvent event) {
-        String locale = integrationModule.getTritonLocale(fPlayer);
+        String locale = integrationModuleProvider.get().getTritonLocale(fPlayer);
         if (locale == null) {
             WrapperPlayClientSettings wrapperPlayClientSettings = new WrapperPlayClientSettings(event);
             locale = wrapperPlayClientSettings.getLocale();

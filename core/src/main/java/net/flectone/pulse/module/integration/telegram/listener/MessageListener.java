@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.integration.telegram.listener;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.configuration.Integration;
@@ -22,13 +23,14 @@ public class MessageListener extends EventListener {
     @Getter private final Integration.Telegram integration;
 
     private final TaskScheduler taskScheduler;
-
-    @Inject private TelegramIntegration telegramIntegration;
+    private final Provider<TelegramIntegration> telegramIntegration;
 
     @Inject
     public MessageListener(FileManager fileManager,
-                           TaskScheduler taskScheduler) {
+                           TaskScheduler taskScheduler,
+                           Provider<TelegramIntegration> telegramIntegration) {
         this.taskScheduler = taskScheduler;
+        this.telegramIntegration = telegramIntegration;
 
         integration = fileManager.getIntegration().getTelegram();
     }
@@ -101,6 +103,6 @@ public class MessageListener extends EventListener {
             sendMessage = sendMessage.messageThreadId(message.getMessageThreadId());
         }
 
-        telegramIntegration.executeMethod(sendMessage.build());
+        telegramIntegration.get().executeMethod(sendMessage.build());
     }
 }

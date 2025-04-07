@@ -22,11 +22,13 @@ public class EmojiModule extends AbstractModule {
 
     private final Message.Format.Emoji message;
     private final Permission.Message.Format.Emoji permission;
-
-    @Inject private MessageFormatter messageFormatter;
+    private final MessageFormatter messageFormatter;
 
     @Inject
-    public EmojiModule(FileManager fileManager) {
+    public EmojiModule(FileManager fileManager,
+                       MessageFormatter messageFormatter) {
+        this.messageFormatter = messageFormatter;
+
         message = fileManager.getMessage().getFormat().getEmoji();
         permission = fileManager.getPermission().getMessage().getFormat().getEmoji();
     }

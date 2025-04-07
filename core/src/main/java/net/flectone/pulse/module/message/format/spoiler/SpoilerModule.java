@@ -23,11 +23,14 @@ public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Fo
     private final Message.Format.Spoiler message;
     private final Permission.Message.Format.Spoiler permission;
 
-    @Inject private MessageFormatter messageFormatter;
+    private final MessageFormatter messageFormatter;
 
     @Inject
-    public SpoilerModule(FileManager fileManager) {
+    public SpoilerModule(FileManager fileManager,
+                         MessageFormatter messageFormatter) {
         super(localization -> localization.getMessage().getFormat().getSpoiler());
+
+        this.messageFormatter = messageFormatter;
 
         message = fileManager.getMessage().getFormat().getSpoiler();
         permission = fileManager.getPermission().getMessage().getFormat().getSpoiler();

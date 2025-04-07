@@ -35,14 +35,15 @@ public class ImageModule extends AbstractModule {
     private final Permission.Message.Format.Image permission;
 
     private final TaskScheduler taskScheduler;
-
-    @Inject private MessageFormatter messageFormatter;
+    private final MessageFormatter messageFormatter;
 
     @Inject
     public ImageModule(FileManager fileManager,
-                       TaskScheduler taskScheduler) {
+                       TaskScheduler taskScheduler,
+                       MessageFormatter messageFormatter) {
 
         this.taskScheduler = taskScheduler;
+        this.messageFormatter = messageFormatter;
 
         message = fileManager.getMessage().getFormat().getImage();
         permission = fileManager.getPermission().getMessage().getFormat().getImage();

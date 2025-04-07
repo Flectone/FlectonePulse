@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
@@ -72,7 +71,6 @@ public class BukkitProxyListener implements PluginMessageListener {
     private final FileManager fileManager;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
-    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
     private final ProxySender proxySender;
     private final Gson gson;
@@ -82,7 +80,6 @@ public class BukkitProxyListener implements PluginMessageListener {
     public BukkitProxyListener(FileManager fileManager,
                                FPlayerService fPlayerService,
                                ModerationService moderationService,
-                               PlatformPlayerAdapter platformPlayerAdapter,
                                TaskScheduler taskScheduler,
                                ProxySender proxySender,
                                Gson gson,
@@ -90,7 +87,6 @@ public class BukkitProxyListener implements PluginMessageListener {
         this.fileManager = fileManager;
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
-        this.platformPlayerAdapter = platformPlayerAdapter;
         this.taskScheduler = taskScheduler;
         this.proxySender = proxySender;
         this.gson = gson;

@@ -1,6 +1,7 @@
 package net.flectone.pulse.database.dao;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.database.Database;
@@ -22,16 +23,17 @@ public class FPlayerDAO {
     private final Config.Database config;
     private final Database database;
     private final FLogger fLogger;
-
-    @Inject private SettingDAO settingDAO;
+    private final Provider<SettingDAO> settingDAOProvider;
 
     @Inject
     public FPlayerDAO(FileManager fileManager,
                       Database database,
-                      FLogger fLogger) {
+                      FLogger fLogger,
+                      Provider<SettingDAO> settingDAOProvider) {
         this.config = fileManager.getConfig().getDatabase();
         this.database = database;
         this.fLogger = fLogger;
+        this.settingDAOProvider = settingDAOProvider;
     }
 
     public boolean insert(UUID uuid, String name) {
@@ -219,7 +221,7 @@ public class FPlayerDAO {
         fPlayer.setIp(ip);
 
         if (loadSetting) {
-            settingDAO.load(fPlayer);
+            settingDAOProvider.get().load(fPlayer);
         }
 
         return fPlayer;

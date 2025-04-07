@@ -29,20 +29,21 @@ public class TelegramIntegration implements FIntegration {
     private final FileManager fileManager;
     private final SystemVariableResolver systemVariableResolver;
     private final FLogger fLogger;
+    private final MessageListener messageListener;
 
     private TelegramBotsLongPollingApplication botsApplication;
     private OkHttpTelegramClient telegramClient;
 
-    @Inject private MessageListener messageListener;
-
     @Inject
     public TelegramIntegration(FileManager fileManager,
                                SystemVariableResolver systemVariableResolver,
-                               FLogger fLogger) {
+                               FLogger fLogger,
+                               MessageListener messageListener) {
 
         this.fileManager = fileManager;
         this.systemVariableResolver = systemVariableResolver;
         this.fLogger = fLogger;
+        this.messageListener = messageListener;
 
         integration = fileManager.getIntegration().getTelegram();
     }

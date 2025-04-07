@@ -5,6 +5,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
@@ -25,19 +26,20 @@ public class BukkitProxySender extends ProxySender {
     private final FileManager fileManager;
     private final Plugin plugin;
     private final Gson gson;
-
-    @Inject private BukkitProxyListener proxyListener;
+    private final Provider<BukkitProxyListener> proxyListenerProvider;
 
     @Inject
     public BukkitProxySender(FileManager fileManager,
                              FLogger fLogger,
                              Plugin plugin,
-                             Gson gson) {
+                             Gson gson,
+                             Provider<BukkitProxyListener> proxyListenerProvider) {
         super(fileManager, fLogger);
 
         this.fileManager = fileManager;
         this.plugin = plugin;
         this.gson = gson;
+        this.proxyListenerProvider = proxyListenerProvider;
     }
 
     @Override
@@ -50,7 +52,7 @@ public class BukkitProxySender extends ProxySender {
         plugin.getServer().getMessenger().unregisterOutgoingPluginChannel(plugin);
         plugin.getServer().getMessenger().unregisterIncomingPluginChannel(plugin);
         plugin.getServer().getMessenger().registerOutgoingPluginChannel(plugin, channel);
-        plugin.getServer().getMessenger().registerIncomingPluginChannel(plugin, channel, proxyListener);
+        plugin.getServer().getMessenger().registerIncomingPluginChannel(plugin, channel, proxyListenerProvider.get());
     }
 
     @Override

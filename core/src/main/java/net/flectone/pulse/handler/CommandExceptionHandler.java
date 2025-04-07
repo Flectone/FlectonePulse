@@ -26,11 +26,9 @@ public class CommandExceptionHandler {
     private final MessageFormatter messageFormatter;
 
     @Inject
-    public CommandExceptionHandler(
-            FileManager fileManager,
-            MessageSender messageSender,
-            MessageFormatter messageFormatter
-    ) {
+    public CommandExceptionHandler(FileManager fileManager,
+                                   MessageSender messageSender,
+                                   MessageFormatter messageFormatter) {
         this.fileManager = fileManager;
         this.messageSender = messageSender;
         this.messageFormatter = messageFormatter;

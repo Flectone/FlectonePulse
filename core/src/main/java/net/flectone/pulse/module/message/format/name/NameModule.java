@@ -25,15 +25,16 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
     private final Permission.Message.Format.Name permission;
 
     private final IntegrationModule integrationModule;
-
-    @Inject private MessageFormatter messageFormatter;
+    private final MessageFormatter messageFormatter;
 
     @Inject
     public NameModule(FileManager fileManager,
-                      IntegrationModule integrationModule) {
+                      IntegrationModule integrationModule,
+                      MessageFormatter messageFormatter) {
         super(localization -> localization.getMessage().getFormat().getName_());
 
         this.integrationModule = integrationModule;
+        this.messageFormatter = messageFormatter;
 
         message = fileManager.getMessage().getFormat().getName_();
         permission = fileManager.getPermission().getMessage().getFormat().getName_();

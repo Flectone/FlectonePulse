@@ -3,12 +3,12 @@ package net.flectone.pulse.module.message.bubble;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.bubble.listener.BubbleListener;
 import net.flectone.pulse.module.message.bubble.manager.BukkitBubbleManager;
-import net.flectone.pulse.module.message.chat.BukkitChatModule;
+import net.flectone.pulse.module.message.chat.ChatModule;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
 import org.bukkit.event.EventPriority;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,15 +18,17 @@ public class BukkitBubbleModule extends BubbleModule {
     private final BukkitBubbleManager bubbleManager;
     private final BukkitListenerRegistry bukkitListenerManager;
 
-    @Inject private BukkitChatModule chatModule;
+    private final ChatModule chatModule;
 
     @Inject
     public BukkitBubbleModule(FileManager fileManager,
                               BukkitBubbleManager bubbleManager,
-                              BukkitListenerRegistry bukkitListenerManager) {
+                              BukkitListenerRegistry bukkitListenerManager,
+                              ChatModule bukkitChatModule) {
         super(fileManager);
         this.bubbleManager = bubbleManager;
         this.bukkitListenerManager = bukkitListenerManager;
+        this.chatModule = bukkitChatModule;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package net.flectone.pulse.formatter;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.configuration.Localization;
@@ -22,19 +23,22 @@ public class ModerationMessageFormatter {
     private final FPlayerService fPlayerService;
     private final TimeFormatter timeFormatter;
     private final ModerationService moderationService;
-
-    @Inject private IntegrationModule integrationModule;
-    @Inject private NewbieModule newbieModule;
+    private final Provider<IntegrationModule> integrationModuleProvider;
+    private final Provider<NewbieModule> newbieModuleProvider;
 
     @Inject
     public ModerationMessageFormatter(FileManager fileManager,
                                       FPlayerService fPlayerService,
                                       TimeFormatter timeFormatter,
-                                      ModerationService moderationService) {
+                                      ModerationService moderationService,
+                                      Provider<IntegrationModule> integrationModuleProvider,
+                                      Provider<NewbieModule> newbieModuleProvider) {
         this.fileManager = fileManager;
         this.fPlayerService = fPlayerService;
         this.timeFormatter = timeFormatter;
         this.moderationService = moderationService;
+        this.integrationModuleProvider = integrationModuleProvider;
+        this.newbieModuleProvider = newbieModuleProvider;
     }
 
     public String replacePlaceholders(String message,
@@ -114,13 +118,13 @@ public class ModerationMessageFormatter {
                 yield replacePlaceholders(format, fPlayer, mutes.get(0));
             }
             case EXTERNAL -> {
-                ExternalModeration mute = integrationModule.getMute(fPlayer);
+                ExternalModeration mute = integrationModuleProvider.get().getMute(fPlayer);
                 if (mute == null) yield format;
 
                 yield replacePlaceholders(format, fPlayer, mute);
             }
             case NEWBIE -> {
-                ExternalModeration mute = newbieModule.getModeration(fPlayer);
+                ExternalModeration mute = newbieModuleProvider.get().getModeration(fPlayer);
                 if (mute == null) yield format;
 
                 yield replacePlaceholders(format, fPlayer, mute);

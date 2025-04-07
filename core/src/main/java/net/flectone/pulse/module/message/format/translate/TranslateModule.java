@@ -22,11 +22,14 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
     private final Message.Format.Translate message;
     private final Permission.Message.Format.Translate permission;
 
-    @Inject private MessageFormatter messageFormatter;
+    private final MessageFormatter messageFormatter;
 
     @Inject
-    public TranslateModule(FileManager fileManager) {
+    public TranslateModule(FileManager fileManager,
+                           MessageFormatter messageFormatter) {
         super(localization -> localization.getMessage().getFormat().getTranslate());
+
+        this.messageFormatter = messageFormatter;
 
         message = fileManager.getMessage().getFormat().getTranslate();
         permission = fileManager.getPermission().getMessage().getFormat().getTranslate();

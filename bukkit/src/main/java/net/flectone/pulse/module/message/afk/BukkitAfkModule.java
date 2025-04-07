@@ -30,15 +30,16 @@ public class BukkitAfkModule extends AfkModule {
     @Getter private final Message.Afk message;
 
     private final BukkitListenerRegistry bukkitListenerManager;
-
-    @Inject private FPlayerService fPlayerService;
+    private final FPlayerService fPlayerService;
 
     @Inject
     public BukkitAfkModule(FileManager fileManager,
-                           BukkitListenerRegistry bukkitListenerManager) {
+                           BukkitListenerRegistry bukkitListenerRegistry,
+                           FPlayerService fPlayerService) {
         super(fileManager);
 
-        this.bukkitListenerManager = bukkitListenerManager;
+        this.bukkitListenerManager = bukkitListenerRegistry;
+        this.fPlayerService = fPlayerService;
 
         message = fileManager.getMessage().getAfk();
     }

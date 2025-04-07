@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.message.format;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.adapter.PlatformServerAdapter;
@@ -40,24 +41,40 @@ import java.util.Map;
 
 import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
-
-public abstract class FormatModule extends AbstractModuleMessage<Localization.Message.Format> {
+@Singleton
+public class FormatModule extends AbstractModuleMessage<Localization.Message.Format> {
 
     @Getter private final Map<TagType, TagResolver> tagResolverMap = new HashMap<>();
 
     private final Message.Format message;
     @Getter private final Permission.Message.Format permission;
 
-    @Inject private PlatformServerAdapter platformServerAdapter;
-    @Inject private FPlayerService fPlayerService;
-    @Inject private PlatformPlayerAdapter platformPlayerAdapter;
-    @Inject private SkinService skinService;
-    @Inject private PermissionChecker permissionChecker;
-    @Inject private ItemTextFormatter itemTextFormatter;
-    @Inject private MessageFormatter messageFormatter;
+    private final PlatformServerAdapter platformServerAdapter;
+    private final FPlayerService fPlayerService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final SkinService skinService;
+    private final PermissionChecker permissionChecker;
+    private final ItemTextFormatter itemTextFormatter;
+    private final MessageFormatter messageFormatter;
 
-    public FormatModule(FileManager fileManager) {
+    @Inject
+    public FormatModule(FileManager fileManager,
+                        PlatformServerAdapter platformServerAdapter,
+                        FPlayerService fPlayerService,
+                        PlatformPlayerAdapter platformPlayerAdapter,
+                        SkinService skinService,
+                        PermissionChecker permissionChecker,
+                        ItemTextFormatter itemTextFormatter,
+                        MessageFormatter messageFormatter) {
         super(localization -> localization.getMessage().getFormat());
+
+        this.platformServerAdapter = platformServerAdapter;
+        this.fPlayerService = fPlayerService;
+        this.platformPlayerAdapter = platformPlayerAdapter;
+        this.skinService = skinService;
+        this.permissionChecker = permissionChecker;
+        this.itemTextFormatter = itemTextFormatter;
+        this.messageFormatter = messageFormatter;
 
         message = fileManager.getMessage().getFormat();
         permission = fileManager.getPermission().getMessage().getFormat();
@@ -163,8 +180,45 @@ public abstract class FormatModule extends AbstractModuleMessage<Localization.Me
         });
     }
 
-    public abstract TagResolver coordsTag(FEntity sender, FEntity fReceiver);
-    public abstract TagResolver statsTag(FEntity sender, FEntity fReceiver);
+    public TagResolver coordsTag(FEntity sender, FEntity fReceiver) {
+        String tag = "coords";
+        if (!isCorrectTag(TagType.COORDS, sender)) return emptyTagResolver(tag);
+
+        PlatformPlayerAdapter.Coordinates coordinates = platformPlayerAdapter.getCoordinates(sender);
+        if (coordinates == null) return emptyTagResolver(tag);
+
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
+            String string = resolveLocalization(fReceiver).getTags().get(TagType.COORDS)
+                    .replace("<x>", String.valueOf(coordinates.x()))
+                    .replace("<y>", String.valueOf(coordinates.y()))
+                    .replace("<z>", String.valueOf(coordinates.z()));
+
+            Component component = messageFormatter.builder(sender, fReceiver, string).build();
+
+            return Tag.selfClosingInserting(component);
+        });
+    }
+
+    public TagResolver statsTag(FEntity sender, FEntity fReceiver) {
+        String tag = "stats";
+        if (!isCorrectTag(TagType.STATS, sender)) return emptyTagResolver(tag);
+
+        PlatformPlayerAdapter.Statistics statistics = platformPlayerAdapter.getStatistics(sender);
+        if (statistics == null) return emptyTagResolver(tag);
+
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
+            String string = resolveLocalization(fReceiver).getTags().get(TagType.STATS)
+                    .replace("<hp>", String.valueOf(statistics.health()))
+                    .replace("<armor>", String.valueOf(statistics.armor()))
+                    .replace("<exp>", String.valueOf(statistics.level()))
+                    .replace("<food>", String.valueOf(statistics.food())
+                    .replace("<attack>", String.valueOf(statistics.damage())));
+
+            Component component = messageFormatter.builder(sender, fReceiver, string).build();
+
+            return Tag.selfClosingInserting(component);
+        });
+    }
 
     public TagResolver skinTag(FEntity sender, FEntity fReceiver) {
         String tag = "skin";

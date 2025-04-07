@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.message.chat;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.checker.PermissionChecker;
@@ -40,9 +41,8 @@ public class BukkitChatModule extends ChatModule {
     private final BukkitListenerRegistry bukkitListenerManager;
     private final IntegrationModule integrationModule;
     private final TimeFormatter timeFormatter;
-
-    @Inject private BukkitBubbleModule bubbleModule;
-    @Inject private SpyModule spyModule;
+    private final Provider<BukkitBubbleModule> bubbleModuleProvider;
+    private final Provider<SpyModule> spyModuleProvider;
 
     @Inject
     public BukkitChatModule(FileManager fileManager,
@@ -51,7 +51,9 @@ public class BukkitChatModule extends ChatModule {
                             BukkitListenerRegistry bukkitListenerManager,
                             IntegrationModule integrationModule,
                             PermissionChecker permissionChecker,
-                            TimeFormatter timeFormatter) {
+                            TimeFormatter timeFormatter,
+                            Provider<BukkitBubbleModule> bubbleModuleProvider,
+                            Provider<SpyModule> spyModuleProvider) {
         super(fileManager);
 
         this.fPlayerService = fPlayerService;
@@ -60,6 +62,8 @@ public class BukkitChatModule extends ChatModule {
         this.integrationModule = integrationModule;
         this.permissionChecker = permissionChecker;
         this.timeFormatter = timeFormatter;
+        this.bubbleModuleProvider = bubbleModuleProvider;
+        this.spyModuleProvider = spyModuleProvider;
     }
 
     @Override
@@ -162,7 +166,7 @@ public class BukkitChatModule extends ChatModule {
                 .map(FEntity::getUuid)
                 .toList();
 
-        spyModule.checkChat(fPlayer, chatName, finalMessage);
+        spyModuleProvider.get().checkChat(fPlayer, chatName, finalMessage);
 
         int countRecipients = recipientsUUID.size();
         if (playerChat.isNullRecipient() && countRecipients < 2) {
@@ -185,7 +189,7 @@ public class BukkitChatModule extends ChatModule {
         event.setCancelled(playerChat.isCancel());
         event.getRecipients().clear();
 
-        bubbleModule.add(fPlayer, eventMessage);
+        bubbleModuleProvider.get().add(fPlayer, eventMessage);
     }
 
     @Async

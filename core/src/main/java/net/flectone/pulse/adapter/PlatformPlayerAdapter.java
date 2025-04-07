@@ -1,6 +1,7 @@
 package net.flectone.pulse.adapter;
 
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
 import net.kyori.adventure.text.Component;
@@ -66,4 +67,14 @@ public abstract class PlatformPlayerAdapter {
     public abstract void clear(FPlayer fPlayer);
 
     public abstract void update(FPlayer fPlayer);
+
+    public abstract void updateInventory(UUID uuid);
+
+    public record Coordinates(double x, double y, double z) {}
+
+    public abstract Coordinates getCoordinates(FEntity fPlayer);
+
+    public record Statistics(double health, double armor, double level, double food, double damage) {}
+
+    public abstract Statistics getStatistics(FEntity fPlayer);
 }

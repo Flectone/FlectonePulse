@@ -2,6 +2,7 @@ package net.flectone.pulse.formatter;
 
 import com.google.gson.JsonElement;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.module.message.format.fixation.FixationModule;
@@ -39,38 +40,71 @@ import java.util.UUID;
 @Singleton
 public class MessageFormatter {
 
+    private final FLogger fLogger;
     private final PermissionChecker permissionChecker;
     private final MiniMessage miniMessage;
     private final LegacyMiniConvertor legacyMiniConvertor;
-    private final FLogger fLogger;
-
-    @Inject private IntegrationModule integrationModule;
-    @Inject private ColorModule colorModule;
-    @Inject private EmojiModule emojiModule;
-    @Inject private FixationModule fixationModule;
-    @Inject private SpoilerModule spoilerModule;
-    @Inject private TranslateModule translateModule;
-    @Inject private FormatModule formatModule;
-    @Inject private MentionModule mentionModule;
-    @Inject private CapsModule capsModule;
-    @Inject private FloodModule floodModule;
-    @Inject private SwearModule swearModule;
-    @Inject private ImageModule imageModule;
-    @Inject private WorldModule worldModule;
-    @Inject private AfkModule afkModule;
-    @Inject private StreamModule streamModule;
-    @Inject private NameModule nameModule;
-    @Inject private QuestionAnswerModule questionAnswerModule;
+    private final Provider<IntegrationModule> integrationModuleProvider;
+    private final Provider<ColorModule> colorModuleProvider;
+    private final Provider<EmojiModule> emojiModuleProvider;
+    private final Provider<FixationModule> fixationModuleProvider;
+    private final Provider<SpoilerModule> spoilerModuleProvider;
+    private final Provider<TranslateModule> translateModuleProvider;
+    private final Provider<FormatModule> formatModuleProvider;
+    private final Provider<MentionModule> mentionModuleProvider;
+    private final Provider<CapsModule> capsModuleProvider;
+    private final Provider<FloodModule> floodModuleProvider;
+    private final Provider<SwearModule> swearModuleProvider;
+    private final Provider<ImageModule> imageModuleProvider;
+    private final Provider<WorldModule> worldModuleProvider;
+    private final Provider<AfkModule> afkModuleProvider;
+    private final Provider<StreamModule> streamModuleProvider;
+    private final Provider<NameModule> nameModuleProvider;
+    private final Provider<QuestionAnswerModule> questionAnswerModuleProvider;
 
     @Inject
-    public MessageFormatter(PermissionChecker permissionChecker,
+    public MessageFormatter(FLogger fLogger,
+                            PermissionChecker permissionChecker,
                             MiniMessage miniMessage,
                             LegacyMiniConvertor legacyMiniConvertor,
-                            FLogger fLogger) {
+                            Provider<IntegrationModule> integrationModuleProvider,
+                            Provider<ColorModule> colorModuleProvider,
+                            Provider<EmojiModule> emojiModuleProvider,
+                            Provider<FixationModule> fixationModuleProvider,
+                            Provider<SpoilerModule> spoilerModuleProvider,
+                            Provider<TranslateModule> translateModuleProvider,
+                            Provider<FormatModule> formatModuleProvider,
+                            Provider<MentionModule> mentionModuleProvider,
+                            Provider<CapsModule> capsModuleProvider,
+                            Provider<FloodModule> floodModuleProvider,
+                            Provider<SwearModule> swearModuleProvider,
+                            Provider<ImageModule> imageModuleProvider,
+                            Provider<WorldModule> worldModuleProvider,
+                            Provider<AfkModule> afkModuleProvider,
+                            Provider<StreamModule> streamModuleProvider,
+                            Provider<NameModule> nameModuleProvider,
+                            Provider<QuestionAnswerModule> questionAnswerModuleProvider) {
         this.permissionChecker = permissionChecker;
         this.miniMessage = miniMessage;
         this.legacyMiniConvertor = legacyMiniConvertor;
         this.fLogger = fLogger;
+        this.integrationModuleProvider = integrationModuleProvider;
+        this.colorModuleProvider = colorModuleProvider;
+        this.emojiModuleProvider = emojiModuleProvider;
+        this.fixationModuleProvider = fixationModuleProvider;
+        this.spoilerModuleProvider = spoilerModuleProvider;
+        this.translateModuleProvider = translateModuleProvider;
+        this.formatModuleProvider = formatModuleProvider;
+        this.mentionModuleProvider = mentionModuleProvider;
+        this.capsModuleProvider = capsModuleProvider;
+        this.floodModuleProvider = floodModuleProvider;
+        this.swearModuleProvider = swearModuleProvider;
+        this.imageModuleProvider = imageModuleProvider;
+        this.worldModuleProvider = worldModuleProvider;
+        this.afkModuleProvider = afkModuleProvider;
+        this.streamModuleProvider = streamModuleProvider;
+        this.nameModuleProvider = nameModuleProvider;
+        this.questionAnswerModuleProvider = questionAnswerModuleProvider;
     }
 
     public Builder builder(@NotNull String message) {
@@ -212,6 +246,9 @@ public class MessageFormatter {
         // need refactor logic formatting
         // mb chain or eventbus pattern
         public Component build() {
+
+            IntegrationModule integrationModule = integrationModuleProvider.get();
+
             String message = integrationModule.setPlaceholders(
                     sender,
                     receiver,
@@ -226,26 +263,30 @@ public class MessageFormatter {
             }
 
             if (emoji) {
+                EmojiModule emojiModule = emojiModuleProvider.get();
                 message = emojiModule.replace(sender, message);
                 tagResolverList.add(emojiModule.emojiTag(sender, receiver));
             }
 
             if (question && userMessage) {
+                QuestionAnswerModule questionAnswerModule = questionAnswerModuleProvider.get();
                 message = questionAnswerModule.replace(sender, message);
                 tagResolverList.add(questionAnswerModule.questionAnswerTag(processId, sender, receiver));
             }
 
             if (spoiler) {
+                SpoilerModule spoilerModule = spoilerModuleProvider.get();
                 tagResolverList.add(spoilerModule.spoilerTag(sender, receiver, userMessage));
             }
 
             if (translate) {
+                TranslateModule translateModule = translateModuleProvider.get();
                 message = message.replace("<message_to_translate>", messageToTranslate == null ? "" : messageToTranslate);
                 tagResolverList.add(translateModule.translateTag(sender, receiver));
             }
 
+            FormatModule formatModule = formatModuleProvider.get();
             if (formatting) {
-
                 formatModule.getTagResolverMap()
                         .entrySet()
                         .stream()
@@ -270,19 +311,23 @@ public class MessageFormatter {
             }
 
             if (mention) {
+                MentionModule mentionModule = mentionModuleProvider.get();
                 message = mentionModule.replace(sender, message);
                 tagResolverList.add(mentionModule.mentionTag(processId, sender, receiver));
             }
 
             if (caps && userMessage) {
+                CapsModule capsModule = capsModuleProvider.get();
                 message = capsModule.replace(sender, message);
             }
 
             if (flood && userMessage) {
+                FloodModule floodModule = floodModuleProvider.get();
                 message = floodModule.replace(sender, message);
             }
 
             if (swear) {
+                SwearModule swearModule = swearModuleProvider.get();
                 tagResolverList.add(swearModule.swearTag(sender, receiver));
 
                 if (userMessage) {
@@ -291,22 +336,33 @@ public class MessageFormatter {
             }
 
             if (image && !userMessage) {
+                ImageModule imageModule = imageModuleProvider.get();
                 tagResolverList.add(imageModule.imageTag(sender, receiver));
             }
 
             if (fixation && userMessage) {
+                FixationModule fixationModule = fixationModuleProvider.get();
                 message = fixationModule.replace(sender, message);
             }
 
             if (!userMessage || permissionChecker.check(sender, formatModule.getPermission().getAll().getName())) {
+                ColorModule colorModule = colorModuleProvider.get();
                 tagResolverList.add(colorModule.colorTag(colorModule.getMessage().isUseRecipientColors() ? receiver : sender));
 
+                WorldModule worldModule = worldModuleProvider.get();
                 tagResolverList.add(worldModule.worldTag(sender));
+
+                AfkModule afkModule = afkModuleProvider.get();
                 tagResolverList.add(afkModule.afkTag(sender));
+
+                StreamModule streamModule = streamModuleProvider.get();
                 tagResolverList.add(streamModule.streamTag(sender));
+
+                NameModule nameModule = nameModuleProvider.get();
                 if (player) {
                     tagResolverList.add(nameModule.playerTag(sender));
                 }
+
                 tagResolverList.add(nameModule.displayTag(sender, receiver));
                 tagResolverList.add(nameModule.vaultSuffixTag(sender, receiver));
                 tagResolverList.add(nameModule.vaultPrefixTag(sender, receiver));

@@ -33,19 +33,20 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final IntegrationModule integrationModule;
-
-    @Inject private MessageFormatter messageFormatter;
+    private final MessageFormatter messageFormatter;
 
     @Inject
     public MentionModule(FileManager fileManager,
                          FPlayerService fPlayerService,
                          PermissionChecker permissionChecker,
-                         IntegrationModule integrationModule) {
+                         IntegrationModule integrationModule,
+                         MessageFormatter messageFormatter) {
         super(localization -> localization.getMessage().getFormat().getMention());
 
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
         this.integrationModule = integrationModule;
+        this.messageFormatter = messageFormatter;
 
         message = fileManager.getMessage().getFormat().getMention();
         permission = fileManager.getPermission().getMessage().getFormat().getMention();

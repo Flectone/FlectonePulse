@@ -5,6 +5,8 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
+import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.stream.StreamModule;
 import net.flectone.pulse.module.message.afk.AfkModule;
@@ -18,7 +20,6 @@ import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
-import net.flectone.pulse.formatter.MessageFormatter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
@@ -285,5 +286,44 @@ public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
         injector.getInstance(FooterModule.class).send(fPlayer);
         injector.getInstance(HeaderModule.class).send(fPlayer);
         injector.getInstance(BrandModule.class).send(fPlayer);
+    }
+
+    @Override
+    public void updateInventory(UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null) return;
+
+        player.updateInventory();
+    }
+
+    @Override
+    public Coordinates getCoordinates(FEntity fPlayer) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        if (player == null) return null;
+
+        Location location = player.getLocation();
+
+        return new Coordinates(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    }
+
+    @Override
+    public Statistics getStatistics(FEntity fPlayer) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        if (player == null) return null;
+
+        AttributeInstance armor = null;
+        AttributeInstance damage = null;
+
+        try {
+            armor = player.getAttribute(Attribute.GENERIC_ARMOR);
+            damage = player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
+        } catch (ArrayIndexOutOfBoundsException ignored) {}
+
+        return new Statistics(Math.round(player.getHealth() * 10.0)/10.0,
+                armor != null ? Math.round(armor.getValue() * 10.0)/10.0 : 0.0,
+                player.getLevel(),
+                player.getFoodLevel(),
+                damage != null ? Math.round(damage.getValue() * 10.0)/10.0 : 0.0
+        );
     }
 }
