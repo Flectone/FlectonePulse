@@ -4,18 +4,26 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import io.leangen.geantyref.TypeToken;
+import net.flectone.pulse.handler.CommandExceptionHandler;
 import net.flectone.pulse.mapper.FPlayerMapper;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.parser.integer.ColorParser;
 import net.flectone.pulse.parser.integer.DurationReasonParser;
 import net.flectone.pulse.parser.player.PlayerParser;
 import net.flectone.pulse.parser.string.MessageParser;
+import net.kyori.adventure.text.Component;
 import org.bukkit.plugin.Plugin;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
+import org.incendo.cloud.brigadier.BrigadierSetting;
 import org.incendo.cloud.brigadier.CloudBrigadierManager;
 import org.incendo.cloud.bukkit.CloudBukkitCapabilities;
+import org.incendo.cloud.exception.ArgumentParseException;
+import org.incendo.cloud.exception.CommandExecutionException;
+import org.incendo.cloud.exception.InvalidSyntaxException;
+import org.incendo.cloud.exception.NoPermissionException;
 import org.incendo.cloud.execution.ExecutionCoordinator;
+import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
 import org.incendo.cloud.paper.LegacyPaperCommandManager;
 import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.setting.ManagerSetting;
@@ -29,6 +37,7 @@ public class BukkitCommandRegistry extends CommandRegistry {
 
     @Inject
     public BukkitCommandRegistry(CommandParserRegistry parsers,
+                                 CommandExceptionHandler commandExceptionHandler,
                                  Plugin plugin,
                                  FPlayerMapper fPlayerMapper) {
         super(parsers);
@@ -60,11 +69,18 @@ public class BukkitCommandRegistry extends CommandRegistry {
                             .to(argument -> StringArgumentType.greedyString())
             );
 
+            brigadierManager.settings().set(BrigadierSetting.FORCE_EXECUTABLE, true);
+
         } else if (manager.hasCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
             manager.registerAsynchronousCompletions();
         }
 
         manager.settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);
+
+        manager.exceptionController().registerHandler(ArgumentParseException.class, commandExceptionHandler::handleArgumentParseException);
+        manager.exceptionController().registerHandler(InvalidSyntaxException.class, commandExceptionHandler::handleInvalidSyntaxException);
+        manager.exceptionController().registerHandler(NoPermissionException.class, commandExceptionHandler::handleNoPermissionException);
+        manager.exceptionController().registerHandler(CommandExecutionException.class, commandExceptionHandler::handleCommandExecutionException);
     }
 
     @Override
@@ -89,5 +105,9 @@ public class BukkitCommandRegistry extends CommandRegistry {
     @Override
     public void unregisterCommand(String name) {
         manager.deleteRootCommand(name);
+    }
+
+    public static <C> MinecraftExceptionHandler.MessageFactory<C, InvalidSyntaxException> createDefaultInvalidSyntaxHandler() {
+        return (formatter, ctx) -> Component.text(ctx.exception().correctSyntax());
     }
 }

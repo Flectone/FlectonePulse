@@ -95,6 +95,7 @@ public class MessageFormatter {
         private String messageToTranslate;
         private boolean userMessage;
         private boolean mention;
+        private boolean player = true;
         private boolean emoji = true;
         private boolean fixation = true;
         private boolean question = true;
@@ -190,6 +191,11 @@ public class MessageFormatter {
 
         public Builder mention(boolean mention) {
             this.mention = mention;
+            return this;
+        }
+
+        public Builder player(boolean player) {
+            this.player = player;
             return this;
         }
 
@@ -298,7 +304,9 @@ public class MessageFormatter {
                 tagResolverList.add(worldModule.worldTag(sender));
                 tagResolverList.add(afkModule.afkTag(sender));
                 tagResolverList.add(streamModule.streamTag(sender));
-                tagResolverList.add(nameModule.playerTag(sender));
+                if (player) {
+                    tagResolverList.add(nameModule.playerTag(sender));
+                }
                 tagResolverList.add(nameModule.displayTag(sender, receiver));
                 tagResolverList.add(nameModule.vaultSuffixTag(sender, receiver));
                 tagResolverList.add(nameModule.vaultPrefixTag(sender, receiver));

@@ -6,6 +6,8 @@ dependencies {
     compileOnly "com.github.Anon8281:UniversalScheduler:$UniversalScheduler_version"
 
     compileOnly "org.incendo:cloud-paper:$cloud_paper_version"
+    compileOnly "org.incendo:cloud-minecraft-extras:$cloud_minecraft_extras_version"
+
     compileOnly "net.elytrium:serializer:$elytrium_serializer_version"
 
     compileOnly "org.spigotmc:spigot-api:$spigot_version"

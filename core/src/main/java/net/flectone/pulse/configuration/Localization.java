@@ -321,6 +321,14 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 "scissors", "ножницы"
         ));
 
+        command.exception.execution = "<color:#ff7171><b>⁉</b> Произошла ошибка при выполнении команды <br><color:#ff7171><b>⁉</b> <exception>";
+        command.exception.syntax = "<hover:show_text:\"<fcolor:2>Использовать <br><fcolor:1>/<correct_syntax>\"><click:suggest_command:\"/<command> \"><fcolor:2>┌<br>│ Использование →<br>│ <fcolor:1>/<correct_syntax><br><fcolor:2>└";
+        command.exception.parseUnknown = "<color:#ff7171><b>⁉</b> Неизвестная ошибка аргумента в <br><input>";
+        command.exception.parseBoolean = "<color:#ff7171><b>⁉</b> Ожидался boolean аргумент, но ты ввёл <br><input>";
+        command.exception.parseNumber = "<color:#ff7171><b>⁉</b> Ожидался числовой аргумент, но ты ввёл <br><input>";
+        command.exception.parseString = "<color:#ff7171><b>⁉</b> Ожидался строковый аргумент, но ты ввёл <br><input>";
+        command.exception.permission = "<color:#ff7171><b>⁉</b> У тебя нет прав на использование этой команды";
+
         command.prompt.message = "сообщение";
         command.prompt.hard = "сложно?";
         command.prompt.accept = "принять";
@@ -619,6 +627,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
     @Getter
     public static final class Command implements CommandConfig, Localizable {
 
+        private Exception exception = new Exception();
         private Prompt prompt = new Prompt();
 
         @Override
@@ -629,6 +638,18 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Override
         public SubCommandConfig getMark() {
             return null;
+        }
+
+        @Getter
+        @NoArgsConstructor
+        public static final class Exception {
+            private String execution = "<color:#ff7171><b>⁉</b> An error occurred while executing the command <br><color:#ff7171><b>⁉</b> <exception>";
+            private String parseUnknown = "<color:#ff7171><b>⁉</b> Unknown argument error while parsing <br><input>";
+            private String parseBoolean = "<color:#ff7171><b>⁉</b> A boolean argument was expected, but you entered <br><input>";
+            private String parseNumber = "<color:#ff7171><b>⁉</b> A number argument was expected, but you entered <br><input>";
+            private String parseString = "<color:#ff7171><b>⁉</b> A string argument was expected, but you entered <br><input>";
+            private String permission = "<color:#ff7171><b>⁉</b> You don't have permission to use this command";
+            private String syntax = "<hover:show_text:\"<fcolor:2>Use <br><fcolor:1>/<correct_syntax>\"><click:suggest_command:\"/<command> \"><fcolor:2>┌<br>│ Usage →<br>│ <fcolor:1>/<correct_syntax><br><fcolor:2>└";
         }
 
         @Getter
