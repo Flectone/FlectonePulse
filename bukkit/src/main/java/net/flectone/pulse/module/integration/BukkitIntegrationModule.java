@@ -240,6 +240,23 @@ public class BukkitIntegrationModule extends IntegrationModule {
     }
 
     @Override
+    public boolean hasMessenger() {
+        if (getChildren().contains(DiscordModule.class)) {
+            return injector.getInstance(DiscordModule.class).isEnable();
+        }
+
+        if (getChildren().contains(TwitchModule.class)) {
+            return injector.getInstance(TwitchModule.class).isEnable();
+        }
+
+        if (getChildren().contains(TelegramModule.class)) {
+            return injector.getInstance(TelegramModule.class).isEnable();
+        }
+
+        return false;
+    }
+
+    @Override
     public boolean isVanished(FEntity sender) {
         if (getChildren().contains(SuperVanishModule.class)) {
             return injector.getInstance(SuperVanishModule.class).isVanished(sender);

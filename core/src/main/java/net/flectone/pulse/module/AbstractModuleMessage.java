@@ -12,15 +12,17 @@ import net.flectone.pulse.formatter.MessageFormatter;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.formatter.TimeFormatter;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.sender.ProxySender;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.MessageSender;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.*;
+import net.flectone.pulse.util.DisableAction;
+import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.util.Range;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -429,6 +431,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             if (tag == null) return;
             if (integrationString == null) return;
             if (range != Range.SERVER && range != Range.PROXY) return;
+            if (!integrationModule.hasMessenger()) return;
 
             Component component = messageFormatter.builder(fPlayer, FPlayer.UNKNOWN, resolveString(FPlayer.UNKNOWN, format))
                     .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(FPlayer.UNKNOWN))

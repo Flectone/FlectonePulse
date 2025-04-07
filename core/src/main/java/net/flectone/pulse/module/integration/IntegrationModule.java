@@ -68,6 +68,8 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public abstract void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> discordString);
 
+    public abstract boolean hasMessenger();
+
     public abstract boolean isVanished(FEntity sender);
 
     public abstract boolean isMuted(FPlayer fPlayer);
