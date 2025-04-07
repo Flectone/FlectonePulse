@@ -15,9 +15,12 @@ public class BukkitPermissionRegistry implements PermissionRegistry {
 
     @Override
     public void register(String name, String type) {
-        if (Bukkit.getPluginManager().getPermission(name) != null) {
+        Permission permission = Bukkit.getPluginManager().getPermission(name);
+        if (permission != null) {
+            if (permission.getDefault().name().equalsIgnoreCase(type)) return;
+
             // does not always work correctly, requires a full restart
-            Bukkit.getPluginManager().removePermission(name);
+            Bukkit.getPluginManager().removePermission(permission);
         }
 
         Bukkit.getPluginManager().addPermission(new Permission(name, PermissionDefault.getByName(type)));
