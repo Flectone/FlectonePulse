@@ -7,7 +7,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -18,12 +18,12 @@ public class BookModule extends AbstractModule {
     private final Message.Book message;
     private final Permission.Message.Book permission;
 
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
 
     @Inject
     public BookModule(FileManager fileManager,
-                      MessageFormatter messageFormatter) {
-        this.messageFormatter = messageFormatter;
+                      MessagePipeline messagePipeline) {
+        this.messagePipeline = messagePipeline;
 
         message = fileManager.getMessage().getBook();
         permission = fileManager.getPermission().getMessage().getBook();
@@ -45,7 +45,7 @@ public class BookModule extends AbstractModule {
         try {
             Component deserialized = LegacyComponentSerializer.legacySection().deserialize(string);
 
-            Component component = messageFormatter.builder(fPlayer, string.replace("§", "&"))
+            Component component = messagePipeline.builder(fPlayer, string.replace("§", "&"))
                     .userMessage(true)
                     .build()
                     .mergeStyle(deserialized);

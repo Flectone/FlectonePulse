@@ -20,7 +20,7 @@ import net.flectone.pulse.module.message.death.listener.DeathPacketListener;
 import net.flectone.pulse.module.message.death.model.Death;
 import net.flectone.pulse.module.message.death.model.Item;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.sender.PacketSender;
 import net.kyori.adventure.text.Component;
@@ -37,7 +37,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
     @Getter private final Message.Death message;
     private final Permission.Message.Death permission;
 
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
     private final PacketSender packetSender;
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
@@ -45,7 +45,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
 
     @Inject
     public DeathModule(FileManager fileManager,
-                       MessageFormatter messageFormatter,
+                       MessagePipeline messagePipeline,
                        PacketSender packetSender,
                        FPlayerService fPlayerService,
                        ListenerRegistry listenerRegistry,
@@ -53,7 +53,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
                        Gson gson) {
         super(localization -> localization.getMessage().getDeath());
 
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
@@ -112,7 +112,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
 
         if (!death.isPlayer()) return;
 
-        Component component = messageFormatter.builder(fTarget, fReceiver, resolveLocalization(fReceiver).getTypes().get(death.getKey()))
+        Component component = messagePipeline.builder(fTarget, fReceiver, resolveLocalization(fReceiver).getTypes().get(death.getKey()))
                 .tagResolvers(killerTag(fReceiver, death.getKiller()), byItemTag(death.getItem()))
                 .build();
 
@@ -160,7 +160,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
         if (entity == null) return emptyTagResolver(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) ->
-                Tag.selfClosingInserting(messageFormatter.builder(entity, receiver, "<display_name>").build())
+                Tag.selfClosingInserting(messagePipeline.builder(entity, receiver, "<display_name>").build())
         );
     }
 }

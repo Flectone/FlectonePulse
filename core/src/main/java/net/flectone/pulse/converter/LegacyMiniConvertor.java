@@ -26,6 +26,13 @@ package net.flectone.pulse.converter;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.processor.MessageProcessor;
+import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +45,7 @@ import java.util.regex.Pattern;
  */
 
 @Singleton
-public final class LegacyMiniConvertor {
+public final class LegacyMiniConvertor implements MessageProcessor {
     private final Set<Option> DEF_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
             Option.COLOR,
             Option.HEX_COLOR_STANDALONE,
@@ -49,10 +56,31 @@ public final class LegacyMiniConvertor {
             Option.RESET
     ));
 
-    private static final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
+    private final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
+    private final Permission.Message.Format formatPermission;
+
+    private final PermissionChecker permissionChecker;
 
     @Inject
-    public LegacyMiniConvertor() {}
+    public LegacyMiniConvertor(FileManager fileManager,
+                               MessageProcessRegistry messageProcessRegistry,
+                               PermissionChecker permissionChecker) {
+        this.permissionChecker = permissionChecker;
+
+        formatPermission = fileManager.getPermission().getMessage().getFormat();
+
+        messageProcessRegistry.register(200, this);
+    }
+
+    @Override
+    public void process(MessageContext messageContext) {
+        FEntity sender = messageContext.getSender();
+        if (!messageContext.isColors()) return;
+        if (messageContext.isUserMessage() && !permissionChecker.check(sender, formatPermission.getAll())) return;
+
+        String message = toMini(messageContext.getMessage());
+        messageContext.setMessage(message);
+    }
 
     /**
      * Translate text to MiniMessage format with default options (everything but {@link Option#CLOSE_COLORS})

@@ -5,7 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.stream.StreamModule;
@@ -225,7 +225,7 @@ public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
     public Component getPlayerListHeader(FPlayer fPlayer) {
         String header = injector.getInstance(HeaderModule.class).getCurrentMessage(fPlayer);
         if (header != null) {
-            return injector.getInstance(MessageFormatter.class).builder(fPlayer, header).build();
+            return injector.getInstance(MessagePipeline.class).builder(fPlayer, header).build();
         }
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
@@ -241,7 +241,7 @@ public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
     public Component getPlayerListFooter(FPlayer fPlayer) {
         String footer = injector.getInstance(FooterModule.class).getCurrentMessage(fPlayer);
         if (footer != null) {
-            return injector.getInstance(MessageFormatter.class).builder(fPlayer, footer).build();
+            return injector.getInstance(MessagePipeline.class).builder(fPlayer, footer).build();
         }
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());

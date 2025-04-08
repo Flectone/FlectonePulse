@@ -3,7 +3,7 @@ package net.flectone.pulse.handler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.sender.MessageSender;
@@ -23,15 +23,15 @@ public class CommandExceptionHandler {
 
     private final FileManager fileManager;
     private final MessageSender messageSender;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
 
     @Inject
     public CommandExceptionHandler(FileManager fileManager,
                                    MessageSender messageSender,
-                                   MessageFormatter messageFormatter) {
+                                   MessagePipeline messagePipeline) {
         this.fileManager = fileManager;
         this.messageSender = messageSender;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
     }
 
     public void handleArgumentParseException(ExceptionContext<FPlayer, ArgumentParseException> context) {
@@ -59,7 +59,7 @@ public class CommandExceptionHandler {
                     .replace("<input>", throwable.getMessage());
         }
 
-        Component componentMessage = messageFormatter.builder(fPlayer, message)
+        Component componentMessage = messagePipeline.builder(fPlayer, message)
                 .player(false)
                 .build();
 
@@ -75,7 +75,7 @@ public class CommandExceptionHandler {
                 .replace("<correct_syntax>", correctSyntax)
                 .replace("<command>", correctSyntax.split(" ")[0]);
 
-        Component componentMessage = messageFormatter.builder(fPlayer, message)
+        Component componentMessage = messagePipeline.builder(fPlayer, message)
                 .player(false)
                 .build();
 
@@ -88,7 +88,7 @@ public class CommandExceptionHandler {
         String message = fileManager.getLocalization(fPlayer)
                 .getCommand().getException().getPermission();
 
-        Component componentMessage = messageFormatter.builder(fPlayer, message)
+        Component componentMessage = messagePipeline.builder(fPlayer, message)
                 .player(false)
                 .build();
 
@@ -102,7 +102,7 @@ public class CommandExceptionHandler {
                 .getCommand().getException().getExecution()
                 .replace("<exception>", context.exception().getMessage());
 
-        Component componentMessage = messageFormatter.builder(fPlayer, message)
+        Component componentMessage = messagePipeline.builder(fPlayer, message)
                 .player(false)
                 .build();
 

@@ -2,14 +2,18 @@ package net.flectone.pulse.module.message.afk;
 
 import com.google.inject.Inject;
 import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.processor.MessageProcessor;
+import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MessageTag;
@@ -21,20 +25,26 @@ import org.jetbrains.annotations.NotNull;
 
 import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
-public abstract class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> {
+public abstract class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> implements MessageProcessor {
 
     private final Message.Afk message;
     private final Permission.Message.Afk permission;
+    private final Permission.Message.Format formatPermission;
 
     @Inject private FPlayerService fPlayerService;
     @Inject private TaskScheduler taskScheduler;
     @Inject private IntegrationModule integrationModule;
+    @Inject private PermissionChecker permissionChecker;
 
-    public AfkModule(FileManager fileManager) {
+    public AfkModule(FileManager fileManager,
+                     MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getMessage().getAfk());
 
         message = fileManager.getMessage().getAfk();
         permission = fileManager.getPermission().getMessage().getAfk();
+        formatPermission = fileManager.getPermission().getMessage().getFormat();
+
+        messageProcessRegistry.register(150, this);
     }
 
     @Override
@@ -49,6 +59,14 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
     @Override
     public boolean isConfigEnable() {
         return message.isEnable();
+    }
+
+    @Override
+    public void process(MessageContext messageContext) {
+        FEntity sender = messageContext.getSender();
+        if (messageContext.isUserMessage() && !permissionChecker.check(sender, formatPermission.getAll())) return;
+
+        messageContext.addTagResolvers(afkTag(messageContext.getSender()));
     }
 
     public abstract void remove(@NotNull String action, FPlayer fPlayer);
@@ -102,7 +120,7 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
                 .sendBuilt();
     }
 
-    public TagResolver afkTag(@NotNull FEntity sender) {
+    private TagResolver afkTag(@NotNull FEntity sender) {
         String tag = "afk_suffix";
         if (checkModulePredicates(sender)) return emptyTagResolver(tag);
         if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);

@@ -6,7 +6,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.anvil.listener.AnvilListener;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -17,15 +17,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class BukkitAnvilModule extends AnvilModule {
 
     private final BukkitListenerRegistry bukkitListenerManager;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
 
     @Inject
     public BukkitAnvilModule(FileManager fileManager,
                              BukkitListenerRegistry bukkitListenerManager,
-                             MessageFormatter messageFormatter) {
+                             MessagePipeline messagePipeline) {
         super(fileManager);
         this.bukkitListenerManager = bukkitListenerManager;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class BukkitAnvilModule extends AnvilModule {
         try {
             Component deserialized = LegacyComponentSerializer.legacySection().deserialize(displayName);
 
-            Component component = messageFormatter.builder(fPlayer, displayName.replace("§", "&"))
+            Component component = messagePipeline.builder(fPlayer, displayName.replace("§", "&"))
                     .userMessage(true)
                     .colors(false)
                     .build()

@@ -7,7 +7,7 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
@@ -34,7 +34,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final CommandRegistry commandRegistry;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
     private final Gson gson;
 
     @Inject
@@ -43,7 +43,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
                       ModerationService moderationService,
                       ModerationMessageFormatter moderationMessageFormatter,
                       CommandRegistry commandRegistry,
-                      MessageFormatter messageFormatter,
+                      MessagePipeline messagePipeline,
                       Gson gson) {
         super(localization -> localization.getCommand().getKick(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.KICK));
 
@@ -51,7 +51,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         this.moderationService = moderationService;
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.commandRegistry = commandRegistry;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
         this.gson = gson;
 
         command = fileManager.getCommand().getKick();
@@ -134,6 +134,6 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
 
         String format = moderationMessageFormatter.replacePlaceholders(resolveLocalization(fReceiver).getPerson(), fReceiver, kick);
 
-        fPlayerService.kick(fReceiver, messageFormatter.builder(fReceiver, format).build());
+        fPlayerService.kick(fReceiver, messagePipeline.builder(fReceiver, format).build());
     }
 }

@@ -26,7 +26,7 @@ import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.discord.listener.MessageCreateListener;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.SkinService;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.logging.FLogger;
@@ -50,7 +50,7 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
     private final TaskScheduler taskScheduler;
     private final SkinService skinService;
     private final MessageCreateListener messageCreateListener;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
     private final SystemVariableResolver systemVariableResolver;
     private final FLogger fLogger;
 
@@ -62,14 +62,14 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
     public DiscordIntegration(FileManager fileManager,
                               TaskScheduler taskScheduler,
                               SkinService skinService,
-                              MessageFormatter messageFormatter,
+                              MessagePipeline messagePipeline,
                               SystemVariableResolver systemVariableResolver,
                               MessageCreateListener messageCreateListener,
                               FLogger fLogger) {
         this.fileManager = fileManager;
         this.taskScheduler = taskScheduler;
         this.skinService = skinService;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
         this.systemVariableResolver = systemVariableResolver;
         this.messageCreateListener = messageCreateListener;
         this.fLogger = fLogger;
@@ -279,7 +279,7 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
                     .blockOptional()
                     .ifPresent(channel -> {
                         String name = PlainTextComponentSerializer.plainText()
-                                .serialize(messageFormatter.builder(entry.getValue()).build());
+                                .serialize(messagePipeline.builder(entry.getValue()).build());
 
                         channel.getRestChannel()
                                 .modify(ChannelModifyRequest.builder()

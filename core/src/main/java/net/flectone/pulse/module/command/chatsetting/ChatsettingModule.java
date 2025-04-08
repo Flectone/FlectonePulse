@@ -16,7 +16,7 @@ import net.flectone.pulse.model.inventory.Inventory;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -32,7 +32,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     private final Permission.Command.Chatsetting permission;
 
     private final FPlayerService fPlayerService;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
     private final CommandRegistry commandRegistry;
     private final PermissionChecker permissionChecker;
     private final InventoryController inventoryController;
@@ -41,7 +41,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     @Inject
     public ChatsettingModule(FileManager fileManager,
                              FPlayerService fPlayerService,
-                             MessageFormatter messageFormatter,
+                             MessagePipeline messagePipeline,
                              CommandRegistry commandRegistry,
                              PermissionChecker permissionChecker,
                              InventoryController inventoryController,
@@ -49,7 +49,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         super(localization -> localization.getCommand().getChatsetting(), null);
 
         this.fPlayerService = fPlayerService;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
         this.commandRegistry = commandRegistry;
         this.permissionChecker = permissionChecker;
         this.inventoryController = inventoryController;
@@ -90,7 +90,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         if (checkModulePredicates(fPlayer)) return;
 
         Localization.Command.Chatsetting localization = resolveLocalization(fPlayer);
-        Component header = messageFormatter.builder(fPlayer, localization.getHeader()).build();
+        Component header = messagePipeline.builder(fPlayer, localization.getHeader()).build();
 
         Inventory.Builder inventoryBuilder = new Inventory.Builder()
                 .name(header)

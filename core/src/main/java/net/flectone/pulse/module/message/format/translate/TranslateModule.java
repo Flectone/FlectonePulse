@@ -5,11 +5,14 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -17,22 +20,25 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
-public class TranslateModule extends AbstractModuleMessage<Localization.Message.Format.Translate> {
+public class TranslateModule extends AbstractModuleMessage<Localization.Message.Format.Translate> implements MessageProcessor {
 
     private final Message.Format.Translate message;
     private final Permission.Message.Format.Translate permission;
 
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
 
     @Inject
     public TranslateModule(FileManager fileManager,
-                           MessageFormatter messageFormatter) {
+                           MessagePipeline messagePipeline,
+                           MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getMessage().getFormat().getTranslate());
 
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
 
         message = fileManager.getMessage().getFormat().getTranslate();
         permission = fileManager.getPermission().getMessage().getFormat().getTranslate();
+
+        messageProcessRegistry.register(100, this);
     }
 
     @Override
@@ -40,7 +46,23 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
         registerModulePermission(permission);
     }
 
-    public TagResolver translateTag(FEntity fPlayer, FEntity receiver) {
+    @Override
+    public boolean isConfigEnable() {
+        return message.isEnable();
+    }
+
+    @Override
+    public void process(MessageContext messageContext) {
+        if (!messageContext.isTranslate()) return;
+
+        String messageToTranslate = messageContext.getMessageToTranslate();
+        String message = messageContext.getMessage().replace("<message_to_translate>", messageToTranslate == null ? "" : messageToTranslate);
+
+        messageContext.setMessage(message);
+        messageContext.addTagResolvers(translateTag(messageContext.getSender(), messageContext.getReceiver()));
+    }
+
+    private TagResolver translateTag(FEntity fPlayer, FEntity receiver) {
         String tag = "translateto";
         if (checkModulePredicates(fPlayer)) return emptyTagResolver(tag);
 
@@ -80,7 +102,7 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
                     .replaceFirst("<language>", secondLang)
                     .replace("<message>", text);
 
-            return Tag.selfClosingInserting(messageFormatter.builder(fPlayer, receiver, action)
+            return Tag.selfClosingInserting(messagePipeline.builder(fPlayer, receiver, action)
                     .interactiveChat(false)
                     .question(false)
                     .mention(false)
@@ -88,10 +110,5 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
                     .build()
             );
         });
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return message.isEnable();
     }
 }

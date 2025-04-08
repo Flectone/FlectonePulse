@@ -23,7 +23,7 @@ import net.flectone.pulse.module.message.status.players.PlayersModule;
 import net.flectone.pulse.module.message.status.version.VersionModule;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 
 import java.util.Collection;
 import java.util.List;
@@ -38,7 +38,7 @@ public class StatusModule extends AbstractModule {
     private final IconModule iconModule;
     private final PlayersModule playersModule;
     private final VersionModule versionModule;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
     private final PlatformServerAdapter platformServerAdapter;
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
@@ -50,7 +50,7 @@ public class StatusModule extends AbstractModule {
                         IconModule iconModule,
                         PlayersModule playersModule,
                         VersionModule versionModule,
-                        MessageFormatter messageFormatter,
+                        MessagePipeline messagePipeline,
                         PlatformServerAdapter platformServerAdapter,
                         FPlayerService fPlayerService,
                         ListenerRegistry listenerRegistry,
@@ -59,7 +59,7 @@ public class StatusModule extends AbstractModule {
         this.iconModule = iconModule;
         this.playersModule = playersModule;
         this.versionModule = versionModule;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
         this.platformServerAdapter = platformServerAdapter;
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
@@ -179,7 +179,7 @@ public class StatusModule extends AbstractModule {
             }
 
             JsonObject playerObject = new JsonObject();
-            playerObject.addProperty("name", messageFormatter.builder(fPlayer, sample.getName()).legacySerialize());
+            playerObject.addProperty("name", messagePipeline.builder(fPlayer, sample.getName()).legacySerializerBuild());
             playerObject.addProperty("id", sample.getId() == null ? onlineFPlayers.stream().findAny().orElse(FPlayer.UNKNOWN).getUuid().toString() : sample.getId());
             jsonArray.add(playerObject);
         });

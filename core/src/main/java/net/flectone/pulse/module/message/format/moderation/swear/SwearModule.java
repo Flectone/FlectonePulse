@@ -6,10 +6,13 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -23,7 +26,7 @@ import java.util.regex.PatternSyntaxException;
 import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
-public class SwearModule extends AbstractModuleMessage<Localization.Message.Format.Moderation.Swear> {
+public class SwearModule extends AbstractModuleMessage<Localization.Message.Format.Moderation.Swear> implements MessageProcessor {
 
 
     private final Message.Format.Moderation.Swear message;
@@ -31,7 +34,7 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
 
     private final PermissionChecker permissionChecker;
     private final FLogger fLogger;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
 
     private Pattern combinedPattern;
 
@@ -39,15 +42,18 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
     public SwearModule(FileManager fileManager,
                        PermissionChecker permissionChecker,
                        FLogger fLogger,
-                       MessageFormatter messageFormatter) {
+                       MessagePipeline messagePipeline,
+                       MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getMessage().getFormat().getModeration().getSwear());
 
         this.permissionChecker = permissionChecker;
         this.fLogger = fLogger;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
 
         message = fileManager.getMessage().getFormat().getModeration().getSwear();
         permission = fileManager.getPermission().getMessage().getFormat().getModeration().getSwear();
+
+        messageProcessRegistry.register(100, this);
     }
 
     @Override
@@ -69,7 +75,19 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
         return message.isEnable();
     }
 
-    public String replace(FEntity sender, String message) {
+    @Override
+    public void process(MessageContext messageContext) {
+        if (!messageContext.isSwear()) return;
+
+        messageContext.addTagResolvers(swearTag(messageContext.getSender(), messageContext.getReceiver()));
+
+        if (!messageContext.isUserMessage()) return;
+
+        String message = replace(messageContext.getSender(), messageContext.getMessage());
+        messageContext.setMessage(message);
+    }
+
+    private String replace(FEntity sender, String message) {
         if (checkModulePredicates(sender)) return message;
         if (permissionChecker.check(sender, permission.getBypass())) return message;
         if (combinedPattern == null) return message;
@@ -84,7 +102,7 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
         return result.toString();
     }
 
-    public TagResolver swearTag(FEntity sender, FEntity receiver) {
+    private TagResolver swearTag(FEntity sender, FEntity receiver) {
         String tag = "swear";
         if (checkModulePredicates(sender)) return emptyTagResolver(tag);
 
@@ -97,7 +115,7 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
 
             String message = resolveLocalization(receiver).getSymbol().repeat(swear.length());
 
-            Component component = messageFormatter.builder(sender, receiver, message).build();
+            Component component = messagePipeline.builder(sender, receiver, message).build();
 
             if (permissionChecker.check(receiver, permission.getSee())) {
                 component = component.hoverEvent(HoverEvent.showText(Component.text(swear)));

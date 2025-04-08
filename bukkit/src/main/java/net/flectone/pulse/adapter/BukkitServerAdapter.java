@@ -13,7 +13,7 @@ import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.configuration.Command;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.service.FPlayerService;
@@ -58,18 +58,18 @@ public class BukkitServerAdapter extends PlatformServerAdapter {
 
     @Override
     public ItemStack buildItemStack(int settingIndex, FPlayer fPlayer, List<String> itemMessages, Command.Chatsetting.SettingItem settingItem) {
-        MessageFormatter messageFormatter = injector.getInstance(MessageFormatter.class);
+        MessagePipeline messagePipeline = injector.getInstance(MessagePipeline.class);
 
         Component name = itemMessages.isEmpty()
                 ? Component.empty()
-                : messageFormatter.builder(fPlayer, itemMessages.get(0)).build();
+                : messagePipeline.builder(fPlayer, itemMessages.get(0)).build();
 
         List<Component> lore = new ArrayList<>();
         if (itemMessages.size() > 1) {
             itemMessages.stream()
                     .skip(1)
                     .forEach(string -> lore.add(
-                                    messageFormatter
+                                    messagePipeline
                                             .builder(fPlayer, string.replace("<chat>", String.valueOf(fPlayer.getSettingValue(FPlayer.Setting.CHAT))))
                                             .build()
                             )

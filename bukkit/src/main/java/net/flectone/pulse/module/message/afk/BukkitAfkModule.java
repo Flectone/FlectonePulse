@@ -9,6 +9,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.afk.listener.AfkListener;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
+import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.Pair;
 import org.bukkit.Bukkit;
@@ -35,8 +36,9 @@ public class BukkitAfkModule extends AfkModule {
     @Inject
     public BukkitAfkModule(FileManager fileManager,
                            BukkitListenerRegistry bukkitListenerRegistry,
-                           FPlayerService fPlayerService) {
-        super(fileManager);
+                           FPlayerService fPlayerService,
+                           MessageProcessRegistry messageProcessRegistry) {
+        super(fileManager, messageProcessRegistry);
 
         this.bukkitListenerManager = bukkitListenerRegistry;
         this.fPlayerService = fPlayerService;

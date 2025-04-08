@@ -13,7 +13,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -24,7 +24,7 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final MuteChecker muteChecker;
     private final MessageSender messageSender;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
     private final FLogger fLogger;
 
     @Inject
@@ -32,13 +32,13 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
                                   ModerationMessageFormatter moderationMessageFormatter,
                                   MuteChecker muteChecker,
                                   MessageSender messageSender,
-                                  MessageFormatter messageFormatter,
+                                  MessagePipeline messagePipeline,
                                   FLogger fLogger) {
         this.fPlayerService = fPlayerService;
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.muteChecker = muteChecker;
         this.messageSender = messageSender;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
         this.fLogger = fLogger;
     }
 
@@ -85,6 +85,6 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
         event.cancel();
 
         String message = moderationMessageFormatter.buildMuteMessage(fPlayer, status);
-        messageSender.sendActionBar(fPlayer, messageFormatter.builder(fPlayer, message).build());
+        messageSender.sendActionBar(fPlayer, messagePipeline.builder(fPlayer, message).build());
     }
 }

@@ -5,12 +5,15 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.processor.MessageProcessor;
+import net.flectone.pulse.registry.MessageProcessRegistry;
 
 @Singleton
-public class CapsModule extends AbstractModule {
+public class CapsModule extends AbstractModule implements MessageProcessor {
 
     private final Message.Format.Moderation.Caps message;
     private final Permission.Message.Format.Moderation.Caps permission;
@@ -19,11 +22,14 @@ public class CapsModule extends AbstractModule {
 
     @Inject
     public CapsModule(FileManager fileManager,
-                      PermissionChecker permissionChecker) {
+                      PermissionChecker permissionChecker,
+                      MessageProcessRegistry messageProcessRegistry) {
         this.permissionChecker = permissionChecker;
 
         message = fileManager.getMessage().getFormat().getModeration().getCaps();
         permission = fileManager.getPermission().getMessage().getFormat().getModeration().getCaps();
+
+        messageProcessRegistry.register(100, this);
     }
 
     @Override
@@ -36,7 +42,16 @@ public class CapsModule extends AbstractModule {
         return message.isEnable();
     }
 
-    public String replace(FEntity sender, String message) {
+    @Override
+    public void process(MessageContext messageContext) {
+        if (!messageContext.isCaps()) return;
+        if (!messageContext.isUserMessage()) return;
+
+        String message = replace(messageContext.getSender(), messageContext.getMessage());
+        messageContext.setMessage(message);
+    }
+
+    private String replace(FEntity sender, String message) {
         if (checkModulePredicates(sender)) return message;
         if (permissionChecker.check(sender, permission.getBypass())) return message;
         if (message == null || message.isEmpty()) return message;

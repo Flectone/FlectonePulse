@@ -3,12 +3,16 @@ package net.flectone.pulse.module.message.format.color;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.processor.MessageProcessor;
+import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -21,15 +25,25 @@ import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 
 @Singleton
-public class ColorModule extends AbstractModule {
+public class ColorModule extends AbstractModule implements MessageProcessor {
 
     @Getter private final Message.Format.Color message;
     private final Permission.Message.Format.Color permission;
+    private final Permission.Message.Format formatPermission;
+
+    private final PermissionChecker permissionChecker;
 
     @Inject
-    public ColorModule(FileManager fileManager) {
+    public ColorModule(FileManager fileManager,
+                       PermissionChecker permissionChecker,
+                       MessageProcessRegistry messageProcessRegistry) {
+        this.permissionChecker = permissionChecker;
+
         message = fileManager.getMessage().getFormat().getColor();
         permission = fileManager.getPermission().getMessage().getFormat().getColor();
+        formatPermission = fileManager.getPermission().getMessage().getFormat();
+
+        messageProcessRegistry.register(150, this);
     }
 
     @Override
@@ -37,7 +51,15 @@ public class ColorModule extends AbstractModule {
         registerModulePermission(permission);
     }
 
-    public TagResolver colorTag(FEntity sender) {
+    @Override
+    public void process(MessageContext messageContext) {
+        FEntity sender = messageContext.getSender();
+        if (messageContext.isUserMessage() && !permissionChecker.check(sender, formatPermission.getAll())) return;
+
+        messageContext.addTagResolvers(colorTag(message.isUseRecipientColors() ? messageContext.getReceiver() : sender));
+    }
+
+    private TagResolver colorTag(FEntity sender) {
         String tag = "fcolor";
         if (checkModulePredicates(sender)) return emptyTagResolver(tag);
 

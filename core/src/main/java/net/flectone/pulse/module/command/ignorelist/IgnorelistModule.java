@@ -12,7 +12,7 @@ import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.formatter.TimeFormatter;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
@@ -29,7 +29,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
 
     private final FPlayerService fPlayerService;
     private final MessageSender messageSender;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
     private final CommandRegistry commandRegistry;
     private final TimeFormatter timeFormatter;
 
@@ -37,14 +37,14 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
     public IgnorelistModule(FileManager fileManager,
                             FPlayerService fPlayerService,
                             MessageSender messageSender,
-                            MessageFormatter messageFormatter,
+                            MessagePipeline messagePipeline,
                             CommandRegistry commandRegistry,
                             TimeFormatter timeFormatter) {
         super(localization -> localization.getCommand().getIgnorelist(), null);
 
         this.fPlayerService = fPlayerService;
         this.messageSender = messageSender;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
         this.commandRegistry = commandRegistry;
         this.timeFormatter = timeFormatter;
 
@@ -112,7 +112,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
                  .limit(perPage)
                  .toList();
         String header = localization.getHeader().replace("<count>", String.valueOf(size));
-        Component component = messageFormatter.builder(fPlayer, header)
+        Component component = messagePipeline.builder(fPlayer, header)
                 .build()
                 .append(Component.newline());
 
@@ -124,7 +124,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
                     .replace("<date>", timeFormatter.formatDate(ignore.date()));
 
             component = component
-                    .append(messageFormatter.builder(fTarget, fPlayer, line).build())
+                    .append(messagePipeline.builder(fTarget, fPlayer, line).build())
                     .append(Component.newline());
         }
 
@@ -135,7 +135,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
                 .replace("<current_page>", String.valueOf(page))
                 .replace("<last_page>", String.valueOf(countPage));
 
-        component = component.append(messageFormatter.builder(fPlayer, footer).build());
+        component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
         messageSender.sendMessage(fPlayer, component);
 

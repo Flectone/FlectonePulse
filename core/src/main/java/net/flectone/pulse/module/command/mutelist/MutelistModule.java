@@ -14,7 +14,7 @@ import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
@@ -33,7 +33,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final UnmuteModule unmuteModule;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
     private final CommandRegistry commandRegistry;
     private final MessageSender messageSender;
 
@@ -43,7 +43,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
                           ModerationService moderationService,
                           ModerationMessageFormatter moderationMessageFormatter,
                           UnmuteModule unmuteModule,
-                          MessageFormatter messageFormatter,
+                          MessagePipeline messagePipeline,
                           CommandRegistry commandRegistry,
                           MessageSender messageSender) {
         super(localization -> localization.getCommand().getMutelist(), null);
@@ -52,7 +52,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
         this.moderationService = moderationService;
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.unmuteModule = unmuteModule;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
         this.commandRegistry = commandRegistry;
         this.messageSender = messageSender;
 
@@ -153,7 +153,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
                 .toList();
 
         String header = localizationType.getHeader().replace("<count>", String.valueOf(size));
-        Component component = messageFormatter.builder(fPlayer, header)
+        Component component = messagePipeline.builder(fPlayer, header)
                 .build()
                 .append(Component.newline());
 
@@ -165,7 +165,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
             line = moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation);
 
             component = component
-                    .append(messageFormatter.builder(fTarget, fPlayer, line).build())
+                    .append(messagePipeline.builder(fTarget, fPlayer, line).build())
                     .append(Component.newline());
         }
 
@@ -176,7 +176,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
                 .replace("<current_page>", String.valueOf(page))
                 .replace("<last_page>", String.valueOf(countPage));
 
-        component = component.append(messageFormatter.builder(fPlayer, footer).build());
+        component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
         messageSender.sendMessage(fPlayer, component);
 

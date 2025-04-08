@@ -22,7 +22,7 @@ import net.flectone.pulse.module.command.maintenance.listener.MaintenancePacketL
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.util.FileUtil;
 import net.flectone.pulse.sender.PacketSender;
 import net.kyori.adventure.text.Component;
@@ -44,7 +44,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     private final ListenerRegistry listenerRegistry;
     private final Path iconPath;
     private final FileUtil fileUtil;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
     private final CommandRegistry commandRegistry;
     private final PacketSender packetSender;
 
@@ -58,7 +58,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                              @Named("projectPath") Path projectPath,
                              FileUtil fileUtil,
                              CommandRegistry commandRegistry,
-                             MessageFormatter messageFormatter,
+                             MessagePipeline messagePipeline,
                              PacketSender packetSender) {
         super(module -> module.getCommand().getMaintenance(), null);
 
@@ -69,7 +69,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         this.listenerRegistry = listenerRegistry;
         this.iconPath = projectPath.resolve("images");
         this.fileUtil = fileUtil;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
 
         command = fileManager.getCommand().getMaintenance();
@@ -147,7 +147,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         responseJson.add("version", getVersionJson(localizationMaintenance.getServerVersion()));
         responseJson.add("players", getPlayersJson());
 
-        responseJson.add("description", messageFormatter.builder(fPlayer, localizationMaintenance.getServerDescription()).serializeToTree());
+        responseJson.add("description", messagePipeline.builder(fPlayer, localizationMaintenance.getServerDescription()).jsonSerializerBuild());
         responseJson.addProperty("favicon", "data:image/png;base64," + (icon == null ? "" : icon));
         responseJson.addProperty("enforcesSecureChat", false);
 
@@ -164,7 +164,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         FPlayer fPlayer = fPlayerService.getFPlayer(userProfile.getUUID());
         if (permissionChecker.check(fPlayer, permission.getJoin())) return false;
 
-        Component reason = messageFormatter.builder(fPlayer, messageKick).build();
+        Component reason = messagePipeline.builder(fPlayer, messageKick).build();
         packetSender.send(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
         return true;
     }
@@ -194,7 +194,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                 .stream()
                 .filter(filter -> !permissionChecker.check(filter, permission.getJoin()))
                 .forEach(fReceiver -> {
-                    Component component = messageFormatter.builder(fSender, fReceiver, resolveLocalization(fReceiver).getKick()).build();
+                    Component component = messagePipeline.builder(fSender, fReceiver, resolveLocalization(fReceiver).getKick()).build();
                     fPlayerService.kick(fReceiver, component);
                 });
     }

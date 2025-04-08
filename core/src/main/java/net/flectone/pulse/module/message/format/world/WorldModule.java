@@ -4,14 +4,18 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.world.listener.WorldPacketListener;
+import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -21,26 +25,34 @@ import org.jetbrains.annotations.NotNull;
 import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
-public class WorldModule extends AbstractModule {
+public class WorldModule extends AbstractModule implements MessageProcessor {
 
     private final Message.Format.World message;
     private final Permission.Message.Format.World permission;
+    private final Permission.Message.Format formatPermission;
 
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ListenerRegistry listenerRegistry;
+    private final PermissionChecker permissionChecker;
 
     @Inject
     public WorldModule(FileManager fileManager,
                        FPlayerService fPlayerService,
                        PlatformPlayerAdapter platformPlayerAdapter,
-                       ListenerRegistry listenerRegistry) {
+                       ListenerRegistry listenerRegistry,
+                       PermissionChecker permissionChecker,
+                       MessageProcessRegistry messageProcessRegistry) {
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.listenerRegistry = listenerRegistry;
+        this.permissionChecker = permissionChecker;
 
         message = fileManager.getMessage().getFormat().getWorld();
         permission = fileManager.getPermission().getMessage().getFormat().getWorld();
+        formatPermission = fileManager.getPermission().getMessage().getFormat();
+
+        messageProcessRegistry.register(150, this);
     }
 
     @Override
@@ -53,6 +65,14 @@ public class WorldModule extends AbstractModule {
     @Override
     public boolean isConfigEnable() {
         return message.isEnable();
+    }
+
+    @Override
+    public void process(MessageContext messageContext) {
+        FEntity sender = messageContext.getSender();
+        if (messageContext.isUserMessage() && !permissionChecker.check(sender, formatPermission.getAll())) return;
+
+        messageContext.addTagResolvers(worldTag(sender));
     }
 
     @Async
@@ -70,7 +90,7 @@ public class WorldModule extends AbstractModule {
         fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.WORLD_PREFIX, newWorldPrefix);
     }
 
-    public TagResolver worldTag(@NotNull FEntity sender) {
+    private TagResolver worldTag(@NotNull FEntity sender) {
         String tag = "world_prefix";
         if (checkModulePredicates(sender)) return emptyTagResolver(tag);
         if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);

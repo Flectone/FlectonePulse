@@ -17,7 +17,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.model.FBubble;
 import net.flectone.pulse.converter.ColorConverter;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.util.RandomUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
@@ -42,7 +42,7 @@ public class BukkitBubbleManager implements BubbleManager {
     private final TaskScheduler taskScheduler;
     private final FPlayerService fPlayerService;
     private final FileManager fileManager;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
     private final RandomUtil randomUtil;
     private final ColorConverter colorConverter;
     private final IntegrationModule integrationModule;
@@ -52,14 +52,14 @@ public class BukkitBubbleManager implements BubbleManager {
                                FPlayerService fPlayerService,
                                FileManager fileManager,
                                RandomUtil randomUtil,
-                               MessageFormatter messageFormatter,
+                               MessagePipeline messagePipeline,
                                ColorConverter colorConverter,
                                IntegrationModule integrationModule) {
         this.taskScheduler = taskScheduler;
         this.fPlayerService = fPlayerService;
         this.fileManager = fileManager;
         this.randomUtil = randomUtil;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
         this.colorConverter = colorConverter;
         this.integrationModule = integrationModule;
     }
@@ -132,13 +132,13 @@ public class BukkitBubbleManager implements BubbleManager {
                     FPlayer fReceiver = fPlayerService.getFPlayer(receiver);
                     if (fReceiver.isIgnored(fPlayer)) return;
 
-                    Component component = messageFormatter.builder(fPlayer, fReceiver, localizationBubble.getFormat())
+                    Component component = messagePipeline.builder(fPlayer, fReceiver, localizationBubble.getFormat())
                             .mention(false)
                             .question(false)
                             .interactiveChat(false)
                             .build()
                             .replaceText(TextReplacementConfig.builder().match("<message>").replacement(
-                                                    messageFormatter.builder(fPlayer, fReceiver, message)
+                                                    messagePipeline.builder(fPlayer, fReceiver, message)
                                                             .userMessage(true)
                                                             .mention(false)
                                                             .question(false)

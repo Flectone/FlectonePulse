@@ -9,8 +9,10 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.formatter.ItemTextFormatter;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -27,6 +29,7 @@ import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.format.spoiler.SpoilerModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
+import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.*;
@@ -42,7 +45,7 @@ import java.util.Map;
 import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
-public class FormatModule extends AbstractModuleMessage<Localization.Message.Format> {
+public class FormatModule extends AbstractModuleMessage<Localization.Message.Format> implements MessageProcessor {
 
     @Getter private final Map<TagType, TagResolver> tagResolverMap = new HashMap<>();
 
@@ -55,7 +58,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
     private final SkinService skinService;
     private final PermissionChecker permissionChecker;
     private final ItemTextFormatter itemTextFormatter;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
 
     @Inject
     public FormatModule(FileManager fileManager,
@@ -65,7 +68,8 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
                         SkinService skinService,
                         PermissionChecker permissionChecker,
                         ItemTextFormatter itemTextFormatter,
-                        MessageFormatter messageFormatter) {
+                        MessagePipeline messagePipeline,
+                        MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getMessage().getFormat());
 
         this.platformServerAdapter = platformServerAdapter;
@@ -74,7 +78,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         this.skinService = skinService;
         this.permissionChecker = permissionChecker;
         this.itemTextFormatter = itemTextFormatter;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
 
         message = fileManager.getMessage().getFormat();
         permission = fileManager.getPermission().getMessage().getFormat();
@@ -91,6 +95,8 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         addChildren(SpoilerModule.class);
         addChildren(TranslateModule.class);
         addChildren(WorldModule.class);
+
+        messageProcessRegistry.register(100, this);
     }
 
     @Override
@@ -131,6 +137,36 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         return message.isEnable();
     }
 
+    @Override
+    public void process(MessageContext messageContext) {
+        if (!messageContext.isFormatting()) return;
+
+        FEntity sender = messageContext.getSender();
+        getTagResolverMap()
+                .entrySet()
+                .stream()
+                .filter(entry -> isCorrectTag(entry.getKey(), sender, messageContext.isUserMessage()))
+                .forEach(entry -> messageContext.addTagResolvers(entry.getValue()));
+
+        FEntity receiver = messageContext.getReceiver();
+        messageContext.addTagResolvers(pingTag(sender, receiver));
+        messageContext.addTagResolvers(tpsTag(sender, receiver));
+        messageContext.addTagResolvers(onlineTag(sender, receiver));
+        messageContext.addTagResolvers(coordsTag(sender, receiver));
+        messageContext.addTagResolvers(statsTag(sender, receiver));
+        messageContext.addTagResolvers(skinTag(sender, receiver));
+        messageContext.addTagResolvers(itemTag(sender, receiver));
+
+        if (messageContext.isUrl()) {
+            messageContext.addTagResolvers(urlTag(sender, receiver));
+        }
+
+        if (messageContext.isUserMessage()) {
+            String message = replaceAll(sender, receiver, messageContext.getMessage());
+            messageContext.setMessage(message);
+        }
+    }
+
     private void putKyoriTag(TagType type, TagResolver tagResolver) {
         Message.Format.Tag tag = message.getTags().get(type);
         if (tag == null) return;
@@ -139,33 +175,33 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         tagResolverMap.put(type, tagResolver);
     }
 
-    public TagResolver tpsTag(FEntity sender, FEntity fReceiver) {
+    private TagResolver tpsTag(FEntity sender, FEntity fReceiver) {
         String tag = "tps";
         if (!isCorrectTag(TagType.TPS, sender)) return emptyTagResolver(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
             String string = resolveLocalization(fReceiver).getTags().get(TagType.TPS).replace("<tps>", String.valueOf(platformServerAdapter.getTPS()));
 
-            Component component = messageFormatter.builder(sender, fReceiver, string).build();
+            Component component = messagePipeline.builder(sender, fReceiver, string).build();
 
             return Tag.selfClosingInserting(component);
         });
     }
 
-    public TagResolver onlineTag(FEntity sender, FEntity fReceiver) {
+    private TagResolver onlineTag(FEntity sender, FEntity fReceiver) {
         String tag = "online";
         if (!isCorrectTag(TagType.ONLINE, sender)) return emptyTagResolver(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
             String string = resolveLocalization(fReceiver).getTags().get(TagType.ONLINE).replace("<online>", String.valueOf(platformServerAdapter.getOnlineCount()));
 
-            Component component = messageFormatter.builder(sender, fReceiver, string).build();
+            Component component = messagePipeline.builder(sender, fReceiver, string).build();
 
             return Tag.selfClosingInserting(component);
         });
     }
 
-    public TagResolver pingTag(FEntity sender, FEntity fReceiver) {
+    private TagResolver pingTag(FEntity sender, FEntity fReceiver) {
         String tag = "ping";
         if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);
         if (!isCorrectTag(TagType.PING, sender)) return emptyTagResolver(tag);
@@ -174,13 +210,13 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
             int ping = fPlayerService.getPing(fPlayer);
             String string = resolveLocalization(fReceiver).getTags().get(TagType.PING).replace("<ping>", String.valueOf(ping));
 
-            Component component = messageFormatter.builder(sender, fReceiver, string).build();
+            Component component = messagePipeline.builder(sender, fReceiver, string).build();
 
             return Tag.selfClosingInserting(component);
         });
     }
 
-    public TagResolver coordsTag(FEntity sender, FEntity fReceiver) {
+    private TagResolver coordsTag(FEntity sender, FEntity fReceiver) {
         String tag = "coords";
         if (!isCorrectTag(TagType.COORDS, sender)) return emptyTagResolver(tag);
 
@@ -193,13 +229,13 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
                     .replace("<y>", String.valueOf(coordinates.y()))
                     .replace("<z>", String.valueOf(coordinates.z()));
 
-            Component component = messageFormatter.builder(sender, fReceiver, string).build();
+            Component component = messagePipeline.builder(sender, fReceiver, string).build();
 
             return Tag.selfClosingInserting(component);
         });
     }
 
-    public TagResolver statsTag(FEntity sender, FEntity fReceiver) {
+    private TagResolver statsTag(FEntity sender, FEntity fReceiver) {
         String tag = "stats";
         if (!isCorrectTag(TagType.STATS, sender)) return emptyTagResolver(tag);
 
@@ -214,13 +250,13 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
                     .replace("<food>", String.valueOf(statistics.food())
                     .replace("<attack>", String.valueOf(statistics.damage())));
 
-            Component component = messageFormatter.builder(sender, fReceiver, string).build();
+            Component component = messagePipeline.builder(sender, fReceiver, string).build();
 
             return Tag.selfClosingInserting(component);
         });
     }
 
-    public TagResolver skinTag(FEntity sender, FEntity fReceiver) {
+    private TagResolver skinTag(FEntity sender, FEntity fReceiver) {
         String tag = "skin";
         if (!isCorrectTag(TagType.SKIN, sender)) return emptyTagResolver(tag);
 
@@ -228,13 +264,13 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
 
             String url = skinService.getBodyUrl(sender);
             String string = resolveLocalization(fReceiver).getTags().get(TagType.SKIN).replace("<message>", url);
-            Component component = messageFormatter.builder(sender, fReceiver, string).build();
+            Component component = messagePipeline.builder(sender, fReceiver, string).build();
 
             return Tag.selfClosingInserting(component);
         });
     }
 
-    public TagResolver itemTag(FEntity sender, FEntity fReceiver) {
+    private TagResolver itemTag(FEntity sender, FEntity fReceiver) {
         String tag = "item";
         if (!isCorrectTag(TagType.ITEM, sender)) return emptyTagResolver(tag);
 
@@ -242,7 +278,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
             String string = resolveLocalization(fReceiver).getTags().get(TagType.ITEM);
-            return Tag.selfClosingInserting(messageFormatter.builder(sender, fReceiver, string)
+            return Tag.selfClosingInserting(messagePipeline.builder(sender, fReceiver, string)
                     .build()
                     .replaceText(TextReplacementConfig.builder()
                             .match("<message>")
@@ -253,7 +289,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         });
     }
 
-    public TagResolver urlTag(FEntity sender, FEntity fReceiver) {
+    private TagResolver urlTag(FEntity sender, FEntity fReceiver) {
         String tag = "url";
         if (!isCorrectTag(TagType.URL, sender)) return emptyTagResolver(tag);
 
@@ -263,7 +299,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
             if (urlArgument == null) return Tag.selfClosingInserting(Component.empty());
 
             String url = urlArgument.value();
-            Component component = messageFormatter.builder(sender, fReceiver, resolveLocalization(fReceiver).getTags().get(TagType.URL).replace("<message>", url))
+            Component component = messagePipeline.builder(sender, fReceiver, resolveLocalization(fReceiver).getTags().get(TagType.URL).replace("<message>", url))
                     .url(false)
                     .build();
 
@@ -271,7 +307,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         });
     }
 
-    public String replaceAll(FEntity sender, FEntity fReceiver, String message) {
+    private String replaceAll(FEntity sender, FEntity fReceiver, String message) {
         if (checkModulePredicates(sender)) return message;
 
         if (isCorrectTag(TagType.IMAGE, sender)) {
@@ -379,14 +415,14 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         return message;
     }
 
-    public String replaceAll(FEntity sender, String message, Permission.PermissionEntry permission, String trigger, String format) {
+    private String replaceAll(FEntity sender, String message, Permission.PermissionEntry permission, String trigger, String format) {
         if (checkModulePredicates(sender)) return message;
         if (!permissionChecker.check(sender, permission)) return message;
 
         return message.replaceAll(trigger, format);
     }
 
-    public boolean isCorrectTag(TagType tagType, FEntity sender, boolean needPermission) {
+    private boolean isCorrectTag(TagType tagType, FEntity sender, boolean needPermission) {
         if (checkModulePredicates(sender)) return false;
         if (!message.getTags().get(tagType).isEnable()) return false;
         if (!tagResolverMap.containsKey(tagType)) return false;
@@ -394,7 +430,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         return !needPermission || permissionChecker.check(sender, permission.getTags().get(tagType));
     }
 
-    public boolean isCorrectTag(TagType tagType, FEntity sender) {
+    private boolean isCorrectTag(TagType tagType, FEntity sender) {
         if (checkModulePredicates(sender)) return false;
         if (!message.getTags().get(tagType).isEnable()) return false;
 

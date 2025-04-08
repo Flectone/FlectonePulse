@@ -6,15 +6,18 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.processor.MessageProcessor;
+import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.Range;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -30,7 +33,7 @@ import java.util.regex.PatternSyntaxException;
 import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
-public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Message.Format.QuestionAnswer> {
+public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Message.Format.QuestionAnswer> implements MessageProcessor {
 
     private final WeakHashMap<UUID, Boolean> processedQuestions = new WeakHashMap<>();
 
@@ -49,7 +52,8 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
     public QuestionAnswerModule(FileManager fileManager,
                                 TaskScheduler taskScheduler,
                                 PermissionChecker permissionChecker,
-                                FLogger fLogger) {
+                                FLogger fLogger,
+                                MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getMessage().getFormat().getQuestionAnswer());
 
         this.taskScheduler = taskScheduler;
@@ -58,6 +62,8 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
 
         message = fileManager.getMessage().getFormat().getQuestionAnswer();
         permission = fileManager.getPermission().getMessage().getFormat().getQuestionAnswer();
+
+        messageProcessRegistry.register(100, this);
     }
 
     @Override
@@ -86,7 +92,18 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
         return message.isEnable();
     }
 
-    public String replace(FEntity sender, String message) {
+    @Override
+    public void process(MessageContext messageContext) {
+        if (!messageContext.isQuestion()) return;
+        if (!messageContext.isUserMessage()) return;
+
+        String message = replace(messageContext.getSender(), messageContext.getMessage());
+
+        messageContext.setMessage(message);
+        messageContext.addTagResolvers(questionAnswerTag(messageContext.getProcessId(), messageContext.getSender(), messageContext.getReceiver()));
+    }
+
+    private String replace(FEntity sender, String message) {
         if (checkModulePredicates(sender)) return message;
 
         for (Map.Entry<String, Pattern> entry : patternMap.entrySet()) {
@@ -105,7 +122,7 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
         return message;
     }
 
-    public TagResolver questionAnswerTag(UUID processId, FEntity sender, FEntity receiver) {
+    private TagResolver questionAnswerTag(UUID processId, FEntity sender, FEntity receiver) {
         String tag = "question";
         if (checkModulePredicates(sender)) return emptyTagResolver(tag);
 
@@ -122,7 +139,7 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
         });
     }
 
-    public void sendAnswer(UUID processId, FEntity sender, FEntity receiver, String question) {
+    private void sendAnswer(UUID processId, FEntity sender, FEntity receiver, String question) {
         if (processedQuestions.containsKey(processId)) return;
 
         processedQuestions.put(processId, true);

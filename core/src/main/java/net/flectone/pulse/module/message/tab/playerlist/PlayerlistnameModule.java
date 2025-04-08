@@ -19,7 +19,7 @@ import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.sender.PacketSender;
 import net.kyori.adventure.text.Component;
 
@@ -31,7 +31,7 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
 
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
     private final PacketSender packetSender;
     private final PacketProvider packetProvider;
     private final TaskScheduler taskScheduler;
@@ -40,7 +40,7 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
     public PlayerlistnameModule(FPlayerService fPlayerService,
                                 PlatformPlayerAdapter platformPlayerAdapter,
                                 FileManager fileManager,
-                                MessageFormatter messageFormatter,
+                                MessagePipeline messagePipeline,
                                 PacketSender packetSender,
                                 PacketProvider packetProvider,
                                 TaskScheduler taskScheduler) {
@@ -48,7 +48,7 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
 
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
         this.packetProvider = packetProvider;
         this.taskScheduler = taskScheduler;
@@ -91,7 +91,7 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
         User user = packetProvider.getUser(fPlayer);
         if (user == null) return;
 
-        Component name = messageFormatter.builder(fPlayer, fReceiver, resolveLocalization(fReceiver).getFormat())
+        Component name = messagePipeline.builder(fPlayer, fReceiver, resolveLocalization(fReceiver).getFormat())
                 .userMessage(false)
                 .build();
 

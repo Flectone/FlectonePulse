@@ -17,7 +17,7 @@ import net.flectone.pulse.module.command.poll.model.Poll;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 import net.kyori.adventure.text.Component;
@@ -44,7 +44,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     private final ProxySender proxySender;
     private final TaskScheduler taskScheduler;
     private final CommandRegistry commandRegistry;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
     private final Gson gson;
 
     @Inject
@@ -53,7 +53,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                       ProxySender proxySender,
                       TaskScheduler taskScheduler,
                       CommandRegistry commandRegistry,
-                      MessageFormatter messageFormatter,
+                      MessagePipeline messagePipeline,
                       Gson gson) {
         super(localization -> localization.getCommand().getPoll(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.POLL));
 
@@ -62,7 +62,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         this.proxySender = proxySender;
         this.taskScheduler = taskScheduler;
         this.commandRegistry = commandRegistry;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
         this.gson = gson;
 
         command = fileManager.getCommand().getPoll();
@@ -284,7 +284,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
             int k = 0;
             for (String answer : poll.getAnswers()) {
 
-                Component answerComponent = messageFormatter.builder(fPlayer, FPlayer.UNKNOWN, answer).build();
+                Component answerComponent = messagePipeline.builder(fPlayer, FPlayer.UNKNOWN, answer).build();
 
                 answersBuilder.append(message.getAnswerTemplate()
                         .replace("<id>", String.valueOf(poll.getId()))

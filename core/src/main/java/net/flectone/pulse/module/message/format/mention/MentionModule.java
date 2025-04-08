@@ -6,13 +6,16 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -23,7 +26,7 @@ import java.util.WeakHashMap;
 import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
-public class MentionModule extends AbstractModuleMessage<Localization.Message.Format.Mention> {
+public class MentionModule extends AbstractModuleMessage<Localization.Message.Format.Mention> implements MessageProcessor {
 
     private final WeakHashMap<UUID, Boolean> processedMentions = new WeakHashMap<>();
 
@@ -33,23 +36,26 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final IntegrationModule integrationModule;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
 
     @Inject
     public MentionModule(FileManager fileManager,
                          FPlayerService fPlayerService,
                          PermissionChecker permissionChecker,
                          IntegrationModule integrationModule,
-                         MessageFormatter messageFormatter) {
+                         MessagePipeline messagePipeline,
+                         MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getMessage().getFormat().getMention());
 
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
         this.integrationModule = integrationModule;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
 
         message = fileManager.getMessage().getFormat().getMention();
         permission = fileManager.getPermission().getMessage().getFormat().getMention();
+
+        messageProcessRegistry.register(100, this);
     }
 
     @Override
@@ -67,7 +73,16 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
         return message.isEnable();
     }
 
-    public String replace(FEntity sender, String message) {
+    @Override
+    public void process(MessageContext messageContext) {
+        if (!messageContext.isMention()) return;
+
+        String message = replace(messageContext.getSender(), messageContext.getMessage());
+        messageContext.setMessage(message);
+        messageContext.addTagResolvers(mentionTag(messageContext.getProcessId(), messageContext.getSender(), messageContext.getReceiver()));
+    }
+
+    private String replace(FEntity sender, String message) {
         if (checkModulePredicates(sender)) return message;
 
         String[] words = message.split(" ");
@@ -92,7 +107,7 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
         return String.join(" ", words);
     }
 
-    public TagResolver mentionTag(UUID processId, FEntity sender, FEntity receiver) {
+    private TagResolver mentionTag(UUID processId, FEntity sender, FEntity receiver) {
         String tag = "mention";
         if (checkModulePredicates(sender)) return emptyTagResolver(tag);
 
@@ -126,7 +141,7 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
                     .replace("<player>", mention)
                     .replace("<target>", mention);
 
-            return Tag.selfClosingInserting(messageFormatter.builder(receiver, format).build());
+            return Tag.selfClosingInserting(messagePipeline.builder(receiver, format).build());
         });
     }
 

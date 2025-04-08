@@ -1,15 +1,19 @@
 package net.flectone.pulse.module.message.format.image;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.processor.MessageProcessor;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.image.model.FImage;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -20,45 +24,57 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
-public class ImageModule extends AbstractModule {
+public class ImageModule extends AbstractModule implements MessageProcessor {
 
-    private final Map<String, Component> imageMap = new HashMap<>();
+    private final Cache<String, Component> imageCache = CacheBuilder.newBuilder()
+            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .maximumSize(100)
+            .build();
 
     private final Message.Format.Image message;
     private final Permission.Message.Format.Image permission;
 
-    private final TaskScheduler taskScheduler;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
 
     @Inject
     public ImageModule(FileManager fileManager,
-                       TaskScheduler taskScheduler,
-                       MessageFormatter messageFormatter) {
+                       MessagePipeline messagePipeline,
+                       MessageProcessRegistry messageProcessRegistry) {
 
-        this.taskScheduler = taskScheduler;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
 
         message = fileManager.getMessage().getFormat().getImage();
         permission = fileManager.getPermission().getMessage().getFormat().getImage();
+
+        messageProcessRegistry.register(100, this);
     }
 
     @Override
     public void reload() {
-        imageMap.clear();
+        imageCache.invalidateAll();
         registerModulePermission(permission);
-
-        // 10 min timer
-        taskScheduler.runAsyncTimer(imageMap::clear, 12000L, 12000L);
     }
 
-    public TagResolver imageTag(FEntity sender, FEntity receiver) {
+    @Override
+    public boolean isConfigEnable() {
+        return message.isEnable();
+    }
+
+    @Override
+    public void process(MessageContext messageContext) {
+        if (!messageContext.isImage()) return;
+
+        messageContext.addTagResolvers(imageTag(messageContext.getSender(), messageContext.getReceiver()));
+    }
+
+    private TagResolver imageTag(FEntity sender, FEntity receiver) {
         String tag = "image";
         if (checkModulePredicates(sender)) return emptyTagResolver(tag);
 
@@ -68,26 +84,23 @@ public class ImageModule extends AbstractModule {
 
             final String link = argument.value();
 
-            Component component = imageMap.get(link);
-            if (component == null) {
-                component = createComponent(link);
+            Component component;
+            try {
+                component = imageCache.get(link, () -> createComponent(link));
+            } catch (ExecutionException e) {
+                return Tag.selfClosingInserting(Component.empty());
             }
 
             List<StyleBuilderApplicable> styleBuilderApplicables = new ArrayList<>();
             styleBuilderApplicables.add(HoverEvent.showText(component));
             styleBuilderApplicables.add(ClickEvent.openUrl(link));
-            styleBuilderApplicables.add(messageFormatter.builder(sender, receiver, message.getColor())
+            styleBuilderApplicables.add(messagePipeline.builder(sender, receiver, message.getColor())
                     .build()
                     .color()
             );
 
             return Tag.styling(styleBuilderApplicables.toArray(new StyleBuilderApplicable[]{}));
         });
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return message.isEnable();
     }
 
     private Component createComponent(String link) {
@@ -108,7 +121,7 @@ public class ImageModule extends AbstractModule {
                 }
             }
 
-            imageMap.put(link, component);
+            imageCache.put(link, component);
 
         } catch (IOException ignored) {}
 

@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.message.sign.listener.SignListener;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import org.bukkit.event.EventPriority;
 
 @Singleton
@@ -15,9 +15,9 @@ public class BukkitSignModule extends SignModule {
 
     @Inject
     public BukkitSignModule(FileManager fileManager,
-                            MessageFormatter messageFormatter,
+                            MessagePipeline messagePipeline,
                             BukkitListenerRegistry bukkitListenerManager) {
-        super(fileManager, messageFormatter);
+        super(fileManager, messagePipeline);
 
         this.bukkitListenerManager = bukkitListenerManager;
     }

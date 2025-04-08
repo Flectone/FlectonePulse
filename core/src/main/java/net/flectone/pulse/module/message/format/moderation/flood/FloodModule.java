@@ -5,12 +5,15 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.processor.MessageProcessor;
+import net.flectone.pulse.registry.MessageProcessRegistry;
 
 @Singleton
-public class FloodModule extends AbstractModule {
+public class FloodModule extends AbstractModule implements MessageProcessor {
 
     private final Message.Format.Moderation.Flood message;
     private final Permission.Message.Format.Moderation.Flood permission;
@@ -19,11 +22,14 @@ public class FloodModule extends AbstractModule {
 
     @Inject
     public FloodModule(FileManager fileManager,
-                       PermissionChecker permissionChecker) {
+                       PermissionChecker permissionChecker,
+                       MessageProcessRegistry messageProcessRegistry) {
         this.permissionChecker = permissionChecker;
 
         message = fileManager.getMessage().getFormat().getModeration().getFlood();
         permission = fileManager.getPermission().getMessage().getFormat().getModeration().getFlood();
+
+        messageProcessRegistry.register(100, this);
     }
 
     @Override
@@ -36,7 +42,16 @@ public class FloodModule extends AbstractModule {
         return message.isEnable();
     }
 
-    public String replace(FEntity sender, String message) {
+    @Override
+    public void process(MessageContext messageContext) {
+        if (!messageContext.isFlood()) return;
+        if (!messageContext.isUserMessage()) return;
+
+        String message = replace(messageContext.getSender(), messageContext.getMessage());
+        messageContext.setMessage(message);
+    }
+
+    private String replace(FEntity sender, String message) {
         if (checkModulePredicates(sender)) return message;
         if (permissionChecker.check(sender, permission.getBypass())) return message;
         if (message == null || message.isEmpty()) return message;
@@ -122,5 +137,4 @@ public class FloodModule extends AbstractModule {
                     .append(" ");
         }
     }
-
 }

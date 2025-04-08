@@ -10,7 +10,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
@@ -41,7 +41,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     private final CommandRegistry commandRegistry;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final PermissionChecker permissionChecker;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
     private final PacketSender packetSender;
     private final ProxySender proxySender;
     private final Gson gson;
@@ -53,7 +53,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
                      CommandRegistry commandRegistry,
                      ModerationMessageFormatter moderationMessageFormatter,
                      PermissionChecker permissionChecker,
-                     MessageFormatter messageFormatter,
+                     MessagePipeline messagePipeline,
                      PacketSender packetSender,
                      ProxySender proxySender,
                      Gson gson) {
@@ -64,7 +64,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         this.commandRegistry = commandRegistry;
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.permissionChecker = permissionChecker;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
         this.proxySender = proxySender;
         this.gson = gson;
@@ -180,7 +180,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         String formatPlayer = localization.getPerson();
         formatPlayer = moderationMessageFormatter.replacePlaceholders(formatPlayer, fTarget, ban);
 
-        fPlayerService.kick(fTarget, messageFormatter.builder(fModerator, fTarget, formatPlayer).build());
+        fPlayerService.kick(fTarget, messagePipeline.builder(fModerator, fTarget, formatPlayer).build());
     }
 
     public boolean isKicked(UserProfile userProfile) {
@@ -196,7 +196,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
             String formatPlayer = localization.getPerson();
             formatPlayer = moderationMessageFormatter.replacePlaceholders(formatPlayer, fPlayer, ban);
 
-            Component reason = messageFormatter.builder(fModerator, fPlayer, formatPlayer).build();
+            Component reason = messagePipeline.builder(fModerator, fPlayer, formatPlayer).build();
             packetSender.send(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
 
             if (command.isShowConnectionAttempts()) {

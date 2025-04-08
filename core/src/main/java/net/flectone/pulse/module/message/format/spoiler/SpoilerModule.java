@@ -5,10 +5,13 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -18,22 +21,25 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
-public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Format.Spoiler> {
+public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Format.Spoiler> implements MessageProcessor {
 
     private final Message.Format.Spoiler message;
     private final Permission.Message.Format.Spoiler permission;
 
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
 
     @Inject
     public SpoilerModule(FileManager fileManager,
-                         MessageFormatter messageFormatter) {
+                         MessagePipeline messagePipeline,
+                         MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getMessage().getFormat().getSpoiler());
 
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
 
         message = fileManager.getMessage().getFormat().getSpoiler();
         permission = fileManager.getPermission().getMessage().getFormat().getSpoiler();
+
+        messageProcessRegistry.register(100, this);
     }
 
     @Override
@@ -41,7 +47,19 @@ public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Fo
         registerModulePermission(permission);
     }
 
-    public TagResolver spoilerTag(FEntity sender, FEntity receiver, boolean userMessage) {
+    @Override
+    public boolean isConfigEnable() {
+        return message.isEnable();
+    }
+
+    @Override
+    public void process(MessageContext messageContext) {
+        if (!messageContext.isSpoiler()) return;
+
+        messageContext.addTagResolvers(spoilerTag(messageContext.getSender(), messageContext.getReceiver(), messageContext.isUserMessage()));
+    }
+
+    private TagResolver spoilerTag(FEntity sender, FEntity receiver, boolean userMessage) {
         String tag = "spoiler";
         if (checkModulePredicates(sender)) return emptyTagResolver(tag);
 
@@ -51,7 +69,7 @@ public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Fo
 
             String spoilerText = spoilerTag.value();
 
-            Component spoilerComponent = messageFormatter.builder(sender, receiver, spoilerText)
+            Component spoilerComponent = messagePipeline.builder(sender, receiver, spoilerText)
                     .userMessage(userMessage)
                     .build();
 
@@ -60,24 +78,19 @@ public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Fo
             Localization.Message.Format.Spoiler localization = resolveLocalization(receiver);
 
             Component component = Component.text(localization.getSymbol().repeat(length))
-                    .hoverEvent(messageFormatter.builder(sender, receiver, localization.getHover())
+                    .hoverEvent(messagePipeline.builder(sender, receiver, localization.getHover())
                             .build()
                             .replaceText(TextReplacementConfig.builder().match("<message>")
                                     .replacement(spoilerComponent)
                                     .build()
                             )
                     )
-                    .color(messageFormatter.builder(sender, receiver, message.getColor())
+                    .color(messagePipeline.builder(sender, receiver, message.getColor())
                             .build()
                             .color()
                     );
 
             return Tag.selfClosingInserting(component);
         });
-    }
-
-    @Override
-    public boolean isConfigEnable() {
-        return message.isEnable();
     }
 }

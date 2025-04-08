@@ -25,6 +25,7 @@ import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.triton.TritonModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.vault.VaultModule;
+import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -45,8 +46,9 @@ public class BukkitIntegrationModule extends IntegrationModule {
     public BukkitIntegrationModule(FileManager fileManager,
                                    FLogger fLogger,
                                    PlatformServerAdapter platformServerAdapter,
-                                   Injector injector) {
-        super(fileManager, injector);
+                                   Injector injector,
+                                   MessageProcessRegistry messageProcessRegistry) {
+        super(fileManager, injector, messageProcessRegistry);
 
         this.injector = injector;
 

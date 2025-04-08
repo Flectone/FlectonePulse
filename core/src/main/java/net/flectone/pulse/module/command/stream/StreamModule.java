@@ -5,14 +5,18 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.NonNull;
 import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
@@ -33,25 +37,33 @@ import java.util.function.Function;
 import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
-public class StreamModule extends AbstractModuleCommand<Localization.Command.Stream> {
+public class StreamModule extends AbstractModuleCommand<Localization.Command.Stream> implements MessageProcessor {
 
     @Getter private final Command.Stream command;
     private final Permission.Command.Stream permission;
+    private final Permission.Message.Format formatPermission;
 
     private final FPlayerService fPlayerService;
     private final CommandRegistry commandRegistry;
+    private final PermissionChecker permissionChecker;
 
     @Inject
     public StreamModule(FileManager fileManager,
                         FPlayerService fPlayerService,
-                        CommandRegistry commandRegistry) {
+                        CommandRegistry commandRegistry,
+                        PermissionChecker permissionChecker,
+                        MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getCommand().getStream(), null);
 
         this.fPlayerService = fPlayerService;
         this.commandRegistry = commandRegistry;
+        this.permissionChecker = permissionChecker;
 
         command = fileManager.getCommand().getStream();
         permission = fileManager.getPermission().getCommand().getStream();
+        formatPermission = fileManager.getPermission().getMessage().getFormat();
+
+        messageProcessRegistry.register(150, this);
     }
 
     @Override
@@ -76,6 +88,14 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                         .optional(promptUrl, commandRegistry.nativeMessageParser())
                         .handler(this)
         );
+    }
+
+    @Override
+    public void process(MessageContext messageContext) {
+        FEntity sender = messageContext.getSender();
+        if (messageContext.isUserMessage() && !permissionChecker.check(sender, formatPermission.getAll())) return;
+
+        messageContext.addTagResolvers(streamTag(sender));
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
@@ -169,7 +189,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.STREAM_PREFIX, resolveLocalization().getPrefixFalse());
     }
 
-    public TagResolver streamTag(@NotNull FEntity sender) {
+    private TagResolver streamTag(@NotNull FEntity sender) {
         String tag = "stream_prefix";
         if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);
         if (checkModulePredicates(fPlayer)) return emptyTagResolver(tag);

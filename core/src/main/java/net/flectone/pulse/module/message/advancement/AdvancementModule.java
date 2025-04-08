@@ -17,7 +17,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.advancement.listener.AdvancementPacketListener;
 import net.flectone.pulse.module.message.advancement.model.Advancement;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.util.MessageTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -37,7 +37,7 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
 
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
     private final Gson gson;
 
     @Inject
@@ -45,13 +45,13 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
                              FPlayerService fPlayerService,
                              ListenerRegistry listenerRegistry,
                              IntegrationModule integrationModule,
-                             MessageFormatter messageFormatter,
+                             MessagePipeline messagePipeline,
                              Gson gson) {
         super(localization -> localization.getMessage().getAdvancement());
 
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
         this.gson = gson;
 
         message = fileManager.getMessage().getAdvancement();
@@ -157,7 +157,7 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
                 default -> "";
             };
 
-            Component component = messageFormatter.builder(sender, receiver, title
+            Component component = messagePipeline.builder(sender, receiver, title
                             .replace("<title>", advancement.title())
                             .replace("<description>", advancement.description())
                     )

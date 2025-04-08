@@ -14,7 +14,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.sender.PacketSender;
 import net.kyori.adventure.text.Component;
 
@@ -29,7 +29,7 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final PlatformServerAdapter platformServerAdapter;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
     private final PacketSender packetSender;
 
     @Inject
@@ -37,14 +37,14 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
                          FPlayerService fPlayerService,
                          PermissionChecker permissionChecker,
                          PlatformServerAdapter platformServerAdapter,
-                         MessageFormatter messageFormatter,
+                         MessagePipeline messagePipeline,
                          PacketSender packetSender) {
         super(module -> module.getMessage().getStatus().getPlayers());
 
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
         this.platformServerAdapter = platformServerAdapter;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
 
         message = fileManager.getMessage().getStatus().getPlayers();
@@ -71,7 +71,7 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
 
         String message = resolveLocalization(fPlayer).getFull();
 
-        Component reason = messageFormatter.builder(fPlayer, message).build();
+        Component reason = messagePipeline.builder(fPlayer, message).build();
 
         packetSender.send(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
         return true;

@@ -14,7 +14,7 @@ import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
@@ -34,7 +34,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
     private final CommandRegistry commandRegistry;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final UnbanModule unbanModule;
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
     private final MessageSender messageSender;
 
     @Inject
@@ -44,7 +44,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
                          CommandRegistry commandRegistry,
                          ModerationMessageFormatter moderationMessageFormatter,
                          UnbanModule unbanModule,
-                         MessageFormatter messageFormatter,
+                         MessagePipeline messagePipeline,
                          MessageSender messageSender) {
         super(localization -> localization.getCommand().getBanlist(), null);
 
@@ -53,7 +53,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         this.commandRegistry = commandRegistry;
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.unbanModule = unbanModule;
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
         this.messageSender = messageSender;
 
         command = fileManager.getCommand().getBanlist();
@@ -154,7 +154,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
                 .toList();
 
         String header = localizationType.getHeader().replace("<count>", String.valueOf(size));
-        Component component = messageFormatter.builder(fPlayer, header)
+        Component component = messagePipeline.builder(fPlayer, header)
                 .build()
                 .append(Component.newline());
 
@@ -165,7 +165,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
             line = moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation);
 
             component = component
-                    .append(messageFormatter.builder(fTarget, fPlayer, line).build())
+                    .append(messagePipeline.builder(fTarget, fPlayer, line).build())
                     .append(Component.newline());
         }
 
@@ -176,7 +176,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
                 .replace("<current_page>", String.valueOf(page))
                 .replace("<last_page>", String.valueOf(countPage));
 
-        component = component.append(messageFormatter.builder(fPlayer, footer).build());
+        component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
         messageSender.sendMessage(fPlayer, component);
 

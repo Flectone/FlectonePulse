@@ -16,6 +16,7 @@ import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.checker.BukkitPermissionChecker;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Config;
+import net.flectone.pulse.converter.LegacyMiniConvertor;
 import net.flectone.pulse.formatter.BukkitItemTextFormatter;
 import net.flectone.pulse.formatter.ItemTextFormatter;
 import net.flectone.pulse.manager.FileManager;
@@ -139,6 +140,7 @@ public class BukkitInjector extends AbstractModule {
         // Libraries and serialization
         bind(LibraryResolver.class).toInstance(libraryResolver);
         bind(Gson.class).toInstance(GsonComponentSerializer.gson().serializer());
+        bind(LegacyMiniConvertor.class).asEagerSingleton();
 
         // Core bindings
         bind(FlectonePulse.class).toInstance(instance);

@@ -8,7 +8,7 @@ import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.formatter.TimeFormatter;
 import net.flectone.pulse.manager.FileManager;
@@ -43,7 +43,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
     @Inject private PermissionChecker permissionChecker;
     @Inject private MuteChecker muteChecker;
     @Inject private FileManager fileManager;
-    @Inject private MessageFormatter messageFormatter;
+    @Inject private MessagePipeline messagePipeline;
     @Inject private ModerationMessageFormatter moderationMessageFormatter;
     @Inject private TimeFormatter timeFormatter;
     @Inject private ProxySender proxySender;
@@ -222,9 +222,9 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         private Consumer<ByteArrayDataOutput> proxyOutput = null;
         private UnaryOperator<String> integrationString = null;
         private BiFunction<FPlayer, M, String> format = null;
-        private UnaryOperator<MessageFormatter.Builder> formatComponentBuilder = null;
+        private UnaryOperator<MessagePipeline.Builder> formatComponentBuilder = null;
         private BiFunction<FPlayer, M, String> message = null;
-        private UnaryOperator<MessageFormatter.Builder> messageComponentBuilder = null;
+        private UnaryOperator<MessagePipeline.Builder> messageComponentBuilder = null;
         private Function<FPlayer, TagResolver[]> tagResolvers = null;
 
         public Builder(FEntity fEntity) {
@@ -317,12 +317,12 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             return this;
         }
 
-        public Builder formatBuilder(UnaryOperator<MessageFormatter.Builder> formatComponentBuilder) {
+        public Builder formatBuilder(UnaryOperator<MessagePipeline.Builder> formatComponentBuilder) {
             this.formatComponentBuilder = formatComponentBuilder;
             return this;
         }
 
-        public Builder messageBuilder(UnaryOperator<MessageFormatter.Builder> messageComponentBuilder) {
+        public Builder messageBuilder(UnaryOperator<MessagePipeline.Builder> messageComponentBuilder) {
             this.messageComponentBuilder = messageComponentBuilder;
             return this;
         }
@@ -391,14 +391,14 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         private Component buildSubcomponent(FPlayer fReceiver) {
             return destination.getSubtext().isEmpty()
                     ? Component.empty()
-                    : messageFormatter.builder(fPlayer, fReceiver, destination.getSubtext()).build();
+                    : messagePipeline.builder(fPlayer, fReceiver, destination.getSubtext()).build();
         }
 
         private Component buildFormatComponent(FPlayer fReceiver) {
             String format = resolveString(fReceiver, this.format);
             if (format == null) return Component.empty();
 
-            MessageFormatter.Builder formatBuilder = messageFormatter
+            MessagePipeline.Builder formatBuilder = messagePipeline
                     .builder(fPlayer, fReceiver, format)
                     .translate(resolveString(fReceiver, this.message), format.contains("message_to_translate"))
                     .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(fReceiver));
@@ -414,7 +414,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             String message = resolveString(fReceiver, this.message);
             if (message == null) return Component.empty();
 
-            MessageFormatter.Builder messageBuilder = messageFormatter.builder(fPlayer, fReceiver, message);
+            MessagePipeline.Builder messageBuilder = messagePipeline.builder(fPlayer, fReceiver, message);
 
             if (messageComponentBuilder != null) {
                 messageBuilder = messageComponentBuilder.apply(messageBuilder);
@@ -433,7 +433,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             if (range != Range.SERVER && range != Range.PROXY) return;
             if (!integrationModule.hasMessenger()) return;
 
-            Component component = messageFormatter.builder(fPlayer, FPlayer.UNKNOWN, resolveString(FPlayer.UNKNOWN, format))
+            Component component = messagePipeline.builder(fPlayer, FPlayer.UNKNOWN, resolveString(FPlayer.UNKNOWN, format))
                     .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(FPlayer.UNKNOWN))
                     .build();
 
@@ -441,7 +441,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             if (message != null) {
                 component = component.replaceText(TextReplacementConfig.builder()
                         .match("<message>")
-                        .replacement(messageFormatter
+                        .replacement(messagePipeline
                                 .builder(fPlayer, FPlayer.UNKNOWN, message)
                                 .userMessage(true)
                                 .mention(false)

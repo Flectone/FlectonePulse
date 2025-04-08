@@ -9,7 +9,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleListMessage;
-import net.flectone.pulse.formatter.MessageFormatter;
+import net.flectone.pulse.pipeline.MessagePipeline;
 
 import java.util.List;
 
@@ -19,14 +19,14 @@ public class MOTDModule extends AbstractModuleListMessage<Localization.Message.S
     private final Message.Status.MOTD message;
     private final Permission.Message.Status.MOTD permission;
 
-    private final MessageFormatter messageFormatter;
+    private final MessagePipeline messagePipeline;
 
     @Inject
     public MOTDModule(FileManager fileManager,
-                      MessageFormatter messageFormatter) {
+                      MessagePipeline messagePipeline) {
         super(localization -> localization.getMessage().getStatus().getMotd());
 
-        this.messageFormatter = messageFormatter;
+        this.messagePipeline = messagePipeline;
 
         message = fileManager.getMessage().getStatus().getMotd();
         permission = fileManager.getPermission().getMessage().getStatus().getMotd();
@@ -44,7 +44,7 @@ public class MOTDModule extends AbstractModuleListMessage<Localization.Message.S
         String message = getNextMessage(fPlayer, this.message.isRandom());
         if (message == null) return null;
 
-        return messageFormatter.builder(fPlayer, message).serializeToTree();
+        return messagePipeline.builder(fPlayer, message).jsonSerializerBuild();
     }
 
     @Override
