@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.message.afk;
 
-import com.google.inject.Inject;
+import lombok.Getter;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
@@ -17,38 +18,59 @@ import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.util.Pair;
 import net.flectone.pulse.util.Range;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 public abstract class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> implements MessageProcessor {
 
-    private final Message.Afk message;
+    private final Map<UUID, Pair<Integer, PlatformPlayerAdapter.Coordinates>> playersCoordinates = new HashMap<>();
+
+    @Getter private final Message.Afk message;
     private final Permission.Message.Afk permission;
     private final Permission.Message.Format formatPermission;
 
-    @Inject private FPlayerService fPlayerService;
-    @Inject private TaskScheduler taskScheduler;
-    @Inject private IntegrationModule integrationModule;
-    @Inject private PermissionChecker permissionChecker;
+    private final FPlayerService fPlayerService;
+    private final TaskScheduler taskScheduler;
+    private final IntegrationModule integrationModule;
+    private final PermissionChecker permissionChecker;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
 
     public AfkModule(FileManager fileManager,
-                     MessageProcessRegistry messageProcessRegistry) {
+                     MessageProcessRegistry messageProcessRegistry,
+                     FPlayerService fPlayerService,
+                     TaskScheduler taskScheduler,
+                     IntegrationModule integrationModule,
+                     PermissionChecker permissionChecker,
+                     PlatformPlayerAdapter platformPlayerAdapter) {
         super(localization -> localization.getMessage().getAfk());
 
         message = fileManager.getMessage().getAfk();
         permission = fileManager.getPermission().getMessage().getAfk();
         formatPermission = fileManager.getPermission().getMessage().getFormat();
 
+        this.fPlayerService = fPlayerService;
+        this.taskScheduler = taskScheduler;
+        this.integrationModule = integrationModule;
+        this.permissionChecker = permissionChecker;
+        this.platformPlayerAdapter = platformPlayerAdapter;
+
         messageProcessRegistry.register(150, this);
     }
 
     @Override
     public void reload() {
+        playersCoordinates.clear();
+
         registerModulePermission(permission);
 
         if (message.getTicker().isEnable()) {
@@ -69,9 +91,63 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
         messageContext.addTagResolvers(afkTag(messageContext.getSender()));
     }
 
-    public abstract void remove(@NotNull String action, FPlayer fPlayer);
+    @Async
+    public void remove(@NotNull String action, FPlayer fPlayer) {
+        if (action.isEmpty()) {
+            fPlayer.removeSetting(FPlayer.Setting.AFK_SUFFIX);
+            playersCoordinates.remove(fPlayer.getUuid());
+            fPlayerService.deleteSetting(fPlayer, FPlayer.Setting.AFK_SUFFIX);
+            return;
+        }
 
-    public abstract void check(@NotNull FPlayer fPlayer);
+        if (checkModulePredicates(fPlayer)) return;
+        if (message.getIgnore().contains(action)) return;
+
+        playersCoordinates.put(fPlayer.getUuid(), new Pair<>(0, new PlatformPlayerAdapter.Coordinates(0, -1000, 0)));
+        check(fPlayer);
+    }
+
+    @Async
+    public void check(@NotNull FPlayer fPlayer) {
+        if (!fPlayer.isOnline()) {
+            String afkSuffix = fPlayer.getSettingValue(FPlayer.Setting.AFK_SUFFIX);
+
+            fPlayer.removeSetting(FPlayer.Setting.AFK_SUFFIX);
+            playersCoordinates.remove(fPlayer.getUuid());
+
+            if (afkSuffix != null) {
+                send(fPlayer);
+            }
+
+            return;
+        }
+
+        if (checkModulePredicates(fPlayer)) return;
+
+        PlatformPlayerAdapter.Coordinates coordinates = platformPlayerAdapter.getCoordinates(fPlayer);
+        if (coordinates == null) return;
+
+        int time = (int) (System.currentTimeMillis()/1000);
+
+        Pair<Integer, PlatformPlayerAdapter.Coordinates> timeVector = playersCoordinates.get(fPlayer.getUuid());
+        if (timeVector == null || !timeVector.getValue().equals(coordinates)) {
+
+            if (fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX)) {
+                fPlayer.removeSetting(FPlayer.Setting.AFK_SUFFIX);
+                playersCoordinates.remove(fPlayer.getUuid());
+                fPlayerService.deleteSetting(fPlayer, FPlayer.Setting.AFK_SUFFIX);
+                send(fPlayer);
+            }
+
+            playersCoordinates.put(fPlayer.getUuid(), new Pair<>(time, coordinates));
+            return;
+        }
+
+        if (fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX)) return;
+        if (time - timeVector.getKey() < message.getDelay()) return;
+
+        setAfk(fPlayer);
+    }
 
     @Async
     public void setAfk(FPlayer fPlayer) {

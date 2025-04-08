@@ -70,7 +70,13 @@ public abstract class PlatformPlayerAdapter {
 
     public abstract void updateInventory(UUID uuid);
 
-    public record Coordinates(double x, double y, double z) {}
+    public record Coordinates(double x, double y, double z) {
+
+        public boolean equals(Coordinates coordinates) {
+            return this.x == coordinates.x && this.y == coordinates.y && this.z == coordinates.z;
+        }
+
+    }
 
     public abstract Coordinates getCoordinates(FEntity fPlayer);
 
