@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
@@ -27,19 +28,22 @@ public class BukkitProxySender extends ProxySender {
     private final Plugin plugin;
     private final Gson gson;
     private final Provider<BukkitProxyListener> proxyListenerProvider;
+    private final MessagePipeline messagePipeline;
 
     @Inject
     public BukkitProxySender(FileManager fileManager,
                              FLogger fLogger,
                              Plugin plugin,
                              Gson gson,
-                             Provider<BukkitProxyListener> proxyListenerProvider) {
+                             Provider<BukkitProxyListener> proxyListenerProvider,
+                             MessagePipeline messagePipeline) {
         super(fileManager, fLogger);
 
         this.fileManager = fileManager;
         this.plugin = plugin;
         this.gson = gson;
         this.proxyListenerProvider = proxyListenerProvider;
+        this.messagePipeline = messagePipeline;
     }
 
     @Override
@@ -80,6 +84,9 @@ public class BukkitProxySender extends ProxySender {
             out.writeUTF(cluster);
         }
 
+        String constantName = getConstantName(sender);
+        sender.setConstantName(constantName);
+
         out.writeBoolean(sender instanceof FPlayer);
         out.writeUTF(gson.toJson(sender));
         outputConsumer.accept(out);
@@ -90,5 +97,12 @@ public class BukkitProxySender extends ProxySender {
 
         player.sendPluginMessage(plugin, getChannel(), out.toByteArray());
         return true;
+    }
+
+    private String getConstantName(FEntity sender) {
+        String message = fileManager.getLocalization(sender).getMessage().getFormat().getName_().getConstant();
+        if (message.isEmpty()) return "";
+
+        return messagePipeline.builder(sender, message).defaultSerializerBuild();
     }
 }

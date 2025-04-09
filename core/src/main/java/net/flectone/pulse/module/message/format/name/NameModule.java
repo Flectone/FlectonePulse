@@ -7,13 +7,13 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -71,6 +71,8 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
             messageContext.addTagResolvers(playerTag(sender));
         }
 
+        messageContext.addTagResolvers(constantTag(sender));
+
         FEntity receiver = messageContext.getReceiver();
         messageContext.addTagResolvers(displayTag(sender, receiver));
         messageContext.addTagResolvers(vaultSuffixTag(sender, receiver));
@@ -110,9 +112,31 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
         });
     }
 
+    private TagResolver constantTag(FEntity player) {
+        String tag = "constant";
+        if (checkModulePredicates(player)) return emptyTagResolver(tag);
+
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
+            String constantName = player.getConstantName();
+            if (constantName != null && constantName.isEmpty()) {
+                return Tag.preProcessParsed(constantName);
+            }
+
+            if (constantName == null) {
+                constantName = resolveLocalization(player).getConstant();
+            }
+
+            if (constantName.isEmpty()) {
+                return Tag.selfClosingInserting(Component.empty());
+            }
+
+            return Tag.preProcessParsed(messagePipeline.builder(player, constantName).defaultSerializerBuild());
+        });
+    }
+
     private TagResolver playerTag(@NotNull FEntity player) {
         String tag = "player";
-        if (checkModulePredicates(player)) return emptyTagResolver(tag);;
+        if (checkModulePredicates(player)) return emptyTagResolver(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) ->
                 Tag.preProcessParsed(player.getName())

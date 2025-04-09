@@ -1848,6 +1848,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
             @Getter
             public static final class Name implements SubFormatMessageConfig, Localizable {
+                private String constant = "";
                 private String display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <player>\"><vault_prefix><stream_prefix><fcolor:2><player></fcolor><afk_suffix><vault_suffix></hover></click>";
                 private String entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:<name>> <br><fcolor:1>Type <fcolor:2><lang:<type>> <br><fcolor:1>ID <fcolor:2><uuid>\"><lang:<name>></hover></fcolor:2>";
                 private String unknown = "<fcolor:2><name></fcolor:2>";
