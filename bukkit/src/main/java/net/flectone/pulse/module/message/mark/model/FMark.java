@@ -99,17 +99,17 @@ public class FMark extends FPacketEntity {
                 null)
         );
 
-        List<EntityData> metadata = new ArrayList<>();
+        List<EntityData<?>> metadata = new ArrayList<>();
 
         // size
         if (EntityTypes.MAGMA_CUBE.equals(entityType) || EntityTypes.SLIME.equals(entityType)) {
-            metadata.add(new EntityData(16, EntityDataTypes.INT, legacy.getSize()));
+            metadata.add(new EntityData<>(16, EntityDataTypes.INT, legacy.getSize()));
         }
 
         if (EntityTypes.BLOCK_DISPLAY.equals(entityType)) {
             // scale
             float scale = modern.getScale();
-            metadata.add(new EntityData(12, EntityDataTypes.VECTOR3F, new Vector3f(scale, scale, scale)));
+            metadata.add(new EntityData<>(12, EntityDataTypes.VECTOR3F, new Vector3f(scale, scale, scale)));
 
             // block state
             int blockId = 0;
@@ -117,18 +117,18 @@ public class FMark extends FPacketEntity {
                 blockId = SpigotConversionUtil.fromBukkitBlockData(Material.valueOf(modern.getBlock()).createBlockData()).getGlobalId();
             } catch (IllegalArgumentException ignored) {}
 
-            metadata.add(new EntityData(23, EntityDataTypes.BLOCK_STATE, blockId));
+            metadata.add(new EntityData<>(23, EntityDataTypes.BLOCK_STATE, blockId));
         }
 
         // invisible and glowing
-        metadata.add(new EntityData(0, EntityDataTypes.BYTE, (byte) 96));
+        metadata.add(new EntityData<>(0, EntityDataTypes.BYTE, (byte) 96));
 
         sendPacketToViewers(new WrapperPlayServerEntityMetadata(id, metadata));
     }
 
     public void setGlowing(boolean value) {
         byte mask = value ? (byte) 0x40 : 0;
-        List<EntityData> metadata = Collections.singletonList(new EntityData(0, EntityDataTypes.BYTE, mask));
+        List<EntityData<?>> metadata = Collections.singletonList(new EntityData<>(0, EntityDataTypes.BYTE, mask));
         sendPacketToViewers(new WrapperPlayServerEntityMetadata(id, metadata));
     }
 

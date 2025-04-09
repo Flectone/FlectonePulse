@@ -113,6 +113,10 @@ subprojects {
         maven {
             url = "https://repo.diogotc.com/releases"
         }
+
+        maven {
+            url = "https://repo.codemc.io/repository/maven-snapshots/"
+        }
     }
 
     dependencies {

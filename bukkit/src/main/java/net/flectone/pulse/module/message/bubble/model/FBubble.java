@@ -85,34 +85,34 @@ public class FBubble extends FPacketEntity {
 
         sendPacketToViewers(new WrapperPlayServerSpawnEntity(id, uuid, type, location, 0, 0, null));
 
-        List<EntityData> metadataList = new ArrayList<>();
+        List<EntityData<?>> metadataList = new ArrayList<>();
 
         if (type == EntityTypes.INTERACTION) {
             // width
-            metadataList.add(new EntityData(8, EntityDataTypes.FLOAT, (float) 0.000001));
+            metadataList.add(new EntityData<>(8, EntityDataTypes.FLOAT, (float) 0.000001));
             // height
-            metadataList.add(new EntityData(9, EntityDataTypes.FLOAT, height));
+            metadataList.add(new EntityData<>(9, EntityDataTypes.FLOAT, height));
         } else if (type == EntityTypes.TEXT_DISPLAY) {
             // scale
-            metadataList.add(new EntityData(12, EntityDataTypes.VECTOR3F, new Vector3f(scale, scale, scale)));
+            metadataList.add(new EntityData<>(12, EntityDataTypes.VECTOR3F, new Vector3f(scale, scale, scale)));
             // center for viewer
-            metadataList.add(new EntityData(15, EntityDataTypes.BYTE, (byte) 3));
+            metadataList.add(new EntityData<>(15, EntityDataTypes.BYTE, (byte) 3));
             // text
-            metadataList.add(new EntityData(23, EntityDataTypes.ADV_COMPONENT, text));
+            metadataList.add(new EntityData<>(23, EntityDataTypes.ADV_COMPONENT, text));
             // width
-            metadataList.add(new EntityData(24, EntityDataTypes.INT, lineWidth));
+            metadataList.add(new EntityData<>(24, EntityDataTypes.INT, lineWidth));
             // background color
-            metadataList.add(new EntityData(25, EntityDataTypes.INT, backgroundColor));
+            metadataList.add(new EntityData<>(25, EntityDataTypes.INT, backgroundColor));
 
             if (hasShadow) {
-                metadataList.add(new EntityData(27, EntityDataTypes.BYTE, (byte) 0x01));
+                metadataList.add(new EntityData<>(27, EntityDataTypes.BYTE, (byte) 0x01));
             }
 
         } else {
             // text
-            metadataList.add(new EntityData(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(text)));
+            metadataList.add(new EntityData<>(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.of(text)));
             // custom name visible
-            metadataList.add(new EntityData(3, EntityDataTypes.BOOLEAN, visibleName));
+            metadataList.add(new EntityData<>(3, EntityDataTypes.BOOLEAN, visibleName));
 
             // radius
             int radiusIndex = 8;
@@ -121,7 +121,7 @@ public class FBubble extends FPacketEntity {
                 radiusIndex = 7;
             }
 
-            metadataList.add(new EntityData(radiusIndex, EntityDataTypes.FLOAT, 0f));
+            metadataList.add(new EntityData<>(radiusIndex, EntityDataTypes.FLOAT, 0f));
         }
 
         sendPacketToViewers(new WrapperPlayServerEntityMetadata(id, metadataList));
