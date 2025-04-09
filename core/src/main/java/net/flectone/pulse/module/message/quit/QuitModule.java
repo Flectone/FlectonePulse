@@ -48,7 +48,7 @@ public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit>
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

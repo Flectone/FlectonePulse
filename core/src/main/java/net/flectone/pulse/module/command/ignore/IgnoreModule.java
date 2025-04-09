@@ -43,7 +43,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

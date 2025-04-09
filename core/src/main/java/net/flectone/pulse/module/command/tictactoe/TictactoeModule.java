@@ -58,7 +58,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

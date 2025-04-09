@@ -35,7 +35,7 @@ public class SignModule extends AbstractModule {
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

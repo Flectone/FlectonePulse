@@ -53,7 +53,7 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

@@ -48,7 +48,7 @@ public class SleepModule extends AbstractModuleMessage<Localization.Message.Slee
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

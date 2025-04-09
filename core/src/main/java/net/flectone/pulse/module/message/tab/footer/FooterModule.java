@@ -61,7 +61,7 @@ public class FooterModule extends AbstractModuleListMessage<Localization.Message
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

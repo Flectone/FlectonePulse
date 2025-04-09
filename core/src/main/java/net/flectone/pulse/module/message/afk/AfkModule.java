@@ -79,7 +79,7 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

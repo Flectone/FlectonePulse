@@ -53,7 +53,7 @@ public class BukkitRightclickModule extends RightclickModule {
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

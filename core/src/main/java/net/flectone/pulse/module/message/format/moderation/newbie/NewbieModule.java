@@ -40,7 +40,7 @@ public class NewbieModule extends AbstractModuleMessage<Localization.Message.For
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

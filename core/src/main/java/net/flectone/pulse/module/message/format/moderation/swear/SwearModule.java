@@ -71,7 +71,7 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

@@ -47,7 +47,7 @@ public abstract class ChatModule extends AbstractModuleMessage<Localization.Mess
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

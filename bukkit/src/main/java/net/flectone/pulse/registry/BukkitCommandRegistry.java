@@ -11,7 +11,6 @@ import net.flectone.pulse.parser.integer.ColorParser;
 import net.flectone.pulse.parser.integer.DurationReasonParser;
 import net.flectone.pulse.parser.player.PlayerParser;
 import net.flectone.pulse.parser.string.MessageParser;
-import net.kyori.adventure.text.Component;
 import org.bukkit.plugin.Plugin;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
@@ -23,7 +22,6 @@ import org.incendo.cloud.exception.CommandExecutionException;
 import org.incendo.cloud.exception.InvalidSyntaxException;
 import org.incendo.cloud.exception.NoPermissionException;
 import org.incendo.cloud.execution.ExecutionCoordinator;
-import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
 import org.incendo.cloud.paper.LegacyPaperCommandManager;
 import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.setting.ManagerSetting;
@@ -105,9 +103,5 @@ public class BukkitCommandRegistry extends CommandRegistry {
     @Override
     public void unregisterCommand(String name) {
         manager.deleteRootCommand(name);
-    }
-
-    public static <C> MinecraftExceptionHandler.MessageFactory<C, InvalidSyntaxException> createDefaultInvalidSyntaxHandler() {
-        return (formatter, ctx) -> Component.text(ctx.exception().correctSyntax());
     }
 }

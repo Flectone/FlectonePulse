@@ -45,7 +45,7 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

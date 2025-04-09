@@ -45,6 +45,7 @@ public abstract class LibraryResolver {
         libraryManager.addRepository("https://repo.minebench.de");
         libraryManager.addRepository("https://s01.oss.sonatype.org/content/repositories/snapshots");
         libraryManager.addRepository("https://repo.codemc.io/repository/maven-releases");
+        libraryManager.addRepository("https://repo.codemc.io/repository/maven-snapshots/");
     }
 
     public void addLibraries() {

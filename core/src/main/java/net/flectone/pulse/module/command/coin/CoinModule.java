@@ -45,7 +45,7 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

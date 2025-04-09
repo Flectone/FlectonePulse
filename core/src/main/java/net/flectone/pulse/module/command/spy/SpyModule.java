@@ -46,7 +46,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

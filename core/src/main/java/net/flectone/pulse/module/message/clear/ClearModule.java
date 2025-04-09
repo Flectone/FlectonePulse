@@ -48,7 +48,7 @@ public class ClearModule extends AbstractModuleMessage<Localization.Message.Clea
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

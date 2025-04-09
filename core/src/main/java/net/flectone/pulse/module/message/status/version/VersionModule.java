@@ -30,7 +30,7 @@ public class VersionModule extends AbstractModuleMessage<Localization.Message.St
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

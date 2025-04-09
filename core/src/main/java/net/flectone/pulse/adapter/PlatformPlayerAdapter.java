@@ -6,81 +6,74 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
 
-public abstract class PlatformPlayerAdapter {
+public interface PlatformPlayerAdapter {
 
-    public abstract int getEntityId(UUID uuid);
+    /**
+     * Record representing coordinates in the world
+     *
+     * @param x X-axis coordinate
+     * @param y Y-axis coordinate
+     * @param z Z-axis coordinate
+     */
+    record Coordinates(double x, double y, double z) {}
 
-    public int getEntityId(FPlayer fPlayer) {
-        return getEntityId(fPlayer.getUuid());
-    }
+    /**
+     * Record representing player statistics
+     *
+     * @param health Current health points
+     * @param armor  Current armor points
+     * @param level  Experience level
+     * @param food   Food level
+     * @param damage Damage dealt
+     */
+    record Statistics(double health, double armor, double level, double food, double damage) {}
 
-    public abstract UUID getPlayerByEntityId(int id);
 
-    public abstract String getName(UUID uuid);
+    // Player identification methods
+    int getEntityId(@NotNull UUID uuid);
+    @Nullable UUID getPlayerByEntityId(int entityId);
+    @Nullable UUID getUUID(@NotNull Object platformPlayer);
+    @Nullable Object convertToPlatformPlayer(@NotNull FPlayer fPlayer);
 
-    public String getName(FPlayer fPlayer) {
-        return getName(fPlayer.getUuid());
-    }
+    // Player information methods
+    @NotNull String getName(@NotNull UUID uuid);
+    @NotNull String getName(@NotNull Object platformPlayer);
+    @NotNull String getWorldName(@NotNull FPlayer fPlayer);
+    @NotNull String getWorldEnvironment(@NotNull FPlayer fPlayer);
+    @Nullable String getIp(@NotNull FPlayer fPlayer);
+    @NotNull GameMode getGamemode(@NotNull FPlayer fPlayer);
 
-    public abstract UUID getUUID(Object player);
+    // Player list methods
+    @NotNull Component getPlayerListHeader(@NotNull FPlayer fPlayer);
+    @NotNull Component getPlayerListFooter(@NotNull FPlayer fPlayer);
 
-    public abstract Object convertToPlatformPlayer(FPlayer fPlayer);
+    // Objective and statistic methods
+    int getObjectiveScore(@NotNull UUID uuid, @Nullable ObjectiveMode objectiveMode);
+    @Nullable Statistics getStatistics(@NotNull FEntity fEntity);
 
-    public abstract String getName(Object player);
+    // Position and measurement methods
+    @Nullable Coordinates getCoordinates(@NotNull FEntity fEntity);
+    double distance(@NotNull FPlayer first, @NotNull FPlayer second);
 
-    public abstract String getWorldName(FPlayer fPlayer);
+    // Player state methods
+    boolean isConsole(@NotNull Object platformPlayer);
+    boolean hasPlayedBefore(@NotNull FPlayer fPlayer);
+    boolean isOnline(@NotNull FPlayer fPlayer);
+    long getFirstPlayed(@NotNull FPlayer fPlayer);
+    long getLastPlayed(@NotNull FPlayer fPlayer);
+    long getAllTimePlayed(@NotNull FPlayer fPlayer);
 
-    public abstract String getWorldEnvironment(FPlayer fPlayer);
+    // Inventory operations
+    void updateInventory(@NotNull UUID uuid);
+    @Nullable Object getItem(@NotNull UUID uuid);
 
-    public abstract String getIp(FPlayer fPlayer);
-
-    public abstract Object getItem(@NotNull UUID uuid);
-
-    public abstract Component getPlayerListHeader(FPlayer fPlayer);
-
-    public abstract Component getPlayerListFooter(FPlayer fPlayer);
-
-    public abstract int getObjectiveScore(UUID uuid, ObjectiveMode objectiveValueType);
-
-    public abstract double distance(FPlayer first, FPlayer second);
-
-    public abstract GameMode getGamemode(FPlayer fPlayer);
-
-    public abstract List<UUID> getOnlinePlayers();
-
-    public abstract boolean isConsole(Object player);
-
-    public abstract boolean hasPlayedBefore(FPlayer fPlayer);
-
-    public abstract boolean isOnline(FPlayer fPlayer);
-
-    public abstract long getFirstPlayed(FPlayer fPlayer);
-
-    public abstract long getLastPlayed(FPlayer fPlayer);
-
-    public abstract long getAllTimePlayed(FPlayer fPlayer);
-
-    public abstract void clear(FPlayer fPlayer);
-
-    public abstract void update(FPlayer fPlayer);
-
-    public abstract void updateInventory(UUID uuid);
-
-    public record Coordinates(double x, double y, double z) {
-
-        public boolean equals(Coordinates coordinates) {
-            return this.x == coordinates.x && this.y == coordinates.y && this.z == coordinates.z;
-        }
-
-    }
-
-    public abstract Coordinates getCoordinates(FEntity fPlayer);
-
-    public record Statistics(double health, double armor, double level, double food, double damage) {}
-
-    public abstract Statistics getStatistics(FEntity fPlayer);
+    // Player management
+    void clear(@NotNull FPlayer fPlayer);
+    void update(@NotNull FPlayer fPlayer);
+    @NotNull List<UUID> getOnlinePlayers();
 }

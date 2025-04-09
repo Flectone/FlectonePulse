@@ -154,7 +154,7 @@ public class FPlayerService {
     }
 
     public int getEntityId(FPlayer fPlayer) {
-        return platformPlayerAdapter.getEntityId(fPlayer);
+        return platformPlayerAdapter.getEntityId(fPlayer.getUuid());
     }
 
     public FPlayer getFPlayer(int id) {
@@ -175,7 +175,7 @@ public class FPlayerService {
 
     public FPlayer getFPlayer(Object player) {
         String name = platformPlayerAdapter.getName(player);
-        if (name == null) return FPlayer.UNKNOWN;
+        if (name.isEmpty()) return FPlayer.UNKNOWN;
 
         UUID uuid = platformPlayerAdapter.getUUID(player);
         if (uuid != null) return this.getFPlayer(uuid);

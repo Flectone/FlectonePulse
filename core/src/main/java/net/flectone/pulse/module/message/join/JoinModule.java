@@ -51,7 +51,7 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

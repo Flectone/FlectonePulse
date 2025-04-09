@@ -11,7 +11,6 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.processor.MessageProcessor;
-import net.flectone.pulse.formatter.ItemTextFormatter;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
@@ -57,7 +56,6 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final SkinService skinService;
     private final PermissionChecker permissionChecker;
-    private final ItemTextFormatter itemTextFormatter;
     private final MessagePipeline messagePipeline;
 
     @Inject
@@ -67,7 +65,6 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
                         PlatformPlayerAdapter platformPlayerAdapter,
                         SkinService skinService,
                         PermissionChecker permissionChecker,
-                        ItemTextFormatter itemTextFormatter,
                         MessagePipeline messagePipeline,
                         MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getMessage().getFormat());
@@ -77,7 +74,6 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.skinService = skinService;
         this.permissionChecker = permissionChecker;
-        this.itemTextFormatter = itemTextFormatter;
         this.messagePipeline = messagePipeline;
 
         message = fileManager.getMessage().getFormat();
@@ -133,7 +129,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 
@@ -180,7 +176,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         if (!isCorrectTag(TagType.TPS, sender)) return emptyTagResolver(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            String string = resolveLocalization(fReceiver).getTags().get(TagType.TPS).replace("<tps>", String.valueOf(platformServerAdapter.getTPS()));
+            String string = resolveLocalization(fReceiver).getTags().get(TagType.TPS).replace("<tps>", platformServerAdapter.getTPS());
 
             Component component = messagePipeline.builder(sender, fReceiver, string).build();
 
@@ -193,7 +189,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         if (!isCorrectTag(TagType.ONLINE, sender)) return emptyTagResolver(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            String string = resolveLocalization(fReceiver).getTags().get(TagType.ONLINE).replace("<online>", String.valueOf(platformServerAdapter.getOnlineCount()));
+            String string = resolveLocalization(fReceiver).getTags().get(TagType.ONLINE).replace("<online>", String.valueOf(platformServerAdapter.getOnlinePlayerCount()));
 
             Component component = messagePipeline.builder(sender, fReceiver, string).build();
 
@@ -282,7 +278,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
                     .build()
                     .replaceText(TextReplacementConfig.builder()
                             .match("<message>")
-                            .replacement(itemTextFormatter.translatableComponent(itemStackObject))
+                            .replacement(platformServerAdapter.translateItemName(itemStackObject))
                             .build()
                     )
             );

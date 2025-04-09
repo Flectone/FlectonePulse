@@ -83,7 +83,7 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

@@ -48,7 +48,7 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

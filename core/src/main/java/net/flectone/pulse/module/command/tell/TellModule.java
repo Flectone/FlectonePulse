@@ -54,7 +54,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

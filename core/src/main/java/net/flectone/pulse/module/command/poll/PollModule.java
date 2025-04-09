@@ -70,7 +70,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

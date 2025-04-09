@@ -57,7 +57,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

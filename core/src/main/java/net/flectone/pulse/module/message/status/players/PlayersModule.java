@@ -66,7 +66,7 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
         if (checkModulePredicates(fPlayer)) return false;
         if (permissionChecker.check(fPlayer, permission.getBypass())) return false;
 
-        int online = platformServerAdapter.getOnlineCount();
+        int online = platformServerAdapter.getOnlinePlayerCount();
         if (online < message.getMax()) return false;
 
         String message = resolveLocalization(fPlayer).getFull();
@@ -78,7 +78,7 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

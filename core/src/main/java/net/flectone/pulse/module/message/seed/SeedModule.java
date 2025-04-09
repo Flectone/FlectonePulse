@@ -48,7 +48,7 @@ public class SeedModule extends AbstractModuleMessage<Localization.Message.Seed>
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

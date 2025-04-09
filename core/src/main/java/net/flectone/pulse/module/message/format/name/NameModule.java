@@ -58,7 +58,7 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

@@ -48,7 +48,7 @@ public class BedModule extends AbstractModuleMessage<Localization.Message.Bed> {
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

@@ -46,6 +46,7 @@ import java.util.regex.Pattern;
 
 @Singleton
 public final class LegacyMiniConvertor implements MessageProcessor {
+
     private final Set<Option> DEF_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
             Option.COLOR,
             Option.HEX_COLOR_STANDALONE,

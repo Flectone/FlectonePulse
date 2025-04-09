@@ -61,7 +61,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

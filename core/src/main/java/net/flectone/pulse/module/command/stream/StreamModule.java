@@ -67,7 +67,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

@@ -41,7 +41,7 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

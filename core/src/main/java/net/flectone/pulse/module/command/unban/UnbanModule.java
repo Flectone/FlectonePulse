@@ -55,7 +55,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

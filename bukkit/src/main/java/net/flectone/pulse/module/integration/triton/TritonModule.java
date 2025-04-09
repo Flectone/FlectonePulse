@@ -41,7 +41,7 @@ public class TritonModule extends AbstractModule {
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return config.isEnable();
     }
 

@@ -42,7 +42,7 @@ public abstract class SidebarModule extends AbstractModuleListMessage<Localizati
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

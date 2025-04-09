@@ -75,7 +75,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

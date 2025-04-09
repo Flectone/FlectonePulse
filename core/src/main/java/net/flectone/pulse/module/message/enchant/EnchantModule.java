@@ -48,7 +48,7 @@ public class EnchantModule extends AbstractModuleMessage<Localization.Message.En
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

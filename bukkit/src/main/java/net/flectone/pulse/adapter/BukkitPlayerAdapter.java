@@ -30,13 +30,14 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.UUID;
 
 @Singleton
-public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
+public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     private final Injector injector;
 
@@ -45,64 +46,73 @@ public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
         this.injector = injector;
     }
 
-    @NotNull
-    public FPlayer get(Object player) {
-        if (!(player instanceof Player bukkitPlayer)) return FPlayer.UNKNOWN;
-
-        if (!bukkitPlayer.isOnline()) return FPlayer.UNKNOWN;
-        return get(bukkitPlayer.getUniqueId());
+    @Override
+    public @Nullable Object convertToPlatformPlayer(@NotNull FPlayer fPlayer) {
+        return Bukkit.getPlayer(fPlayer.getUuid());
     }
 
     @Override
-    public int getEntityId(UUID uuid) {
+    public int getEntityId(@NotNull UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
-        if (player == null) return 0;
-
-        return player.getEntityId();
+        return player != null ? player.getEntityId() : 0;
     }
 
     @Override
-    public UUID getPlayerByEntityId(int id) {
+    public @Nullable UUID getPlayerByEntityId(int entityId) {
         return Bukkit.getOnlinePlayers().stream()
-                .filter(player -> player.getEntityId() == id)
+                .filter(player -> player.getEntityId() == entityId)
                 .findFirst()
                 .map(Entity::getUniqueId)
                 .orElse(null);
     }
 
     @Override
-    public String getName(UUID uuid) {
+    public @Nullable UUID getUUID(@NotNull Object player) {
+        return player instanceof Player onlinePlayer ? onlinePlayer.getUniqueId() : null;
+    }
+
+    @Override
+    public @NotNull String getName(@NotNull UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
-        if (player == null) return "";
-
-        return player.getName();
+        return player != null ? player.getName() : "";
     }
 
     @Override
-    public UUID getUUID(Object player) {
-        if (player instanceof Player onlinePlayer) {
-            return onlinePlayer.getUniqueId();
-        }
-
-        return null;
+    public @NotNull String getName(@NotNull Object player) {
+        return player instanceof CommandSender commandSender ? commandSender.getName() : "";
     }
 
     @Override
-    public Object convertToPlatformPlayer(FPlayer fPlayer) {
-        return Bukkit.getPlayer(fPlayer.getUuid());
+    public @NotNull String getWorldName(@NotNull FPlayer fPlayer) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        return player != null ? player.getWorld().getName() : "";
     }
 
     @Override
-    public String getName(Object player) {
-        if (player instanceof CommandSender commandSender) {
-            return commandSender.getName();
-        }
-
-        return null;
+    public @NotNull String getWorldEnvironment(@NotNull FPlayer fPlayer) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        return player != null ? player.getWorld().getEnvironment().toString().toLowerCase() : "";
     }
 
     @Override
-    public boolean hasPlayedBefore(FPlayer fPlayer) {
+    public @Nullable String getIp(@NotNull FPlayer fPlayer) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        if (player == null) return null;
+
+        InetSocketAddress address = player.getAddress();
+        return address != null ? address.getHostString() : null;
+    }
+
+    @Override
+    public @NotNull GameMode getGamemode(@NotNull FPlayer fPlayer) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        return player != null
+                ? SpigotConversionUtil.fromBukkitGameMode(player.getGameMode())
+                : GameMode.SURVIVAL;
+    }
+
+    @Override
+    public boolean hasPlayedBefore(@NotNull FPlayer fPlayer) {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return false;
 
@@ -110,7 +120,7 @@ public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
     }
 
     @Override
-    public boolean isOnline(FPlayer fPlayer) {
+    public boolean isOnline(@NotNull FPlayer fPlayer) {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return false;
 
@@ -118,111 +128,33 @@ public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
     }
 
     @Override
-    public long getFirstPlayed(FPlayer fPlayer) {
+    public boolean isConsole(@NotNull Object player) {
+        return player instanceof ConsoleCommandSender;
+    }
+
+    @Override
+    public long getFirstPlayed(@NotNull FPlayer fPlayer) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(fPlayer.getUuid());
 
         return player.getFirstPlayed();
     }
 
     @Override
-    public long getLastPlayed(FPlayer fPlayer) {
+    public long getLastPlayed(@NotNull FPlayer fPlayer) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(fPlayer.getUuid());
 
         return player.getLastPlayed();
     }
 
     @Override
-    public long getAllTimePlayed(FPlayer fPlayer) {
+    public long getAllTimePlayed(@NotNull FPlayer fPlayer) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(fPlayer.getUuid());
 
         return player.getStatistic(Statistic.PLAY_ONE_MINUTE) * 60L;
     }
 
     @Override
-    public String getWorldName(FPlayer fPlayer) {
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
-        if (player == null) return "";
-
-        return player.getWorld().getName();
-    }
-
-    @Override
-    public String getWorldEnvironment(FPlayer fPlayer) {
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
-        if (player == null) return "";
-
-        return player.getWorld().getEnvironment().toString().toLowerCase();
-    }
-
-    @Override
-    public String getIp(FPlayer fPlayer) {
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
-        if (player == null) return null;
-
-        InetSocketAddress address = player.getAddress();
-        if (address == null) return null;
-
-        return address.getHostString();
-    }
-
-    @Override
-    public int getObjectiveScore(UUID uuid, ObjectiveMode objectiveValueType) {
-        Player player = Bukkit.getPlayer(uuid);
-        if (player == null) return 0;
-
-        if (objectiveValueType == null) return 0;
-
-        return switch (objectiveValueType) {
-            case HEALTH -> (int) Math.round(player.getHealth() * 10.0)/10;
-            case LEVEL -> player.getLevel();
-            case FOOD -> player.getFoodLevel();
-            case PING -> player.getPing();
-            case ARMOR -> {
-                AttributeInstance armor = player.getAttribute(Attribute.GENERIC_ARMOR);
-                yield armor != null ? (int) Math.round(armor.getValue() * 10.0)/10 : 0;
-            }
-            case ATTACK -> {
-                AttributeInstance damage = player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
-                yield damage != null ? (int) Math.round(damage.getValue() * 10.0)/10 : 0;
-            }
-        };
-    }
-
-    @Override
-    public double distance(FPlayer first, FPlayer second) {
-        Player firstPlayer = Bukkit.getPlayer(first.getUuid());
-        if (firstPlayer == null) return -1.0;
-
-        Player secondPlayer = Bukkit.getPlayer(second.getUuid());
-        if (secondPlayer == null) return -1.0;
-
-        World world = firstPlayer.getLocation().getWorld();
-        if (world == null) return -1.0;
-        if (!world.equals(secondPlayer.getLocation().getWorld())) return -1.0;
-
-        return firstPlayer.getLocation().distance(secondPlayer.getLocation());
-    }
-
-    @Override
-    public GameMode getGamemode(FPlayer fPlayer) {
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
-        if (player == null) return GameMode.SURVIVAL;
-
-        return SpigotConversionUtil.fromBukkitGameMode(player.getGameMode());
-    }
-
-    @Override
-    public Object getItem(@NotNull UUID uuid) {
-        Player player = Bukkit.getPlayer(uuid);
-        if (player == null) return null;
-
-        return player.getInventory().getItemInMainHand().getType() == Material.AIR
-                ? player.getInventory().getItemInOffHand()
-                : player.getInventory().getItemInMainHand();
-    }
-
-    @Override
-    public Component getPlayerListHeader(FPlayer fPlayer) {
+    public @NotNull Component getPlayerListHeader(@NotNull FPlayer fPlayer) {
         String header = injector.getInstance(HeaderModule.class).getCurrentMessage(fPlayer);
         if (header != null) {
             return injector.getInstance(MessagePipeline.class).builder(fPlayer, header).build();
@@ -238,7 +170,7 @@ public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
     }
 
     @Override
-    public Component getPlayerListFooter(FPlayer fPlayer) {
+    public @NotNull Component getPlayerListFooter(@NotNull FPlayer fPlayer) {
         String footer = injector.getInstance(FooterModule.class).getCurrentMessage(fPlayer);
         if (footer != null) {
             return injector.getInstance(MessagePipeline.class).builder(fPlayer, footer).build();
@@ -254,50 +186,61 @@ public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
     }
 
     @Override
-    public List<UUID> getOnlinePlayers() {
-        return Bukkit.getOnlinePlayers().stream()
-                .map(Entity::getUniqueId)
-                .toList();
-    }
-
-    @Override
-    public boolean isConsole(Object player) {
-        return player instanceof ConsoleCommandSender;
-    }
-
-    @Override
-    public void clear(FPlayer fPlayer) {
-        injector.getInstance(AfkModule.class).remove("quit", fPlayer);
-        injector.getInstance(ScoreboardModule.class).remove(fPlayer);
-        injector.getInstance(BelownameModule.class).remove(fPlayer);
-        injector.getInstance(TabnameModule.class).remove(fPlayer);
-    }
-
-    @Override
-    public void update(FPlayer fPlayer) {
-        injector.getInstance(WorldModule.class).update(fPlayer);
-        injector.getInstance(AfkModule.class).remove("", fPlayer);
-        injector.getInstance(StreamModule.class).setStreamPrefix(fPlayer, fPlayer.isSetting(FPlayer.Setting.STREAM));
-        injector.getInstance(ScoreboardModule.class).add(fPlayer);
-        injector.getInstance(BelownameModule.class).add(fPlayer);
-        injector.getInstance(TabnameModule.class).add(fPlayer);
-        injector.getInstance(PlayerlistnameModule.class).update();
-        injector.getInstance(SidebarModule.class).send(fPlayer);
-        injector.getInstance(FooterModule.class).send(fPlayer);
-        injector.getInstance(HeaderModule.class).send(fPlayer);
-        injector.getInstance(BrandModule.class).send(fPlayer);
-    }
-
-    @Override
-    public void updateInventory(UUID uuid) {
+    public int getObjectiveScore(@NotNull UUID uuid, @Nullable ObjectiveMode objectiveValueType) {
         Player player = Bukkit.getPlayer(uuid);
-        if (player == null) return;
+        if (player == null) return 0;
+        if (objectiveValueType == null) return 0;
 
-        player.updateInventory();
+        return switch (objectiveValueType) {
+            case HEALTH -> (int) Math.round(player.getHealth() * 10.0) / 10;
+            case LEVEL -> player.getLevel();
+            case FOOD -> player.getFoodLevel();
+            case PING -> player.getPing();
+            case ARMOR -> (int) getAttributeValue(player, Attribute.GENERIC_ARMOR);
+            case ATTACK -> (int) getAttributeValue(player, Attribute.GENERIC_ATTACK_DAMAGE);
+        };
+    }
+
+    private double getAttributeValue(@NotNull Player player, @NotNull Attribute attribute) {
+        try {
+            AttributeInstance instance = player.getAttribute(attribute);
+            return instance != null ? Math.round(instance.getValue() * 10.0) / 10.0 : 0.0;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return 0.0;
+        }
     }
 
     @Override
-    public Coordinates getCoordinates(FEntity fPlayer) {
+    public Statistics getStatistics(@NotNull FEntity fPlayer) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        if (player == null) return null;
+
+        return new Statistics(
+                Math.round(player.getHealth() * 10.0) / 10.0,
+                getAttributeValue(player, Attribute.GENERIC_ARMOR),
+                player.getLevel(),
+                player.getFoodLevel(),
+                getAttributeValue(player, Attribute.GENERIC_ATTACK_DAMAGE)
+        );
+    }
+
+    @Override
+    public double distance(@NotNull FPlayer first, @NotNull FPlayer second) {
+        Player firstPlayer = Bukkit.getPlayer(first.getUuid());
+        if (firstPlayer == null) return -1.0;
+
+        Player secondPlayer = Bukkit.getPlayer(second.getUuid());
+        if (secondPlayer == null) return -1.0;
+
+        World world = firstPlayer.getLocation().getWorld();
+        if (world == null) return -1.0;
+        if (!world.equals(secondPlayer.getLocation().getWorld())) return -1.0;
+
+        return firstPlayer.getLocation().distance(secondPlayer.getLocation());
+    }
+
+    @Override
+    public Coordinates getCoordinates(@NotNull FEntity fPlayer) {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return null;
 
@@ -307,23 +250,51 @@ public class BukkitPlayerAdapter extends PlatformPlayerAdapter {
     }
 
     @Override
-    public Statistics getStatistics(FEntity fPlayer) {
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+    public Object getItem(@NotNull UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
         if (player == null) return null;
 
-        AttributeInstance armor = null;
-        AttributeInstance damage = null;
+        return player.getInventory().getItemInMainHand().getType() == Material.AIR
+                ? player.getInventory().getItemInOffHand()
+                : player.getInventory().getItemInMainHand();
+    }
 
-        try {
-            armor = player.getAttribute(Attribute.GENERIC_ARMOR);
-            damage = player.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
-        } catch (ArrayIndexOutOfBoundsException ignored) {}
+    @Override
+    public void updateInventory(@NotNull UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null) return;
 
-        return new Statistics(Math.round(player.getHealth() * 10.0)/10.0,
-                armor != null ? Math.round(armor.getValue() * 10.0)/10.0 : 0.0,
-                player.getLevel(),
-                player.getFoodLevel(),
-                damage != null ? Math.round(damage.getValue() * 10.0)/10.0 : 0.0
-        );
+        player.updateInventory();
+    }
+
+    @Override
+    public @NotNull List<UUID> getOnlinePlayers() {
+        return Bukkit.getOnlinePlayers().stream()
+                .map(Entity::getUniqueId)
+                .toList();
+    }
+
+    @Override
+    public void clear(@NotNull FPlayer fPlayer) {
+        injector.getInstance(AfkModule.class).remove("quit", fPlayer);
+        injector.getInstance(ScoreboardModule.class).remove(fPlayer);
+        injector.getInstance(BelownameModule.class).remove(fPlayer);
+        injector.getInstance(TabnameModule.class).remove(fPlayer);
+    }
+
+    @Override
+    public void update(@NotNull FPlayer fPlayer) {
+        injector.getInstance(WorldModule.class).update(fPlayer);
+        injector.getInstance(AfkModule.class).remove("", fPlayer);
+        injector.getInstance(StreamModule.class).setStreamPrefix(fPlayer, fPlayer.isSetting(FPlayer.Setting.STREAM));
+
+        injector.getInstance(ScoreboardModule.class).add(fPlayer);
+        injector.getInstance(BelownameModule.class).add(fPlayer);
+        injector.getInstance(TabnameModule.class).add(fPlayer);
+        injector.getInstance(PlayerlistnameModule.class).update();
+        injector.getInstance(SidebarModule.class).send(fPlayer);
+        injector.getInstance(FooterModule.class).send(fPlayer);
+        injector.getInstance(HeaderModule.class).send(fPlayer);
+        injector.getInstance(BrandModule.class).send(fPlayer);
     }
 }

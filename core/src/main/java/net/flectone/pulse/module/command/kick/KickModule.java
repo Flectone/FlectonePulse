@@ -59,7 +59,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

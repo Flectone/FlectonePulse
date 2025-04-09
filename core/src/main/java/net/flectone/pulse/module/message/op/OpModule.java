@@ -48,7 +48,7 @@ public class OpModule extends AbstractModuleMessage<Localization.Message.Op> {
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

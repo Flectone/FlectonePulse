@@ -2,6 +2,8 @@ package net.flectone.pulse.sender;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
@@ -12,8 +14,8 @@ import net.flectone.pulse.model.Toast;
 import net.flectone.pulse.module.integration.BukkitIntegrationModule;
 import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.serializer.PacketSerializer;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
@@ -22,14 +24,16 @@ import org.bukkit.advancement.Advancement;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class BukkitMessageSender extends MessageSender {
 
-    private final Map<UUID, Long> playerCacheMap = new HashMap<>();
+    private final Cache<UUID, Long> toastCooldownCache = CacheBuilder.newBuilder()
+            .expireAfterWrite(60, TimeUnit.SECONDS)
+            .build();
 
     private final Plugin plugin;
     private final TaskScheduler taskScheduler;
@@ -63,12 +67,12 @@ public class BukkitMessageSender extends MessageSender {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;
 
-        long lastCache = playerCacheMap.containsKey(fPlayer.getUuid())
-                // cooldown 60 seconds
-                ? Math.abs(playerCacheMap.get(fPlayer.getUuid()) - System.currentTimeMillis()) > 60 * 1000
-                    ? System.currentTimeMillis()
-                    : playerCacheMap.get(fPlayer.getUuid())
-                : System.currentTimeMillis();
+        long lastCache;
+        try {
+            lastCache = toastCooldownCache.get(fPlayer.getUuid(), System::currentTimeMillis);
+        } catch (ExecutionException e) {
+            lastCache = System.currentTimeMillis();
+        }
 
         String key = fPlayer.getUuid().toString() + lastCache;
         NamespacedKey namespacedKey = new NamespacedKey(plugin, key);
@@ -76,8 +80,6 @@ public class BukkitMessageSender extends MessageSender {
         createToast(namespacedKey, title, toast);
         grantToast(namespacedKey, player);
         revokeToast(namespacedKey, player);
-
-        playerCacheMap.put(fPlayer.getUuid(), lastCache);
     }
 
     private void createToast(NamespacedKey key, Component title, Toast toast) {
@@ -122,12 +124,10 @@ public class BukkitMessageSender extends MessageSender {
 
         jsonObject.add("requirements", requirementsElements);
 
-        String jsonToast = jsonObject.toString();
-
         taskScheduler.runSync(() -> {
             if (Bukkit.getServer().getAdvancement(key) != null) return;
 
-            Bukkit.getUnsafe().loadAdvancement(key, jsonToast);
+            Bukkit.getUnsafe().loadAdvancement(key, jsonObject.toString());
         });
     }
 

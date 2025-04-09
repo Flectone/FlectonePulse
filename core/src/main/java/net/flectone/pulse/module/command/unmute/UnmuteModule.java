@@ -55,7 +55,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

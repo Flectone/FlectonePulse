@@ -50,7 +50,7 @@ public abstract class IntegrationModule extends AbstractModule implements Messag
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return integration.isEnable();
     }
 

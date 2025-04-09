@@ -48,7 +48,7 @@ public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Fo
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

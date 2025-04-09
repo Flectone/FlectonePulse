@@ -85,7 +85,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
     public void reload() {}
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return integration.isEnable();
     }
 }

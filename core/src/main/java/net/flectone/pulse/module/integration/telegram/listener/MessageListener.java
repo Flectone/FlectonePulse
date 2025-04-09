@@ -39,7 +39,7 @@ public class MessageListener extends EventListener {
     public void reload() {}
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return integration.isEnable();
     }
 

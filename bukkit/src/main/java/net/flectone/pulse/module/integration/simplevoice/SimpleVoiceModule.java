@@ -41,7 +41,7 @@ public class SimpleVoiceModule extends AbstractModule {
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return config.isEnable();
     }
 

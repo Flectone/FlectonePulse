@@ -93,7 +93,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             case "player" -> fPlayer.getName();
             case "ip" -> fPlayer.getIp();
             case "ping" -> String.valueOf(fPlayerService.getPing(fPlayer));
-            case "online" -> String.valueOf(platformServerAdapter.getOnlineCount());
+            case "online" -> String.valueOf(platformServerAdapter.getOnlinePlayerCount());
             case "tps" -> platformServerAdapter.getTPS();
             default -> null;
         };

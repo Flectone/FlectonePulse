@@ -46,7 +46,7 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

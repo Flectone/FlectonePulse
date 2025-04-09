@@ -32,7 +32,7 @@ public class TabModule extends AbstractModule {
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 }

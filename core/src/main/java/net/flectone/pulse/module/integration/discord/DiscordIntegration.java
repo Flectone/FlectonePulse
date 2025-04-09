@@ -301,7 +301,7 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return integration.isEnable();
     }
 

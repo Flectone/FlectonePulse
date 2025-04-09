@@ -8,21 +8,26 @@ import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.configuration.Command;
-import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.event.HoverEventSource;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -31,23 +36,29 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Singleton
-public class BukkitServerAdapter extends PlatformServerAdapter {
+public class BukkitServerAdapter implements PlatformServerAdapter {
 
     public final static boolean IS_FOLIA;
     public final static boolean IS_PAPER;
     public final static boolean IS_1_20_5_OR_NEWER;
 
     static {
-        IS_FOLIA = isFolia();
-        IS_PAPER = isPaper();
-        IS_1_20_5_OR_NEWER = getBukkitVersion() >= 20.5;
+        IS_FOLIA = detectFolia();
+        IS_PAPER = detectPaper();
+        IS_1_20_5_OR_NEWER = parseBukkitVersion() >= 20.5;
     }
 
-    private final Injector injector;
+    private final Provider<IntegrationModule> integrationModuleProvider;
+    private final Provider<FPlayerService> fPlayerServiceProvider;
+    private final Provider<MessagePipeline> messagePipelineProvider;
 
     @Inject
-    public BukkitServerAdapter(Injector injector) {
-        this.injector = injector;
+    public BukkitServerAdapter(Provider<IntegrationModule> integrationModuleProvider,
+                               Provider<FPlayerService> fPlayerServiceProvider,
+                               Provider<MessagePipeline> messagePipelineProvider) {
+        this.integrationModuleProvider = integrationModuleProvider;
+        this.fPlayerServiceProvider = fPlayerServiceProvider;
+        this.messagePipelineProvider = messagePipelineProvider;
     }
 
     @Sync
@@ -57,110 +68,47 @@ public class BukkitServerAdapter extends PlatformServerAdapter {
     }
 
     @Override
-    public ItemStack buildItemStack(int settingIndex, FPlayer fPlayer, List<String> itemMessages, Command.Chatsetting.SettingItem settingItem) {
-        MessagePipeline messagePipeline = injector.getInstance(MessagePipeline.class);
-
-        Component name = itemMessages.isEmpty()
-                ? Component.empty()
-                : messagePipeline.builder(fPlayer, itemMessages.get(0)).build();
-
-        List<Component> lore = new ArrayList<>();
-        if (itemMessages.size() > 1) {
-            itemMessages.stream()
-                    .skip(1)
-                    .forEach(string -> lore.add(
-                                    messagePipeline
-                                            .builder(fPlayer, string.replace("<chat>", String.valueOf(fPlayer.getSettingValue(FPlayer.Setting.CHAT))))
-                                            .build()
-                            )
-                    );
-        }
-
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            return new ItemStack.Builder()
-                    .type(SpigotConversionUtil.fromBukkitItemMaterial(Material.valueOf(settingItem.getMaterials().get(settingIndex))))
-                    .component(ComponentTypes.ITEM_NAME, name)
-                    .component(ComponentTypes.LORE, new ItemLore(lore))
-                    .build();
-        }
-
-        org.bukkit.inventory.ItemStack legacyItemStack = new org.bukkit.inventory.ItemStack(Material.valueOf(settingItem.getMaterials().get(settingIndex)));
-
-        ItemMeta itemMeta = legacyItemStack.getItemMeta();
-        itemMeta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(name));
-        itemMeta.setLore(lore.stream()
-                .map(component -> LegacyComponentSerializer.legacySection().serialize(component))
-                .toList()
-        );
-
-        legacyItemStack.setItemMeta(itemMeta);
-
-        return SpigotConversionUtil.fromBukkitItemStack(legacyItemStack);
-    }
-
-    @Override
-    public String getMinecraftName(Object itemStack) {
-        if (!(itemStack instanceof org.bukkit.inventory.ItemStack is)) return "";
-
+    public @NotNull String getTPS() {
         try {
-
-            if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
-                Material material = is.getType();
-                return (material.isBlock() ? "block" : "item") + ".minecraft." + material.toString().toLowerCase();
-            }
-
-            Object nmsStack = is.getClass().getMethod("asNMSCopy", org.bukkit.inventory.ItemStack.class).invoke(null, is);
-
-            assert nmsStack != null;
-            Object item = nmsStack.getClass().getMethod("getItem").invoke(nmsStack);
-
-            return (String) item.getClass().getMethod("getName").invoke(item);
-        } catch (Exception ex) {
+            double[] recentTps = getRecentTps();
+            double tps = Math.min(Math.round(recentTps[0] * 10.0) / 10.0, 20.0);
+            return String.valueOf(tps);
+        } catch (ReflectiveOperationException e) {
             return "";
         }
     }
 
-    @Override
-    public String getTPS() {
-        try {
-            Server server = Bukkit.getServer();
+    private double[] getRecentTps() throws ReflectiveOperationException {
+        Server server = Bukkit.getServer();
+        Object minecraftServer = getMinecraftServer(server);
+        Field recentTpsField = minecraftServer.getClass().getSuperclass().getDeclaredField("recentTps");
+        recentTpsField.setAccessible(true);
+        return (double[]) recentTpsField.get(minecraftServer);
+    }
 
-            Field consoleField = server.getClass().getDeclaredField("console");
-            consoleField.setAccessible(true);
-
-            Object minecraftServer = consoleField.get(server);
-
-            Field recentTps = minecraftServer.getClass().getSuperclass().getDeclaredField("recentTps");
-            recentTps.setAccessible(true);
-
-            double tps = Math.round(((double[]) recentTps.get(minecraftServer))[0] * 10.0)/10.0;
-
-            return String.valueOf(Math.min(tps, 20.0));
-        } catch (Throwable e) {
-            return null;
-        }
+    private Object getMinecraftServer(@NotNull Server server) throws ReflectiveOperationException {
+        Field consoleField = server.getClass().getDeclaredField("console");
+        consoleField.setAccessible(true);
+        return consoleField.get(server);
     }
 
     @Override
-    public JsonElement getMOTD() {
+    public @NotNull JsonElement getMOTD() {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("text", Bukkit.getServer().getMotd());
         return jsonObject;
     }
 
     @Override
-    public int getMax() {
+    public int getMaxPlayers() {
         return Bukkit.getMaxPlayers();
     }
 
     @Override
-    public int getOnlineCount() {
-        IntegrationModule integrationModule = injector.getInstance(IntegrationModule.class);
-        FPlayerService fPlayerService = injector.getInstance(FPlayerService.class);
-
-        return (int) fPlayerService.getFPlayers().stream()
+    public int getOnlinePlayerCount() {
+        return (int) fPlayerServiceProvider.get().getFPlayers().stream()
                 .filter(fPlayer -> !fPlayer.isUnknown())
-                .filter(fPlayer -> !integrationModule.isVanished(fPlayer))
+                .filter(fPlayer -> !integrationModuleProvider.get().isVanished(fPlayer))
                 .count();
     }
 
@@ -169,7 +117,155 @@ public class BukkitServerAdapter extends PlatformServerAdapter {
         return Bukkit.getPluginManager().getPlugin(projectName) != null;
     }
 
-    private static double getBukkitVersion() {
+    @Override
+    public @NotNull ItemStack buildItemStack(int settingIndex, @NotNull FPlayer fPlayer,
+                                             @NotNull List<String> itemMessages,
+                                             @NotNull Command.Chatsetting.SettingItem settingItem) {
+        Component name = buildItemNameComponent(fPlayer, itemMessages);
+        List<Component> lore = buildItemLoreComponents(fPlayer, itemMessages);
+
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+            return buildModernItemStack(settingIndex, settingItem, name, lore);
+        }
+
+        return buildLegacyItemStack(settingIndex, settingItem, name, lore);
+    }
+
+    private @NotNull Component buildItemNameComponent(@NotNull FPlayer fPlayer, @NotNull List<String> itemMessages) {
+        return itemMessages.isEmpty()
+                ? Component.empty()
+                : messagePipelineProvider.get().builder(fPlayer, itemMessages.get(0)).build();
+    }
+
+    private @NotNull List<Component> buildItemLoreComponents(@NotNull FPlayer fPlayer, @NotNull List<String> itemMessages) {
+        List<Component> lore = new ArrayList<>();
+        if (itemMessages.size() > 1) {
+            itemMessages.stream()
+                    .skip(1)
+                    .forEach(message -> lore.add(
+                            messagePipelineProvider.get().builder(fPlayer, replaceChatPlaceholder(message, fPlayer)).build()
+                    ));
+        }
+
+        return lore;
+    }
+
+    private String replaceChatPlaceholder(@NotNull String message, @NotNull FPlayer fPlayer) {
+        return message.replace("<chat>", String.valueOf(fPlayer.getSettingValue(FPlayer.Setting.CHAT)));
+    }
+
+    private @NotNull ItemStack buildModernItemStack(int settingIndex, @NotNull Command.Chatsetting.SettingItem settingItem,
+                                                    @NotNull Component name, @NotNull List<Component> lore) {
+        return new ItemStack.Builder()
+                .type(SpigotConversionUtil.fromBukkitItemMaterial(getItemMaterial(settingIndex, settingItem)))
+                .component(ComponentTypes.ITEM_NAME, name)
+                .component(ComponentTypes.LORE, new ItemLore(lore))
+                .build();
+    }
+
+    private @NotNull ItemStack buildLegacyItemStack(int settingIndex, @NotNull Command.Chatsetting.SettingItem settingItem,
+                                                    @NotNull Component name, @NotNull List<Component> lore) {
+        org.bukkit.inventory.ItemStack legacyItem = new org.bukkit.inventory.ItemStack(getItemMaterial(settingIndex, settingItem));
+        ItemMeta meta = legacyItem.getItemMeta();
+
+        meta.setDisplayName(serializeComponent(name));
+        meta.setLore(lore.stream()
+                .map(this::serializeComponent)
+                .toList());
+
+        legacyItem.setItemMeta(meta);
+        return SpigotConversionUtil.fromBukkitItemStack(legacyItem);
+    }
+
+    private @NotNull Material getItemMaterial(int settingIndex, @NotNull Command.Chatsetting.SettingItem settingItem) {
+        return Material.valueOf(settingItem.getMaterials().get(settingIndex));
+    }
+
+    private @NotNull String serializeComponent(@NotNull Component component) {
+        return LegacyComponentSerializer.legacySection().serialize(component);
+    }
+
+    @Override
+    public @NotNull String getItemName(@Nullable Object itemStack) {
+        if (!(itemStack instanceof org.bukkit.inventory.ItemStack bukkitItem)) {
+            return "";
+        }
+
+        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            return getModernItemName(bukkitItem.getType());
+        }
+
+        return getLegacyItemName(bukkitItem);
+    }
+
+    private @NotNull String getModernItemName(@NotNull Material material) {
+        return (material.isBlock() ? "block" : "item") + ".minecraft." + material.toString().toLowerCase();
+    }
+
+    private @NotNull String getLegacyItemName(@NotNull org.bukkit.inventory.ItemStack itemStack) {
+        try {
+            Object nmsStack = itemStack.getClass()
+                    .getMethod("asNMSCopy", org.bukkit.inventory.ItemStack.class)
+                    .invoke(null, itemStack);
+
+            Object item = nmsStack.getClass().getMethod("getItem").invoke(nmsStack);
+            return (String) item.getClass().getMethod("getName").invoke(item);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    @Override
+    public @NotNull Component translateItemName(Object item) {
+        if (!(item instanceof org.bukkit.inventory.ItemStack itemStack)) return Component.empty();
+
+        HoverEvent<?> hoverEvent = hoverEvent(itemStack);
+
+        Component component = itemStack.getItemMeta() == null || itemStack.getItemMeta().getDisplayName().isEmpty()
+                ? Component.translatable(getItemName(itemStack))
+                : Component.text(itemStack.getItemMeta().getDisplayName()).decorate(TextDecoration.ITALIC);
+
+        if (hoverEvent != null) {
+            component = component.hoverEvent(hoverEvent);
+        }
+
+        return component;
+    }
+
+    // don't work after 0.2.0 release
+    // need fix but idk how
+    // more information https://discord.com/channels/861147957365964810/1329866516732182579
+    @Nullable
+    private HoverEvent<?> hoverEvent(Object item) {
+        if (!(item instanceof org.bukkit.inventory.ItemStack itemStack)) return null;
+        if (itemStack.getType() == Material.AIR) return null;
+
+        try {
+            return ((HoverEventSource<?>) itemStack).asHoverEvent();
+        } catch (ClassCastException ignored) {}
+
+        return null;
+    }
+
+    private static boolean detectFolia() {
+        try {
+            Class.forName("io.papermc.paper.threadedregions.ThreadedRegionizer");
+            return true;
+        } catch (ClassNotFoundException ignored) {}
+
+        return false;
+    }
+
+    private static boolean detectPaper() {
+        try {
+            Class.forName("com.destroystokyo.paper.ParticleBuilder");
+            return true;
+        } catch (ClassNotFoundException ignored) {}
+
+        return false;
+    }
+
+    private static double parseBukkitVersion() {
         double finalVersion = 0.0;
         Matcher m = Pattern.compile("1\\.(\\d+(\\.\\d+)?)").matcher(Bukkit.getVersion());
         if (m.find()) {
@@ -180,23 +276,4 @@ public class BukkitServerAdapter extends PlatformServerAdapter {
 
         return finalVersion;
     }
-
-    private static boolean isFolia() {
-        try {
-            Class.forName("io.papermc.paper.threadedregions.ThreadedRegionizer");
-            return true;
-        } catch (ClassNotFoundException ignored) {}
-
-        return false;
-    }
-
-    private static boolean isPaper() {
-        try {
-            Class.forName("com.destroystokyo.paper.ParticleBuilder");
-            return true;
-        } catch (ClassNotFoundException ignored) {}
-
-        return false;
-    }
-
 }

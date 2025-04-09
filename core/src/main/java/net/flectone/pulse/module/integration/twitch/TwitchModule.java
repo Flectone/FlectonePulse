@@ -336,7 +336,7 @@ public class TwitchModule extends AbstractModule {
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return integration.isEnable();
     }
 

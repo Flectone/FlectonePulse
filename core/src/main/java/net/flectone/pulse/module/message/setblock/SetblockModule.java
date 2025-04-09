@@ -48,7 +48,7 @@ public class SetblockModule extends AbstractModuleMessage<Localization.Message.S
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

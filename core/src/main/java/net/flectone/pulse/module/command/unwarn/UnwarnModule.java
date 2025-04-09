@@ -55,7 +55,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

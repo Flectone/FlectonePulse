@@ -47,7 +47,7 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

@@ -54,7 +54,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

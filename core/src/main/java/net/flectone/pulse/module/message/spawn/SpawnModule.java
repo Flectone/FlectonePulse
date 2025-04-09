@@ -52,7 +52,7 @@ public class SpawnModule extends AbstractModuleMessage<Localization.Message.Spaw
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

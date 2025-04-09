@@ -45,7 +45,7 @@ public class GreetingModule extends AbstractModuleMessage<Localization.Message.G
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

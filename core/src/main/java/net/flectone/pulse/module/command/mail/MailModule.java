@@ -49,7 +49,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

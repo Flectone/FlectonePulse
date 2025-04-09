@@ -63,7 +63,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

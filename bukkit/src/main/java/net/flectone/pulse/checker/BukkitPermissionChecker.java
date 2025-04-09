@@ -21,17 +21,17 @@ public class BukkitPermissionChecker implements PermissionChecker {
     }
 
     @Override
-    public boolean check(FEntity sender, String permission) {
+    public boolean check(FEntity entity, String permission) {
         if (permission == null) return true;
-        if (!(sender instanceof FPlayer fPlayer) || fPlayer.isUnknown()) return true;
+        if (!(entity instanceof FPlayer fPlayer) || fPlayer.isUnknown()) return true;
 
         Permission bukkitPermission = Bukkit.getPluginManager().getPermission(permission);
 
         boolean value = (bukkitPermission != null && bukkitPermission.getDefault() == PermissionDefault.TRUE) ||
                 Bukkit.getOperators().stream()
-                        .anyMatch(offlinePlayer -> offlinePlayer.getUniqueId().equals(sender.getUuid()));
+                        .anyMatch(offlinePlayer -> offlinePlayer.getUniqueId().equals(entity.getUuid()));
 
-        Player player = Bukkit.getPlayer(sender.getUuid());
+        Player player = Bukkit.getPlayer(entity.getUuid());
         if (player != null) {
             value = player.hasPermission(permission);
         }
@@ -40,8 +40,8 @@ public class BukkitPermissionChecker implements PermissionChecker {
     }
 
     @Override
-    public boolean check(FEntity sender, net.flectone.pulse.configuration.Permission.IPermission permission) {
-        return permission == null || check(sender, permission.getName());
+    public boolean check(FEntity entity, net.flectone.pulse.configuration.Permission.IPermission permission) {
+        return permission == null || check(entity, permission.getName());
     }
 
 }

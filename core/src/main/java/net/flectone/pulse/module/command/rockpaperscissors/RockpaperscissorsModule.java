@@ -54,7 +54,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

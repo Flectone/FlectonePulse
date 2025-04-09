@@ -36,7 +36,7 @@ public abstract class AbstractModule {
 
     public abstract void reload();
 
-    public abstract boolean isConfigEnable();
+    protected abstract boolean isConfigEnable();
 
     public void registerModulePermission(Permission.IPermission permission) {
         registerPermission(permission);

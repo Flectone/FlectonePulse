@@ -39,7 +39,7 @@ public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

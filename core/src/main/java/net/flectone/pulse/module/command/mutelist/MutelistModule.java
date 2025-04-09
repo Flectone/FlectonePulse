@@ -63,7 +63,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

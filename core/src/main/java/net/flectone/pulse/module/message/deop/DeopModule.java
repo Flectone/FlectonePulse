@@ -48,7 +48,7 @@ public class DeopModule extends AbstractModuleMessage<Localization.Message.Deop>
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

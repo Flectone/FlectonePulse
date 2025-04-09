@@ -64,7 +64,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return command.isEnable();
     }
 

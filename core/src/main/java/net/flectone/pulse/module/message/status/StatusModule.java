@@ -82,7 +82,7 @@ public class StatusModule extends AbstractModule {
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 
@@ -143,12 +143,12 @@ public class StatusModule extends AbstractModule {
 
         int max = playersModule.isEnable()
                 ? playersModule.getMessage().getMax()
-                : platformServerAdapter.getMax();
+                : platformServerAdapter.getMaxPlayers();
         playersJson.addProperty("max", max);
 
         int online = playersModule.isEnable()
-                ? playersModule.getMessage().getOnline() == -69 ? platformServerAdapter.getOnlineCount() : playersModule.getMessage().getOnline()
-                : platformServerAdapter.getOnlineCount();
+                ? playersModule.getMessage().getOnline() == -69 ? platformServerAdapter.getOnlinePlayerCount() : playersModule.getMessage().getOnline()
+                : platformServerAdapter.getOnlinePlayerCount();
         playersJson.addProperty("online", online);
 
         playersJson.add("sample", getSampleJson(fPlayer));

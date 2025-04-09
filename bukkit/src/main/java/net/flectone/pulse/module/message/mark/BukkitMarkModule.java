@@ -62,7 +62,7 @@ public class BukkitMarkModule extends MarkModule {
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

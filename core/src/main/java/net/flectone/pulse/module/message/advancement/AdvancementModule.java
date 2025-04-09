@@ -70,7 +70,7 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 

@@ -63,7 +63,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
     public void reload() {}
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return integration.isEnable();
     }
 }

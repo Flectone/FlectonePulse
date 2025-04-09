@@ -55,7 +55,7 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
     }
 
     @Override
-    public boolean isConfigEnable() {
+    protected boolean isConfigEnable() {
         return message.isEnable();
     }
 
