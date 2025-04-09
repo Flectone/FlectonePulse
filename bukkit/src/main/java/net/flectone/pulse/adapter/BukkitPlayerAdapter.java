@@ -20,6 +20,7 @@ import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
@@ -291,7 +292,8 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         injector.getInstance(ScoreboardModule.class).add(fPlayer);
         injector.getInstance(BelownameModule.class).add(fPlayer);
         injector.getInstance(TabnameModule.class).add(fPlayer);
-        injector.getInstance(PlayerlistnameModule.class).update();
+        injector.getInstance(TaskScheduler.class).runAsyncLater(() ->
+                injector.getInstance(PlayerlistnameModule.class).update(), 10L);
         injector.getInstance(SidebarModule.class).send(fPlayer);
         injector.getInstance(FooterModule.class).send(fPlayer);
         injector.getInstance(HeaderModule.class).send(fPlayer);
