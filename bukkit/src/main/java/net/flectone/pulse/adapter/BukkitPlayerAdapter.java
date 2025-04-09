@@ -115,7 +115,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public boolean hasPlayedBefore(@NotNull FPlayer fPlayer) {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
-        if (player == null) return false;
+        if (player == null) return true;
 
         return player.hasPlayedBefore();
     }
