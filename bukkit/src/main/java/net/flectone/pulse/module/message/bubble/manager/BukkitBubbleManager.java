@@ -112,7 +112,7 @@ public class BukkitBubbleManager implements BubbleManager {
         boolean isTextDisplay = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4) && modernBubble.isEnable();
 
         // 1.21.3+ supported interaction riding
-        boolean isInteractionRiding = PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_21_3);
+        boolean isInteractionRiding = modernBubble.isInteractionRiding() && PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_21_3);
 
         int lineWidth = messageBubble.getLineWidth();
         double distance = messageBubble.getDistance();
