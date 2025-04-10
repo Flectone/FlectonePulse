@@ -333,7 +333,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.prompt.hard = "сложно?";
         command.prompt.accept = "принять";
         command.prompt.turn = "включить";
-        command.prompt.type = "type";
+        command.prompt.type = "тип";
         command.prompt.category = "категория";
         command.prompt.reason = "причина";
         command.prompt.id = "айди";
