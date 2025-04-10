@@ -3,12 +3,11 @@ package net.flectone.pulse.module.message.format.scoreboard;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.megavex.scoreboardlibrary.api.team.ScoreboardTeam;
 import net.megavex.scoreboardlibrary.api.team.TeamDisplay;
@@ -22,7 +21,6 @@ public class BukkitScoreboardModule extends ScoreboardModule {
 
     private final Message.Format.Scoreboard message;
 
-    private final FileManager fileManager;
     private final TeamManager teamManager;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
@@ -34,7 +32,6 @@ public class BukkitScoreboardModule extends ScoreboardModule {
                                   MessagePipeline messagePipeline) {
         super(fileManager);
 
-        this.fileManager = fileManager;
         this.teamManager = teamManager;
         this.fPlayerService = fPlayerService;
         this.messagePipeline = messagePipeline;
@@ -61,14 +58,12 @@ public class BukkitScoreboardModule extends ScoreboardModule {
 
         teamDisplay.nameTagVisibility(message.isNameVisible() ? NameTagVisibility.ALWAYS : NameTagVisibility.HIDE_FOR_OTHER_TEAMS);
 
-        Localization.Message.Format.Name localization = fileManager.getLocalization().getMessage().getFormat().getName_();
-
-        if (!localization.getPrefix().isEmpty()) {
-            teamDisplay.prefix(messagePipeline.builder(fPlayer, localization.getPrefix()).build());
+        if (!message.getPrefix().isEmpty()) {
+            teamDisplay.prefix(messagePipeline.builder(fPlayer, message.getPrefix()).build());
         }
 
-        if (!localization.getSuffix().isEmpty()) {
-            teamDisplay.suffix(messagePipeline.builder(fPlayer, fPlayer, localization.getSuffix()).build());
+        if (!message.getSuffix().isEmpty()) {
+            teamDisplay.suffix(messagePipeline.builder(fPlayer, fPlayer, message.getSuffix()).build());
         }
 
         teamDisplay.addEntry(fPlayer.getName());

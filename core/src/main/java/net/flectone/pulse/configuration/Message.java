@@ -489,6 +489,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             private boolean enable = true;
             private boolean nameVisible = false;
             private String color = "<white>";
+            private String prefix = "<vault_prefix><stream_prefix>";
+            private String suffix = "<afk_suffix><vault_suffix>";
         }
 
         @Getter
