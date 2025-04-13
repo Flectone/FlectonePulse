@@ -20,6 +20,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
@@ -120,16 +121,16 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
                 return Tag.preProcessParsed(message.getTrigger() + mention);
             }
 
-            if (integrationModule.getGroups().contains(mention)) {
-                for (String group : integrationModule.getGroups()) {
-                    if (!(receiver instanceof FPlayer mentionFPlayer)) break;
-                    if (permissionChecker.check(mentionFPlayer, permission.getBypass())) break;
-                    if (!permissionChecker.check(receiver, "group." + group)) continue;
+            Optional<String> group = integrationModule.getGroups().stream()
+                    .filter(name -> name.equalsIgnoreCase(mention))
+                    .findFirst();
 
+            if (group.isPresent()) {
+                if (receiver instanceof FPlayer mentionFPlayer
+                        && !permissionChecker.check(mentionFPlayer, permission.getBypass())
+                        && permissionChecker.check(mentionFPlayer, "group." + group.get())) {
                     sendMention(processId, mentionFPlayer);
-                    break;
                 }
-
             } else {
                 FPlayer mentionFPlayer = fPlayerService.getFPlayer(mention);
                 if (mentionFPlayer.equals(receiver) && !permissionChecker.check(mentionFPlayer, permission.getBypass())) {
