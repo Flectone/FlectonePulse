@@ -108,9 +108,6 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
         FEntity sender = messageContext.getSender();
         if (!(sender instanceof FPlayer fPlayer)) return;
 
-        Player receiver = Bukkit.getPlayer(messageContext.getReceiver().getUuid());
-        if (receiver == null) return;
-
         String message = messageContext.getMessage();
 
         try {
@@ -118,6 +115,10 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             message = PlaceholderAPI.setPlaceholders(offlinePlayer, message);
 
             if (!offlinePlayer.isOnline()) return;
+
+            Player receiver = Bukkit.getPlayer(messageContext.getReceiver().getUuid());
+            if (receiver == null) return;
+
             message = PlaceholderAPI.setRelationalPlaceholders(offlinePlayer.getPlayer(), receiver, message);
 
         } catch (NullPointerException | ClassCastException ignored) {}
