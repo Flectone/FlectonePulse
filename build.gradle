@@ -117,6 +117,10 @@ subprojects {
         maven {
             url = "https://repo.codemc.io/repository/maven-snapshots/"
         }
+
+        maven {
+            url = "https://maven.devs.beer/"
+        }
     }
 
     dependencies {

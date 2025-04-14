@@ -37,6 +37,7 @@ dependencies {
     compileOnly "com.rexcantor64.triton:triton-api:$tritonapi_version"
     compileOnly "com.gitlab.ruany:LiteBansAPI:$litebans_version"
     compileOnly "com.github.DevLeoko:AdvancedBan:$advancedban_version"
+    compileOnly "dev.lone:api-itemsadder:$itemsadder_version"
 
     compileOnly "net.kyori:adventure-platform-bukkit:$adventure_platform_bukkit_version"
     compileOnly "net.kyori:adventure-api:$adventure_api"

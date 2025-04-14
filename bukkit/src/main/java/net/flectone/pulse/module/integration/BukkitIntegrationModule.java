@@ -11,6 +11,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.advancedban.AdvancedBanModule;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.interactivechat.InteractiveChatModule;
+import net.flectone.pulse.module.integration.itemsadder.ItemsAdderModule;
 import net.flectone.pulse.module.integration.litebans.LiteBansModule;
 import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.module.integration.minimotd.MiniMOTDModule;
@@ -66,6 +67,10 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
         if (platformServerAdapter.hasProject("InteractiveChat")) {
             addChildren(InteractiveChatModule.class);
+        }
+
+        if (platformServerAdapter.hasProject("ItemsAdder")) {
+            addChildren(ItemsAdderModule.class);
         }
 
         if (platformServerAdapter.hasProject("LiteBans")) {
