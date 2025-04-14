@@ -7,6 +7,8 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
@@ -21,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Singleton
-public class PlaceholderAPIIntegration extends PlaceholderExpansion implements FIntegration {
+public class PlaceholderAPIIntegration extends PlaceholderExpansion implements FIntegration, MessageProcessor {
 
     private final Message.Format.Color color;
 
@@ -101,22 +103,25 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
         return placeholder == null ? "" : placeholder;
     }
 
-    public String setPlaceholders(FEntity sender, FEntity fReceiver, String message) {
-        if (!(sender instanceof FPlayer fPlayer)) return message;
+    @Override
+    public void process(MessageContext messageContext) {
+        FEntity sender = messageContext.getSender();
+        if (!(sender instanceof FPlayer fPlayer)) return;
 
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(fPlayer.getUuid());
+        Player receiver = Bukkit.getPlayer(messageContext.getReceiver().getUuid());
+        if (receiver == null) return;
+
+        String message = messageContext.getMessage();
 
         try {
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(fPlayer.getUuid());
             message = PlaceholderAPI.setPlaceholders(offlinePlayer, message);
 
-            if (!offlinePlayer.isOnline()) return message;
+            if (!offlinePlayer.isOnline()) return;
+            message = PlaceholderAPI.setRelationalPlaceholders(offlinePlayer.getPlayer(), receiver, message);
 
-            Player receiver = Bukkit.getPlayer(fReceiver.getUuid());
-            if (receiver == null) return message;
-
-            return PlaceholderAPI.setRelationalPlaceholders(offlinePlayer.getPlayer(), receiver, message);
         } catch (NullPointerException | ClassCastException ignored) {}
 
-        return message;
+        messageContext.setMessage(message);
     }
 }

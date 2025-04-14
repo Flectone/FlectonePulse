@@ -8,6 +8,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.registry.MessageProcessRegistry;
 
 @Singleton
 public class PlaceholderAPIModule extends AbstractModule {
@@ -15,18 +16,29 @@ public class PlaceholderAPIModule extends AbstractModule {
     private final Integration.Placeholderapi integration;
     private final Permission.Integration.Placeholderapi permission;
 
-    private final PermissionChecker permissionChecker;
     private final PlaceholderAPIIntegration placeholderAPIIntegration;
 
     @Inject
     public PlaceholderAPIModule(FileManager fileManager,
                                 PermissionChecker permissionChecker,
-                                PlaceholderAPIIntegration placeholderAPIIntegration) {
-        this.permissionChecker = permissionChecker;
+                                PlaceholderAPIIntegration placeholderAPIIntegration,
+                                MessageProcessRegistry messageProcessRegistry) {
         this.placeholderAPIIntegration = placeholderAPIIntegration;
 
         integration = fileManager.getIntegration().getPlaceholderapi();
         permission = fileManager.getPermission().getIntegration().getPlaceholderapi();
+
+        messageProcessRegistry.register(10, messageContext -> {
+            FEntity sender = messageContext.getSender();
+            if (checkModulePredicates(sender)) return;
+
+            FEntity receiver = messageContext.getReceiver();
+            boolean isUserMessage = messageContext.isUserMessage();
+            if (!permissionChecker.check(sender, permission.getUse()) && isUserMessage) return;
+            if (!permissionChecker.check(receiver, permission.getUse()) && isUserMessage) return;
+
+            placeholderAPIIntegration.process(messageContext);
+        });
     }
 
     @Override
@@ -40,13 +52,5 @@ public class PlaceholderAPIModule extends AbstractModule {
     @Override
     protected boolean isConfigEnable() {
         return integration.isEnable();
-    }
-
-    public String setPlaceholders(FEntity sender, FEntity receiver, String message, boolean permission) {
-        if (checkModulePredicates(sender)) return message;
-        if (!permissionChecker.check(sender, this.permission.getUse()) && permission) return message;
-        if (!permissionChecker.check(receiver, this.permission.getUse()) && permission) return message;
-
-        return placeholderAPIIntegration.setPlaceholders(sender, receiver, message);
     }
 }

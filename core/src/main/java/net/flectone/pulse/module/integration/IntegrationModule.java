@@ -3,7 +3,6 @@ package net.flectone.pulse.module.integration;
 import com.google.inject.Injector;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.model.FEntity;
@@ -14,22 +13,19 @@ import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.yandex.YandexModule;
-import net.flectone.pulse.processor.MessageProcessor;
-import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.flectone.pulse.util.MessageTag;
 
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
-public abstract class IntegrationModule extends AbstractModule implements MessageProcessor {
+public abstract class IntegrationModule extends AbstractModule {
 
     private final Integration integration;
     private final Permission.Integration permission;
     private final Injector injector;
 
     public IntegrationModule(FileManager fileManager,
-                             Injector injector,
-                             MessageProcessRegistry messageProcessRegistry) {
+                             Injector injector) {
         this.injector = injector;
 
         integration = fileManager.getIntegration();
@@ -40,8 +36,6 @@ public abstract class IntegrationModule extends AbstractModule implements Messag
         addChildren(TelegramModule.class);
         addChildren(TwitchModule.class);
         addChildren(YandexModule.class);
-
-        messageProcessRegistry.register(0, this);
     }
 
     @Override
@@ -54,26 +48,7 @@ public abstract class IntegrationModule extends AbstractModule implements Messag
         return integration.isEnable();
     }
 
-    @Override
-    public void process(MessageContext messageContext) {
-        String message = setPlaceholders(
-                messageContext.getSender(),
-                messageContext.getReceiver(),
-                // InteractiveChat integration
-                messageContext.isInteractiveChat() ?
-                        markSender(messageContext.getSender(), messageContext.getMessage())
-                        : messageContext.getMessage(),
-                messageContext.isUserMessage()
-        );
-
-        messageContext.setMessage(message);
-    }
-
     public abstract String checkMention(FEntity fPlayer, String message);
-
-    public abstract String markSender(FEntity sender, String message);
-
-    public abstract String setPlaceholders(FEntity sender, FEntity receiver, String message, boolean permission);
 
     public abstract boolean hasFPlayerPermission(FPlayer fPlayer, String permission);
 

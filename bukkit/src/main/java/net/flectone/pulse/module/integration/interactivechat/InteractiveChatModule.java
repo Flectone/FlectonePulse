@@ -7,6 +7,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.kyori.adventure.text.Component;
 
 @Singleton
@@ -18,10 +19,14 @@ public class InteractiveChatModule extends AbstractModule {
 
     @Inject
     public InteractiveChatModule(FileManager fileManager,
-                                 InteractiveChatIntegration interactiveChatIntegration) {
+                                 InteractiveChatIntegration interactiveChatIntegration,
+                                 MessageProcessRegistry messageProcessRegistry) {
         this.interactiveChatIntegration = interactiveChatIntegration;
+
         integration = fileManager.getIntegration().getInteractivechat();
         permission = fileManager.getPermission().getIntegration().getInteractivechat();
+
+        messageProcessRegistry.register(0, interactiveChatIntegration);
     }
 
     @Override
@@ -35,17 +40,10 @@ public class InteractiveChatModule extends AbstractModule {
         return integration.isEnable();
     }
 
-
     public String checkMention(FEntity fSender, String message) {
         if (checkModulePredicates(fSender)) return message;
 
         return interactiveChatIntegration.checkMention(fSender, message);
-    }
-
-    public String markSender(FEntity fSender, String message) {
-        if (checkModulePredicates(fSender)) return message;
-
-        return interactiveChatIntegration.markSender(fSender, message);
     }
 
     public boolean sendMessage(FEntity fReceiver, Component message) {

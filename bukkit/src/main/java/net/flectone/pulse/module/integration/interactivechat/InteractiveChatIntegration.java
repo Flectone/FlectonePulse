@@ -7,6 +7,8 @@ import com.loohp.interactivechat.api.InteractiveChatAPI;
 import com.loohp.interactivechat.data.PlayerDataManager;
 import com.loohp.interactivechat.listeners.ChatEvents;
 import com.loohp.interactivechat.registry.Registry;
+import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
@@ -21,7 +23,7 @@ import java.util.UUID;
 // but users really like it, so...
 
 @Singleton
-public class InteractiveChatIntegration implements FIntegration {
+public class InteractiveChatIntegration implements FIntegration, MessageProcessor {
 
     private final FLogger fLogger;
 
@@ -63,7 +65,7 @@ public class InteractiveChatIntegration implements FIntegration {
     }
 
     // https://github.com/LOOHP/InteractiveChat/issues/164
-    public String markSender(FEntity fSender, String message) {
+    private String markSender(FEntity fSender, String message) {
         UUID sender = fSender.getUuid();
         if (Bukkit.getPlayer(fSender.getUuid()) == null) return message;
 
@@ -102,5 +104,16 @@ public class InteractiveChatIntegration implements FIntegration {
         }
 
         return true;
+    }
+
+    @Override
+    public void process(MessageContext messageContext) {
+        if (!messageContext.isInteractiveChat()) return;
+
+        FEntity sender = messageContext.getSender();
+        String message = messageContext.getMessage();
+        message = markSender(sender, message);
+
+        messageContext.setMessage(message);
     }
 }
