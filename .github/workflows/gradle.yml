@@ -20,12 +20,9 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: gradle
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: false
 
       - name: Build with Gradle
         run: ./gradlew mergeJars
