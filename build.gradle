@@ -96,6 +96,10 @@ tasks.register("mergeJars", Jar) {
         }
     }
 
+    from(rootProject.file('LICENSE')) {
+        into('/')
+    }
+
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     dependsOn platforms.collect { it.tasks.named("shadowJar") }
