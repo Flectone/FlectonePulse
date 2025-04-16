@@ -21,34 +21,14 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Build Bukkit
-      run: ./gradlew bukkit:shadowJar
+    - name: Build
+      run: ./gradlew shadowJar
 
-    - name: Publish Bukkit artifact
+    - name: Publish artifact
       uses: actions/upload-artifact@v4
       with:
-        name: FlectonePulse-bukkit
-        path: build/bukkit/libs
-        if-no-files-found: warn
-
-    - name: Build Velocity
-      run: ./gradlew velocity:shadowJar
-
-    - name: Publish Velocity artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: FlectonePulse-velocity
-        path: build/velocity/libs
-        if-no-files-found: warn
-
-    - name: Build Bungeecord
-      run: ./gradlew bungeecord:shadowJar
-
-    - name: Publish Bungeecord artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: FlectonePulse-bungeecord
-        path: build/bungeecord/libs
+        name: FlectonePulse
+        path: build/libs
         if-no-files-found: warn
 
 

@@ -9,8 +9,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = project_name
-
 include "core"
 include "bukkit"
 include "velocity"

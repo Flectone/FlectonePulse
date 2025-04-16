@@ -4,11 +4,11 @@ plugins {
     id 'com.github.gmazzo.buildconfig' version '5.3.5'
 }
 
-jar.enabled = false
-
 subprojects {
     apply plugin: 'java'
     apply plugin: 'com.github.gmazzo.buildconfig'
+
+    group = "net.flectone.pulse.${project.name}"
 
     if (!project.name.is("fabric")) {
         apply plugin: 'com.github.johnrengelman.shadow'
@@ -19,22 +19,22 @@ subprojects {
         }
 
         shadowJar {
-            archiveFileName = "FlectonePulse-" + project.name + "-" + project_version + ".jar"
+            relocate("com.alessiodp.libby", "net.flectone.pulse.library.libby")
+            relocate("com.google.inject", "net.flectone.pulse.library.guice")
+            relocate("com.google.common", "net.flectone.pulse.library.guava")
+            relocate("net.elytrium.serializer", "net.flectone.pulse.library.elytrium")
 
-            if (!project.name.is("velocity") && !project.name.is("bungeecord")) {
-                relocate("com.alessiodp.libby", "net.flectone.pulse.library.libby")
-                relocate("com.google.inject", "net.flectone.pulse.library.guice")
-                relocate("com.google.common", "net.flectone.pulse.library.guava")
-                relocate("net.elytrium.serializer", "net.flectone.pulse.library.elytrium")
+            relocate("com.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents")
+            relocate("io.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents.impl")
 
-                relocate("com.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents")
-                relocate("io.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents.impl")
-
-                relocate("net.kyori.adventure", "net.flectone.pulse.library.adventure")
-                relocate("me.imdanix.text", "net.flectone.pulse.library.minitranslator")
-            }
+            relocate("net.kyori.adventure", "net.flectone.pulse.library.adventure")
+            relocate("me.imdanix.text", "net.flectone.pulse.library.minitranslator")
 
             outputs.cacheIf { true }
+
+            archiveBaseName.set("${project_name}-${project.name}")
+            archiveClassifier.set("")
+            archiveVersion.set("${project_version}")
 
             minimize()
         }
@@ -46,81 +46,26 @@ subprojects {
         options.encoding = 'UTF-8'
     }
 
-    group = "net.flectone.pulse." + project.name
-    project.buildDir(new File(rootProject.projectDir, "build/" + project.name))
-
     repositories {
         mavenCentral()
 
-        maven {
-            url = 'https://jitpack.io'
-        }
-
-        maven {
-            name = "spigotmc-repo"
-            url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
-        }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/groups/public/"
-        }
-
-        maven {
-            name = "aikar"
-            url = "https://repo.aikar.co/content/groups/aikar/"
-        }
-
-        maven {
-            url = "https://repo.codemc.io/repository/maven-releases/"
-        }
-
-        maven {
-            url = 'https://repo.minebench.de'
-        }
-
-        maven {
-            url = "https://s01.oss.sonatype.org/content/repositories/snapshots"
-        }
-
-        maven {
-            url = "https://libraries.minecraft.net"
-        }
-
-        maven {
-            url = "https://maven.evokegames.gg/snapshots"
-        }
-
-        maven {
-            url = "https://maven.maxhenkel.de/repository/public"
-        }
-
-        maven {
-            url = "https://repo.extendedclip.com/content/repositories/placeholderapi/"
-        }
-
-        maven {
-            url = "https://repo.plasmoverse.com/releases"
-        }
-
-        maven {
-            url = "https://repo.plasmoverse.com/snapshots"
-        }
-
-        maven {
-            url = "https://repo.loohpjames.com/repository"
-        }
-
-        maven {
-            url = "https://repo.diogotc.com/releases"
-        }
-
-        maven {
-            url = "https://repo.codemc.io/repository/maven-snapshots/"
-        }
-
-        maven {
-            url = "https://maven.devs.beer/"
-        }
+        maven { url = "https://jitpack.io" }
+        maven { url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/" }
+        maven { url = "https://oss.sonatype.org/content/groups/public/" }
+        maven { url = "https://repo.aikar.co/content/groups/aikar/" }
+        maven { url = "https://repo.codemc.io/repository/maven-releases/" }
+        maven { url = "https://repo.minebench.de" }
+        maven { url = "https://s01.oss.sonatype.org/content/repositories/snapshots" }
+        maven { url = "https://libraries.minecraft.net" }
+        maven { url = "https://maven.evokegames.gg/snapshots" }
+        maven { url = "https://maven.maxhenkel.de/repository/public" }
+        maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
+        maven { url = "https://repo.plasmoverse.com/releases" }
+        maven { url = "https://repo.plasmoverse.com/snapshots" }
+        maven { url = "https://repo.loohpjames.com/repository" }
+        maven { url = "https://repo.diogotc.com/releases" }
+        maven { url = "https://repo.codemc.io/repository/maven-snapshots/" }
+        maven { url = "https://maven.devs.beer/" }
     }
 
     dependencies {
@@ -135,3 +80,23 @@ subprojects {
     }
 }
 
+tasks.named("shadowJar").configure { enabled = false }
+tasks.named("jar").configure { enabled = false }
+
+tasks.register("mergeJars", Jar) {
+    archiveVersion.set("${project_version}")
+
+    def platforms = subprojects.findAll {
+        it.name != "fabric" && it.name != "core"
+    }
+
+    from {
+        platforms.collect {
+            zipTree("${it.buildDir}/libs/${project_name}-${it.name}-${project_version}.jar")
+        }
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    dependsOn platforms.collect { it.tasks.named("shadowJar") }
+}
