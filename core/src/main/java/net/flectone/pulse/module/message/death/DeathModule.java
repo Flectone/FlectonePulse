@@ -89,6 +89,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
         if (!death.isPlayer()) {
             builder(fTarget)
                     .destination(message.getDestination())
+                    .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DEATH))
                     .receiver(fReceiver)
                     .format(s -> s.getTypes().get(death.getKey()))
                     .tagResolvers(fResolver -> new TagResolver[]{killerTag(fResolver, death.getKiller()), byItemTag(death.getItem())})
@@ -102,6 +103,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
         builder(fTarget)
                 .range(message.getRange())
                 .destination(message.getDestination())
+                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DEATH))
                 .tag(MessageTag.DEATH)
                 .format(s -> s.getTypes().get(death.getKey()))
                 .tagResolvers(fResolver -> new TagResolver[]{killerTag(fResolver, death.getKiller()), byItemTag(death.getItem())})
@@ -111,6 +113,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
                 .sendBuilt();
 
         if (!death.isPlayer()) return;
+        if (fTarget instanceof FPlayer player && !player.isSetting(FPlayer.Setting.DEATH)) return;
 
         Component component = messagePipeline.builder(fTarget, fReceiver, resolveLocalization(fReceiver).getTypes().get(death.getKey()))
                 .tagResolvers(killerTag(fReceiver, death.getKiller()), byItemTag(death.getItem()))

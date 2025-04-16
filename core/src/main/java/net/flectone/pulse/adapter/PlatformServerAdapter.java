@@ -82,7 +82,7 @@ public interface PlatformServerAdapter {
     @NotNull ItemStack buildItemStack(
             int settingIndex,
             FPlayer fPlayer,
-            List<String> itemMessages,
+            List<List<String>> messages,
             Command.Chatsetting.SettingItem settingItem
     );
 }

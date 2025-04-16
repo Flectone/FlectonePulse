@@ -106,10 +106,9 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
             int slot = entry.getValue().getSlot();
 
             List<List<String>> messages = localization.getItems().get(setting);
-            List<String> itemMessages = messages.get(settingIndex);
 
             inventoryBuilder = inventoryBuilder
-                    .addItem(slot, platformServerAdapter.buildItemStack(settingIndex, fPlayer, itemMessages, entry.getValue()))
+                    .addItem(slot, platformServerAdapter.buildItemStack(settingIndex, fPlayer, messages, entry.getValue()))
                     .addClickHandler(slot, (itemStack, inventory) -> {
                         if (!permissionChecker.check(fPlayer, permission.getItems().get(setting).getName())) {
                             builder(fPlayer)
@@ -156,7 +155,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                             }
                         }
 
-                        ItemStack newItemStack = platformServerAdapter.buildItemStack(newSettingIndex, fPlayer, itemMessages, entry.getValue());
+                        ItemStack newItemStack = platformServerAdapter.buildItemStack(newSettingIndex, fPlayer, messages, entry.getValue());
                         inventoryController.changeItem(fPlayer, inventory, slot, newItemStack);
                     });
         }

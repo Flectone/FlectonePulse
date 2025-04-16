@@ -119,8 +119,10 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
     @Override
     public @NotNull ItemStack buildItemStack(int settingIndex, @NotNull FPlayer fPlayer,
-                                             @NotNull List<String> itemMessages,
+                                             @NotNull List<List<String>> messages,
                                              @NotNull Command.Chatsetting.SettingItem settingItem) {
+        List<String> itemMessages = messages.get(settingIndex);
+
         Component name = buildItemNameComponent(fPlayer, itemMessages);
         List<Component> lore = buildItemLoreComponents(fPlayer, itemMessages);
 

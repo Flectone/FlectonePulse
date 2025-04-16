@@ -72,6 +72,7 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
 
         builder(fPlayer)
                 .destination(type.getDestination())
+                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.AUTO))
                 .format(format)
                 .sound(sound)
                 .sendBuilt();
