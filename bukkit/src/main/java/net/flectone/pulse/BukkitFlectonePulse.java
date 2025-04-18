@@ -13,7 +13,6 @@ import net.flectone.pulse.module.Module;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
-import net.flectone.pulse.module.message.mark.manager.MarkManager;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.BukkitLibraryResolver;
@@ -151,7 +150,6 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(CommandRegistry.class).reload();
         injector.getInstance(ListenerRegistry.class).reload();
         injector.getInstance(TaskScheduler.class).reload();
-        injector.getInstance(MarkManager.class).reload();
 
         FileManager fileManager = injector.getInstance(FileManager.class);
         fileManager.reload();

@@ -26,7 +26,6 @@ import net.flectone.pulse.module.command.ignorelist.IgnorelistModule;
 import net.flectone.pulse.module.command.kick.KickModule;
 import net.flectone.pulse.module.command.mail.MailModule;
 import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
-import net.flectone.pulse.module.command.mark.MarkModule;
 import net.flectone.pulse.module.command.me.MeModule;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.command.mutelist.MutelistModule;
@@ -79,7 +78,6 @@ public class CommandModule extends AbstractModule {
         addChildren(KickModule.class);
         addChildren(MailModule.class);
         addChildren(MaintenanceModule.class);
-        addChildren(MarkModule.class);
         addChildren(MeModule.class);
         addChildren(MuteModule.class);
         addChildren(MutelistModule.class);

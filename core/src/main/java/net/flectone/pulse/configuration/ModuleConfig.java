@@ -28,7 +28,6 @@ public interface ModuleConfig {
         SubCommandConfig getKick();
         SubCommandConfig getMail();
         SubCommandConfig getMaintenance();
-        SubCommandConfig getMark();
         SubCommandConfig getMe();
         SubCommandConfig getMute();
         SubCommandConfig getMutelist();
@@ -97,7 +96,6 @@ public interface ModuleConfig {
         SubMessageConfig getGamemode();
         SubMessageConfig getGreeting();
         SubMessageConfig getJoin();
-        SubMessageConfig getMark();
         ObjectiveMessageConfig getObjective();
         SubMessageConfig getOp();
         SubMessageConfig getQuit();

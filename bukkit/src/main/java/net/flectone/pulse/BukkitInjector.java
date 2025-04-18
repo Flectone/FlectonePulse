@@ -36,8 +36,6 @@ import net.flectone.pulse.module.message.format.scoreboard.BukkitScoreboardModul
 import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.join.BukkitJoinModule;
 import net.flectone.pulse.module.message.join.JoinModule;
-import net.flectone.pulse.module.message.mark.BukkitMarkModule;
-import net.flectone.pulse.module.message.mark.MarkModule;
 import net.flectone.pulse.module.message.objective.BukkitObjectiveModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.quit.BukkitQuitModule;
@@ -175,7 +173,6 @@ public class BukkitInjector extends AbstractModule {
 
     private void bindModules() {
         bind(IntegrationModule.class).to(BukkitIntegrationModule.class);
-        bind(MarkModule.class).to(BukkitMarkModule.class);
         bind(ScoreboardModule.class).to(BukkitScoreboardModule.class);
         bind(ObjectiveModule.class).to(BukkitObjectiveModule.class);
         bind(SidebarModule.class).to(BukkitSidebarModule.class);

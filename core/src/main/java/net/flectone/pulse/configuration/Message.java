@@ -76,8 +76,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Greeting greeting = new Greeting();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/join/")})
     private Join join = new Join();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/mark/")})
-    private Mark mark = new Mark();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/objective/")})
     private Objective objective = new Objective();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/op/")})
@@ -546,34 +544,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         private int range = Range.SERVER;
         private Destination destination = new Destination();
         private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Mark implements SubMessageConfig, Config.IEnable {
-        private boolean enable = false;
-        private boolean limit = true;
-        private boolean color = true;
-        private int range = 100;
-        private int duration = 60;
-        private String item = "WOODEN_SWORD";
-        private Legacy legacy = new Legacy();
-        private Modern modern = new Modern();
-        private Cooldown cooldown = new Cooldown();
-        private Sound sound = new Sound();
-
-        @Getter
-        public static final class Legacy {
-            private boolean enable = true;
-            private int size = 1;
-            private String entity = "MAGMA_CUBE";
-        }
-
-        @Getter
-        public static final class Modern {
-            private boolean enable = false;
-            private float scale = 1.0f;
-            private String block = "BEACON";
-        }
     }
 
     @Getter

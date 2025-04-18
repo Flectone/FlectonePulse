@@ -635,11 +635,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
             return null;
         }
 
-        @Override
-        public SubCommandConfig getMark() {
-            return null;
-        }
-
         @Getter
         @NoArgsConstructor
         public static final class Exception {
@@ -1481,11 +1476,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Greeting greeting = new Greeting();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/join/")})
         private Join join = new Join();
-
-        @Override
-        public SubMessageConfig getMark() {
-            return null;
-        }
 
         @Override
         public ObjectiveMessageConfig getObjective() {

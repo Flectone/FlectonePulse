@@ -83,8 +83,6 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     private Mail mail = new Mail();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/maintenance/")})
     private Maintenance maintenance = new Maintenance();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/mark/")})
-    private Mark mark = new Mark();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/me/")})
     private Me me = new Me();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/mute/")})
@@ -368,14 +366,6 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
         public boolean turnedOn;
         private List<String> aliases = new ArrayList<>(List.of("maintenance"));
         private Destination destination = new Destination();
-        private Cooldown cooldown = new Cooldown();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Mark implements SubCommandConfig, ICommandFile {
-        private boolean enable = false;
-        private List<String> aliases = new ArrayList<>(List.of("mark"));
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
