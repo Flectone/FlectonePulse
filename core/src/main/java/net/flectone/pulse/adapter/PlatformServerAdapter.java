@@ -75,7 +75,7 @@ public interface PlatformServerAdapter {
      *
      * @param settingIndex The index of the setting
      * @param fPlayer The player context for the item
-     * @param itemMessages List of messages to include
+     * @param messages List of messages to include
      * @param settingItem The item configuration
      * @return Configured ItemStack
      */

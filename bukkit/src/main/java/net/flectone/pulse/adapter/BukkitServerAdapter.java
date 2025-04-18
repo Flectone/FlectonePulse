@@ -225,6 +225,8 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
                 ? Component.translatable(getItemName(itemStack))
                 : Component.text(itemStack.getItemMeta().getDisplayName()).decorate(TextDecoration.ITALIC);
 
+        if (itemStack.getType() == Material.AIR) return component;
+
         Key key = Key.key(itemStack.getType().name().toLowerCase());
         return component.hoverEvent(HoverEvent.showItem(key, itemStack.getAmount()));
     }
