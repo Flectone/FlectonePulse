@@ -218,17 +218,29 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NotNull Component translateItemName(Object item) {
+    public @NotNull Component translateItemName(Object item, boolean translatable) {
         if (!(item instanceof org.bukkit.inventory.ItemStack itemStack)) return Component.empty();
 
         Component component = itemStack.getItemMeta() == null || itemStack.getItemMeta().getDisplayName().isEmpty()
-                ? Component.translatable(getItemName(itemStack))
+                ? createTranslatableItemName(itemStack, translatable)
                 : Component.text(itemStack.getItemMeta().getDisplayName()).decorate(TextDecoration.ITALIC);
 
         if (itemStack.getType() == Material.AIR) return component;
 
         Key key = Key.key(itemStack.getType().name().toLowerCase());
         return component.hoverEvent(HoverEvent.showItem(key, itemStack.getAmount()));
+    }
+
+    private Component createTranslatableItemName(org.bukkit.inventory.ItemStack itemStack, boolean translatable) {
+        if (translatable) {
+            String itemName = getItemName(itemStack);
+
+            return Component.translatable(itemName);
+        }
+
+        String itemName = itemStack.getType().name().toLowerCase().replace("_", " ");
+
+        return Component.text(itemName);
     }
 
     private static boolean detectFolia() {

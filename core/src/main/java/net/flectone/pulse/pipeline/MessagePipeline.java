@@ -13,6 +13,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 
 @Singleton
@@ -117,6 +118,11 @@ public class MessagePipeline {
             return this;
         }
 
+        public Builder translateItem(boolean translateItem) {
+            context.setTranslateItem(translateItem);
+            return this;
+        }
+
         public Builder userMessage(boolean userMessage) {
             context.setUserMessage(userMessage);
             return this;
@@ -161,6 +167,10 @@ public class MessagePipeline {
 
         public String defaultSerializerBuild() {
             return MiniMessage.miniMessage().serialize(build());
+        }
+
+        public String plainSerializerBuild() {
+            return PlainTextComponentSerializer.plainText().serialize(build());
         }
 
         public String legacySerializerBuild() {

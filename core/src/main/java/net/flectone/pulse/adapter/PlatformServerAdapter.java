@@ -66,9 +66,10 @@ public interface PlatformServerAdapter {
      * Gets the translated display name of an item in Minecraft's
      *
      * @param item The platform-specific item object
+     * @param translatable Use translatable item name
      * @return Localized item name or empty string if invalid
      */
-    @NotNull Component translateItemName(Object item);
+    @NotNull Component translateItemName(Object item, boolean translatable);
 
     /**
      * Builds an ItemStack from configuration settings

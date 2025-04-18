@@ -97,6 +97,14 @@ public class MessageContext {
         flags.put("translate", translate);
     }
 
+    public boolean isTranslateItem() {
+        return flags.getOrDefault("translateItem", true);
+    }
+
+    public void setTranslateItem(boolean translateItem) {
+        flags.put("translateItem", translateItem);
+    }
+
     public boolean isSwear() {
         return flags.getOrDefault("swear", true);
     }

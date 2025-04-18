@@ -151,7 +151,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         messageContext.addTagResolvers(coordsTag(sender, receiver));
         messageContext.addTagResolvers(statsTag(sender, receiver));
         messageContext.addTagResolvers(skinTag(sender, receiver));
-        messageContext.addTagResolvers(itemTag(sender, receiver));
+        messageContext.addTagResolvers(itemTag(sender, receiver, messageContext.isTranslateItem()));
 
         if (messageContext.isUrl()) {
             messageContext.addTagResolvers(urlTag(sender, receiver));
@@ -266,7 +266,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         });
     }
 
-    private TagResolver itemTag(FEntity sender, FEntity fReceiver) {
+    private TagResolver itemTag(FEntity sender, FEntity fReceiver, boolean translatable) {
         String tag = "item";
         if (!isCorrectTag(TagType.ITEM, sender)) return emptyTagResolver(tag);
 
@@ -274,11 +274,12 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
             String string = resolveLocalization(fReceiver).getTags().get(TagType.ITEM);
+
             return Tag.selfClosingInserting(messagePipeline.builder(sender, fReceiver, string)
                     .build()
                     .replaceText(TextReplacementConfig.builder()
                             .match("<message>")
-                            .replacement(platformServerAdapter.translateItemName(itemStackObject))
+                            .replacement(platformServerAdapter.translateItemName(itemStackObject, translatable))
                             .build()
                     )
             );
