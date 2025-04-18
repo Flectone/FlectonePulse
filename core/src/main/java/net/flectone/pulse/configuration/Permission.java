@@ -91,8 +91,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Mail mail = new Mail();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/maintenance/")})
         private Maintenance maintenance = new Maintenance();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/mark/")})
-        private Mark mark = new Mark();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/me/")})
         private Me me = new Me();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/mute/")})
@@ -340,14 +338,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private PermissionEntry join = new PermissionEntry("flectonepulse.module.command.maintenance.join", Type.OP);
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.maintenance.cooldown.bypass", Type.OP);
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.maintenance.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Mark implements SubCommandConfig, IPermission {
-            private String name = "flectonepulse.module.command.mark";
-            private Type type = Type.TRUE;
-            private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.mark.cooldown.bypass", Type.OP);
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.mark.sound", Type.TRUE);
         }
 
         @Getter
@@ -722,8 +712,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Greeting greeting = new Greeting();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/join/")})
         private Join join = new Join();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/mark/")})
-        private Mark mark = new Mark();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/objective/")})
         private Objective objective = new Objective();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/op/")})
@@ -1093,14 +1081,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private String name = "flectonepulse.module.message.join";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.join.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Mark implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.mark";
-            private Type type = Type.TRUE;
-            private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.mark.cooldown.bypass", Type.OP);
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.mark.sound", Type.TRUE);
         }
 
         @Getter
