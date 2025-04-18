@@ -132,7 +132,7 @@ public class BubbleRenderer {
             bubbleEntities.removeAll(bubbleEntitiesToRemove);
 
             // remove space
-            rideEntities(bubble.getSender(), bubbleEntitiesToRemove.getFirst().getViewer());
+            rideEntities(bubble.getSender(), bubbleEntitiesToRemove.get(0).getViewer());
         });
     }
 
