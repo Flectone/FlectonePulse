@@ -2,12 +2,11 @@ package net.flectone.pulse.module.message.sidebar;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.pipeline.MessagePipeline;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.sidebar.Sidebar;
 import org.bukkit.Bukkit;
@@ -38,7 +37,6 @@ public class BukkitSidebarModule extends SidebarModule {
         this.messagePipeline = messagePipeline;
     }
 
-    @Async
     @Override
     public void send(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;

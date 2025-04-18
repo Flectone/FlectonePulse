@@ -2,7 +2,6 @@ package net.flectone.pulse.module.message.tab.header;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
@@ -47,7 +46,6 @@ public class HeaderModule extends AbstractModuleListMessage<Localization.Message
         }
     }
 
-    @Async
     public void send(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 

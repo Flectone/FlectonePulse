@@ -8,7 +8,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPl
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
@@ -16,11 +15,11 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.sender.PacketSender;
+import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 
 @Singleton
@@ -67,7 +66,6 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
         }
     }
 
-    @Async
     public void update() {
         if (!isEnable()) return;
 

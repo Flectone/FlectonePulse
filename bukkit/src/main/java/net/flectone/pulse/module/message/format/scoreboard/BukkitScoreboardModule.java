@@ -2,7 +2,6 @@ package net.flectone.pulse.module.message.format.scoreboard;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
@@ -39,7 +38,6 @@ public class BukkitScoreboardModule extends ScoreboardModule {
         message = fileManager.getMessage().getFormat().getScoreboard();
     }
 
-    @Async
     @Override
     public void add(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
@@ -63,14 +61,13 @@ public class BukkitScoreboardModule extends ScoreboardModule {
         }
 
         if (!message.getSuffix().isEmpty()) {
-            teamDisplay.suffix(messagePipeline.builder(fPlayer, fPlayer, message.getSuffix()).build());
+            teamDisplay.suffix(messagePipeline.builder(fPlayer, message.getSuffix()).build());
         }
 
         teamDisplay.addEntry(fPlayer.getName());
         teamManager.addPlayer(player);
     }
 
-    @Async
     @Override
     public void remove(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;

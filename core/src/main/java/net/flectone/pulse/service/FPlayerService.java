@@ -104,10 +104,10 @@ public class FPlayerService {
         taskScheduler.runAsync(() -> {
             // update old database data
             fPlayerRepository.saveOrUpdate(finalPlayer);
-        });
 
-        // send info for modules
-        platformPlayerAdapter.update(finalPlayer);
+            // send info for modules
+            platformPlayerAdapter.update(finalPlayer);
+        });
 
         return finalPlayer;
     }

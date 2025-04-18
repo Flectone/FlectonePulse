@@ -2,7 +2,6 @@ package net.flectone.pulse.module.message.brand;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
@@ -52,7 +51,6 @@ public class BrandModule extends AbstractModuleListMessage<Localization.Message.
         return message.isEnable();
     }
 
-    @Async
     public void send(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 

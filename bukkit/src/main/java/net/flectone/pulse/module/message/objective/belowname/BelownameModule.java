@@ -3,7 +3,6 @@ package net.flectone.pulse.module.message.objective.belowname;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
@@ -68,7 +67,6 @@ public class BelownameModule extends AbstractModule {
         return message.isEnable();
     }
 
-    @Async
     public void add(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
@@ -79,7 +77,6 @@ public class BelownameModule extends AbstractModule {
         objectiveManager.addPlayer(player);
     }
 
-    @Async
     public void remove(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 

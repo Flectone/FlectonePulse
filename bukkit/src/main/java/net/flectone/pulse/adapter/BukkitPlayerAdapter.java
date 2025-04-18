@@ -6,7 +6,6 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.stream.StreamModule;
@@ -21,6 +20,7 @@ import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -35,7 +35,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 @Singleton
 public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
@@ -334,12 +336,14 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         injector.getInstance(AfkModule.class).remove("", fPlayer);
         injector.getInstance(StreamModule.class).setStreamPrefix(fPlayer, fPlayer.isSetting(FPlayer.Setting.STREAM));
 
-        injector.getInstance(ScoreboardModule.class).add(fPlayer);
-        injector.getInstance(BelownameModule.class).add(fPlayer);
-        injector.getInstance(TabnameModule.class).add(fPlayer);
-        injector.getInstance(TaskScheduler.class).runAsyncLater(() ->
-                injector.getInstance(PlayerlistnameModule.class).update(), 10L);
-        injector.getInstance(SidebarModule.class).send(fPlayer);
+        injector.getInstance(TaskScheduler.class).runAsyncLater(() -> {
+            injector.getInstance(ScoreboardModule.class).add(fPlayer);
+            injector.getInstance(BelownameModule.class).add(fPlayer);
+            injector.getInstance(TabnameModule.class).add(fPlayer);
+            injector.getInstance(PlayerlistnameModule.class).update();
+            injector.getInstance(SidebarModule.class).send(fPlayer);
+        }, 10L);
+
         injector.getInstance(FooterModule.class).send(fPlayer);
         injector.getInstance(HeaderModule.class).send(fPlayer);
         injector.getInstance(BrandModule.class).send(fPlayer);

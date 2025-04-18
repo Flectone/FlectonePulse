@@ -2,16 +2,15 @@ package net.flectone.pulse.module.message.auto;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleListMessage;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 
 import java.util.List;
@@ -47,9 +46,7 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
 
             Ticker ticker = value.getTicker();
             if (ticker.isEnable()) {
-                taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(fPlayer -> send(fPlayer, key, value, sound)),
-                        ticker.getPeriod(), ticker.getPeriod()
-                );
+                taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(fPlayer -> send(fPlayer, key, value, sound)), ticker.getPeriod());
             }
         });
     }
@@ -59,7 +56,6 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
         return message.isEnable();
     }
 
-    @Async
     public void send(FPlayer fPlayer, String name, Message.Auto.Type type, Sound sound) {
         if (checkModulePredicates(fPlayer)) return;
         if (!fPlayer.isSetting(FPlayer.Setting.AUTO)) return;
