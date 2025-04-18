@@ -11,6 +11,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.module.message.bubble.renderer.BubbleRenderer;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.RandomUtil;
 import org.jetbrains.annotations.NotNull;
@@ -28,18 +29,21 @@ public class BubbleService {
     private final ColorConverter colorConverter;
     private final TaskScheduler taskScheduler;
     private final RandomUtil randomUtil;
+    private final MessagePipeline messagePipeline;
     
     @Inject
     public BubbleService(TaskScheduler taskScheduler,
                          FileManager fileManager,
                          BubbleRenderer bubbleRenderer,
                          ColorConverter colorConverter,
-                         RandomUtil randomUtil) {
+                         RandomUtil randomUtil,
+                         MessagePipeline messagePipeline) {
         this.fileManager = fileManager;
         this.bubbleRenderer = bubbleRenderer;
         this.colorConverter = colorConverter;
         this.taskScheduler = taskScheduler;
         this.randomUtil = randomUtil;
+        this.messagePipeline = messagePipeline;
     }
 
     private void startTicker() {
@@ -53,7 +57,15 @@ public class BubbleService {
                 sender.getUuid(), 
                 uuid -> new LinkedList<>()
         );
-        
+
+        message = messagePipeline.builder(sender, message)
+                .userMessage(true)
+                .mention(false)
+                .question(false)
+                .interactiveChat(false)
+                .translateItem(false)
+                .plainSerializerBuild();
+
         List<Bubble> bubbles = splitMessageToBubbles(sender, message);
 
         bubbleQueue.addAll(bubbles);
