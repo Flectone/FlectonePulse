@@ -54,7 +54,8 @@ public final class LegacyMiniConvertor implements MessageProcessor {
             Option.FORMAT,
             Option.GRADIENT,
             Option.FAST_RESET,
-            Option.RESET
+            Option.RESET,
+            Option.DOUBLE_TO_ESCAPE
     ));
 
     private final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
@@ -100,6 +101,9 @@ public final class LegacyMiniConvertor implements MessageProcessor {
      */
     public @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
         text = text.replace('§', '&');
+        if (options.contains(Option.DOUBLE_TO_ESCAPE)) {
+            text = text.replace("&&", "§");
+        }
 
         if (options.contains(Option.COLOR_DOUBLE_HASH)) {
             text = replaceDoubleHashHexColor(text);
@@ -123,7 +127,7 @@ public final class LegacyMiniConvertor implements MessageProcessor {
                 index++, nextIndex = text.indexOf('&', index)
         ) {
             if (nextIndex == -1) {
-                builder.append(text.substring(index));
+                builder.append(text, index, length);
                 break;
             }
 
@@ -144,7 +148,6 @@ public final class LegacyMiniConvertor implements MessageProcessor {
 
             switch (tag) {
                 case "hex_color" -> {
-                    // TODO: This looks too duplicated - there has to be a good way to simplify it
                     if (symbol == '#') {
                         if (length > index + 6 && isHexPattern(text, index + 1)) {
                             handleClosing(order, builder, closeLastTag, fastReset);
@@ -173,10 +176,14 @@ public final class LegacyMiniConvertor implements MessageProcessor {
                     int endIndex = -1;
                     for (int inner = index + 1; inner < length; inner++) {
                         char inCh = Character.toLowerCase(text.charAt(inner));
-                        if (inCh == '&') {
+                        if (inCh == '@') {
                             endIndex = inner;
                             break;
-                        } else if (!(('a' <= inCh && inCh <= 'z') || ('0' <= inCh && inCh <= '9') || inCh == '#' || inCh == '-')) {
+                        } else if (!(
+                                ('a' <= inCh && inCh <= 'z') ||
+                                        ('0' <= inCh && inCh <= '9') ||
+                                        inCh == '#' || inCh == '-'
+                        )) {
                             break;
                         }
                     }
@@ -190,10 +197,8 @@ public final class LegacyMiniConvertor implements MessageProcessor {
                         if (color.length() == 1) {
                             color = colorByChar(color.charAt(0));
                             if (color == null) break;
-                        } else if (color.startsWith("#")) {
-                            if (!isHexPattern(color, 1)) {
-                                break;
-                            }
+                        } else if (color.startsWith("#") && (color.length() < 7 || !isHexPattern(color, 1))) {
+                            break;
                         } else if (NamedTextColor.NAMES.value(color) == null) {
                             break;
                         }
@@ -226,18 +231,17 @@ public final class LegacyMiniConvertor implements MessageProcessor {
         if (closeLastTag || !fastReset) {
             handleClosing(order, builder, closeLastTag, closeLastTag && fastReset);
         }
-        return builder.toString();
+        return builder.toString().replace('§', '&');
     }
 
     private @Nullable String extractLegacyHex(String input, int from) {
         StringBuilder builder = new StringBuilder(6);
         for (int i = from + 1, end = from + 12; i <= end; i += 2) {
             char ch = input.charAt(i);
-            if (isHexDigit(ch)) {
-                builder.append(ch);
-            } else {
+            if (!isHexDigit(ch)) {
                 return null;
             }
+            builder.append(ch);
         }
         return builder.toString();
     }
@@ -263,23 +267,6 @@ public final class LegacyMiniConvertor implements MessageProcessor {
         }
 
         return result.toString();
-    }
-
-    private boolean isHexColorStandalone(String text, int index) {
-        if (index + 6 >= text.length()) return false;
-
-        char prevChar = index == 0
-                ? ' '
-                : text.charAt(index - 1);
-        char nextChar = index + 7 >= text.length()
-                ? ' '
-                : text.charAt(index + 7);
-
-        if (prevChar == '&') return false; // &#123456
-        if (prevChar == '<' && nextChar == '>') return false; // <#123456>
-        if (prevChar == ':' && (nextChar == '>' || nextChar == ':')) return false; // <color:#123456> | <gradient:#123456:#654321>
-
-        return isHexPattern(text, index + 1);
     }
 
     private String replaceDoubleHashHexColor(String text) {
@@ -313,6 +300,23 @@ public final class LegacyMiniConvertor implements MessageProcessor {
         return result.toString();
     }
 
+    private boolean isHexColorStandalone(String text, int index) {
+        if (index + 6 >= text.length()) return false;
+
+        char prevChar = index == 0
+                ? ' '
+                : text.charAt(index - 1);
+        char nextChar = index + 7 >= text.length()
+                ? ' '
+                : text.charAt(index + 7);
+
+        if (prevChar == '&') return false; // &#123456
+        if (prevChar == '<' && nextChar == '>') return false; // <#123456>
+        if (prevChar == ':' && (nextChar == '>' || nextChar == ':')) return false; // <color:#123456> | <gradient:#123456:#654321>
+
+        return isHexPattern(text, index + 1);
+    }
+
     private void handleClosing(List<String> order, StringBuilder builder, boolean closeLast, boolean fastReset) {
         if (fastReset && order.size() > 1) {
             builder.append("<reset>");
@@ -332,12 +336,12 @@ public final class LegacyMiniConvertor implements MessageProcessor {
         } else if (isFormatChar(ch)) {
             if (!options.contains(Option.FORMAT)) return null;
             return switch (ch) {
-                case 'l', 'L' -> "b";
-                case 'n', 'N' -> "u";
-                case 'm', 'M' -> "st";
-                case 'o', 'O' -> "i";
                 case 'k', 'K' -> "obf";
-                default -> throw new IllegalStateException("Provided impossible symbol '" + ch + "'");
+                case 'l', 'L' -> "b";
+                case 'm', 'M' -> "st";
+                case 'n', 'N' -> "u";
+                case 'o', 'O' -> "i";
+                default -> throw new IllegalStateException("Provided impossible format symbol '" + ch + "'");
             };
         } else if (ch == 'r' || ch == 'R') {
             if (!options.contains(Option.RESET)) return null;
@@ -444,7 +448,11 @@ public final class LegacyMiniConvertor implements MessageProcessor {
         /**
          * Close color tags when another color was found
          */
-        CLOSE_COLORS
+        CLOSE_COLORS,
+        /**
+         * Allow EssentialsX-like {@code &&} escaping
+         */
+        DOUBLE_TO_ESCAPE
     }
 }
 
