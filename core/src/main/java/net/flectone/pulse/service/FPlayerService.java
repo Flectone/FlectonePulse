@@ -73,10 +73,10 @@ public class FPlayerService {
     }
 
     public FPlayer addAndGetFPlayer(UUID uuid) {
-        return addAndGetFPlayer(uuid, platformPlayerAdapter.getEntityId(uuid), platformPlayerAdapter.getName(uuid));
+        return addAndGetFPlayer(uuid, platformPlayerAdapter.getName(uuid));
     }
 
-    public FPlayer addAndGetFPlayer(UUID uuid, int entityId, String name) {
+    public FPlayer addAndGetFPlayer(UUID uuid, String name) {
         // insert to database
         boolean isInserted = fPlayerRepository.save(uuid, name);
 
@@ -97,13 +97,14 @@ public class FPlayerService {
         loadIgnores(finalPlayer);
         finalPlayer.setOnline(true);
         finalPlayer.setIp(platformPlayerAdapter.getIp(finalPlayer));
-        finalPlayer.setEntityId(entityId);
 
         // add player to online cache and remove from offline
         fPlayerRepository.add(finalPlayer);
 
-        // update old database data
-        taskScheduler.runAsync(() -> fPlayerRepository.saveOrUpdate(finalPlayer));
+        taskScheduler.runAsync(() -> {
+            // update old database data
+            fPlayerRepository.saveOrUpdate(finalPlayer);
+        });
 
         // send info for modules
         platformPlayerAdapter.update(finalPlayer);

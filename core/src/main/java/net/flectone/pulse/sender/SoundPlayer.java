@@ -41,7 +41,7 @@ public class SoundPlayer {
         if (packetSound == null) return;
 
         packetSender.send(fPlayer, new WrapperPlayServerEntitySoundEffect(packetSound, category.get(),
-                fPlayer.getEntityId(),
+                platformPlayerAdapter.getEntityId(fPlayer.getUuid()),
                 sound.getVolume(),
                 sound.getPitch()
         ));

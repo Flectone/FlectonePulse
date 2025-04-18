@@ -80,11 +80,10 @@ public class BasePacketListener extends AbstractPacketListener {
         UUID uuid = user.getUUID();
         if (uuid == null) return;
 
-        int entityId = user.getEntityId();
         String name = user.getName();
 
         taskScheduler.runAsync(() -> {
-            FPlayer fPlayer = fPlayerService.addAndGetFPlayer(uuid, entityId, name);
+            FPlayer fPlayer = fPlayerService.addAndGetFPlayer(uuid, name);
 
             joinModuleProvider.get().send(fPlayer, true);
             greetingModuleProvider.get().send(fPlayer);
