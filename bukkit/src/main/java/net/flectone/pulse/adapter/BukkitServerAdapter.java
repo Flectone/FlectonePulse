@@ -17,9 +17,9 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.service.FPlayerService;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.event.HoverEventSource;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
@@ -221,32 +221,12 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     public @NotNull Component translateItemName(Object item) {
         if (!(item instanceof org.bukkit.inventory.ItemStack itemStack)) return Component.empty();
 
-        HoverEvent<?> hoverEvent = hoverEvent(itemStack);
-
         Component component = itemStack.getItemMeta() == null || itemStack.getItemMeta().getDisplayName().isEmpty()
                 ? Component.translatable(getItemName(itemStack))
                 : Component.text(itemStack.getItemMeta().getDisplayName()).decorate(TextDecoration.ITALIC);
 
-        if (hoverEvent != null) {
-            component = component.hoverEvent(hoverEvent);
-        }
-
-        return component;
-    }
-
-    // don't work after 0.2.0 release
-    // need fix but idk how
-    // more information https://discord.com/channels/861147957365964810/1329866516732182579
-    @Nullable
-    private HoverEvent<?> hoverEvent(Object item) {
-        if (!(item instanceof org.bukkit.inventory.ItemStack itemStack)) return null;
-        if (itemStack.getType() == Material.AIR) return null;
-
-        try {
-            return ((HoverEventSource<?>) itemStack).asHoverEvent();
-        } catch (ClassCastException ignored) {}
-
-        return null;
+        Key key = Key.key(itemStack.getType().name().toLowerCase());
+        return component.hoverEvent(HoverEvent.showItem(key, itemStack.getAmount()));
     }
 
     private static boolean detectFolia() {
