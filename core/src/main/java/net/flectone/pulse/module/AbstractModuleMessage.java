@@ -181,6 +181,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
 
         if (sender instanceof FPlayer fPlayer && !fPlayer.isUnknown()) {
             return fReceiver -> {
+                if (fReceiver.isUnknown()) return true;
                 if (fReceiver.isIgnored(fPlayer)) return false;
 
                 if (range > 0) {
