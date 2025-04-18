@@ -1,6 +1,8 @@
 package net.flectone.pulse.adapter;
 
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.potion.PotionType;
+import com.github.retrooper.packetevents.protocol.world.Location;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
@@ -58,11 +60,13 @@ public interface PlatformPlayerAdapter {
 
     // Position and measurement methods
     @Nullable Coordinates getCoordinates(@NotNull FEntity fEntity);
+    @Nullable Location getLocation(@NotNull FPlayer fPlayer);
     double distance(@NotNull FPlayer first, @NotNull FPlayer second);
 
     // Player state methods
     boolean isConsole(@NotNull Object platformPlayer);
     boolean hasPlayedBefore(@NotNull FPlayer fPlayer);
+    boolean hasPotionEffect(@NotNull FPlayer fPlayer, @NotNull PotionType potionType);
     boolean isOnline(@NotNull FPlayer fPlayer);
     long getFirstPlayed(@NotNull FPlayer fPlayer);
     long getLastPlayed(@NotNull FPlayer fPlayer);
@@ -76,4 +80,6 @@ public interface PlatformPlayerAdapter {
     void clear(@NotNull FPlayer fPlayer);
     void update(@NotNull FPlayer fPlayer);
     @NotNull List<UUID> getOnlinePlayers();
+    @NotNull List<UUID> getNearbyEntities(FPlayer fPlayer, double x, double y, double z);
+    @NotNull List<Integer> getPassengers(FPlayer fPlayer);
 }

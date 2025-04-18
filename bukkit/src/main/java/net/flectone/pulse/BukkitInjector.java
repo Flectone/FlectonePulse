@@ -30,8 +30,6 @@ import net.flectone.pulse.module.message.book.BookModule;
 import net.flectone.pulse.module.message.book.BukkitBookModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.bubble.BukkitBubbleModule;
-import net.flectone.pulse.module.message.bubble.manager.BubbleManager;
-import net.flectone.pulse.module.message.bubble.manager.BukkitBubbleManager;
 import net.flectone.pulse.module.message.chat.BukkitChatModule;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.format.scoreboard.BukkitScoreboardModule;
@@ -128,7 +126,6 @@ public class BukkitInjector extends AbstractModule {
         bind(ProxySender.class).to(BukkitProxySender.class);
         bind(MetricsService.class).to(BukkitMetricsService.class);
         bind(FileUtil.class).to(BukkitFileUtil.class);
-        bind(BubbleManager.class).to(BukkitBubbleManager.class);
         bind(MessageSender.class).to(BukkitMessageSender.class);
 
         // Modules

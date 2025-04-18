@@ -18,14 +18,14 @@ import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.mail.MailModule;
 import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.bubble.manager.BubbleManager;
+import net.flectone.pulse.module.message.bubble.service.BubbleService;
 import net.flectone.pulse.module.message.greeting.GreetingModule;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
 import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.sender.PacketSender;
+import net.flectone.pulse.service.FPlayerService;
 
 import java.util.UUID;
 
@@ -40,7 +40,7 @@ public class BasePacketListener extends AbstractPacketListener {
     private final Provider<GreetingModule> greetingModuleProvider;
     private final Provider<MailModule> mailModuleProvider;
     private final Provider<IntegrationModule> integrationModuleProvider;
-    private final Provider<BubbleManager> bubbleManagerProvider;
+    private final Provider<BubbleService> bubbleServiceProvider;
     private final Provider<BanModule> banModuleProvider;
     private final Provider<PlayersModule> playersModuleProvider;
     private final Provider<MaintenanceModule> maintenanceModuleProvider;
@@ -54,7 +54,7 @@ public class BasePacketListener extends AbstractPacketListener {
                               Provider<GreetingModule> greetingModuleProvider,
                               Provider<MailModule> mailModuleProvider,
                               Provider<IntegrationModule> integrationModuleProvider,
-                              Provider<BubbleManager> bubbleManagerProvider,
+                              Provider<BubbleService> bubbleServiceProvider,
                               Provider<BanModule> banModuleProvider,
                               Provider<PlayersModule> playersModuleProvider,
                               Provider<MaintenanceModule> maintenanceModuleProvider) {
@@ -66,7 +66,7 @@ public class BasePacketListener extends AbstractPacketListener {
         this.greetingModuleProvider = greetingModuleProvider;
         this.mailModuleProvider = mailModuleProvider;
         this.integrationModuleProvider = integrationModuleProvider;
-        this.bubbleManagerProvider = bubbleManagerProvider;
+        this.bubbleServiceProvider = bubbleServiceProvider;
         this.banModuleProvider = banModuleProvider;
         this.playersModuleProvider = playersModuleProvider;
         this.maintenanceModuleProvider = maintenanceModuleProvider;
@@ -100,7 +100,7 @@ public class BasePacketListener extends AbstractPacketListener {
             if (!fPlayer.isOnline()) return;
 
             fPlayerService.clearAndSave(fPlayer);
-            bubbleManagerProvider.get().remove(fPlayer);
+            bubbleServiceProvider.get().clear(fPlayer);
             quitModuleProvider.get().send(fPlayer);
         });
     }

@@ -170,10 +170,14 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Bubble implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private boolean useInteraction = true;
+        private int maxCount = 3;
+        private int maxLength = 20;
+        private float height = 0.4f;
         private double distance = 30.0;
-        private int lineWidth = 200;
-        private double readSpeed = 100.0;
+        private double readSpeed = 90.0;
         private double handicapChars = 10.0;
+
         private Modern modern = new Modern();
 
         @Getter
@@ -181,8 +185,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         public static final class Modern {
             private boolean enable = true;
             private boolean hasShadow = false;
-            private boolean interactionRiding = true;
-            private float height = 0.2f;
             private float scale = 1.0f;
             private String background = "#00000040";
         }

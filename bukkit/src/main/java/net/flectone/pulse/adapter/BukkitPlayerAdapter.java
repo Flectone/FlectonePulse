@@ -1,6 +1,7 @@
 package net.flectone.pulse.adapter;
 
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
@@ -34,8 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Singleton
 public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
@@ -118,6 +118,14 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         if (player == null) return true;
 
         return player.hasPlayedBefore();
+    }
+
+    @Override
+    public boolean hasPotionEffect(@NotNull FPlayer fPlayer, @NotNull PotionType potionType) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        if (player == null) return false;
+
+        return player.hasPotionEffect(SpigotConversionUtil.toBukkitPotionEffectType(potionType));
     }
 
     @Override
@@ -251,6 +259,14 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
+    public com.github.retrooper.packetevents.protocol.world.@Nullable Location getLocation(@NotNull FPlayer fPlayer) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        if (player == null) return null;
+
+        return SpigotConversionUtil.fromBukkitLocation(player.getLocation());
+    }
+
+    @Override
     public Object getItem(@NotNull UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) return null;
@@ -274,6 +290,35 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
                 .map(Entity::getUniqueId)
                 .toList();
     }
+
+    @Override
+    public @NotNull List<UUID> getNearbyEntities(FPlayer fPlayer, double x, double y, double z) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        if (player == null) return Collections.emptyList();
+
+        World world = player.getWorld();
+        Location location = player.getLocation();
+
+        return world.getNearbyEntities(location, x, y, z)
+                .stream()
+                .filter(player::canSee)
+                .map(Entity::getUniqueId)
+                .toList();
+    }
+
+    @Override
+    public @NotNull List<Integer> getPassengers(FPlayer fPlayer) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        if (player == null) return Collections.emptyList();
+
+        List<Entity> passengers = player.getPassengers();
+        if (passengers.isEmpty()) return Collections.emptyList();
+
+        return passengers.stream()
+                .map(Entity::getEntityId)
+                .toList();
+    }
+
 
     @Override
     public void clear(@NotNull FPlayer fPlayer) {
