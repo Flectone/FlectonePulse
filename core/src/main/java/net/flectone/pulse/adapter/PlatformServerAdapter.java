@@ -40,6 +40,13 @@ public interface PlatformServerAdapter {
     int getOnlinePlayerCount();
 
     /**
+     * Returns the name of the server core
+     *
+     * @return A string representing the name of the server core
+     */
+    @NotNull String getServerCore();
+
+    /**
      * Gets the server MOTD
      *
      * @return MOTD as JsonElement
@@ -53,6 +60,13 @@ public interface PlatformServerAdapter {
      * @return true if the project is available, false otherwise
      */
     boolean hasProject(String projectName);
+
+    /**
+     * Checks if the server is currently in online mode
+     *
+     * @return {@code true} if the server is in online mode, {@code false} otherwise
+     */
+    boolean isOnlineMode();
 
     /**
      * Gets the Minecraft name of an item

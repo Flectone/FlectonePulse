@@ -71,7 +71,7 @@ public abstract class AbstractModule {
         return false;
     }
 
-    public Map<String, Integer> collectModuleStatuses() {
+    public Map<String, String> collectModuleStatuses() {
         return collectModuleStatuses(this.getClass());
     }
 
@@ -79,12 +79,12 @@ public abstract class AbstractModule {
         reloadWithChildren(this.getClass(), AbstractModule::isConfigEnable);
     }
 
-    private Map<String, Integer> collectModuleStatuses(Class<? extends AbstractModule> clazz) {
+    private Map<String, String> collectModuleStatuses(Class<? extends AbstractModule> clazz) {
         AbstractModule module = injector.getInstance(clazz);
 
-        Map<String, Integer> modules = new HashMap<>();
+        Map<String, String> modules = new HashMap<>();
 
-        modules.put(clazz.getSimpleName(), module.isEnable() ? 1 : 0);
+        modules.put(clazz.getSimpleName(), module.isEnable() ? "true" : "false");
 
         injector.getInstance(clazz)
                 .getChildren()

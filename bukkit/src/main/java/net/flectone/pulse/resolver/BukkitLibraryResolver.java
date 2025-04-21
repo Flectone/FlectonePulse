@@ -21,18 +21,6 @@ public class BukkitLibraryResolver extends LibraryResolver {
         super.addLibraries();
 
         addLibrary(Library.builder()
-                .groupId("org{}bstats")
-                .artifactId("bstats-bukkit")
-                .version(BuildConfig.BSTATS_VERSION)
-                .resolveTransitiveDependencies(true)
-                .relocate(Relocation.builder()
-                        .pattern("org{}bstats")
-                        .relocatedPattern("net.flectone.pulse.library.bstats")
-                        .build())
-                .build()
-        );
-
-        addLibrary(Library.builder()
                 .groupId("net{}kyori")
                 .artifactId("adventure-api")
                 .version(BuildConfig.ADVENTURE_API)

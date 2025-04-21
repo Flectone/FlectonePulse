@@ -97,7 +97,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(ProxySender.class).reload();
 
         if (fileManager.getConfig().isMetrics()) {
-            injector.getInstance(MetricsService.class).register();
+            injector.getInstance(MetricsService.class).reload();
         }
         
         injector.getInstance(ListenerRegistry.class).registerDefaultListeners();
@@ -170,6 +170,10 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(FPlayerService.class).reload();
         injector.getInstance(ModerationService.class).reload();
         injector.getInstance(Module.class).reloadWithChildren();
+
+        if (fileManager.getConfig().isMetrics()) {
+            injector.getInstance(MetricsService.class).reload();
+        }
 
         fLogger.logReloaded();
     }

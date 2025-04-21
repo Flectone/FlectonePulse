@@ -1,8 +1,6 @@
 dependencies {
     implementation "com.alessiodp.libby:libby-bukkit:$libby_version"
 
-    compileOnly "org.bstats:bstats-bukkit:$bstats_version"
-
     compileOnly "com.github.Anon8281:UniversalScheduler:$UniversalScheduler_version"
 
     compileOnly "org.incendo:cloud-paper:$cloud_paper_version"
@@ -52,11 +50,8 @@ dependencies {
 }
 
 shadowJar {
-    relocate("org.bstats", "net.flectone.pulse.library.bstats")
-
     relocate("com.github.Anon8281", "net.flectone.pulse.library.universalscheduler")
     relocate("com.zaxxer", "net.flectone.pulse.library.database")
-    relocate("dev.jorel", "net.flectone.pulse.library.commandapi")
 
     relocate("net.megavex.scoreboardlibrary", "net.flectone.pulse.library.scoreboardlibrary")
 }

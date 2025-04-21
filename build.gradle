@@ -28,7 +28,6 @@ subprojects {
             relocate("io.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents.impl")
 
             relocate("net.kyori.adventure", "net.flectone.pulse.library.adventure")
-            relocate("me.imdanix.text", "net.flectone.pulse.library.minitranslator")
 
             outputs.cacheIf { true }
 

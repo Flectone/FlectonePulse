@@ -54,8 +54,6 @@ import net.flectone.pulse.sender.BukkitMessageSender;
 import net.flectone.pulse.sender.BukkitProxySender;
 import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.sender.ProxySender;
-import net.flectone.pulse.service.BukkitMetricsService;
-import net.flectone.pulse.service.MetricsService;
 import net.flectone.pulse.util.BukkitFileUtil;
 import net.flectone.pulse.util.FileUtil;
 import net.flectone.pulse.util.interceptor.AsyncInterceptor;
@@ -122,7 +120,6 @@ public class BukkitInjector extends AbstractModule {
         bind(PermissionChecker.class).to(BukkitPermissionChecker.class);
         bind(TaskScheduler.class).to(BukkitTaskScheduler.class);
         bind(ProxySender.class).to(BukkitProxySender.class);
-        bind(MetricsService.class).to(BukkitMetricsService.class);
         bind(FileUtil.class).to(BukkitFileUtil.class);
         bind(MessageSender.class).to(BukkitMessageSender.class);
 

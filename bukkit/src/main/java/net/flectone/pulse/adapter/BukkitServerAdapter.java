@@ -113,8 +113,18 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
+    public @NotNull String getServerCore() {
+        return Bukkit.getServer().getName();
+    }
+
+    @Override
     public boolean hasProject(String projectName) {
         return Bukkit.getPluginManager().getPlugin(projectName) != null;
+    }
+
+    @Override
+    public boolean isOnlineMode() {
+        return Bukkit.getServer().getOnlineMode();
     }
 
     @Override
