@@ -8,8 +8,7 @@ import net.flectone.pulse.util.logging.FLogger;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.group.Group;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import net.luckperms.api.model.user.User;
 
 import java.util.Collections;
 import java.util.Set;
@@ -34,18 +33,17 @@ public class LuckPermsIntegration implements FIntegration {
     }
 
     public boolean hasPermission(FPlayer fPlayer, String permission) {
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
-        if (player == null) return false;
+        User user = getUser(fPlayer);
+        if (user == null) return false;
 
-        return luckPerms.getPlayerAdapter(Player.class).getPermissionData(player).checkPermission(permission).asBoolean();
+        return user.getCachedData().getPermissionData().checkPermission(permission).asBoolean();
     }
 
     public int getGroupWeight(FPlayer fPlayer) {
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
-        if (player == null) return 0;
+        User user = getUser(fPlayer);
+        if (user == null) return 0;
 
-        String groupName = luckPerms.getPlayerAdapter(Player.class).getMetaData(player).getPrimaryGroup();
-        if (groupName == null) return 0;
+        String groupName = user.getPrimaryGroup();
 
         Group group = luckPerms.getGroupManager().getGroup(groupName);
         if (group == null) return 0;
@@ -54,17 +52,17 @@ public class LuckPermsIntegration implements FIntegration {
     }
 
     public String getPrefix(FPlayer fPlayer) {
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
-        if (player == null) return null;
+        User user = getUser(fPlayer);
+        if (user == null) return null;
 
-        return luckPerms.getPlayerAdapter(Player.class).getMetaData(player).getPrefix();
+        return user.getCachedData().getMetaData().getPrefix();
     }
 
     public String getSuffix(FPlayer fPlayer) {
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
-        if (player == null) return null;
+        User user = getUser(fPlayer);
+        if (user == null) return null;
 
-        return luckPerms.getPlayerAdapter(Player.class).getMetaData(player).getSuffix();
+        return user.getCachedData().getMetaData().getSuffix();
     }
 
     public Set<String> getGroups() {
@@ -73,5 +71,9 @@ public class LuckPermsIntegration implements FIntegration {
         return luckPerms.getGroupManager().getLoadedGroups().stream()
                 .map(Group::getName)
                 .collect(Collectors.toSet());
+    }
+
+    private User getUser(FPlayer fPlayer) {
+        return luckPerms.getUserManager().getUser(fPlayer.getUuid());
     }
 }
