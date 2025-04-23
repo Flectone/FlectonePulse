@@ -25,6 +25,7 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
     private final Message.Format.Translate message;
     private final Permission.Message.Format.Translate permission;
 
+    private final String TAG = "translateto";
     private final MessagePipeline messagePipeline;
 
     @Inject
@@ -53,7 +54,10 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
 
     @Override
     public void process(MessageContext messageContext) {
-        if (!messageContext.isTranslate()) return;
+        if (!messageContext.isTranslate()) {
+            messageContext.addTagResolvers(emptyTagResolver(TAG));
+            return;
+        }
 
         String messageToTranslate = messageContext.getMessageToTranslate();
         String message = messageContext.getMessage().replace("<message_to_translate>", messageToTranslate == null ? "" : messageToTranslate);
@@ -63,10 +67,9 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
     }
 
     private TagResolver translateTag(FEntity fPlayer, FEntity receiver) {
-        String tag = "translateto";
-        if (checkModulePredicates(fPlayer)) return emptyTagResolver(tag);
+        if (checkModulePredicates(fPlayer)) return emptyTagResolver(TAG);
 
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
+        return TagResolver.resolver(TAG, (argumentQueue, context) -> {
             if (!(receiver instanceof FPlayer fReceiver) || fReceiver.isUnknown()) return Tag.selfClosingInserting(Component.empty());
             if (!argumentQueue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 

@@ -435,6 +435,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             if (!integrationModule.hasMessenger()) return;
 
             Component component = messagePipeline.builder(fPlayer, FPlayer.UNKNOWN, resolveString(FPlayer.UNKNOWN, format))
+                    .translate(false)
                     .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(FPlayer.UNKNOWN))
                     .build();
 
@@ -444,6 +445,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
                         .match("<message>")
                         .replacement(messagePipeline
                                 .builder(fPlayer, FPlayer.UNKNOWN, message)
+                                .translate(false)
                                 .userMessage(true)
                                 .mention(false)
                                 .interactiveChat(false)
