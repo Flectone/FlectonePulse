@@ -46,9 +46,70 @@ public abstract class LibraryResolver {
         libraryManager.addRepository("https://s01.oss.sonatype.org/content/repositories/snapshots");
         libraryManager.addRepository("https://repo.codemc.io/repository/maven-releases");
         libraryManager.addRepository("https://repo.codemc.io/repository/maven-snapshots/");
+        libraryManager.addRepository("https://maven.fabricmc.net/");
     }
 
     public void addLibraries() {
+
+        addLibrary(Library.builder()
+                .groupId("net{}kyori")
+                .artifactId("adventure-api")
+                .version(BuildConfig.ADVENTURE_API)
+                .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("net{}kyori")
+                .artifactId("adventure-text-minimessage")
+                .version(BuildConfig.ADVENTURE_API)
+                .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("net{}kyori")
+                .artifactId("adventure-text-serializer-plain")
+                .version(BuildConfig.ADVENTURE_API)
+                .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("net{}kyori")
+                .artifactId("adventure-text-serializer-legacy")
+                .version(BuildConfig.ADVENTURE_API)
+                .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("net{}kyori")
+                .artifactId("adventure-nbt")
+                .version(BuildConfig.ADVENTURE_API)
+                .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("net{}kyori")
+                        .relocatedPattern("net.flectone.pulse.library")
+                        .build())
+                .build()
+        );
 
         addLibrary(Library.builder()
                 .groupId("com{}google{}inject")
@@ -96,6 +157,19 @@ public abstract class LibraryResolver {
                 .relocate(Relocation.builder()
                         .pattern("net{}elytrium{}serializer")
                         .relocatedPattern("net.flectone.pulse.library.elytrium")
+                        .build()
+                )
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("com{}zaxxer")
+                .artifactId("HikariCP")
+                .version(BuildConfig.HIKARICP_VERSION)
+                .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("com{}zaxxer")
+                        .relocatedPattern("net.flectone.pulse.library.database")
                         .build()
                 )
                 .build()
