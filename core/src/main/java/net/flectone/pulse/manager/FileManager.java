@@ -24,6 +24,7 @@ public class FileManager {
 
     private final Map<String, Localization> localizationMap = new HashMap<>();
 
+    @Getter
     private final Path projectPath;
 
     @Getter private final Command command;
