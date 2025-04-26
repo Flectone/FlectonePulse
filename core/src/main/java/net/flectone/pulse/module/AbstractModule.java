@@ -50,7 +50,7 @@ public abstract class AbstractModule {
     }
 
     public void registerPermission(String name, Permission.Type type) {
-        permissionRegistry.register(name, type.name());
+        permissionRegistry.register(name, type);
     }
 
     public void addChildren(Class<? extends AbstractModule> clazz) {
