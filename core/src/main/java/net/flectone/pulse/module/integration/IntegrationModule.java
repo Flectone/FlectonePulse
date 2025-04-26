@@ -62,7 +62,19 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public abstract String getTextureUrl(FEntity sender);
 
-    public abstract void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> discordString);
+    public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> discordString) {
+        if (getChildren().contains(DiscordModule.class)) {
+            injector.getInstance(DiscordModule.class).sendMessage(sender, messageTag, discordString);
+        }
+
+        if (getChildren().contains(TwitchModule.class)) {
+            injector.getInstance(TwitchModule.class).sendMessage(sender, messageTag, discordString);
+        }
+
+        if (getChildren().contains(TelegramModule.class)) {
+            injector.getInstance(TelegramModule.class).sendMessage(sender, messageTag, discordString);
+        }
+    }
 
     public abstract boolean hasMessenger();
 

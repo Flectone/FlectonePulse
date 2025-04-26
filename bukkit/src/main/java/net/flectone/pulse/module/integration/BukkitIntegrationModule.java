@@ -26,7 +26,6 @@ import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.triton.TritonModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.vault.VaultModule;
-import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -35,7 +34,6 @@ import org.bukkit.metadata.MetadataValue;
 
 import java.util.Collections;
 import java.util.Set;
-import java.util.function.UnaryOperator;
 
 @Singleton
 public class BukkitIntegrationModule extends IntegrationModule {
@@ -206,21 +204,6 @@ public class BukkitIntegrationModule extends IntegrationModule {
         if (!(sender instanceof FPlayer fPlayer)) return null;
 
         return injector.getInstance(SkinsRestorerModule.class).getTextureUrl(fPlayer);
-    }
-
-    @Override
-    public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> discordString) {
-        if (getChildren().contains(DiscordModule.class)) {
-            injector.getInstance(DiscordModule.class).sendMessage(sender, messageTag, discordString);
-        }
-
-        if (getChildren().contains(TwitchModule.class)) {
-            injector.getInstance(TwitchModule.class).sendMessage(sender, messageTag, discordString);
-        }
-
-        if (getChildren().contains(TelegramModule.class)) {
-            injector.getInstance(TelegramModule.class).sendMessage(sender, messageTag, discordString);
-        }
     }
 
     @Override
