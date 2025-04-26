@@ -1,5 +1,7 @@
 package net.flectone.pulse.module.message.afk;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
@@ -31,7 +33,8 @@ import java.util.UUID;
 
 import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
-public abstract class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> implements MessageProcessor {
+@Singleton
+public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> implements MessageProcessor {
 
     private final Map<UUID, Pair<Integer, PlatformPlayerAdapter.Coordinates>> playersCoordinates = new HashMap<>();
 
@@ -45,6 +48,7 @@ public abstract class AfkModule extends AbstractModuleMessage<Localization.Messa
     private final PermissionChecker permissionChecker;
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
+    @Inject
     public AfkModule(FileManager fileManager,
                      MessageProcessRegistry messageProcessRegistry,
                      FPlayerService fPlayerService,
