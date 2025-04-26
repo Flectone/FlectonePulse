@@ -14,7 +14,7 @@ public class FabricAnvilModule extends AnvilModule {
     }
 
     @Override
-    public void format(FPlayer fPlayer, Object itemMeta) {
-
+    public boolean format(FPlayer fPlayer, Object itemMeta) {
+        return false;
     }
 }

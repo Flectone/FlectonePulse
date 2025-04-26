@@ -11,5 +11,4 @@ public class FabricObjectiveModule extends ObjectiveModule {
     public FabricObjectiveModule(FileManager fileManager) {
         super(fileManager);
     }
-
 }

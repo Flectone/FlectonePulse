@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.sidebar;
+package net.flectone.pulse.module.message.format.scoreboard;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -14,7 +14,12 @@ public class FabricScoreboardModule extends ScoreboardModule {
     }
 
     @Override
-    public void send(FPlayer fPlayer) {
+    public void add(FPlayer fPlayer) {
+
+    }
+
+    @Override
+    public void remove(FPlayer fPlayer) {
 
     }
 }

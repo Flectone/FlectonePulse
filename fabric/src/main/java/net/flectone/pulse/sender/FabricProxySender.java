@@ -1,25 +1,22 @@
-package net.flectone.pulse.manager;
+package net.flectone.pulse.sender;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.logging.FLogger;
+import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.function.Consumer;
 
 @Singleton
-public class FabricProxyManager extends ProxyManager {
+public class FabricProxySender extends ProxySender {
 
     @Inject
-    public FabricProxyManager(FileManager fileManager, FLogger fLogger) {
+    public FabricProxySender(FileManager fileManager,
+                             FLogger fLogger) {
         super(fileManager, fLogger);
-    }
-
-    @Override
-    public void reloadChannel() {
-
     }
 
     @Override
@@ -28,7 +25,7 @@ public class FabricProxyManager extends ProxyManager {
     }
 
     @Override
-    public boolean sendMessage(FEntity sender, MessageTag tag, Consumer<ByteArrayDataOutput> outputConsumer) {
+    public boolean sendMessage(FEntity sender, MessageTag tag, Consumer<ByteArrayDataOutput> output) {
         return false;
     }
 }
