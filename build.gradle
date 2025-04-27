@@ -59,8 +59,6 @@ subprojects {
         compileOnly "net.kyori:adventure-text-minimessage:$adventure_api"
         compileOnly "net.kyori:adventure-text-serializer-gson:$adventure_api"
         compileOnly "net.kyori:adventure-text-serializer-plain:$adventure_api"
-        compileOnly "io.netty:netty-all:$netty_all_version"
-        compileOnly "commons-lang:commons-lang:$commons_lang_version"
         compileOnly "com.discord4j:discord4j-core:$discord4j_version"
         compileOnly "com.github.twitch4j:twitch4j:$twitch4j_version"
         compileOnly "org.telegram:telegrambots-longpolling:$telegrambots_version"

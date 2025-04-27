@@ -12,6 +12,7 @@ import org.apache.logging.log4j.message.Message;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The log filter.
@@ -54,6 +55,11 @@ public class LogFilter implements Filter {
 
     @Override
     public boolean isStopped() {
+        return false;
+    }
+
+    @Override
+    public boolean stop(long timeout, TimeUnit timeUnit) {
         return false;
     }
 
