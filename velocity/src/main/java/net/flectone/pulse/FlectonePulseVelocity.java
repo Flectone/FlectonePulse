@@ -27,17 +27,18 @@ public class FlectonePulseVelocity implements FlectonePulse {
 
     private final MinecraftChannelIdentifier IDENTIFIER = MinecraftChannelIdentifier.from("flectonepulse:main");
 
-    @Inject
-    private ProxyServer proxyServer;
+    private final ProxyServer proxyServer;
+    private final FLogger fLogger;
 
     @Inject
-    private Logger logger;
-
-    private FLogger fLogger;
+    public FlectonePulseVelocity(ProxyServer proxyServer,
+                                 Logger logger) {
+        this.proxyServer = proxyServer;
+        fLogger = new FLogger(logRecord -> logger.info(logRecord.getMessage()));
+    }
 
     @Subscribe
     public void onProxyInitializeEvent(ProxyInitializeEvent event) {
-        fLogger = new FLogger(logRecord -> logger.info(logRecord.getMessage()));
         fLogger.logEnabling();
 
         proxyServer.getChannelRegistrar().register(IDENTIFIER);
