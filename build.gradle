@@ -11,39 +11,15 @@ subprojects {
 
     group = "net.flectone.pulse.${project.name}"
 
-    java {
-        sourceCompatibility = java_version
-        targetCompatibility = java_version
-    }
-
-    shadowJar {
-        relocate("com.alessiodp.libby", "net.flectone.pulse.library.libby")
-
-        if (!project.name.is("velocity")) {
-            relocate("com.google.inject", "net.flectone.pulse.library.guice")
-            relocate("com.google.common", "net.flectone.pulse.library.guava")
-        }
-
-        relocate("net.elytrium.serializer", "net.flectone.pulse.library.elytrium")
-
-        relocate("com.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents")
-        relocate("io.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents.impl")
-
-        relocate("net.kyori.adventure", "net.flectone.pulse.library.adventure")
-
-        outputs.cacheIf { true }
-
-        archiveBaseName.set("${project_name}-${project.name}")
-        archiveClassifier.set("")
-        archiveVersion.set("${project_version}")
-
-        minimize()
-    }
-
     compileJava.options.encoding = 'UTF-8'
 
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
+    }
+
+    java {
+        sourceCompatibility = java_version
+        targetCompatibility = java_version
     }
 
     repositories {
@@ -69,14 +45,62 @@ subprojects {
     }
 
     dependencies {
-        compileOnly "org.jetbrains:annotations:$jetbrains_annotations_version"
-
         compileOnly "org.projectlombok:lombok:$lombok_version"
-        annotationProcessor "org.projectlombok:lombok:$lombok_version"
-
+        compileOnly "org.jetbrains:annotations:$jetbrains_annotations_version"
         compileOnly "com.google.inject:guice:$guice_version"
         compileOnly "net.kyori:adventure-api:$adventure_api"
         compileOnly "org.apache.logging.log4j:log4j-core:$log4j_core_version"
+        compileOnly "net.elytrium:serializer:$elytrium_serializer_version"
+        compileOnly "org.incendo:cloud-core:$cloud_core_version"
+        compileOnly "org.incendo:cloud-minecraft-extras:$cloud_minecraft_extras_version"
+        compileOnly "com.zaxxer:HikariCP:$HikariCP_version"
+        compileOnly "org.xerial:sqlite-jdbc:$sqlite_jdbc_version"
+        compileOnly "net.kyori:adventure-text-serializer-legacy:$adventure_api"
+        compileOnly "net.kyori:adventure-text-minimessage:$adventure_api"
+        compileOnly "net.kyori:adventure-text-serializer-gson:$adventure_api"
+        compileOnly "net.kyori:adventure-text-serializer-plain:$adventure_api"
+        compileOnly "io.netty:netty-all:$netty_all_version"
+        compileOnly "commons-lang:commons-lang:$commons_lang_version"
+        compileOnly "com.discord4j:discord4j-core:$discord4j_version"
+        compileOnly "com.github.twitch4j:twitch4j:$twitch4j_version"
+        compileOnly "org.telegram:telegrambots-longpolling:$telegrambots_version"
+        compileOnly "org.telegram:telegrambots-client:$telegrambots_version"
+        compileOnly "com.yandex.cloud:java-sdk-services:$yandexsdk_version"
+        compileOnly "com.deepl.api:deepl-java:$deepl_version"
+
+        annotationProcessor "org.projectlombok:lombok:$lombok_version"
+    }
+
+    buildConfig {
+        className("BuildConfig")
+        packageName("net.flectone.pulse")
+        rootProject.ext.properties.findAll { key, value ->
+            !key.contains('.')
+        }.each { key, value ->
+            buildConfigField(String, key.toString().toUpperCase(), value)
+        }
+    }
+
+    shadowJar {
+        relocate("com.alessiodp.libby", "net.flectone.pulse.library.libby")
+        relocate("net.elytrium.serializer", "net.flectone.pulse.library.elytrium")
+        relocate("com.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents")
+        relocate("io.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents.impl")
+        relocate("net.kyori.adventure", "net.flectone.pulse.library.adventure")
+        relocate("com.zaxxer", "net.flectone.pulse.library.database")
+
+        if (!project.name.is("velocity")) {
+            relocate("com.google.inject", "net.flectone.pulse.library.guice")
+            relocate("com.google.common", "net.flectone.pulse.library.guava")
+        }
+
+        outputs.cacheIf { true }
+
+        archiveBaseName.set("${project_name}-${project.name}")
+        archiveClassifier.set("")
+        archiveVersion.set("${project_version}")
+
+        minimize()
     }
 }
 

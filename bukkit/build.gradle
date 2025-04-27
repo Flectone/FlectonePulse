@@ -1,29 +1,11 @@
 dependencies {
-    implementation "com.alessiodp.libby:libby-bukkit:$libby_version"
-
     compileOnly "com.github.Anon8281:UniversalScheduler:$UniversalScheduler_version"
-
     compileOnly "org.incendo:cloud-paper:$cloud_paper_version"
-    compileOnly "org.incendo:cloud-minecraft-extras:$cloud_minecraft_extras_version"
-
-    compileOnly "net.elytrium:serializer:$elytrium_serializer_version"
-
     compileOnly "org.spigotmc:spigot-api:$spigot_version"
-
-    compileOnly "io.netty:netty-all:$netty_all_version"
-
     compileOnly "net.megavex:scoreboard-library-api:$scoreboard_library_api_version"
     compileOnly "net.megavex:scoreboard-library-implementation:$scoreboard_library_api_version"
     compileOnly "net.megavex:scoreboard-library-packetevents:$scoreboard_library_api_version"
-
     compileOnly "com.github.retrooper:packetevents-spigot:$packetevents_spigot_version"
-
-    compileOnly "com.zaxxer:HikariCP:$HikariCP_version"
-
-    compileOnly "com.mojang:brigadier:$brigadier_version"
-
-    compileOnly "com.mojang:authlib:$authlib_version"
-
     compileOnly "me.clip:placeholderapi:$placeholderapi_version"
     compileOnly "com.github.MilkBowl:VaultAPI:$vaultapi_version"
     compileOnly "net.luckperms:api:$luckpermsapi_version"
@@ -37,22 +19,12 @@ dependencies {
     compileOnly "com.github.DevLeoko:AdvancedBan:$advancedban_version"
     compileOnly "dev.lone:api-itemsadder:$itemsadder_version"
 
-    compileOnly "net.kyori:adventure-platform-bukkit:$adventure_platform_bukkit_version"
-    compileOnly "net.kyori:adventure-api:$adventure_api"
-    compileOnly "net.kyori:adventure-text-serializer-legacy:$adventure_api"
-    compileOnly "net.kyori:adventure-text-minimessage:$adventure_api"
-    compileOnly "net.kyori:adventure-text-serializer-gson:$adventure_api"
-    compileOnly "net.kyori:adventure-text-serializer-plain:$adventure_api"
-
-    compileOnly "org.telegram:telegrambots-longpolling:$telegrambots_version"
-
-    implementation(project(":core"))
+    implementation "com.alessiodp.libby:libby-bukkit:$libby_version"
+    implementation project(":core")
 }
 
 shadowJar {
     relocate("com.github.Anon8281", "net.flectone.pulse.library.universalscheduler")
-    relocate("com.zaxxer", "net.flectone.pulse.library.database")
-
     relocate("net.megavex.scoreboardlibrary", "net.flectone.pulse.library.scoreboardlibrary")
 }
 

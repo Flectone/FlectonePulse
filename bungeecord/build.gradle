@@ -1,15 +1,3 @@
-repositories {
-    mavenCentral()
-    maven {
-        name = "sonatype"
-        url = "https://oss.sonatype.org/content/groups/public/"
-    }
-    maven {
-        name = "Minecraft Libraries"
-        url = "https://libraries.minecraft.net/"
-    }
-}
-
 dependencies {
     compileOnly "net.md-5:bungeecord-api:$bungeecord_version"
 
