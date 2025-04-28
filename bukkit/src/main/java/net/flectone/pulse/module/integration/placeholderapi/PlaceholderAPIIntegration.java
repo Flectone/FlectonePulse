@@ -117,7 +117,9 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             if (!offlinePlayer.isOnline()) return;
 
             Player receiver = Bukkit.getPlayer(messageContext.getReceiver().getUuid());
-            if (receiver == null) return;
+            if (receiver == null) {
+                receiver = offlinePlayer.getPlayer();
+            }
 
             message = PlaceholderAPI.setRelationalPlaceholders(offlinePlayer.getPlayer(), receiver, message);
 
