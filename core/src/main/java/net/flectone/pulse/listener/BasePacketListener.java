@@ -25,6 +25,7 @@ import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.PacketSender;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 
 import java.util.UUID;
@@ -35,6 +36,7 @@ public class BasePacketListener extends AbstractPacketListener {
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final PacketSender packetSender;
+    private final ProxySender proxySender;
     private final Provider<QuitModule> quitModuleProvider;
     private final Provider<JoinModule> joinModuleProvider;
     private final Provider<GreetingModule> greetingModuleProvider;
@@ -49,6 +51,7 @@ public class BasePacketListener extends AbstractPacketListener {
     public BasePacketListener(FPlayerService fPlayerService,
                               TaskScheduler taskScheduler,
                               PacketSender packetSender,
+                              ProxySender proxySender,
                               Provider<QuitModule> quitModuleProvider,
                               Provider<JoinModule> joinModuleProvider,
                               Provider<GreetingModule> greetingModuleProvider,
@@ -61,6 +64,7 @@ public class BasePacketListener extends AbstractPacketListener {
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.packetSender = packetSender;
+        this.proxySender = proxySender;
         this.quitModuleProvider = quitModuleProvider;
         this.joinModuleProvider = joinModuleProvider;
         this.greetingModuleProvider = greetingModuleProvider;
@@ -83,6 +87,13 @@ public class BasePacketListener extends AbstractPacketListener {
         String name = user.getName();
 
         taskScheduler.runAsync(() -> {
+            // if no one was on the server, the cache may be invalid for other servers
+            // because FlectonePulse on Proxy cannot send a message for servers that have no player
+            if (fPlayerService.getFPlayers().isEmpty() && proxySender.isEnable()) {
+                // clears the cache of players who might have left from other servers
+                fPlayerService.clear();
+            }
+
             FPlayer fPlayer = fPlayerService.addAndGetFPlayer(uuid, name);
 
             joinModuleProvider.get().send(fPlayer, true);
