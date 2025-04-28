@@ -5,10 +5,9 @@ import com.google.inject.Singleton;
 import litebans.api.Database;
 import litebans.api.Entry;
 import lombok.Getter;
-import net.flectone.pulse.model.FEntity;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.model.ExternalModeration;
+import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
@@ -30,15 +29,11 @@ public class LiteBansIntegration implements FIntegration {
     }
 
     public boolean isMuted(FEntity fEntity) {
-        String ip = fEntity instanceof FPlayer fPlayer ? fPlayer.getIp() : null;
-
-        return Database.get().isPlayerMuted(fEntity.getUuid(), ip);
+        return Database.get().isPlayerMuted(fEntity.getUuid(), null);
     }
 
     public ExternalModeration getMute(FEntity fEntity) {
-        String ip = fEntity instanceof FPlayer fPlayer ? fPlayer.getIp() : null;
-
-        Entry mute = Database.get().getMute(fEntity.getUuid(), ip, null);
+        Entry mute = Database.get().getMute(fEntity.getUuid(), null, null);
         if (mute == null) return null;
 
         return new ExternalModeration(
