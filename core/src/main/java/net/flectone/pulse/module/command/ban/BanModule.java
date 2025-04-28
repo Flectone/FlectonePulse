@@ -145,7 +145,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         Moderation ban = moderationService.ban(fTarget, databaseTime, reason, fPlayer.getId());
         if (ban == null) return;
 
-        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_BAN, byteArrayDataOutput -> {});
+        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_BAN, dataOutputStream -> {});
 
         kick(fPlayer, fTarget, ban);
 

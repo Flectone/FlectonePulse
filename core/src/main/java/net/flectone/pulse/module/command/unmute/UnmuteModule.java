@@ -126,7 +126,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
 
         moderationService.remove(fTarget, mutes);
 
-        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_MUTE, byteArrayDataOutput -> {});
+        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_MUTE, dataOutputStream -> {});
 
         builder(fTarget)
                 .tag(MessageTag.COMMAND_UNMUTE)

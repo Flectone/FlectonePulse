@@ -127,7 +127,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
 
         moderationService.remove(fTarget, bans);
 
-        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_BAN, byteArrayDataOutput -> {});
+        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_BAN, dataOutputStream -> {});
 
         builder(fTarget)
                 .tag(MessageTag.COMMAND_UNBAN)

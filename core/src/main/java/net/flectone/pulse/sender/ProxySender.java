@@ -1,14 +1,14 @@
 package net.flectone.pulse.sender;
 
-import com.google.common.io.ByteArrayDataOutput;
 import lombok.Getter;
 import net.flectone.pulse.configuration.Config;
-import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.util.DataConsumer;
 import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.util.logging.FLogger;
 
-import java.util.function.Consumer;
+import java.io.DataOutputStream;
 
 public abstract class ProxySender {
 
@@ -42,6 +42,6 @@ public abstract class ProxySender {
 
     public abstract void disable();
 
-    public abstract boolean sendMessage(FEntity sender, MessageTag tag, Consumer<ByteArrayDataOutput> output);
+    public abstract boolean sendMessage(FEntity sender, MessageTag tag, DataConsumer<DataOutputStream> output);
 
 }

@@ -195,7 +195,7 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> i
                         : s.getFormatTrue().getGlobal()
                 )
                 .integration()
-                .proxy(byteArrayDataOutput -> byteArrayDataOutput.writeBoolean(isAfk))
+                .proxy(dataOutputStream -> dataOutputStream.writeBoolean(isAfk))
                 .sound(getSound())
                 .sendBuilt();
     }

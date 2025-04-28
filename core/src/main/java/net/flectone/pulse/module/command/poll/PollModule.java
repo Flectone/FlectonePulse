@@ -163,9 +163,9 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         String promptNumber = getPrompt().getNumber();
         int numberVote = commandContext.get(promptNumber);
 
-        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_POLL_VOTE, byteArrayDataOutput -> {
-            byteArrayDataOutput.writeInt(id);
-            byteArrayDataOutput.writeInt(numberVote);
+        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_POLL_VOTE, dataOutputStream -> {
+            dataOutputStream.writeInt(id);
+            dataOutputStream.writeInt(numberVote);
         });
 
         if (isSent) return;

@@ -1,6 +1,5 @@
 package net.flectone.pulse.module;
 
-import com.google.common.io.ByteArrayDataOutput;
 import com.google.inject.Inject;
 import lombok.Getter;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
@@ -8,18 +7,19 @@ import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.formatter.TimeFormatter;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.util.DataConsumer;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.Range;
@@ -29,6 +29,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.*;
@@ -220,7 +221,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         private Destination destination = new Destination();
         private Sound sound = null;
         private Predicate<FPlayer> builderFilter = player -> true;
-        private Consumer<ByteArrayDataOutput> proxyOutput = null;
+        private DataConsumer<DataOutputStream> proxyOutput = null;
         private UnaryOperator<String> integrationString = null;
         private BiFunction<FPlayer, M, String> format = null;
         private UnaryOperator<MessagePipeline.Builder> formatComponentBuilder = null;
@@ -264,11 +265,11 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         }
 
         public Builder proxy() {
-            this.proxyOutput = byteArrayDataOutput -> {};
+            this.proxyOutput = dataOutputStream -> {};
             return this;
         }
 
-        public Builder proxy(Consumer<ByteArrayDataOutput> output) {
+        public Builder proxy(DataConsumer<DataOutputStream> output) {
             this.proxyOutput = output;
             return this;
         }

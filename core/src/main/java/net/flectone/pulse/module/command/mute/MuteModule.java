@@ -126,7 +126,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         Moderation mute = moderationService.mute(fTarget, databaseTime, reason, fPlayer.getId());
         if (mute == null) return;
 
-        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_MUTE, byteArrayDataOutput -> {});
+        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_MUTE, dataOutputStream -> {});
 
         builder(fTarget)
                 .range(command.getRange())

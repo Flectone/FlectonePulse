@@ -125,9 +125,9 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         RockPaperScissors rockPaperScissors = new RockPaperScissors(fPlayer.getUuid(), fReceiver.getUuid());
 
-        proxySender.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_CREATE, byteArrayDataOutput -> {
-            byteArrayDataOutput.writeUTF(rockPaperScissors.getId().toString());
-            byteArrayDataOutput.writeUTF(rockPaperScissors.getReceiver().toString());
+        proxySender.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_CREATE, dataOutputStream -> {
+            dataOutputStream.writeUTF(rockPaperScissors.getId().toString());
+            dataOutputStream.writeUTF(rockPaperScissors.getReceiver().toString());
         });
 
         create(rockPaperScissors.getId(), fPlayer, fReceiver.getUuid());
@@ -168,9 +168,9 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                 return;
             }
 
-            boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_FINAL, byteArrayDataOutput -> {
-                byteArrayDataOutput.writeUTF(rockPaperScissors.getId().toString());
-                byteArrayDataOutput.writeUTF(move);
+            boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_FINAL, dataOutputStream -> {
+                dataOutputStream.writeUTF(rockPaperScissors.getId().toString());
+                dataOutputStream.writeUTF(move);
             });
 
             if (isSent) return;
@@ -185,9 +185,9 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                 .format((fResolver, s) -> s.getSender())
                 .sendBuilt();
 
-        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_MOVE, byteArrayDataOutput -> {
-            byteArrayDataOutput.writeUTF(rockPaperScissors.getId().toString());
-            byteArrayDataOutput.writeUTF(move);
+        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_MOVE, dataOutputStream -> {
+            dataOutputStream.writeUTF(rockPaperScissors.getId().toString());
+            dataOutputStream.writeUTF(move);
         });
 
         if (isSent) return;

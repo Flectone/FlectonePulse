@@ -126,7 +126,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
 
         moderationService.remove(fTarget, warns);
 
-        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_WARN, byteArrayDataOutput -> {});
+        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_WARN, dataOutputStream -> {});
 
         builder(fTarget)
                 .tag(MessageTag.COMMAND_UNWARN)

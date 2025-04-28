@@ -1,30 +1,32 @@
 package net.flectone.pulse.sender;
 
 import com.google.common.collect.Iterables;
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.listener.BukkitProxyListener;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.listener.BukkitProxyListener;
+import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.util.DataConsumer;
 import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Set;
-import java.util.function.Consumer;
 
 @Singleton
 public class BukkitProxySender extends ProxySender {
 
     private final FileManager fileManager;
+    private final FLogger fLogger;
     private final Plugin plugin;
     private final Gson gson;
     private final Provider<BukkitProxyListener> proxyListenerProvider;
@@ -40,6 +42,7 @@ public class BukkitProxySender extends ProxySender {
         super(fileManager, fLogger);
 
         this.fileManager = fileManager;
+        this.fLogger = fLogger;
         this.plugin = plugin;
         this.gson = gson;
         this.proxyListenerProvider = proxyListenerProvider;
@@ -68,35 +71,41 @@ public class BukkitProxySender extends ProxySender {
     }
 
     @Override
-    public boolean sendMessage(FEntity sender, MessageTag tag, Consumer<ByteArrayDataOutput> outputConsumer) {
+    public boolean sendMessage(FEntity sender, MessageTag tag, DataConsumer<DataOutputStream> outputConsumer) {
         if (!isEnable()) return false;
         if (tag == null) return false;
         if (outputConsumer == null) return false;
 
         Set<String> clusters = fileManager.getConfig().getClusters();
 
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+             DataOutputStream output = new DataOutputStream(byteStream)) {
 
-        out.writeUTF(tag.toProxyTag());
+            output.writeUTF(tag.toProxyTag());
 
-        out.writeInt(clusters.size());
-        for (String cluster : clusters) {
-            out.writeUTF(cluster);
+            output.writeInt(clusters.size());
+            for (String cluster : clusters) {
+                output.writeUTF(cluster);
+            }
+
+            String constantName = getConstantName(sender);
+            sender.setConstantName(constantName);
+
+            output.writeBoolean(sender instanceof FPlayer);
+            output.writeUTF(gson.toJson(sender));
+            outputConsumer.accept(output);
+
+            Player player = Bukkit.getPlayer(sender.getUuid());
+            player = player != null ? player : Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+            if (player == null) return false;
+
+            player.sendPluginMessage(plugin, getChannel(), byteStream.toByteArray());
+            return true;
+        } catch (IOException e) {
+            fLogger.warning(e);
         }
 
-        String constantName = getConstantName(sender);
-        sender.setConstantName(constantName);
-
-        out.writeBoolean(sender instanceof FPlayer);
-        out.writeUTF(gson.toJson(sender));
-        outputConsumer.accept(out);
-
-        Player player = Bukkit.getPlayer(sender.getUuid());
-        player = player != null ? player : Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-        if (player == null) return false;
-
-        player.sendPluginMessage(plugin, getChannel(), out.toByteArray());
-        return true;
+        return false;
     }
 
     private String getConstantName(FEntity sender) {

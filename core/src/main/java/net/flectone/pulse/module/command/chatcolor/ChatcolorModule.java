@@ -131,8 +131,8 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
                 }
 
                 String[] finalInputColors = inputColors;
-                proxySender.sendMessage(fTarget, MessageTag.COMMAND_CHATCOLOR, byteArrayDataOutput ->
-                        byteArrayDataOutput.writeUTF(String.join(" ", finalInputColors))
+                proxySender.sendMessage(fTarget, MessageTag.COMMAND_CHATCOLOR, dataOutputStream ->
+                        dataOutputStream.writeUTF(String.join(" ", finalInputColors))
                 );
 
                 if (inputColors[1].equalsIgnoreCase("clear")) {

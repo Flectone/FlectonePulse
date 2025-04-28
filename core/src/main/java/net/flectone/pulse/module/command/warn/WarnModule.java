@@ -133,7 +133,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         Moderation warn = moderationService.warn(fTarget, databaseTime, reason, fPlayer.getId());
         if (warn == null) return;
 
-        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_WARN, byteArrayDataOutput -> {});
+        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_WARN, dataOutputStream -> {});
 
         builder(fTarget)
                 .range(command.getRange())

@@ -1,7 +1,5 @@
 package net.flectone.pulse.handler;
 
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteStreams;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
@@ -54,8 +52,12 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.Range;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -67,6 +69,7 @@ public class ProxyMessageHandler {
     private final Injector injector;
     private final FileManager fileManager;
     private final FPlayerService fPlayerService;
+    private final FLogger fLogger;
     private final ModerationService moderationService;
     private final Gson gson;
 
@@ -74,46 +77,55 @@ public class ProxyMessageHandler {
     public ProxyMessageHandler(Injector injector,
                                FileManager fileManager,
                                FPlayerService fPlayerService,
+                               FLogger fLogger,
                                ModerationService moderationService,
                                Gson gson) {
         this.injector = injector;
         this.fileManager = fileManager;
         this.fPlayerService = fPlayerService;
+        this.fLogger = fLogger;
         this.moderationService = moderationService;
         this.gson = gson;
     }
 
     @Async
     public void handleProxyMessage(byte[] bytes) {
-        ByteArrayDataInput input = ByteStreams.newDataInput(bytes);
-        MessageTag tag = MessageTag.fromProxyString(input.readUTF());
-        if (tag == null) return;
+        try (ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
+             DataInputStream input = new DataInputStream(byteStream)) {
 
-        switch (tag) {
-            case SYSTEM_ONLINE -> handleSystemOnline(input);
-            case SYSTEM_OFFLINE -> handleSystemOffline(input);
-            default -> handleTaggedMessage(input, tag);
+            MessageTag tag = MessageTag.fromProxyString(input.readUTF());
+            if (tag == null) return;
+
+            switch (tag) {
+                case SYSTEM_ONLINE -> handleSystemOnline(input);
+                case SYSTEM_OFFLINE -> handleSystemOffline(input);
+                default -> handleTaggedMessage(input, tag);
+            }
+        } catch (IOException e) {
+            fLogger.warning(e);
         }
     }
 
-    private void handleSystemOnline(ByteArrayDataInput input) {
+    private void handleSystemOnline(DataInputStream input) throws IOException {
         fPlayerService.invalidateOffline(UUID.fromString(input.readUTF()));
     }
 
-    private void handleSystemOffline(ByteArrayDataInput input) {
+    private void handleSystemOffline(DataInputStream input) throws IOException {
         fPlayerService.invalidateOnline(UUID.fromString(input.readUTF()));
     }
 
-    private void handleTaggedMessage(ByteArrayDataInput input, MessageTag tag) {
+    private void handleTaggedMessage(DataInputStream input, MessageTag tag) throws IOException {
         int clustersCount = input.readInt();
+        Set<String> proxyClusters = readClusters(input, clustersCount);
+
         boolean isPlayer = input.readBoolean();
+
         FEntity fEntity = gson.fromJson(input.readUTF(), isPlayer ? FPlayer.class : FEntity.class);
 
         if (handleModerationInvalidation(tag, fEntity)) {
             return;
         }
 
-        Set<String> proxyClusters = readClusters(input, clustersCount);
         Set<String> configClusters = fileManager.getConfig().getClusters();
         if (!configClusters.isEmpty() && configClusters.stream().noneMatch(proxyClusters::contains)) {
             return;
@@ -177,7 +189,7 @@ public class ProxyMessageHandler {
         };
     }
 
-    private Set<String> readClusters(ByteArrayDataInput input, int clustersCount) {
+    private Set<String> readClusters(DataInputStream input, int clustersCount) throws IOException {
         Set<String> clusters = new HashSet<>(clustersCount);
         for (int i = 0; i < clustersCount; i++) {
             clusters.add(input.readUTF());
@@ -186,33 +198,38 @@ public class ProxyMessageHandler {
         return clusters;
     }
 
-    private void handleMeCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleMeCommand(DataInputStream input, FEntity fEntity) throws IOException {
         MeModule module = injector.getInstance(MeModule.class);
         if (module.checkModulePredicates(fEntity)) return;
 
+        String message = input.readUTF();
+
         module.builder(fEntity)
                 .range(Range.SERVER)
                 .destination(module.getCommand().getDestination())
-                .format((fResolver, s) -> s.getFormat())
-                .message((fResolver, s) -> input.readUTF())
+                .format(Localization.Command.Me::getFormat)
+                .message(message)
                 .sound(module.getSound())
                 .sendBuilt();
     }
 
-    private void handleBallCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleBallCommand(DataInputStream input, FEntity fEntity) throws IOException {
         BallModule module = injector.getInstance(BallModule.class);
         if (module.checkModulePredicates(fEntity)) return;
 
+        int answer = input.readInt();
+        String message = input.readUTF();
+
         module.builder(fEntity)
                 .range(Range.SERVER)
                 .destination(module.getCommand().getDestination())
-                .format(module.replaceAnswer(input.readInt()))
-                .message((fResolver, s) -> input.readUTF())
+                .format(module.replaceAnswer(answer))
+                .message(message)
                 .sound(module.getSound())
                 .sendBuilt();
     }
 
-    private void handleBanCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleBanCommand(DataInputStream input, FEntity fEntity) throws IOException {
         BanModule module = injector.getInstance(BanModule.class);
         FPlayer moderator = gson.fromJson(input.readUTF(), FPlayer.class);
         if (module.checkModulePredicates(moderator)) return;
@@ -228,7 +245,7 @@ public class ProxyMessageHandler {
                 .sendBuilt();
     }
 
-    private void handleBroadcastCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleBroadcastCommand(DataInputStream input, FEntity fEntity) throws IOException {
         BroadcastModule broadcastModule = injector.getInstance(BroadcastModule.class);
         if (broadcastModule.checkModulePredicates(fEntity)) return;
 
@@ -237,8 +254,8 @@ public class ProxyMessageHandler {
         broadcastModule.builder(fEntity)
                 .range(Range.SERVER)
                 .destination(broadcastModule.getCommand().getDestination())
-                .format((fResolver, s) -> s.getFormat())
-                .message((fResolver, s) -> message)
+                .format(Localization.Command.Broadcast::getFormat)
+                .message(message)
                 .sound(broadcastModule.getSound())
                 .sendBuilt();
     }
@@ -247,7 +264,7 @@ public class ProxyMessageHandler {
         fPlayerService.loadColors(fPlayerService.getFPlayer(fEntity.getUuid()));
     }
 
-    private void handleCoinCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleCoinCommand(DataInputStream input, FEntity fEntity) throws IOException {
         CoinModule coinModule = injector.getInstance(CoinModule.class);
         if (coinModule.checkModulePredicates(fEntity)) return;
 
@@ -261,7 +278,7 @@ public class ProxyMessageHandler {
                 .sendBuilt();
     }
 
-    private void handleDiceCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleDiceCommand(DataInputStream input, FEntity fEntity) throws IOException {
         DiceModule diceModule = injector.getInstance(DiceModule.class);
         if (diceModule.checkModulePredicates(fEntity)) return;
 
@@ -275,7 +292,7 @@ public class ProxyMessageHandler {
                 .sendBuilt();
     }
 
-    private void handleDoCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleDoCommand(DataInputStream input, FEntity fEntity) throws IOException {
         DoModule doModule = injector.getInstance(DoModule.class);
         if (doModule.checkModulePredicates(fEntity)) return;
 
@@ -284,13 +301,13 @@ public class ProxyMessageHandler {
         doModule.builder(fEntity)
                 .range(Range.SERVER)
                 .destination(doModule.getCommand().getDestination())
-                .format((fResolver, s) -> s.getFormat())
-                .message((fResolver, s) -> message)
+                .format(Localization.Command.Do::getFormat)
+                .message(message)
                 .sound(doModule.getSound())
                 .sendBuilt();
     }
 
-    private void handleHelperCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleHelperCommand(DataInputStream input, FEntity fEntity) throws IOException {
         HelperModule helperModule = injector.getInstance(HelperModule.class);
         if (helperModule.checkModulePredicates(fEntity)) return;
 
@@ -299,13 +316,13 @@ public class ProxyMessageHandler {
         helperModule.builder(fEntity)
                 .destination(helperModule.getCommand().getDestination())
                 .filter(helperModule.getFilterSee())
-                .format((fResolver, s) -> s.getGlobal())
-                .message((fResolver, s) -> message)
+                .format(Localization.Command.Helper::getGlobal)
+                .message(message)
                 .sound(helperModule.getSound())
                 .sendBuilt();
     }
 
-    private void handleMuteCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleMuteCommand(DataInputStream input, FEntity fEntity) throws IOException {
         MuteModule muteModule = injector.getInstance(MuteModule.class);
 
         FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -323,7 +340,7 @@ public class ProxyMessageHandler {
         muteModule.sendForTarget(fModerator, (FPlayer) fEntity, mute);
     }
 
-    private void handleUnbanCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleUnbanCommand(DataInputStream input, FEntity fEntity) throws IOException {
         UnbanModule unbanModule = injector.getInstance(UnbanModule.class);
 
         FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -338,7 +355,7 @@ public class ProxyMessageHandler {
                 .sendBuilt();
     }
 
-    private void handleUnmuteCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleUnmuteCommand(DataInputStream input, FEntity fEntity) throws IOException {
         UnmuteModule unmuteModule = injector.getInstance(UnmuteModule.class);
 
         FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -353,7 +370,7 @@ public class ProxyMessageHandler {
                 .sendBuilt();
     }
 
-    private void handleUnwarnCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleUnwarnCommand(DataInputStream input, FEntity fEntity) throws IOException {
         UnwarnModule unwarnModule = injector.getInstance(UnwarnModule.class);
 
         FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -368,11 +385,11 @@ public class ProxyMessageHandler {
                 .sendBuilt();
     }
 
-    private void handlePollVote(ByteArrayDataInput input, FEntity fEntity) {
+    private void handlePollVote(DataInputStream input, FEntity fEntity) throws IOException {
         injector.getInstance(PollModule.class).vote(fEntity, input.readInt(), input.readInt());
     }
 
-    private void handlePollCreate(ByteArrayDataInput input, FEntity fEntity) {
+    private void handlePollCreate(DataInputStream input, FEntity fEntity) throws IOException {
         PollModule pollModule = injector.getInstance(PollModule.class);
         if (pollModule.checkModulePredicates(fEntity)) return;
 
@@ -382,12 +399,12 @@ public class ProxyMessageHandler {
         pollModule.builder(fEntity)
                 .range(Range.SERVER)
                 .format(pollModule.resolvePollFormat(fEntity, poll, PollModule.Status.START))
-                .message((fResolver, s) -> poll.getTitle())
+                .message(poll.getTitle())
                 .sound(pollModule.getSound())
                 .sendBuilt();
     }
 
-    private void handleSpyCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleSpyCommand(DataInputStream input, FEntity fEntity) throws IOException {
         String action = input.readUTF();
         String string = input.readUTF();
 
@@ -403,11 +420,11 @@ public class ProxyMessageHandler {
                         && fReceiver.isOnline()
                 )
                 .format(spyModule.replaceAction(action))
-                .message((fResolver, s) -> string)
+                .message(string)
                 .sendBuilt();
     }
 
-    private void handleStreamCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleStreamCommand(DataInputStream input, FEntity fEntity) throws IOException {
         StreamModule streamModule = injector.getInstance(StreamModule.class);
         if (streamModule.checkModulePredicates(fEntity)) return;
 
@@ -419,7 +436,7 @@ public class ProxyMessageHandler {
                 .sendBuilt();
     }
 
-    private void handleTellCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleTellCommand(DataInputStream input, FEntity fEntity) throws IOException {
         TellModule tellModule = injector.getInstance(TellModule.class);
         if (tellModule.checkModulePredicates(fEntity)) return;
 
@@ -435,7 +452,7 @@ public class ProxyMessageHandler {
         tellModule.send(fEntity, fReceiver, (fResolver, s) -> s.getReceiver(), message);
     }
 
-    private void handleTranslateToCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleTranslateToCommand(DataInputStream input, FEntity fEntity) throws IOException {
         TranslatetoModule translatetoModule = injector.getInstance(TranslatetoModule.class);
         if (translatetoModule.checkModulePredicates(fEntity)) return;
 
@@ -446,12 +463,12 @@ public class ProxyMessageHandler {
                 .range(Range.SERVER)
                 .destination(translatetoModule.getCommand().getDestination())
                 .format(translatetoModule.replaceLanguage(targetLang))
-                .message((fResolver, s) -> message)
+                .message(message)
                 .sound(translatetoModule.getSound())
                 .sendBuilt();
     }
 
-    private void handleTryCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleTryCommand(DataInputStream input, FEntity fEntity) throws IOException {
         TryModule tryModule = injector.getInstance(TryModule.class);
         if (tryModule.checkModulePredicates(fEntity)) return;
 
@@ -463,12 +480,12 @@ public class ProxyMessageHandler {
                 .destination(tryModule.getCommand().getDestination())
                 .tag(MessageTag.COMMAND_TRY)
                 .format(tryModule.replacePercent(value))
-                .message((fResolver, s) -> message)
+                .message(message)
                 .sound(tryModule.getSound())
                 .sendBuilt();
     }
 
-    private void handleWarnCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleWarnCommand(DataInputStream input, FEntity fEntity) throws IOException {
         WarnModule warnModule = injector.getInstance(WarnModule.class);
 
         FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -486,7 +503,7 @@ public class ProxyMessageHandler {
         warnModule.send(fModerator, (FPlayer) fEntity, warn);
     }
 
-    private void handleKickCommand(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleKickCommand(DataInputStream input, FEntity fEntity) throws IOException {
         KickModule kickModule = injector.getInstance(KickModule.class);
 
         FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -504,7 +521,7 @@ public class ProxyMessageHandler {
         kickModule.kick(fModerator, (FPlayer) fEntity, kick);
     }
 
-    private void handleTicTacToeCreate(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleTicTacToeCreate(DataInputStream input, FEntity fEntity) throws IOException {
         if (!(fEntity instanceof FPlayer fPlayer)) return;
 
         FPlayer fReceiver = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -521,7 +538,7 @@ public class ProxyMessageHandler {
         injector.getInstance(TictactoeModule.class).sendCreateMessage(fPlayer, fReceiver, ticTacToe);
     }
 
-    private void handleTicTacToeMove(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleTicTacToeMove(DataInputStream input, FEntity fEntity) throws IOException {
         if (!(fEntity instanceof FPlayer fPlayer)) return;
 
         FPlayer fReceiver = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -532,27 +549,27 @@ public class ProxyMessageHandler {
         injector.getInstance(TictactoeModule.class).sendMoveMessage(fPlayer, fReceiver, ticTacToe, typeTitle, move);
     }
 
-    private void handleChatMessage(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleChatMessage(DataInputStream input, FEntity fEntity) throws IOException {
         String chat = input.readUTF();
         String message = input.readUTF();
 
         injector.getInstance(ChatModule.class).send(fEntity, chat, message);
     }
 
-    private void handleRockPaperScissorsCreate(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleRockPaperScissorsCreate(DataInputStream input, FEntity fEntity) throws IOException {
         UUID id = UUID.fromString(input.readUTF());
         UUID receiver = UUID.fromString(input.readUTF());
         injector.getInstance(RockpaperscissorsModule.class).create(id, fEntity, receiver);
     }
 
-    private void handleRockPaperScissorsMove(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleRockPaperScissorsMove(DataInputStream input, FEntity fEntity) throws IOException {
         UUID id = UUID.fromString(input.readUTF());
         String move = input.readUTF();
 
         injector.getInstance(RockpaperscissorsModule.class).move(id, fEntity, move);
     }
 
-    private void handleRockPaperScissorsFinal(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleRockPaperScissorsFinal(DataInputStream input, FEntity fEntity) throws IOException {
         if (!(fEntity instanceof FPlayer fPlayer)) return;
 
         UUID id = UUID.fromString(input.readUTF());
@@ -561,7 +578,7 @@ public class ProxyMessageHandler {
         injector.getInstance(RockpaperscissorsModule.class).sendFinalMessage(id, fPlayer, move);
     }
 
-    private void handleDiscordMessage(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleDiscordMessage(DataInputStream input, FEntity fEntity) throws IOException {
         String nickname = input.readUTF();
         String string = input.readUTF();
 
@@ -570,13 +587,13 @@ public class ProxyMessageHandler {
                 .range(Range.SERVER)
                 .destination(messageCreateListener.getIntegration().getDestination())
                 .tag(MessageTag.FROM_DISCORD_TO_MINECRAFT)
-                .format((fResolver, s) -> s.getForMinecraft().replace("<name>", nickname))
-                .message((fResolver, s) -> string)
+                .format((s) -> s.getForMinecraft().replace("<name>", nickname))
+                .message(string)
                 .sound(messageCreateListener.getSound())
                 .sendBuilt();
     }
 
-    private void handleTwitchMessage(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleTwitchMessage(DataInputStream input, FEntity fEntity) throws IOException {
         String nickname = input.readUTF();
         String channelName = input.readUTF();
         String string = input.readUTF();
@@ -586,16 +603,16 @@ public class ProxyMessageHandler {
                 .range(Range.SERVER)
                 .destination(channelMessageListener.getIntegration().getDestination())
                 .tag(MessageTag.FROM_TWITCH_TO_MINECRAFT)
-                .format((fResolver, s) -> s.getForMinecraft()
+                .format((s) -> s.getForMinecraft()
                         .replace("<name>", nickname)
                         .replace("<channel>", channelName)
                 )
-                .message((fResolver, s) -> string)
+                .message(string)
                 .sound(channelMessageListener.getSound())
                 .sendBuilt();
     }
 
-    private void handleTelegramMessage(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleTelegramMessage(DataInputStream input, FEntity fEntity) throws IOException {
         String author = input.readUTF();
         String chat = input.readUTF();
         String text = input.readUTF();
@@ -605,16 +622,16 @@ public class ProxyMessageHandler {
                 .range(Range.PROXY)
                 .destination(messageListener.getIntegration().getDestination())
                 .tag(MessageTag.FROM_TELEGRAM_TO_MINECRAFT)
-                .format((fResolver, s) -> s.getForMinecraft()
+                .format((s) -> s.getForMinecraft()
                         .replace("<name>", author)
                         .replace("<chat>", chat)
                 )
-                .message((fResolver, s) -> text)
+                .message(text)
                 .sound(messageListener.getSound())
                 .sendBuilt();
     }
 
-    private void handleAdvancement(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleAdvancement(DataInputStream input, FEntity fEntity) throws IOException {
         AdvancementModule advancementModule = injector.getInstance(AdvancementModule.class);
         if (advancementModule.checkModulePredicates(fEntity)) return;
 
@@ -630,7 +647,7 @@ public class ProxyMessageHandler {
                 .sendBuilt();
     }
 
-    private void handleDeath(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleDeath(DataInputStream input, FEntity fEntity) throws IOException {
         DeathModule deathModule = injector.getInstance(DeathModule.class);
         if (deathModule.checkModulePredicates(fEntity)) return;
 
@@ -646,7 +663,7 @@ public class ProxyMessageHandler {
                 .sendBuilt();
     }
 
-    private void handleJoin(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleJoin(DataInputStream input, FEntity fEntity) throws IOException {
         JoinModule joinModule = injector.getInstance(JoinModule.class);
         if (joinModule.checkModulePredicates(fEntity)) return;
 
@@ -662,7 +679,7 @@ public class ProxyMessageHandler {
                 .sendBuilt();
     }
 
-    private void handleQuit(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleQuit(DataInputStream input, FEntity fEntity) throws IOException {
         QuitModule quitModule = injector.getInstance(QuitModule.class);
         if (quitModule.checkModulePredicates(fEntity)) return;
 
@@ -676,7 +693,7 @@ public class ProxyMessageHandler {
                 .sendBuilt();
     }
 
-    private void handleAfk(ByteArrayDataInput input, FEntity fEntity) {
+    private void handleAfk(DataInputStream input, FEntity fEntity) throws IOException {
         AfkModule afkModule = injector.getInstance(AfkModule.class);
         if (afkModule.checkModulePredicates(fEntity)) return;
 

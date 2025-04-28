@@ -119,9 +119,9 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
         String receiverUUID = fReceiver.getUuid().toString();
 
-        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_TELL, byteArrayDataOutput -> {
-            byteArrayDataOutput.writeUTF(receiverUUID);
-            byteArrayDataOutput.writeUTF(message);
+        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_TELL, dataOutputStream -> {
+            dataOutputStream.writeUTF(receiverUUID);
+            dataOutputStream.writeUTF(message);
 
             send(fReceiver, fPlayer, (fResolver, s) -> s.getSender(), message);
         });

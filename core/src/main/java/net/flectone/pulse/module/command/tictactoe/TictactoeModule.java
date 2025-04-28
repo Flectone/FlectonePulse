@@ -134,10 +134,10 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 .sound(getSound())
                 .sendBuilt();
 
-        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_TICTACTOE_CREATE, byteArrayDataOutput -> {
-            byteArrayDataOutput.writeUTF(gson.toJson(fReceiver));
-            byteArrayDataOutput.writeInt(ticTacToe.getId());
-            byteArrayDataOutput.writeBoolean(isHard);
+        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_TICTACTOE_CREATE, dataOutputStream -> {
+            dataOutputStream.writeUTF(gson.toJson(fReceiver));
+            dataOutputStream.writeInt(ticTacToe.getId());
+            dataOutputStream.writeBoolean(isHard);
         });
 
         if (isSent) return;
@@ -219,11 +219,11 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 .format(getMoveMessage(ticTacToe, fReceiver, fPlayer, finalTypeTitle, move))
                 .sendBuilt();
 
-        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_TICTACTOE_MOVE, byteArrayDataOutput -> {
-            byteArrayDataOutput.writeUTF(gson.toJson(fReceiver));
-            byteArrayDataOutput.writeUTF(ticTacToe.toString());
-            byteArrayDataOutput.writeInt(finalTypeTitle);
-            byteArrayDataOutput.writeUTF(move);
+        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_TICTACTOE_MOVE, dataOutputStream -> {
+            dataOutputStream.writeUTF(gson.toJson(fReceiver));
+            dataOutputStream.writeUTF(ticTacToe.toString());
+            dataOutputStream.writeInt(finalTypeTitle);
+            dataOutputStream.writeUTF(move);
         });
 
         if (isSent) return;
