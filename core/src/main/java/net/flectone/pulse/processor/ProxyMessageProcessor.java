@@ -1,105 +1,41 @@
 package net.flectone.pulse.processor;
 
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import lombok.experimental.UtilityClass;
 import net.flectone.pulse.util.MessageTag;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.io.*;
 import java.util.UUID;
 
 @UtilityClass
 public class ProxyMessageProcessor {
 
     public byte[] create(MessageTag tag, UUID uuid) {
-        ByteArrayDataOutput output = ByteStreams.newDataOutput();
-        output.writeUTF(tag.toProxyTag());
-        output.writeUTF(uuid.toString());
+        try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+             DataOutputStream output = new DataOutputStream(byteStream)) {
 
-        return output.toByteArray();
+            output.writeUTF(tag.toProxyTag());
+            output.writeUTF(uuid.toString());
+
+            return byteStream.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create message", e);
+        }
     }
 
     public byte[] create(byte[] data) {
-        ByteArrayDataInput input = ByteStreams.newDataInput(data);
+        try (ByteArrayInputStream byteStream = new ByteArrayInputStream(data);
+             DataInputStream input = new DataInputStream(byteStream)) {
 
-        String tag = input.readUTF();
-        if (!tag.startsWith("FlectonePulse")) return null;
+            String tag = input.readUTF();
+            if (!tag.startsWith("FlectonePulse")) return null;
 
-        MessageTag proxyMessageTag = MessageTag.fromProxyString(tag);
-        if (proxyMessageTag == null) return null;
+            MessageTag proxyMessageTag = MessageTag.fromProxyString(tag);
+            if (proxyMessageTag == null) return null;
 
-        int clustersCount = input.readInt();
-        Set<String> clusters = new HashSet<>(clustersCount);
-
-        for (int i = 0; i < clustersCount; i++) {
-            clusters.add(input.readUTF());
+            return data;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to process message", e);
         }
-
-        boolean isPlayer = input.readBoolean();
-        String fPlayer = input.readUTF();
-
-        ByteArrayDataOutput output = ByteStreams.newDataOutput();
-        output.writeUTF(tag);
-
-        output.writeInt(clustersCount);
-        for (String cluster : clusters) {
-            output.writeUTF(cluster);
-        }
-
-        output.writeBoolean(isPlayer);
-        output.writeUTF(fPlayer);
-
-        switch (proxyMessageTag) {
-            case COMMAND_ME, COMMAND_BROADCAST, COMMAND_DO, COMMAND_HELPER, COMMAND_CHATCOLOR,
-                 COMMAND_STREAM, DEATH, ADVANCEMENT, COMMAND_DICE, COMMAND_UNBAN,
-                 COMMAND_UNMUTE, COMMAND_UNWARN, COMMAND_POLL_CREATE_MESSAGE -> output.writeUTF(input.readUTF());
-
-            case COMMAND_BALL, COMMAND_TRY -> {
-                output.writeInt(input.readInt());
-                output.writeUTF(input.readUTF());
-            }
-
-            case FROM_TWITCH_TO_MINECRAFT, FROM_TELEGRAM_TO_MINECRAFT -> {
-                output.writeUTF(input.readUTF());
-                output.writeUTF(input.readUTF());
-                output.writeUTF(input.readUTF());
-            }
-
-            case CHAT, COMMAND_TRANSLATETO, FROM_DISCORD_TO_MINECRAFT, COMMAND_TELL, COMMAND_KICK, COMMAND_SPY,
-                 COMMAND_ROCKPAPERSCISSORS_CREATE, COMMAND_ROCKPAPERSCISSORS_MOVE, COMMAND_ROCKPAPERSCISSORS_FINAL,
-                 COMMAND_MUTE, COMMAND_BAN, COMMAND_WARN -> {
-                output.writeUTF(input.readUTF());
-                output.writeUTF(input.readUTF());
-            }
-
-            case COMMAND_COIN -> output.writeInt(input.readInt());
-
-            case COMMAND_POLL_VOTE -> {
-                output.writeInt(input.readInt());
-                output.writeInt(input.readInt());
-            }
-
-            case COMMAND_TICTACTOE_CREATE -> {
-                output.writeUTF(input.readUTF());
-                output.writeInt(input.readInt());
-                output.writeBoolean(input.readBoolean());
-            }
-
-            case COMMAND_TICTACTOE_MOVE -> {
-                output.writeUTF(input.readUTF());
-                output.writeUTF(input.readUTF());
-                output.writeInt(input.readInt());
-                output.writeUTF(input.readUTF());
-            }
-
-            case QUIT, JOIN, AFK -> output.writeBoolean(input.readBoolean());
-
-            default -> {}
-        }
-
-        return output.toByteArray();
     }
 
 }
