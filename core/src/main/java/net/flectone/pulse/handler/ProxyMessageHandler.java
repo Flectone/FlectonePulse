@@ -115,7 +115,7 @@ public class ProxyMessageHandler {
 
         Set<String> proxyClusters = readClusters(input, clustersCount);
         Set<String> configClusters = fileManager.getConfig().getClusters();
-        if (configClusters.isEmpty() || configClusters.stream().anyMatch(proxyClusters::contains)) {
+        if (!configClusters.isEmpty() && configClusters.stream().noneMatch(proxyClusters::contains)) {
             return;
         }
 
