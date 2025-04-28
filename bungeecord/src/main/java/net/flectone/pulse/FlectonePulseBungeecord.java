@@ -4,9 +4,7 @@ import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.processor.ProxyMessageProcessor;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.event.PlayerDisconnectEvent;
-import net.md_5.bungee.api.event.PluginMessageEvent;
-import net.md_5.bungee.api.event.PostLoginEvent;
+import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
@@ -51,7 +49,7 @@ public final class FlectonePulseBungeecord extends Plugin implements Listener, F
     }
 
     @EventHandler
-    public void onLoginEvent(PostLoginEvent event) {
+    public void onServerConnectedEvent(ServerConnectedEvent event) {
         byte[] data = ProxyMessageProcessor.create(MessageTag.SYSTEM_ONLINE, event.getPlayer().getUniqueId());
 
         ProxyServer.getInstance().getServers().values().stream()

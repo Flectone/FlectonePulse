@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
-import com.velocitypowered.api.event.connection.PostLoginEvent;
+import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
@@ -69,7 +69,7 @@ public class FlectonePulseVelocity implements FlectonePulse {
     }
 
     @Subscribe
-    public void onLoginEvent(PostLoginEvent event) {
+    public void onServerConnectedEvent(ServerConnectedEvent event) {
         byte[] data = ProxyMessageProcessor.create(MessageTag.SYSTEM_ONLINE, event.getPlayer().getUniqueId());
 
         proxyServer.getAllServers().stream()
