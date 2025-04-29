@@ -5,7 +5,6 @@ import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.util.logging.FLogger;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -17,6 +16,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+// only for modern paper based servers
 public class MiniPlaceholdersIntegration implements FIntegration, MessageProcessor {
 
     private final Pattern BRACES_PATTERN = Pattern.compile("\\{([^}]*)}");
@@ -41,14 +41,14 @@ public class MiniPlaceholdersIntegration implements FIntegration, MessageProcess
         Player sender = Bukkit.getPlayer(messageContext.getSender().getUuid());
         if (sender != null) {
             try {
-                resolvers.add(MiniPlaceholders.getAudiencePlaceholders((Audience) sender));
+                resolvers.add(MiniPlaceholders.getAudiencePlaceholders(sender));
 
                 Player receiver = Bukkit.getPlayer(messageContext.getReceiver().getUuid());
                 if (receiver == null) {
                     receiver = sender;
                 }
 
-                resolvers.add(MiniPlaceholders.getRelationalPlaceholders((Audience) sender, (Audience) receiver));
+                resolvers.add(MiniPlaceholders.getRelationalPlaceholders(sender, receiver));
 
             } catch (ClassCastException e) {
                 fLogger.warning(e);
@@ -68,7 +68,10 @@ public class MiniPlaceholdersIntegration implements FIntegration, MessageProcess
             String content = matcher.group(1);
 
             Component parsedMessage = miniMessage.deserialize(content, resolvers);
-            matcher.appendReplacement(result, miniMessage.serialize(parsedMessage));
+
+            // fix colors problems for custom RP
+            // https://github.com/BertTowne/InlineHeads
+            matcher.appendReplacement(result, miniMessage.serialize(parsedMessage).replaceAll("</#[0-9a-fA-F]+>", ""));
         }
 
         matcher.appendTail(result);
