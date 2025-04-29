@@ -1,0 +1,77 @@
+package net.flectone.pulse.module.integration.miniplaceholders;
+
+import io.github.miniplaceholders.api.MiniPlaceholders;
+import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.processor.MessageProcessor;
+import net.flectone.pulse.util.logging.FLogger;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class MiniPlaceholdersIntegration implements FIntegration, MessageProcessor {
+
+    private final Pattern BRACES_PATTERN = Pattern.compile("\\{([^}]*)}");
+
+    private final FLogger fLogger;
+    private final MiniMessage miniMessage = MiniMessage.miniMessage();
+
+    public MiniPlaceholdersIntegration(FLogger fLogger) {
+        this.fLogger = fLogger;
+    }
+
+    @Override
+    public void hook() {
+        fLogger.info("MiniPlaceholders hooked");
+    }
+
+    @Override
+    public void process(MessageContext messageContext) {
+        Set<TagResolver> resolvers = new HashSet<>();
+        resolvers.add(MiniPlaceholders.getGlobalPlaceholders());
+
+        Player sender = Bukkit.getPlayer(messageContext.getSender().getUuid());
+        if (sender != null) {
+            try {
+                resolvers.add(MiniPlaceholders.getAudiencePlaceholders((Audience) sender));
+
+                Player receiver = Bukkit.getPlayer(messageContext.getReceiver().getUuid());
+                if (receiver == null) {
+                    receiver = sender;
+                }
+
+                resolvers.add(MiniPlaceholders.getRelationalPlaceholders((Audience) sender, (Audience) receiver));
+
+            } catch (ClassCastException e) {
+                fLogger.warning(e);
+            }
+        }
+
+        TagResolver[] resolversArray = resolvers.toArray(new TagResolver[0]);
+        String message = replaceMiniPlaceholders(messageContext.getMessage(), resolversArray);
+
+        messageContext.setMessage(message);
+    }
+
+    public String replaceMiniPlaceholders(String text, TagResolver[] resolvers) {
+        Matcher matcher = BRACES_PATTERN.matcher(text);
+        StringBuilder result = new StringBuilder();
+        while (matcher.find()) {
+            String content = matcher.group(1);
+
+            Component parsedMessage = miniMessage.deserialize(content, resolvers);
+            matcher.appendReplacement(result, miniMessage.serialize(parsedMessage));
+        }
+
+        matcher.appendTail(result);
+        return result.toString();
+    }
+}

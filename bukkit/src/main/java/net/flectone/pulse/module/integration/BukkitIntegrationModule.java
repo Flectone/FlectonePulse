@@ -15,6 +15,7 @@ import net.flectone.pulse.module.integration.itemsadder.ItemsAdderModule;
 import net.flectone.pulse.module.integration.litebans.LiteBansModule;
 import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.module.integration.minimotd.MiniMOTDModule;
+import net.flectone.pulse.module.integration.miniplaceholders.MiniPlaceholdersModule;
 import net.flectone.pulse.module.integration.motd.MOTDModule;
 import net.flectone.pulse.module.integration.placeholderapi.PlaceholderAPIModule;
 import net.flectone.pulse.module.integration.plasmovoice.PlasmoVoiceModule;
@@ -79,6 +80,10 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
         if (platformServerAdapter.hasProject("MiniMOTD")) {
             addChildren(MiniMOTDModule.class);
+        }
+
+        if (platformServerAdapter.hasProject("MiniPlaceholders")) {
+            addChildren(MiniPlaceholdersModule.class);
         }
 
         if (platformServerAdapter.hasProject("MOTD")) {

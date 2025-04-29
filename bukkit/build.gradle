@@ -18,6 +18,7 @@ dependencies {
     compileOnly "com.gitlab.ruany:LiteBansAPI:$litebans_version"
     compileOnly "com.github.DevLeoko:AdvancedBan:$advancedban_version"
     compileOnly "dev.lone:api-itemsadder:$itemsadder_version"
+    compileOnly "io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version"
 
     implementation "com.alessiodp.libby:libby-bukkit:$libby_version"
     implementation project(":core")

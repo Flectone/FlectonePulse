@@ -525,6 +525,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Luckperms luckperms = new Luckperms();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/minimotd/")})
         private MiniMOTD minimotd = new MiniMOTD();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/miniplaceholders/")})
+        private MiniPlaceholders miniplaceholders = new MiniPlaceholders();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/motd/")})
         private MOTD motd = new MOTD();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/placeholderapi/")})
@@ -596,6 +598,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         public static final class MiniMOTD implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.minimotd";
             private Type type = Type.TRUE;
+        }
+
+        @Getter
+        public static final class MiniPlaceholders implements SubIntegrationConfig, IPermission {
+            private String name = "flectonepulse.module.integration.miniplaceholders";
+            private Type type = Type.TRUE;
+            private PermissionEntry use = new PermissionEntry("flectonepulse.module.integration.miniplaceholders.use", Type.OP);
         }
 
         @Getter

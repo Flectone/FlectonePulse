@@ -19,7 +19,7 @@ subprojects {
 
     java {
         sourceCompatibility = java_version
-        targetCompatibility = java_version
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     repositories {
@@ -98,6 +98,9 @@ subprojects {
         archiveClassifier.set("")
         archiveVersion.set("${project_version}")
 
+        // avoid relocate
+        exclude 'net/flectone/pulse/module/integration/miniplaceholders/MiniPlaceholdersIntegration.class'
+
         minimize()
     }
 }
@@ -125,4 +128,10 @@ tasks.register("mergeJars", Jar) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     dependsOn platforms.collect { it.tasks.named("shadowJar") }
+
+    // return an excluded class without relocation
+    def integrationProj = project(":bukkit")
+    from("${integrationProj.buildDir}/classes/java/main") {
+        include "net/flectone/pulse/module/integration/miniplaceholders/MiniPlaceholdersIntegration.class"
+    }
 }

@@ -62,6 +62,7 @@ public interface ModuleConfig {
         SubIntegrationConfig getLitebans();
         SubIntegrationConfig getLuckperms();
         SubIntegrationConfig getMinimotd();
+        SubIntegrationConfig getMiniplaceholders();
         SubIntegrationConfig getMotd();
         SubIntegrationConfig getPlaceholderapi();
         SubIntegrationConfig getPlasmovoice();
