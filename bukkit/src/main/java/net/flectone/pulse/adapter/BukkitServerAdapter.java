@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
@@ -17,6 +18,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.PaperItemStackUtil;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -236,6 +238,16 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
                 : Component.text(itemStack.getItemMeta().getDisplayName()).decorate(TextDecoration.ITALIC);
 
         if (itemStack.getType() == Material.AIR) return component;
+
+        try {
+            // it's not really working full
+            // for some reason nbt components are not showing up
+            // waiting for new NBTSerializer by Kyori
+            if (BukkitServerAdapter.IS_PAPER) {
+                JsonElement element = PaperItemStackUtil.serialize(itemStack);
+                return component.hoverEvent(AdventureSerializer.serializer().fromJsonTree(element).hoverEvent());
+            }
+        } catch (Exception ignored) {}
 
         Key key = Key.key(itemStack.getType().name().toLowerCase());
         return component.hoverEvent(HoverEvent.showItem(key, itemStack.getAmount()));

@@ -5,6 +5,6 @@ java {
 
 dependencies {
     compileOnly "io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version"
-    compileOnly "org.spigotmc:spigot-api:$spigot_version"
+    compileOnly "io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT"
     compileOnly project(":core")
 }
