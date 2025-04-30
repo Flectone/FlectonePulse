@@ -13,7 +13,6 @@ import net.flectone.pulse.sender.MetricsSender;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.time.Instant;
-import java.util.Locale;
 
 @Singleton
 public class MetricsService {
@@ -51,12 +50,10 @@ public class MetricsService {
         metricsDTO.setServerVersion(PacketEvents.getAPI().getServerManager().getVersion().getReleaseName());
         metricsDTO.setOsName(getOsName());
         metricsDTO.setOsArchitecture(getOsArch());
+        metricsDTO.setOsVersion(getOsVersion());
         metricsDTO.setJavaVersion(getJavaVersion());
         metricsDTO.setCpuCores(Runtime.getRuntime().availableProcessors());
         metricsDTO.setTotalRAM(Runtime.getRuntime().totalMemory());
-
-        Locale locale = Locale.getDefault();
-        metricsDTO.setLocation(locale.getCountry());
 
         Config config = fileManager.getConfig();
 
@@ -78,6 +75,10 @@ public class MetricsService {
 
     private String getOsArch() {
         return System.getProperty("os.arch");
+    }
+
+    private String getOsVersion() {
+        return System.getProperty("os.version");
     }
 
     private String getJavaVersion() {
