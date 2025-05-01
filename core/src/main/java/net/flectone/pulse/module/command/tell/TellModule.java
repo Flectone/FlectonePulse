@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.tell;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
@@ -16,6 +17,7 @@ import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.util.Range;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
@@ -35,19 +37,22 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
     private final ProxySender proxySender;
     private final IntegrationModule integrationModule;
     private final CommandRegistry commandRegistry;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Inject
     public TellModule(FileManager fileManager,
                       FPlayerService fPlayerService,
                       ProxySender proxySender,
                       IntegrationModule integrationModule,
-                      CommandRegistry commandRegistry) {
+                      CommandRegistry commandRegistry,
+                      PlatformPlayerAdapter platformPlayerAdapter) {
         super(localization -> localization.getCommand().getTell(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELL));
 
         this.fPlayerService = fPlayerService;
         this.proxySender = proxySender;
         this.integrationModule = integrationModule;
         this.commandRegistry = commandRegistry;
+        this.platformPlayerAdapter = platformPlayerAdapter;
 
         command = fileManager.getCommand().getTell();
         permission = fileManager.getPermission().getCommand().getTell();
@@ -104,8 +109,13 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
             return;
         }
 
+        int range = command.getRange();
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
-        if (fReceiver.isUnknown() || !fReceiver.isOnline()) {
+
+        if (fReceiver.isUnknown()
+                || !fReceiver.isOnline()
+                || !rangeFilter(fPlayer, range).test(fReceiver)
+                || range == Range.PROXY && !platformPlayerAdapter.isOnline(fReceiver)) {
             builder(fPlayer)
                     .format(Localization.Command.Tell::getNullPlayer)
                     .sendBuilt();

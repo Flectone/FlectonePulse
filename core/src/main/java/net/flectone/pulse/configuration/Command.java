@@ -524,6 +524,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     public static final class Tell implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean suggestOfflinePlayers = false;
+        private int range = Range.PROXY;
         private List<String> aliases = new ArrayList<>(){
             {
                 add("tell");
