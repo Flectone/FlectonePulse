@@ -74,6 +74,7 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
     }
 
     private void onMicrophonePacketEvent(MicrophonePacketEvent event) {
+        if (event.isCancelled()) return;
         if (event.getSenderConnection() == null) return;
 
         Player player = event.getSenderConnection().getPlayer();
