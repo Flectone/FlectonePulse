@@ -170,8 +170,8 @@ welcome-message: "<gradient:#FF0000:#00FF00>&lПривет</gradient> <rainbow><
 ## 📊 **Статистика — мы в тренде!** 
 Да, мы следим за цифрами как Илон за твиттером 🚀
 <div align="center">
-  <a href="https://bstats.org/plugin/bukkit/FlectonePulse" target="_blank">
-    <img src="https://bstats.org/signatures/bukkit/FlectonePulse.svg" alt="FlectonePulse stats">
+  <a href="https://flectone.net/pulse/docs/metrics" target="_blank">
+    <img src="https://flectone.net/api/pulse/metrics/svg" alt="FlectonePulse stats">
   </a>
 </div>
 
