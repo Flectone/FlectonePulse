@@ -24,19 +24,6 @@ public class BukkitIgnoreSnapshotLibraryManager extends BukkitLibraryManager {
 
     @NotNull
     @Override
-    public Collection<String> resolveLibrary(@NotNull Library library) {
-        Set<String> urls = new LinkedHashSet<>(requireNonNull(library, "library").getUrls());
-        Collection<String> repos = resolveRepositories(library);
-
-        for (String repository : repos) {
-            urls.add(repository + library.getPath());
-        }
-
-        return Collections.unmodifiableSet(urls);
-    }
-
-    @NotNull
-    @Override
     public Path downloadLibrary(@NotNull Library library) {
         Path file = saveDirectory.resolve(requireNonNull(library, "library").getPath());
         if (Files.exists(file)) {
