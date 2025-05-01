@@ -1,6 +1,5 @@
 package net.flectone.pulse.resolver;
 
-import com.alessiodp.libby.BukkitLibraryManager;
 import com.alessiodp.libby.Library;
 import com.alessiodp.libby.logging.adapters.JDKLogAdapter;
 import com.alessiodp.libby.relocation.Relocation;
@@ -13,7 +12,7 @@ import org.bukkit.plugin.Plugin;
 public class BukkitLibraryResolver extends LibraryResolver {
 
     public BukkitLibraryResolver(Plugin plugin, FLogger fLogger) {
-        super(new BukkitLibraryManager(plugin, "libraries", new JDKLogAdapter(fLogger)));
+        super(new BukkitIgnoreSnapshotLibraryManager(plugin, "libraries", new JDKLogAdapter(fLogger)));
     }
 
     @Override
@@ -28,7 +27,8 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .relocate(Relocation.builder()
                         .pattern("net{}kyori")
                         .relocatedPattern("net.flectone.pulse.library")
-                        .build())
+                        .build()
+                )
                 .build()
         );
 
@@ -40,7 +40,8 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .relocate(Relocation.builder()
                         .pattern("net{}kyori")
                         .relocatedPattern("net.flectone.pulse.library")
-                        .build())
+                        .build()
+                )
                 .build()
         );
 
@@ -52,7 +53,8 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .relocate(Relocation.builder()
                         .pattern("net{}kyori")
                         .relocatedPattern("net.flectone.pulse.library")
-                        .build())
+                        .build()
+                )
                 .build()
         );
 
@@ -64,7 +66,8 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .relocate(Relocation.builder()
                         .pattern("net{}kyori")
                         .relocatedPattern("net.flectone.pulse.library")
-                        .build())
+                        .build()
+                )
                 .build()
         );
 
@@ -76,7 +79,8 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .relocate(Relocation.builder()
                         .pattern("net{}kyori")
                         .relocatedPattern("net.flectone.pulse.library")
-                        .build())
+                        .build()
+                )
                 .build()
         );
 
@@ -88,7 +92,8 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .relocate(Relocation.builder()
                         .pattern("net{}kyori")
                         .relocatedPattern("net.flectone.pulse.library")
-                        .build())
+                        .build()
+                )
                 .build()
         );
 
@@ -100,15 +105,18 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .relocate(Relocation.builder()
                         .pattern("com{}github{}retrooper")
                         .relocatedPattern("net.flectone.pulse.library")
-                        .build())
+                        .build()
+                )
                 .relocate(Relocation.builder()
                         .pattern("io{}github{}retrooper{}packetevents")
                         .relocatedPattern("net.flectone.pulse.library.packetevents.impl")
-                        .build())
+                        .build()
+                )
                 .relocate(Relocation.builder()
                         .pattern("net{}kyori")
                         .relocatedPattern("net.flectone.pulse.library")
-                        .build())
+                        .build()
+                )
                 .build()
         );
 
@@ -120,19 +128,23 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .relocate(Relocation.builder()
                         .pattern("net{}megavex")
                         .relocatedPattern("net.flectone.pulse.library")
-                        .build())
+                        .build()
+                )
                 .relocate(Relocation.builder()
                         .pattern("com{}github{}retrooper")
                         .relocatedPattern("net.flectone.pulse.library")
-                        .build())
+                        .build()
+                )
                 .relocate(Relocation.builder()
                         .pattern("io{}github{}retrooper{}packetevents")
                         .relocatedPattern("net.flectone.pulse.library.packetevents.impl")
-                        .build())
+                        .build()
+                )
                 .relocate(Relocation.builder()
                         .pattern("net{}kyori")
                         .relocatedPattern("net.flectone.pulse.library")
-                        .build())
+                        .build()
+                )
                 .build()
         );
 
@@ -144,19 +156,23 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .relocate(Relocation.builder()
                         .pattern("net{}megavex")
                         .relocatedPattern("net.flectone.pulse.library")
-                        .build())
+                        .build()
+                )
                 .relocate(Relocation.builder()
                         .pattern("com{}github{}retrooper")
                         .relocatedPattern("net.flectone.pulse.library")
-                        .build())
+                        .build()
+                )
                 .relocate(Relocation.builder()
                         .pattern("io{}github{}retrooper{}packetevents")
                         .relocatedPattern("net.flectone.pulse.library.packetevents.impl")
-                        .build())
+                        .build()
+                )
                 .relocate(Relocation.builder()
                         .pattern("net{}kyori")
                         .relocatedPattern("net.flectone.pulse.library")
-                        .build())
+                        .build()
+                )
                 .build()
         );
 
@@ -168,19 +184,23 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .relocate(Relocation.builder()
                         .pattern("net{}megavex")
                         .relocatedPattern("net.flectone.pulse.library")
-                        .build())
+                        .build()
+                )
                 .relocate(Relocation.builder()
                         .pattern("com{}github{}retrooper")
                         .relocatedPattern("net.flectone.pulse.library")
-                        .build())
+                        .build()
+                )
                 .relocate(Relocation.builder()
                         .pattern("io{}github{}retrooper{}packetevents")
                         .relocatedPattern("net.flectone.pulse.library.packetevents.impl")
-                        .build())
+                        .build()
+                )
                 .relocate(Relocation.builder()
                         .pattern("net{}kyori")
                         .relocatedPattern("net.flectone.pulse.library")
-                        .build())
+                        .build()
+                )
                 .build()
         );
 
