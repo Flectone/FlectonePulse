@@ -259,24 +259,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.chatsetting.disable.server = "<color:#ff7171><b>⁉</b> Команда отключена на сервере";
 
         command.symbol.format = "<click:suggest_command:\"<message>\"><fcolor:2>\uD83D\uDDA5 Нажми, чтобы использовать: <fcolor:1><message>";
-        command.symbol.categories.clear();
-        command.symbol.categories.put("activities", "мероприятие");
-        command.symbol.categories.put("animals", "животные");
-        command.symbol.categories.put("arrows", "стрелки");
-        command.symbol.categories.put("body", "тело");
-        command.symbol.categories.put("clothes", "одежда");
-        command.symbol.categories.put("environment", "окружение");
-        command.symbol.categories.put("faces", "лицо");
-        command.symbol.categories.put("food", "еда");
-        command.symbol.categories.put("greenery", "зелень");
-        command.symbol.categories.put("hands", "руки");
-        command.symbol.categories.put("misc", "разное");
-        command.symbol.categories.put("numbers", "числа");
-        command.symbol.categories.put("people", "люди");
-        command.symbol.categories.put("shapes", "фигуры");
-        command.symbol.categories.put("symbols", "символы");
-        command.symbol.categories.put("things", "вещи");
-        command.symbol.categories.put("transport", "транспорт");
 
         command.mail.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.mail.sender = "<fcolor:2>✉ Письмо #<id> для <display_name> » <fcolor:1><message>";
@@ -1104,27 +1086,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Symbol implements SubCommandConfig, Localizable {
             private String format = "<click:suggest_command:\"<message>\"><fcolor:2>🖥 Click for using: <fcolor:1><message>";
-            private Map<String, String> categories = new LinkedHashMap<>(){
-                {
-                    put("activities", "activities");
-                    put("animals", "animals");
-                    put("arrows", "arrows");
-                    put("body", "body");
-                    put("clothes", "clothes");
-                    put("environment", "environment");
-                    put("faces", "faces");
-                    put("food", "food");
-                    put("greenery", "greenery");
-                    put("hands", "hands");
-                    put("misc", "misc");
-                    put("numbers", "numbers");
-                    put("people", "people");
-                    put("shapes", "shapes");
-                    put("symbols", "symbols");
-                    put("things", "things");
-                    put("transport", "transport");
-                }
-            };
         }
 
         @Getter
