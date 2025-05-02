@@ -170,7 +170,7 @@ Create unique chat designs — players will gasp at the style 💥. Even the ser
 ## 📊 **Stats — We’re Trending!**
 Yes, we track stats like Elon tracks Twitter 🚀
 <div align="center">
-  <a href="https://flectone.net/en/pulse/docs/metrics" target="_blank">
+  <a href="https://flectone.net/en/pulse/metrics" target="_blank">
     <img src="https://flectone.net/api/pulse/metrics/svg" alt="FlectonePulse stats">
   </a>
 </div>
