@@ -111,6 +111,10 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         fLogger.logDisabling();
 
+        if (injector.getInstance(FileManager.class).getConfig().isMetrics()) {
+            injector.getInstance(MetricsService.class).send();
+        }
+
         injector.getInstance(InventoryController.class).closeAll();
 
         FPlayerService fPlayerService = injector.getInstance(FPlayerService.class);
