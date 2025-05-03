@@ -10,7 +10,6 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.Module;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.MetricsSender;
-import net.flectone.pulse.util.logging.FLogger;
 
 import java.time.Instant;
 
@@ -36,14 +35,11 @@ public class MetricsService {
         this.module = module;
     }
 
-    @Inject
-    private FLogger fLogger;
-
     public void reload() {
         taskScheduler.runAsyncTimer(this::send, 0L, 20L * 60 * 60);
     }
 
-    private void send() {
+    public void send() {
         MetricsDTO metricsDTO = new MetricsDTO();
         metricsDTO.setServerCore(platformServerAdapter.getServerCore());
 
