@@ -115,7 +115,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         if (fReceiver.isUnknown()
                 || !fReceiver.isOnline()
                 || !rangeFilter(fPlayer, range).test(fReceiver)
-                || range == Range.PROXY && !platformPlayerAdapter.isOnline(fReceiver)) {
+                || range != Range.PROXY && !platformPlayerAdapter.isOnline(fReceiver)) {
             builder(fPlayer)
                     .format(Localization.Command.Tell::getNullPlayer)
                     .sendBuilt();
