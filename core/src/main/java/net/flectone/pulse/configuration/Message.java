@@ -432,7 +432,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             @Getter
             public static final class Newbie implements SubModerationFormatMessageConfig, Config.IEnable {
                 private boolean enable = false;
+                private Mode mode = Mode.PLAYED_TIME;
                 private long timeout = 3600;
+
+                public enum Mode {
+                    PLAYED_TIME,
+                    SINCE_JOIN,
+                }
             }
 
             @Getter

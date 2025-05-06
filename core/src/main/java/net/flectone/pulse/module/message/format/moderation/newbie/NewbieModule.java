@@ -48,11 +48,14 @@ public class NewbieModule extends AbstractModuleMessage<Localization.Message.For
         if (checkModulePredicates(fPlayer)) return false;
         if (permissionChecker.check(fPlayer, permission.getBypass())) return false;
 
-        long firstPlayed = platformPlayerAdapter.getFirstPlayed(fPlayer);
-        long timeLeft = System.currentTimeMillis() - firstPlayed;
+        long timeToCheck = switch (message.getMode()) {
+            case SINCE_JOIN -> System.currentTimeMillis() - platformPlayerAdapter.getFirstPlayed(fPlayer);
+            case PLAYED_TIME -> platformPlayerAdapter.getAllTimePlayed(fPlayer);
+        };
+
         long timeout = message.getTimeout() * 1000L;
 
-        return timeLeft <= timeout;
+        return timeToCheck <= timeout;
     }
 
     public ExternalModeration getModeration(FPlayer fPlayer) {
@@ -61,12 +64,17 @@ public class NewbieModule extends AbstractModuleMessage<Localization.Message.For
         long timeout = message.getTimeout() * 1000L;
         long firstPlayed = platformPlayerAdapter.getFirstPlayed(fPlayer);
 
+        long moderationTime = switch (message.getMode()) {
+            case SINCE_JOIN -> firstPlayed + timeout;
+            case PLAYED_TIME -> System.currentTimeMillis() + (timeout - platformPlayerAdapter.getAllTimePlayed(fPlayer));
+        };
+
         return new ExternalModeration(fPlayer.getName(),
                 FPlayer.UNKNOWN.getName(),
                 resolveLocalization().getReason(),
                 1,
                 firstPlayed,
-                firstPlayed + timeout,
+                moderationTime,
                 false
         );
     }
