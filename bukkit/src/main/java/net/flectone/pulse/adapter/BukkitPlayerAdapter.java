@@ -161,7 +161,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     public long getAllTimePlayed(@NotNull FPlayer fPlayer) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(fPlayer.getUuid());
 
-        return player.getStatistic(Statistic.PLAY_ONE_MINUTE) * 60L;
+        return player.getStatistic(Statistic.PLAY_ONE_MINUTE) * 50L;
     }
 
     @Override
