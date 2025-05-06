@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.NonNull;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
@@ -174,7 +173,6 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         };
     }
 
-    @Async
     public void setStreamPrefix(FPlayer fPlayer, boolean isStart) {
         if (checkModulePredicates(fPlayer)) return;
         if (fPlayer.isUnknown()) return;

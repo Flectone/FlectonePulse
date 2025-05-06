@@ -3,10 +3,10 @@ package net.flectone.pulse.module.message.chat;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.formatter.TimeFormatter;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.model.FEntity;
@@ -20,7 +20,6 @@ import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.Range;
-import net.flectone.pulse.formatter.TimeFormatter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
@@ -192,7 +191,6 @@ public class BukkitChatModule extends ChatModule {
         bubbleModuleProvider.get().add(fPlayer, eventMessage);
     }
 
-    @Async
     public void send(FEntity fPlayer, String chatName, String string) {
         if (checkModulePredicates(fPlayer)) return;
 

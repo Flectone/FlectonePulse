@@ -2,11 +2,10 @@ package net.flectone.pulse.database.dao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.database.Database;
-import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
+import net.flectone.pulse.util.logging.FLogger;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.Connection;
@@ -60,7 +59,6 @@ public class IgnoreDAO {
         return null;
     }
 
-    @Async
     public void delete(Ignore ignore) {
         try (Connection connection = database.getConnection()) {
             String SQL_DELETE = "DELETE FROM `ignore` WHERE `id` = ?";

@@ -2,7 +2,6 @@ package net.flectone.pulse.database.dao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.logging.FLogger;
@@ -26,7 +25,6 @@ public class SettingDAO {
         this.fLogger = fLogger;
     }
 
-    @Async
     public void save(FPlayer fPlayer) {
         for (FPlayer.Setting setting : FPlayer.Setting.values()) {
             if (!fPlayer.isSetting(setting)) {
@@ -66,7 +64,6 @@ public class SettingDAO {
         return Optional.empty();
     }
 
-    @Async
     public void delete(FPlayer fPlayer, FPlayer.Setting setting) {
         try (Connection connection = database.getConnection()) {
             String SQL_DELETE = "DELETE FROM `setting` WHERE `player` = ? AND `type` = ?";
@@ -80,7 +77,6 @@ public class SettingDAO {
         }
     }
 
-    @Async
     public void insert(FPlayer fPlayer, FPlayer.Setting setting) {
         try (Connection connection = database.getConnection()) {
             insert(connection, fPlayer.getId(), setting, fPlayer.getSettingValue(setting));
@@ -90,7 +86,6 @@ public class SettingDAO {
         }
     }
 
-    @Async
     public void update(FPlayer fPlayer, FPlayer.Setting setting) {
         try (Connection connection = database.getConnection()) {
             String SQL_UPDATE = "UPDATE `setting` SET `value` =  ? WHERE `player` = ? AND `type` = ?";

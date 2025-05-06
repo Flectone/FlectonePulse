@@ -2,7 +2,6 @@ package net.flectone.pulse.module.command.mail;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
@@ -115,7 +114,6 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
                 .sendBuilt();
     }
 
-    @Async
     public void send(FPlayer fReceiver) {
         if (checkModulePredicates(fReceiver)) return;
 

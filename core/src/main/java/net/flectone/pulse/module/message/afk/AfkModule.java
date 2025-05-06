@@ -111,8 +111,7 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> i
         check(fPlayer);
     }
 
-    @Async
-    public void check(@NotNull FPlayer fPlayer) {
+    private void check(@NotNull FPlayer fPlayer) {
         if (!fPlayer.isOnline()) {
             String afkSuffix = fPlayer.getSettingValue(FPlayer.Setting.AFK_SUFFIX);
 
@@ -153,7 +152,6 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> i
         setAfk(fPlayer);
     }
 
-    @Async
     public void setAfk(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
@@ -161,8 +159,7 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> i
         send(fPlayer);
     }
 
-    @Async
-    public void send(FPlayer fPlayer) {
+    private void send(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
         int range = message.getRange();

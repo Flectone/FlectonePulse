@@ -4,20 +4,19 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.poll.model.Poll;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 import net.kyori.adventure.text.Component;
@@ -173,7 +172,6 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         vote(fPlayer, id, numberVote);
     }
 
-    @Async
     public void executeCreate(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (!isEnable()) return;
         if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;

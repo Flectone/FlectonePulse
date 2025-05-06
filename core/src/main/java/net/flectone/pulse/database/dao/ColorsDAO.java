@@ -2,12 +2,11 @@ package net.flectone.pulse.database.dao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.database.Database;
 import net.flectone.pulse.configuration.Config;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.database.Database;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.util.logging.FLogger;
 
 import java.sql.*;
 import java.util.Map;
@@ -28,7 +27,6 @@ public class ColorsDAO {
         this.fLogger = fLogger;
     }
 
-    @Async
     public void save(FPlayer fPlayer) {
         try (Connection connection = database.getConnection()) {
             Map<String, String> colors = fPlayer.getColors();
