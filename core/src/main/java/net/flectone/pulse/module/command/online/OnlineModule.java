@@ -119,7 +119,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
                             ? s.getFormatCurrent()
                             : timeFormatter.format(fPlayer, System.currentTimeMillis() - platformPlayerAdapter.getLastPlayed(targetFPlayer), s.getFormatLast());
                     case "total" -> timeFormatter.format(fPlayer,
-                            platformPlayerAdapter.getAllTimePlayed(fPlayer),
+                            platformPlayerAdapter.getAllTimePlayed(targetFPlayer),
                             s.getFormatTotal()
                     );
                     default -> "";
