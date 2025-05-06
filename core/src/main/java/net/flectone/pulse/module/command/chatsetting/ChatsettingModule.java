@@ -127,7 +127,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                                 boolean needNextChat = fPlayer.getSettingValue(FPlayer.Setting.CHAT) == null;
                                 boolean chatChanged = false;
                                 for (String chatName : chatMessage.getTypes().keySet()) {
-                                    String permission = chatPermission.getTypes().get(chatName).getName();
+                                    Permission.IPermission permission = chatPermission.getTypes().get(chatName);
                                     if (!permissionChecker.check(fPlayer, permission)) continue;
 
                                     if (needNextChat) {
