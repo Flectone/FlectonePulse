@@ -6,16 +6,16 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.adapter.PlatformServerAdapter;
+import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.processor.MessageProcessor;
-import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.processor.MessageProcessor;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -28,18 +28,15 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     private final Message.Format.Color color;
 
     private final FPlayerService fPlayerService;
-    private final TaskScheduler taskScheduler;
     private final PlatformServerAdapter platformServerAdapter;
     private final FLogger fLogger;
 
     @Inject
     public PlaceholderAPIIntegration(FPlayerService fPlayerService,
-                                     TaskScheduler taskScheduler,
                                      FileManager fileManager,
                                      PlatformServerAdapter platformServerAdapter,
                                      FLogger fLogger) {
         this.fPlayerService = fPlayerService;
-        this.taskScheduler = taskScheduler;
         this.platformServerAdapter = platformServerAdapter;
         this.fLogger = fLogger;
 
@@ -61,16 +58,15 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
         return BuildConfig.PROJECT_VERSION;
     }
 
+    @Sync
     @Override
     public void hook() {
-        taskScheduler.runSync(() -> {
-            if (isRegistered()) {
-                unregister();
-            }
+        if (isRegistered()) {
+            unregister();
+        }
 
-            register();
-            fLogger.info("PlaceholderAPI hooked");
-        });
+        register();
+        fLogger.info("PlaceholderAPI hooked");
     }
 
     @Override

@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.format.questionanswer;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
@@ -144,20 +145,23 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
 
         processedQuestions.put(processId, true);
 
-        taskScheduler.runAsyncLater(() -> {
-            Message.Format.QuestionAnswer.Question questionMessage = message.getQuestions().get(question);
-            if (questionMessage == null) return;
+        sendAnswerLater(sender, receiver, question);
+    }
 
-            int range = questionMessage.getRange();
-            if (range == Range.PLAYER && !sender.equals(receiver)) return;
-            if (!(receiver instanceof FPlayer fReceiver)) return;
+    @Async(delay = 1L)
+    public void sendAnswerLater(FEntity sender, FEntity receiver, String question) {
+        Message.Format.QuestionAnswer.Question questionMessage = message.getQuestions().get(question);
+        if (questionMessage == null) return;
 
-            builder(sender)
-                    .receiver(fReceiver)
-                    .destination(questionMessage.getDestination())
-                    .format(questionAnswer -> questionAnswer.getQuestions().getOrDefault(question, ""))
-                    .sound(soundMap.get(question))
-                    .sendBuilt();
-        }, 1L);
+        int range = questionMessage.getRange();
+        if (range == Range.PLAYER && !sender.equals(receiver)) return;
+        if (!(receiver instanceof FPlayer fReceiver)) return;
+
+        builder(sender)
+                .receiver(fReceiver)
+                .destination(questionMessage.getDestination())
+                .format(questionAnswer -> questionAnswer.getQuestions().getOrDefault(question, ""))
+                .sound(soundMap.get(question))
+                .sendBuilt();
     }
 }

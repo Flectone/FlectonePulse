@@ -4,9 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.telegram.TelegramIntegration;
 import net.flectone.pulse.util.MessageTag;
@@ -22,14 +22,11 @@ public class MessageListener extends EventListener {
 
     @Getter private final Integration.Telegram integration;
 
-    private final TaskScheduler taskScheduler;
     private final Provider<TelegramIntegration> telegramIntegration;
 
     @Inject
     public MessageListener(FileManager fileManager,
-                           TaskScheduler taskScheduler,
                            Provider<TelegramIntegration> telegramIntegration) {
-        this.taskScheduler = taskScheduler;
         this.telegramIntegration = telegramIntegration;
 
         integration = fileManager.getIntegration().getTelegram();
@@ -72,7 +69,12 @@ public class MessageListener extends EventListener {
         List<String> chats = integration.getMessageChannel().get(MessageTag.FROM_TELEGRAM_TO_MINECRAFT);
         if (!chats.contains(chatID)) return;
 
-        taskScheduler.runAsync(() -> builder(FPlayer.UNKNOWN)
+        sendMessage(author, chat, text);
+    }
+
+    @Async
+    public void sendMessage(String author, String chat, String message) {
+        builder(FPlayer.UNKNOWN)
                 .range(Range.PROXY)
                 .destination(integration.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELEGRAM))
@@ -81,16 +83,15 @@ public class MessageListener extends EventListener {
                         .replace("<name>", author)
                         .replace("<chat>", chat)
                 )
-                .message(text)
+                .message(message)
                 .proxy(output -> {
                     output.writeUTF(author);
                     output.writeUTF(chat);
-                    output.writeUTF(text);
+                    output.writeUTF(message);
                 })
                 .integration()
                 .sound(getSound())
-                .sendBuilt()
-        );
+                .sendBuilt();
     }
 
     private void sendInfoMessage(String chatID, Message message) {

@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.chat;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
@@ -169,19 +170,7 @@ public class BukkitChatModule extends ChatModule {
 
         int countRecipients = recipientsUUID.size();
         if (playerChat.isNullRecipient() && countRecipients < 2) {
-            taskScheduler.runAsyncLater(() -> {
-                Set<UUID> onlinePlayers = fPlayerService.findOnlineFPlayers()
-                        .stream()
-                        .map(FEntity::getUuid)
-                        .collect(Collectors.toSet());
-
-                if ((onlinePlayers.containsAll(recipientsUUID) && onlinePlayers.size() <= countRecipients)
-                        || chatRange > -1) {
-                    builder(fPlayer)
-                            .format(Localization.Message.Chat::getNullRecipient)
-                            .sendBuilt();
-                }
-            }, 5);
+            checkRecipientsLater(fPlayer, countRecipients, chatRange, recipientsUUID);
         }
 
         event.setMessage(finalMessage);
@@ -189,6 +178,21 @@ public class BukkitChatModule extends ChatModule {
         event.getRecipients().clear();
 
         bubbleModuleProvider.get().add(fPlayer, eventMessage);
+    }
+
+    @Async(delay = 5L)
+    public void checkRecipientsLater(FPlayer fPlayer, int countRecipients, int chatRange, List<UUID> recipientsUUID) {
+        Set<UUID> onlinePlayers = fPlayerService.findOnlineFPlayers()
+                .stream()
+                .map(FEntity::getUuid)
+                .collect(Collectors.toSet());
+
+        if ((onlinePlayers.containsAll(recipientsUUID) && onlinePlayers.size() <= countRecipients)
+                || chatRange > -1) {
+            builder(fPlayer)
+                    .format(Localization.Message.Chat::getNullRecipient)
+                    .sendBuilt();
+        }
     }
 
     public void send(FEntity fPlayer, String chatName, String string) {

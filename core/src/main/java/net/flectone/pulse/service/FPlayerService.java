@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDi
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
@@ -15,7 +16,6 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.repository.FPlayerRepository;
 import net.flectone.pulse.repository.SocialRepository;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.PacketSender;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +35,6 @@ public class FPlayerService {
     private final IntegrationModule integrationModule;
     private final PacketSender packetSender;
     private final PacketProvider packetProvider;
-    private final TaskScheduler taskScheduler;
 
     @Inject
     public FPlayerService(FileManager fileManager,
@@ -45,8 +44,7 @@ public class FPlayerService {
                           ModerationService moderationService,
                           IntegrationModule integrationModule,
                           PacketSender packetSender,
-                          PacketProvider packetProvider,
-                          TaskScheduler taskScheduler) {
+                          PacketProvider packetProvider) {
         this.config = fileManager.getConfig();
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.fPlayerRepository = fPlayerRepository;
@@ -55,7 +53,6 @@ public class FPlayerService {
         this.integrationModule = integrationModule;
         this.packetSender = packetSender;
         this.packetProvider = packetProvider;
-        this.taskScheduler = taskScheduler;
     }
 
     public void clear() {
@@ -81,35 +78,36 @@ public class FPlayerService {
         boolean isInserted = fPlayerRepository.save(uuid, name);
 
         // player can be in the cache and be unknown
-        FPlayer player = fPlayerRepository.get(uuid);
-        if (player.isUnknown()) {
+        FPlayer fPlayer = fPlayerRepository.get(uuid);
+        if (fPlayer.isUnknown()) {
             fPlayerRepository.invalid(uuid);
-            player = fPlayerRepository.get(uuid);
+            fPlayer = fPlayerRepository.get(uuid);
         }
 
         moderationService.invalidate(uuid);
 
-        FPlayer finalPlayer = player;
-
         // load player data
-        loadOrSaveDefaultSetting(finalPlayer, !isInserted);
-        loadColors(finalPlayer);
-        loadIgnores(finalPlayer);
-        finalPlayer.setOnline(true);
-        finalPlayer.setIp(platformPlayerAdapter.getIp(finalPlayer));
+        loadOrSaveDefaultSetting(fPlayer, !isInserted);
+        loadColors(fPlayer);
+        loadIgnores(fPlayer);
+        fPlayer.setOnline(true);
+        fPlayer.setIp(platformPlayerAdapter.getIp(fPlayer));
 
         // add player to online cache and remove from offline
-        fPlayerRepository.add(finalPlayer);
+        fPlayerRepository.add(fPlayer);
 
-        taskScheduler.runAsync(() -> {
-            // update old database data
-            fPlayerRepository.saveOrUpdate(finalPlayer);
+        update(fPlayer);
 
-            // send info for modules
-            platformPlayerAdapter.update(finalPlayer);
-        });
+        return fPlayer;
+    }
 
-        return finalPlayer;
+    @Async
+    public void update(FPlayer fPlayer) {
+        // update old database data
+        fPlayerRepository.saveOrUpdate(fPlayer);
+
+        // send info for modules
+        platformPlayerAdapter.update(fPlayer);
     }
 
     public int getPing(FPlayer player) {

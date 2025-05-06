@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Toast;
 import net.flectone.pulse.module.integration.BukkitIntegrationModule;
@@ -36,7 +37,6 @@ public class BukkitMessageSender extends MessageSender {
             .build();
 
     private final Plugin plugin;
-    private final TaskScheduler taskScheduler;
     private final BukkitIntegrationModule integrationModule;
 
     @Inject
@@ -51,7 +51,6 @@ public class BukkitMessageSender extends MessageSender {
         super(taskScheduler, platformPlayerAdapter, packetSerializer, packetSender, packetProvider, fLogger);
 
         this.plugin = plugin;
-        this.taskScheduler = taskScheduler;
         this.integrationModule = integrationModule;
     }
 
@@ -124,28 +123,29 @@ public class BukkitMessageSender extends MessageSender {
 
         jsonObject.add("requirements", requirementsElements);
 
-        taskScheduler.runSync(() -> {
-            if (Bukkit.getServer().getAdvancement(key) != null) return;
-
-            Bukkit.getUnsafe().loadAdvancement(key, jsonObject.toString());
-        });
+        loadToast(key, jsonObject.toString());
     }
 
-    private void grantToast(NamespacedKey key, Player player) {
-        taskScheduler.runSyncLater(() -> {
-            Advancement advancement = Bukkit.getAdvancement(key);
-            if (advancement == null) return;
+    @Sync
+    public void loadToast(NamespacedKey key, String toast) {
+        if (Bukkit.getServer().getAdvancement(key) != null) return;
 
-            player.getAdvancementProgress(advancement).awardCriteria("trigger");
-        }, 2);
+        Bukkit.getUnsafe().loadAdvancement(key, toast);
     }
 
+    @Sync(delay = 2L)
+    public void grantToast(NamespacedKey key, Player player) {
+        Advancement advancement = Bukkit.getAdvancement(key);
+        if (advancement == null) return;
+
+        player.getAdvancementProgress(advancement).awardCriteria("trigger");
+    }
+
+    @Sync(delay = 4L)
     private void revokeToast(NamespacedKey key, Player player) {
-        taskScheduler.runSyncLater(() -> {
-            Advancement advancement = Bukkit.getAdvancement(key);
-            if (advancement == null) return;
+        Advancement advancement = Bukkit.getAdvancement(key);
+        if (advancement == null) return;
 
-            player.getAdvancementProgress(advancement).revokeCriteria("trigger");
-        }, 4);
+        player.getAdvancementProgress(advancement).revokeCriteria("trigger");
     }
 }

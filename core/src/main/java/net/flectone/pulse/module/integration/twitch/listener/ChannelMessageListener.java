@@ -4,27 +4,23 @@ import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.Range;
 
 import java.util.List;
 
+@Getter
 @Singleton
 public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
 
-    @Getter private final Integration.Twitch integration;
-
-    private final TaskScheduler taskScheduler;
+    private final Integration.Twitch integration;
 
     @Inject
-    public ChannelMessageListener(FileManager fileManager,
-                                  TaskScheduler taskScheduler) {
-        this.taskScheduler = taskScheduler;
-
+    public ChannelMessageListener(FileManager fileManager) {
         integration = fileManager.getIntegration().getTwitch();
     }
 
@@ -41,22 +37,28 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
 
         String nickname = event.getUser().getName();
         String message = event.getMessage();
-        taskScheduler.runAsync(() -> builder(FPlayer.UNKNOWN)
+
+        sendMessage(nickname, channelName, message);
+    }
+
+    @Async
+    public void sendMessage(String nickname, String channel, String message) {
+        builder(FPlayer.UNKNOWN)
                 .range(Range.PROXY)
                 .destination(integration.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.TWITCH))
                 .tag(MessageTag.FROM_TWITCH_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft()
                         .replace("<name>", nickname)
-                        .replace("<channel>", channelName))
+                        .replace("<channel>", channel))
                 .message(message)
                 .proxy((output) -> {
                     output.writeUTF(nickname);
-                    output.writeUTF(channelName);
+                    output.writeUTF(channel);
                     output.writeUTF(message);
                 })
                 .integration()
-                .sendBuilt());
+                .sendBuilt();
     }
 
     @Override

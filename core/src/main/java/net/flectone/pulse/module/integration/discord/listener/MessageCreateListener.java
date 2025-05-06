@@ -7,26 +7,22 @@ import discord4j.core.object.entity.Attachment;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import lombok.Getter;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.Range;
 import reactor.core.publisher.Mono;
 
+@Getter
 @Singleton
 public class MessageCreateListener extends EventListener<MessageCreateEvent> {
 
-    @Getter private final Integration.Discord integration;
-
-    private final TaskScheduler taskScheduler;
+    private final Integration.Discord integration;
 
     @Inject
-    public MessageCreateListener(FileManager fileManager,
-                                 TaskScheduler taskScheduler) {
-        this.taskScheduler = taskScheduler;
-
+    public MessageCreateListener(FileManager fileManager) {
         integration = fileManager.getIntegration().getDiscord();
     }
 
@@ -60,25 +56,27 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
             );
         }
 
-        String finalMessage = message;
-        taskScheduler.runAsync(() -> builder(FPlayer.UNKNOWN)
+        sendMessage(nickname, discordMessage.getContent(), message);
+
+        return Mono.empty();
+    }
+
+    @Async
+    public void sendMessage(String nickname, String rawMessage, String message) {
+        builder(FPlayer.UNKNOWN)
                 .range(Range.PROXY)
                 .destination(integration.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DISCORD))
                 .tag(MessageTag.FROM_DISCORD_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft().replace("<name>", nickname))
-                .message(finalMessage)
+                .message(message)
                 .proxy(output -> {
                     output.writeUTF(nickname);
-                    output.writeUTF(discordMessage.getContent());
+                    output.writeUTF(rawMessage);
                 })
                 .integration()
                 .sound(getSound())
-                .sendBuilt()
-        );
-
-
-        return Mono.empty();
+                .sendBuilt();
     }
 
     @Override

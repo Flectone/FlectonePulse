@@ -13,6 +13,7 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSe
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.mail.MailModule;
@@ -23,7 +24,6 @@ import net.flectone.pulse.module.message.greeting.GreetingModule;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.PacketSender;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
@@ -34,7 +34,6 @@ import java.util.UUID;
 public class BasePacketListener extends AbstractPacketListener {
 
     private final FPlayerService fPlayerService;
-    private final TaskScheduler taskScheduler;
     private final PacketSender packetSender;
     private final ProxySender proxySender;
     private final Provider<QuitModule> quitModuleProvider;
@@ -49,7 +48,6 @@ public class BasePacketListener extends AbstractPacketListener {
 
     @Inject
     public BasePacketListener(FPlayerService fPlayerService,
-                              TaskScheduler taskScheduler,
                               PacketSender packetSender,
                               ProxySender proxySender,
                               Provider<QuitModule> quitModuleProvider,
@@ -62,7 +60,6 @@ public class BasePacketListener extends AbstractPacketListener {
                               Provider<PlayersModule> playersModuleProvider,
                               Provider<MaintenanceModule> maintenanceModuleProvider) {
         this.fPlayerService = fPlayerService;
-        this.taskScheduler = taskScheduler;
         this.packetSender = packetSender;
         this.proxySender = proxySender;
         this.quitModuleProvider = quitModuleProvider;
@@ -86,34 +83,41 @@ public class BasePacketListener extends AbstractPacketListener {
 
         String name = user.getName();
 
-        taskScheduler.runAsync(() -> {
-            // if no one was on the server, the cache may be invalid for other servers
-            // because FlectonePulse on Proxy cannot send a message for servers that have no player
-            if (fPlayerService.getFPlayers().isEmpty() && proxySender.isEnable()) {
-                // clears the cache of players who might have left from other servers
-                fPlayerService.clear();
-            }
+        handleUserLogin(uuid, name);
+    }
 
-            FPlayer fPlayer = fPlayerService.addAndGetFPlayer(uuid, name);
+    @Async
+    public void handleUserLogin(UUID uuid, String name) {
+        // if no one was on the server, the cache may be invalid for other servers
+        // because FlectonePulse on Proxy cannot send a message for servers that have no player
+        if (fPlayerService.getFPlayers().isEmpty() && proxySender.isEnable()) {
+            // clears the cache of players who might have left from other servers
+            fPlayerService.clear();
+        }
 
-            joinModuleProvider.get().send(fPlayer, true);
-            greetingModuleProvider.get().send(fPlayer);
-            mailModuleProvider.get().send(fPlayer);
-        });
+        FPlayer fPlayer = fPlayerService.addAndGetFPlayer(uuid, name);
+
+        joinModuleProvider.get().send(fPlayer, true);
+        greetingModuleProvider.get().send(fPlayer);
+        mailModuleProvider.get().send(fPlayer);
     }
 
     @Override
     public void onUserDisconnect(UserDisconnectEvent event) {
-        if (event.getUser().getUUID() == null) return;
+        UUID uuid = event.getUser().getUUID();
+        if (uuid == null) return;
 
-        taskScheduler.runAsync(() -> {
-            FPlayer fPlayer = fPlayerService.getFPlayer(event.getUser().getUUID());
-            if (!fPlayer.isOnline()) return;
+        handleUserDisconnect(uuid);
+    }
 
-            fPlayerService.clearAndSave(fPlayer);
-            bubbleServiceProvider.get().clear(fPlayer);
-            quitModuleProvider.get().send(fPlayer);
-        });
+    @Async
+    public void handleUserDisconnect(UUID uuid) {
+        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+        if (!fPlayer.isOnline()) return;
+
+        fPlayerService.clearAndSave(fPlayer);
+        bubbleServiceProvider.get().clear(fPlayer);
+        quitModuleProvider.get().send(fPlayer);
     }
 
     @Override
@@ -135,10 +139,13 @@ public class BasePacketListener extends AbstractPacketListener {
         }
 
         // first time player joined, wait for it to be added
-        taskScheduler.runAsyncLater(() -> {
-            FPlayer newFPlayer = fPlayerService.getFPlayer(uuid);
-            fPlayerService.saveOrUpdateSetting(newFPlayer, FPlayer.Setting.LOCALE, locale);
-        }, 40);
+        updateLocaleLater(uuid, locale);
+    }
+
+    @Async(delay = 40L)
+    public void updateLocaleLater(UUID uuid, String locale) {
+        FPlayer newFPlayer = fPlayerService.getFPlayer(uuid);
+        fPlayerService.saveOrUpdateSetting(newFPlayer, FPlayer.Setting.LOCALE, locale);
     }
 
     @Override

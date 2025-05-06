@@ -3,14 +3,13 @@ package net.flectone.pulse.util.interceptor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.scheduler.RunnableException;
 import net.flectone.pulse.scheduler.TaskScheduler;
-import org.aopalliance.intercept.Invocation;
+import net.flectone.pulse.util.logging.FLogger;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class SyncInterceptor implements MethodInterceptor {
@@ -21,28 +20,27 @@ public class SyncInterceptor implements MethodInterceptor {
     @Override
     public Object invoke(final MethodInvocation invocation) throws Throwable {
         Method method = invocation.getMethod();
-
-        if (method.isAnnotationPresent(Sync.class) && !Thread.currentThread().getName().equals("Server thread")) {
-
-            CompletableFuture<Object> completableFuture = new CompletableFuture<>();
-
-            taskScheduler.runSync(() -> proceed(method, invocation, completableFuture));
-
-            return completableFuture.get();
+        if (!method.isAnnotationPresent(Sync.class)) return invocation.proceed();
+        if (method.getReturnType() != Void.TYPE) {
+            throw new IllegalStateException("@Sync can only be applied to void methods");
         }
 
-        return invocation.proceed();
+        long delay = method.getAnnotation(Sync.class).delay();
+
+        RunnableException task = () -> proceedSafely(invocation);
+
+        if (delay > 0) {
+            taskScheduler.runSyncLater(task, delay);
+        } else {
+            taskScheduler.runSync(task);
+        }
+
+        return null;
     }
 
-    private void proceed(Method method, Invocation invocation, CompletableFuture<Object> future) {
+    private void proceedSafely(MethodInvocation invocation) {
         try {
-            if (method.getReturnType().equals(Void.TYPE)) {
-                invocation.proceed();
-                future.complete(null);
-            } else {
-                Object result = invocation.proceed();
-                future.complete(result);
-            }
+            invocation.proceed();
         } catch (Throwable e) {
             fLogger.warning(e.getMessage());
             e.printStackTrace();

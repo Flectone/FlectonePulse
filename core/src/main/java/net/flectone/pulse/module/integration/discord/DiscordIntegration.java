@@ -118,11 +118,7 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
                     && webhookPlayerData.applicationId().isPresent()
                     && webhookPlayerData.applicationId().get().asLong() == clientID) {
                 webhooks.add(webhookID);
-                taskScheduler.runAsyncLater(() -> {
-                    discordClient.getWebhookService().deleteWebhook(webhookID, null)
-                            .subscribe();
-                    webhooks.remove(webhookID);
-                }, 20 * 60);
+                deleteWebhookLater(webhookID);
             }
 
             ImmutableWebhookExecuteRequest.Builder webhookBuilder = WebhookExecuteRequest.builder()
@@ -154,6 +150,13 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
         discordClient.getChannelById(Snowflake.of(integrationChannel))
                 .createMessage(messageCreateSpecBuilder.build().asRequest())
                 .subscribe();
+    }
+
+    @Async(delay = 1200L)
+    public void deleteWebhookLater(long webhookID) {
+        discordClient.getWebhookService().deleteWebhook(webhookID, null)
+                .subscribe();
+        webhooks.remove(webhookID);
     }
 
     private WebhookData createWebhook(String avatarURL, String fPlayerName, long channelID) {

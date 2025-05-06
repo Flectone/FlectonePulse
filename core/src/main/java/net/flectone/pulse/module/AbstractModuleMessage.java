@@ -3,6 +3,7 @@ package net.flectone.pulse.module;
 import com.google.inject.Inject;
 import lombok.Getter;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
@@ -13,7 +14,6 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.sender.SoundPlayer;
@@ -32,7 +32,10 @@ import org.jetbrains.annotations.NotNull;
 import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 public abstract class AbstractModuleMessage<M extends Localization.Localizable> extends AbstractModule {
 
@@ -51,7 +54,6 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
     @Inject private IntegrationModule integrationModule;
     @Inject private MessageSender messageSender;
     @Inject private SoundPlayer soundPlayer;
-    @Inject private TaskScheduler taskScheduler;
 
     @Getter private Cooldown cooldown;
     @Getter private Sound sound;
@@ -429,6 +431,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             return messageBuilder.build();
         }
 
+        @Async
         public void sendToIntegrations() {
             if (tag == null) return;
             if (integrationString == null) return;
@@ -463,7 +466,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
                     .replace("<final_message>", finalMessage)
                     .replace("<final_clear_message>", finalMessage.replaceAll("[\\p{C}\\p{So}\\x{E0100}-\\x{E01EF}]+", ""));
 
-            taskScheduler.runAsync(() -> integrationModule.sendMessage(fPlayer, tag, interfaceReplaceString));
+            integrationModule.sendMessage(fPlayer, tag, interfaceReplaceString);
         }
 
         public boolean sendToProxy() {
