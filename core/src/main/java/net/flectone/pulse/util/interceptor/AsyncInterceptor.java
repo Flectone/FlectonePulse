@@ -42,8 +42,8 @@ public class AsyncInterceptor implements MethodInterceptor {
                 future.complete(result);
             }
         } catch (Throwable e) {
-            e.printStackTrace();
             fLogger.warning(e.getMessage());
+            e.printStackTrace();
         }
     }
 }
