@@ -16,7 +16,6 @@ import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.registry.MessageProcessRegistry;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.Range;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -45,19 +44,16 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
     private final Message.Format.QuestionAnswer message;
     private final Permission.Message.Format.QuestionAnswer permission;
 
-    private final TaskScheduler taskScheduler;
     private final PermissionChecker permissionChecker;
     private final FLogger fLogger;
 
     @Inject
     public QuestionAnswerModule(FileManager fileManager,
-                                TaskScheduler taskScheduler,
                                 PermissionChecker permissionChecker,
                                 FLogger fLogger,
                                 MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getMessage().getFormat().getQuestionAnswer());
 
-        this.taskScheduler = taskScheduler;
         this.permissionChecker = permissionChecker;
         this.fLogger = fLogger;
 

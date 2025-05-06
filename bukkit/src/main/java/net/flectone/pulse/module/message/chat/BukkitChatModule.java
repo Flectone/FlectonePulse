@@ -17,7 +17,6 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BukkitBubbleModule;
 import net.flectone.pulse.module.message.chat.listener.ChatListener;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
-import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.Range;
@@ -37,7 +36,6 @@ public class BukkitChatModule extends ChatModule {
 
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
-    private final TaskScheduler taskScheduler;
     private final BukkitListenerRegistry bukkitListenerManager;
     private final IntegrationModule integrationModule;
     private final TimeFormatter timeFormatter;
@@ -47,7 +45,6 @@ public class BukkitChatModule extends ChatModule {
     @Inject
     public BukkitChatModule(FileManager fileManager,
                             FPlayerService fPlayerService,
-                            TaskScheduler taskScheduler,
                             BukkitListenerRegistry bukkitListenerManager,
                             IntegrationModule integrationModule,
                             PermissionChecker permissionChecker,
@@ -57,7 +54,6 @@ public class BukkitChatModule extends ChatModule {
         super(fileManager);
 
         this.fPlayerService = fPlayerService;
-        this.taskScheduler = taskScheduler;
         this.bukkitListenerManager = bukkitListenerManager;
         this.integrationModule = integrationModule;
         this.permissionChecker = permissionChecker;
