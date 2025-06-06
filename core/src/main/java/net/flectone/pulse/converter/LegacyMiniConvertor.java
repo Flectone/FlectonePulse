@@ -25,7 +25,6 @@ package net.flectone.pulse.converter;
  */
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
@@ -41,20 +40,18 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 /**
- * A "translator" from legacy minecraft formatting (e.g. &a &4 &l) to MiniMessage-acceptable format
+ * A "translator" from legacy Minecraft JE formatting (e.g. &a &4 &l) to MiniMessage-acceptable format
  */
-
-@Singleton
 public final class LegacyMiniConvertor implements MessageProcessor {
 
-    private final Set<Option> DEF_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
+    private final Set<Option> DEFAULT_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
             Option.COLOR,
+            Option.FORMAT,
             Option.HEX_COLOR_STANDALONE,
             Option.COLOR_DOUBLE_HASH,
-            Option.FORMAT,
+            Option.RESET,
             Option.GRADIENT,
             Option.FAST_RESET,
-            Option.RESET,
             Option.DOUBLE_TO_ESCAPE
     ));
 
@@ -85,12 +82,22 @@ public final class LegacyMiniConvertor implements MessageProcessor {
     }
 
     /**
-     * Translate text to MiniMessage format with default options (everything but {@link Option#CLOSE_COLORS})
+     * Translate text to MiniMessage format using default options
      * @param text text to translate
      * @return translated string
      */
     public @NotNull String toMini(@NotNull String text) {
-        return toMini(text, DEF_OPTIONS);
+        return toMini(text, DEFAULT_OPTIONS);
+    }
+
+    /**
+     * Translate text to MiniMessage format
+     * @param text text to translate
+     * @param options options to use
+     * @return translated string
+     */
+    public @NotNull String toMini(@NotNull String text, @NotNull Option @NotNull ... options) {
+        return toMini(text, EnumSet.copyOf(Arrays.asList(options)));
     }
 
     /**
@@ -109,17 +116,18 @@ public final class LegacyMiniConvertor implements MessageProcessor {
             text = replaceDoubleHashHexColor(text);
         }
 
-        if (options.contains(Option.HEX_COLOR_STANDALONE)) {
-            text = replaceHexColorStandalone(text);
-        }
-
         final String colorTagStart = options.contains(Option.VERBOSE_HEX_COLOR) ? "color:#" : "#";
 
-        List<String> order = new ArrayList<>();
-        StringBuilder builder = new StringBuilder();
-        boolean defCloseValue = options.contains(Option.CLOSE_COLORS);
-        boolean fastReset = options.contains(Option.FAST_RESET);
-        boolean closeLastTag = defCloseValue;
+        if (options.contains(Option.HEX_COLOR_STANDALONE)) {
+            text = replaceHexColorStandalone(text, colorTagStart);
+        }
+
+        final List<String> order = new ArrayList<>(2);
+        final StringBuilder builder = new StringBuilder();
+        final boolean fastReset = options.contains(Option.FAST_RESET);
+        final boolean closeColors = options.contains(Option.CLOSE_COLORS);
+
+        boolean hadColor = false;
 
         for (
                 int index = 0, nextIndex = text.indexOf('&'), length = text.length();
@@ -150,8 +158,8 @@ public final class LegacyMiniConvertor implements MessageProcessor {
                 case "hex_color" -> {
                     if (symbol == '#') {
                         if (length > index + 6 && isHexPattern(text, index + 1)) {
-                            handleClosing(order, builder, closeLastTag, fastReset);
-                            closeLastTag = defCloseValue;
+                            handleClosing(order, builder, hadColor, fastReset, closeColors);
+                            hadColor = true;
                             String builtTag = colorTagStart + text.substring(index + 1, index + 7);
                             builder.append('<').append(builtTag).append('>');
                             index += 6;
@@ -161,8 +169,8 @@ public final class LegacyMiniConvertor implements MessageProcessor {
                     } else if (length > index + 12) {
                         String color = extractLegacyHex(text, index + 1);
                         if (color != null) {
-                            handleClosing(order, builder, closeLastTag, fastReset);
-                            closeLastTag = defCloseValue;
+                            handleClosing(order, builder, hadColor, fastReset, closeColors);
+                            hadColor = true;
                             String builtTag = colorTagStart + color;
                             builder.append('<').append(builtTag).append('>');
                             index += 12;
@@ -206,14 +214,15 @@ public final class LegacyMiniConvertor implements MessageProcessor {
                     }
                     if (colors.size() == split.length) {
                         index = endIndex;
-                        handleClosing(order, builder, closeLastTag, fastReset);
-                        closeLastTag = true;
+                        handleClosing(order, builder, hadColor, fastReset, closeColors);
+                        hadColor = true;
                         builder.append("<gradient:").append(String.join(":", colors)).append('>');
                         order.add(tag);
                     }
                 }
                 case "reset" -> {
                     order.clear();
+                    hadColor = false;
                     builder.append("<reset>");
                 }
                 case "b", "u", "st", "i", "obf" -> {
@@ -221,15 +230,15 @@ public final class LegacyMiniConvertor implements MessageProcessor {
                     builder.append('<').append(tag).append('>');
                 }
                 default -> {
-                    handleClosing(order, builder, closeLastTag, fastReset);
-                    closeLastTag = defCloseValue;
+                    handleClosing(order, builder, hadColor, fastReset, closeColors);
+                    hadColor = true;
                     order.add(tag);
                     builder.append('<').append(tag).append('>');
                 }
             }
         }
-        if (closeLastTag || !fastReset) {
-            handleClosing(order, builder, closeLastTag, closeLastTag && fastReset);
+        if (closeColors) {
+            handleClosing(order, builder, hadColor, false, true);
         }
         return builder.toString().replace('§', '&');
     }
@@ -246,7 +255,8 @@ public final class LegacyMiniConvertor implements MessageProcessor {
         return builder.toString();
     }
 
-    private String replaceHexColorStandalone(String text) {
+    // TODO Should probably follow the same logic as other colors do? Not sure
+    private String replaceHexColorStandalone(String text, String colorTagStart) {
         StringBuilder result = new StringBuilder();
         int index = 0;
 
@@ -258,7 +268,7 @@ public final class LegacyMiniConvertor implements MessageProcessor {
             }
 
             if (isHexColorStandalone(text, nextIndex)) {
-                result.append(text, index, nextIndex).append("<color:").append(text, nextIndex, nextIndex + 7).append('>');
+                result.append(text, index, nextIndex).append('<').append(colorTagStart).append(text, nextIndex + 1, nextIndex + 7).append('>');
                 index = nextIndex + 7;
             } else {
                 result.append(text, index, nextIndex + 1);
@@ -317,10 +327,10 @@ public final class LegacyMiniConvertor implements MessageProcessor {
         return isHexPattern(text, index + 1);
     }
 
-    private void handleClosing(List<String> order, StringBuilder builder, boolean closeLast, boolean fastReset) {
+    private void handleClosing(List<String> order, StringBuilder builder, boolean hadColor, boolean fastReset, boolean closeColors) {
         if (fastReset && order.size() > 1) {
             builder.append("<reset>");
-        } else for (int i = order.size() - 1, until = closeLast ? 0 : 1; i >= until; i--) {
+        } else for (int i = order.size() - 1, until = (hadColor && !closeColors) ? 1 : 0; i >= until; i--) {
             builder.append("</").append(order.get(i)).append('>');
         }
         order.clear();
@@ -414,11 +424,11 @@ public final class LegacyMiniConvertor implements MessageProcessor {
      */
     public enum Option {
         /**
-         * Translate color (e.g. &a &1 #123456)
+         * Translate colors (e.g. {@code &a} {@code &1} {@code &#123456})
          */
         COLOR,
         /**
-         * Translate standalone hex colors (e.g. #123456)
+         * Translate standalone hex colors without the special sign {@code &} (e.g. {@code #123456})
          */
         HEX_COLOR_STANDALONE,
         /**
@@ -426,25 +436,25 @@ public final class LegacyMiniConvertor implements MessageProcessor {
          */
         COLOR_DOUBLE_HASH,
         /**
-         * Use the full MiniMessage color format {@code <color:#123456>} instead of the shortened one {@code <#123456>}
-         */
-        VERBOSE_HEX_COLOR,
-        /**
-         * Translate formatting (e.g. &l &r)
+         * Translate formatting (e.g. {@code &l} {@code &o})
          */
         FORMAT,
-        /**
-         * Translate custom gradient format (e.g. &@gold-#123456&)
-         */
-        GRADIENT,
-        /**
-         * Place the reset tag when there's 2+ tags to close
-         */
-        FAST_RESET,
         /**
          * Translate the reset tag {@code &r}
          */
         RESET,
+        /**
+         * Use the full MiniMessage color format {@code <color:#123456>} instead of the shortened one {@code <#123456>}
+         */
+        VERBOSE_HEX_COLOR,
+        /**
+         * Translate custom gradient format (e.g. {@code &@gold-#123456@})
+         */
+        GRADIENT,
+        /**
+         * Place the reset tag when there are 2+ tags to close (ignores {@link Option#RESET})
+         */
+        FAST_RESET,
         /**
          * Close color tags when another color was found
          */
