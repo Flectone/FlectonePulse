@@ -133,10 +133,10 @@ public class FileManager {
     }
 
     public boolean isOlderThan(String first, String second) {
-        String[] subFirst = first.split("\\.");
+        String[] subFirst = splitNumbers(first);
         if (subFirst.length != 3) return false;
 
-        String[] subSecond = second.split("\\.");
+        String[] subSecond = splitNumbers(second);
         if (subSecond.length != 3) return true;
 
         for (int i = 0; i < 3; i++) {
@@ -149,5 +149,10 @@ public class FileManager {
         }
 
         return false;
+    }
+
+    private String[] splitNumbers(String string) {
+        int endIndex = string.indexOf('-');
+        return (endIndex == -1 ? string : string.substring(0, endIndex)).split("\\.");
     }
 }
