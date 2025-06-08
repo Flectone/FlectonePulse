@@ -3,7 +3,6 @@ package net.flectone.pulse.module;
 import com.google.inject.Inject;
 import lombok.Getter;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
@@ -14,6 +13,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.sender.SoundPlayer;
@@ -54,6 +54,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
     @Inject private IntegrationModule integrationModule;
     @Inject private MessageSender messageSender;
     @Inject private SoundPlayer soundPlayer;
+    @Inject private TaskScheduler taskScheduler;
 
     @Getter private Cooldown cooldown;
     @Getter private Sound sound;
@@ -341,7 +342,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         }
 
         public List<FPlayer> build() {
-            sendToIntegrations();
+            taskScheduler.runAsync(this::sendToIntegrations);
 
             // proxy sent message for all servers
             if (sendToProxy()) {
@@ -431,7 +432,6 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             return messageBuilder.build();
         }
 
-        @Async
         public void sendToIntegrations() {
             if (tag == null) return;
             if (integrationString == null) return;
