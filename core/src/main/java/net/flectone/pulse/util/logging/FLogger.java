@@ -126,14 +126,14 @@ public class FLogger extends Logger {
         LogRecord warn = new LogRecord(Level.WARNING, "An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues");
         warn.setMessage(message);
 
-        logConsumer.accept(warn);
+        log(warn);
     }
 
     public void warning(Exception e) {
         LogRecord warn = new LogRecord(Level.WARNING, "An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues");
         warn.setThrown(e);
 
-        logConsumer.accept(warn);
+        log(warn);
     }
 
     public void warningTree(Component component) {
