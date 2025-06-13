@@ -102,12 +102,9 @@ public class BubbleRenderer {
                     BubbleEntity bubbleEntity = createBubbleEntity(bubble, formattedMessage, fViewer);
                     bubbleEntities.push(bubbleEntity);
 
-                    int count = bubbleEntity.getEntityType() == EntityTypes.AREA_EFFECT_CLOUD
-                            ? (int) bubble.getHeight()
-                            : 1;
-
-                    Collections.nCopies(count, createSpaceBubbleEntity(bubble, fViewer))
-                            .forEach(bubbleEntities::push);
+                    for (int i = 0; i < bubble.getHeight(); i++) {
+                        bubbleEntities.push(createSpaceBubbleEntity(bubble, fViewer));
+                    }
 
                     activeBubbleEntities.put(key, bubbleEntities);
 
@@ -142,12 +139,26 @@ public class BubbleRenderer {
         if (bubbleEntities.isEmpty()) return;
         if (!isCorrectPlayer(sender)) return;
 
+        boolean hasSeenVisible = false;
+        boolean hasSpawnedSpace = false;
+
         int lastID = platformPlayerAdapter.getEntityId(sender.getUuid());
 
         for (BubbleEntity bubbleEntity : bubbleEntities) {
+            if (bubbleEntity.isVisible()) {
+                hasSpawnedSpace = false;
+                hasSeenVisible = true;
+            } else if (hasSeenVisible && hasSpawnedSpace) {
+                continue;
+            }
+
             spawnEntity(bubbleEntity);
 
             lastID = rideEntity(bubbleEntity, lastID, new int[]{bubbleEntity.getId()});
+
+            if (!bubbleEntity.isVisible() && hasSeenVisible) {
+                hasSpawnedSpace = true;
+            }
         }
     }
 
@@ -315,7 +326,7 @@ public class BubbleRenderer {
             Bubble bubble = bubbleEntity.getBubble();
 
             // height
-            float height = bubble.getHeight();
+            float height = bubble.getInteractionHeight();
             metadataList.add(new EntityData<>(9, EntityDataTypes.FLOAT, height));
 
             return metadataList;

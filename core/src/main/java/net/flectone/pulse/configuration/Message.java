@@ -168,15 +168,22 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Bubble implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
-        private boolean useInteraction = true;
         private int maxCount = 3;
         private int maxLength = 20;
-        private float height = 0.4f;
+        private int height = 1;
         private double distance = 30.0;
         private double readSpeed = 90.0;
         private double handicapChars = 10.0;
 
+        private Interaction interaction = new Interaction();
         private Modern modern = new Modern();
+
+        @Getter
+        @NoArgsConstructor
+        public static final class Interaction {
+            private boolean enable = true;
+            private float height = 0.4f;
+        }
 
         @Getter
         @NoArgsConstructor

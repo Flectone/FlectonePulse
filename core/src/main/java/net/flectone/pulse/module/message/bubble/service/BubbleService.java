@@ -77,7 +77,8 @@ public class BubbleService {
         Message.Bubble config = fileManager.getMessage().getBubble();
 
         long duration = calculateDuration(message);
-        float height = config.getHeight();
+        int height = config.getHeight();
+        float interactionHeight = config.getInteraction().getHeight();
 
         boolean useModernBubble = isModern();
         boolean useInteractionRiding = isInteractionRiding();
@@ -99,8 +100,8 @@ public class BubbleService {
                 String newMessage = symbol == ' ' ? line.toString().trim() : line + "-";
 
                 Bubble bubble = useModernBubble
-                        ? new ModernBubble(id, sender, newMessage, duration, height, useInteractionRiding, hasShadow, background, animationTime, scale)
-                        : new Bubble(id, sender, newMessage, duration, height, useInteractionRiding);
+                        ? new ModernBubble(id, sender, newMessage, duration, height, interactionHeight, useInteractionRiding, hasShadow, background, animationTime, scale)
+                        : new Bubble(id, sender, newMessage, duration, height, interactionHeight, useInteractionRiding);
 
                 bubbles.add(bubble);
 
@@ -110,8 +111,8 @@ public class BubbleService {
 
         if (!line.isEmpty()) {
             Bubble bubble = useModernBubble
-                    ? new ModernBubble(id, sender, line.toString(), duration, height, useInteractionRiding, hasShadow, background, animationTime, scale)
-                    : new Bubble(id, sender, line.toString(), duration, height, useInteractionRiding);
+                    ? new ModernBubble(id, sender, line.toString(), duration, height, interactionHeight, useInteractionRiding, hasShadow, background, animationTime, scale)
+                    : new Bubble(id, sender, line.toString(), duration, height, interactionHeight, useInteractionRiding);
 
             bubbles.add(bubble);
         }
@@ -170,6 +171,6 @@ public class BubbleService {
 
     private boolean isInteractionRiding() {
         return PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_21_3)
-                && fileManager.getMessage().getBubble().isUseInteraction();
+                && fileManager.getMessage().getBubble().getInteraction().isEnable();
     }
 }

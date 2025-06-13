@@ -19,18 +19,21 @@ public class Bubble {
     private final String rawMessage;
     private final long duration;
     private final long creationTime;
-    private final float height;
+    private final int height;
+
+    private final float interactionHeight;
     private final boolean interactionRiding;
 
     @Setter private boolean created;
 
-    public Bubble(int id, @NotNull FPlayer sender, @NotNull String message, long duration, float height, boolean interactionRiding) {
+    public Bubble(int id, @NotNull FPlayer sender, @NotNull String message, long duration, int height, float interactionHeight, boolean interactionRiding) {
         this.id = id;
         this.uuid = UUID.randomUUID();
         this.sender = sender;
         this.rawMessage = message;
         this.duration = duration;
         this.height = height;
+        this.interactionHeight = interactionHeight;
         this.interactionRiding = interactionRiding;
         this.creationTime = System.currentTimeMillis();
     }
