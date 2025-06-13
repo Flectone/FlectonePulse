@@ -278,7 +278,7 @@ public class BubbleRenderer {
             metadataList.add(new EntityData<>(12, EntityDataTypes.VECTOR3F, new Vector3f()));
 
             // center for viewer
-            metadataList.add(new EntityData<>(15, EntityDataTypes.BYTE, (byte) 3));
+            metadataList.add(new EntityData<>(15, EntityDataTypes.BYTE, (byte) bubble.getBillboard().ordinal()));
 
             // text
             Component message = bubbleEntity.getMessage();

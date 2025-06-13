@@ -194,6 +194,14 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             private int animationTime = 5;
             private float scale = 1.0f;
             private String background = "#00000040";
+            private Billboard billboard = Billboard.CENTER;
+        }
+
+        public enum Billboard {
+            FIXED,
+            VERTICAL,
+            HORIZONTAL,
+            CENTER
         }
     }
 
