@@ -10,6 +10,7 @@ public class ModernBubble extends Bubble {
     private final boolean hasShadow;
     private final int background;
     private final float scale;
+    private final int animationTime;
 
     public ModernBubble(int id,
                         @NotNull FPlayer sender,
@@ -19,11 +20,13 @@ public class ModernBubble extends Bubble {
                         boolean interactionRiding,
                         boolean hasShadow,
                         int background,
+                        int animationTime,
                         float scale) {
         super(id, sender, message, duration, height, interactionRiding);
 
         this.hasShadow = hasShadow;
         this.background = background;
+        this.animationTime = animationTime;
         this.scale = scale;
     }
 }

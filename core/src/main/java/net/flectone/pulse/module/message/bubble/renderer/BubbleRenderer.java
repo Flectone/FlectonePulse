@@ -196,7 +196,14 @@ public class BubbleRenderer {
     }
 
     private void despawnBubbleEntity(BubbleEntity bubbleEntity) {
-        packetSender.send(bubbleEntity.getViewer(), new WrapperPlayServerDestroyEntities(bubbleEntity.getId()));
+        EntityType entityType = bubbleEntity.getEntityType();
+        int despawnDelay = 0;
+        if (entityType == EntityTypes.TEXT_DISPLAY && bubbleEntity.getBubble() instanceof ModernBubble bubble) {
+            interpolate(bubbleEntity, bubble, new Vector3f());
+            despawnDelay = bubble.getAnimationTime();
+        }
+
+        taskScheduler.runAsyncLater(() -> packetSender.send(bubbleEntity.getViewer(), new WrapperPlayServerDestroyEntities(bubbleEntity.getId())), despawnDelay);
     }
 
     public void removeAllBubbles() {
@@ -226,7 +233,29 @@ public class BubbleRenderer {
 
         bubbleEntity.setCreated(true);
         bubbleEntity.getBubble().setCreated(true);
+
+        taskScheduler.runAsyncLater(() -> {
+            if (entityType == EntityTypes.TEXT_DISPLAY && bubbleEntity.getBubble() instanceof ModernBubble bubble) {
+                interpolate(bubbleEntity, bubble, new Vector3f(bubble.getScale(), bubble.getScale(), bubble.getScale()));
+            }
+        }, 1);
     }
+
+    private void interpolate(BubbleEntity bubbleEntity, ModernBubble bubble, Vector3f scale) {
+        List<EntityData<?>> metadataList = new ArrayList<>();
+
+        // interpolation delay
+        metadataList.add(new EntityData<>(8, EntityDataTypes.INT, -1));
+
+        // transformation duration
+        metadataList.add(new EntityData<>(9, EntityDataTypes.INT, bubble.getAnimationTime()));
+
+        // scale
+        metadataList.add(new EntityData<>(12, EntityDataTypes.VECTOR3F, scale));
+
+        packetSender.send(bubbleEntity.getViewer(), new WrapperPlayServerEntityMetadata(bubbleEntity.getId(), metadataList));
+    }
+
 
     private List<EntityData<?>> createEntityData(BubbleEntity bubbleEntity) {
         List<EntityData<?>> metadataList = new ArrayList<>();
@@ -235,8 +264,7 @@ public class BubbleRenderer {
 
         if (entityType == EntityTypes.TEXT_DISPLAY && bubbleEntity.getBubble() instanceof ModernBubble bubble) {
             // scale
-            float scale = bubble.getScale();
-            metadataList.add(new EntityData<>(12, EntityDataTypes.VECTOR3F, new Vector3f(scale, scale, scale)));
+            metadataList.add(new EntityData<>(12, EntityDataTypes.VECTOR3F, new Vector3f()));
 
             // center for viewer
             metadataList.add(new EntityData<>(15, EntityDataTypes.BYTE, (byte) 3));

@@ -83,6 +83,7 @@ public class BubbleService {
         boolean useInteractionRiding = isInteractionRiding();
         boolean hasShadow = config.getModern().isHasShadow();
         int background = colorConverter.parseHexToArgb(config.getModern().getBackground());
+        int animationTime = config.getModern().getAnimationTime();
         float scale = config.getModern().getScale();
 
         int maxLength = fileManager.getMessage().getBubble().getMaxLength();
@@ -98,7 +99,7 @@ public class BubbleService {
                 String newMessage = symbol == ' ' ? line.toString().trim() : line + "-";
 
                 Bubble bubble = useModernBubble
-                        ? new ModernBubble(id, sender, newMessage, duration, height, useInteractionRiding, hasShadow, background, scale)
+                        ? new ModernBubble(id, sender, newMessage, duration, height, useInteractionRiding, hasShadow, background, animationTime, scale)
                         : new Bubble(id, sender, newMessage, duration, height, useInteractionRiding);
 
                 bubbles.add(bubble);
@@ -109,7 +110,7 @@ public class BubbleService {
 
         if (!line.isEmpty()) {
             Bubble bubble = useModernBubble
-                    ? new ModernBubble(id, sender, line.toString(), duration, height, useInteractionRiding, hasShadow, background, scale)
+                    ? new ModernBubble(id, sender, line.toString(), duration, height, useInteractionRiding, hasShadow, background, animationTime, scale)
                     : new Bubble(id, sender, line.toString(), duration, height, useInteractionRiding);
 
             bubbles.add(bubble);

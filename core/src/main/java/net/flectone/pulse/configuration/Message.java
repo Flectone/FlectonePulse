@@ -183,6 +183,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         public static final class Modern {
             private boolean enable = true;
             private boolean hasShadow = false;
+            private int animationTime = 5;
             private float scale = 1.0f;
             private String background = "#00000040";
         }
