@@ -3,7 +3,6 @@ package net.flectone.pulse.module.message.bubble.model;
 import lombok.Getter;
 import lombok.Setter;
 import net.flectone.pulse.model.FPlayer;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -26,16 +25,66 @@ public class Bubble {
 
     @Setter private boolean created;
 
-    public Bubble(int id, @NotNull FPlayer sender, @NotNull String message, long duration, int height, float interactionHeight, boolean interactionRiding) {
-        this.id = id;
+    Bubble(Builder builder) {
+        this.id = builder.id;
         this.uuid = UUID.randomUUID();
-        this.sender = sender;
-        this.rawMessage = message;
-        this.duration = duration;
-        this.height = height;
-        this.interactionHeight = interactionHeight;
-        this.interactionRiding = interactionRiding;
+        this.sender = builder.sender;
+        this.rawMessage = builder.message;
+        this.duration = builder.duration;
+        this.height = builder.height;
+        this.interactionHeight = builder.interactionHeight;
+        this.interactionRiding = builder.interactionRiding;
         this.creationTime = System.currentTimeMillis();
+    }
+
+    public static class Builder {
+
+        private int id;
+        private FPlayer sender;
+        private String message;
+        private long duration;
+        private int height;
+        private float interactionHeight;
+        private boolean interactionRiding;
+
+        public Builder id(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder sender(FPlayer sender) {
+            this.sender = sender;
+            return this;
+        }
+
+        public Builder message(String message) {
+            this.message = message;
+            return this;
+        }
+
+        public Builder duration(long duration) {
+            this.duration = duration;
+            return this;
+        }
+
+        public Builder height(int height) {
+            this.height = height;
+            return this;
+        }
+
+        public Builder interactionHeight(float interactionHeight) {
+            this.interactionHeight = interactionHeight;
+            return this;
+        }
+
+        public Builder interactionRiding(boolean interactionRiding) {
+            this.interactionRiding = interactionRiding;
+            return this;
+        }
+
+        public Bubble build() {
+            return new Bubble(this);
+        }
     }
 
     public boolean isExpired() {

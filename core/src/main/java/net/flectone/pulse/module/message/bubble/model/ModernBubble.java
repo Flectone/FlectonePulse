@@ -1,8 +1,7 @@
 package net.flectone.pulse.module.message.bubble.model;
 
 import lombok.Getter;
-import net.flectone.pulse.model.FPlayer;
-import org.jetbrains.annotations.NotNull;
+import net.flectone.pulse.configuration.Message;
 
 @Getter
 public class ModernBubble extends Bubble {
@@ -11,23 +10,52 @@ public class ModernBubble extends Bubble {
     private final int background;
     private final float scale;
     private final int animationTime;
+    private final Message.Bubble.Billboard billboard;
 
-    public ModernBubble(int id,
-                        @NotNull FPlayer sender,
-                        @NotNull String message,
-                        long duration,
-                        int height,
-                        float interactionHeight,
-                        boolean interactionRiding,
-                        boolean hasShadow,
-                        int background,
-                        int animationTime,
-                        float scale) {
-        super(id, sender, message, duration, height, interactionHeight, interactionRiding);
+    private ModernBubble(ModernBuilder builder) {
+        super(builder);
+        this.hasShadow = builder.hasShadow;
+        this.background = builder.background;
+        this.scale = builder.scale;
+        this.animationTime = builder.animationTime;
+        this.billboard = builder.billboard;
+    }
 
-        this.hasShadow = hasShadow;
-        this.background = background;
-        this.animationTime = animationTime;
-        this.scale = scale;
+    public static class ModernBuilder extends Builder {
+        private boolean hasShadow;
+        private int background;
+        private float scale;
+        private int animationTime;
+        private Message.Bubble.Billboard billboard;
+
+        public ModernBuilder hasShadow(boolean hasShadow) {
+            this.hasShadow = hasShadow;
+            return this;
+        }
+
+        public ModernBuilder background(int background) {
+            this.background = background;
+            return this;
+        }
+
+        public ModernBuilder scale(float scale) {
+            this.scale = scale;
+            return this;
+        }
+
+        public ModernBuilder animationTime(int animationTime) {
+            this.animationTime = animationTime;
+            return this;
+        }
+
+        public ModernBuilder billboard(Message.Bubble.Billboard billboard) {
+            this.billboard = billboard;
+            return this;
+        }
+
+        @Override
+        public ModernBubble build() {
+            return new ModernBubble(this);
+        }
     }
 }

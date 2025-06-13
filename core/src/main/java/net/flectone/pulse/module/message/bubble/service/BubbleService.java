@@ -74,6 +74,7 @@ public class BubbleService {
     private List<Bubble> splitMessageToBubbles(@NotNull FPlayer sender, @NotNull String message) {
         int id = randomUtil.nextInt(Integer.MAX_VALUE);
 
+        // default bubble
         Message.Bubble config = fileManager.getMessage().getBubble();
 
         long duration = calculateDuration(message);
@@ -82,10 +83,17 @@ public class BubbleService {
 
         boolean useModernBubble = isModern();
         boolean useInteractionRiding = isInteractionRiding();
-        boolean hasShadow = config.getModern().isHasShadow();
-        int background = colorConverter.parseHexToArgb(config.getModern().getBackground());
-        int animationTime = config.getModern().getAnimationTime();
-        float scale = config.getModern().getScale();
+
+        String wordBreakHint = config.getWordBreakHint();
+
+        // modern bubble
+        Message.Bubble.Modern configModern = config.getModern();
+
+        boolean hasShadow = configModern.isHasShadow();
+        int background = colorConverter.parseHexToArgb(configModern.getBackground());
+        int animationTime = configModern.getAnimationTime();
+        float scale = configModern.getScale();
+        Message.Bubble.Billboard billboard = configModern.getBillboard();
 
         int maxLength = fileManager.getMessage().getBubble().getMaxLength();
 
@@ -99,26 +107,48 @@ public class BubbleService {
             boolean isLetter = Character.isLetter(symbol);
             if (!isLetter && line.length() < maxLength + 5) continue;
 
-            String newMessage = isLetter ? line + config.getWordBreakHint() : line.toString().trim();
+            String newMessage = isLetter ? line + wordBreakHint : line.toString().trim();
+            bubbles.add(buildBubble(
+                    id, sender, newMessage, duration, height, interactionHeight,
+                    useInteractionRiding, useModernBubble, hasShadow, background,
+                    animationTime, scale, billboard
+            ));
 
-            Bubble bubble = useModernBubble
-                    ? new ModernBubble(id, sender, newMessage, duration, height, interactionHeight, useInteractionRiding, hasShadow, background, animationTime, scale)
-                    : new Bubble(id, sender, newMessage, duration, height, interactionHeight, useInteractionRiding);
-
-            bubbles.add(bubble);
-
-            line = new StringBuilder();
+            line.setLength(0);
         }
 
         if (!line.isEmpty()) {
-            Bubble bubble = useModernBubble
-                    ? new ModernBubble(id, sender, line.toString(), duration, height, interactionHeight, useInteractionRiding, hasShadow, background, animationTime, scale)
-                    : new Bubble(id, sender, line.toString(), duration, height, interactionHeight, useInteractionRiding);
-
-            bubbles.add(bubble);
+            bubbles.add(buildBubble(
+                    id, sender, line.toString(), duration, height, interactionHeight,
+                    useInteractionRiding, useModernBubble, hasShadow, background,
+                    animationTime, scale, billboard
+            ));
         }
 
         return bubbles;
+    }
+
+    private Bubble buildBubble(int id, FPlayer sender, String message, long duration, int height, float interactionHeight,
+                               boolean interactionRiding, boolean useModern, boolean hasShadow, int background,
+                               int animationTime, float scale, Message.Bubble.Billboard billboard) {
+        Bubble.Builder builder = useModern
+                ? new ModernBubble.ModernBuilder()
+                .hasShadow(hasShadow)
+                .background(background)
+                .animationTime(animationTime)
+                .scale(scale)
+                .billboard(billboard)
+                : new Bubble.Builder();
+
+        return builder
+                .id(id)
+                .sender(sender)
+                .message(message)
+                .duration(duration)
+                .height(height)
+                .interactionHeight(interactionHeight)
+                .interactionRiding(interactionRiding)
+                .build();
     }
 
     private void processBubbleQueue(UUID playerUuid, Queue<Bubble> bubbleQueue) {
