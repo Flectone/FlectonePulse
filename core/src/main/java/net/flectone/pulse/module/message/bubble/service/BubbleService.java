@@ -94,19 +94,20 @@ public class BubbleService {
         StringBuilder line = new StringBuilder();
         for (char symbol : message.toCharArray()) {
             line.append(symbol);
+            if (line.length() < maxLength) continue;
 
-            if ((symbol == ' ' && line.length() > maxLength - 5) || line.length() > maxLength) {
+            boolean isLetter = Character.isLetter(symbol);
+            if (!isLetter && line.length() < maxLength + 5) continue;
 
-                String newMessage = symbol == ' ' ? line.toString().trim() : line + "-";
+            String newMessage = isLetter ? line + config.getWordBreakHint() : line.toString().trim();
 
-                Bubble bubble = useModernBubble
-                        ? new ModernBubble(id, sender, newMessage, duration, height, interactionHeight, useInteractionRiding, hasShadow, background, animationTime, scale)
-                        : new Bubble(id, sender, newMessage, duration, height, interactionHeight, useInteractionRiding);
+            Bubble bubble = useModernBubble
+                    ? new ModernBubble(id, sender, newMessage, duration, height, interactionHeight, useInteractionRiding, hasShadow, background, animationTime, scale)
+                    : new Bubble(id, sender, newMessage, duration, height, interactionHeight, useInteractionRiding);
 
-                bubbles.add(bubble);
+            bubbles.add(bubble);
 
-                line = new StringBuilder();
-            }
+            line = new StringBuilder();
         }
 
         if (!line.isEmpty()) {

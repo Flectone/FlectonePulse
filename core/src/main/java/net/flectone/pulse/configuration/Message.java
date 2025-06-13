@@ -169,11 +169,12 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     public static final class Bubble implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private int maxCount = 3;
-        private int maxLength = 20;
+        private int maxLength = 30;
         private int height = 1;
         private double distance = 30.0;
         private double readSpeed = 90.0;
         private double handicapChars = 10.0;
+        private String wordBreakHint = "‑";
 
         private Interaction interaction = new Interaction();
         private Modern modern = new Modern();
