@@ -138,10 +138,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(DiscordModule.class).disconnect();
         injector.getInstance(TwitchModule.class).disconnect();
         injector.getInstance(TelegramModule.class).disconnect();
-
-        TaskScheduler taskScheduler = injector.getInstance(TaskScheduler.class);
-        taskScheduler.reload();
-        taskScheduler.setEnable(false);
+        injector.getInstance(TaskScheduler.class).reload();
 
         fLogger.logDisabled();
     }

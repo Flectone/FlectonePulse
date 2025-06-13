@@ -15,6 +15,4 @@ public interface TaskScheduler {
     void runSyncLater(RunnableException runnable, long tick);
 
     void reload();
-
-    void setEnable(boolean enable);
 }
