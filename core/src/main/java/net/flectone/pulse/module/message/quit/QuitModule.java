@@ -3,16 +3,15 @@ package net.flectone.pulse.module.message.quit;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.quit.listener.QuitPacketListener;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.util.MessageTag;
 
 @Singleton
@@ -52,7 +51,6 @@ public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit>
         return message.isEnable();
     }
 
-    @Async
     public void send(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 

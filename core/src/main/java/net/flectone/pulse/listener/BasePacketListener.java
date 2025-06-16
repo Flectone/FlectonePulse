@@ -115,9 +115,9 @@ public class BasePacketListener extends AbstractPacketListener {
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
         if (!fPlayer.isOnline()) return;
 
+        quitModuleProvider.get().send(fPlayer);
         fPlayerService.clearAndSave(fPlayer);
         bubbleServiceProvider.get().clear(fPlayer);
-        quitModuleProvider.get().send(fPlayer);
     }
 
     @Override
