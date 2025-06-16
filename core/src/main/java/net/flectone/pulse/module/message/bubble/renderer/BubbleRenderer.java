@@ -102,7 +102,7 @@ public class BubbleRenderer {
                     BubbleEntity bubbleEntity = createBubbleEntity(bubble, formattedMessage, fViewer);
                     bubbleEntities.push(bubbleEntity);
 
-                    for (int i = 0; i < bubble.getHeight(); i++) {
+                    for (int i = 0; i < bubble.getElevation(); i++) {
                         bubbleEntities.push(createSpaceBubbleEntity(bubble, fViewer));
                     }
 

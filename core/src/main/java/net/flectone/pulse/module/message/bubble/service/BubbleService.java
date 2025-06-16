@@ -78,7 +78,7 @@ public class BubbleService {
         Message.Bubble config = fileManager.getMessage().getBubble();
 
         long duration = calculateDuration(message);
-        int height = config.getHeight();
+        int elevation = config.getElevation();
         float interactionHeight = config.getInteraction().getHeight();
 
         boolean useModernBubble = isModern();
@@ -109,7 +109,7 @@ public class BubbleService {
 
             String newMessage = isLetter ? line + wordBreakHint : line.toString().trim();
             bubbles.add(buildBubble(
-                    id, sender, newMessage, duration, height, interactionHeight,
+                    id, sender, newMessage, duration, elevation, interactionHeight,
                     useInteractionRiding, useModernBubble, hasShadow, background,
                     animationTime, scale, billboard
             ));
@@ -119,7 +119,7 @@ public class BubbleService {
 
         if (!line.isEmpty()) {
             bubbles.add(buildBubble(
-                    id, sender, line.toString(), duration, height, interactionHeight,
+                    id, sender, line.toString(), duration, elevation, interactionHeight,
                     useInteractionRiding, useModernBubble, hasShadow, background,
                     animationTime, scale, billboard
             ));
@@ -128,7 +128,7 @@ public class BubbleService {
         return bubbles;
     }
 
-    private Bubble buildBubble(int id, FPlayer sender, String message, long duration, int height, float interactionHeight,
+    private Bubble buildBubble(int id, FPlayer sender, String message, long duration, int elevation, float interactionHeight,
                                boolean interactionRiding, boolean useModern, boolean hasShadow, int background,
                                int animationTime, float scale, Message.Bubble.Billboard billboard) {
         Bubble.Builder builder = useModern
@@ -145,7 +145,7 @@ public class BubbleService {
                 .sender(sender)
                 .message(message)
                 .duration(duration)
-                .height(height)
+                .elevation(elevation)
                 .interactionHeight(interactionHeight)
                 .interactionRiding(interactionRiding)
                 .build();

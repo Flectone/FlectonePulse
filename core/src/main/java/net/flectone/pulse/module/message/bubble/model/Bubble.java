@@ -18,7 +18,7 @@ public class Bubble {
     private final String rawMessage;
     private final long duration;
     private final long creationTime;
-    private final int height;
+    private final int elevation;
 
     private final float interactionHeight;
     private final boolean interactionRiding;
@@ -31,7 +31,7 @@ public class Bubble {
         this.sender = builder.sender;
         this.rawMessage = builder.message;
         this.duration = builder.duration;
-        this.height = builder.height;
+        this.elevation = builder.elevation;
         this.interactionHeight = builder.interactionHeight;
         this.interactionRiding = builder.interactionRiding;
         this.creationTime = System.currentTimeMillis();
@@ -43,7 +43,7 @@ public class Bubble {
         private FPlayer sender;
         private String message;
         private long duration;
-        private int height;
+        private int elevation;
         private float interactionHeight;
         private boolean interactionRiding;
 
@@ -67,8 +67,8 @@ public class Bubble {
             return this;
         }
 
-        public Builder height(int height) {
-            this.height = height;
+        public Builder elevation(int elevation) {
+            this.elevation = elevation;
             return this;
         }
 
