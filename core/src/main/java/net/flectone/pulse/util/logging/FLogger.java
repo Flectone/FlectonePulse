@@ -77,6 +77,7 @@ public class FLogger extends Logger {
             default -> "";
         };
 
+        logRecord.setLoggerName("");
         logRecord.setMessage(PLUGIN_NAME + colorLog + logRecord.getMessage() + "\033[0m");
 
         logConsumer.accept(logRecord);
