@@ -1,6 +1,10 @@
 package net.flectone.pulse.adapter;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEventsAPI;
+import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -40,7 +44,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -49,6 +52,7 @@ import java.util.UUID;
 public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     private final Injector injector;
+    private final PacketEventsAPI<?> packetEvents = PacketEvents.getAPI();
 
     @Inject
     public BukkitPlayerAdapter(Injector injector) {
@@ -105,11 +109,15 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @Nullable String getIp(@NotNull FPlayer fPlayer) {
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
-        if (player == null) return null;
+        ProtocolManager protocolManager = packetEvents.getProtocolManager();
 
-        InetSocketAddress address = player.getAddress();
-        return address != null ? address.getHostString() : null;
+        Object channel = protocolManager.getChannel(fPlayer.getUuid());
+        if (channel == null) return null;
+
+        User user = protocolManager.getUser(channel);
+        if (user == null) return null;
+
+        return user.getAddress().getAddress().getHostName();
     }
 
     @Override
