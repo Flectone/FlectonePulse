@@ -33,10 +33,18 @@ public class ModerationRepository {
     public List<Moderation> getValid(FPlayer player, Moderation.Type type) {
         try {
             CacheKey key = new CacheKey(player.getUuid(), type);
-            return moderationCache.get(
-                    key,
-                    () -> moderationDAO.getValid(player, type)
-            );
+            List<Moderation> cached = moderationCache.get(key, () -> moderationDAO.getValid(player, type));
+            if (cached.stream().anyMatch(Moderation::isActive)) {
+                return cached;
+            }
+
+            List<Moderation> valid = cached.stream()
+                    .filter(Moderation::isActive)
+                    .toList();
+
+            moderationCache.put(key, valid);
+
+            return valid;
         } catch (Exception e) {
             return List.of();
         }
