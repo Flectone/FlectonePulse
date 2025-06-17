@@ -28,6 +28,10 @@ public class Moderation {
         this.valid = valid;
     }
 
+    public boolean isActive() {
+        return isValid() && !isExpired();
+    }
+
     public void setInvalid() {
         this.valid = false;
     }
