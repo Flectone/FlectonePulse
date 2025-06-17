@@ -159,10 +159,13 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         if (!isEnable()) return false;
         if (!command.isTurnedOn()) return false;
 
-        String messageKick = resolveLocalization().getKick();
-
         FPlayer fPlayer = fPlayerService.getFPlayer(userProfile.getUUID());
         if (permissionChecker.check(fPlayer, permission.getJoin())) return false;
+
+        fPlayerService.loadSettings(fPlayer);
+        fPlayerService.loadColors(fPlayer);
+
+        String messageKick = resolveLocalization(fPlayer).getKick();
 
         Component reason = messagePipeline.builder(fPlayer, messageKick).build();
         packetSender.send(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));

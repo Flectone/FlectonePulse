@@ -191,10 +191,11 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         for (Moderation ban : moderationService.getValidBans(fPlayer)) {
             FPlayer fModerator = fPlayerService.getFPlayer(ban.getModerator());
 
-            Localization.Command.Ban localization = resolveLocalization();
+            fPlayerService.loadSettings(fPlayer);
+            fPlayerService.loadColors(fPlayer);
 
-            String formatPlayer = localization.getPerson();
-            formatPlayer = moderationMessageFormatter.replacePlaceholders(formatPlayer, fPlayer, ban);
+            Localization.Command.Ban localization = resolveLocalization(fPlayer);
+            String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.getPerson(), fPlayer, ban);
 
             Component reason = messagePipeline.builder(fModerator, fPlayer, formatPlayer).build();
             packetSender.send(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));

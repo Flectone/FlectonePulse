@@ -69,6 +69,9 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
         int online = platformServerAdapter.getOnlinePlayerCount();
         if (online < message.getMax()) return false;
 
+        fPlayerService.loadSettings(fPlayer);
+        fPlayerService.loadColors(fPlayer);
+
         String message = resolveLocalization(fPlayer).getFull();
 
         Component reason = messagePipeline.builder(fPlayer, message).build();

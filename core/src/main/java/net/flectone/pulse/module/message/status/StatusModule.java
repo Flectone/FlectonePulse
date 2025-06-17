@@ -21,9 +21,9 @@ import net.flectone.pulse.module.message.status.listener.StatusPacketListener;
 import net.flectone.pulse.module.message.status.motd.MOTDModule;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
 import net.flectone.pulse.module.message.status.version.VersionModule;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.pipeline.MessagePipeline;
 
 import java.util.Collection;
 import java.util.List;
@@ -90,6 +90,7 @@ public class StatusModule extends AbstractModule {
         FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
         if (checkModulePredicates(fPlayer)) return;
 
+        fPlayerService.loadSettings(fPlayer);
         fPlayerService.loadColors(fPlayer);
 
         JsonObject responseJson = new JsonObject();
