@@ -6,7 +6,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDi
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
@@ -66,16 +65,18 @@ public class FPlayerService {
         fPlayerRepository.add(console);
         fPlayerRepository.saveOrIgnore(console);
 
-        platformPlayerAdapter.getOnlinePlayers().forEach(this::addAndGetFPlayer);
+        platformPlayerAdapter.getOnlinePlayers().forEach(uuid -> {
+            String name = platformPlayerAdapter.getName(uuid);
+            addFPlayer(uuid, name);
+            loadData(uuid);
+        });
     }
 
-    public FPlayer addAndGetFPlayer(UUID uuid) {
-        return addAndGetFPlayer(uuid, platformPlayerAdapter.getName(uuid));
-    }
-
-    public FPlayer addAndGetFPlayer(UUID uuid, String name) {
+    public boolean addFPlayer(UUID uuid, String name) {
         // insert to database
-        boolean isInserted = fPlayerRepository.save(uuid, name);
+        boolean isNew = fPlayerRepository.save(uuid, name);
+
+        moderationService.invalidate(uuid);
 
         // player can be in the cache and be unknown
         FPlayer fPlayer = fPlayerRepository.get(uuid);
@@ -84,30 +85,31 @@ public class FPlayerService {
             fPlayer = fPlayerRepository.get(uuid);
         }
 
-        moderationService.invalidate(uuid);
+        if (isNew) {
+            fPlayer.setDefaultSettings();
+            saveSettings(fPlayer);
+        }
 
-        // load player data
-        loadOrSaveDefaultSetting(fPlayer, !isInserted);
-        loadColors(fPlayer);
-        loadIgnores(fPlayer);
-        fPlayer.setOnline(true);
         fPlayer.setIp(platformPlayerAdapter.getIp(fPlayer));
 
         // add player to online cache and remove from offline
         fPlayerRepository.add(fPlayer);
 
-        update(fPlayer);
-
-        return fPlayer;
+        return isNew;
     }
 
-    @Async
-    public void update(FPlayer fPlayer) {
+    public void loadData(UUID uuid) {
+        FPlayer fPlayer = getFPlayer(uuid);
+
+        fPlayer.setOnline(true);
+
+        // load player data
+        loadSettings(fPlayer);
+        loadColors(fPlayer);
+        loadIgnores(fPlayer);
+
         // update old database data
         fPlayerRepository.saveOrUpdate(fPlayer);
-
-        // send info for modules
-        platformPlayerAdapter.update(fPlayer);
     }
 
     public int getPing(FPlayer player) {
@@ -247,16 +249,6 @@ public class FPlayerService {
 
     public void deleteMail(Mail mail) {
         socialRepository.deleteMail(mail);
-    }
-
-    public void loadOrSaveDefaultSetting(FPlayer fPlayer, boolean load) {
-        if (load) {
-            fPlayerRepository.loadSettings(fPlayer);
-            return;
-        }
-
-        fPlayer.setDefaultSettings();
-        saveSettings(fPlayer);
     }
 
     public void saveSettings(FPlayer fPlayer) {
