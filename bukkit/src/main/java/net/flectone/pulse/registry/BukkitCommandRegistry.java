@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import io.leangen.geantyref.TypeToken;
+import net.flectone.pulse.adapter.BukkitServerAdapter;
+import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.handler.CommandExceptionHandler;
 import net.flectone.pulse.mapper.FPlayerMapper;
 import net.flectone.pulse.model.FPlayer;
@@ -88,6 +90,9 @@ public class BukkitCommandRegistry extends CommandRegistry {
         // root name
         String commandName = command.rootComponent().name();
 
+        // spigot issue
+        if (!BukkitServerAdapter.IS_PAPER && containsCommand(commandName)) return;
+
         // unregister minecraft and other plugins command
         if (!containsCommand(commandName)) {
             unregisterCommand(commandName);
@@ -103,5 +108,20 @@ public class BukkitCommandRegistry extends CommandRegistry {
     @Override
     public void unregisterCommand(String name) {
         manager.deleteRootCommand(name);
+    }
+
+    @Override
+    public void reload() {
+        if (BukkitServerAdapter.IS_PAPER) {
+            super.reload();
+        } else {
+            // only for spigot
+            syncReload();
+        }
+    }
+
+    @Sync
+    public void syncReload() {
+        super.reload();
     }
 }
