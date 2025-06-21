@@ -165,8 +165,10 @@ public class BukkitChatModule extends ChatModule {
         spyModuleProvider.get().checkChat(fPlayer, chatName, finalMessage);
 
         int countRecipients = recipientsUUID.size();
-        if (playerChat.isNullRecipient() && countRecipients < 2) {
-            checkRecipientsLater(fPlayer, countRecipients, chatRange, recipientsUUID);
+        Message.Chat.Type.NullRecipient nullRecipient = playerChat.getNullRecipient();
+
+        if (nullRecipient.isEnable() && countRecipients < 2) {
+            checkRecipientsLater(fPlayer, countRecipients, chatRange, recipientsUUID, nullRecipient);
         }
 
         event.setMessage(finalMessage);
@@ -177,7 +179,8 @@ public class BukkitChatModule extends ChatModule {
     }
 
     @Async(delay = 5L)
-    public void checkRecipientsLater(FPlayer fPlayer, int countRecipients, int chatRange, List<UUID> recipientsUUID) {
+    public void checkRecipientsLater(FPlayer fPlayer, int countRecipients, int chatRange,
+                                     List<UUID> recipientsUUID, Message.Chat.Type.NullRecipient nullRecipient) {
         Set<UUID> onlinePlayers = fPlayerService.findOnlineFPlayers()
                 .stream()
                 .map(FEntity::getUuid)
@@ -186,6 +189,7 @@ public class BukkitChatModule extends ChatModule {
         if ((onlinePlayers.containsAll(recipientsUUID) && onlinePlayers.size() <= countRecipients)
                 || chatRange > -1) {
             builder(fPlayer)
+                    .destination(nullRecipient.getDestination())
                     .format(Localization.Message.Chat::getNullRecipient)
                     .sendBuilt();
         }
