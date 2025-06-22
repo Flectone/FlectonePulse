@@ -153,22 +153,22 @@ public class BukkitChatModule extends ChatModule {
                 .integration(s -> s.replace("<message>", finalMessage))
                 .sound(soundMap.get(chatName));
 
-        List<FPlayer> recipients = builder.build();
+        List<FPlayer> receivers = builder.build();
 
-        builder.send(recipients);
+        builder.send(receivers);
 
-        List<UUID> recipientsUUID = recipients.stream()
+        List<UUID> receiversUUID = receivers.stream()
                 .filter(filterFPlayer -> !filterFPlayer.isUnknown())
                 .map(FEntity::getUuid)
                 .toList();
 
         spyModuleProvider.get().checkChat(fPlayer, chatName, finalMessage);
 
-        int countRecipients = recipientsUUID.size();
-        Message.Chat.Type.NullRecipient nullRecipient = playerChat.getNullRecipient();
+        int countReceivers = receiversUUID.size();
+        Message.Chat.Type.NullReceiver nullReceiver = playerChat.getNullReceiver();
 
-        if (nullRecipient.isEnable() && countRecipients < 2) {
-            checkRecipientsLater(fPlayer, countRecipients, chatRange, recipientsUUID, nullRecipient);
+        if (nullReceiver.isEnable() && countReceivers < 2) {
+            checkReceiversLater(fPlayer, countReceivers, chatRange, receiversUUID, nullReceiver);
         }
 
         event.setMessage(finalMessage);
@@ -179,18 +179,18 @@ public class BukkitChatModule extends ChatModule {
     }
 
     @Async(delay = 5L)
-    public void checkRecipientsLater(FPlayer fPlayer, int countRecipients, int chatRange,
-                                     List<UUID> recipientsUUID, Message.Chat.Type.NullRecipient nullRecipient) {
+    public void checkReceiversLater(FPlayer fPlayer, int countReceiver, int chatRange,
+                                    List<UUID> receiversUUID, Message.Chat.Type.NullReceiver nullReceiver) {
         Set<UUID> onlinePlayers = fPlayerService.findOnlineFPlayers()
                 .stream()
                 .map(FEntity::getUuid)
                 .collect(Collectors.toSet());
 
-        if ((onlinePlayers.containsAll(recipientsUUID) && onlinePlayers.size() <= countRecipients)
+        if ((onlinePlayers.containsAll(receiversUUID) && onlinePlayers.size() <= countReceiver)
                 || chatRange > -1) {
             builder(fPlayer)
-                    .destination(nullRecipient.getDestination())
-                    .format(Localization.Message.Chat::getNullRecipient)
+                    .destination(nullReceiver.getDestination())
+                    .format(Localization.Message.Chat::getNullReceiver)
                     .sendBuilt();
         }
     }

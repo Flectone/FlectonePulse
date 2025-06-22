@@ -368,7 +368,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 "global", "<display_name> <world_prefix>»<fcolor:4> <message> <translate>"
         ));
         message.chat.nullChat = "<color:#ff7171><b>⁉</b> На сервер выключен чат";
-        message.chat.nullRecipient = "<color:#ff7171><b>⁉</b> Тебя никто не услышал";
+        message.chat.nullReceiver = "<color:#ff7171><b>⁉</b> Тебя никто не услышал";
 
         message.clear.single = "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><number></fcolor:2> предметов у игрока <display_name>";
         message.clear.multiple = "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><number></fcolor:2> предметов у <fcolor:2><count></fcolor:2> игроков";
@@ -496,7 +496,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.format.name_.entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:<name>> <br><fcolor:1>Тип <fcolor:2><lang:<type>> <br><fcolor:1>Айди <fcolor:2><uuid>\"><lang:<name>></hover></fcolor:2>";
         message.format.name_.unknown = "<fcolor:2><name></fcolor:2>";
 
-        message.format.translate.action = "<click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Перевести сообщение\"><fcolor:1>[📖]";
+        message.format.translate.action = "<click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Перевести сообщение\"><fcolor:1>⇄";
 
         message.format.questionAnswer.questions.clear();
         message.format.questionAnswer.questions.put("server", "<fcolor:2>[Вопрос-Ответ] @<player><fcolor:1>, это ванильный сервер в Майнкрафте!");
@@ -1581,7 +1581,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Chat implements SubMessageConfig, Localizable {
             private String nullChat = "<color:#ff7171><b>⁉</b> Chat is disabled on this server";
-            private String nullRecipient = "<color:#ff7171><b>⁉</b> Nobody heard you";
+            private String nullReceiver = "<color:#ff7171><b>⁉</b> Nobody heard you";
             private Map<String, String> types = new LinkedHashMap<>(){
                 {
                     put("global", "<display_name> <world_prefix>»<fcolor:4> <message> <translate>");

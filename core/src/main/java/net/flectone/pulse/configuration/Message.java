@@ -223,26 +223,26 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             private int range = 0;
             private int priority = 0;
             private String trigger = "";
-            private NullRecipient nullRecipient = new NullRecipient();
+            private NullReceiver nullReceiver = new NullReceiver();
             private Destination destination = new Destination();
             private Cooldown cooldown = new Cooldown();
             private Sound sound = new Sound();
 
-            public Type(String trigger, boolean nullRecipient, boolean cancel, int range, int priority) {
+            public Type(String trigger, boolean nullReceiver, boolean cancel, int range, int priority) {
                 this.trigger = trigger;
                 this.cancel = cancel;
-                this.nullRecipient = new NullRecipient(nullRecipient);
+                this.nullReceiver = new NullReceiver(nullReceiver);
                 this.range = range;
                 this.priority = priority;
             }
 
             @Getter
             @NoArgsConstructor
-            public static final class NullRecipient {
+            public static final class NullReceiver {
                 private boolean enable = true;
                 private Destination destination = new Destination(Destination.Type.ACTION_BAR);
 
-                public NullRecipient(boolean enable) {
+                public NullReceiver(boolean enable) {
                     this.enable = enable;
                 }
             }
