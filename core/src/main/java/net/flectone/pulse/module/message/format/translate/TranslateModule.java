@@ -1,5 +1,7 @@
 package net.flectone.pulse.module.message.format.translate;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
@@ -19,17 +21,20 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
 public class TranslateModule extends AbstractModuleMessage<Localization.Message.Format.Translate> implements MessageProcessor {
 
-    private final Map<UUID, String> messageMap = new HashMap<>();
+    private final Cache<String, UUID> messageCache = CacheBuilder.newBuilder()
+            .maximumSize(5000)
+            .expireAfterWrite(1, TimeUnit.HOURS)
+            .build();
 
     private final Message.Format.Translate message;
     private final Permission.Message.Format.Translate permission;
@@ -54,7 +59,7 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
     @Override
     public void reload() {
         registerModulePermission(permission);
-        messageMap.clear();
+        messageCache.invalidateAll();
     }
 
     @Override
@@ -77,9 +82,11 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
     }
 
     private UUID saveMessage(String message) {
-        UUID uuid = UUID.randomUUID();
-
-        messageMap.put(uuid, message);
+        UUID uuid = messageCache.getIfPresent(message);
+        if (uuid == null) {
+            uuid = UUID.randomUUID();
+            messageCache.put(message, uuid);
+        }
 
         return uuid;
     }
@@ -97,7 +104,12 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
 
     @Nullable
     public String getMessage(UUID uuid) {
-        return messageMap.get(uuid);
+        return messageCache.asMap().entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().equals(uuid))
+                .findFirst()
+                .map(Map.Entry::getKey)
+                .orElse(null);
     }
 
     private TagResolver translateTag(FEntity fPlayer, FEntity receiver, @NotNull UUID key) {
