@@ -80,6 +80,8 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public abstract boolean isVanished(FEntity sender);
 
+    public abstract boolean hasSeeVanishPermission(FEntity sender);
+
     public abstract boolean isMuted(FPlayer fPlayer);
 
     public abstract ExternalModeration getMute(FPlayer fPlayer);

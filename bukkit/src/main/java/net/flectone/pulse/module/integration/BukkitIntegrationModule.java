@@ -233,6 +233,14 @@ public class BukkitIntegrationModule extends IntegrationModule {
     }
 
     @Override
+    public boolean hasSeeVanishPermission(FEntity sender) {
+        Player player = Bukkit.getPlayer(sender.getUuid());
+        if (player == null) return false;
+
+        return player.hasPermission("sv.see");
+    }
+
+    @Override
     public boolean isMuted(FPlayer fPlayer) {
         if (getChildren().contains(LiteBansModule.class)) {
             return injector.getInstance(LiteBansModule.class).isMuted(fPlayer);
