@@ -433,7 +433,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         public static final class Mention implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
             private String trigger = "@";
-            private Destination destination = new Destination(Destination.Type.ACTION_BAR);
+            private Destination destination = new Destination(Destination.Type.TOAST, new Toast("minecraft:bell", Toast.Type.TASK));
             private Sound sound = new Sound(true, 0.1f, 0.1f, SoundCategory.NEUTRAL.name(), Sounds.ENTITY_EXPERIENCE_ORB_PICKUP.getName().toString());
         }
 
