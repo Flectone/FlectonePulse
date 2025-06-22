@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.command.translateto;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.NonNull;
@@ -11,6 +12,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
@@ -36,15 +38,18 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
 
     private final CommandRegistry commandRegistry;
     private final IntegrationModule integrationModule;
+    private final Provider<TranslateModule> translateModuleProvider;
 
     @Inject
     public TranslatetoModule(FileManager fileManager,
                              CommandRegistry commandRegistry,
-                             IntegrationModule integrationModule) {
+                             IntegrationModule integrationModule,
+                             Provider<TranslateModule> translateModuleProvider) {
         super(localization -> localization.getCommand().getTranslateto(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TRANSLATETO));
 
         this.commandRegistry = commandRegistry;
         this.integrationModule = integrationModule;
+        this.translateModuleProvider = translateModuleProvider;
 
         command = fileManager.getCommand().getTranslateto();
         permission = fileManager.getPermission().getCommand().getTranslateto();
@@ -97,8 +102,13 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
         String promptMessage = getPrompt().getMessage();
         String message = commandContext.get(promptMessage);
 
-        String translated = translate(fPlayer, mainLang, targetLang, message);
-        if (translated.isEmpty()) {
+        String messageToTranslate = translateModuleProvider.get().getMessage(message);
+        if (messageToTranslate == null) {
+            messageToTranslate = message;
+        }
+
+        String translatedMessage = translate(fPlayer, mainLang, targetLang, messageToTranslate);
+        if (translatedMessage.isEmpty()) {
             builder(fPlayer)
                     .format(Localization.Command.Translateto::getNullOrError)
                     .sendBuilt();
@@ -110,13 +120,13 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
                 .destination(command.getDestination())
                 .tag(MessageTag.COMMAND_TRANSLATETO)
                 .format(replaceLanguage(targetLang))
-                .message(translated)
+                .message(translatedMessage)
                 .proxy(output -> {
                     output.writeUTF(targetLang);
-                    output.writeUTF(translated);
+                    output.writeUTF(translatedMessage);
                 })
                 .integration(s -> s
-                        .replace("<message>", translated)
+                        .replace("<message>", translatedMessage)
                         .replace("<language>", targetLang)
                 )
                 .sound(getSound())

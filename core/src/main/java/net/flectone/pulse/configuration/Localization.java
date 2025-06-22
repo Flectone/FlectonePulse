@@ -364,8 +364,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.chat.types.clear();
         message.chat.types.putAll(Map.of(
-                "local", "<display_name><fcolor:3>: <message> <translateto:\"<message_to_translate>\">",
-                "global", "<display_name> <world_prefix>»<fcolor:4> <message> <translateto:\"<message_to_translate>\">"
+                "local", "<display_name><fcolor:3>: <message> <translate>",
+                "global", "<display_name> <world_prefix>»<fcolor:4> <message> <translate>"
         ));
         message.chat.nullChat = "<color:#ff7171><b>⁉</b> На сервер выключен чат";
         message.chat.nullRecipient = "<color:#ff7171><b>⁉</b> Тебя никто не услышал";
@@ -1584,8 +1584,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String nullRecipient = "<color:#ff7171><b>⁉</b> Nobody heard you";
             private Map<String, String> types = new LinkedHashMap<>(){
                 {
-                    put("global", "<display_name> <world_prefix>»<fcolor:4> <message> <translateto:\"<message_to_translate>\">");
-                    put("local", "<display_name><fcolor:3>: <message> <translateto:\"<message_to_translate>\">");
+                    put("global", "<display_name> <world_prefix>»<fcolor:4> <message> <translate>");
+                    put("local", "<display_name><fcolor:3>: <message> <translate>");
                 }
             };
         }
@@ -1838,7 +1838,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
             @Getter
             public static final class Translate implements SubFormatMessageConfig, Localizable {
-                private String action = "<click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Translate message\"><fcolor:1>[📖]";
+                private String action = "<click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Translate message\"><fcolor:1>⇄";
             }
         }
 
