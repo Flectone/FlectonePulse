@@ -39,8 +39,6 @@ import net.flectone.pulse.module.message.objective.BukkitObjectiveModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.quit.BukkitQuitModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
-import net.flectone.pulse.module.message.rightclick.BukkitRightclickModule;
-import net.flectone.pulse.module.message.rightclick.RightclickModule;
 import net.flectone.pulse.module.message.sidebar.BukkitSidebarModule;
 import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.sign.BukkitSignModule;
@@ -179,7 +177,6 @@ public class BukkitInjector extends AbstractModule {
         bind(BubbleModule.class).to(BukkitBubbleModule.class);
         bind(ChatModule.class).to(BukkitChatModule.class);
         bind(SignModule.class).to(BukkitSignModule.class);
-        bind(RightclickModule.class).to(BukkitRightclickModule.class);
         bind(SpyModule.class).to(BukkitSpyModule.class);
 
         if (!BukkitServerAdapter.IS_PAPER) {
