@@ -9,6 +9,8 @@ import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.provider.PacketProvider;
@@ -20,7 +22,8 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.*;
 
-public abstract class MessageSender {
+@Singleton
+public class MessageSender {
 
     private final PacketSerializer packetSerializer;
     private final TaskScheduler taskScheduler;
@@ -29,6 +32,7 @@ public abstract class MessageSender {
     private final PacketProvider packetProvider;
     private final FLogger fLogger;
 
+    @Inject
     public MessageSender(TaskScheduler taskScheduler,
                          PlatformPlayerAdapter platformPlayerAdapter,
                          PacketSerializer packetSerializer,
