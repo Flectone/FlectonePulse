@@ -333,11 +333,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
         integration.discord.infoChannel.put("айди", "ТПС <tps>");
 
         message.advancement.task.format = "<color:#4eff52>🌠 <fcolor:2><display_name> <fcolor:1>получил достижение <advancement>";
-        message.advancement.task.tag = "<color:#4eff52>[<hover:show_text:\"<color:#4eff52><lang:<title>> <br><lang:<description>>\"><lang:<title>></hover>]";
+        message.advancement.task.tag = "<color:#4eff52>[<hover:show_text:\"<color:#4eff52><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]";
         message.advancement.goal.format = "<color:#FFFF00>🌠 <fcolor:2><display_name> <fcolor:1>выполнил цель <advancement>";
-        message.advancement.goal.tag = "<color:#FFFF00>[<hover:show_text:\"<color:#FFFF00><lang:<title>> <br><lang:<description>>\"><lang:<title>></hover>]";
+        message.advancement.goal.tag = "<color:#FFFF00>[<hover:show_text:\"<color:#FFFF00><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]";
         message.advancement.challenge.format = "<color:#834eff>🌠 <fcolor:2><display_name> <fcolor:1>завершил испытание <advancement>";
-        message.advancement.challenge.tag = "<color:#834eff>[<hover:show_text:\"<color:#834eff><lang:<title>> <br><lang:<description>>\"><lang:<title>></hover>]";
+        message.advancement.challenge.tag = "<color:#834eff>[<hover:show_text:\"<color:#834eff><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]";
         message.advancement.revoke.manyToOne = "<fcolor:1>🌠 Отозвано <fcolor:2><number></fcolor:2> достижений у игрока <display_name>";
         message.advancement.revoke.oneToOne = "<fcolor:1>🌠 Отозвано достижение <fcolor:2><advancement></fcolor:2> у игрока <display_name>";
         message.advancement.grant.manyToOne = "<fcolor:1>🌠 Выдано <fcolor:2><number></fcolor:2> достижений игроку <display_name>";
@@ -481,8 +481,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.deop.format = "<fcolor:1>\uD83E\uDD16 <display_name> больше не является оператором сервера";
 
-        message.enchant.single = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:<enchant>> <lang:<level>></fcolor:2>» на предмет <display_name>";
-        message.enchant.multiple = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:<enchant>> <lang:<level>></fcolor:2>» на предмет <fcolor:2><count></fcolor:2> сущностей";
+        message.enchant.single = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'></fcolor:2>» на предмет <display_name>";
+        message.enchant.multiple = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'></fcolor:2>» на предмет <fcolor:2><count></fcolor:2> сущностей";
 
         message.format.mention.person = "<fcolor:2>Тебя упомянули!";
 
@@ -493,7 +493,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.format.tags.put(TagType.SKIN, "<image:\"<message>\"><u>👨 Скин</u></image>");
 
         message.format.name_.display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <player>\"><vault_prefix><stream_prefix><fcolor:2><player></fcolor><afk_suffix><vault_suffix></hover></click>";
-        message.format.name_.entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:<name>> <br><fcolor:1>Тип <fcolor:2><lang:<type>> <br><fcolor:1>Айди <fcolor:2><uuid>\"><lang:<name>></hover></fcolor:2>";
+        message.format.name_.entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<name>'> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><lang:'<name>'></hover></fcolor:2>";
         message.format.name_.unknown = "<fcolor:2><name></fcolor:2>";
 
         message.format.translate.action = "<click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Перевести сообщение\"><fcolor:1>⇄";
@@ -1480,17 +1480,17 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
             private Type task = new Type(
                     "<color:#4eff52>🌠 <fcolor:2><display_name> <fcolor:1>has completed the task <advancement>",
-                    "<color:#4eff52>[<hover:show_text:\"<color:#4eff52><lang:<title>> <br><lang:<description>>\"><lang:<title>></hover>]"
+                    "<color:#4eff52>[<hover:show_text:\"<color:#4eff52><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]"
             );
 
             private Type goal = new Type(
                     "<color:#FFFF00>🌠 <fcolor:2><display_name> <fcolor:1>has completed the goal <advancement>",
-                    "<color:#FFFF00>[<hover:show_text:\"<color:#FFFF00><lang:<title>> <br><lang:<description>>\"><lang:<title>></hover>]"
+                    "<color:#FFFF00>[<hover:show_text:\"<color:#FFFF00><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]"
             );
 
             private Type challenge = new Type(
                     "<color:#834eff>🌠 <fcolor:2><display_name> <fcolor:1>has completed the challenge <color:#834eff><advancement>",
-                    "<color:#834eff>[<hover:show_text:\"<color:#834eff><lang:<title>> <br><lang:<description>>\"><lang:<title>></hover>]"
+                    "<color:#834eff>[<hover:show_text:\"<color:#834eff><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]"
             );
 
             private Command revoke = new Command(
@@ -1711,8 +1711,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Enchant implements SubMessageConfig, Localizable {
-            private String single = "<fcolor:1>📖 Applied enchantment «<fcolor:2><lang:<enchant>> <lang:<level>></fcolor:2>» to <display_name>'s item";
-            private String multiple = "<fcolor:1>📖 Applied enchantment «<fcolor:2><lang:<enchant>> <lang:<level>></fcolor:2>» to <fcolor:2><count></fcolor:2> entities";
+            private String single = "<fcolor:1>📖 Applied enchantment «<fcolor:2><lang:'<enchant>'> <lang:'<level>'></fcolor:2>» to <display_name>'s item";
+            private String multiple = "<fcolor:1>📖 Applied enchantment «<fcolor:2><lang:'<enchant>'> <lang:'<level>'></fcolor:2>» to <fcolor:2><count></fcolor:2> entities";
         }
 
         @Getter
@@ -1816,7 +1816,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             public static final class Name implements SubFormatMessageConfig, Localizable {
                 private String constant = "";
                 private String display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <player>\"><vault_prefix><stream_prefix><fcolor:2><player></fcolor><afk_suffix><vault_suffix></hover></click>";
-                private String entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:<name>> <br><fcolor:1>Type <fcolor:2><lang:<type>> <br><fcolor:1>ID <fcolor:2><uuid>\"><lang:<name>></hover></fcolor:2>";
+                private String entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<name>'> <br><fcolor:1>Type <fcolor:2><lang:'<type>'> <br><fcolor:1>ID <fcolor:2><uuid>\"><lang:'<name>'></hover></fcolor:2>";
                 private String unknown = "<fcolor:2><name></fcolor:2>";
             }
 
