@@ -162,8 +162,16 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
         FEntity entity = convertDeath(killer);
         if (entity == null) return emptyTagResolver(tag);
 
-        return TagResolver.resolver(tag, (argumentQueue, context) ->
-                Tag.selfClosingInserting(messagePipeline.builder(entity, receiver, "<display_name>").build())
-        );
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
+            Localization.Message.Death message = resolveLocalization(receiver);
+
+            Component component = messagePipeline.builder(entity, receiver, killer.isPlayer()
+                            ? message.getKillerPlayer()
+                            : message.getKillerEntity()
+                    )
+                    .build();
+
+            return Tag.selfClosingInserting(component);
+        });
     }
 }

@@ -1598,6 +1598,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Death implements SubMessageConfig, Localizable {
+            private String killerPlayer = "<display_name>";
+            private String killerEntity = "<display_name>";
             private Map<String, String> types = new LinkedHashMap<>(){
                 {
                     put("death.attack.anvil", "<color:#778899>🪦 <fcolor:1><display_name> was squashed by a falling anvil");
