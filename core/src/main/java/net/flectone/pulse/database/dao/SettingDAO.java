@@ -37,6 +37,8 @@ public class SettingDAO {
     }
 
     public void load(FPlayer fPlayer) {
+        fPlayer.getSettings().clear();
+
         for (FPlayer.Setting setting : FPlayer.Setting.values()) {
             Optional<String> optionalValue = get(fPlayer, setting);
             if (optionalValue.isEmpty()) continue;
