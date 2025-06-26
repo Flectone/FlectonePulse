@@ -4,16 +4,27 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.service.FPlayerService;
 
 public abstract class ScoreboardModule extends AbstractModule {
 
     private final Message.Format.Scoreboard message;
     private final Permission.Message.Format.Scoreboard permission;
 
-    public ScoreboardModule(FileManager fileManager) {
+    private final FPlayerService fPlayerService;
+    private final TaskScheduler taskScheduler;
+
+    public ScoreboardModule(FileManager fileManager,
+                            FPlayerService fPlayerService,
+                            TaskScheduler taskScheduler) {
         message = fileManager.getMessage().getFormat().getScoreboard();
         permission = fileManager.getPermission().getMessage().getFormat().getScoreboard();
+
+        this.fPlayerService = fPlayerService;
+        this.taskScheduler = taskScheduler;
     }
 
     @Override
@@ -24,10 +35,15 @@ public abstract class ScoreboardModule extends AbstractModule {
     @Override
     public void reload() {
         registerModulePermission(permission);
+
+        Ticker ticker = message.getTicker();
+        if (ticker.isEnable()) {
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::update), ticker.getPeriod());
+        }
     }
 
-    public abstract void add(FPlayer fPlayer);
-
     public abstract void remove(FPlayer fPlayer);
+
+    public abstract void update(FPlayer fPlayer);
 
 }

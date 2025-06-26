@@ -6,6 +6,7 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.megavex.scoreboardlibrary.api.team.ScoreboardTeam;
@@ -28,8 +29,9 @@ public class BukkitScoreboardModule extends ScoreboardModule {
     public BukkitScoreboardModule(FileManager fileManager,
                                   TeamManager teamManager,
                                   FPlayerService fPlayerService,
+                                  TaskScheduler taskScheduler,
                                   MessagePipeline messagePipeline) {
-        super(fileManager);
+        super(fileManager, fPlayerService, taskScheduler);
 
         this.teamManager = teamManager;
         this.fPlayerService = fPlayerService;
@@ -39,14 +41,23 @@ public class BukkitScoreboardModule extends ScoreboardModule {
     }
 
     @Override
-    public void add(FPlayer fPlayer) {
+    public void remove(FPlayer fPlayer) {
+        if (checkModulePredicates(fPlayer)) return;
+
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        if (player == null) return;
+
+        teamManager.removePlayer(player);
+    }
+
+    @Override
+    public void update(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return;
 
         String teamName = fPlayerService.getSortedName(fPlayer);
-
         ScoreboardTeam playerTeam = teamManager.createIfAbsent(teamName);
         TeamDisplay teamDisplay = playerTeam.defaultDisplay();
 
@@ -66,15 +77,5 @@ public class BukkitScoreboardModule extends ScoreboardModule {
 
         teamDisplay.addEntry(fPlayer.getName());
         teamManager.addPlayer(player);
-    }
-
-    @Override
-    public void remove(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
-
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
-        if (player == null) return;
-
-        teamManager.removePlayer(player);
     }
 }

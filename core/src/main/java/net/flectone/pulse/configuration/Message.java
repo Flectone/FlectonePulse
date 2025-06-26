@@ -526,6 +526,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             private String color = "<white>";
             private String prefix = "<vault_prefix><stream_prefix>";
             private String suffix = "<afk_suffix><vault_suffix>";
+            private Ticker ticker = new Ticker();
         }
 
         @Getter

@@ -373,6 +373,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         injector.getInstance(ScoreboardModule.class).add(fPlayer);
         injector.getInstance(BelownameModule.class).add(fPlayer);
         injector.getInstance(TabnameModule.class).add(fPlayer);
+        injector.getInstance(ScoreboardModule.class).update(fPlayer);
         injector.getInstance(PlayerlistnameModule.class).update();
         injector.getInstance(SidebarModule.class).send(fPlayer);
         injector.getInstance(FooterModule.class).send(fPlayer);
