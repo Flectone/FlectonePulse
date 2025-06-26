@@ -24,10 +24,11 @@ import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.Range;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.DataOutputStream;
 import java.util.ArrayList;
@@ -36,6 +37,9 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
+
+import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 public abstract class AbstractModuleMessage<M extends Localization.Localizable> extends AbstractModule {
 
@@ -217,6 +221,8 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
 
     public class Builder {
 
+        private static final Pattern finalClearMessagePattern = Pattern.compile("[\\p{C}\\p{So}\\x{E0100}-\\x{E01EF}]+");
+
         private final FEntity fPlayer;
         private FPlayer fReceiver = FPlayer.UNKNOWN;
         private MessageTag tag = null;
@@ -358,24 +364,21 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         public void send(List<FPlayer> recipients) {
             recipients.forEach(fReceiver -> {
 
-                // user message
-                // example for chat message
-                Component message = buildMessageComponent(fReceiver);
-
                 // example
                 // format: TheFaser > <message>
                 // message: hello world!
                 // final formatted message: TheFaser > hello world!
-                Component component = combine(buildFormatComponent(fReceiver), message);
+                String message = resolveString(fReceiver, this.message);
+                Component format = buildFormatComponent(fReceiver, message);
 
                 // destination subtext
                 Component subcomponent = Component.empty();
                 if (destination.getType() == Destination.Type.TITLE
                         || destination.getType() == Destination.Type.SUBTITLE) {
-                    subcomponent = combine(buildSubcomponent(fReceiver), message);
+                    subcomponent = buildSubcomponent(fReceiver, message);
                 }
 
-                messageSender.send(fReceiver, component, subcomponent, destination);
+                messageSender.send(fReceiver, format, subcomponent, destination);
 
                 if (sound != null) {
                     if (!permissionChecker.check(fPlayer, sound.getPermission())) return;
@@ -385,28 +388,40 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             });
         }
 
-        private Component combine(Component format, Component message) {
-            return format.replaceText(TextReplacementConfig.builder()
-                    .match("<message>")
-                    .replacement(message)
-                    .build()
-            );
+        private TagResolver messageTag(@Nullable String message) {
+            String tag = "message";
+            if (message == null || message.isBlank()) return emptyTagResolver(tag);
+
+            return TagResolver.resolver(tag, (argumentQueue, context) -> {
+                MessagePipeline.Builder messageBuilder = messagePipeline.builder(fPlayer, fReceiver, message)
+                        .userMessage(true)
+                        .mention(true);
+
+                if (messageComponentBuilder != null) {
+                    messageBuilder = messageComponentBuilder.apply(messageBuilder);
+                }
+
+                return Tag.inserting(messageBuilder.build());
+            });
         }
 
-        private Component buildSubcomponent(FPlayer fReceiver) {
+        private Component buildSubcomponent(FPlayer fReceiver, String message) {
             return destination.getSubtext().isEmpty()
                     ? Component.empty()
-                    : messagePipeline.builder(fPlayer, fReceiver, destination.getSubtext()).build();
+                    : messagePipeline.builder(fPlayer, fReceiver, destination.getSubtext())
+                    .tagResolvers(messageTag(message))
+                    .build();
         }
 
-        private Component buildFormatComponent(FPlayer fReceiver) {
+        private Component buildFormatComponent(FPlayer fReceiver, String message) {
             String format = resolveString(fReceiver, this.format);
             if (format == null) return Component.empty();
 
             MessagePipeline.Builder formatBuilder = messagePipeline
                     .builder(fPlayer, fReceiver, format)
-                    .translate(resolveString(fReceiver, this.message), format.contains("message_to_translate"))
-                    .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(fReceiver));
+                    .translate(message, format.contains("<translate>"))
+                    .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(fReceiver))
+                    .tagResolvers(messageTag(message));
 
             if (formatComponentBuilder != null) {
                 formatBuilder = formatComponentBuilder.apply(formatBuilder);
@@ -415,56 +430,37 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             return formatBuilder.build();
         }
 
-        private Component buildMessageComponent(FPlayer fReceiver) {
-            String message = resolveString(fReceiver, this.message);
-            if (message == null) return Component.empty();
-
-            MessagePipeline.Builder messageBuilder = messagePipeline.builder(fPlayer, fReceiver, message);
-
-            if (messageComponentBuilder != null) {
-                messageBuilder = messageComponentBuilder.apply(messageBuilder);
-            } else {
-                messageBuilder = messageBuilder
-                        .userMessage(true)
-                        .mention(true);
-            }
-
-            return messageBuilder.build();
-        }
-
         public void sendToIntegrations() {
             if (tag == null) return;
             if (integrationString == null) return;
             if (range != Range.SERVER && range != Range.PROXY) return;
             if (!integrationModule.hasMessenger()) return;
 
-            Component component = messagePipeline.builder(fPlayer, FPlayer.UNKNOWN, resolveString(FPlayer.UNKNOWN, format))
+            Component componentFormat = messagePipeline.builder(fPlayer, FPlayer.UNKNOWN, resolveString(FPlayer.UNKNOWN, format))
                     .translate(false)
                     .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(FPlayer.UNKNOWN))
                     .build();
 
             String message = resolveString(FPlayer.UNKNOWN, this.message);
-            if (message != null) {
-                component = component.replaceText(TextReplacementConfig.builder()
-                        .match("<message>")
-                        .replacement(messagePipeline
-                                .builder(fPlayer, FPlayer.UNKNOWN, message)
-                                .translate(false)
-                                .userMessage(true)
-                                .mention(false)
-                                .interactiveChat(false)
-                                .question(false)
-                                .build()
-                        )
-                        .build()
-                );
-            }
+            Component componentMessage = message == null
+                    ? Component.empty()
+                    : messagePipeline
+                    .builder(fPlayer, FPlayer.UNKNOWN, message)
+                    .translate(false)
+                    .userMessage(true)
+                    .mention(false)
+                    .interactiveChat(false)
+                    .question(false)
+                    .build();
 
-            String finalMessage = PlainTextComponentSerializer.plainText().serialize(component);
+            PlainTextComponentSerializer serializer = PlainTextComponentSerializer.plainText();
+            String finalFormattedMessage = serializer.serialize(componentFormat)
+                    .replace("<message>", serializer.serialize(componentMessage));
+
             UnaryOperator<String> interfaceReplaceString = s -> integrationString.apply(s)
                     .replace("<player>", fPlayer.getName())
-                    .replace("<final_message>", finalMessage)
-                    .replace("<final_clear_message>", finalMessage.replaceAll("[\\p{C}\\p{So}\\x{E0100}-\\x{E01EF}]+", ""));
+                    .replace("<final_message>", finalFormattedMessage)
+                    .replace("<final_clear_message>", finalClearMessagePattern.matcher(finalFormattedMessage).replaceAll(""));
 
             integrationModule.sendMessage(fPlayer, tag, interfaceReplaceString);
         }
