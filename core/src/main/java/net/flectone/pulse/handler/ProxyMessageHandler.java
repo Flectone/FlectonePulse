@@ -137,6 +137,7 @@ public class ProxyMessageHandler {
             case COMMAND_BAN -> handleBanCommand(input, fEntity);
             case COMMAND_BROADCAST -> handleBroadcastCommand(input, fEntity);
             case COMMAND_CHATCOLOR -> handleChatColorCommand(fEntity);
+            case COMMAND_CHATSTYLE -> handleChatStyleCommand(fEntity);
             case COMMAND_COIN -> handleCoinCommand(input, fEntity);
             case COMMAND_DICE -> handleDiceCommand(input, fEntity);
             case COMMAND_DO -> handleDoCommand(input, fEntity);
@@ -262,6 +263,10 @@ public class ProxyMessageHandler {
 
     private void handleChatColorCommand(FEntity fEntity) {
         fPlayerService.loadColors(fPlayerService.getFPlayer(fEntity.getUuid()));
+    }
+
+    private void handleChatStyleCommand(FEntity fEntity) {
+        fPlayerService.loadSettings(fPlayerService.getFPlayer(fEntity.getUuid()));
     }
 
     private void handleCoinCommand(DataInputStream input, FEntity fEntity) throws IOException {

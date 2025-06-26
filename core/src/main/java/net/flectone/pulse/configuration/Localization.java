@@ -47,9 +47,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
         time.permanent = "НАВСЕГДА";
         time.zero = "0с";
 
-        command.dice.format = "<fcolor:1>✎ <display_name> кинул кубики <message> (<sum>)";
+        command.dice.format = "<fcolor:1>✎ <display_name> кинул кубики <style><message><reset> <fcolor:1>(<sum>)";
 
-        command.ball.format = "<color:#9370DB>❓ <display_name> спросил: <message> <br>🔮 Магический шар: <u><answer></u>";
+        command.ball.format = "<color:#9370DB>❓ <display_name> спросил: <style><message><reset> <color:#9370DB><br>🔮 Магический шар: <u><answer></u>";
         command.ball.answers.clear();
         command.ball.answers.addAll(List.of(
                 "Бесспорно",
@@ -82,11 +82,14 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         command.coin.head = "орёл";
         command.coin.tail = "решка";
-        command.coin.format = "<fcolor:1>✎ <display_name> подбросил монетку - <result>";
+        command.coin.format = "<fcolor:1>✎ <display_name> подбросил монетку - <style><result>";
         command.coin.formatDraw = "<fcolor:1>✎ <display_name> неудачно подбросил монетку ребром :)";
 
         command.translateto.nullOrError = "<color:#ff7171><b>⁉</b> Ошибка, возможно указан неправильный язык";
-        command.translateto.format = "<fcolor:1>📖 Перевод на [<language>] → <fcolor:2><message>";
+        command.translateto.format = "<fcolor:1>📖 Перевод на [<language>] → <fcolor:2><style><message>";
+
+        command.chatstyle.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
+        command.chatstyle.format = "<fcolor:1>💬 Теперь твой <style>стиль выглядит так";
 
         command.clearchat.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.clearchat.format = "<fcolor:1>\uD83D\uDCAC Чат очищен";
@@ -95,7 +98,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.geolocate.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.geolocate.format = "<fcolor:1>Геолокация <display_name><br>Страна: <fcolor:2><country><br><fcolor:1>Регион: <fcolor:2><region_name><br><fcolor:1>Город: <fcolor:2><city><br><fcolor:1>Часовой пояс: <fcolor:2><timezone><br><fcolor:1>Мобильный интернет? <fcolor:2><mobile><br><fcolor:1>ВПН? <fcolor:2><proxy><br><fcolor:1>Хостинг? <fcolor:2><hosting><br><fcolor:1>Айпи: <fcolor:2><query>";
 
-        command.broadcast.format = "<color:#ffd500>🕫 Сообщение для всех от <display_name> <br>❝ <message> ❠";
+        command.broadcast.format = "<br><color:#ffd500>│ \uD83D\uDD6B Сообщение для всех <br>│<br>│ Автор <display_name> <br>│<br>│ <fcolor:1><style><message> <br>";
 
         command.spy.formatLog = "<fcolor:1>[👁] <display_name> <color:#98FB98><action> <fcolor:1>→ <fcolor:2><message>";
         command.spy.formatTrue = "<fcolor:1>[👁] Ты <color:#98FB98>включил <fcolor:1>слежку";
@@ -113,13 +116,13 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.kick.person = "<color:#ff7171>🔒 КИК 🔒 <fcolor:1><br><br>Айди: <id><br><br>Дата: <date><br><br>Модератор: <moderator><br><br>Причина: <reason>";
 
         command.helper.nullHelper = "<color:#ff7171><b>⁉</b> Сейчас нет людей, кто бы смог помочь";
-        command.helper.global = "<fcolor:2>👤 <display_name> просит помощи ⏩ <fcolor:1><message>";
+        command.helper.global = "<fcolor:2>👤 <display_name> просит помощи ⏩ <fcolor:1><style><message>";
         command.helper.player = "<fcolor:2>👤 Запрос отправлен, ожидай ответа";
 
         command.tell.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.tell.sender = "<fcolor:2>✉ Ты → <display_name> » <fcolor:1><message>";
         command.tell.receiver = "<fcolor:2>✉ <display_name> → Тебе » <fcolor:1><message>";
-        command.tell.myself = "<fcolor:2>✉ [Заметка] <fcolor:1><message>";
+        command.tell.myself = "<fcolor:2>✉ [Заметка] <fcolor:1><style><message>";
 
         command.reply.nullReceiver = "<color:#ff7171><b>⁉</b> Некому отвечать";
 
@@ -128,7 +131,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.poll.nullPoll = "<color:#ff7171><b>⁉</b> Голосование не найдено";
         command.poll.voteTrue = "<color:#4eff52>👍 Ты выбрал <answer_id> в голосовании #<id>. Всего таких голосов <count>";
         command.poll.voteFalse = "<color:#ff4e4e>\uD83D\uDD93 Ты передумал об <answer_id> в голосовании #<id>. Всего таких голосов <count> без тебя";
-        command.poll.format = "<br><color:#fce303>│ <status> <br>│ <message> <br>├─────────────<br><answers>";
+        command.poll.format = "<br><color:#fce303>│ <status> <br>│ <style><message><reset> <color:#fce303><br>├─────────────<br><answers>";
         command.poll.status.start = "Создано новое голосование #<b><id></b>";
         command.poll.status.run = "Идёт голосование #<b><id></b>";
         command.poll.status.end = "Голосование #<b><id></b> завершено";
@@ -259,11 +262,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.chatsetting.disable.he = "<color:#ff7171><b>⁉</b> Он выключил команду с помощью /chatsetting";
         command.chatsetting.disable.server = "<color:#ff7171><b>⁉</b> Команда отключена на сервере";
 
-        command.symbol.format = "<click:suggest_command:\"<message>\"><fcolor:2>\uD83D\uDDA5 Нажми, чтобы использовать: <fcolor:1><message>";
+        command.symbol.format = "<click:suggest_command:\"<message>\"><fcolor:2>\uD83D\uDDA5 Нажми, чтобы использовать: <fcolor:1><style><message>";
 
         command.mail.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
-        command.mail.sender = "<fcolor:2>✉ Письмо #<id> для <display_name> » <fcolor:1><message>";
-        command.mail.receiver = "<fcolor:2>✉ Письмо от <display_name> » <fcolor:1><message>";
+        command.mail.sender = "<fcolor:2>✉ Письмо #<id> для <display_name> » <fcolor:1><style><message>";
+        command.mail.receiver = "<fcolor:2>✉ Письмо от <display_name> » <fcolor:1><style><message>";
 
         command.clearmail.nullMail = "<color:#ff7171><b>⁉</b> Письма не найдено";
         command.clearmail.format = "<fcolor:2>✉ [УДАЛЕНО] Письмо #<id> для <display_name> » <fcolor:1><message>";
@@ -365,8 +368,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.chat.types.clear();
         message.chat.types.putAll(Map.of(
-                "local", "<display_name><fcolor:3>: <message> <translate>",
-                "global", "<display_name> <world_prefix>»<fcolor:4> <message> <translate>"
+                "local", "<display_name><fcolor:3>: <style><message> <translate>",
+                "global", "<display_name> <world_prefix>»<fcolor:4> <style><message> <translate>"
         ));
         message.chat.nullChat = "<color:#ff7171><b>⁉</b> На сервер выключен чат";
         message.chat.nullReceiver = "<color:#ff7171><b>⁉</b> Тебя никто не услышал";
@@ -664,6 +667,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Chatcolor chatcolor = new Chatcolor();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatsetting/")})
         private Chatsetting chatsetting = new Chatsetting();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatstyle/")})
+        private Chatstyle chatstyle = new Chatstyle();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearchat/")})
         private Clearchat clearchat = new Clearchat();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearmail/")})
@@ -733,7 +738,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Ball implements SubCommandConfig, Localizable {
-            private String format = "<color:#9370DB>❓ <display_name> asked: <message> <br>\uD83D\uDD2E Ball answered: <u><answer></u>";
+            private String format = "<color:#9370DB>❓ <display_name> asked: <style><message><reset> <color:#9370DB><br>\uD83D\uDD2E Ball answered: <u><answer></u>";
             private List<String> answers = new LinkedList<>(){
                 {
                     push("Undeniably");
@@ -798,7 +803,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Broadcast implements SubCommandConfig, Localizable {
-            private String format = "<color:#fce303>\uD83D\uDD6B Message for all from <display_name> <br>❝ <message> ❠";
+            private String format = "<br><color:#ffd500>│ \uD83D\uDD6B Message for everyone <br>│<br>│ Author <display_name> <br>│<br>│ <fcolor:1><style><message> <br>";
         }
 
         @Getter
@@ -863,6 +868,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
         }
 
         @Getter
+        public static final class Chatstyle implements SubCommandConfig, Localizable {
+            private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
+            private String format = "<fcolor:1>💬 Now your <style>style is like this";
+        }
+
+        @Getter
         public static final class Clearchat implements SubCommandConfig, Localizable {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String format = "<fcolor:1>💬 Chat is cleared";
@@ -878,7 +889,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         public static final class Coin implements SubCommandConfig, Localizable {
             private String head = "heads";
             private String tail = "tails";
-            private String format = "<fcolor:1>✎ <display_name> player got <result>";
+            private String format = "<fcolor:1>✎ <display_name> player got <style><result>";
             private String formatDraw = "<fcolor:1>✎ <display_name> player got edge :)";
         }
 
@@ -894,12 +905,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
                     put(6, "⚅");
                 }
             };
-            private String format = "<fcolor:1>✎ <display_name> roll <message> (<sum>)";
+            private String format = "<fcolor:1>✎ <display_name> roll <style><message><reset> <fcolor:1>(<sum>)";
         }
 
         @Getter
         public static final class Do implements SubCommandConfig, Localizable {
-            private String format = "<fcolor:1>✎ <message> (<i><display_name></i>)";
+            private String format = "<fcolor:1>✎ <style><message><reset> <fcolor:1>(<i><display_name></i>)";
         }
 
         @Getter
@@ -919,7 +930,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Helper implements SubCommandConfig, Localizable {
             private String nullHelper = "<color:#ff7171><b>⁉</b> There are no people who can help you";
-            private String global = "<fcolor:2>👤 <display_name> needs help ⏩ <fcolor:1><message>";
+            private String global = "<fcolor:2>👤 <display_name> needs help ⏩ <fcolor:1><style><message>";
             private String player = "<fcolor:2>👤 Request sent, awaiting reply";
         }
 
@@ -958,8 +969,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Mail implements SubCommandConfig, Localizable {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
-            private String sender = "<fcolor:2>✉ Mail #<id> for <display_name> » <fcolor:1><message>";
-            private String receiver = "<fcolor:2>✉ Mail from <display_name> » <fcolor:1><message>";
+            private String sender = "<fcolor:2>✉ Mail #<id> for <display_name> » <fcolor:1><style><message>";
+            private String receiver = "<fcolor:2>✉ Mail from <display_name> » <fcolor:1><style><message>";
         }
 
         @Getter
@@ -973,7 +984,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Me implements SubCommandConfig, Localizable {
-            private String format = "<fcolor:1>✎ <display_name> <message>";
+            private String format = "<fcolor:1>✎ <display_name> <fcolor:1><style><message>";
         }
 
         @Getter
@@ -1029,7 +1040,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String already = "<color:#ff7171><b>⁉</b> You have already voted in this poll";
             private String voteTrue = "<color:#4eff52>👍 You voted for <answer_id> in poll #<id>. There are <count> of you";
             private String voteFalse = "<color:#ff4e4e>🖓 You rejected <answer_id> in poll #<id>. There are <count> without you";
-            private String format = "<br><color:#fce303>│ <status> <br>│ <message> <br>├─────────────<br><answers>";
+            private String format = "<br><color:#fce303>│ <status> <br>│ <style><message><reset> <color:#fce303><br>├─────────────<br><answers>";
             private String answerTemplate = "<color:#fce303>│ <count> → <color:#4eff52><hover:show_text:\"<color:#4eff52>Vote for <bold><answer>\"><click:run_command:\"/pollvote <id> <number>\"><answer> [👍]<br>";
             private Status status = new Status();
 
@@ -1087,7 +1098,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Symbol implements SubCommandConfig, Localizable {
-            private String format = "<click:suggest_command:\"<message>\"><fcolor:2>🖥 Click for using: <fcolor:1><message>";
+            private String format = "<click:suggest_command:\"<message>\"><fcolor:2>🖥 Click for using: <fcolor:1><style><message>";
         }
 
         @Getter
@@ -1095,7 +1106,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String sender = "<fcolor:2>✉ You → <display_name> » <fcolor:1><message>";
             private String receiver = "<fcolor:2>✉ <display_name> → You » <fcolor:1><message>";
-            private String myself = "<fcolor:2>✉ [Note] <fcolor:1><message>";
+            private String myself = "<fcolor:2>✉ [Note] <fcolor:1><style><message>";
         }
 
         @Getter
@@ -1132,13 +1143,13 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Translateto implements SubCommandConfig, Localizable {
             private String nullOrError = "<color:#ff7171><b>⁉</b> Error, you may have specified an unsupported language";
-            private String format = "<fcolor:1>📖 Translation to [<language>] → <fcolor:2><message>";
+            private String format = "<fcolor:1>📖 Translation to [<language>] → <fcolor:2><style><message>";
         }
 
         @Getter
         public static final class Try implements SubCommandConfig, Localizable {
-            private String formatTrue = "<color:#98FB98>☺ <display_name> <message> <percent>%";
-            private String formatFalse = "<color:#F08080>☹ <display_name> <message> <percent>%";
+            private String formatTrue = "<color:#98FB98>☺ <display_name> <style><message><reset> <color:#98FB98><percent>%";
+            private String formatFalse = "<color:#F08080>☹ <display_name> <style><message><reset> <color:#98FB98><percent>%";
         }
 
         @Getter
@@ -1586,8 +1597,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String nullReceiver = "<color:#ff7171><b>⁉</b> Nobody heard you";
             private Map<String, String> types = new LinkedHashMap<>(){
                 {
-                    put("global", "<display_name> <world_prefix>»<fcolor:4> <message> <translate>");
-                    put("local", "<display_name><fcolor:3>: <message> <translate>");
+                    put("global", "<display_name> <world_prefix>»<fcolor:4> <style><message> <translate>");
+                    put("local", "<display_name><fcolor:3>: <style><message> <translate>");
                 }
             };
         }

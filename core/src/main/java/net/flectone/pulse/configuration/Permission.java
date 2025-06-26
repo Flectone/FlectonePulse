@@ -65,6 +65,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Chatcolor chatcolor = new Chatcolor();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatsetting/")})
         private Chatsetting chatsetting = new Chatsetting();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatstyle/")})
+        private Chatstyle chatstyle = new Chatstyle();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearchat/")})
         private Clearchat clearchat = new Clearchat();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearmail/")})
@@ -231,6 +233,15 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                 private String name = "flectonepulse.module.command.chatsetting";
                 private Type type = Type.TRUE;
             }
+        }
+
+        @Getter
+        public static final class Chatstyle implements SubCommandConfig, IPermission {
+            private String name = "flectonepulse.module.command.chatstyle";
+            private Type type = Type.OP;
+            private PermissionEntry other = new PermissionEntry("flectonepulse.module.command.chatstyle.other", Type.OP);
+            private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.chatstyle.cooldown.bypass", Type.OP);
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.chatstyle.sound", Type.TRUE);
         }
 
         @Getter

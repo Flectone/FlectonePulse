@@ -57,6 +57,8 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     private Chatcolor chatcolor = new Chatcolor();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatsetting/")})
     private Chatsetting chatsetting = new Chatsetting();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatstyle/")})
+    private Chatstyle chatstyle = new Chatstyle();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearchat/")})
     private Clearchat clearchat = new Clearchat();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearmail/")})
@@ -235,6 +237,15 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
             private int slot = -1;
             private List<String> materials = new ArrayList<>();
         }
+    }
+
+    @Getter
+    public static final class Chatstyle implements SubCommandConfig, ICommandFile {
+        private boolean enable = true;
+        private List<String> aliases = new ArrayList<>(List.of("chatstyle"));
+        private Destination destination = new Destination();
+        private Cooldown cooldown = new Cooldown();
+        private Sound sound = new Sound();
     }
 
     @Getter
