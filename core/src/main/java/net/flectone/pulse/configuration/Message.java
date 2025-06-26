@@ -240,7 +240,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             @NoArgsConstructor
             public static final class NullReceiver {
                 private boolean enable = true;
-                private Destination destination = new Destination(Destination.Type.ACTION_BAR);
+                private Destination destination = new Destination(Destination.Type.ACTION_BAR, new Times(0, 20, 0));
 
                 public NullReceiver(boolean enable) {
                     this.enable = enable;
