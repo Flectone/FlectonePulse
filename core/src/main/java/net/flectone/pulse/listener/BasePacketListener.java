@@ -62,7 +62,7 @@ public class BasePacketListener extends AbstractPacketListener {
         if (uuid == null) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
-        platformPlayerAdapter.onJoin(fPlayer);
+        platformPlayerAdapter.onJoin(fPlayer, false);
     }
 
     @Override

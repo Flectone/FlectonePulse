@@ -67,12 +67,13 @@ public class FPlayerService {
 
         platformPlayerAdapter.getOnlinePlayers().forEach(uuid -> {
             String name = platformPlayerAdapter.getName(uuid);
-            addFPlayer(uuid, name);
-            loadData(uuid);
+            FPlayer fPlayer = addFPlayer(uuid, name);
+            loadData(fPlayer);
+            platformPlayerAdapter.onJoin(fPlayer, true);
         });
     }
 
-    public boolean addFPlayer(UUID uuid, String name) {
+    public FPlayer addFPlayer(UUID uuid, String name) {
         // insert to database
         boolean isNew = fPlayerRepository.save(uuid, name);
 
@@ -95,12 +96,15 @@ public class FPlayerService {
         // add player to online cache and remove from offline
         fPlayerRepository.add(fPlayer);
 
-        return isNew;
+        return fPlayer;
     }
 
     public void loadData(UUID uuid) {
         FPlayer fPlayer = getFPlayer(uuid);
+        loadData(fPlayer);
+    }
 
+    public void loadData(FPlayer fPlayer) {
         fPlayer.setOnline(true);
 
         // load player data

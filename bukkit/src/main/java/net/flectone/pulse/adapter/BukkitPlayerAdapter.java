@@ -343,13 +343,16 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public void onJoin(@NotNull FPlayer fPlayer) {
+    public void onJoin(@NotNull FPlayer fPlayer, boolean silent) {
         injector.getInstance(WorldModule.class).update(fPlayer);
         injector.getInstance(AfkModule.class).remove("", fPlayer);
         injector.getInstance(StreamModule.class).setStreamPrefix(fPlayer, fPlayer.isSetting(FPlayer.Setting.STREAM));
-        injector.getInstance(JoinModule.class).send(fPlayer, true);
 
-        onJoinLater(fPlayer);
+        if (!silent) {
+            injector.getInstance(JoinModule.class).send(fPlayer, true);
+        }
+
+        onJoinLater(fPlayer, silent);
     }
 
     @Override
@@ -367,8 +370,11 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Async(delay = 10L)
-    public void onJoinLater(FPlayer fPlayer) {
-        injector.getInstance(GreetingModule.class).send(fPlayer);
+    public void onJoinLater(FPlayer fPlayer, boolean silent) {
+        if (!silent) {
+            injector.getInstance(GreetingModule.class).send(fPlayer);
+        }
+
         injector.getInstance(MailModule.class).send(fPlayer);
         injector.getInstance(ScoreboardModule.class).update(fPlayer);
         injector.getInstance(BelownameModule.class).update(fPlayer);

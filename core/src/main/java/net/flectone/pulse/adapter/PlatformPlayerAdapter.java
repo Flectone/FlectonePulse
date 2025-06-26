@@ -78,7 +78,7 @@ public interface PlatformPlayerAdapter {
 
     // Player management
     void clear(@NotNull FPlayer fPlayer);
-    void onJoin(@NotNull FPlayer fPlayer);
+    void onJoin(@NotNull FPlayer fPlayer, boolean silent);
     void onQuit(@NotNull FPlayer fPlayer);
     @NotNull List<UUID> getOnlinePlayers();
     @NotNull List<UUID> getNearbyEntities(FPlayer fPlayer, double x, double y, double z);
