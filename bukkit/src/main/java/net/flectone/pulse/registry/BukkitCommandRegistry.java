@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import io.leangen.geantyref.TypeToken;
 import net.flectone.pulse.adapter.BukkitServerAdapter;
 import net.flectone.pulse.annotation.Sync;
+import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.handler.CommandExceptionHandler;
 import net.flectone.pulse.mapper.FPlayerMapper;
 import net.flectone.pulse.model.FPlayer;
@@ -38,9 +39,10 @@ public class BukkitCommandRegistry extends CommandRegistry {
     @Inject
     public BukkitCommandRegistry(CommandParserRegistry parsers,
                                  CommandExceptionHandler commandExceptionHandler,
+                                 PermissionChecker permissionChecker,
                                  Plugin plugin,
                                  FPlayerMapper fPlayerMapper) {
-        super(parsers);
+        super(parsers, permissionChecker);
 
         this.manager = new LegacyPaperCommandManager<>(plugin, ExecutionCoordinator.asyncCoordinator(), fPlayerMapper);
 

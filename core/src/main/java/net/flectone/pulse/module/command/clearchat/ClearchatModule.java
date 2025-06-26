@@ -2,7 +2,6 @@ package net.flectone.pulse.module.command.clearchat;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.NonNull;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
@@ -14,9 +13,7 @@ import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
-import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 
-import java.util.Collections;
 import java.util.Optional;
 
 @Singleton
@@ -65,17 +62,9 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
         commandRegistry.registerCommand(manager ->
                 manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
                         .permission(permission.getName())
-                        .optional(promptPlayer, commandRegistry.playerParser(), playerSuggestionPermission())
+                        .optional(promptPlayer, commandRegistry.playerParser(), commandRegistry.playerSuggestionPermission(permission.getOther()))
                         .handler(this)
         );
-    }
-
-    private @NonNull BlockingSuggestionProvider<FPlayer> playerSuggestionPermission() {
-        return (context, input) -> {
-            if (!permissionChecker.check(context.sender(), permission.getOther())) return Collections.emptyList();
-
-            return commandRegistry.playerParser().parser().suggestionProvider().suggestionsFuture(context, input).join();
-        };
     }
 
     @Override

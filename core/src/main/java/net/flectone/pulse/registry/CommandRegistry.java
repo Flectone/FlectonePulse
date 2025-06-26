@@ -1,13 +1,17 @@
 package net.flectone.pulse.registry;
 
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.Pair;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.parser.ParserDescriptor;
+import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -17,9 +21,12 @@ public abstract class CommandRegistry {
     private final Set<String> registeredCommands = new HashSet<>();
 
     private final CommandParserRegistry parsers;
+    private final PermissionChecker permissionChecker;
 
-    public CommandRegistry(CommandParserRegistry parsers) {
+    public CommandRegistry(CommandParserRegistry parsers,
+                           PermissionChecker permissionChecker) {
         this.parsers = parsers;
+        this.permissionChecker = permissionChecker;
     }
 
     public void reload() {
@@ -101,5 +108,13 @@ public abstract class CommandRegistry {
 
     public @NonNull ParserDescriptor<FPlayer, String> colorParser() {
         return parsers.colorParser();
+    }
+
+    public @NonNull BlockingSuggestionProvider<FPlayer> playerSuggestionPermission(Permission.IPermission permission) {
+        return (context, input) -> {
+            if (!permissionChecker.check(context.sender(), permission)) return Collections.emptyList();
+
+            return playerParser().parser().suggestionProvider().suggestionsFuture(context, input).join();
+        };
     }
 }
