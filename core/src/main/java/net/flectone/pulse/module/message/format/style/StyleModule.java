@@ -44,8 +44,10 @@ public class StyleModule extends AbstractModule implements MessageProcessor {
 
         String style = sender.getSettingValue(FPlayer.Setting.STYLE);
 
+        // only possible solution
         String message = messageContext.getMessage()
-                .replace("<style>", style == null ? "" : style);
+                .replace("<style>", style == null ? "" : style)
+                .replace("</style>", "");
 
         messageContext.setMessage(message);
     }
