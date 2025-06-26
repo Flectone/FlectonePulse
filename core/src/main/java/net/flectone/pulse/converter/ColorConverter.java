@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.util.logging.FLogger;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -87,6 +88,21 @@ public class ColorConverter {
         legacyHexMap.put("&d", "#FF55FF");
         legacyHexMap.put("&e", "#FFFF55");
         legacyHexMap.put("&f", "#FFFFFF");
+    }
+
+    @Nullable
+    public String convertOrDefault(String color, @Nullable String value) {
+        if (color == null) return value;
+
+        if (color.startsWith("#") && color.length() == 7) {
+            return color;
+        }
+
+        if (color.startsWith("&")) {
+            return legacyHexMap.getOrDefault(color, value);
+        }
+
+        return minecraftHexMap.getOrDefault(color, value);
     }
 
     public int parseHexToArgb(String hex) {

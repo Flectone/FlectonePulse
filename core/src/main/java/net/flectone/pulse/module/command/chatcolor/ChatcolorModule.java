@@ -154,15 +154,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
                 break;
             }
 
-            String inputColor = inputColors[i];
-
-            if (inputColor.startsWith("#") && inputColor.length() == 7) {
-                // all right
-            } else if (inputColor.startsWith("&")) {
-                inputColor = colorConverter.getLegacyHexMap().get(inputColor);
-            } else {
-                inputColor = colorConverter.getMinecraftHexMap().get(inputColor);
-            }
+            String inputColor = colorConverter.convertOrDefault(inputColors[i], null);
 
             if (inputColor == null) {
                 builder(fPlayer)
