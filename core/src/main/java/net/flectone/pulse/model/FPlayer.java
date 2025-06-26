@@ -93,6 +93,7 @@ public class FPlayer extends FEntity {
         setSetting(Setting.DISCORD);
         setSetting(Setting.TELEGRAM);
         setSetting(Setting.TWITCH);
+        setSetting(Setting.STYLE);
     }
 
     public boolean isSetting(Setting setting) {
@@ -152,6 +153,7 @@ public class FPlayer extends FEntity {
         TRY,
         TWITCH,
         WARN,
-        WORLD_PREFIX
+        WORLD_PREFIX,
+        STYLE
     }
 }

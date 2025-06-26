@@ -214,6 +214,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
                 put(FPlayer.Setting.ROCKPAPERSCISSORS, new SettingItem(28, List.of("LIME_CONCRETE", "RED_CONCRETE")));
                 put(FPlayer.Setting.SPY, new SettingItem(3, List.of("LIME_CONCRETE", "RED_CONCRETE")));
                 put(FPlayer.Setting.STREAM, new SettingItem(2, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+                put(FPlayer.Setting.STYLE, new SettingItem(32, List.of("YELLOW_CONCRETE")));
                 put(FPlayer.Setting.TELEGRAM, new SettingItem(30, List.of("LIME_CONCRETE", "RED_CONCRETE")));
                 put(FPlayer.Setting.TELL, new SettingItem(16, List.of("LIME_CONCRETE", "RED_CONCRETE")));
                 put(FPlayer.Setting.TICTACTOE, new SettingItem(19, List.of("LIME_CONCRETE", "RED_CONCRETE")));

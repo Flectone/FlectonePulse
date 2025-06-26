@@ -342,6 +342,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         private Scoreboard scoreboard = new Scoreboard();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/spoiler/")})
         private Spoiler spoiler = new Spoiler();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/style/")})
+        private Style style = new Style();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/translate/")})
         private Translate translate = new Translate();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/world/")})
@@ -533,6 +535,11 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         public static final class Spoiler implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
             private String color = "<fcolor:2>";
+        }
+
+        @Getter
+        public static final class Style implements SubFormatMessageConfig, Config.IEnable {
+            private boolean enable = true;
         }
 
         @Getter

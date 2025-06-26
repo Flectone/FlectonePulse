@@ -246,6 +246,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.chatsetting.items.put(FPlayer.Setting.ROCKPAPERSCISSORS, List.of(List.of("<fcolor:2>Команда /rockpaperscissors", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /rockpaperscissors", "<color:#ff7171>Скрыта")));
         command.chatsetting.items.put(FPlayer.Setting.SPY, List.of(List.of("<fcolor:2>Режим слежки", "<color:#98FB98>Включён"), List.of("<fcolor:2>Режим слежки", "<color:#ff7171>Выключен")));
         command.chatsetting.items.put(FPlayer.Setting.STREAM, List.of(List.of("<fcolor:2>Режим стримера", "<color:#98FB98>Включён"), List.of("<fcolor:2>Режим стримера", "<color:#ff7171>Выключен")));
+        command.chatsetting.items.put(FPlayer.Setting.STYLE, List.of(List.of("<fcolor:2>Стиль", "<fcolor:1>Выбран такой <style>стиль")));
         command.chatsetting.items.put(FPlayer.Setting.TELL, List.of(List.of("<fcolor:2>Команда /tell", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /tell", "<color:#ff7171>Скрыта")));
         command.chatsetting.items.put(FPlayer.Setting.TELEGRAM, List.of(List.of("<fcolor:2>Сообщения для/из Telegram", "<color:#98FB98>Показываются"), List.of("<fcolor:2>Сообщения для/из Telegram", "<color:#ff7171>Скрыты")));
         command.chatsetting.items.put(FPlayer.Setting.TICTACTOE, List.of(List.of("<fcolor:2>Команда /tictactoe", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /tictactoe", "<color:#ff7171>Скрыта")));
@@ -849,6 +850,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                     put(FPlayer.Setting.ROCKPAPERSCISSORS, List.of(List.of("<fcolor:2>Command /rockpaperscissors", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /rockpaperscissors", "<color:#ff7171>Display disabled")));
                     put(FPlayer.Setting.SPY, List.of(List.of("<fcolor:2>Spy", "<color:#98FB98>You're spying"), List.of("<fcolor:2>Spy", "<color:#ff7171>You're not spying")));
                     put(FPlayer.Setting.STREAM, List.of(List.of("<fcolor:2>Stream", "<color:#98FB98>You're streaming"), List.of("<fcolor:2>Stream", "<color:#ff7171>You don't stream")));
+                    put(FPlayer.Setting.STYLE, List.of(List.of("<fcolor:2>Style", "<fcolor:1>Your <style>style")));
                     put(FPlayer.Setting.TELL, List.of(List.of("<fcolor:2>Command /tell", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /tell", "<color:#ff7171>Display disabled")));
                     put(FPlayer.Setting.TELEGRAM, List.of(List.of("<fcolor:2>Messages for/from Telegram", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Messages for/from Telegram", "<color:#ff7171>Display disabled")));
                     put(FPlayer.Setting.TICTACTOE, List.of(List.of("<fcolor:2>Command /tictactoe", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /tictactoe", "<color:#ff7171>Display disabled")));

@@ -10,6 +10,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.module.message.format.style.StyleModule;
 import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.manager.FileManager;
@@ -88,6 +89,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         addChildren(NameModule.class);
         addChildren(QuestionAnswerModule.class);
         addChildren(ScoreboardModule.class);
+        addChildren(StyleModule.class);
         addChildren(SpoilerModule.class);
         addChildren(TranslateModule.class);
         addChildren(WorldModule.class);
