@@ -58,7 +58,7 @@ public class BelownameModule extends AbstractModule {
 
         Ticker ticker = message.getTicker();
         if (ticker.isEnable()) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::add), ticker.getPeriod());
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::update), ticker.getPeriod());
         }
     }
 
@@ -67,7 +67,7 @@ public class BelownameModule extends AbstractModule {
         return message.isEnable();
     }
 
-    public void add(FPlayer fPlayer) {
+    public void update(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());

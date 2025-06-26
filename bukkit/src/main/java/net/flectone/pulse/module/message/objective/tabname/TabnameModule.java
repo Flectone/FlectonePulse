@@ -58,7 +58,7 @@ public class TabnameModule extends AbstractModule {
 
         Ticker ticker = config.getTicker();
         if (ticker.isEnable()) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::add), ticker.getPeriod());
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::update), ticker.getPeriod());
         }
     }
 
@@ -67,7 +67,7 @@ public class TabnameModule extends AbstractModule {
         return config.isEnable();
     }
 
-    public void add(FPlayer fPlayer) {
+    public void update(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());

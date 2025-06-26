@@ -370,10 +370,9 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     public void onJoinLater(FPlayer fPlayer) {
         injector.getInstance(GreetingModule.class).send(fPlayer);
         injector.getInstance(MailModule.class).send(fPlayer);
-        injector.getInstance(ScoreboardModule.class).add(fPlayer);
-        injector.getInstance(BelownameModule.class).add(fPlayer);
-        injector.getInstance(TabnameModule.class).add(fPlayer);
         injector.getInstance(ScoreboardModule.class).update(fPlayer);
+        injector.getInstance(BelownameModule.class).update(fPlayer);
+        injector.getInstance(TabnameModule.class).update(fPlayer);
         injector.getInstance(PlayerlistnameModule.class).update();
         injector.getInstance(SidebarModule.class).send(fPlayer);
         injector.getInstance(FooterModule.class).send(fPlayer);
