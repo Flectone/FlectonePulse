@@ -340,7 +340,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         String material = enabled ? checkbox.getEnabledMaterial() : checkbox.getDisabledMaterial();
 
         Localization.Command.Chatsetting localization = resolveLocalization(fPlayer);
-        String title = localization.getCheckbox().getItems().getOrDefault(setting, "");
+        String title = localization.getCheckbox().getTypes().getOrDefault(setting, "");
         String lore = enabled ? localization.getCheckbox().getFormatEnable() : localization.getCheckbox().getFormatDisable();
 
         return inventoryBuilder

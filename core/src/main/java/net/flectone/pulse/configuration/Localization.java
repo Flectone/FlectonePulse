@@ -229,37 +229,37 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.chatsetting.inventory = "<reset>          Настройки чата";
         command.chatsetting.checkbox.formatEnable = "<color:#98FB98>Отображение включено";
         command.chatsetting.checkbox.formatDisable = "<color:#ff7171>Отображение выключено";
-        command.chatsetting.checkbox.items.clear();
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.ADVANCEMENT, "<fcolor:2>Достижения");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.AFK, "<fcolor:2>Команда /afk");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.AUTO, "<fcolor:2>Авто-сообщения");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.BALL, "<fcolor:2>Команда /ball");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.BAN, "<fcolor:2>Команда /ban");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.BROADCAST, "<fcolor:2>Команда /broadcast");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.COIN, "<fcolor:2>Команда /coin");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.DEATH, "<fcolor:2>Смерти");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.DICE, "<fcolor:2>Команда /dice");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.DISCORD, "<fcolor:2>Сообщения в/из Discord");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.DO, "<fcolor:2>Команда /do");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.GREETING, "<fcolor:2>Приветственное сообщение");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.JOIN, "<fcolor:2>Вход на сервер");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.KICK, "<fcolor:2>Команда /kick");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.MAIL, "<fcolor:2>Команда /mail");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.ME, "<fcolor:2>Команда /me");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.MUTE, "<fcolor:2>Команда /mute");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.POLL, "<fcolor:2>Команда /poll");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.QUIT, "<fcolor:2>Выход с сервера");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.REPLY, "<fcolor:2>Команда /reply");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.ROCKPAPERSCISSORS, "<fcolor:2>Команда /rockpaperscissors");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.SPY, "<fcolor:2>Режим слежки");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.STREAM, "<fcolor:2>Режим стримера");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.TELL, "<fcolor:2>Команда /tell");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.TELEGRAM, "<fcolor:2>Сообщения в/из Telegram");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.TICTACTOE, "<fcolor:2>Команда /tictactoe");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.TRANSLATETO, "<fcolor:2>Команда /translateto");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.TRY, "<fcolor:2>Команда /try");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.TWITCH, "<fcolor:2>Сообщения в/из Twitch");
-        command.chatsetting.checkbox.items.put(FPlayer.Setting.WARN, "<fcolor:2>Команда /warn");
+        command.chatsetting.checkbox.types.clear();
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.ADVANCEMENT, "<fcolor:2>Достижения");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.AFK, "<fcolor:2>Команда /afk");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.AUTO, "<fcolor:2>Авто-сообщения");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.BALL, "<fcolor:2>Команда /ball");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.BAN, "<fcolor:2>Команда /ban");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.BROADCAST, "<fcolor:2>Команда /broadcast");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.COIN, "<fcolor:2>Команда /coin");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.DEATH, "<fcolor:2>Смерти");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.DICE, "<fcolor:2>Команда /dice");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.DISCORD, "<fcolor:2>Сообщения в/из Discord");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.DO, "<fcolor:2>Команда /do");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.GREETING, "<fcolor:2>Приветственное сообщение");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.JOIN, "<fcolor:2>Вход на сервер");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.KICK, "<fcolor:2>Команда /kick");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.MAIL, "<fcolor:2>Команда /mail");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.ME, "<fcolor:2>Команда /me");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.MUTE, "<fcolor:2>Команда /mute");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.POLL, "<fcolor:2>Команда /poll");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.QUIT, "<fcolor:2>Выход с сервера");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.REPLY, "<fcolor:2>Команда /reply");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.ROCKPAPERSCISSORS, "<fcolor:2>Команда /rockpaperscissors");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.SPY, "<fcolor:2>Режим слежки");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.STREAM, "<fcolor:2>Режим стримера");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.TELL, "<fcolor:2>Команда /tell");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.TELEGRAM, "<fcolor:2>Сообщения в/из Telegram");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.TICTACTOE, "<fcolor:2>Команда /tictactoe");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.TRANSLATETO, "<fcolor:2>Команда /translateto");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.TRY, "<fcolor:2>Команда /try");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.TWITCH, "<fcolor:2>Сообщения в/из Twitch");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.WARN, "<fcolor:2>Команда /warn");
         command.chatsetting.menu.chat.item = "<fcolor:2>Тип чата <br><fcolor:1>Чат для просмотра и отправки сообщений <br><br><fcolor:1>Выбранный чат <fcolor:2><chat>";
         command.chatsetting.menu.chat.inventory = "<reset>                 Чаты";
         command.chatsetting.menu.chat.types.clear();
@@ -875,7 +875,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 private String formatEnable = "<color:#98FB98>Display enabled";
                 private String formatDisable = "<color:#ff7171>Display disabled";
 
-                private Map<FPlayer.Setting, String> items = new LinkedHashMap<>() {
+                private Map<FPlayer.Setting, String> types = new LinkedHashMap<>() {
                     {
                         put(FPlayer.Setting.ADVANCEMENT, "<fcolor:2>Advancement");
                         put(FPlayer.Setting.AFK, "<fcolor:2>Command /afk");
@@ -915,14 +915,14 @@ public final class Localization extends FileSerializable implements ModuleConfig
             @NoArgsConstructor
             public static final class Menu {
 
-                private Type chat = new Type("<fcolor:2>Chat type <br><fcolor:1>Chat for viewing and sending messages <br><br><fcolor:1>Your chat is <fcolor:2><chat>", "<reset>                 Chats", new LinkedHashMap<>() {
+                private SubMenu chat = new SubMenu("<fcolor:2>Chat type <br><fcolor:1>Chat for viewing and sending messages <br><br><fcolor:1>Your chat is <fcolor:2><chat>", "<reset>                 Chats", new LinkedHashMap<>() {
                     {
                         put("default", "<fcolor:2>Default chat<br><fcolor:1>You can see <fcolor:2>all</fcolor:2> chats and write to any chat");
                         put("local", "<fcolor:2>Local chat<br><fcolor:1>You can only write to <fcolor:2>local</fcolor:2> chat and see it");
                         put("global", "<fcolor:2>Global chat<br><fcolor:1>You can only write to <fcolor:2>global</fcolor:2> chat and see it");
                     }
                 });
-                private Type color = new Type("<fcolor:2>Colors <br><fcolor:1>Main colors of FlectonePulse <br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world! <br><br><u><color:#ff7171>Only you see it", "<reset>                Colors", new LinkedHashMap<>() {
+                private SubMenu color = new SubMenu("<fcolor:2>Colors <br><fcolor:1>Main colors of FlectonePulse <br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world! <br><br><u><color:#ff7171>Only you see it", "<reset>                Colors", new LinkedHashMap<>() {
                     {
                         put("default", "<fcolor:2>Default colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
                         put("white", "<fcolor:2>White colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
@@ -943,7 +943,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                         put("pink", "<fcolor:2>Pink colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
                     }
                 });
-                private Type style = new Type("<fcolor:2>Style <br><fcolor:1>Style of the messages you sent <br><br><fcolor:1>Your style is <gray><style>hello world! <br><br><u><color:#ff7171>Everyone sees it",  "<reset>                Styles", new LinkedHashMap<>() {
+                private SubMenu style = new SubMenu("<fcolor:2>Style <br><fcolor:1>Style of the messages you sent <br><br><fcolor:1>Your style is <gray><style>hello world! <br><br><u><color:#ff7171>Everyone sees it",  "<reset>                Styles", new LinkedHashMap<>() {
                     {
                         put("default", "<style>Default style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
                         put("white", "<style>White style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
@@ -968,7 +968,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 @Getter
                 @NoArgsConstructor
                 @AllArgsConstructor
-                public static class Type {
+                public static class SubMenu {
                     private String item;
                     private String inventory;
                     private Map<String, String> types;
