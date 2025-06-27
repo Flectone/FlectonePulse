@@ -177,7 +177,7 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         @Getter
         public static final class Chatcolor implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.chatcolor";
-            private Type type = Type.TRUE;
+            private Type type = Type.OP;
             private PermissionEntry other = new PermissionEntry("flectonepulse.module.command.chatcolor.other", Type.OP);
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.chatcolor.cooldown.bypass", Type.OP);
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.chatcolor.sound", Type.TRUE);
