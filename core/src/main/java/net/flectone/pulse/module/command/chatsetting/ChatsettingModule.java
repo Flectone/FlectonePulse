@@ -330,9 +330,9 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
 
     private Inventory.Builder handleCheckboxItem(FPlayer fPlayer, FPlayer.Setting setting, Inventory.Builder inventoryBuilder) {
         Command.Chatsetting.Checkbox checkbox = command.getCheckbox();
-        if (!checkbox.getItems().containsKey(setting)) return inventoryBuilder;
+        if (!checkbox.getTypes().containsKey(setting)) return inventoryBuilder;
 
-        int slot = checkbox.getItems().get(setting);
+        int slot = checkbox.getTypes().get(setting);
         if (slot == -1) return inventoryBuilder;
 
         boolean enabled = fPlayer.isSetting(setting);

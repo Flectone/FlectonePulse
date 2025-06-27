@@ -195,7 +195,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
             private String disabledMaterial = "RED_DYE";
             private String enabledMaterial = "LIME_DYE";
 
-            private Map<FPlayer.Setting, Integer> items = new LinkedHashMap<>() {
+            private Map<FPlayer.Setting, Integer> types = new LinkedHashMap<>() {
                 {
                     put(FPlayer.Setting.SPY, 9);
                     put(FPlayer.Setting.STREAM, 10);
