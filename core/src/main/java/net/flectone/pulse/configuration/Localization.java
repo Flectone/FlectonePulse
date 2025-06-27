@@ -1704,7 +1704,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Bubble implements SubMessageConfig, Localizable {
-            private String format = "<fcolor:3><message>";
+            private String format = "<fcolor:3><style><message>";
         }
 
         @Getter

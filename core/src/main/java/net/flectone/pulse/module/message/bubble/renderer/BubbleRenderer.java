@@ -31,7 +31,8 @@ import net.flectone.pulse.sender.PacketSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.RandomUtil;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -175,15 +176,16 @@ public class BubbleRenderer {
                 .mention(false)
                 .question(false)
                 .interactiveChat(false)
-                .build()
-                .replaceText(TextReplacementConfig.builder().match("<message>").replacement(
-                        messagePipeline.builder(bubble.getSender(), viewer, bubble.getRawMessage())
-                                .userMessage(true)
-                                .mention(false)
-                                .question(false)
-                                .interactiveChat(false)
+                .tagResolvers(TagResolver.resolver("message", (argumentQueue, context) ->
+                        Tag.inserting(messagePipeline.builder(bubble.getSender(), viewer, bubble.getRawMessage())
+                                        .userMessage(true)
+                                        .mention(false)
+                                        .question(false)
+                                        .interactiveChat(false)
                                 .build()
-                ).build());
+                        )
+                ))
+                .build();
     }
     
     private BubbleEntity createBubbleEntity(Bubble bubble, Component formattedMessage, FPlayer viewer) {
