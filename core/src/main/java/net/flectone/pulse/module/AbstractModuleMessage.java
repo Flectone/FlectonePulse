@@ -28,7 +28,6 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.DataOutputStream;
 import java.util.ArrayList;
@@ -38,8 +37,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
-
-import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 public abstract class AbstractModuleMessage<M extends Localization.Localizable> extends AbstractModule {
 
@@ -368,7 +365,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
                 // format: TheFaser > <message>
                 // message: hello world!
                 // final formatted message: TheFaser > hello world!
-                String message = resolveString(fReceiver, this.message);
+                Component message = buildMessageComponent(fReceiver);
                 Component format = buildFormatComponent(fReceiver, message);
 
                 // destination subtext
@@ -388,24 +385,11 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             });
         }
 
-        private TagResolver messageTag(@Nullable String message) {
-            String tag = "message";
-            if (message == null || message.isBlank()) return emptyTagResolver(tag);
-
-            return TagResolver.resolver(tag, (argumentQueue, context) -> {
-                MessagePipeline.Builder messageBuilder = messagePipeline.builder(fPlayer, fReceiver, message)
-                        .userMessage(true)
-                        .mention(true);
-
-                if (messageComponentBuilder != null) {
-                    messageBuilder = messageComponentBuilder.apply(messageBuilder);
-                }
-
-                return Tag.inserting(messageBuilder.build());
-            });
+        private TagResolver messageTag(Component message) {
+            return TagResolver.resolver("message", (argumentQueue, context) -> Tag.inserting(message));
         }
 
-        private Component buildSubcomponent(FPlayer fReceiver, String message) {
+        private Component buildSubcomponent(FPlayer fReceiver, Component message) {
             return destination.getSubtext().isEmpty()
                     ? Component.empty()
                     : messagePipeline.builder(fPlayer, fReceiver, destination.getSubtext())
@@ -413,15 +397,34 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
                     .build();
         }
 
-        private Component buildFormatComponent(FPlayer fReceiver, String message) {
+        private Component buildMessageComponent(FPlayer fReceiver) {
+            String message = resolveString(fReceiver, this.message);
+            if (message == null || message.isBlank()) return Component.empty();
+
+            MessagePipeline.Builder messageBuilder = messagePipeline.builder(fPlayer, fReceiver, message)
+                    .userMessage(true)
+                    .mention(!fReceiver.isUnknown());
+
+            if (messageComponentBuilder != null) {
+                messageBuilder = messageComponentBuilder.apply(messageBuilder);
+            }
+
+            return messageBuilder.build();
+        }
+
+        private Component buildFormatComponent(FPlayer fReceiver, Component message) {
             String format = resolveString(fReceiver, this.format);
             if (format == null) return Component.empty();
 
             MessagePipeline.Builder formatBuilder = messagePipeline
                     .builder(fPlayer, fReceiver, format)
-                    .translate(message, format.contains("<translate>"))
                     .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(fReceiver))
                     .tagResolvers(messageTag(message));
+
+            if (!fReceiver.isUnknown()) {
+                String messageToTranslate = resolveString(fReceiver, this.message);
+                formatBuilder = formatBuilder.translate(messageToTranslate, format.contains("<translate>"));
+            }
 
             if (formatComponentBuilder != null) {
                 formatBuilder = formatComponentBuilder.apply(formatBuilder);
