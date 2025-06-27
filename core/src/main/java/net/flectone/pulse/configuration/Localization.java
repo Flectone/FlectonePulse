@@ -551,14 +551,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.format.questionAnswer.questions.put("server", "<fcolor:2>[Вопрос-Ответ] @<player><fcolor:1>, это ванильный сервер в Майнкрафте!");
         message.format.questionAnswer.questions.put("flectone", "<fcolor:2>[Вопрос-Ответ] @<player><fcolor:1>, это бренд и проекты созданные TheFaser'ом");
 
-        message.gamemode.self.creative = "<fcolor:1>\uD83D\uDDD8 Твой режим игры изменён на <fcolor:2>Творческий режим";
-        message.gamemode.self.survival = "<fcolor:1>\uD83D\uDDD8 Твой режим игры изменён на <fcolor:2>Режим выживания";
-        message.gamemode.self.adventure = "<fcolor:1>\uD83D\uDDD8 Твой режим игры изменён на <fcolor:2>Режим приключения";
-        message.gamemode.self.spectator = "<fcolor:1>\uD83D\uDDD8 Твой режим игры изменён на <fcolor:2>Режим наблюдателя";
-        message.gamemode.other.creative = "<fcolor:1>\uD83D\uDDD8 Режим игры игрока <display_name> изменён на <fcolor:2>Творческий режим";
-        message.gamemode.other.survival = "<fcolor:1>\uD83D\uDDD8 Режим игры игрока <display_name> изменён на <fcolor:2>Режим выживания";
-        message.gamemode.other.adventure = "<fcolor:1>\uD83D\uDDD8 Режим игры игрока <display_name> изменён на <fcolor:2>Режим приключения";
-        message.gamemode.other.spectator = "<fcolor:1>\uD83D\uDDD8 Режим игры игрока <display_name> изменён на <fcolor:2>Режим наблюдателя";
+        message.gamemode.formatSelf = "<fcolor:1>\uD83D\uDDD8 Твой режим игры изменён на <fcolor:2><lang:gameMode.<gamemode>>";
+        message.gamemode.formatOther = "<fcolor:1>\uD83D\uDDD8 Режим игры игрока <display_name> изменён на <fcolor:2><lang:gameMode.<gamemode>>";
 
         message.greeting.format = "<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]  <fcolor:1>Привет,<br>[#][#][#][#][#][#][#][#]  <player><br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>";
 
@@ -1976,28 +1970,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Gamemode implements SubMessageConfig, Localizable {
 
-            private Type self = new Type(
-                    "<fcolor:1>🗘 Set own game mode to <fcolor:2>Creative Mode",
-                    "<fcolor:1>🗘 Set own game mode to <fcolor:2>Survival Mode",
-                    "<fcolor:1>🗘 Set own game mode to <fcolor:2>Adventure Mode",
-                    "<fcolor:1>🗘 Set own game mode to <fcolor:2>Spectator Mode"
-            );
+            private String formatSelf = "<fcolor:1>🗘 Set own game mode to <fcolor:2><lang:gameMode.<gamemode>>";
+            private String formatOther = "<fcolor:1>🗘 Set <display_name>'s game mode to <fcolor:2><lang:gameMode.<gamemode>>";
 
-            private Type other = new Type(
-                    "<fcolor:1>🗘 Set <display_name>'s game mode to <fcolor:2>Creative Mode",
-                    "<fcolor:1>🗘 Set <display_name>'s game mode to <fcolor:2>Survival Mode",
-                    "<fcolor:1>🗘 Set <display_name>'s game mode to <fcolor:2>Adventure Mode",
-                    "<fcolor:1>🗘 Set <display_name>'s game mode to <fcolor:2>Spectator Mode"
-            );
-
-            @Getter
-            @AllArgsConstructor
-            public static final class Type {
-                private String creative;
-                private String survival;
-                private String adventure;
-                private String spectator;
-            }
         }
 
         @Getter

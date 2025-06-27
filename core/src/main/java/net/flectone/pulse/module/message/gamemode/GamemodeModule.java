@@ -7,11 +7,12 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
-import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.gamemode.listener.GamemodePacketListener;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.MinecraftTranslationKeys;
 
 import java.util.UUID;
 
@@ -52,40 +53,22 @@ public class GamemodeModule extends AbstractModuleMessage<Localization.Message.G
     }
 
     @Async
-    public void send(UUID receiver, String key, String target) {
-        FPlayer fPlayer = fPlayerService.getFPlayer(receiver);
+    public void send(UUID sender, String gameModeKey, String target, MinecraftTranslationKeys key) {
+        FPlayer fPlayer = fPlayerService.getFPlayer(sender);
         if (checkModulePredicates(fPlayer)) return;
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) return;
 
         boolean isSelf = fPlayer.equals(fTarget);
+        String gamemode = gameModeKey.split("\\.")[1];
 
         // for sender
         builder(fTarget)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> getString(key, isSelf ? s.getSelf() : s.getOther()))
+                .format(s -> (isSelf ? s.getFormatSelf() : s.getFormatOther()).replace("<gamemode>", gamemode))
                 .sound(getSound())
                 .sendBuilt();
-
-        // for receiver
-        if (!isSelf) {
-            builder(fTarget)
-                    .destination(message.getDestination())
-                    .format(s -> getString(key, s.getSelf()))
-                    .sound(getSound())
-                    .sendBuilt();
-        }
-    }
-
-    private String getString(String key, Localization.Message.Gamemode.Type type) {
-        return switch (key.split("\\.")[1]) {
-            case "creative" -> type.getCreative();
-            case "survival" -> type.getSurvival();
-            case "adventure" -> type.getAdventure();
-            case "spectator" -> type.getSpectator();
-            default -> "";
-        };
     }
 }

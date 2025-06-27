@@ -29,6 +29,7 @@ public enum MinecraftTranslationKeys {
     COMMANDS_ENCHANT_SUCCESS_SINGLE("commands.enchant.success.single"),
     COMMANDS_GAMEMODE_SUCCESS_OTHER("commands.gamemode.success.other"),
     COMMANDS_GAMEMODE_SUCCESS_SELF("commands.gamemode.success.self"),
+    GAMEMODE_CHANGED("gameMode.changed"),
     COMMANDS_OP_SUCCESS("commands.op.success"),
     COMMANDS_SEED_SUCCESS("commands.seed.success"),
     COMMANDS_SETBLOCK_SUCCESS("commands.setblock.success"),
