@@ -119,7 +119,9 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     private Inventory.Builder handleChat(FPlayer fPlayer, Inventory.Builder inventoryBuilder) {
         Command.Chatsetting.Menu menu = command.getMenu();
         Command.Chatsetting.Menu.Chat chat = menu.getChat();
+
         int slot = chat.getSlot();
+        if (slot == -1) return inventoryBuilder;
 
         String currentChat = fPlayer.getSettingValue(FPlayer.Setting.CHAT);
         if (currentChat == null) {
@@ -196,7 +198,9 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     private Inventory.Builder handleColor(FPlayer fPlayer, Inventory.Builder inventoryBuilder) {
         Command.Chatsetting.Menu menu = command.getMenu();
         Command.Chatsetting.Menu.Color color = menu.getColor();
+
         int slot = color.getSlot();
+        if (slot == -1) return inventoryBuilder;
 
         String material = menu.getMaterial();
 
@@ -263,7 +267,9 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     private Inventory.Builder handleStyle(FPlayer fPlayer, Inventory.Builder inventoryBuilder) {
         Command.Chatsetting.Menu menu = command.getMenu();
         Command.Chatsetting.Menu.Style style = menu.getStyle();
+
         int slot = style.getSlot();
+        if (slot == -1) return inventoryBuilder;
 
         String material = menu.getMaterial();
 
@@ -327,6 +333,8 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         if (!checkbox.getItems().containsKey(setting)) return inventoryBuilder;
 
         int slot = checkbox.getItems().get(setting);
+        if (slot == -1) return inventoryBuilder;
+
         boolean enabled = fPlayer.isSetting(setting);
 
         String material = enabled ? checkbox.getEnabledMaterial() : checkbox.getDisabledMaterial();
