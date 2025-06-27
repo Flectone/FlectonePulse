@@ -113,6 +113,7 @@ public class FPlayer extends FEntity {
         return this.id == fPlayer.getId();
     }
 
+    @Override
     public boolean isUnknown() {
         return this.getId() == -1;
     }

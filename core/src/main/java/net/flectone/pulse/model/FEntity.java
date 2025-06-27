@@ -26,4 +26,8 @@ public class FEntity {
     public boolean equals(FEntity fEntity) {
         return this.uuid.equals(fEntity.getUuid());
     }
+
+    public boolean isUnknown() {
+        return this.uuid.equals(UNKNOWN_UUID);
+    }
 }
