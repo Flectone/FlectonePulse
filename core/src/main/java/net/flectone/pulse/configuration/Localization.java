@@ -266,7 +266,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.chatsetting.menu.chat.types.put("default", "<fcolor:2>Стандартный чат<br><fcolor:1>Ты можешь видеть <fcolor:2>все</fcolor:2> чаты и писать в любой чат");
         command.chatsetting.menu.chat.types.put("local", "<fcolor:2>Локальный чат<br><fcolor:1>Ты можешь писать только в <fcolor:2>локальный</fcolor:2> чат и видишь только его");
         command.chatsetting.menu.chat.types.put("global", "<fcolor:2>Глобальный чат<br><fcolor:1>Ты можешь писать только в <fcolor:2>глобальный</fcolor:2> чат и видишь только его");
-        command.chatsetting.menu.color.item = "<fcolor:2>Цвета <br><fcolor:1>Главные цвета FlectonePulse <br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир! <br><br><u><color:#ff7171>Только ты это видишь";
+        command.chatsetting.menu.color.item = "<fcolor:2>Цвета <br><fcolor:1>Главные цвета FlectonePulse <br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир! <br><br><u><color:#ff7171>Только ты это видишь";
         command.chatsetting.menu.color.inventory = "<reset>                Цвета";
         command.chatsetting.menu.color.types.clear();
         command.chatsetting.menu.color.types.put("default", "<fcolor:2>Стандартные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
@@ -922,7 +922,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                         put("global", "<fcolor:2>Global chat<br><fcolor:1>You can only write to <fcolor:2>global</fcolor:2> chat and see it");
                     }
                 });
-                private Type color = new Type("<fcolor:2>Colors <br><fcolor:1>Main colors of FlectonePulse <br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world! <br><br><u><color:#ff7171>Only you see it", "<reset>                Colors", new LinkedHashMap<>() {
+                private Type color = new Type("<fcolor:2>Colors <br><fcolor:1>Main colors of FlectonePulse <br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world! <br><br><u><color:#ff7171>Only you see it", "<reset>                Colors", new LinkedHashMap<>() {
                     {
                         put("default", "<fcolor:2>Default colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
                         put("white", "<fcolor:2>White colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
