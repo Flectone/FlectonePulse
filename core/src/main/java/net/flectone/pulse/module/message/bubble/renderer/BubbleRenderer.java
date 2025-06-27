@@ -171,20 +171,19 @@ public class BubbleRenderer {
     
     private Component createFormattedMessage(Bubble bubble, FPlayer viewer) {
         Localization.Message.Bubble localization = fileManager.getLocalization(viewer).getMessage().getBubble();
+
+        Component message = messagePipeline.builder(bubble.getSender(), viewer, bubble.getRawMessage())
+                .userMessage(true)
+                .mention(false)
+                .question(false)
+                .interactiveChat(false)
+                .build();
         
         return messagePipeline.builder(bubble.getSender(), viewer, localization.getFormat())
                 .mention(false)
                 .question(false)
                 .interactiveChat(false)
-                .tagResolvers(TagResolver.resolver("message", (argumentQueue, context) ->
-                        Tag.inserting(messagePipeline.builder(bubble.getSender(), viewer, bubble.getRawMessage())
-                                        .userMessage(true)
-                                        .mention(false)
-                                        .question(false)
-                                        .interactiveChat(false)
-                                .build()
-                        )
-                ))
+                .tagResolvers(TagResolver.resolver("message", (argumentQueue, context) -> Tag.inserting(message)))
                 .build();
     }
     
