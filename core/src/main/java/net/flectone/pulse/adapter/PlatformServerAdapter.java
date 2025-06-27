@@ -2,12 +2,9 @@ package net.flectone.pulse.adapter;
 
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.google.gson.JsonElement;
-import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.model.FPlayer;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 public interface PlatformServerAdapter {
 
@@ -85,19 +82,19 @@ public interface PlatformServerAdapter {
      */
     @NotNull Component translateItemName(Object item, boolean translatable);
 
-    /**
-     * Builds an ItemStack from configuration settings
-     *
-     * @param settingIndex The index of the setting
-     * @param fPlayer The player context for the item
-     * @param messages List of messages to include
-     * @param settingItem The item configuration
-     * @return Configured ItemStack
-     */
+
     @NotNull ItemStack buildItemStack(
-            int settingIndex,
             FPlayer fPlayer,
-            List<List<String>> messages,
-            Command.Chatsetting.SettingItem settingItem
+            String material,
+            String title,
+            String lore
     );
+
+    @NotNull ItemStack buildItemStack(
+            FPlayer fPlayer,
+            String material,
+            String title,
+            String[] lore
+    );
+
 }

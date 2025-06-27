@@ -13,7 +13,6 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
@@ -32,7 +31,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -130,56 +130,47 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
-    public @NotNull ItemStack buildItemStack(int settingIndex, @NotNull FPlayer fPlayer,
-                                             @NotNull List<List<String>> messages,
-                                             @NotNull Command.Chatsetting.SettingItem settingItem) {
-        List<String> itemMessages = messages.get(settingIndex);
+    public @NotNull ItemStack buildItemStack(FPlayer fPlayer, String material, String title, String lore) {
+        String[] stringsLore = lore.split("<br>");
 
-        Component name = buildItemNameComponent(fPlayer, itemMessages);
-        List<Component> lore = buildItemLoreComponents(fPlayer, itemMessages);
+        return buildItemStack(fPlayer, material, title, stringsLore.length == 0 ? new String[]{lore} : stringsLore);
+    }
+
+    @Override
+    public @NotNull ItemStack buildItemStack(FPlayer fPlayer, String material, String title, String[] lore) {
+        Material itemMaterial = Material.valueOf(material);
+
+        Component componentName = buildItemNameComponent(fPlayer, title);
+
+        List<Component> componentLore = lore.length == 0
+                ? Collections.emptyList()
+                : Arrays.stream(lore)
+                .map(message -> messagePipelineProvider.get().builder(fPlayer, message).build().decoration(TextDecoration.ITALIC, false))
+                .toList();
 
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
-            return buildModernItemStack(settingIndex, settingItem, name, lore);
+            return buildModernItemStack(itemMaterial, componentName, componentLore);
         }
 
-        return buildLegacyItemStack(settingIndex, settingItem, name, lore);
+        return buildLegacyItemStack(itemMaterial, componentName, componentLore);
     }
 
-    private @NotNull Component buildItemNameComponent(@NotNull FPlayer fPlayer, @NotNull List<String> itemMessages) {
-        return itemMessages.isEmpty()
+    private @NotNull Component buildItemNameComponent(@NotNull FPlayer fPlayer, @NotNull String title) {
+        return title.isEmpty()
                 ? Component.empty()
-                : messagePipelineProvider.get().builder(fPlayer, itemMessages.get(0)).build();
+                : messagePipelineProvider.get().builder(fPlayer, title).build();
     }
 
-    private @NotNull List<Component> buildItemLoreComponents(@NotNull FPlayer fPlayer, @NotNull List<String> itemMessages) {
-        List<Component> lore = new ArrayList<>();
-        if (itemMessages.size() > 1) {
-            itemMessages.stream()
-                    .skip(1)
-                    .forEach(message -> lore.add(
-                            messagePipelineProvider.get().builder(fPlayer, replaceChatPlaceholder(message, fPlayer)).build()
-                    ));
-        }
-
-        return lore;
-    }
-
-    private String replaceChatPlaceholder(@NotNull String message, @NotNull FPlayer fPlayer) {
-        return message.replace("<chat>", String.valueOf(fPlayer.getSettingValue(FPlayer.Setting.CHAT)));
-    }
-
-    private @NotNull ItemStack buildModernItemStack(int settingIndex, @NotNull Command.Chatsetting.SettingItem settingItem,
-                                                    @NotNull Component name, @NotNull List<Component> lore) {
+    private @NotNull ItemStack buildModernItemStack(@NotNull Material material, @NotNull Component name, @NotNull List<Component> lore) {
         return new ItemStack.Builder()
-                .type(SpigotConversionUtil.fromBukkitItemMaterial(getItemMaterial(settingIndex, settingItem)))
+                .type(SpigotConversionUtil.fromBukkitItemMaterial(material))
                 .component(ComponentTypes.ITEM_NAME, name)
                 .component(ComponentTypes.LORE, new ItemLore(lore))
                 .build();
     }
 
-    private @NotNull ItemStack buildLegacyItemStack(int settingIndex, @NotNull Command.Chatsetting.SettingItem settingItem,
-                                                    @NotNull Component name, @NotNull List<Component> lore) {
-        org.bukkit.inventory.ItemStack legacyItem = new org.bukkit.inventory.ItemStack(getItemMaterial(settingIndex, settingItem));
+    private @NotNull ItemStack buildLegacyItemStack(@NotNull Material material, @NotNull Component name, @NotNull List<Component> lore) {
+        org.bukkit.inventory.ItemStack legacyItem = new org.bukkit.inventory.ItemStack(material);
         ItemMeta meta = legacyItem.getItemMeta();
 
         meta.setDisplayName(serializeComponent(name));
@@ -189,10 +180,6 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
         legacyItem.setItemMeta(meta);
         return SpigotConversionUtil.fromBukkitItemStack(legacyItem);
-    }
-
-    private @NotNull Material getItemMaterial(int settingIndex, @NotNull Command.Chatsetting.SettingItem settingItem) {
-        return Material.valueOf(settingItem.getMaterials().get(settingIndex));
     }
 
     private @NotNull String serializeComponent(@NotNull Component component) {
