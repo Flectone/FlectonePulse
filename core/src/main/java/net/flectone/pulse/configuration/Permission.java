@@ -187,17 +187,20 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         public static final class Chatsetting implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.chatsetting";
             private Type type = Type.TRUE;
-            private Map<FPlayer.Setting, Chatsetting.SettingItem> items = new LinkedHashMap<>(){
+            private Map<FPlayer.Setting, Chatsetting.SettingItem> settings = new LinkedHashMap<>(){
                 {
+                    put(FPlayer.Setting.CHAT, new SettingItem("flectonepulse.module.command.chatsetting.chat", Type.TRUE));
+                    put(FPlayer.Setting.COLOR, new SettingItem("flectonepulse.module.command.chatsetting.color", Type.TRUE));
+                    put(FPlayer.Setting.STYLE, new SettingItem("flectonepulse.module.command.chatsetting.style", Type.OP));
+                    put(FPlayer.Setting.SPY, new SettingItem("flectonepulse.module.command.chatsetting.spy", Type.OP));
+                    put(FPlayer.Setting.STREAM, new SettingItem("flectonepulse.module.command.chatsetting.stream", Type.OP));
                     put(FPlayer.Setting.ADVANCEMENT, new SettingItem("flectonepulse.module.command.chatsetting.advancement", Type.TRUE));
                     put(FPlayer.Setting.AFK, new SettingItem("flectonepulse.module.command.chatsetting.afk", Type.TRUE));
                     put(FPlayer.Setting.AUTO, new SettingItem("flectonepulse.module.command.chatsetting.auto", Type.TRUE));
                     put(FPlayer.Setting.BALL, new SettingItem("flectonepulse.module.command.chatsetting.ball", Type.TRUE));
                     put(FPlayer.Setting.BAN, new SettingItem("flectonepulse.module.command.chatsetting.ban", Type.TRUE));
                     put(FPlayer.Setting.BROADCAST, new SettingItem("flectonepulse.module.command.chatsetting.broadcast", Type.TRUE));
-                    put(FPlayer.Setting.CHAT, new SettingItem("flectonepulse.module.command.chatsetting.chat", Type.TRUE));
                     put(FPlayer.Setting.COIN, new SettingItem("flectonepulse.module.command.chatsetting.coin", Type.TRUE));
-                    put(FPlayer.Setting.COLOR, new SettingItem("flectonepulse.module.command.chatsetting.color", Type.TRUE));
                     put(FPlayer.Setting.DEATH, new SettingItem("flectonepulse.module.command.chatsetting.death", Type.TRUE));
                     put(FPlayer.Setting.DICE, new SettingItem("flectonepulse.module.command.chatsetting.dice", Type.TRUE));
                     put(FPlayer.Setting.DISCORD, new SettingItem("flectonepulse.module.command.chatsetting.discord", Type.TRUE));
@@ -212,8 +215,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                     put(FPlayer.Setting.QUIT, new SettingItem("flectonepulse.module.command.chatsetting.quit", Type.TRUE));
                     put(FPlayer.Setting.REPLY, new SettingItem("flectonepulse.module.command.chatsetting.reply", Type.TRUE));
                     put(FPlayer.Setting.ROCKPAPERSCISSORS, new SettingItem("flectonepulse.module.command.chatsetting.rockpaperscissors", Type.TRUE));
-                    put(FPlayer.Setting.SPY, new SettingItem("flectonepulse.module.command.chatsetting.spy", Type.OP));
-                    put(FPlayer.Setting.STREAM, new SettingItem("flectonepulse.module.command.chatsetting.stream", Type.OP));
                     put(FPlayer.Setting.TELEGRAM, new SettingItem("flectonepulse.module.command.chatsetting.telegram", Type.TRUE));
                     put(FPlayer.Setting.TELL, new SettingItem("flectonepulse.module.command.chatsetting.tell", Type.TRUE));
                     put(FPlayer.Setting.TICTACTOE, new SettingItem("flectonepulse.module.command.chatsetting.tictactoe", Type.TRUE));

@@ -223,44 +223,89 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.chatcolor.nullColor = "<color:#ff7171><b>⁉</b> Цвета введены неверно";
 
         command.chatsetting.noPermission = "<color:#ff7171><b>⁉</b> Нет разрешения на изменение этой настройки";
-        command.chatsetting.items.clear();
-        command.chatsetting.items.put(FPlayer.Setting.ADVANCEMENT, List.of(List.of("<fcolor:2>Достижения", "<color:#98FB98>Показываются"), List.of("<fcolor:2>Достижения", "<color:#ff7171>Скрыты")));
-        command.chatsetting.items.put(FPlayer.Setting.AFK, List.of(List.of("<fcolor:2>Команда /afk", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /afk", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.AUTO, List.of(List.of("<fcolor:2>Авто сообщения", "<color:#98FB98>Показываются"), List.of("<fcolor:2>Авто сообщения", "<color:#ff7171>Скрыты")));
-        command.chatsetting.items.put(FPlayer.Setting.BALL, List.of(List.of("<fcolor:2>Команда /ball", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /ball", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.BAN, List.of(List.of("<fcolor:2>Команда /ban", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /ban", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.BROADCAST, List.of(List.of("<fcolor:2>Команда /broadcast", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /broadcast", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.CHAT, List.of(List.of("<fcolor:2>Чат", "<fcolor:1>Выбран чат <bold><chat>")));
-        command.chatsetting.items.put(FPlayer.Setting.COIN, List.of(List.of("<fcolor:2>Команда /coin", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /coin", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.COLOR, List.of(List.of("<fcolor:2>Цвета", "<fcolor:1>сообщение", "<fcolor:2>сообщение", "<fcolor:3>сообщение", "<fcolor:4>сообщение")));
-        command.chatsetting.items.put(FPlayer.Setting.DEATH, List.of(List.of("<fcolor:2>Смерти", "<color:#98FB98>Показываются"), List.of("<fcolor:2>Смерти", "<color:#ff7171>Скрыты")));
-        command.chatsetting.items.put(FPlayer.Setting.DICE, List.of(List.of("<fcolor:2>Команда /dice", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /dice", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.DISCORD, List.of(List.of("<fcolor:2>Сообщения для/из Discord", "<color:#98FB98>Показываются"), List.of("<fcolor:2>Сообщения для/из Discord", "<color:#ff7171>Скрыты")));
-        command.chatsetting.items.put(FPlayer.Setting.DO, List.of(List.of("<fcolor:2>Команда /do", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /do", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.GREETING, List.of(List.of("<fcolor:2>Приветственное сообщение", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Приветственное сообщение", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.JOIN, List.of(List.of("<fcolor:2>Оповещения о входе", "<color:#98FB98>Показываются"), List.of("<fcolor:2>Оповещения о входе", "<color:#ff7171>Скрыты")));
-        command.chatsetting.items.put(FPlayer.Setting.KICK, List.of(List.of("<fcolor:2>Команда /kick", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /kick", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.MAIL, List.of(List.of("<fcolor:2>Команда /mail", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /mail", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.ME, List.of(List.of("<fcolor:2>Команда /me", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /me", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.MUTE, List.of(List.of("<fcolor:2>Команда /mute", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /mute", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.POLL, List.of(List.of("<fcolor:2>Команда /poll", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /poll", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.QUIT, List.of(List.of("<fcolor:2>Оповещения о выходе", "<color:#98FB98>Показываются"), List.of("<fcolor:2>Оповещения о выходе", "<color:#ff7171>Скрыты")));
-        command.chatsetting.items.put(FPlayer.Setting.REPLY, List.of(List.of("<fcolor:2>Команда /reply", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /reply", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.ROCKPAPERSCISSORS, List.of(List.of("<fcolor:2>Команда /rockpaperscissors", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /rockpaperscissors", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.SPY, List.of(List.of("<fcolor:2>Режим слежки", "<color:#98FB98>Включён"), List.of("<fcolor:2>Режим слежки", "<color:#ff7171>Выключен")));
-        command.chatsetting.items.put(FPlayer.Setting.STREAM, List.of(List.of("<fcolor:2>Режим стримера", "<color:#98FB98>Включён"), List.of("<fcolor:2>Режим стримера", "<color:#ff7171>Выключен")));
-        command.chatsetting.items.put(FPlayer.Setting.STYLE, List.of(List.of("<fcolor:2>Стиль", "<fcolor:1>Выбран такой <style>стиль")));
-        command.chatsetting.items.put(FPlayer.Setting.TELL, List.of(List.of("<fcolor:2>Команда /tell", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /tell", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.TELEGRAM, List.of(List.of("<fcolor:2>Сообщения для/из Telegram", "<color:#98FB98>Показываются"), List.of("<fcolor:2>Сообщения для/из Telegram", "<color:#ff7171>Скрыты")));
-        command.chatsetting.items.put(FPlayer.Setting.TICTACTOE, List.of(List.of("<fcolor:2>Команда /tictactoe", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /tictactoe", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.TRANSLATETO, List.of(List.of("<fcolor:2>Команда /translate", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /translate", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.TRY, List.of(List.of("<fcolor:2>Команда /try", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /try", "<color:#ff7171>Скрыта")));
-        command.chatsetting.items.put(FPlayer.Setting.TWITCH, List.of(List.of("<fcolor:2>Сообщения для/из Twitch", "<color:#98FB98>Показываются"), List.of("<fcolor:2>Сообщения для/из Twitch", "<color:#ff7171>Скрыты")));
-        command.chatsetting.items.put(FPlayer.Setting.WARN, List.of(List.of("<fcolor:2>Команда /warn", "<color:#98FB98>Показывается"), List.of("<fcolor:2>Команда /warn", "<color:#ff7171>Скрыта")));
-        command.chatsetting.header = "          Настройки чата";
         command.chatsetting.disable.you = "<color:#ff7171><b>⁉</b> Команда скрыта, проверь /chatsetting";
         command.chatsetting.disable.he = "<color:#ff7171><b>⁉</b> Он выключил команду с помощью /chatsetting";
         command.chatsetting.disable.server = "<color:#ff7171><b>⁉</b> Команда отключена на сервере";
+        command.chatsetting.inventory = "<reset>          Настройки чата";
+        command.chatsetting.checkbox.formatEnable = "<color:#98FB98>Отображение включено";
+        command.chatsetting.checkbox.formatDisable = "<color:#ff7171>Отображение выключено";
+        command.chatsetting.checkbox.items.clear();
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.ADVANCEMENT, "<fcolor:2>Достижения");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.AFK, "<fcolor:2>Команда /afk");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.AUTO, "<fcolor:2>Авто-сообщения");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.BALL, "<fcolor:2>Команда /ball");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.BAN, "<fcolor:2>Команда /ban");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.BROADCAST, "<fcolor:2>Команда /broadcast");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.COIN, "<fcolor:2>Команда /coin");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.DEATH, "<fcolor:2>Смерти");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.DICE, "<fcolor:2>Команда /dice");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.DISCORD, "<fcolor:2>Сообщения в/из Discord");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.DO, "<fcolor:2>Команда /do");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.GREETING, "<fcolor:2>Приветственное сообщение");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.JOIN, "<fcolor:2>Вход на сервер");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.KICK, "<fcolor:2>Команда /kick");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.MAIL, "<fcolor:2>Команда /mail");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.ME, "<fcolor:2>Команда /me");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.MUTE, "<fcolor:2>Команда /mute");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.POLL, "<fcolor:2>Команда /poll");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.QUIT, "<fcolor:2>Выход с сервера");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.REPLY, "<fcolor:2>Команда /reply");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.ROCKPAPERSCISSORS, "<fcolor:2>Команда /rockpaperscissors");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.SPY, "<fcolor:2>Режим слежки");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.STREAM, "<fcolor:2>Режим стримера");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.TELL, "<fcolor:2>Команда /tell");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.TELEGRAM, "<fcolor:2>Сообщения в/из Telegram");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.TICTACTOE, "<fcolor:2>Команда /tictactoe");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.TRANSLATETO, "<fcolor:2>Команда /translateto");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.TRY, "<fcolor:2>Команда /try");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.TWITCH, "<fcolor:2>Сообщения в/из Twitch");
+        command.chatsetting.checkbox.items.put(FPlayer.Setting.WARN, "<fcolor:2>Команда /warn");
+        command.chatsetting.menu.chat.item = "<fcolor:2>Тип чата <br><fcolor:1>Чат для просмотра и отправки сообщений <br><br><fcolor:1>Выбранный чат <fcolor:2><chat>";
+        command.chatsetting.menu.chat.inventory = "<reset>                 Чаты";
+        command.chatsetting.menu.chat.types.clear();
+        command.chatsetting.menu.chat.types.put("default", "<fcolor:2>Стандартный чат<br><fcolor:1>Ты можешь видеть <fcolor:2>все</fcolor:2> чаты и писать в любой чат");
+        command.chatsetting.menu.chat.types.put("local", "<fcolor:2>Локальный чат<br><fcolor:1>Ты можешь писать только в <fcolor:2>локальный</fcolor:2> чат и видишь только его");
+        command.chatsetting.menu.chat.types.put("global", "<fcolor:2>Глобальный чат<br><fcolor:1>Ты можешь писать только в <fcolor:2>глобальный</fcolor:2> чат и видишь только его");
+        command.chatsetting.menu.color.item = "<fcolor:2>Цвета <br><fcolor:1>Главные цвета FlectonePulse <br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир! <br><br><u><color:#ff7171>Только ты это видишь";
+        command.chatsetting.menu.color.inventory = "<reset>                Цвета";
+        command.chatsetting.menu.color.types.clear();
+        command.chatsetting.menu.color.types.put("default", "<fcolor:2>Стандартные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.color.types.put("white", "<fcolor:2>Белые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.color.types.put("light_gray", "<fcolor:2>Светло-серые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.color.types.put("gray", "<fcolor:2>Серые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.color.types.put("black", "<fcolor:2>Черные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.color.types.put("brown", "<fcolor:2>Коричневые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.color.types.put("red", "<fcolor:2>Красные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.color.types.put("orange", "<fcolor:2>Оранжевые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.color.types.put("yellow", "<fcolor:2>Желтые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.color.types.put("lime", "<fcolor:2>Лаймовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.color.types.put("green", "<fcolor:2>Зеленые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.color.types.put("cyan", "<fcolor:2>Бирюзовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.color.types.put("light_blue", "<fcolor:2>Голубые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.color.types.put("blue", "<fcolor:2>Синие цвета<br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.color.types.put("purple", "<fcolor:2>Фиолетовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.color.types.put("magenta", "<fcolor:2>Пурпурные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.color.types.put("pink", "<fcolor:2>Розовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир!<br> <fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.style.item = "<fcolor:2>Стиль <br><fcolor:1>Стиль сообщений, который ты отправил <br><br><fcolor:1>Твой стиль <gray><style>привет мир! <br><br><u><color:#ff7171>Это видят все";
+        command.chatsetting.menu.style.inventory = "<reset>                Стили";
+        command.chatsetting.menu.style.types.clear();
+        command.chatsetting.menu.style.types.put("default", "<style>Стандартный стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
+        command.chatsetting.menu.style.types.put("white", "<style>Белый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
+        command.chatsetting.menu.style.types.put("light_gray", "<style>Светло-серый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
+        command.chatsetting.menu.style.types.put("gray", "<style>Серый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
+        command.chatsetting.menu.style.types.put("black", "<style>Чёрный стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
+        command.chatsetting.menu.style.types.put("brown", "<style>Коричневый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
+        command.chatsetting.menu.style.types.put("red", "<style>Красный стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
+        command.chatsetting.menu.style.types.put("orange", "<style>Оранжевый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
+        command.chatsetting.menu.style.types.put("yellow", "<style>Жёлтый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
+        command.chatsetting.menu.style.types.put("lime", "<style>Лаймовый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
+        command.chatsetting.menu.style.types.put("green", "<style>Зелёный стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
+        command.chatsetting.menu.style.types.put("cyan", "<style>Бирюзовый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
+        command.chatsetting.menu.style.types.put("light_blue", "<style>Голубой стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
+        command.chatsetting.menu.style.types.put("blue", "<style>Синий стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
+        command.chatsetting.menu.style.types.put("purple", "<style>Фиолетовый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
+        command.chatsetting.menu.style.types.put("magenta", "<style>Пурпурный стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
+        command.chatsetting.menu.style.types.put("pink", "<style>Розовый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
 
         command.symbol.format = "<click:suggest_command:\"<message>\"><fcolor:2>\uD83D\uDDA5 Нажми, чтобы использовать: <fcolor:1><style><message>";
 
@@ -818,7 +863,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String noPermission = "<color:#ff7171><b>⁉</b> No permission to change this setting";
             private Disable disable = new Disable();
 
-            private String header = "            Chat Settings";
+            private String inventory = "<reset>            Chat Settings";
+            private Checkbox checkbox = new Checkbox();
+            private Menu menu = new Menu();
 
             @Getter
             @NoArgsConstructor
@@ -828,43 +875,112 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 private String server = "<color:#ff7171><b>⁉</b> This command disabled on server";
             }
 
-            private Map<FPlayer.Setting, List<List<String>>> items = new LinkedHashMap<>(){
-                {
-                    put(FPlayer.Setting.ADVANCEMENT, List.of(List.of("<fcolor:2>Advancement", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Advancement", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.AFK, List.of(List.of("<fcolor:2>Command /afk", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /afk", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.AUTO, List.of(List.of("<fcolor:2>Auto Message", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Auto Message", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.BALL, List.of(List.of("<fcolor:2>Command /ball", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /ball", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.BAN, List.of(List.of("<fcolor:2>Command /ban", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /ban", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.BROADCAST, List.of(List.of("<fcolor:2>Command /broadcast", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /broadcast", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.CHAT, List.of(List.of("<fcolor:2>Chat", "<fcolor:1>Your chat <bold><chat>")));
-                    put(FPlayer.Setting.COIN, List.of(List.of("<fcolor:2>Command /coin", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /coin", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.COLOR, List.of(List.of("<fcolor:2>Colors", "<fcolor:1>message", "<fcolor:2>message", "<fcolor:3>message", "<fcolor:4>message")));
-                    put(FPlayer.Setting.DEATH, List.of(List.of("<fcolor:2>Death", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Death", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.DICE, List.of(List.of("<fcolor:2>Command /dice", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /dice", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.DISCORD, List.of(List.of("<fcolor:2>Messages for/from Discord", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Messages for/from Discord", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.DO, List.of(List.of("<fcolor:2>Command /do", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /do", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.GREETING, List.of(List.of("<fcolor:2>Greeting message", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Greeting message", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.JOIN, List.of(List.of("<fcolor:2>Join", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Join", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.KICK, List.of(List.of("<fcolor:2>Command /kick", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /kick", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.MAIL, List.of(List.of("<fcolor:2>Command /mail", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /mail", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.ME, List.of(List.of("<fcolor:2>Command /me", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /me", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.MUTE, List.of(List.of("<fcolor:2>Command /mute", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /mute", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.POLL, List.of(List.of("<fcolor:2>Command /poll", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /poll", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.QUIT, List.of(List.of("<fcolor:2>Quit", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Quit", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.REPLY, List.of(List.of("<fcolor:2>Command /reply", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /reply", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.ROCKPAPERSCISSORS, List.of(List.of("<fcolor:2>Command /rockpaperscissors", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /rockpaperscissors", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.SPY, List.of(List.of("<fcolor:2>Spy", "<color:#98FB98>You're spying"), List.of("<fcolor:2>Spy", "<color:#ff7171>You're not spying")));
-                    put(FPlayer.Setting.STREAM, List.of(List.of("<fcolor:2>Stream", "<color:#98FB98>You're streaming"), List.of("<fcolor:2>Stream", "<color:#ff7171>You don't stream")));
-                    put(FPlayer.Setting.STYLE, List.of(List.of("<fcolor:2>Style", "<fcolor:1>Your <style>style")));
-                    put(FPlayer.Setting.TELL, List.of(List.of("<fcolor:2>Command /tell", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /tell", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.TELEGRAM, List.of(List.of("<fcolor:2>Messages for/from Telegram", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Messages for/from Telegram", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.TICTACTOE, List.of(List.of("<fcolor:2>Command /tictactoe", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /tictactoe", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.TRANSLATETO, List.of(List.of("<fcolor:2>Command /translateto", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /translateto", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.TRY, List.of(List.of("<fcolor:2>Command /try", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /try", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.TWITCH, List.of(List.of("<fcolor:2>Messages for/from Twitch", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Messages for/from Twitch", "<color:#ff7171>Display disabled")));
-                    put(FPlayer.Setting.WARN, List.of(List.of("<fcolor:2>Command /warn", "<color:#98FB98>Display enabled"), List.of("<fcolor:2>Command /warn", "<color:#ff7171>Display disabled")));
+            @Getter
+            @NoArgsConstructor
+            public static final class Checkbox {
+                private String formatEnable = "<color:#98FB98>Display enabled";
+                private String formatDisable = "<color:#ff7171>Display disabled";
+
+                private Map<FPlayer.Setting, String> items = new LinkedHashMap<>() {
+                    {
+                        put(FPlayer.Setting.ADVANCEMENT, "<fcolor:2>Advancement");
+                        put(FPlayer.Setting.AFK, "<fcolor:2>Command /afk");
+                        put(FPlayer.Setting.AUTO, "<fcolor:2>Auto Message");
+                        put(FPlayer.Setting.BALL, "<fcolor:2>Command /ball");
+                        put(FPlayer.Setting.BAN, "<fcolor:2>Command /ban");
+                        put(FPlayer.Setting.BROADCAST, "<fcolor:2>Command /broadcast");
+                        put(FPlayer.Setting.COIN, "<fcolor:2>Command /coin");
+                        put(FPlayer.Setting.DEATH, "<fcolor:2>Death");
+                        put(FPlayer.Setting.DICE, "<fcolor:2>Command /dice");
+                        put(FPlayer.Setting.DISCORD, "<fcolor:2>Messages for/from Discord");
+                        put(FPlayer.Setting.DO, "<fcolor:2>Command /do");
+                        put(FPlayer.Setting.GREETING, "<fcolor:2>Greeting message");
+                        put(FPlayer.Setting.JOIN, "<fcolor:2>Join");
+                        put(FPlayer.Setting.KICK, "<fcolor:2>Command /kick");
+                        put(FPlayer.Setting.MAIL, "<fcolor:2>Command /mail");
+                        put(FPlayer.Setting.ME, "<fcolor:2>Command /me");
+                        put(FPlayer.Setting.MUTE, "<fcolor:2>Command /mute");
+                        put(FPlayer.Setting.POLL, "<fcolor:2>Command /poll");
+                        put(FPlayer.Setting.QUIT, "<fcolor:2>Quit");
+                        put(FPlayer.Setting.REPLY, "<fcolor:2>Command /reply");
+                        put(FPlayer.Setting.ROCKPAPERSCISSORS, "<fcolor:2>Command /rockpaperscissors");
+                        put(FPlayer.Setting.SPY, "<fcolor:2>Spy");
+                        put(FPlayer.Setting.STREAM, "<fcolor:2>Stream");
+                        put(FPlayer.Setting.TELL, "<fcolor:2>Command /tell");
+                        put(FPlayer.Setting.TELEGRAM, "<fcolor:2>Messages for/from Telegram");
+                        put(FPlayer.Setting.TICTACTOE, "<fcolor:2>Command /tictactoe");
+                        put(FPlayer.Setting.TRANSLATETO, "<fcolor:2>Command /translateto");
+                        put(FPlayer.Setting.TRY, "<fcolor:2>Command /try");
+                        put(FPlayer.Setting.TWITCH, "<fcolor:2>Messages for/from Twitch");
+                        put(FPlayer.Setting.WARN, "<fcolor:2>Command /warn");
+                    }
+                };
+            }
+
+            @Getter
+            @NoArgsConstructor
+            public static final class Menu {
+
+                private Type chat = new Type("<fcolor:2>Chat type <br><fcolor:1>Chat for viewing and sending messages <br><br><fcolor:1>Your chat is <fcolor:2><chat>", "<reset>                 Chats", new LinkedHashMap<>() {
+                    {
+                        put("default", "<fcolor:2>Default chat<br><fcolor:1>You can see <fcolor:2>all</fcolor:2> chats and write to any chat");
+                        put("local", "<fcolor:2>Local chat<br><fcolor:1>You can only write to <fcolor:2>local</fcolor:2> chat and see it");
+                        put("global", "<fcolor:2>Global chat<br><fcolor:1>You can only write to <fcolor:2>global</fcolor:2> chat and see it");
+                    }
+                });
+                private Type color = new Type("<fcolor:2>Colors <br><fcolor:1>Main colors of FlectonePulse <br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world! <br><br><u><color:#ff7171>Only you see it", "<reset>                Colors", new LinkedHashMap<>() {
+                    {
+                        put("default", "<fcolor:2>Default colors<br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("white", "<fcolor:2>White colors<br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("light_gray", "<fcolor:2>Light gray colors<br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("gray", "<fcolor:2>Gray colors<br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("black", "<fcolor:2>Black colors<br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("brown", "<fcolor:2>Brown colors<br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("red", "<fcolor:2>Red colors<br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("orange", "<fcolor:2>Orange colors<br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("yellow", "<fcolor:2>Yellow colors<br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("lime", "<fcolor:2>Lime colors<br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("green", "<fcolor:2>Green colors<br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("cyan", "<fcolor:2>Cyan colors<br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("light_blue", "<fcolor:2>Light blue colors<br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("blue", "<fcolor:2>Blue colors<br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("purple", "<fcolor:2>Purple colors<br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("magenta", "<fcolor:2>Magenta colors<br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("pink", "<fcolor:2>Pink colors<br><br><fcolor:2><player><fcolor:3>: hello world!<br> <fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                    }
+                });
+                private Type style = new Type("<fcolor:2>Style <br><fcolor:1>Style of the messages you sent <br><br><fcolor:1>Your style is <gray><style>hello world! <br><br><u><color:#ff7171>Everyone sees it",  "<reset>                Styles", new LinkedHashMap<>() {
+                    {
+                        put("default", "<style>Default style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                        put("white", "<style>White style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                        put("light_gray", "<style>Light gray style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                        put("gray", "<style>Gray style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                        put("black", "<style>Black style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                        put("brown", "<style>Brown style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                        put("red", "<style>Red style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                        put("orange", "<style>Orange style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                        put("yellow", "<style>Yellow style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                        put("lime", "<style>Lime style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                        put("green", "<style>Green style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                        put("cyan", "<style>Cyan style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                        put("light_blue", "<style>Light blue style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                        put("blue", "<style>Blue style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                        put("purple", "<style>Purple style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                        put("magenta", "<style>Magenta style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                        put("pink", "<style>Pink style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                    }
+                });
+
+                @Getter
+                @NoArgsConstructor
+                @AllArgsConstructor
+                public static class Type {
+                    private String item;
+                    private String inventory;
+                    private Map<String, String> types;
                 }
-            };
+
+            }
         }
 
         @Getter

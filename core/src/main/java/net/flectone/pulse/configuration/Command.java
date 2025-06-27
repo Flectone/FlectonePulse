@@ -12,10 +12,7 @@ import net.flectone.pulse.model.*;
 import net.flectone.pulse.util.Range;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @SuppressWarnings({"FieldMayBeFinal", "unused"})
 @Comment(
@@ -189,43 +186,161 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
 
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("chatsetting"));
-        private Map<FPlayer.Setting, SettingItem> items = new LinkedHashMap<>(){
-            {
-                put(FPlayer.Setting.ADVANCEMENT, new SettingItem(4, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.AFK, new SettingItem(25, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.AUTO, new SettingItem(8, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.BALL, new SettingItem(12, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.BAN, new SettingItem(14, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.BROADCAST, new SettingItem(22, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.CHAT, new SettingItem(0, List.of("YELLOW_CONCRETE")));
-                put(FPlayer.Setting.COIN, new SettingItem(24, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.COLOR, new SettingItem(1, List.of("YELLOW_CONCRETE")));
-                put(FPlayer.Setting.DEATH, new SettingItem(5, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.DICE, new SettingItem(11, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.DISCORD, new SettingItem(29, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.DO, new SettingItem(23, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.GREETING, new SettingItem(27, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.JOIN, new SettingItem(6, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.KICK, new SettingItem(20, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.MAIL, new SettingItem(18, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.ME, new SettingItem(9, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.MUTE, new SettingItem(13, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.POLL, new SettingItem(26, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.QUIT, new SettingItem(7, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.REPLY, new SettingItem(17, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.ROCKPAPERSCISSORS, new SettingItem(28, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.SPY, new SettingItem(3, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.STREAM, new SettingItem(2, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.STYLE, new SettingItem(32, List.of("YELLOW_CONCRETE")));
-                put(FPlayer.Setting.TELEGRAM, new SettingItem(30, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.TELL, new SettingItem(16, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.TICTACTOE, new SettingItem(19, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.TRANSLATETO, new SettingItem(21, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.TRY, new SettingItem(10, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.TWITCH, new SettingItem(31, List.of("LIME_CONCRETE", "RED_CONCRETE")));
-                put(FPlayer.Setting.WARN, new SettingItem(15, List.of("LIME_CONCRETE", "RED_CONCRETE")));
+
+        private Checkbox checkbox = new Checkbox();
+        private Menu menu = new Menu();
+
+        @Getter
+        public static final class Checkbox {
+            private String disabledMaterial = "RED_DYE";
+            private String enabledMaterial = "LIME_DYE";
+
+            private Map<FPlayer.Setting, Integer> items = new LinkedHashMap<>() {
+                {
+                    put(FPlayer.Setting.SPY, 9);
+                    put(FPlayer.Setting.STREAM, 10);
+                    put(FPlayer.Setting.ADVANCEMENT, 18);
+                    put(FPlayer.Setting.AFK, 19);
+                    put(FPlayer.Setting.AUTO, 20);
+                    put(FPlayer.Setting.BALL, 21);
+                    put(FPlayer.Setting.BAN, 22);
+                    put(FPlayer.Setting.BROADCAST, 23);
+                    put(FPlayer.Setting.COIN, 24);
+                    put(FPlayer.Setting.DEATH, 25);
+                    put(FPlayer.Setting.DICE, 26);
+                    put(FPlayer.Setting.DISCORD, 27);
+                    put(FPlayer.Setting.DO, 28);
+                    put(FPlayer.Setting.GREETING, 29);
+                    put(FPlayer.Setting.JOIN, 30);
+                    put(FPlayer.Setting.KICK, 31);
+                    put(FPlayer.Setting.MAIL, 32);
+                    put(FPlayer.Setting.ME, 33);
+                    put(FPlayer.Setting.MUTE, 34);
+                    put(FPlayer.Setting.POLL, 35);
+                    put(FPlayer.Setting.QUIT, 36);
+                    put(FPlayer.Setting.REPLY, 37);
+                    put(FPlayer.Setting.ROCKPAPERSCISSORS, 38);
+                    put(FPlayer.Setting.TELL, 39);
+                    put(FPlayer.Setting.TELEGRAM, 40);
+                    put(FPlayer.Setting.TICTACTOE, 41);
+                    put(FPlayer.Setting.TRANSLATETO, 42);
+                    put(FPlayer.Setting.TRY, 43);
+                    put(FPlayer.Setting.TWITCH, 44);
+                    put(FPlayer.Setting.WARN, 45);
+                }
+            };
+        }
+
+        @Getter
+        public static final class Menu {
+            private String material = "LIGHT_BLUE_DYE";
+
+            private Chat chat = new Chat(0, List.of(
+                    new Chat.Type("default", "ARROW"),
+                    new Chat.Type("local", "WHITE_DYE"),
+                    new Chat.Type("global", "BLACK_DYE")
+            ));
+            private Color color = new Color(1, List.of(
+                    new Color.Type("default", "ARROW", new LinkedHashMap<>(Map.of("1", "#ADD8E6", "2", "#87CEFA", "3", "#A9A9A9", "4", "#FFFAFA"))),
+                    new Color.Type("white", "WHITE_DYE", new LinkedHashMap<>(Map.of("1", "#F9FFFE", "2", "#E4E4E4", "3", "#A9A9A9", "4", "#FFFAFA"))),
+                    new Color.Type("light_gray", "LIGHT_GRAY_DYE", new LinkedHashMap<>(Map.of("1", "#9D9D97", "2", "#7A7A76", "3", "#A9A9A9", "4", "#FFFAFA"))),
+                    new Color.Type("gray", "GRAY_DYE", new LinkedHashMap<>(Map.of("1", "#474F52", "2", "#353A3C", "3", "#A9A9A9", "4", "#FFFAFA"))),
+                    new Color.Type("black", "BLACK_DYE", new LinkedHashMap<>(Map.of("1", "#1D1D21", "2", "#0E0E10", "3", "#A9A9A9", "4", "#FFFAFA"))),
+                    new Color.Type("brown", "BROWN_DYE", new LinkedHashMap<>(Map.of("1", "#835432", "2", "#5E3A1F", "3", "#A9A9A9", "4", "#FFFAFA"))),
+                    new Color.Type("red", "RED_DYE", new LinkedHashMap<>(Map.of("1", "#B02E26", "2", "#8C1A12", "3", "#A9A9A9", "4", "#FFFAFA"))),
+                    new Color.Type("orange", "ORANGE_DYE", new LinkedHashMap<>(Map.of("1", "#F9801D", "2", "#E35E1A", "3", "#A9A9A9", "4", "#FFFAFA"))),
+                    new Color.Type("yellow", "YELLOW_DYE", new LinkedHashMap<>(Map.of("1", "#FED83D", "2", "#F5C71A", "3", "#A9A9A9", "4", "#FFFAFA"))),
+                    new Color.Type("lime", "LIME_DYE", new LinkedHashMap<>(Map.of("1", "#80C71F", "2", "#6AAD17", "3", "#A9A9A9", "4", "#FFFAFA"))),
+                    new Color.Type("green", "GREEN_DYE", new LinkedHashMap<>(Map.of("1", "#5E7C16", "2", "#3B5A14", "3", "#A9A9A9", "4", "#FFFAFA"))),
+                    new Color.Type("cyan", "CYAN_DYE", new LinkedHashMap<>(Map.of("1", "#169C9C", "2", "#0E7D7D", "3", "#A9A9A9", "4", "#FFFAFA"))),
+                    new Color.Type("light_blue", "LIGHT_BLUE_DYE", new LinkedHashMap<>(Map.of("1", "#ADD8E6", "2", "#87CEFA", "3", "#A9A9A9", "4", "#FFFAFA"))),
+                    new Color.Type("blue", "BLUE_DYE", new LinkedHashMap<>(Map.of("1", "#3C44AA", "2", "#2A2F8A", "3", "#A9A9A9", "4", "#FFFAFA"))),
+                    new Color.Type("purple", "PURPLE_DYE", new LinkedHashMap<>(Map.of("1", "#8932B8", "2", "#6A1F9C", "3", "#A9A9A9", "4", "#FFFAFA"))),
+                    new Color.Type("magenta", "MAGENTA_DYE", new LinkedHashMap<>(Map.of("1", "#C74EBD", "2", "#B03AB0", "3", "#A9A9A9", "4", "#FFFAFA"))),
+                    new Color.Type("pink", "PINK_DYE", new LinkedHashMap<>(Map.of("1", "#F38BAA", "2", "#E57FA0", "3", "#A9A9A9", "4", "#FFFAFA")))
+            ));
+            private Style style = new Style(2, List.of(
+                    new Style.Type("default", "ARROW", ""),
+                    new Style.Type("white", "WHITE_DYE", "<gradient:#F9FFFE:#E4E4E4>"),
+                    new Style.Type("light_gray", "LIGHT_GRAY_DYE", "<gradient:#9D9D97:#7A7A76>"),
+                    new Style.Type("gray", "GRAY_DYE", "<gradient:#474F52:#353A3C>"),
+                    new Style.Type("black", "BLACK_DYE", "<gradient:#1D1D21:#0E0E10>"),
+                    new Style.Type("brown", "BROWN_DYE", "<gradient:#835432:#5E3A1F>"),
+                    new Style.Type("red", "RED_DYE", "<gradient:#B02E26:#8C1A12>"),
+                    new Style.Type("orange", "ORANGE_DYE", "<gradient:#F9801D:#E35E1A>"),
+                    new Style.Type("yellow", "YELLOW_DYE", "<gradient:#FED83D:#F5C71A>"),
+                    new Style.Type("lime", "LIME_DYE", "<gradient:#80C71F:#6AAD17>"),
+                    new Style.Type("green", "GREEN_DYE", "<gradient:#5E7C16:#3B5A14>"),
+                    new Style.Type("cyan", "CYAN_DYE", "<gradient:#169C9C:#0E7D7D>"),
+                    new Style.Type("light_blue", "LIGHT_BLUE_DYE", "<gradient:#ADD8E6:#87CEFA>"),
+                    new Style.Type("blue", "BLUE_DYE", "<gradient:#3C44AA:#2A2F8A>"),
+                    new Style.Type("purple", "PURPLE_DYE", "<gradient:#8932B8:#6A1F9C>"),
+                    new Style.Type("magenta", "MAGENTA_DYE", "<gradient:#C74EBD:#B03AB0>"),
+                    new Style.Type("pink", "PINK_DYE", "<gradient:#F38BAA:#E57FA0>")
+            ));
+
+            @Getter
+            @AllArgsConstructor
+            @NoArgsConstructor
+            public static final class Chat {
+
+                private int slot;
+                private List<Type> types = new LinkedList<>();
+
+                @Getter
+                @AllArgsConstructor
+                @NoArgsConstructor
+                public static final class Type {
+
+                    private String name;
+                    private String material;
+
+                }
+
             }
-        };
+
+            @Getter
+            @AllArgsConstructor
+            @NoArgsConstructor
+            public static final class Color {
+
+                private int slot;
+                private List<Type> types;
+
+                @Getter
+                @AllArgsConstructor
+                @NoArgsConstructor
+                public static final class Type {
+
+                    private String name;
+                    private String material;
+                    private LinkedHashMap<String, String> colors;
+
+                }
+
+            }
+
+            @Getter
+            @AllArgsConstructor
+            @NoArgsConstructor
+            public static final class Style {
+
+                private int slot;
+                private List<Type> types;
+
+                @Getter
+                @AllArgsConstructor
+                @NoArgsConstructor
+                public static final class Type {
+
+                    private String name;
+                    private String material;
+                    private String value;
+
+                }
+
+            }
+        }
 
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
