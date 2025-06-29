@@ -9,6 +9,7 @@ import net.flectone.pulse.listener.AbstractPacketListener;
 import net.flectone.pulse.module.message.death.DeathModule;
 import net.flectone.pulse.module.message.death.model.Death;
 import net.flectone.pulse.module.message.death.model.Item;
+import net.flectone.pulse.util.EntityUtil;
 import net.flectone.pulse.util.MinecraftTranslationKeys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -20,10 +21,13 @@ import net.kyori.adventure.text.format.TextDecoration;
 public class DeathPacketListener extends AbstractPacketListener {
 
     private final DeathModule deathModule;
+    private final EntityUtil entityUtil;
 
     @Inject
-    public DeathPacketListener(DeathModule deathModule) {
+    public DeathPacketListener(DeathModule deathModule,
+                               EntityUtil entityUtil) {
         this.deathModule = deathModule;
+        this.entityUtil = entityUtil;
     }
 
     @Override
@@ -128,7 +132,7 @@ public class DeathPacketListener extends AbstractPacketListener {
             if (death != null && !showEntity.type().value().equalsIgnoreCase("player")) {
                 death.setPlayer(false);
                 death.setTargetUUID(showEntity.id());
-                death.setTargetType("entity.minecraft." + showEntity.type().key().value());
+                death.setTargetType(entityUtil.resolveEntityTranslationKey(showEntity.type().key().value()));
             }
 
             if (hoverComponent.children().isEmpty()) return death;
@@ -146,7 +150,7 @@ public class DeathPacketListener extends AbstractPacketListener {
             death.setTargetName(targetNameBuilder.toString());
 
             death.setTargetUUID(showEntity.id());
-            death.setTargetType("entity.minecraft." + showEntity.type().key().value());
+            death.setTargetType(entityUtil.resolveEntityTranslationKey(showEntity.type().key().value()));
             return death;
         }
 

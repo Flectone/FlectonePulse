@@ -1,13 +1,12 @@
 package net.flectone.pulse.module.message.kill.listener;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.protocol.item.type.ItemType;
-import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.AbstractPacketListener;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.message.kill.KillModule;
+import net.flectone.pulse.util.EntityUtil;
 import net.flectone.pulse.util.MinecraftTranslationKeys;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -19,10 +18,13 @@ import java.util.UUID;
 public class KillPacketListener extends AbstractPacketListener {
 
     private final KillModule killModule;
+    private final EntityUtil entityUtil;
 
     @Inject
-    public KillPacketListener(KillModule killModule) {
+    public KillPacketListener(KillModule killModule,
+                              EntityUtil entityUtil) {
         this.killModule = killModule;
+        this.entityUtil = entityUtil;
     }
 
     @Override
@@ -65,13 +67,7 @@ public class KillPacketListener extends AbstractPacketListener {
         if (hoverEvent == null) return;
         HoverEvent.ShowEntity showEntity = (HoverEvent.ShowEntity) hoverEvent.value();
         if (type.isEmpty()) {
-            type = showEntity.type().key().value();
-
-            ItemType itemType = ItemTypes.getByName(type);
-
-            type = itemType == null
-                    ? "entity.minecraft." + type
-                    : itemType.getPlacedType() == null ? "item.minecraft." + type : "block.minecraft." + type;
+            type = entityUtil.resolveEntityTranslationKey(showEntity.type().key().value());
         }
 
         String name;
