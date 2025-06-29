@@ -76,6 +76,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Greeting greeting = new Greeting();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/join/")})
     private Join join = new Join();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/kill/")})
+    private Kill kill = new Kill();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/objective/")})
     private Objective objective = new Objective();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/op/")})
@@ -586,6 +588,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         private int range = Range.SERVER;
         private Destination destination = new Destination();
         private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Kill implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Sound sound = new Sound();
+        private Destination destination = new Destination();
     }
 
     @Getter

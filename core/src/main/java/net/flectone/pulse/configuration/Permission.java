@@ -743,6 +743,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Greeting greeting = new Greeting();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/join/")})
         private Join join = new Join();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/kill/")})
+        private Kill kill = new Kill();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/objective/")})
         private Objective objective = new Objective();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/op/")})
@@ -1120,6 +1122,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private String name = "flectonepulse.module.message.join";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.join.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Kill implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.kill";
+            private Type type = Type.TRUE;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.kill.sound", Type.TRUE);
         }
 
         @Getter

@@ -563,6 +563,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.join.formatFirstTime = "<color:#4eff52>→ <display_name> <fcolor:1>впервые тут!";
 
+        message.kill.single = "<color:#778899>🪦 <fcolor:1><display_name> убит";
+        message.kill.multiple = "<color:#778899>🪦 <fcolor:1>Уничтожено <fcolor:2><count></fcolor:2> сущностей";
+
         message.op.format = "<fcolor:1>\uD83E\uDD16 <display_name> назначен оператором сервера";
 
         message.sidebar.values.clear();
@@ -1580,7 +1583,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Greeting greeting = new Greeting();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/join/")})
         private Join join = new Join();
-
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/kill/")})
+        private Kill kill = new Kill();
         @Override
         public ObjectiveMessageConfig getObjective() {
             return null;
@@ -1999,6 +2003,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
         public static final class Join implements SubMessageConfig, Localizable {
             private String format = "<color:#4eff52>→ <display_name>";
             private String formatFirstTime = "<color:#4eff52>→ <display_name> <fcolor:1>welcome!";
+        }
+
+        @Getter
+        public static final class Kill implements SubMessageConfig, Localizable {
+            private String single = "<color:#778899>🪦 <fcolor:1>Killed <display_name>";
+            private String multiple = "<color:#778899>🪦 <fcolor:1>Killed <fcolor:2><count>";
         }
 
         @Getter

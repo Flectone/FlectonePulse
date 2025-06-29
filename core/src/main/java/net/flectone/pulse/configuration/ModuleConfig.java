@@ -98,6 +98,7 @@ public interface ModuleConfig {
         SubMessageConfig getGamemode();
         SubMessageConfig getGreeting();
         SubMessageConfig getJoin();
+        SubMessageConfig getKill();
         ObjectiveMessageConfig getObjective();
         SubMessageConfig getOp();
         SubMessageConfig getQuit();
