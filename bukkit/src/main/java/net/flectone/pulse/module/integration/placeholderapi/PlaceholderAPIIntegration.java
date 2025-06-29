@@ -84,10 +84,15 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             return fPlayer.getColors().getOrDefault(number, color.getValues().get(number));
         }
 
+        FPlayer.Setting setting = FPlayer.Setting.fromString(params);
+        if (setting != null) {
+            String value = fPlayer.getSettingValue(setting);
+            return value == null ? ""
+                    : value.isEmpty() ? "true"
+                    : value;
+        }
+
         String placeholder = switch (params) {
-            case "world_prefix" -> fPlayer.getSettingValue(FPlayer.Setting.WORLD_PREFIX);
-            case "stream_prefix" -> fPlayer.getSettingValue(FPlayer.Setting.STREAM_PREFIX);
-            case "afk_suffix" -> fPlayer.getSettingValue(FPlayer.Setting.AFK_SUFFIX);
             case "player" -> fPlayer.getName();
             case "ip" -> fPlayer.getIp();
             case "ping" -> String.valueOf(fPlayerService.getPing(fPlayer));
