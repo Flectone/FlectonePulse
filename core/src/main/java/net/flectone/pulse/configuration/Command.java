@@ -108,6 +108,8 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     private Tell tell = new Tell();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/tictactoe/")})
     private Tictactoe tictactoe = new Tictactoe();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/toponline/")})
+    private Toponline toponline = new Toponline();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/translateto/")})
     private Translateto translateto = new Translateto();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/try/")})
@@ -676,6 +678,15 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
                 add("ttt");
             }
         };
+        private Cooldown cooldown = new Cooldown();
+        private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Toponline implements SubCommandConfig, ICommandFile {
+        private boolean enable = true;
+        private int perPage = 10;
+        private List<String> aliases = new ArrayList<>(List.of("toponline"));
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }

@@ -119,6 +119,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Tell tell = new Tell();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/tictactoe/")})
         private Tictactoe tictactoe = new Tictactoe();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/toponline/")})
+        private Toponline toponline = new Toponline();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/translateto/")})
         private Translateto translateto = new Translateto();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/try/")})
@@ -455,6 +457,14 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.tictactoe.cooldown.bypass", Type.OP);
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.tictactoe.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Toponline implements SubCommandConfig, IPermission {
+            private String name = "flectonepulse.module.command.toponline";
+            private Type type = Type.TRUE;
+            private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.toponline.cooldown.bypass", Type.OP);
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.toponline.sound", Type.TRUE);
         }
 
         @Getter

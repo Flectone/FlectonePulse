@@ -329,6 +329,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.tictactoe.formatDraw = "<color:#98FB98>Ничья \uD83D\uDC6C</color:#98FB98>";
         command.tictactoe.symbol.blank = "<hover:show_text:\"<fcolor:1>Ход <move>\"><click:run_command:\"/tictactoemove %d <move>\">☐</click></hover>";
 
+        command.toponline.nullPage = "<color:#ff7171><b>⁉</b> Страница не найдена";
+        command.toponline.header = "<fcolor:2>▋ Игроков: <count> <br>";
+        command.toponline.line = "<fcolor:2><time_player> <fcolor:1>наиграл <fcolor:2><time>";
+        command.toponline.footer = "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
+
         command.maintenance.kick = "<color:#ff7171>★ На сервере ведутся технические работы";
         command.maintenance.serverDescription = "<color:#ff7171>В настоящее время проводятся технические работы";
         command.maintenance.serverVersion = "Технические работы";
@@ -760,6 +765,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Tell tell = new Tell();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/tictactoe/")})
         private Tictactoe tictactoe = new Tictactoe();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/toponline/")})
+        private Toponline toponline = new Toponline();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/translateto/")})
         private Translateto translateto = new Translateto();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/try/")})
@@ -1248,6 +1255,14 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String formatDraw = "<color:#98FB98>The game ended in a draw 👬</color:#98FB98>";
             private String sender = "<fcolor:1>☐ An offer to play was sent to <display_name>";
             private String receiver = "<click:run_command:\"/tictactoemove %d create\"><fcolor:1>☐ Received an invite to play tic-tac-toe with <display_name>, accept? [+]";
+        }
+
+        @Getter
+        public static final class Toponline implements SubCommandConfig, Localizable {
+            private String nullPage = "<color:#ff7171><b>⁉</b> This page doesn't exist";
+            private String header = "<fcolor:2>▋ Players: <count> <br>";
+            private String line = "<fcolor:2><time_player> <fcolor:1>played for <fcolor:2><time>";
+            private String footer = "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
         }
 
         @Getter

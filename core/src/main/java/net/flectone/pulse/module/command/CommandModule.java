@@ -40,6 +40,7 @@ import net.flectone.pulse.module.command.stream.StreamModule;
 import net.flectone.pulse.module.command.symbol.SymbolModule;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.module.command.tictactoe.TictactoeModule;
+import net.flectone.pulse.module.command.toponline.ToponlineModule;
 import net.flectone.pulse.module.command.translateto.TranslatetoModule;
 import net.flectone.pulse.module.command.try_.TryModule;
 import net.flectone.pulse.module.command.unban.UnbanModule;
@@ -93,6 +94,7 @@ public class CommandModule extends AbstractModule {
         addChildren(SymbolModule.class);
         addChildren(TellModule.class);
         addChildren(TictactoeModule.class);
+        addChildren(ToponlineModule.class);
         addChildren(TranslatetoModule.class);
         addChildren(TryModule.class);
         addChildren(UnbanModule.class);

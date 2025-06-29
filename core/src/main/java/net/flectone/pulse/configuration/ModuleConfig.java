@@ -41,6 +41,7 @@ public interface ModuleConfig {
         SubCommandConfig getSymbol();
         SubCommandConfig getTell();
         SubCommandConfig getTictactoe();
+        SubCommandConfig getToponline();
         SubCommandConfig getTranslateto();
         SubCommandConfig getTry();
         SubCommandConfig getUnban();
