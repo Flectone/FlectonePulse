@@ -33,7 +33,6 @@ subprojects {
         maven { url = "https://repo.minebench.de" }
         maven { url = "https://s01.oss.sonatype.org/content/repositories/snapshots" }
         maven { url = "https://libraries.minecraft.net" }
-        maven { url = "https://maven.evokegames.gg/snapshots" }
         maven { url = "https://maven.maxhenkel.de/repository/public" }
         maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
         maven { url = "https://repo.plasmoverse.com/releases" }
