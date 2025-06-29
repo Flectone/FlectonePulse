@@ -87,6 +87,8 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
         FPlayer.Setting setting = FPlayer.Setting.fromString(params);
         if (setting != null) {
             String value = fPlayer.getSettingValue(setting);
+            if (setting == FPlayer.Setting.CHAT && value == null) return "default";
+
             return value == null ? ""
                     : value.isEmpty() ? "true"
                     : value;
