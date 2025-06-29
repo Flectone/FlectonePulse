@@ -155,6 +155,13 @@ public class FPlayer extends FEntity {
         TWITCH,
         WARN,
         WORLD_PREFIX,
-        STYLE
+        STYLE;
+
+        @Nullable
+        public static Setting fromString(String setting) {
+            return Arrays.stream(Setting.values()).filter(s -> s.name().equalsIgnoreCase(setting))
+                    .findFirst()
+                    .orElse(null);
+        }
     }
 }
