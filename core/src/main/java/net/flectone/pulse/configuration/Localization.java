@@ -2008,7 +2008,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Kill implements SubMessageConfig, Localizable {
             private String single = "<color:#778899>🪦 <fcolor:1>Killed <display_name>";
-            private String multiple = "<color:#778899>🪦 <fcolor:1>Killed <fcolor:2><count>";
+            private String multiple = "<color:#778899>🪦 <fcolor:1>Killed <fcolor:2><count></fcolor:2> entities";
         }
 
         @Getter
