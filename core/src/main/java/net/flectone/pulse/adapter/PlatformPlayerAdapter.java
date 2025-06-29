@@ -35,6 +35,14 @@ public interface PlatformPlayerAdapter {
      */
     record Statistics(double health, double armor, double level, double food, double damage) {}
 
+    /**
+     * Represent total playtime of the player when they are offline
+     *
+     * @param name Name of the player
+     * @param playedTime Total playtime of the player
+     */
+    record PlayedTimePlayer(String name, long playedTime) {}
+
 
     // Player identification methods
     int getEntityId(@NotNull UUID uuid);
@@ -83,4 +91,5 @@ public interface PlatformPlayerAdapter {
     @NotNull List<UUID> getOnlinePlayers();
     @NotNull List<UUID> getNearbyEntities(FPlayer fPlayer, double x, double y, double z);
     @NotNull List<Integer> getPassengers(FPlayer fPlayer);
+    @NotNull List<PlayedTimePlayer> getPlayedTimePlayers();
 }

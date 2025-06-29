@@ -44,9 +44,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Singleton
 public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
@@ -330,6 +328,13 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
         return passengers.stream()
                 .map(Entity::getEntityId)
+                .toList();
+    }
+
+    @Override
+    public @NotNull List<PlayedTimePlayer> getPlayedTimePlayers() {
+        return Arrays.stream(Bukkit.getOfflinePlayers())
+                .map(offlinePlayer -> new PlayedTimePlayer(offlinePlayer.getName(), offlinePlayer.getStatistic(Statistic.PLAY_ONE_MINUTE) * 50L))
                 .toList();
     }
 
