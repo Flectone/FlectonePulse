@@ -334,6 +334,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @NotNull List<PlayedTimePlayer> getPlayedTimePlayers() {
         return Arrays.stream(Bukkit.getOfflinePlayers())
+                .filter(offlinePlayer -> offlinePlayer.getName() != null)
                 .map(offlinePlayer -> new PlayedTimePlayer(offlinePlayer.getName(), offlinePlayer.getStatistic(Statistic.PLAY_ONE_MINUTE) * 50L))
                 .toList();
     }
