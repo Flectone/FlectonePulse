@@ -820,7 +820,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                     put("default", "You have been banned from this server");
                 }
             };
-            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> was banned player <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
+            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> has banned <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
             private String person = "<color:#ff7171>🔒 BAN 🔒<fcolor:1><br><br>Date: <date><br><br>Time: <time><br><br>Remaining time: <time_left><br><br>Moderator: <moderator><br><br>Reason: <reason>";
             private String connectionAttempt = "<color:#ff7171>🔒 Banned <fcolor:2><player></fcolor> tried to log in <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
 
@@ -1082,7 +1082,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 }
             };
 
-            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> was kicked player <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
+            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> kicked <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
             private String person = "<color:#ff7171>🔒 KICK 🔒 <fcolor:1><br><br>ID: <id><br><br>Date: <date><br><br>Moderator: <moderator><br><br>Reason: <reason>";
         }
 
@@ -1116,7 +1116,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                     put("default", "You have been muted on this server");
                 }
             };
-            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> was muted player <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
+            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> has muted <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
             private String person = "<color:#ff7171>🔒 You are muted, <time_left> left";
         }
 
@@ -1311,7 +1311,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 }
             };
 
-            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> was warned player <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
+            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> gave a warning to <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
             private String person = "<color:#ff7171>🔒 You are warned a <time>";
         }
 
