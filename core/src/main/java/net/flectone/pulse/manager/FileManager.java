@@ -42,23 +42,10 @@ public class FileManager {
         this.projectPath = projectPath;
 
         command = new Command(projectPath);
-        command.reload();
-
         config = new Config(projectPath);
-        config.reload();
-
         integration = new Integration(projectPath);
-        integration.reload();
-
         message = new Message(projectPath);
-        message.reload();
-
         permission = new Permission(projectPath);
-        permission.reload();
-
-        reloadLanguages();
-
-        defaultLocalization = localizationMap.get(config.getLanguage());
     }
 
     public Localization getLocalization() {

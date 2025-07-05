@@ -26,7 +26,6 @@ import net.flectone.pulse.util.logging.FLogger;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
 import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
 import net.megavex.scoreboardlibrary.api.team.TeamManager;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Singleton
@@ -88,8 +87,6 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         try {
             injector.getInstance(Database.class).connect();
         } catch (Exception e) {
-            fLogger.warning("Failed to connect database");
-            fLogger.warning(e);
             return;
         }
 
@@ -144,8 +141,10 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
     }
 
     @Override
-    public void reload() {
+    public void reload() throws Exception {
         if (injector == null) return;
+
+        Exception reloadException = null;
 
         fLogger.logReloading();
 
@@ -156,18 +155,20 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(TaskScheduler.class).reload();
 
         FileManager fileManager = injector.getInstance(FileManager.class);
-        fileManager.reload();
+
+        try {
+            fileManager.reload();
+        } catch (Exception e) {
+            reloadException = e;
+        }
 
         fLogger.reload(fileManager.getConfig().getLogFilter());
 
         try {
             injector.getInstance(Database.class).disconnect();
             injector.getInstance(Database.class).connect();
-
         } catch (Exception e) {
-            fLogger.warning("Failed to connect database");
-
-            Bukkit.getPluginManager().disablePlugin(this);
+            reloadException = e;
         }
 
         injector.getInstance(ProxySender.class).reload();
@@ -180,5 +181,9 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         }
 
         fLogger.logReloaded();
+
+        if (reloadException != null) {
+            throw reloadException;
+        }
     }
 }

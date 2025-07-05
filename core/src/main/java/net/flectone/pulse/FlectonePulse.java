@@ -2,6 +2,6 @@ package net.flectone.pulse;
 
 public interface FlectonePulse {
 
-    void reload();
+    void reload() throws Exception;
 
 }
