@@ -214,7 +214,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.warnlist.player.line = "<hover:show_text:\"<fcolor:1>Снять предупреждение <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
         command.warnlist.player.footer = "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
 
-        command.flectonepulse.formatFalse = "<color:#ff7171>★ Возникла проблема при перезагрузке";
+        command.flectonepulse.formatFalse = "<color:#ff7171>★ Возникла проблема при перезагрузке <br>Ошибка: <message>";
         command.flectonepulse.formatTrue = "<fcolor:2>★ <u>FlectonePulse</u> успешно перезагружен! (<i><time></i>)";
         command.flectonepulse.formatTrueText = "<fcolor:2>★ ВАЖНО! Перезагружен только текст, для ПОЛНОЙ перезагрузки нужно использовать: <br><fcolor:1>/flectonepulse reload";
 
@@ -1035,7 +1035,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Flectonepulse implements SubCommandConfig, Localizable {
-            private String formatFalse = "<color:#ff7171>★ An has error occurred while reloading";
+            private String formatFalse = "<color:#ff7171>★ An has error occurred while reloading <br>Error: <message>";
             private String formatTrue = "<fcolor:2>★ <u>FlectonePulse</u> successfully reloaded! (<i><time></i>)";
             private String formatTrueText = "<fcolor:2>★ IMPORTANT! <br>Only texts have been updated, for a FULL reload you need to use: <br><fcolor:1>/flectonepulse reload";
         }

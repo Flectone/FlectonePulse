@@ -116,6 +116,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
             builder(fPlayer)
                     .destination(command.getDestination())
                     .format(Localization.Command.Flectonepulse::getFormatFalse)
+                    .message(e.getLocalizedMessage())
                     .sendBuilt();
         }
     }
