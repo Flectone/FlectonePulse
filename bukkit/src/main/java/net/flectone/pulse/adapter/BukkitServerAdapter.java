@@ -27,9 +27,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,14 +52,17 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         IS_1_20_5_OR_NEWER = parseBukkitVersion() >= 20.5;
     }
 
+    private final Plugin plugin;
     private final Provider<IntegrationModule> integrationModuleProvider;
     private final Provider<FPlayerService> fPlayerServiceProvider;
     private final Provider<MessagePipeline> messagePipelineProvider;
 
     @Inject
-    public BukkitServerAdapter(Provider<IntegrationModule> integrationModuleProvider,
+    public BukkitServerAdapter(Plugin plugin,
+                               Provider<IntegrationModule> integrationModuleProvider,
                                Provider<FPlayerService> fPlayerServiceProvider,
                                Provider<MessagePipeline> messagePipelineProvider) {
+        this.plugin = plugin;
         this.integrationModuleProvider = integrationModuleProvider;
         this.fPlayerServiceProvider = fPlayerServiceProvider;
         this.messagePipelineProvider = messagePipelineProvider;
@@ -197,6 +202,11 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         }
 
         return getLegacyItemName(bukkitItem);
+    }
+
+    @Override
+    public @Nullable InputStream getResource(String path) {
+        return plugin.getResource(path);
     }
 
     private @NotNull String getModernItemName(@NotNull Material material) {

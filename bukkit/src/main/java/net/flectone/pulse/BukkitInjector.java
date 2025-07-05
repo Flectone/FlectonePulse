@@ -14,7 +14,6 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.checker.BukkitPermissionChecker;
 import net.flectone.pulse.checker.PermissionChecker;
-import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.converter.LegacyMiniConvertor;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.spy.BukkitSpyModule;
@@ -66,7 +65,6 @@ import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
 import net.megavex.scoreboardlibrary.api.team.TeamManager;
 import org.bukkit.plugin.Plugin;
 
-import java.io.InputStream;
 import java.nio.file.Path;
 
 @Singleton
@@ -148,10 +146,6 @@ public class BukkitInjector extends AbstractModule {
 
         // Scoreboard
         setupScoreboard();
-
-        // Database SQL files
-        setupDatabaseBindings(fileManager);
-
 //        try {
 //            Package[] packs = Package.getPackages();
 //
@@ -211,15 +205,5 @@ public class BukkitInjector extends AbstractModule {
         bind(ScoreboardLibrary.class).toInstance(scoreboardLibrary);
         bind(ObjectiveManager.class).toInstance(scoreboardLibrary.createObjectiveManager());
         bind(TeamManager.class).toInstance(scoreboardLibrary.createTeamManager());
-    }
-
-    private void setupDatabaseBindings(FileManager fileManager) {
-        if (fileManager.getConfig().getDatabase().getType() == Config.Database.Type.MYSQL) {
-            bind(InputStream.class).annotatedWith(Names.named("SQLFile"))
-                    .toInstance(plugin.getResource("sqls/mysql.sql"));
-        } else {
-            bind(InputStream.class).annotatedWith(Names.named("SQLFile"))
-                    .toInstance(plugin.getResource("sqls/sqlite.sql"));
-        }
     }
 }

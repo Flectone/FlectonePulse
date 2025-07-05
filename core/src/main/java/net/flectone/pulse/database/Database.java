@@ -8,6 +8,7 @@ import com.google.inject.name.Named;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
+import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.database.dao.SettingDAO;
@@ -34,8 +35,8 @@ public class Database {
     private final Injector injector;
     private final FileManager fileManager;
     private final Path projectPath;
-    private final InputStream SQLFile;
     private final SystemVariableResolver systemVariableResolver;
+    private final PlatformServerAdapter platformServerAdapter;
     private final FLogger fLogger;
 
     private HikariDataSource dataSource;
@@ -44,15 +45,15 @@ public class Database {
     public Database(FileManager fileManager,
                     Injector injector,
                     @Named("projectPath") Path projectPath,
-                    @Named("SQLFile") InputStream SQLFile,
                     SystemVariableResolver systemVariableResolver,
+                    PlatformServerAdapter platformServerAdapter,
                     FLogger fLogger) {
 
         this.injector = injector;
         this.fileManager = fileManager;
         this.projectPath = projectPath;
-        this.SQLFile = SQLFile;
         this.systemVariableResolver = systemVariableResolver;
+        this.platformServerAdapter = platformServerAdapter;
         this.fLogger = fLogger;
 
         config = fileManager.getConfig().getDatabase();
@@ -70,7 +71,8 @@ public class Database {
         }
 
         try (Connection ignored = getConnection()){
-            executeFile(SQLFile);
+            InputStream SQLFile = platformServerAdapter.getResource("sqls/" + config.getType().name().toLowerCase() + ".sql");
+            executeSQLFile(SQLFile);
 
             if (fileManager.isOlderThan(fileManager.getPreInitVersion(), "0.6.0")) {
                 MIGRATION_0_6_0();
@@ -153,7 +155,7 @@ public class Database {
         return hikariConfig;
     }
 
-    private void executeFile(InputStream inputStream) throws SQLException, IOException {
+    private void executeSQLFile(InputStream inputStream) throws SQLException, IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
         try (Connection connection = getConnection()) {

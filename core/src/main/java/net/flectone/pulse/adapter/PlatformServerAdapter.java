@@ -5,6 +5,9 @@ import com.google.gson.JsonElement;
 import net.flectone.pulse.model.FPlayer;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.InputStream;
 
 public interface PlatformServerAdapter {
 
@@ -72,6 +75,15 @@ public interface PlatformServerAdapter {
      * @return Localized item name or empty string if invalid
      */
     @NotNull String getItemName(Object item);
+
+
+    /**
+     * Gets an input stream for the specified resource path.
+     *
+     * @param path Resource path (classpath relative)
+     * @return InputStream or null if not found
+     */
+    @Nullable InputStream getResource(String path);
 
     /**
      * Gets the translated display name of an item in Minecraft's
