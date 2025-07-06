@@ -107,6 +107,11 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @Nullable String getIp(@NotNull FPlayer fPlayer) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        if (player != null) {
+            return player.getAddress().getHostName();
+        }
+
         ProtocolManager protocolManager = packetEvents.getProtocolManager();
 
         Object channel = protocolManager.getChannel(fPlayer.getUuid());
