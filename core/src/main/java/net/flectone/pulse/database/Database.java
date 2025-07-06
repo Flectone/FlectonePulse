@@ -12,7 +12,6 @@ import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.database.dao.ColorsDAO;
 import net.flectone.pulse.database.dao.FPlayerDAO;
-import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.Mail;
 import net.flectone.pulse.model.Moderation;
@@ -83,14 +82,6 @@ public class Database {
 
         InputStream SQLFile = platformServerAdapter.getResource("sqls/" + config.getType().name().toLowerCase() + ".sql");
         executeSQLFile(SQLFile);
-
-        if (fileManager.isOlderThan(fileManager.getPreInitVersion(), "0.6.0")) {
-            MIGRATION_0_6_0();
-        }
-
-            if (config.getType() == Config.Database.Type.SQLITE) {
-                injector.getInstance(FPlayerDAO.class).updateAllToOffline();
-            }
 
         if (config.getType() == Config.Database.Type.SQLITE) {
             injector.getInstance(FPlayerDAO.class).updateAllToOffline();
@@ -186,22 +177,6 @@ public class Database {
             }
         }
     }
-
-    private void MIGRATION_0_6_0() {
-        backupDatabase();
-
-        injector.getInstance(SettingDAO.class).MIGRATION_0_6_0();
-
-        getJdbi().useHandle(handle -> {
-            handle.execute("ALTER TABLE `player` DROP COLUMN `chat`");
-            handle.execute("ALTER TABLE `player` DROP COLUMN `locale`");
-            handle.execute("ALTER TABLE `player` DROP COLUMN `world_prefix`");
-            handle.execute("ALTER TABLE `player` DROP COLUMN `stream_prefix`");
-            handle.execute("ALTER TABLE `player` DROP COLUMN `afk_suffix`");
-            handle.execute("ALTER TABLE `player` DROP COLUMN `setting`");
-        });
-    }
-
 
     private void backupDatabase() {
         if (config.getType() == Config.Database.Type.SQLITE) {
