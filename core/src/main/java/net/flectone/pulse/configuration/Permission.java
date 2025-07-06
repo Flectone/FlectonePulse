@@ -53,6 +53,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
 
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/afk/")})
         private Afk afk = new Afk();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/anon/")})
+        private Anon anon = new Anon();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ball/")})
         private Ball ball = new Ball();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ban/")})
@@ -145,6 +147,14 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         }
 
         @Getter
+        public static final class Anon implements SubCommandConfig, IPermission {
+            private String name = "flectonepulse.module.command.anon";
+            private Type type = Type.TRUE;
+            private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.anon.cooldown.bypass", Type.OP);
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.anon.sound", Type.TRUE);
+        }
+
+        @Getter
         public static final class Ball implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.ball";
             private Type type = Type.TRUE;
@@ -198,6 +208,7 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                     put(FPlayer.Setting.STREAM, new SettingItem("flectonepulse.module.command.chatsetting.stream", Type.OP));
                     put(FPlayer.Setting.ADVANCEMENT, new SettingItem("flectonepulse.module.command.chatsetting.advancement", Type.TRUE));
                     put(FPlayer.Setting.AFK, new SettingItem("flectonepulse.module.command.chatsetting.afk", Type.TRUE));
+                    put(FPlayer.Setting.ANON, new SettingItem("flectonepulse.module.command.chatsetting.anon", Type.TRUE));
                     put(FPlayer.Setting.AUTO, new SettingItem("flectonepulse.module.command.chatsetting.auto", Type.TRUE));
                     put(FPlayer.Setting.BALL, new SettingItem("flectonepulse.module.command.chatsetting.ball", Type.TRUE));
                     put(FPlayer.Setting.BAN, new SettingItem("flectonepulse.module.command.chatsetting.ban", Type.TRUE));

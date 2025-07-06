@@ -9,6 +9,7 @@ public interface ModuleConfig {
     interface CommandConfig {
 
         SubCommandConfig getAfk();
+        SubCommandConfig getAnon();
         SubCommandConfig getBall();
         SubCommandConfig getBan();
         SubCommandConfig getBanlist();

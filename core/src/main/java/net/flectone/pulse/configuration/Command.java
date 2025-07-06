@@ -42,6 +42,8 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
 
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/afk/")})
     private Afk afk = new Afk();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/anon/")})
+    private Anon anon = new Anon();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ball/")})
     private Ball ball = new Ball();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ban/")})
@@ -126,6 +128,16 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     private Warnlist warnlist = new Warnlist();
 
     @Getter
+    public static final class Anon implements SubCommandConfig, ICommandFile {
+        private boolean enable = true;
+        private int range = Range.PROXY;
+        private List<String> aliases = new ArrayList<>(List.of("anon"));
+        private Destination destination = new Destination();
+        private Cooldown cooldown = new Cooldown();
+        private Sound sound = new Sound();
+    }
+
+    @Getter
     public static final class Afk implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("afk"));
@@ -203,32 +215,33 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
                     put(FPlayer.Setting.STREAM, 10);
                     put(FPlayer.Setting.ADVANCEMENT, 18);
                     put(FPlayer.Setting.AFK, 19);
-                    put(FPlayer.Setting.AUTO, 20);
-                    put(FPlayer.Setting.BALL, 21);
-                    put(FPlayer.Setting.BAN, 22);
-                    put(FPlayer.Setting.BROADCAST, 23);
-                    put(FPlayer.Setting.COIN, 24);
-                    put(FPlayer.Setting.DEATH, 25);
-                    put(FPlayer.Setting.DICE, 26);
-                    put(FPlayer.Setting.DISCORD, 27);
-                    put(FPlayer.Setting.DO, 28);
-                    put(FPlayer.Setting.GREETING, 29);
-                    put(FPlayer.Setting.JOIN, 30);
-                    put(FPlayer.Setting.KICK, 31);
-                    put(FPlayer.Setting.MAIL, 32);
-                    put(FPlayer.Setting.ME, 33);
-                    put(FPlayer.Setting.MUTE, 34);
-                    put(FPlayer.Setting.POLL, 35);
-                    put(FPlayer.Setting.QUIT, 36);
-                    put(FPlayer.Setting.REPLY, 37);
-                    put(FPlayer.Setting.ROCKPAPERSCISSORS, 38);
-                    put(FPlayer.Setting.TELL, 39);
-                    put(FPlayer.Setting.TELEGRAM, 40);
-                    put(FPlayer.Setting.TICTACTOE, 41);
-                    put(FPlayer.Setting.TRANSLATETO, 42);
-                    put(FPlayer.Setting.TRY, 43);
-                    put(FPlayer.Setting.TWITCH, 44);
-                    put(FPlayer.Setting.WARN, 45);
+                    put(FPlayer.Setting.ANON, 20);
+                    put(FPlayer.Setting.AUTO, 21);
+                    put(FPlayer.Setting.BALL, 22);
+                    put(FPlayer.Setting.BAN, 23);
+                    put(FPlayer.Setting.BROADCAST, 24);
+                    put(FPlayer.Setting.COIN, 25);
+                    put(FPlayer.Setting.DEATH, 26);
+                    put(FPlayer.Setting.DICE, 27);
+                    put(FPlayer.Setting.DISCORD, 28);
+                    put(FPlayer.Setting.DO, 29);
+                    put(FPlayer.Setting.GREETING, 30);
+                    put(FPlayer.Setting.JOIN, 31);
+                    put(FPlayer.Setting.KICK, 32);
+                    put(FPlayer.Setting.MAIL, 33);
+                    put(FPlayer.Setting.ME, 34);
+                    put(FPlayer.Setting.MUTE, 35);
+                    put(FPlayer.Setting.POLL, 36);
+                    put(FPlayer.Setting.QUIT, 37);
+                    put(FPlayer.Setting.REPLY, 38);
+                    put(FPlayer.Setting.ROCKPAPERSCISSORS, 39);
+                    put(FPlayer.Setting.TELL, 40);
+                    put(FPlayer.Setting.TELEGRAM, 41);
+                    put(FPlayer.Setting.TICTACTOE, 42);
+                    put(FPlayer.Setting.TRANSLATETO, 43);
+                    put(FPlayer.Setting.TRY, 44);
+                    put(FPlayer.Setting.TWITCH, 45);
+                    put(FPlayer.Setting.WARN, 46);
                 }
             };
         }

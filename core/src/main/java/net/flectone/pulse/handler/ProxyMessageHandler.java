@@ -11,6 +11,7 @@ import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
+import net.flectone.pulse.module.command.anon.AnonModule;
 import net.flectone.pulse.module.command.ball.BallModule;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.broadcast.BroadcastModule;
@@ -132,6 +133,7 @@ public class ProxyMessageHandler {
         }
 
         switch (tag) {
+            case COMMAND_ANON -> handleAnonCommand(input, fEntity);
             case COMMAND_ME -> handleMeCommand(input, fEntity);
             case COMMAND_BALL -> handleBallCommand(input, fEntity);
             case COMMAND_BAN -> handleBanCommand(input, fEntity);
@@ -197,6 +199,21 @@ public class ProxyMessageHandler {
         }
 
         return clusters;
+    }
+
+    private void handleAnonCommand(DataInputStream input, FEntity fEntity) throws IOException {
+        AnonModule module = injector.getInstance(AnonModule.class);
+        if (module.checkModulePredicates(fEntity)) return;
+
+        String message = input.readUTF();
+
+        module.builder(fEntity)
+                .range(Range.SERVER)
+                .destination(module.getCommand().getDestination())
+                .format(Localization.Command.Anon::getFormat)
+                .message(message)
+                .sound(module.getSound())
+                .sendBuilt();
     }
 
     private void handleMeCommand(DataInputStream input, FEntity fEntity) throws IOException {

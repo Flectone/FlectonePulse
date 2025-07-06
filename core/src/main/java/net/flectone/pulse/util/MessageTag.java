@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 public enum MessageTag {
     CHAT,
+    COMMAND_ANON,
     COMMAND_ME,
     COMMAND_BALL,
     COMMAND_BAN,

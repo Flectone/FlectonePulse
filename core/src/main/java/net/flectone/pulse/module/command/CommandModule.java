@@ -7,6 +7,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.command.afk.AfkModule;
+import net.flectone.pulse.module.command.anon.AnonModule;
 import net.flectone.pulse.module.command.ball.BallModule;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.banlist.BanlistModule;
@@ -61,6 +62,7 @@ public class CommandModule extends AbstractModule {
         permission = fileManager.getPermission().getCommand();
 
         addChildren(AfkModule.class);
+        addChildren(AnonModule.class);
         addChildren(BallModule.class);
         addChildren(BanModule.class);
         addChildren(BanlistModule.class);

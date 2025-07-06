@@ -47,6 +47,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         time.permanent = "НАВСЕГДА";
         time.zero = "0с";
 
+        command.anon.format = "<fcolor:1>\uD83D\uDC7B <fcolor:2>Анон</fcolor:2> <fcolor:1><message>";
+
         command.dice.format = "<fcolor:1>✎ <display_name> кинул кубики <style><message><reset> <fcolor:1>(<sum>)";
 
         command.ball.format = "<color:#9370DB>❓ <display_name> спросил: <style><message><reset> <color:#9370DB><br>🔮 Магический шар: <u><answer></u>";
@@ -702,6 +704,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String move = "move";
         }
 
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/anon/")})
+        private Anon anon = new Anon();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ball/")})
         private Ball ball = new Ball();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ban/")})
@@ -784,6 +788,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Warn warn = new Warn();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/warnlist/")})
         private Warnlist warnlist = new Warnlist();
+
+        @Getter
+        public static final class Anon implements SubCommandConfig, Localizable {
+            private String format = "<fcolor:1>\uD83D\uDC7B <fcolor:2>Anon</fcolor:2> <fcolor:1><message>";
+        }
 
         @Getter
         public static final class Ball implements SubCommandConfig, Localizable {
@@ -889,6 +898,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                     {
                         put(FPlayer.Setting.ADVANCEMENT, "<fcolor:2>Advancement");
                         put(FPlayer.Setting.AFK, "<fcolor:2>Command /afk");
+                        put(FPlayer.Setting.ANON, "<fcolor:2>Command /anon");
                         put(FPlayer.Setting.AUTO, "<fcolor:2>Auto Message");
                         put(FPlayer.Setting.BALL, "<fcolor:2>Command /ball");
                         put(FPlayer.Setting.BAN, "<fcolor:2>Command /ban");
