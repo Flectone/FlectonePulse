@@ -6,7 +6,7 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -23,15 +23,15 @@ public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit>
     private final ListenerRegistry listenerRegistry;
 
     @Inject
-    public QuitModule(FileManager fileManager,
+    public QuitModule(FileResolver fileResolver,
                       ListenerRegistry listenerRegistry,
                       IntegrationModule integrationModule) {
         super(localization -> localization.getMessage().getQuit());
 
         this.listenerRegistry = listenerRegistry;
 
-        message = fileManager.getMessage().getQuit();
-        permission = fileManager.getPermission().getMessage().getQuit();
+        message = fileResolver.getMessage().getQuit();
+        permission = fileResolver.getPermission().getMessage().getQuit();
 
         addPredicate(integrationModule::isVanished);
     }

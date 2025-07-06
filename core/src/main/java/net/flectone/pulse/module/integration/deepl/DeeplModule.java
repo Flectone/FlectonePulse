@@ -7,7 +7,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.resolver.LibraryResolver;
@@ -22,14 +22,14 @@ public class DeeplModule extends AbstractModule {
     private final Injector injector;
 
     @Inject
-    public DeeplModule(FileManager fileManager,
+    public DeeplModule(FileResolver fileResolver,
                        LibraryResolver libraryResolver,
                        Injector injector) {
         this.libraryResolver = libraryResolver;
         this.injector = injector;
 
-        integration = fileManager.getIntegration().getDeepl();
-        permission = fileManager.getPermission().getIntegration().getDeepl();
+        integration = fileResolver.getIntegration().getDeepl();
+        permission = fileResolver.getPermission().getIntegration().getDeepl();
     }
 
     @Override

@@ -10,7 +10,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.service.FPlayerService;
@@ -33,7 +33,7 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
     private final PacketSender packetSender;
 
     @Inject
-    public PlayersModule(FileManager fileManager,
+    public PlayersModule(FileResolver fileResolver,
                          FPlayerService fPlayerService,
                          PermissionChecker permissionChecker,
                          PlatformServerAdapter platformServerAdapter,
@@ -47,8 +47,8 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
         this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
 
-        message = fileManager.getMessage().getStatus().getPlayers();
-        permission = fileManager.getPermission().getMessage().getStatus().getPlayers();
+        message = fileResolver.getMessage().getStatus().getPlayers();
+        permission = fileResolver.getPermission().getMessage().getStatus().getPlayers();
     }
 
     @Override

@@ -8,7 +8,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
@@ -37,7 +37,7 @@ public class WorldModule extends AbstractModule implements MessageProcessor {
     private final PermissionChecker permissionChecker;
 
     @Inject
-    public WorldModule(FileManager fileManager,
+    public WorldModule(FileResolver fileResolver,
                        FPlayerService fPlayerService,
                        PlatformPlayerAdapter platformPlayerAdapter,
                        ListenerRegistry listenerRegistry,
@@ -48,9 +48,9 @@ public class WorldModule extends AbstractModule implements MessageProcessor {
         this.listenerRegistry = listenerRegistry;
         this.permissionChecker = permissionChecker;
 
-        message = fileManager.getMessage().getFormat().getWorld();
-        permission = fileManager.getPermission().getMessage().getFormat().getWorld();
-        formatPermission = fileManager.getPermission().getMessage().getFormat();
+        message = fileResolver.getMessage().getFormat().getWorld();
+        permission = fileResolver.getPermission().getMessage().getFormat().getWorld();
+        formatPermission = fileResolver.getPermission().getMessage().getFormat();
 
         messageProcessRegistry.register(150, this);
     }

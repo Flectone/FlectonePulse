@@ -3,7 +3,7 @@ package net.flectone.pulse.module;
 import com.google.inject.Inject;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.DisableAction;
@@ -21,7 +21,7 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
 
     private final Predicate<FPlayer> commandPredicate;
 
-    @Inject private FileManager fileManager;
+    @Inject private FileResolver fileResolver;
 
     public AbstractModuleCommand(Function<Localization, M> messageFunction, Predicate<FPlayer> commandPredicate) {
         super(messageFunction);
@@ -30,7 +30,7 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
     }
 
     public Localization.Command.Prompt getPrompt() {
-        return fileManager.getLocalization().getCommand().getPrompt();
+        return fileResolver.getLocalization().getCommand().getPrompt();
     }
 
     public String getName(Command.ICommandFile command) {

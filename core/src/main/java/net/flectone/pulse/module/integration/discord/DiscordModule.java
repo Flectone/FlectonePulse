@@ -9,7 +9,7 @@ import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
@@ -29,7 +29,7 @@ public class DiscordModule extends AbstractModule {
     private final FLogger fLogger;
 
     @Inject
-    public DiscordModule(FileManager fileManager,
+    public DiscordModule(FileResolver fileResolver,
                          LibraryResolver libraryResolver,
                          Injector injector,
                          FLogger fLogger) {
@@ -37,8 +37,8 @@ public class DiscordModule extends AbstractModule {
         this.injector = injector;
         this.fLogger = fLogger;
 
-        integration = fileManager.getIntegration().getDiscord();
-        permission = fileManager.getPermission().getIntegration().getDiscord();
+        integration = fileResolver.getIntegration().getDiscord();
+        permission = fileResolver.getPermission().getIntegration().getDiscord();
 
         addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.isSetting(FPlayer.Setting.DISCORD));
     }

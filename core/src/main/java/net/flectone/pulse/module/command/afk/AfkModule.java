@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
@@ -22,7 +22,7 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
     private final CommandRegistry commandRegistry;
 
     @Inject
-    public AfkModule(FileManager fileManager,
+    public AfkModule(FileResolver fileResolver,
                      net.flectone.pulse.module.message.afk.AfkModule afkModule,
                      CommandRegistry commandRegistry) {
         super(Localization::getCommand, fPlayer -> fPlayer.isSetting(FPlayer.Setting.AFK));
@@ -30,8 +30,8 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
         this.afkModule = afkModule;
         this.commandRegistry = commandRegistry;
 
-        command = fileManager.getCommand().getAfk();
-        permission = fileManager.getPermission().getCommand().getAfk();
+        command = fileResolver.getCommand().getAfk();
+        permission = fileResolver.getPermission().getCommand().getAfk();
 
         addPredicate(this::checkCooldown);
         addPredicate(fPlayer -> !afkModule.isEnable());

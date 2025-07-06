@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.processor.MessageProcessor;
@@ -18,11 +18,11 @@ public class StyleModule extends AbstractModule implements MessageProcessor {
     private final Permission.Message.Format.Style permission;
 
     @Inject
-    public StyleModule(FileManager fileManager,
+    public StyleModule(FileResolver fileResolver,
                        MessageProcessRegistry messageProcessRegistry) {
 
-        message = fileManager.getMessage().getFormat().getStyle();
-        permission = fileManager.getPermission().getMessage().getFormat().getStyle();
+        message = fileResolver.getMessage().getFormat().getStyle();
+        permission = fileResolver.getPermission().getMessage().getFormat().getStyle();
 
         messageProcessRegistry.register(150, this);
     }

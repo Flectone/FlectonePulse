@@ -6,7 +6,7 @@ import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.sender.ProxySender;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -37,7 +37,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     private final IntegrationModule integrationModule;
 
     @Inject
-    public RockpaperscissorsModule(FileManager fileManager,
+    public RockpaperscissorsModule(FileResolver fileResolver,
                                    ProxySender proxySender,
                                    FPlayerService fPlayerService,
                                    CommandRegistry commandRegistry,
@@ -49,8 +49,8 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         this.commandRegistry = commandRegistry;
         this.integrationModule = integrationModule;
 
-        command = fileManager.getCommand().getRockpaperscissors();
-        permission = fileManager.getPermission().getCommand().getRockpaperscissors();
+        command = fileResolver.getCommand().getRockpaperscissors();
+        permission = fileResolver.getPermission().getCommand().getRockpaperscissors();
     }
 
     @Override

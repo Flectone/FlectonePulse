@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.processor.MessageProcessor;
@@ -19,10 +19,10 @@ public class FixationModule extends AbstractModule implements MessageProcessor {
     private final Permission.Message.Format.Fixation permission;
 
     @Inject
-    public FixationModule(FileManager fileManager,
+    public FixationModule(FileResolver fileResolver,
                           MessageProcessRegistry messageProcessRegistry) {
-        message = fileManager.getMessage().getFormat().getFixation();
-        permission = fileManager.getPermission().getMessage().getFormat().getFixation();
+        message = fileResolver.getMessage().getFormat().getFixation();
+        permission = fileResolver.getPermission().getMessage().getFormat().getFixation();
 
         messageProcessRegistry.register(100, this);
     }

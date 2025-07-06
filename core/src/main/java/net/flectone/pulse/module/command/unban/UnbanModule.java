@@ -7,7 +7,7 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -36,7 +36,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
     private final Gson gson;
 
     @Inject
-    public UnbanModule(FileManager fileManager,
+    public UnbanModule(FileResolver fileResolver,
                        FPlayerService fPlayerService,
                        ModerationService moderationService,
                        CommandRegistry commandRegistry,
@@ -50,8 +50,8 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         this.proxySender = proxySender;
         this.gson = gson;
 
-        command = fileManager.getCommand().getUnban();
-        permission = fileManager.getPermission().getCommand().getUnban();
+        command = fileResolver.getCommand().getUnban();
+        permission = fileResolver.getPermission().getCommand().getUnban();
     }
 
     @Override

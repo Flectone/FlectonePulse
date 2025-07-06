@@ -4,7 +4,7 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleListMessage;
@@ -19,7 +19,7 @@ public abstract class SidebarModule extends AbstractModuleListMessage<Localizati
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
 
-    public SidebarModule(FileManager fileManager,
+    public SidebarModule(FileResolver fileResolver,
                          FPlayerService fPlayerService,
                          TaskScheduler taskScheduler) {
         super(localization -> localization.getMessage().getSidebar());
@@ -27,8 +27,8 @@ public abstract class SidebarModule extends AbstractModuleListMessage<Localizati
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
 
-        message = fileManager.getMessage().getSidebar();
-        permission = fileManager.getPermission().getMessage().getSidebar();
+        message = fileResolver.getMessage().getSidebar();
+        permission = fileResolver.getPermission().getMessage().getSidebar();
     }
 
     @Override

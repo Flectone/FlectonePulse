@@ -19,7 +19,7 @@ import discord4j.rest.util.MultipartRequest;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.FIntegration;
@@ -46,7 +46,7 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
 
     private final List<Long> webhooks = new ArrayList<>();
 
-    private final FileManager fileManager;
+    private final FileResolver fileResolver;
     private final TaskScheduler taskScheduler;
     private final SkinService skinService;
     private final MessageCreateListener messageCreateListener;
@@ -59,14 +59,14 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
     private long clientID;
 
     @Inject
-    public DiscordIntegration(FileManager fileManager,
+    public DiscordIntegration(FileResolver fileResolver,
                               TaskScheduler taskScheduler,
                               SkinService skinService,
                               MessagePipeline messagePipeline,
                               SystemVariableResolver systemVariableResolver,
                               MessageCreateListener messageCreateListener,
                               FLogger fLogger) {
-        this.fileManager = fileManager;
+        this.fileResolver = fileResolver;
         this.taskScheduler = taskScheduler;
         this.skinService = skinService;
         this.messagePipeline = messagePipeline;
@@ -74,7 +74,7 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
         this.messageCreateListener = messageCreateListener;
         this.fLogger = fLogger;
 
-        integration = fileManager.getIntegration().getDiscord();
+        integration = fileResolver.getIntegration().getDiscord();
     }
 
     public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> discordString) {
@@ -82,7 +82,7 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
         if (integrationChannel == null) return;
         if (integrationChannel.isEmpty()) return;
 
-        Localization.Integration.Discord localization = fileManager.getLocalization().getIntegration().getDiscord();
+        Localization.Integration.Discord localization = fileResolver.getLocalization().getIntegration().getDiscord();
         Localization.Integration.Discord.ChannelEmbed messageChannelEmbed = localization.getMessageChannel().get(messageTag);
         if (messageChannelEmbed == null) return;
 
@@ -276,7 +276,7 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
 
         if (!integration.getChannelInfo().isEnable()) return;
 
-        Localization.Integration.Discord localization = fileManager.getLocalization().getIntegration().getDiscord();
+        Localization.Integration.Discord localization = fileResolver.getLocalization().getIntegration().getDiscord();
         for (Map.Entry<String, String> entry : localization.getInfoChannel().entrySet()) {
             gateway.getChannelById(Snowflake.of(entry.getKey()))
                     .blockOptional()

@@ -6,7 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -26,7 +26,7 @@ public class SeedModule extends AbstractModuleMessage<Localization.Message.Seed>
     private final ListenerRegistry listenerRegistry;
 
     @Inject
-    public SeedModule(FileManager fileManager,
+    public SeedModule(FileResolver fileResolver,
                       FPlayerService fPlayerService,
                       ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getSeed());
@@ -34,8 +34,8 @@ public class SeedModule extends AbstractModuleMessage<Localization.Message.Seed>
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
 
-        message = fileManager.getMessage().getSeed();
-        permission = fileManager.getPermission().getMessage().getSeed();
+        message = fileResolver.getMessage().getSeed();
+        permission = fileResolver.getPermission().getMessage().getSeed();
     }
 
     @Override

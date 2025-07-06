@@ -3,7 +3,7 @@ package net.flectone.pulse.module.message.anvil;
 import com.google.inject.Inject;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 
@@ -13,9 +13,9 @@ public abstract class AnvilModule extends AbstractModule {
     private final Permission.Message.Anvil permission;
 
     @Inject
-    public AnvilModule(FileManager fileManager) {
-        message = fileManager.getMessage().getAnvil();
-        permission = fileManager.getPermission().getMessage().getAnvil();
+    public AnvilModule(FileResolver fileResolver) {
+        message = fileResolver.getMessage().getAnvil();
+        permission = fileResolver.getPermission().getMessage().getAnvil();
     }
 
     @Override

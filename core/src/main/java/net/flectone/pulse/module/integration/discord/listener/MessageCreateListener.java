@@ -9,7 +9,7 @@ import discord4j.core.object.entity.User;
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.Range;
@@ -22,8 +22,8 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
     private final Integration.Discord integration;
 
     @Inject
-    public MessageCreateListener(FileManager fileManager) {
-        integration = fileManager.getIntegration().getDiscord();
+    public MessageCreateListener(FileResolver fileResolver) {
+        integration = fileResolver.getIntegration().getDiscord();
     }
 
     @Override

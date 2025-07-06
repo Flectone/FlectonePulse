@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 
@@ -20,12 +20,12 @@ public class VaultModule extends AbstractModule {
     private final VaultIntegration vaultIntegration;
 
     @Inject
-    public VaultModule(FileManager fileManager,
+    public VaultModule(FileResolver fileResolver,
                        VaultIntegration vaultIntegration) {
         this.vaultIntegration = vaultIntegration;
 
-        integration = fileManager.getIntegration().getVault();
-        permission = fileManager.getPermission().getIntegration().getVault();
+        integration = fileResolver.getIntegration().getVault();
+        permission = fileResolver.getPermission().getIntegration().getVault();
     }
 
     @Override

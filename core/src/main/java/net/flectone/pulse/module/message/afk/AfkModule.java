@@ -10,7 +10,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -49,7 +49,7 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> i
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Inject
-    public AfkModule(FileManager fileManager,
+    public AfkModule(FileResolver fileResolver,
                      MessageProcessRegistry messageProcessRegistry,
                      FPlayerService fPlayerService,
                      TaskScheduler taskScheduler,
@@ -58,9 +58,9 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> i
                      PlatformPlayerAdapter platformPlayerAdapter) {
         super(localization -> localization.getMessage().getAfk());
 
-        message = fileManager.getMessage().getAfk();
-        permission = fileManager.getPermission().getMessage().getAfk();
-        formatPermission = fileManager.getPermission().getMessage().getFormat();
+        message = fileResolver.getMessage().getAfk();
+        permission = fileResolver.getPermission().getMessage().getAfk();
+        formatPermission = fileResolver.getPermission().getMessage().getFormat();
 
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;

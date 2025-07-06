@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleListMessage;
@@ -24,7 +24,7 @@ public class HeaderModule extends AbstractModuleListMessage<Localization.Message
     private final TaskScheduler taskScheduler;
 
     @Inject
-    public HeaderModule(FileManager fileManager,
+    public HeaderModule(FileResolver fileResolver,
                         FPlayerService fPlayerService,
                         TaskScheduler taskScheduler) {
         super(module -> module.getMessage().getTab().getHeader());
@@ -32,8 +32,8 @@ public class HeaderModule extends AbstractModuleListMessage<Localization.Message
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
 
-        message = fileManager.getMessage().getTab().getHeader();
-        permission = fileManager.getPermission().getMessage().getTab().getHeader();
+        message = fileResolver.getMessage().getTab().getHeader();
+        permission = fileResolver.getPermission().getMessage().getTab().getHeader();
     }
 
     @Override

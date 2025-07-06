@@ -9,7 +9,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.formatter.TimeFormatter;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
@@ -47,7 +47,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
     @Inject private PlatformPlayerAdapter platformPlayerAdapter;
     @Inject private PermissionChecker permissionChecker;
     @Inject private MuteChecker muteChecker;
-    @Inject private FileManager fileManager;
+    @Inject private FileResolver fileResolver;
     @Inject private MessagePipeline messagePipeline;
     @Inject private ModerationMessageFormatter moderationMessageFormatter;
     @Inject private TimeFormatter timeFormatter;
@@ -93,15 +93,15 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
     }
 
     public String getCooldownMessage(FEntity sender) {
-        return fileManager.getLocalization(sender).getCooldown();
+        return fileResolver.getLocalization(sender).getCooldown();
     }
 
     public M resolveLocalization() {
-        return messageResolver.apply(fileManager.getLocalization());
+        return messageResolver.apply(fileResolver.getLocalization());
     }
 
     public M resolveLocalization(FEntity sender) {
-        return messageResolver.apply(fileManager.getLocalization(sender));
+        return messageResolver.apply(fileResolver.getLocalization(sender));
     }
 
     public Builder builder(FEntity fPlayer) {
@@ -142,7 +142,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
     }
 
     public boolean sendDisableMessage(FEntity fPlayer, @NotNull FEntity fReceiver, DisableAction action) {
-        Localization.Command.Chatsetting.Disable localization = fileManager.getLocalization(fReceiver).getCommand().getChatsetting().getDisable();
+        Localization.Command.Chatsetting.Disable localization = fileResolver.getLocalization(fReceiver).getCommand().getChatsetting().getDisable();
 
         String string = switch (action) {
             case HE -> localization.getHe();
@@ -158,7 +158,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
     }
 
     public boolean checkIgnore(FPlayer fSender, FPlayer fReceiver) {
-        Localization.Command.Ignore localization = fileManager.getLocalization(fSender).getCommand().getIgnore();
+        Localization.Command.Ignore localization = fileResolver.getLocalization(fSender).getCommand().getIgnore();
 
         if (fSender.isIgnored(fReceiver)) {
             builder(fSender)

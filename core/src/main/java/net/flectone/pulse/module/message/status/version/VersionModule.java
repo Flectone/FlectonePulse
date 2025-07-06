@@ -6,7 +6,7 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 
@@ -17,11 +17,11 @@ public class VersionModule extends AbstractModuleMessage<Localization.Message.St
     private final Permission.Message.Status.Version permission;
 
     @Inject
-    public VersionModule(FileManager fileManager) {
+    public VersionModule(FileResolver fileResolver) {
         super(module -> module.getMessage().getStatus().getVersion());
 
-        message = fileManager.getMessage().getStatus().getVersion();
-        permission = fileManager.getPermission().getMessage().getStatus().getVersion();
+        message = fileResolver.getMessage().getStatus().getVersion();
+        permission = fileResolver.getPermission().getMessage().getStatus().getVersion();
     }
 
     @Override

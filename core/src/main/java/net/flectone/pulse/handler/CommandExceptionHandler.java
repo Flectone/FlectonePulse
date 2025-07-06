@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.sender.MessageSender;
 import net.kyori.adventure.text.Component;
@@ -21,15 +21,15 @@ import org.incendo.cloud.parser.standard.StringParser;
 @Singleton
 public class CommandExceptionHandler {
 
-    private final FileManager fileManager;
+    private final FileResolver fileResolver;
     private final MessageSender messageSender;
     private final MessagePipeline messagePipeline;
 
     @Inject
-    public CommandExceptionHandler(FileManager fileManager,
+    public CommandExceptionHandler(FileResolver fileResolver,
                                    MessageSender messageSender,
                                    MessagePipeline messagePipeline) {
-        this.fileManager = fileManager;
+        this.fileResolver = fileResolver;
         this.messageSender = messageSender;
         this.messagePipeline = messagePipeline;
     }
@@ -37,7 +37,7 @@ public class CommandExceptionHandler {
     public void handleArgumentParseException(ExceptionContext<FPlayer, ArgumentParseException> context) {
         FPlayer fPlayer = context.context().sender();
 
-        Localization.Command.Exception localizationException = fileManager.getLocalization(fPlayer)
+        Localization.Command.Exception localizationException = fileResolver.getLocalization(fPlayer)
                 .getCommand().getException();
 
         String message;
@@ -70,7 +70,7 @@ public class CommandExceptionHandler {
         FPlayer fPlayer = context.context().sender();
 
         String correctSyntax = context.exception().correctSyntax();
-        String message = fileManager.getLocalization(fPlayer)
+        String message = fileResolver.getLocalization(fPlayer)
                 .getCommand().getException().getSyntax()
                 .replace("<correct_syntax>", correctSyntax)
                 .replace("<command>", correctSyntax.split(" ")[0]);
@@ -85,7 +85,7 @@ public class CommandExceptionHandler {
     public void handleNoPermissionException(ExceptionContext<FPlayer, NoPermissionException> context) {
         FPlayer fPlayer = context.context().sender();
 
-        String message = fileManager.getLocalization(fPlayer)
+        String message = fileResolver.getLocalization(fPlayer)
                 .getCommand().getException().getPermission();
 
         Component componentMessage = messagePipeline.builder(fPlayer, message)
@@ -98,7 +98,7 @@ public class CommandExceptionHandler {
     public void handleCommandExecutionException(ExceptionContext<FPlayer, CommandExecutionException> context) {
         FPlayer fPlayer = context.context().sender();
 
-        String message = fileManager.getLocalization(fPlayer)
+        String message = fileResolver.getLocalization(fPlayer)
                 .getCommand().getException().getExecution()
                 .replace("<exception>", context.exception().getMessage());
 

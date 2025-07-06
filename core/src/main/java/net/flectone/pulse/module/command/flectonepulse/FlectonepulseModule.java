@@ -6,7 +6,7 @@ import net.flectone.pulse.FlectonePulse;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
@@ -27,13 +27,13 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     private final Permission.Command.Flectonepulse permission;
 
     private final FlectonePulse flectonePulse;
-    private final FileManager fileManager;
+    private final FileResolver fileResolver;
     private final CommandRegistry commandRegistry;
     private final TimeFormatter timeFormatter;
     private final FLogger fLogger;
 
     @Inject
-    public FlectonepulseModule(FileManager fileManager,
+    public FlectonepulseModule(FileResolver fileResolver,
                                CommandRegistry commandRegistry,
                                TimeFormatter timeFormatter,
                                FlectonePulse flectonePulse,
@@ -41,13 +41,13 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
         super(localization -> localization.getCommand().getFlectonepulse(), null);
 
         this.flectonePulse = flectonePulse;
-        this.fileManager = fileManager;
+        this.fileResolver = fileResolver;
         this.commandRegistry = commandRegistry;
         this.timeFormatter = timeFormatter;
         this.fLogger = fLogger;
 
-        command = fileManager.getCommand().getFlectonepulse();
-        permission = fileManager.getPermission().getCommand().getFlectonepulse();
+        command = fileResolver.getCommand().getFlectonepulse();
+        permission = fileResolver.getPermission().getCommand().getFlectonepulse();
 
         addPredicate(this::checkCooldown);
     }
@@ -84,7 +84,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
         String type = optionalType.orElse("all");
 
         if (type.equals("text")) {
-            fileManager.reload();
+            fileResolver.reload();
 
             builder(fPlayer)
                     .destination(command.getDestination())

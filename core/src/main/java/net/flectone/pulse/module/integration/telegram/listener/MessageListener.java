@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.telegram.TelegramIntegration;
 import net.flectone.pulse.util.MessageTag;
@@ -25,11 +25,11 @@ public class MessageListener extends EventListener {
     private final Provider<TelegramIntegration> telegramIntegration;
 
     @Inject
-    public MessageListener(FileManager fileManager,
+    public MessageListener(FileResolver fileResolver,
                            Provider<TelegramIntegration> telegramIntegration) {
         this.telegramIntegration = telegramIntegration;
 
-        integration = fileManager.getIntegration().getTelegram();
+        integration = fileResolver.getIntegration().getTelegram();
     }
 
     @Override

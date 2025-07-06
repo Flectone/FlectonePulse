@@ -8,7 +8,7 @@ import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
@@ -44,7 +44,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
     private final Gson gson;
 
     @Inject
-    public WarnModule(FileManager fileManager,
+    public WarnModule(FileResolver fileResolver,
                       FPlayerService fPlayerService,
                       ModerationService moderationService,
                       ModerationMessageFormatter moderationMessageFormatter,
@@ -62,8 +62,8 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         this.proxySender = proxySender;
         this.gson = gson;
 
-        command = fileManager.getCommand().getWarn();
-        permission = fileManager.getPermission().getCommand().getWarn();
+        command = fileResolver.getCommand().getWarn();
+        permission = fileResolver.getPermission().getCommand().getWarn();
     }
 
     @Override

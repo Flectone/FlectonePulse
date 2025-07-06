@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.format.image.model.FImage;
@@ -25,15 +25,15 @@ public class GreetingModule extends AbstractModuleMessage<Localization.Message.G
     private final FLogger fLogger;
 
     @Inject
-    public GreetingModule(FileManager fileManager,
+    public GreetingModule(FileResolver fileResolver,
                           SkinService skinService,
                           FLogger fLogger) {
         super(localization -> localization.getMessage().getGreeting());
         this.skinService = skinService;
         this.fLogger = fLogger;
 
-        message = fileManager.getMessage().getGreeting();
-        permission = fileManager.getPermission().getMessage().getGreeting();
+        message = fileResolver.getMessage().getGreeting();
+        permission = fileResolver.getPermission().getMessage().getGreeting();
     }
 
     @Override

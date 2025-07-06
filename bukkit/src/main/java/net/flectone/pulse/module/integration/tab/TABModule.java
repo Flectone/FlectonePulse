@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.objective.belowname.BelownameModule;
@@ -22,7 +22,7 @@ public class TABModule extends AbstractModule {
     private final TABIntegration tabIntegration;
 
     @Inject
-    public TABModule(FileManager fileManager,
+    public TABModule(FileResolver fileResolver,
                      TABIntegration tabIntegration,
                      HeaderModule headerModule,
                      FooterModule footerModule,
@@ -30,8 +30,8 @@ public class TABModule extends AbstractModule {
                      ScoreboardModule scoreboardModule,
                      BelownameModule belownameModule,
                      TabnameModule tabnameModule) {
-        integration = fileManager.getIntegration().getTAB();
-        permission = fileManager.getPermission().getIntegration().getTAB();
+        integration = fileResolver.getIntegration().getTAB();
+        permission = fileResolver.getPermission().getIntegration().getTAB();
 
         this.tabIntegration = tabIntegration;
 

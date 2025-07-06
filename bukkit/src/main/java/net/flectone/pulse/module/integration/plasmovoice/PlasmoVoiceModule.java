@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.AbstractModule;
 import su.plo.voice.api.server.PlasmoVoiceServer;
 
@@ -17,12 +17,12 @@ public class PlasmoVoiceModule extends AbstractModule {
     private final PlasmoVoiceIntegration plasmoVoiceIntegration;
 
     @Inject
-    public PlasmoVoiceModule(FileManager fileManager,
+    public PlasmoVoiceModule(FileResolver fileResolver,
                              PlasmoVoiceIntegration plasmoVoiceIntegration) {
         this.plasmoVoiceIntegration = plasmoVoiceIntegration;
 
-        config = fileManager.getIntegration().getPlasmovoice();
-        permission = fileManager.getPermission().getIntegration().getPlasmovoice();
+        config = fileResolver.getIntegration().getPlasmovoice();
+        permission = fileResolver.getPermission().getIntegration().getPlasmovoice();
     }
 
     @Override

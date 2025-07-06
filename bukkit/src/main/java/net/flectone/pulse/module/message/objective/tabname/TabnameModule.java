@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModule;
@@ -33,7 +33,7 @@ public class TabnameModule extends AbstractModule {
     private ScoreboardObjective scoreboardObjective;
 
     @Inject
-    public TabnameModule(FileManager fileManager,
+    public TabnameModule(FileResolver fileResolver,
                          ObjectiveManager objectiveManager,
                          FPlayerService fPlayerService,
                          PlatformPlayerAdapter platformPlayerAdapter,
@@ -43,8 +43,8 @@ public class TabnameModule extends AbstractModule {
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.taskScheduler = taskScheduler;
 
-        config = fileManager.getMessage().getObjective().getTabname();
-        permission = fileManager.getPermission().getMessage().getObjective().getTabname();
+        config = fileResolver.getMessage().getObjective().getTabname();
+        permission = fileResolver.getPermission().getMessage().getObjective().getTabname();
     }
 
     @Override

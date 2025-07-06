@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 
@@ -20,12 +20,12 @@ public class LuckPermsModule extends AbstractModule {
     private final LuckPermsIntegration luckPermsIntegration;
 
     @Inject
-    public LuckPermsModule(FileManager fileManager,
+    public LuckPermsModule(FileResolver fileResolver,
                            LuckPermsIntegration luckPermsIntegration) {
         this.luckPermsIntegration = luckPermsIntegration;
 
-        integration = fileManager.getIntegration().getLuckperms();
-        permission = fileManager.getPermission().getIntegration().getLuckperms();
+        integration = fileResolver.getIntegration().getLuckperms();
+        permission = fileResolver.getPermission().getIntegration().getLuckperms();
     }
 
     @Override

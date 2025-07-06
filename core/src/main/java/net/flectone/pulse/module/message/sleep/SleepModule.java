@@ -6,7 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.sleep.listener.SleepPacketListener;
@@ -26,7 +26,7 @@ public class SleepModule extends AbstractModuleMessage<Localization.Message.Slee
     private final ListenerRegistry listenerRegistry;
 
     @Inject
-    public SleepModule(FileManager fileManager,
+    public SleepModule(FileResolver fileResolver,
                        FPlayerService fPlayerService,
                        ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getSleep());
@@ -34,8 +34,8 @@ public class SleepModule extends AbstractModuleMessage<Localization.Message.Slee
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
 
-        message = fileManager.getMessage().getSleep();
-        permission = fileManager.getPermission().getMessage().getSleep();
+        message = fileResolver.getMessage().getSleep();
+        permission = fileResolver.getPermission().getMessage().getSleep();
     }
 
     @Override

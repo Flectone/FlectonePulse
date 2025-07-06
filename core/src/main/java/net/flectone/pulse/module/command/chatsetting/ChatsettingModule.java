@@ -10,7 +10,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.controller.InventoryController;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.inventory.Inventory;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -40,7 +40,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     private final PlatformServerAdapter platformServerAdapter;
 
     @Inject
-    public ChatsettingModule(FileManager fileManager,
+    public ChatsettingModule(FileResolver fileResolver,
                              FPlayerService fPlayerService,
                              MessagePipeline messagePipeline,
                              CommandRegistry commandRegistry,
@@ -56,10 +56,10 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         this.inventoryController = inventoryController;
         this.platformServerAdapter = platformServerAdapter;
 
-        chatMessage = fileManager.getMessage().getChat();
-        chatPermission = fileManager.getPermission().getMessage().getChat();
-        command = fileManager.getCommand().getChatsetting();
-        permission = fileManager.getPermission().getCommand().getChatsetting();
+        chatMessage = fileResolver.getMessage().getChat();
+        chatPermission = fileResolver.getPermission().getMessage().getChat();
+        command = fileResolver.getCommand().getChatsetting();
+        permission = fileResolver.getPermission().getCommand().getChatsetting();
 
         addPredicate(this::checkCooldown);
     }

@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -38,7 +38,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
     private final MessageSender messageSender;
 
     @Inject
-    public BanlistModule(FileManager fileManager,
+    public BanlistModule(FileResolver fileResolver,
                          FPlayerService fPlayerService,
                          ModerationService moderationService,
                          CommandRegistry commandRegistry,
@@ -56,8 +56,8 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         this.messagePipeline = messagePipeline;
         this.messageSender = messageSender;
 
-        command = fileManager.getCommand().getBanlist();
-        permission = fileManager.getPermission().getCommand().getBanlist();
+        command = fileResolver.getCommand().getBanlist();
+        permission = fileResolver.getPermission().getCommand().getBanlist();
 
         addPredicate(this::checkCooldown);
     }

@@ -7,7 +7,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.integration.FIntegration;
 
 @Singleton
@@ -19,9 +19,9 @@ public class DeeplIntegration implements FIntegration {
     private DeepLClient client;
 
     @Inject
-    public DeeplIntegration(FileManager fileManager,
+    public DeeplIntegration(FileResolver fileResolver,
                             FLogger fLogger) {
-        integration = fileManager.getIntegration().getDeepl();
+        integration = fileResolver.getIntegration().getDeepl();
 
         this.fLogger = fLogger;
     }

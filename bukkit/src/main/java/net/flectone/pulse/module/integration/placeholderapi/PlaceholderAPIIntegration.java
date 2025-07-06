@@ -9,7 +9,7 @@ import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
@@ -33,14 +33,14 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
 
     @Inject
     public PlaceholderAPIIntegration(FPlayerService fPlayerService,
-                                     FileManager fileManager,
+                                     FileResolver fileResolver,
                                      PlatformServerAdapter platformServerAdapter,
                                      FLogger fLogger) {
         this.fPlayerService = fPlayerService;
         this.platformServerAdapter = platformServerAdapter;
         this.fLogger = fLogger;
 
-        color = fileManager.getMessage().getFormat().getColor();
+        color = fileResolver.getMessage().getFormat().getColor();
     }
 
     @Override

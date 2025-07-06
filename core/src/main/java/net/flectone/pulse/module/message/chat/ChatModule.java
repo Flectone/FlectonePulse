@@ -5,7 +5,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -25,11 +25,11 @@ public abstract class ChatModule extends AbstractModuleMessage<Localization.Mess
 
     @Inject private PermissionChecker permissionChecker;
 
-    public ChatModule(FileManager fileManager) {
+    public ChatModule(FileResolver fileResolver) {
         super(localization -> localization.getMessage().getChat());
 
-        message = fileManager.getMessage().getChat();
-        permission = fileManager.getPermission().getMessage().getChat();
+        message = fileResolver.getMessage().getChat();
+        permission = fileResolver.getPermission().getMessage().getChat();
     }
 
     @Override

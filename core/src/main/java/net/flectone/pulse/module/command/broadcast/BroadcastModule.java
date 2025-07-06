@@ -6,7 +6,7 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
@@ -24,14 +24,14 @@ public class BroadcastModule extends AbstractModuleCommand<Localization.Command.
     private final CommandRegistry commandRegistry;
 
     @Inject
-    public BroadcastModule(FileManager fileManager,
+    public BroadcastModule(FileResolver fileResolver,
                            CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getBroadcast(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.BROADCAST));
 
         this.commandRegistry = commandRegistry;
 
-        command = fileManager.getCommand().getBroadcast();
-        permission = fileManager.getPermission().getCommand().getBroadcast();
+        command = fileResolver.getCommand().getBroadcast();
+        permission = fileResolver.getPermission().getCommand().getBroadcast();
 
         addPredicate(this::checkCooldown);
         addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));

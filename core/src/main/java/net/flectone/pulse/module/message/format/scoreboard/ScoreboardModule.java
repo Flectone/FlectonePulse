@@ -2,7 +2,7 @@ package net.flectone.pulse.module.message.format.scoreboard;
 
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModule;
@@ -17,11 +17,11 @@ public abstract class ScoreboardModule extends AbstractModule {
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
 
-    public ScoreboardModule(FileManager fileManager,
+    public ScoreboardModule(FileResolver fileResolver,
                             FPlayerService fPlayerService,
                             TaskScheduler taskScheduler) {
-        message = fileManager.getMessage().getFormat().getScoreboard();
-        permission = fileManager.getPermission().getMessage().getFormat().getScoreboard();
+        message = fileResolver.getMessage().getFormat().getScoreboard();
+        permission = fileResolver.getPermission().getMessage().getFormat().getScoreboard();
 
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;

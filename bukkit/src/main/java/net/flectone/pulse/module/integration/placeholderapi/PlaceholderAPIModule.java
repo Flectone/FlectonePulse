@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.registry.MessageProcessRegistry;
@@ -19,14 +19,14 @@ public class PlaceholderAPIModule extends AbstractModule {
     private final PlaceholderAPIIntegration placeholderAPIIntegration;
 
     @Inject
-    public PlaceholderAPIModule(FileManager fileManager,
+    public PlaceholderAPIModule(FileResolver fileResolver,
                                 PermissionChecker permissionChecker,
                                 PlaceholderAPIIntegration placeholderAPIIntegration,
                                 MessageProcessRegistry messageProcessRegistry) {
         this.placeholderAPIIntegration = placeholderAPIIntegration;
 
-        integration = fileManager.getIntegration().getPlaceholderapi();
-        permission = fileManager.getPermission().getIntegration().getPlaceholderapi();
+        integration = fileResolver.getIntegration().getPlaceholderapi();
+        permission = fileResolver.getPermission().getIntegration().getPlaceholderapi();
 
         messageProcessRegistry.register(10, messageContext -> {
             FEntity sender = messageContext.getSender();

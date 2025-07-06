@@ -8,7 +8,7 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.processor.MessageProcessor;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -40,7 +40,7 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
     private final MessagePipeline messagePipeline;
 
     @Inject
-    public MentionModule(FileManager fileManager,
+    public MentionModule(FileResolver fileResolver,
                          FPlayerService fPlayerService,
                          PermissionChecker permissionChecker,
                          IntegrationModule integrationModule,
@@ -53,8 +53,8 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
         this.integrationModule = integrationModule;
         this.messagePipeline = messagePipeline;
 
-        message = fileManager.getMessage().getFormat().getMention();
-        permission = fileManager.getPermission().getMessage().getFormat().getMention();
+        message = fileResolver.getMessage().getFormat().getMention();
+        permission = fileResolver.getPermission().getMessage().getFormat().getMention();
 
         messageProcessRegistry.register(100, this);
     }

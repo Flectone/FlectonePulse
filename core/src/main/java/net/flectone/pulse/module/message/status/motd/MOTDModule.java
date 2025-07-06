@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleListMessage;
 import net.flectone.pulse.pipeline.MessagePipeline;
@@ -22,14 +22,14 @@ public class MOTDModule extends AbstractModuleListMessage<Localization.Message.S
     private final MessagePipeline messagePipeline;
 
     @Inject
-    public MOTDModule(FileManager fileManager,
+    public MOTDModule(FileResolver fileResolver,
                       MessagePipeline messagePipeline) {
         super(localization -> localization.getMessage().getStatus().getMotd());
 
         this.messagePipeline = messagePipeline;
 
-        message = fileManager.getMessage().getStatus().getMotd();
-        permission = fileManager.getPermission().getMessage().getStatus().getMotd();
+        message = fileResolver.getMessage().getStatus().getMotd();
+        permission = fileResolver.getPermission().getMessage().getStatus().getMotd();
     }
 
     @Override

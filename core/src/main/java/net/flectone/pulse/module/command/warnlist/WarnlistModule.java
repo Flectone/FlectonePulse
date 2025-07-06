@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -38,7 +38,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
     private final MessageSender messageSender;
 
     @Inject
-    public WarnlistModule(FileManager fileManager,
+    public WarnlistModule(FileResolver fileResolver,
                           FPlayerService fPlayerService,
                           ModerationService moderationService,
                           ModerationMessageFormatter moderationMessageFormatter,
@@ -56,8 +56,8 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
         this.messageSender = messageSender;
         this.commandRegistry = commandRegistry;
 
-        command = fileManager.getCommand().getWarnlist();
-        permission = fileManager.getPermission().getCommand().getWarnlist();
+        command = fileResolver.getCommand().getWarnlist();
+        permission = fileResolver.getPermission().getCommand().getWarnlist();
     }
 
     @Override

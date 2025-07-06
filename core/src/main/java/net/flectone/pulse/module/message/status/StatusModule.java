@@ -12,7 +12,7 @@ import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -45,7 +45,7 @@ public class StatusModule extends AbstractModule {
     private final IntegrationModule integrationModule;
 
     @Inject
-    public StatusModule(FileManager fileManager,
+    public StatusModule(FileResolver fileResolver,
                         MOTDModule MOTDModule,
                         IconModule iconModule,
                         PlayersModule playersModule,
@@ -65,8 +65,8 @@ public class StatusModule extends AbstractModule {
         this.listenerRegistry = listenerRegistry;
         this.integrationModule = integrationModule;
 
-        message = fileManager.getMessage().getStatus();
-        permission = fileManager.getPermission().getMessage().getStatus();
+        message = fileResolver.getMessage().getStatus();
+        permission = fileResolver.getPermission().getMessage().getStatus();
 
         addChildren(MOTDModule.class);
         addChildren(IconModule.class);

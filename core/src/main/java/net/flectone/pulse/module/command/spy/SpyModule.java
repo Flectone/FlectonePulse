@@ -7,7 +7,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
@@ -31,7 +31,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
     private final PermissionChecker permissionChecker;
 
     @Inject
-    public SpyModule(FileManager fileManager,
+    public SpyModule(FileResolver fileResolver,
                      CommandRegistry commandRegistry,
                      FPlayerService fPlayerService,
                      PermissionChecker permissionChecker) {
@@ -41,8 +41,8 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
 
-        command = fileManager.getCommand().getSpy();
-        permission = fileManager.getPermission().getCommand().getSpy();
+        command = fileResolver.getCommand().getSpy();
+        permission = fileResolver.getPermission().getCommand().getSpy();
     }
 
     @Override

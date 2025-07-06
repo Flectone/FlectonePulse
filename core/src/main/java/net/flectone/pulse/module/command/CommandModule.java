@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.command.afk.AfkModule;
 import net.flectone.pulse.module.command.anon.AnonModule;
@@ -57,9 +57,9 @@ public class CommandModule extends AbstractModule {
     private final Permission.Command permission;
 
     @Inject
-    public CommandModule(FileManager fileManager) {
-        command = fileManager.getCommand();
-        permission = fileManager.getPermission().getCommand();
+    public CommandModule(FileResolver fileResolver) {
+        command = fileResolver.getCommand();
+        permission = fileResolver.getPermission().getCommand();
 
         addChildren(AfkModule.class);
         addChildren(AnonModule.class);

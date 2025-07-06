@@ -2,7 +2,7 @@ package net.flectone.pulse.sender;
 
 import lombok.Getter;
 import net.flectone.pulse.configuration.Config;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.util.DataConsumer;
 import net.flectone.pulse.util.MessageTag;
@@ -17,11 +17,11 @@ public abstract class ProxySender {
 
     @Getter private String channel;
 
-    public ProxySender(FileManager fileManager,
+    public ProxySender(FileResolver fileResolver,
                        FLogger fLogger) {
         this.fLogger = fLogger;
 
-        config = fileManager.getConfig();
+        config = fileResolver.getConfig();
     }
 
     public boolean isEnable() {

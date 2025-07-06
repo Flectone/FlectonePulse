@@ -6,7 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.gamemode.listener.GamemodePacketListener;
@@ -26,7 +26,7 @@ public class GamemodeModule extends AbstractModuleMessage<Localization.Message.G
     private final ListenerRegistry listenerRegistry;
 
     @Inject
-    public GamemodeModule(FileManager fileManager,
+    public GamemodeModule(FileResolver fileResolver,
                           FPlayerService fPlayerService,
                           ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getGamemode());
@@ -34,8 +34,8 @@ public class GamemodeModule extends AbstractModuleMessage<Localization.Message.G
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
 
-        message = fileManager.getMessage().getGamemode();
-        permission = fileManager.getPermission().getMessage().getGamemode();
+        message = fileResolver.getMessage().getGamemode();
+        permission = fileResolver.getPermission().getMessage().getGamemode();
     }
 
     @Override

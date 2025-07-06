@@ -7,7 +7,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.resolver.LibraryResolver;
@@ -22,14 +22,14 @@ public class YandexModule extends AbstractModule {
     private final Injector injector;
 
     @Inject
-    public YandexModule(FileManager fileManager,
+    public YandexModule(FileResolver fileResolver,
                         LibraryResolver libraryResolver,
                         Injector injector) {
         this.libraryResolver = libraryResolver;
         this.injector = injector;
 
-        integration = fileManager.getIntegration().getYandex();
-        permission = fileManager.getPermission().getIntegration().getYandex();
+        integration = fileResolver.getIntegration().getYandex();
+        permission = fileResolver.getPermission().getIntegration().getYandex();
     }
 
     @Override

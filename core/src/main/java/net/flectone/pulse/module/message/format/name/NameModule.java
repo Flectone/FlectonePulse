@@ -7,7 +7,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -34,7 +34,7 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
     private final PermissionChecker permissionChecker;
 
     @Inject
-    public NameModule(FileManager fileManager,
+    public NameModule(FileResolver fileResolver,
                       IntegrationModule integrationModule,
                       PermissionChecker permissionChecker,
                       MessagePipeline messagePipeline,
@@ -45,9 +45,9 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
         this.permissionChecker = permissionChecker;
         this.messagePipeline = messagePipeline;
 
-        message = fileManager.getMessage().getFormat().getName_();
-        permission = fileManager.getPermission().getMessage().getFormat().getName_();
-        formatPermission = fileManager.getPermission().getMessage().getFormat();
+        message = fileResolver.getMessage().getFormat().getName_();
+        permission = fileResolver.getPermission().getMessage().getFormat().getName_();
+        formatPermission = fileResolver.getPermission().getMessage().getFormat();
 
         messageProcessRegistry.register(150, this);
     }

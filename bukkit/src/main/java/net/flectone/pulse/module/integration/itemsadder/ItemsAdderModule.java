@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.registry.MessageProcessRegistry;
 
@@ -17,11 +17,11 @@ public class ItemsAdderModule extends AbstractModule {
     private final ItemsAdderIntegration itemsAdderIntegration;
 
     @Inject
-    public ItemsAdderModule(FileManager fileManager,
+    public ItemsAdderModule(FileResolver fileResolver,
                             ItemsAdderIntegration itemsAdderIntegration,
                             MessageProcessRegistry messageProcessRegistry) {
-        integration = fileManager.getIntegration().getItemsadder();
-        permission = fileManager.getPermission().getIntegration().getItemsadder();
+        integration = fileResolver.getIntegration().getItemsadder();
+        permission = fileResolver.getPermission().getIntegration().getItemsadder();
 
         this.itemsAdderIntegration = itemsAdderIntegration;
 

@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.registry.MessageProcessRegistry;
@@ -18,13 +18,13 @@ public class InteractiveChatModule extends AbstractModule {
     private final InteractiveChatIntegration interactiveChatIntegration;
 
     @Inject
-    public InteractiveChatModule(FileManager fileManager,
+    public InteractiveChatModule(FileResolver fileResolver,
                                  InteractiveChatIntegration interactiveChatIntegration,
                                  MessageProcessRegistry messageProcessRegistry) {
         this.interactiveChatIntegration = interactiveChatIntegration;
 
-        integration = fileManager.getIntegration().getInteractivechat();
-        permission = fileManager.getPermission().getIntegration().getInteractivechat();
+        integration = fileResolver.getIntegration().getInteractivechat();
+        permission = fileResolver.getPermission().getIntegration().getInteractivechat();
 
         messageProcessRegistry.register(0, interactiveChatIntegration);
     }

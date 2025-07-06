@@ -7,7 +7,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Config;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Mail;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
@@ -36,7 +36,7 @@ public class FPlayerService {
     private final PacketProvider packetProvider;
 
     @Inject
-    public FPlayerService(FileManager fileManager,
+    public FPlayerService(FileResolver fileResolver,
                           PlatformPlayerAdapter platformPlayerAdapter,
                           FPlayerRepository fPlayerRepository,
                           SocialRepository socialRepository,
@@ -44,7 +44,7 @@ public class FPlayerService {
                           IntegrationModule integrationModule,
                           PacketSender packetSender,
                           PacketProvider packetProvider) {
-        this.config = fileManager.getConfig();
+        this.config = fileResolver.getConfig();
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.fPlayerRepository = fPlayerRepository;
         this.socialRepository = socialRepository;

@@ -8,7 +8,7 @@ import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.sender.ProxySender;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
@@ -33,7 +33,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
     private final CommandRegistry commandRegistry;
 
     @Inject
-    public HelperModule(FileManager fileManager,
+    public HelperModule(FileResolver fileResolver,
                         FPlayerService fPlayerService,
                         ProxySender proxySender,
                         PermissionChecker permissionChecker,
@@ -45,8 +45,8 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
         this.permissionChecker = permissionChecker;
         this.commandRegistry = commandRegistry;
 
-        command = fileManager.getCommand().getHelper();
-        permission = fileManager.getPermission().getCommand().getHelper();
+        command = fileResolver.getCommand().getHelper();
+        permission = fileResolver.getPermission().getCommand().getHelper();
 
         addPredicate(this::checkCooldown);
         addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));

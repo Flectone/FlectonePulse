@@ -12,7 +12,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.twitch.listener.ChannelMessageListener;
@@ -37,7 +37,7 @@ public class TwitchIntegration implements FIntegration {
     private TwitchClient twitchClient;
 
     @Inject
-    public TwitchIntegration(FileManager fileManager,
+    public TwitchIntegration(FileResolver fileResolver,
                              PlatformServerAdapter platformServerAdapter,
                              SystemVariableResolver systemVariableResolver,
                              ChannelMessageListener channelMessageListener,
@@ -48,8 +48,8 @@ public class TwitchIntegration implements FIntegration {
         this.systemVariableResolver = systemVariableResolver;
         this.fLogger = fLogger;
 
-        integration = fileManager.getIntegration().getTwitch();
-        localization = fileManager.getLocalization().getIntegration().getTwitch();
+        integration = fileResolver.getIntegration().getTwitch();
+        localization = fileResolver.getLocalization().getIntegration().getTwitch();
     }
 
     @Async

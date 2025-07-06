@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
 import net.flectone.pulse.module.message.afk.AfkModule;
@@ -44,9 +44,9 @@ public class MessageModule extends AbstractModule {
     private final Permission.Message permission;
 
     @Inject
-    public MessageModule(FileManager fileManager) {
-        message = fileManager.getMessage();
-        permission = fileManager.getPermission().getMessage();
+    public MessageModule(FileResolver fileResolver) {
+        message = fileResolver.getMessage();
+        permission = fileResolver.getPermission().getMessage();
 
         addChildren(AdvancementModule.class);
         addChildren(AfkModule.class);

@@ -8,7 +8,7 @@ import lombok.SneakyThrows;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
@@ -27,14 +27,14 @@ public class TwitchModule extends AbstractModule {
     private final Injector injector;
 
     @Inject
-    public TwitchModule(FileManager fileManager,
+    public TwitchModule(FileResolver fileResolver,
                         LibraryResolver libraryResolver,
                         Injector injector) {
         this.libraryResolver = libraryResolver;
         this.injector = injector;
 
-        integration = fileManager.getIntegration().getTwitch();
-        permission = fileManager.getPermission().getIntegration().getTwitch();
+        integration = fileResolver.getIntegration().getTwitch();
+        permission = fileResolver.getPermission().getIntegration().getTwitch();
 
         addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.isSetting(FPlayer.Setting.TWITCH));
     }

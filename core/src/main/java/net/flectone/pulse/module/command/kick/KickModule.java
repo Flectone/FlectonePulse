@@ -9,7 +9,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
@@ -38,7 +38,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
     private final Gson gson;
 
     @Inject
-    public KickModule(FileManager fileManager,
+    public KickModule(FileResolver fileResolver,
                       FPlayerService fPlayerService,
                       ModerationService moderationService,
                       ModerationMessageFormatter moderationMessageFormatter,
@@ -54,8 +54,8 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         this.messagePipeline = messagePipeline;
         this.gson = gson;
 
-        command = fileManager.getCommand().getKick();
-        permission = fileManager.getPermission().getCommand().getKick();
+        command = fileResolver.getCommand().getKick();
+        permission = fileResolver.getPermission().getCommand().getKick();
     }
 
     @Override

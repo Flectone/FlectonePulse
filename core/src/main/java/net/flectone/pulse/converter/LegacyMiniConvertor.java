@@ -29,7 +29,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.registry.MessageProcessRegistry;
@@ -64,12 +64,12 @@ public final class LegacyMiniConvertor implements MessageProcessor {
     private final PermissionChecker permissionChecker;
 
     @Inject
-    public LegacyMiniConvertor(FileManager fileManager,
+    public LegacyMiniConvertor(FileResolver fileResolver,
                                MessageProcessRegistry messageProcessRegistry,
                                PermissionChecker permissionChecker) {
         this.permissionChecker = permissionChecker;
 
-        formatPermission = fileManager.getPermission().getMessage().getFormat();
+        formatPermission = fileResolver.getPermission().getMessage().getFormat();
 
         messageProcessRegistry.register(200, this);
     }

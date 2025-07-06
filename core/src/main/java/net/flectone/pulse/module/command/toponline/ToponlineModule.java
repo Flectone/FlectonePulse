@@ -7,7 +7,7 @@ import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.formatter.TimeFormatter;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.pipeline.MessagePipeline;
@@ -35,7 +35,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
     private final TimeFormatter timeFormatter;
 
     @Inject
-    public ToponlineModule(FileManager fileManager,
+    public ToponlineModule(FileResolver fileResolver,
                            PlatformPlayerAdapter platformPlayerAdapter,
                            CommandRegistry commandRegistry,
                            MessagePipeline messagePipeline,
@@ -49,8 +49,8 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
         this.messageSender = messageSender;
         this.timeFormatter = timeFormatter;
 
-        command = fileManager.getCommand().getToponline();
-        permission = fileManager.getPermission().getCommand().getToponline();
+        command = fileResolver.getCommand().getToponline();
+        permission = fileResolver.getPermission().getCommand().getToponline();
 
         addPredicate(this::checkCooldown);
         addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));

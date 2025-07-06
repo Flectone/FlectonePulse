@@ -19,7 +19,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
@@ -46,7 +46,7 @@ public class BubbleRenderer {
     
     private final Map<String, Deque<BubbleEntity>> activeBubbleEntities = new ConcurrentHashMap<>();
     
-    private final FileManager fileManager;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PacketSender packetSender;
@@ -56,7 +56,7 @@ public class BubbleRenderer {
     private final RandomUtil randomUtil;
     
     @Inject
-    public BubbleRenderer(FileManager fileManager,
+    public BubbleRenderer(FileResolver fileResolver,
                           FPlayerService fPlayerService,
                           PlatformPlayerAdapter platformPlayerAdapter,
                           PacketSender packetSender,
@@ -64,7 +64,7 @@ public class BubbleRenderer {
                           IntegrationModule integrationModule,
                           TaskScheduler taskScheduler,
                           RandomUtil randomUtil) {
-        this.fileManager = fileManager;
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.packetSender = packetSender;
@@ -78,7 +78,7 @@ public class BubbleRenderer {
         FPlayer sender = bubble.getSender();
         if (!isCorrectPlayer(sender)) return;
 
-        Message.Bubble config = fileManager.getMessage().getBubble();
+        Message.Bubble config = fileResolver.getMessage().getBubble();
         double viewDistance = config.getDistance();
 
         CompletableFuture<List<UUID>> nearbyEntitiesFuture = new CompletableFuture<>();
@@ -170,7 +170,7 @@ public class BubbleRenderer {
     }
     
     private Component createFormattedMessage(Bubble bubble, FPlayer viewer) {
-        Localization.Message.Bubble localization = fileManager.getLocalization(viewer).getMessage().getBubble();
+        Localization.Message.Bubble localization = fileResolver.getLocalization(viewer).getMessage().getBubble();
 
         Component message = messagePipeline.builder(bubble.getSender(), viewer, bubble.getRawMessage())
                 .userMessage(true)

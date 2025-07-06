@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.status.StatusModule;
 
@@ -17,11 +17,11 @@ public class MiniMOTDModule extends AbstractModule {
     private final MiniMOTDIntegration miniMOTDIntegration;
 
     @Inject
-    public MiniMOTDModule(FileManager fileManager,
+    public MiniMOTDModule(FileResolver fileResolver,
                           MiniMOTDIntegration miniMOTDIntegration,
                           StatusModule statusModule) {
-        integration = fileManager.getIntegration().getMinimotd();
-        permission = fileManager.getPermission().getIntegration().getMinimotd();
+        integration = fileResolver.getIntegration().getMinimotd();
+        permission = fileResolver.getPermission().getIntegration().getMinimotd();
 
         this.miniMOTDIntegration = miniMOTDIntegration;
 

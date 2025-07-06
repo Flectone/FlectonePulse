@@ -1,4 +1,4 @@
-package net.flectone.pulse.manager;
+package net.flectone.pulse.resolver;
 
 
 import com.google.inject.Inject;
@@ -10,7 +10,6 @@ import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.configuration.*;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.util.TagType;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -20,13 +19,11 @@ import java.util.Set;
 
 
 @Singleton
-public class FileManager {
+public class FileResolver {
 
     private final Map<String, Localization> localizationMap = new HashMap<>();
 
-    @Getter
-    private final Path projectPath;
-
+    @Getter private final Path projectPath;
     @Getter private final Command command;
     @Getter private final Config config;
     @Getter private final Integration integration;
@@ -38,7 +35,7 @@ public class FileManager {
     private Localization defaultLocalization;
 
     @Inject
-    public FileManager(@Named("projectPath") Path projectPath) {
+    public FileResolver(@Named("projectPath") Path projectPath) {
         this.projectPath = projectPath;
 
         command = new Command(projectPath);
@@ -68,8 +65,6 @@ public class FileManager {
         if (!preInitVersion.equals(BuildConfig.PROJECT_VERSION)) {
             config.setVersion(BuildConfig.PROJECT_VERSION);
             config.save();
-
-            upgradeIfNewerThanV_0_1_0(preInitVersion);
         }
 
         command.reload();
@@ -103,27 +98,11 @@ public class FileManager {
         localizationMap.put(language, localization);
     }
 
-    public void upgradeIfNewerThanV_0_1_0(String version) {
-        if (isOlderThan("0.1.0", version)) return;
-
-        Map<TagType, Permission.PermissionEntry> permissionMap = permission.getMessage().getFormat().getTags();
-        if (permissionMap.containsKey(TagType.PRIDE)) return;
-
-        permissionMap.put(TagType.PRIDE, new Permission.PermissionEntry("flectonepulse.module.message.format.pride", Permission.Type.OP));
-        permissionMap.put(TagType.SHADOW_COLOR, new Permission.PermissionEntry("flectonepulse.module.message.format.shadow_color", Permission.Type.OP));
-
-        Map<TagType, Message.Format.Tag> messageMap = message.getFormat().getTags();
-        messageMap.put(TagType.PRIDE, new Message.Format.KyoriTag());
-        messageMap.put(TagType.SHADOW_COLOR, new Message.Format.KyoriTag());
-
-        save();
-    }
-
-    public boolean isOlderThan(String first, String second) {
-        String[] subFirst = splitNumbers(first);
+    public boolean isVersionOlderThan(String first, String second) {
+        String[] subFirst = parseVersionNumbers(first);
         if (subFirst.length != 3) return false;
 
-        String[] subSecond = splitNumbers(second);
+        String[] subSecond = parseVersionNumbers(second);
         if (subSecond.length != 3) return true;
 
         for (int i = 0; i < 3; i++) {
@@ -138,7 +117,7 @@ public class FileManager {
         return false;
     }
 
-    private String[] splitNumbers(String string) {
+    private String[] parseVersionNumbers(String string) {
         int endIndex = string.indexOf('-');
         return (endIndex == -1 ? string : string.substring(0, endIndex)).split("\\.");
     }

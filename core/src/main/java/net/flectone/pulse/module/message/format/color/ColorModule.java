@@ -7,7 +7,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
@@ -34,14 +34,14 @@ public class ColorModule extends AbstractModule implements MessageProcessor {
     private final PermissionChecker permissionChecker;
 
     @Inject
-    public ColorModule(FileManager fileManager,
+    public ColorModule(FileResolver fileResolver,
                        PermissionChecker permissionChecker,
                        MessageProcessRegistry messageProcessRegistry) {
         this.permissionChecker = permissionChecker;
 
-        message = fileManager.getMessage().getFormat().getColor();
-        permission = fileManager.getPermission().getMessage().getFormat().getColor();
-        formatPermission = fileManager.getPermission().getMessage().getFormat();
+        message = fileResolver.getMessage().getFormat().getColor();
+        permission = fileResolver.getPermission().getMessage().getFormat().getColor();
+        formatPermission = fileResolver.getPermission().getMessage().getFormat();
 
         messageProcessRegistry.register(150, this);
     }

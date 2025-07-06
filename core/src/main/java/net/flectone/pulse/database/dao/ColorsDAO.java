@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.database.sql.ColorsSQL;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 
 import java.util.List;
@@ -17,9 +17,9 @@ public class ColorsDAO extends BaseDAO<ColorsSQL> {
     private final Config.Database config;
 
     @Inject
-    public ColorsDAO(FileManager fileManager, Database database) {
+    public ColorsDAO(FileResolver fileResolver, Database database) {
         super(database, ColorsSQL.class);
-        this.config = fileManager.getConfig().getDatabase();
+        this.config = fileResolver.getConfig().getDatabase();
     }
 
     public record ColorEntry(int number, String name) {}

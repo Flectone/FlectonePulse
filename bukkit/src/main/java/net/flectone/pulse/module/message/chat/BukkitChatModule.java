@@ -8,7 +8,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.formatter.TimeFormatter;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -43,7 +43,7 @@ public class BukkitChatModule extends ChatModule {
     private final Provider<SpyModule> spyModuleProvider;
 
     @Inject
-    public BukkitChatModule(FileManager fileManager,
+    public BukkitChatModule(FileResolver fileResolver,
                             FPlayerService fPlayerService,
                             BukkitListenerRegistry bukkitListenerManager,
                             IntegrationModule integrationModule,
@@ -51,7 +51,7 @@ public class BukkitChatModule extends ChatModule {
                             TimeFormatter timeFormatter,
                             Provider<BukkitBubbleModule> bubbleModuleProvider,
                             Provider<SpyModule> spyModuleProvider) {
-        super(fileManager);
+        super(fileResolver);
 
         this.fPlayerService = fPlayerService;
         this.bukkitListenerManager = bukkitListenerManager;

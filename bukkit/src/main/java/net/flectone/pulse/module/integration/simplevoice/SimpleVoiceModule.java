@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import de.maxhenkel.voicechat.api.BukkitVoicechatService;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.AbstractModule;
 import org.bukkit.plugin.Plugin;
 
@@ -19,14 +19,14 @@ public class SimpleVoiceModule extends AbstractModule {
     private final SimpleVoiceIntegration simpleVoiceIntegration;
 
     @Inject
-    public SimpleVoiceModule(FileManager fileManager,
+    public SimpleVoiceModule(FileResolver fileResolver,
                              Plugin plugin,
                              SimpleVoiceIntegration simpleVoiceIntegration) {
         this.plugin = plugin;
         this.simpleVoiceIntegration = simpleVoiceIntegration;
 
-        config = fileManager.getIntegration().getSimplevoice();
-        permission = fileManager.getPermission().getIntegration().getSimplevoice();
+        config = fileResolver.getIntegration().getSimplevoice();
+        permission = fileResolver.getPermission().getIntegration().getSimplevoice();
     }
 
     @Override

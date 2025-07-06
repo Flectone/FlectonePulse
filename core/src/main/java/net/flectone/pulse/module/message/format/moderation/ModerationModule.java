@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.moderation.caps.CapsModule;
 import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
@@ -18,9 +18,9 @@ public class ModerationModule extends AbstractModule {
     private final Permission.Message.Format.Moderation permission;
 
     @Inject
-    public ModerationModule(FileManager fileManager) {
-        message = fileManager.getMessage().getFormat().getModeration();
-        permission = fileManager.getPermission().getMessage().getFormat().getModeration();
+    public ModerationModule(FileResolver fileResolver) {
+        message = fileResolver.getMessage().getFormat().getModeration();
+        permission = fileResolver.getPermission().getMessage().getFormat().getModeration();
 
         addChildren(CapsModule.class);
         addChildren(NewbieModule.class);

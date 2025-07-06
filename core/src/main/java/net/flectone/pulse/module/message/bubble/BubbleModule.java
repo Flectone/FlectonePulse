@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.bubble.service.BubbleService;
@@ -20,10 +20,10 @@ public class BubbleModule extends AbstractModule {
     private final BubbleService bubbleService;
 
     @Inject
-    public BubbleModule(FileManager fileManager,
+    public BubbleModule(FileResolver fileResolver,
                         BubbleService bubbleService) {
-        message = fileManager.getMessage().getBubble();
-        permission = fileManager.getPermission().getMessage().getBubble();
+        message = fileResolver.getMessage().getBubble();
+        permission = fileResolver.getPermission().getMessage().getBubble();
 
         this.bubbleService = bubbleService;
     }

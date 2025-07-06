@@ -6,7 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -26,7 +26,7 @@ public class SetblockModule extends AbstractModuleMessage<Localization.Message.S
     private final ListenerRegistry listenerRegistry;
 
     @Inject
-    public SetblockModule(FileManager fileManager,
+    public SetblockModule(FileResolver fileResolver,
                           FPlayerService fPlayerService,
                           ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getSetblock());
@@ -34,8 +34,8 @@ public class SetblockModule extends AbstractModuleMessage<Localization.Message.S
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
 
-        message = fileManager.getMessage().getSetblock();
-        permission = fileManager.getPermission().getMessage().getSetblock();
+        message = fileResolver.getMessage().getSetblock();
+        permission = fileResolver.getPermission().getMessage().getSetblock();
     }
 
     @Override

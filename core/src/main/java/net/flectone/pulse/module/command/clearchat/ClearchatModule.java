@@ -6,7 +6,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
@@ -28,7 +28,7 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
 
     @Inject
     public ClearchatModule(FPlayerService fPlayerService,
-                           FileManager fileManager,
+                           FileResolver fileResolver,
                            CommandRegistry commandRegistry,
                            PermissionChecker permissionChecker) {
         super(localization -> localization.getCommand().getClearchat(), null);
@@ -37,8 +37,8 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
         this.commandRegistry = commandRegistry;
         this.permissionChecker = permissionChecker;
 
-        command = fileManager.getCommand().getClearchat();
-        permission = fileManager.getPermission().getCommand().getClearchat();
+        command = fileResolver.getCommand().getClearchat();
+        permission = fileResolver.getPermission().getCommand().getClearchat();
 
         addPredicate(this::checkCooldown);
     }

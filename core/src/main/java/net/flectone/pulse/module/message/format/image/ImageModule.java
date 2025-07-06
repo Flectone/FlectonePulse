@@ -9,7 +9,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.image.model.FImage;
@@ -44,14 +44,14 @@ public class ImageModule extends AbstractModule implements MessageProcessor {
     private final MessagePipeline messagePipeline;
 
     @Inject
-    public ImageModule(FileManager fileManager,
+    public ImageModule(FileResolver fileResolver,
                        MessagePipeline messagePipeline,
                        MessageProcessRegistry messageProcessRegistry) {
 
         this.messagePipeline = messagePipeline;
 
-        message = fileManager.getMessage().getFormat().getImage();
-        permission = fileManager.getPermission().getMessage().getFormat().getImage();
+        message = fileResolver.getMessage().getFormat().getImage();
+        permission = fileResolver.getPermission().getMessage().getFormat().getImage();
 
         messageProcessRegistry.register(100, this);
     }

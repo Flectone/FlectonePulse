@@ -3,7 +3,7 @@ package net.flectone.pulse.module.message.format.scoreboard;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.scheduler.TaskScheduler;
@@ -26,18 +26,18 @@ public class BukkitScoreboardModule extends ScoreboardModule {
     private final FPlayerService fPlayerService;
 
     @Inject
-    public BukkitScoreboardModule(FileManager fileManager,
+    public BukkitScoreboardModule(FileResolver fileResolver,
                                   TeamManager teamManager,
                                   FPlayerService fPlayerService,
                                   TaskScheduler taskScheduler,
                                   MessagePipeline messagePipeline) {
-        super(fileManager, fPlayerService, taskScheduler);
+        super(fileResolver, fPlayerService, taskScheduler);
 
         this.teamManager = teamManager;
         this.fPlayerService = fPlayerService;
         this.messagePipeline = messagePipeline;
 
-        message = fileManager.getMessage().getFormat().getScoreboard();
+        message = fileResolver.getMessage().getFormat().getScoreboard();
     }
 
     @Override

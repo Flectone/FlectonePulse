@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.BukkitProxyListener;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.pipeline.MessagePipeline;
@@ -25,7 +25,7 @@ import java.util.Set;
 @Singleton
 public class BukkitProxySender extends ProxySender {
 
-    private final FileManager fileManager;
+    private final FileResolver fileResolver;
     private final FLogger fLogger;
     private final Plugin plugin;
     private final Gson gson;
@@ -33,15 +33,15 @@ public class BukkitProxySender extends ProxySender {
     private final MessagePipeline messagePipeline;
 
     @Inject
-    public BukkitProxySender(FileManager fileManager,
+    public BukkitProxySender(FileResolver fileResolver,
                              FLogger fLogger,
                              Plugin plugin,
                              Gson gson,
                              Provider<BukkitProxyListener> proxyListenerProvider,
                              MessagePipeline messagePipeline) {
-        super(fileManager, fLogger);
+        super(fileResolver, fLogger);
 
-        this.fileManager = fileManager;
+        this.fileResolver = fileResolver;
         this.fLogger = fLogger;
         this.plugin = plugin;
         this.gson = gson;
@@ -76,7 +76,7 @@ public class BukkitProxySender extends ProxySender {
         if (tag == null) return false;
         if (outputConsumer == null) return false;
 
-        Set<String> clusters = fileManager.getConfig().getClusters();
+        Set<String> clusters = fileResolver.getConfig().getClusters();
 
         try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
              DataOutputStream output = new DataOutputStream(byteStream)) {
@@ -109,7 +109,7 @@ public class BukkitProxySender extends ProxySender {
     }
 
     private String getConstantName(FEntity sender) {
-        String message = fileManager.getLocalization(sender).getMessage().getFormat().getName_().getConstant();
+        String message = fileResolver.getLocalization(sender).getMessage().getFormat().getName_().getConstant();
         if (message.isEmpty()) return "";
 
         return messagePipeline.builder(sender, message).defaultSerializerBuild();

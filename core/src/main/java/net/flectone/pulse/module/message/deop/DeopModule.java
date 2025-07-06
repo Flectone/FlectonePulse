@@ -6,7 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.deop.listener.DeopPacketListener;
@@ -26,7 +26,7 @@ public class DeopModule extends AbstractModuleMessage<Localization.Message.Deop>
     private final ListenerRegistry listenerRegistry;
 
     @Inject
-    public DeopModule(FileManager fileManager,
+    public DeopModule(FileResolver fileResolver,
                       FPlayerService fPlayerService,
                       ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getDeop());
@@ -34,8 +34,8 @@ public class DeopModule extends AbstractModuleMessage<Localization.Message.Deop>
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
 
-        message = fileManager.getMessage().getDeop();
-        permission = fileManager.getPermission().getMessage().getDeop();
+        message = fileResolver.getMessage().getDeop();
+        permission = fileResolver.getPermission().getMessage().getDeop();
     }
 
     @Override

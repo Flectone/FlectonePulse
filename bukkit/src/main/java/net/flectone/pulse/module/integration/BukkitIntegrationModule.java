@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformServerAdapter;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -42,11 +42,11 @@ public class BukkitIntegrationModule extends IntegrationModule {
     private final Injector injector;
 
     @Inject
-    public BukkitIntegrationModule(FileManager fileManager,
+    public BukkitIntegrationModule(FileResolver fileResolver,
                                    FLogger fLogger,
                                    PlatformServerAdapter platformServerAdapter,
                                    Injector injector) {
-        super(fileManager, injector);
+        super(fileResolver, injector);
 
         this.injector = injector;
 

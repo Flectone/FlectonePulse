@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.model.ExternalModeration;
@@ -28,7 +28,7 @@ public class LiteBansModule extends AbstractModule {
     private final LiteBansIntegration liteBansIntegration;
 
     @Inject
-    public LiteBansModule(FileManager fileManager,
+    public LiteBansModule(FileResolver fileResolver,
                           LiteBansIntegration liteBansIntegration,
                           BanModule banModule,
                           BanlistModule banlistModule,
@@ -42,8 +42,8 @@ public class LiteBansModule extends AbstractModule {
                           KickModule kickModule) {
         this.liteBansIntegration = liteBansIntegration;
 
-        integration = fileManager.getIntegration().getLitebans();
-        permission = fileManager.getPermission().getIntegration().getLitebans();
+        integration = fileResolver.getIntegration().getLitebans();
+        permission = fileResolver.getPermission().getIntegration().getLitebans();
 
         banModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseBan() && isHooked());
         banlistModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseBan() && isHooked());

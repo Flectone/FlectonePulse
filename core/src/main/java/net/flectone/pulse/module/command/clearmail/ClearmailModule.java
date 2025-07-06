@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.model.Mail;
@@ -27,7 +27,7 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
     private final CommandRegistry commandRegistry;
 
     @Inject
-    public ClearmailModule(FileManager fileManager,
+    public ClearmailModule(FileResolver fileResolver,
                            FPlayerService fPlayerService,
                            CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getClearmail(), null);
@@ -35,8 +35,8 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
         this.fPlayerService = fPlayerService;
         this.commandRegistry = commandRegistry;
 
-        command = fileManager.getCommand().getClearmail();
-        permission = fileManager.getPermission().getCommand().getClearmail();
+        command = fileResolver.getCommand().getClearmail();
+        permission = fileResolver.getPermission().getCommand().getClearmail();
 
         addPredicate(this::checkCooldown);
     }

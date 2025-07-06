@@ -3,7 +3,7 @@ package net.flectone.pulse.formatter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import org.apache.commons.lang.time.DurationFormatUtils;
 
@@ -18,16 +18,16 @@ public class TimeFormatter {
 
     private final Format DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private final FileManager fileManager;
+    private final FileResolver fileResolver;
 
     @Inject
-    public TimeFormatter(FileManager fileManager) {
-        this.fileManager = fileManager;
+    public TimeFormatter(FileResolver fileResolver) {
+        this.fileResolver = fileResolver;
     }
 
     public String format(FPlayer fPlayer, long time) {
 
-        Localization.Time message = fileManager.getLocalization(fPlayer).getTime();
+        Localization.Time message = fileResolver.getLocalization(fPlayer).getTime();
         if (message.getFormat().isEmpty()) return "";
 
         String formattedTime = DurationFormatUtils.formatDuration(time, message.getFormat(), false);

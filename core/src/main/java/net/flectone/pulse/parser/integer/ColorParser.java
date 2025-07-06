@@ -6,7 +6,7 @@ import lombok.NonNull;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.converter.ColorConverter;
 import org.incendo.cloud.context.CommandContext;
@@ -30,11 +30,11 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
     private final StringParser<FPlayer> stringParser;
 
     @Inject
-    public ColorParser(FileManager fileManager,
+    public ColorParser(FileResolver fileResolver,
                        PermissionChecker permissionChecker,
                        ColorConverter colorConverter) {
-        this.colorMessage = fileManager.getMessage().getFormat().getColor();
-        this.chatcolorPermission = fileManager.getPermission().getCommand().getChatcolor();
+        this.colorMessage = fileResolver.getMessage().getFormat().getColor();
+        this.chatcolorPermission = fileResolver.getPermission().getCommand().getChatcolor();
         this.permissionChecker = permissionChecker;
         this.colorConverter = colorConverter;
         this.stringParser = new StringParser<>(StringParser.StringMode.SINGLE);

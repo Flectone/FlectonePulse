@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.Range;
@@ -20,8 +20,8 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
     private final Integration.Twitch integration;
 
     @Inject
-    public ChannelMessageListener(FileManager fileManager) {
-        integration = fileManager.getIntegration().getTwitch();
+    public ChannelMessageListener(FileResolver fileResolver) {
+        integration = fileResolver.getIntegration().getTwitch();
     }
 
     public Class<ChannelMessageEvent> getEventType() {

@@ -6,7 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.service.FPlayerService;
@@ -26,7 +26,7 @@ public class BedModule extends AbstractModuleMessage<Localization.Message.Bed> {
     private final ListenerRegistry listenerRegistry;
 
     @Inject
-    public BedModule(FileManager fileManager,
+    public BedModule(FileResolver fileResolver,
                      FPlayerService fPlayerService,
                      ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getBed());
@@ -34,8 +34,8 @@ public class BedModule extends AbstractModuleMessage<Localization.Message.Bed> {
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
 
-        message = fileManager.getMessage().getBed();
-        permission = fileManager.getPermission().getMessage().getBed();
+        message = fileResolver.getMessage().getBed();
+        permission = fileResolver.getPermission().getMessage().getBed();
     }
 
     @Override

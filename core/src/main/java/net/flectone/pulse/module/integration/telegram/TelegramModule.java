@@ -8,7 +8,7 @@ import lombok.SneakyThrows;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
@@ -27,14 +27,14 @@ public class TelegramModule extends AbstractModule {
     private final Injector injector;
 
     @Inject
-    public TelegramModule(FileManager fileManager,
+    public TelegramModule(FileResolver fileResolver,
                           LibraryResolver libraryResolver,
                           Injector injector) {
         this.libraryResolver = libraryResolver;
         this.injector = injector;
 
-        integration = fileManager.getIntegration().getTelegram();
-        permission = fileManager.getPermission().getIntegration().getTelegram();
+        integration = fileResolver.getIntegration().getTelegram();
+        permission = fileResolver.getPermission().getIntegration().getTelegram();
 
         addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.isSetting(FPlayer.Setting.TELEGRAM));
     }

@@ -6,7 +6,7 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
@@ -24,14 +24,14 @@ public class DoModule extends AbstractModuleCommand<Localization.Command.Do> {
     private final CommandRegistry commandRegistry;
 
     @Inject
-    public DoModule(FileManager fileManager,
+    public DoModule(FileResolver fileResolver,
                     CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getDo(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.DO));
 
         this.commandRegistry = commandRegistry;
 
-        command = fileManager.getCommand().getDo();
-        permission = fileManager.getPermission().getCommand().getDo();
+        command = fileResolver.getCommand().getDo();
+        permission = fileResolver.getPermission().getCommand().getDo();
 
         addPredicate(this::checkCooldown);
         addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));

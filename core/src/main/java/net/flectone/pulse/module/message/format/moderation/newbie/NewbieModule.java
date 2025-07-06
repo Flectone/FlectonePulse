@@ -7,7 +7,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -22,15 +22,15 @@ public class NewbieModule extends AbstractModuleMessage<Localization.Message.For
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Inject
-    public NewbieModule(FileManager fileManager,
+    public NewbieModule(FileResolver fileResolver,
                         PermissionChecker permissionChecker,
                         PlatformPlayerAdapter platformPlayerAdapter) {
         super(localization -> localization.getMessage().getFormat().getModeration().getNewbie());
         this.permissionChecker = permissionChecker;
         this.platformPlayerAdapter = platformPlayerAdapter;
 
-        message = fileManager.getMessage().getFormat().getModeration().getNewbie();
-        permission = fileManager.getPermission().getMessage().getFormat().getModeration().getNewbie();
+        message = fileResolver.getMessage().getFormat().getModeration().getNewbie();
+        permission = fileResolver.getPermission().getMessage().getFormat().getModeration().getNewbie();
     }
 
     @Override

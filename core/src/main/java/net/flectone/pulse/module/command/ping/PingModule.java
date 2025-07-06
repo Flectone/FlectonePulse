@@ -6,7 +6,7 @@ import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -29,7 +29,7 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Inject
-    public PingModule(FileManager fileManager,
+    public PingModule(FileResolver fileResolver,
                       FPlayerService fPlayerService,
                       CommandRegistry commandRegistry,
                       IntegrationModule integrationModule,
@@ -41,8 +41,8 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
         this.integrationModule = integrationModule;
         this.platformPlayerAdapter = platformPlayerAdapter;
 
-        command = fileManager.getCommand().getPing();
-        permission = fileManager.getPermission().getCommand().getPing();
+        command = fileResolver.getCommand().getPing();
+        permission = fileResolver.getPermission().getCommand().getPing();
 
         addPredicate(this::checkCooldown);
     }

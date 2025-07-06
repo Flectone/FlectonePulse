@@ -6,7 +6,7 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
@@ -25,14 +25,14 @@ public class AnonModule extends AbstractModuleCommand<Localization.Command.Anon>
     private final CommandRegistry commandRegistry;
 
     @Inject
-    public AnonModule(FileManager fileManager,
+    public AnonModule(FileResolver fileResolver,
                       CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getAnon(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.ANON));
 
         this.commandRegistry = commandRegistry;
 
-        command = fileManager.getCommand().getAnon();
-        permission = fileManager.getPermission().getCommand().getAnon();
+        command = fileResolver.getCommand().getAnon();
+        permission = fileResolver.getPermission().getCommand().getAnon();
 
         addPredicate(this::checkCooldown);
         addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));

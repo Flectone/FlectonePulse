@@ -7,7 +7,7 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -36,7 +36,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
     private final Gson gson;
 
     @Inject
-    public UnmuteModule(FileManager fileManager,
+    public UnmuteModule(FileResolver fileResolver,
                         FPlayerService fPlayerService,
                         ModerationService moderationService,
                         CommandRegistry commandRegistry,
@@ -50,8 +50,8 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
         this.proxySender = proxySender;
         this.gson = gson;
 
-        command = fileManager.getCommand().getUnmute();
-        permission = fileManager.getPermission().getCommand().getUnmute();
+        command = fileResolver.getCommand().getUnmute();
+        permission = fileResolver.getPermission().getCommand().getUnmute();
     }
 
     @Override

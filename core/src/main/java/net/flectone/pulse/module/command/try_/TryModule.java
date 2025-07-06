@@ -6,7 +6,7 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
@@ -28,7 +28,7 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
     private final CommandRegistry commandRegistry;
 
     @Inject
-    public TryModule(FileManager fileManager,
+    public TryModule(FileResolver fileResolver,
                      RandomUtil randomUtil,
                      CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getTry(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TRY));
@@ -36,8 +36,8 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
         this.randomUtil = randomUtil;
         this.commandRegistry = commandRegistry;
 
-        command = fileManager.getCommand().getTry();
-        permission = fileManager.getPermission().getCommand().getTry();
+        command = fileResolver.getCommand().getTry();
+        permission = fileResolver.getPermission().getCommand().getTry();
 
         addPredicate(this::checkCooldown);
         addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));

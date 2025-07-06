@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
@@ -21,12 +21,12 @@ public class SignModule extends AbstractModule {
     private final MessagePipeline messagePipeline;
 
     @Inject
-    public SignModule(FileManager fileManager,
+    public SignModule(FileResolver fileResolver,
                       MessagePipeline messagePipeline) {
         this.messagePipeline = messagePipeline;
 
-        message = fileManager.getMessage().getSign();
-        permission = fileManager.getPermission().getMessage().getSign();
+        message = fileResolver.getMessage().getSign();
+        permission = fileResolver.getPermission().getMessage().getSign();
     }
 
     @Override

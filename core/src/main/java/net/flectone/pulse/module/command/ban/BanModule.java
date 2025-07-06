@@ -12,7 +12,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
@@ -47,7 +47,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     private final Gson gson;
 
     @Inject
-    public BanModule(FileManager fileManager,
+    public BanModule(FileResolver fileResolver,
                      FPlayerService fPlayerService,
                      ModerationService moderationService,
                      CommandRegistry commandRegistry,
@@ -69,8 +69,8 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         this.proxySender = proxySender;
         this.gson = gson;
 
-        command = fileManager.getCommand().getBan();
-        permission = fileManager.getPermission().getCommand().getBan();
+        command = fileResolver.getCommand().getBan();
+        permission = fileResolver.getPermission().getCommand().getBan();
     }
 
     @Override

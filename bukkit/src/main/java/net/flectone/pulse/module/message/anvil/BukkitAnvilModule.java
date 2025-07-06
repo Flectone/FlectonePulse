@@ -2,7 +2,7 @@ package net.flectone.pulse.module.message.anvil;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.anvil.listener.AnvilListener;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
@@ -20,10 +20,10 @@ public class BukkitAnvilModule extends AnvilModule {
     private final MessagePipeline messagePipeline;
 
     @Inject
-    public BukkitAnvilModule(FileManager fileManager,
+    public BukkitAnvilModule(FileResolver fileResolver,
                              BukkitListenerRegistry bukkitListenerManager,
                              MessagePipeline messagePipeline) {
-        super(fileManager);
+        super(fileResolver);
         this.bukkitListenerManager = bukkitListenerManager;
         this.messagePipeline = messagePipeline;
     }

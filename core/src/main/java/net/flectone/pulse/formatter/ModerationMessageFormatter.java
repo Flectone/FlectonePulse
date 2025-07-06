@@ -5,7 +5,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.model.Moderation;
@@ -19,7 +19,7 @@ import java.util.List;
 @Singleton
 public class ModerationMessageFormatter {
 
-    private final FileManager fileManager;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final TimeFormatter timeFormatter;
     private final ModerationService moderationService;
@@ -27,13 +27,13 @@ public class ModerationMessageFormatter {
     private final Provider<NewbieModule> newbieModuleProvider;
 
     @Inject
-    public ModerationMessageFormatter(FileManager fileManager,
+    public ModerationMessageFormatter(FileResolver fileResolver,
                                       FPlayerService fPlayerService,
                                       TimeFormatter timeFormatter,
                                       ModerationService moderationService,
                                       Provider<IntegrationModule> integrationModuleProvider,
                                       Provider<NewbieModule> newbieModuleProvider) {
-        this.fileManager = fileManager;
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.timeFormatter = timeFormatter;
         this.moderationService = moderationService;
@@ -60,7 +60,7 @@ public class ModerationMessageFormatter {
     }
 
     public String replacePlaceholders(String message, FPlayer fReceiver, Moderation moderation) {
-        Localization localization = fileManager.getLocalization(fReceiver);
+        Localization localization = fileResolver.getLocalization(fReceiver);
 
         Localization.ReasonMap constantReasons = switch (moderation.getType()) {
             case BAN -> localization.getCommand().getBan().getReasons();
@@ -86,7 +86,7 @@ public class ModerationMessageFormatter {
     }
 
     public String replacePlaceholders(String message, FPlayer fReceiver, ExternalModeration moderation) {
-        Localization localization = fileManager.getLocalization(fReceiver);
+        Localization localization = fileResolver.getLocalization(fReceiver);
 
         String date = timeFormatter.formatDate(moderation.date());
         String time = moderation.permanent()
@@ -108,7 +108,7 @@ public class ModerationMessageFormatter {
     }
 
     public String buildMuteMessage(FPlayer fPlayer, MuteChecker.Status status) {
-        String format = fileManager.getLocalization(fPlayer).getCommand().getMute().getPerson();
+        String format = fileResolver.getLocalization(fPlayer).getCommand().getMute().getPerson();
 
         return switch (status) {
             case LOCAL -> {

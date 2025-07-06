@@ -6,7 +6,7 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.processor.MessageProcessor;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
@@ -28,13 +28,13 @@ public class EmojiModule extends AbstractModule implements MessageProcessor {
     private final MessagePipeline messagePipeline;
 
     @Inject
-    public EmojiModule(FileManager fileManager,
+    public EmojiModule(FileResolver fileResolver,
                        MessagePipeline messagePipeline,
                        MessageProcessRegistry messageProcessRegistry) {
         this.messagePipeline = messagePipeline;
 
-        message = fileManager.getMessage().getFormat().getEmoji();
-        permission = fileManager.getPermission().getMessage().getFormat().getEmoji();
+        message = fileResolver.getMessage().getFormat().getEmoji();
+        permission = fileResolver.getPermission().getMessage().getFormat().getEmoji();
 
         messageProcessRegistry.register(100, this);
     }

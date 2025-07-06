@@ -13,7 +13,7 @@ import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.module.message.format.style.StyleModule;
 import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -60,7 +60,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
     private final MessagePipeline messagePipeline;
 
     @Inject
-    public FormatModule(FileManager fileManager,
+    public FormatModule(FileResolver fileResolver,
                         PlatformServerAdapter platformServerAdapter,
                         FPlayerService fPlayerService,
                         PlatformPlayerAdapter platformPlayerAdapter,
@@ -77,8 +77,8 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         this.permissionChecker = permissionChecker;
         this.messagePipeline = messagePipeline;
 
-        message = fileManager.getMessage().getFormat();
-        permission = fileManager.getPermission().getMessage().getFormat();
+        message = fileResolver.getMessage().getFormat();
+        permission = fileResolver.getPermission().getMessage().getFormat();
 
         addChildren(ColorModule.class);
         addChildren(EmojiModule.class);

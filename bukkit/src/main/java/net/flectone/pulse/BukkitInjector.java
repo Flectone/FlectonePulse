@@ -16,7 +16,7 @@ import net.flectone.pulse.checker.BukkitPermissionChecker;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.converter.LegacyMiniConvertor;
 import net.flectone.pulse.database.Database;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.command.spy.BukkitSpyModule;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.BukkitIntegrationModule;
@@ -93,16 +93,16 @@ public class BukkitInjector extends AbstractModule {
         bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
 
         // Initialize and bind FileManager
-        FileManager fileManager;
+        FileResolver fileResolver;
         try {
-            fileManager = new FileManager(projectPath);
-            fileManager.reload();
+            fileResolver = new FileResolver(projectPath);
+            fileResolver.reload();
         } catch (Exception e) {
             fLogger.warning(e);
             instance.setDisableSilently(true);
             return;
         }
-        bind(FileManager.class).toInstance(fileManager);
+        bind(FileResolver.class).toInstance(fileResolver);
         bind(Database.class).asEagerSingleton();
 
         // Adapters

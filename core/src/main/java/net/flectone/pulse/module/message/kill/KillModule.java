@@ -6,7 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -27,7 +27,7 @@ public class KillModule extends AbstractModuleMessage<Localization.Message.Kill>
     private final ListenerRegistry listenerRegistry;
 
     @Inject
-    public KillModule(FileManager fileManager,
+    public KillModule(FileResolver fileResolver,
                       FPlayerService fPlayerService,
                       ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getKill());
@@ -35,8 +35,8 @@ public class KillModule extends AbstractModuleMessage<Localization.Message.Kill>
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
 
-        message = fileManager.getMessage().getKill();
-        permission = fileManager.getPermission().getMessage().getKill();
+        message = fileResolver.getMessage().getKill();
+        permission = fileResolver.getPermission().getMessage().getKill();
     }
 
     @Override

@@ -6,7 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.op.listener.OpPacketListener;
@@ -26,7 +26,7 @@ public class OpModule extends AbstractModuleMessage<Localization.Message.Op> {
     private final ListenerRegistry listenerRegistry;
 
     @Inject
-    public OpModule(FileManager fileManager,
+    public OpModule(FileResolver fileResolver,
                     FPlayerService fPlayerService,
                     ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getOp());
@@ -34,8 +34,8 @@ public class OpModule extends AbstractModuleMessage<Localization.Message.Op> {
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
 
-        message = fileManager.getMessage().getOp();
-        permission = fileManager.getPermission().getMessage().getOp();
+        message = fileResolver.getMessage().getOp();
+        permission = fileResolver.getPermission().getMessage().getOp();
     }
 
     @Override

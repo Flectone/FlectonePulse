@@ -7,7 +7,7 @@ import lombok.NonNull;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
@@ -28,14 +28,14 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
     private final CommandRegistry commandRegistry;
 
     @Inject
-    public SymbolModule(FileManager fileManager,
+    public SymbolModule(FileResolver fileResolver,
                         CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getSymbol(), null);
 
         this.commandRegistry = commandRegistry;
 
-        command = fileManager.getCommand().getSymbol();
-        permission = fileManager.getPermission().getCommand().getSymbol();
+        command = fileResolver.getCommand().getSymbol();
+        permission = fileResolver.getPermission().getCommand().getSymbol();
 
         addPredicate(this::checkCooldown);
     }

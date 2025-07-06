@@ -7,7 +7,7 @@ import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -35,7 +35,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
     private final TimeFormatter timeFormatter;
 
     @Inject
-    public OnlineModule(FileManager fileManager,
+    public OnlineModule(FileResolver fileResolver,
                         FPlayerService fPlayerService,
                         PlatformPlayerAdapter platformPlayerAdapter,
                         CommandRegistry commandRegistry,
@@ -49,8 +49,8 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
         this.integrationModule = integrationModule;
         this.timeFormatter = timeFormatter;
 
-        command = fileManager.getCommand().getOnline();
-        permission = fileManager.getPermission().getCommand().getOnline();
+        command = fileResolver.getCommand().getOnline();
+        permission = fileResolver.getPermission().getCommand().getOnline();
 
         addPredicate(this::checkCooldown);
         addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));

@@ -15,7 +15,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.maintenance.listener.MaintenancePacketListener;
@@ -38,7 +38,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     @Getter private final Command.Maintenance command;
     private final Permission.Command.Maintenance permission;
 
-    private final FileManager fileManager;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
@@ -51,7 +51,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     private String icon;
 
     @Inject
-    public MaintenanceModule(FileManager fileManager,
+    public MaintenanceModule(FileResolver fileResolver,
                              FPlayerService fPlayerService,
                              PermissionChecker permissionChecker,
                              ListenerRegistry listenerRegistry,
@@ -62,7 +62,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                              PacketSender packetSender) {
         super(module -> module.getCommand().getMaintenance(), null);
 
-        this.fileManager = fileManager;
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
         this.commandRegistry = commandRegistry;
@@ -72,8 +72,8 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
 
-        command = fileManager.getCommand().getMaintenance();
-        permission = fileManager.getPermission().getCommand().getMaintenance();
+        command = fileResolver.getCommand().getMaintenance();
+        permission = fileResolver.getPermission().getCommand().getMaintenance();
 
         addPredicate(this::checkCooldown);
     }
@@ -121,7 +121,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         boolean turned = !command.isTurnedOn();
 
         command.setTurnedOn(turned);
-        fileManager.save();
+        fileResolver.save();
 
         builder(fPlayer)
                 .destination(command.getDestination())

@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Mail;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -31,7 +31,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
     private final CommandRegistry commandRegistry;
 
     @Inject
-    public MailModule(FileManager fileManager,
+    public MailModule(FileResolver fileResolver,
                       TellModule tellModule,
                       IntegrationModule integrationModule,
                       FPlayerService fPlayerService,
@@ -43,8 +43,8 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         this.fPlayerService = fPlayerService;
         this.commandRegistry = commandRegistry;
 
-        command = fileManager.getCommand().getMail();
-        permission = fileManager.getPermission().getCommand().getMail();
+        command = fileResolver.getCommand().getMail();
+        permission = fileResolver.getPermission().getCommand().getMail();
     }
 
     @Override

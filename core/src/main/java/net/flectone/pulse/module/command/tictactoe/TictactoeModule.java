@@ -7,7 +7,7 @@ import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.sender.ProxySender;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tictactoe.manager.TictactoeManager;
@@ -37,7 +37,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
     private final Gson gson;
 
     @Inject
-    public TictactoeModule(FileManager fileManager,
+    public TictactoeModule(FileResolver fileResolver,
                            FPlayerService fPlayerService,
                            TictactoeManager tictactoeManager,
                            ProxySender proxySender,
@@ -53,8 +53,8 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         this.commandRegistry = commandRegistry;
         this.gson = gson;
 
-        command = fileManager.getCommand().getTictactoe();
-        permission = fileManager.getPermission().getCommand().getTictactoe();
+        command = fileResolver.getCommand().getTictactoe();
+        permission = fileResolver.getPermission().getCommand().getTictactoe();
     }
 
     @Override

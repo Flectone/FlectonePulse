@@ -6,7 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.telegram.listener.MessageListener;
@@ -26,7 +26,7 @@ public class TelegramIntegration implements FIntegration {
 
     private final Integration.Telegram integration;
 
-    private final FileManager fileManager;
+    private final FileResolver fileResolver;
     private final SystemVariableResolver systemVariableResolver;
     private final FLogger fLogger;
     private final MessageListener messageListener;
@@ -35,17 +35,17 @@ public class TelegramIntegration implements FIntegration {
     private OkHttpTelegramClient telegramClient;
 
     @Inject
-    public TelegramIntegration(FileManager fileManager,
+    public TelegramIntegration(FileResolver fileResolver,
                                SystemVariableResolver systemVariableResolver,
                                FLogger fLogger,
                                MessageListener messageListener) {
 
-        this.fileManager = fileManager;
+        this.fileResolver = fileResolver;
         this.systemVariableResolver = systemVariableResolver;
         this.fLogger = fLogger;
         this.messageListener = messageListener;
 
-        integration = fileManager.getIntegration().getTelegram();
+        integration = fileResolver.getIntegration().getTelegram();
     }
 
     @Async
@@ -75,7 +75,7 @@ public class TelegramIntegration implements FIntegration {
         if (channels == null) return;
         if (channels.isEmpty()) return;
 
-        Localization.Integration.Telegram localization = fileManager.getLocalization().getIntegration().getTelegram();
+        Localization.Integration.Telegram localization = fileResolver.getLocalization().getIntegration().getTelegram();
         String message = localization.getMessageChannel().get(messageTag);
         if (message == null) return;
         if (message.isEmpty()) return;

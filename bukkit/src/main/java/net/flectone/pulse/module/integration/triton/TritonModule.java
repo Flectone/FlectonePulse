@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import org.bukkit.event.EventPriority;
@@ -21,14 +21,14 @@ public class TritonModule extends AbstractModule {
     private final BukkitListenerRegistry bukkitListenerManager;
 
     @Inject
-    public TritonModule(FileManager fileManager,
+    public TritonModule(FileResolver fileResolver,
                         TritonIntegration tritonIntegration,
                         BukkitListenerRegistry bukkitListenerManager) {
         this.tritonIntegration = tritonIntegration;
         this.bukkitListenerManager = bukkitListenerManager;
 
-        config = fileManager.getIntegration().getTriton();
-        permission = fileManager.getPermission().getIntegration().getTriton();
+        config = fileResolver.getIntegration().getTriton();
+        permission = fileResolver.getPermission().getIntegration().getTriton();
     }
 
     @Override

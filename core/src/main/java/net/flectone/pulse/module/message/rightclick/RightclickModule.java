@@ -7,7 +7,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.rightclick.listener.RightclickPacketListener;
@@ -28,7 +28,7 @@ public class RightclickModule extends AbstractModuleMessage<Localization.Message
     private final ListenerRegistry listenerRegistry;
 
     @Inject
-    public RightclickModule(FileManager fileManager,
+    public RightclickModule(FileResolver fileResolver,
                             FPlayerService fPlayerService,
                             PlatformPlayerAdapter platformPlayerAdapter,
                             ListenerRegistry listenerRegistry) {
@@ -37,8 +37,8 @@ public class RightclickModule extends AbstractModuleMessage<Localization.Message
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.listenerRegistry = listenerRegistry;
 
-        message = fileManager.getMessage().getRightclick();
-        permission = fileManager.getPermission().getMessage().getRightclick();
+        message = fileResolver.getMessage().getRightclick();
+        permission = fileResolver.getPermission().getMessage().getRightclick();
 
         addPredicate(this::checkCooldown);
     }

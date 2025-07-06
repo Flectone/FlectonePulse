@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.database.dto.MetricsDTO;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.Module;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.MetricsSender;
@@ -19,19 +19,19 @@ public class MetricsService {
     private final TaskScheduler taskScheduler;
     private final MetricsSender metricsSender;
     private final PlatformServerAdapter platformServerAdapter;
-    private final FileManager fileManager;
+    private final FileResolver fileResolver;
     private final Module module;
 
     @Inject
     public MetricsService(TaskScheduler taskScheduler,
                           MetricsSender metricsSender,
                           PlatformServerAdapter platformServerAdapter,
-                          FileManager fileManager,
+                          FileResolver fileResolver,
                           Module module) {
         this.taskScheduler = taskScheduler;
         this.metricsSender = metricsSender;
         this.platformServerAdapter = platformServerAdapter;
-        this.fileManager = fileManager;
+        this.fileResolver = fileResolver;
         this.module = module;
     }
 
@@ -51,7 +51,7 @@ public class MetricsService {
         metricsDTO.setCpuCores(Runtime.getRuntime().availableProcessors());
         metricsDTO.setTotalRAM(Runtime.getRuntime().totalMemory());
 
-        Config config = fileManager.getConfig();
+        Config config = fileResolver.getConfig();
 
         metricsDTO.setProjectVersion(config.getVersion());
         metricsDTO.setProjectLanguage(config.getLanguage());

@@ -3,7 +3,7 @@ package net.flectone.pulse.module.integration;
 import com.google.inject.Injector;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -24,12 +24,12 @@ public abstract class IntegrationModule extends AbstractModule {
     private final Permission.Integration permission;
     private final Injector injector;
 
-    public IntegrationModule(FileManager fileManager,
+    public IntegrationModule(FileResolver fileResolver,
                              Injector injector) {
         this.injector = injector;
 
-        integration = fileManager.getIntegration();
-        permission = fileManager.getPermission().getIntegration();
+        integration = fileResolver.getIntegration();
+        permission = fileResolver.getPermission().getIntegration();
 
         addChildren(DeeplModule.class);
         addChildren(DiscordModule.class);

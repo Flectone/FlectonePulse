@@ -8,7 +8,7 @@ import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import lombok.Setter;
 import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.database.Database;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.Module;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
@@ -79,9 +79,9 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
             return;
         }
 
-        FileManager fileManager = injector.getInstance(FileManager.class);
+        FileResolver fileResolver = injector.getInstance(FileResolver.class);
 
-        fLogger.reload(fileManager.getConfig().getLogFilter());
+        fLogger.reload(fileResolver.getConfig().getLogFilter());
 
         // test
 //        PacketEvents.getAPI().getEventManager().registerListener(injector.getInstance(TestListener.class), PacketListenerPriority.NORMAL);
@@ -93,7 +93,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(FPlayerService.class).reload();
         injector.getInstance(ProxySender.class).reload();
 
-        if (fileManager.getConfig().isMetrics()) {
+        if (fileResolver.getConfig().isMetrics()) {
             injector.getInstance(MetricsService.class).reload();
         }
         
@@ -108,7 +108,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         fLogger.logDisabling();
 
-        if (injector.getInstance(FileManager.class).getConfig().isMetrics()) {
+        if (injector.getInstance(FileResolver.class).getConfig().isMetrics()) {
             injector.getInstance(MetricsService.class).send();
         }
 
@@ -154,15 +154,15 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(ListenerRegistry.class).reload();
         injector.getInstance(TaskScheduler.class).reload();
 
-        FileManager fileManager = injector.getInstance(FileManager.class);
+        FileResolver fileResolver = injector.getInstance(FileResolver.class);
 
         try {
-            fileManager.reload();
+            fileResolver.reload();
         } catch (Exception e) {
             reloadException = e;
         }
 
-        fLogger.reload(fileManager.getConfig().getLogFilter());
+        fLogger.reload(fileResolver.getConfig().getLogFilter());
 
         try {
             injector.getInstance(Database.class).disconnect();
@@ -176,7 +176,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(ModerationService.class).reload();
         injector.getInstance(Module.class).reloadWithChildren();
 
-        if (fileManager.getConfig().isMetrics()) {
+        if (fileResolver.getConfig().isMetrics()) {
             injector.getInstance(MetricsService.class).reload();
         }
 

@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tell.TellModule;
@@ -24,7 +24,7 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
     private final CommandRegistry commandRegistry;
 
     @Inject
-    public ReplyModule(FileManager fileManager,
+    public ReplyModule(FileResolver fileResolver,
                        TellModule tellModule,
                        CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getReply(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.REPLY));
@@ -32,8 +32,8 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
         this.tellModule = tellModule;
         this.commandRegistry = commandRegistry;
 
-        command = fileManager.getCommand().getReply();
-        permission = fileManager.getPermission().getCommand().getReply();
+        command = fileResolver.getCommand().getReply();
+        permission = fileResolver.getPermission().getCommand().getReply();
 
         addPredicate(this::checkCooldown);
         addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));

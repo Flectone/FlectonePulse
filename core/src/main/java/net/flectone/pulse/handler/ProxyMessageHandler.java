@@ -7,7 +7,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
@@ -68,7 +68,7 @@ import java.util.UUID;
 public class ProxyMessageHandler {
 
     private final Injector injector;
-    private final FileManager fileManager;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final FLogger fLogger;
     private final ModerationService moderationService;
@@ -76,13 +76,13 @@ public class ProxyMessageHandler {
 
     @Inject
     public ProxyMessageHandler(Injector injector,
-                               FileManager fileManager,
+                               FileResolver fileResolver,
                                FPlayerService fPlayerService,
                                FLogger fLogger,
                                ModerationService moderationService,
                                Gson gson) {
         this.injector = injector;
-        this.fileManager = fileManager;
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.fLogger = fLogger;
         this.moderationService = moderationService;
@@ -127,7 +127,7 @@ public class ProxyMessageHandler {
             return;
         }
 
-        Set<String> configClusters = fileManager.getConfig().getClusters();
+        Set<String> configClusters = fileResolver.getConfig().getClusters();
         if (!configClusters.isEmpty() && configClusters.stream().noneMatch(proxyClusters::contains)) {
             return;
         }

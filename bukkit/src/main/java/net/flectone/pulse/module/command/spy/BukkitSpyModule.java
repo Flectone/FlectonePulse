@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.checker.PermissionChecker;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.registry.CommandRegistry;
@@ -31,12 +31,12 @@ public class BukkitSpyModule extends SpyModule {
     private final BukkitListenerRegistry bukkitListenerManager;
 
     @Inject
-    public BukkitSpyModule(FileManager fileManager,
+    public BukkitSpyModule(FileResolver fileResolver,
                            FPlayerService fPlayerService,
                            CommandRegistry commandRegistry,
                            PermissionChecker permissionChecker,
                            BukkitListenerRegistry bukkitListenerManager) {
-        super(fileManager, commandRegistry, fPlayerService, permissionChecker);
+        super(fileResolver, commandRegistry, fPlayerService, permissionChecker);
 
         this.fPlayerService = fPlayerService;
         this.bukkitListenerManager = bukkitListenerManager;

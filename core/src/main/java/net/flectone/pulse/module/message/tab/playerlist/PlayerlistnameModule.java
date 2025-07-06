@@ -11,7 +11,7 @@ import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -38,7 +38,7 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
     @Inject
     public PlayerlistnameModule(FPlayerService fPlayerService,
                                 PlatformPlayerAdapter platformPlayerAdapter,
-                                FileManager fileManager,
+                                FileResolver fileResolver,
                                 MessagePipeline messagePipeline,
                                 PacketSender packetSender,
                                 PacketProvider packetProvider,
@@ -52,8 +52,8 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
         this.packetProvider = packetProvider;
         this.taskScheduler = taskScheduler;
 
-        message = fileManager.getMessage().getTab().getPlayerlistname();
-        permission = fileManager.getPermission().getMessage().getTab().getPlayerlistname();
+        message = fileResolver.getMessage().getTab().getPlayerlistname();
+        permission = fileResolver.getPermission().getMessage().getTab().getPlayerlistname();
     }
 
     @Override

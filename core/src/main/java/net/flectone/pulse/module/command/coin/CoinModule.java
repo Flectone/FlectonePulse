@@ -6,7 +6,7 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
@@ -28,7 +28,7 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
     private final RandomUtil randomUtil;
 
     @Inject
-    public CoinModule(FileManager fileManager,
+    public CoinModule(FileResolver fileResolver,
                       CommandRegistry commandRegistry,
                       RandomUtil randomUtil) {
         super(localization -> localization.getCommand().getCoin(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.COIN));
@@ -36,8 +36,8 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
         this.commandRegistry = commandRegistry;
         this.randomUtil = randomUtil;
 
-        command = fileManager.getCommand().getCoin();
-        permission = fileManager.getPermission().getCommand().getCoin();
+        command = fileResolver.getCommand().getCoin();
+        permission = fileResolver.getPermission().getCommand().getCoin();
 
         addPredicate(this::checkCooldown);
         addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));

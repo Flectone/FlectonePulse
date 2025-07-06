@@ -8,7 +8,7 @@ import lombok.NonNull;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -41,7 +41,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
     private final Provider<TranslateModule> translateModuleProvider;
 
     @Inject
-    public TranslatetoModule(FileManager fileManager,
+    public TranslatetoModule(FileResolver fileResolver,
                              CommandRegistry commandRegistry,
                              IntegrationModule integrationModule,
                              Provider<TranslateModule> translateModuleProvider) {
@@ -51,8 +51,8 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
         this.integrationModule = integrationModule;
         this.translateModuleProvider = translateModuleProvider;
 
-        command = fileManager.getCommand().getTranslateto();
-        permission = fileManager.getPermission().getCommand().getTranslateto();
+        command = fileResolver.getCommand().getTranslateto();
+        permission = fileResolver.getPermission().getCommand().getTranslateto();
 
         addPredicate(this::checkCooldown);
         addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));

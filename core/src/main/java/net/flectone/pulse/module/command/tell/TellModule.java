@@ -8,7 +8,7 @@ import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.sender.ProxySender;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -40,7 +40,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Inject
-    public TellModule(FileManager fileManager,
+    public TellModule(FileResolver fileResolver,
                       FPlayerService fPlayerService,
                       ProxySender proxySender,
                       IntegrationModule integrationModule,
@@ -54,8 +54,8 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         this.commandRegistry = commandRegistry;
         this.platformPlayerAdapter = platformPlayerAdapter;
 
-        command = fileManager.getCommand().getTell();
-        permission = fileManager.getPermission().getCommand().getTell();
+        command = fileResolver.getCommand().getTell();
+        permission = fileResolver.getPermission().getCommand().getTell();
     }
 
     @Override

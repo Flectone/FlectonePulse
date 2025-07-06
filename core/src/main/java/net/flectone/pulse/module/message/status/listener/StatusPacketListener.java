@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.listener.AbstractPacketListener;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.status.StatusModule;
 
@@ -18,11 +18,11 @@ public class StatusPacketListener extends AbstractPacketListener {
     private final StatusModule statusModule;
 
     @Inject
-    public StatusPacketListener(FileManager fileManager,
+    public StatusPacketListener(FileResolver fileResolver,
                                 StatusModule statusModule) {
         this.statusModule = statusModule;
 
-        maintenance = fileManager.getCommand().getMaintenance();
+        maintenance = fileResolver.getCommand().getMaintenance();
     }
 
     @Override

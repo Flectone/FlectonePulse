@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
@@ -27,7 +27,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
     private final CommandRegistry commandRegistry;
 
     @Inject
-    public IgnoreModule(FileManager fileManager,
+    public IgnoreModule(FileResolver fileResolver,
                         FPlayerService fPlayerService,
                         CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getIgnore(), null);
@@ -35,8 +35,8 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
         this.fPlayerService = fPlayerService;
         this.commandRegistry = commandRegistry;
 
-        command = fileManager.getCommand().getIgnore();
-        permission = fileManager.getPermission().getCommand().getIgnore();
+        command = fileResolver.getCommand().getIgnore();
+        permission = fileResolver.getPermission().getCommand().getIgnore();
 
         addPredicate(this::checkCooldown);
         addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));

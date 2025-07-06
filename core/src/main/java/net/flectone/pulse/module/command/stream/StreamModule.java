@@ -9,7 +9,7 @@ import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -47,7 +47,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     private final PermissionChecker permissionChecker;
 
     @Inject
-    public StreamModule(FileManager fileManager,
+    public StreamModule(FileResolver fileResolver,
                         FPlayerService fPlayerService,
                         CommandRegistry commandRegistry,
                         PermissionChecker permissionChecker,
@@ -58,9 +58,9 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         this.commandRegistry = commandRegistry;
         this.permissionChecker = permissionChecker;
 
-        command = fileManager.getCommand().getStream();
-        permission = fileManager.getPermission().getCommand().getStream();
-        formatPermission = fileManager.getPermission().getMessage().getFormat();
+        command = fileResolver.getCommand().getStream();
+        permission = fileResolver.getPermission().getCommand().getStream();
+        formatPermission = fileResolver.getPermission().getMessage().getFormat();
 
         messageProcessRegistry.register(150, this);
     }

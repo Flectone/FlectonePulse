@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.converter.ColorConverter;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
@@ -24,7 +24,7 @@ public class BubbleService {
 
     private final Map<UUID, Queue<Bubble>> playerBubbleQueues = new ConcurrentHashMap<>();
 
-    private final FileManager fileManager;
+    private final FileResolver fileResolver;
     private final BubbleRenderer bubbleRenderer;
     private final ColorConverter colorConverter;
     private final TaskScheduler taskScheduler;
@@ -33,12 +33,12 @@ public class BubbleService {
     
     @Inject
     public BubbleService(TaskScheduler taskScheduler,
-                         FileManager fileManager,
+                         FileResolver fileResolver,
                          BubbleRenderer bubbleRenderer,
                          ColorConverter colorConverter,
                          RandomUtil randomUtil,
                          MessagePipeline messagePipeline) {
-        this.fileManager = fileManager;
+        this.fileResolver = fileResolver;
         this.bubbleRenderer = bubbleRenderer;
         this.colorConverter = colorConverter;
         this.taskScheduler = taskScheduler;
@@ -75,7 +75,7 @@ public class BubbleService {
         int id = randomUtil.nextInt(Integer.MAX_VALUE);
 
         // default bubble
-        Message.Bubble config = fileManager.getMessage().getBubble();
+        Message.Bubble config = fileResolver.getMessage().getBubble();
 
         long duration = calculateDuration(message);
         int elevation = config.getElevation();
@@ -95,7 +95,7 @@ public class BubbleService {
         float scale = configModern.getScale();
         Message.Bubble.Billboard billboard = configModern.getBillboard();
 
-        int maxLength = fileManager.getMessage().getBubble().getMaxLength();
+        int maxLength = fileResolver.getMessage().getBubble().getMaxLength();
 
         List<Bubble> bubbles = new ArrayList<>();
 
@@ -157,7 +157,7 @@ public class BubbleService {
             return;
         }
 
-        int maxCount = fileManager.getMessage().getBubble().getMaxCount();
+        int maxCount = fileResolver.getMessage().getBubble().getMaxCount();
 
         bubbleQueue.removeIf(bubble -> {
             if (bubble.isExpired()) {
@@ -189,7 +189,7 @@ public class BubbleService {
     }
     
     private long calculateDuration(String message) {
-        Message.Bubble config = fileManager.getMessage().getBubble();
+        Message.Bubble config = fileResolver.getMessage().getBubble();
 
         int countWords = message.split(" ").length;
         return (long) (((countWords + config.getHandicapChars()) / config.getReadSpeed()) * 60) * 1000L;
@@ -197,11 +197,11 @@ public class BubbleService {
 
     private boolean isModern() {
         return PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)
-                && fileManager.getMessage().getBubble().getModern().isEnable();
+                && fileResolver.getMessage().getBubble().getModern().isEnable();
     }
 
     private boolean isInteractionRiding() {
         return PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_21_3)
-                && fileManager.getMessage().getBubble().getInteraction().isEnable();
+                && fileResolver.getMessage().getBubble().getInteraction().isEnable();
     }
 }

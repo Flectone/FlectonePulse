@@ -6,7 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.spawn.listener.ChangeGameStatePacketListener;
@@ -28,7 +28,7 @@ public class SpawnModule extends AbstractModuleMessage<Localization.Message.Spaw
     private final ListenerRegistry listenerRegistry;
 
     @Inject
-    public SpawnModule(FileManager fileManager,
+    public SpawnModule(FileResolver fileResolver,
                        FPlayerService fPlayerService,
                        ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getSpawn());
@@ -36,8 +36,8 @@ public class SpawnModule extends AbstractModuleMessage<Localization.Message.Spaw
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
 
-        message = fileManager.getMessage().getSpawn();
-        permission = fileManager.getPermission().getMessage().getSpawn();
+        message = fileResolver.getMessage().getSpawn();
+        permission = fileResolver.getPermission().getMessage().getSpawn();
     }
 
     @Override

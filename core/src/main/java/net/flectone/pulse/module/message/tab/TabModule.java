@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
@@ -17,9 +17,9 @@ public class TabModule extends AbstractModule {
     private final Permission.Message.Tab permission;
 
     @Inject
-    public TabModule(FileManager fileManager) {
-        message = fileManager.getMessage().getTab();
-        permission = fileManager.getPermission().getMessage().getTab();
+    public TabModule(FileResolver fileResolver) {
+        message = fileResolver.getMessage().getTab();
+        permission = fileResolver.getPermission().getMessage().getTab();
 
         addChildren(FooterModule.class);
         addChildren(HeaderModule.class);

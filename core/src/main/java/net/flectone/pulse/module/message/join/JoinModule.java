@@ -8,7 +8,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -27,7 +27,7 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
     private final IntegrationModule integrationModule;
 
     @Inject
-    public JoinModule(FileManager fileManager,
+    public JoinModule(FileResolver fileResolver,
                       ListenerRegistry listenerRegistry,
                       PlatformPlayerAdapter platformPlayerAdapter,
                       IntegrationModule integrationModule) {
@@ -37,8 +37,8 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.integrationModule =  integrationModule;
 
-        message = fileManager.getMessage().getJoin();
-        permission = fileManager.getPermission().getMessage().getJoin();
+        message = fileResolver.getMessage().getJoin();
+        permission = fileResolver.getPermission().getMessage().getJoin();
     }
 
     @Override

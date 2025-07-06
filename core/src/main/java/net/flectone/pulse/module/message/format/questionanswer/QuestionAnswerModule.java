@@ -8,7 +8,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -48,7 +48,7 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
     private final FLogger fLogger;
 
     @Inject
-    public QuestionAnswerModule(FileManager fileManager,
+    public QuestionAnswerModule(FileResolver fileResolver,
                                 PermissionChecker permissionChecker,
                                 FLogger fLogger,
                                 MessageProcessRegistry messageProcessRegistry) {
@@ -57,8 +57,8 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
         this.permissionChecker = permissionChecker;
         this.fLogger = fLogger;
 
-        message = fileManager.getMessage().getFormat().getQuestionAnswer();
-        permission = fileManager.getPermission().getMessage().getFormat().getQuestionAnswer();
+        message = fileResolver.getMessage().getFormat().getQuestionAnswer();
+        permission = fileResolver.getPermission().getMessage().getFormat().getQuestionAnswer();
 
         messageProcessRegistry.register(100, this);
     }

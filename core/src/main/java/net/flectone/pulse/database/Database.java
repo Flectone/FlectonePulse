@@ -13,7 +13,7 @@ import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.database.dao.ColorsDAO;
 import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.database.dao.SettingDAO;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Mail;
 import net.flectone.pulse.model.Moderation;
@@ -37,7 +37,7 @@ public class Database {
     private final Config.Database config;
 
     private final Injector injector;
-    private final FileManager fileManager;
+    private final FileResolver fileResolver;
     private final Path projectPath;
     private final SystemVariableResolver systemVariableResolver;
     private final PlatformServerAdapter platformServerAdapter;
@@ -47,7 +47,7 @@ public class Database {
     private Jdbi jdbi;
 
     @Inject
-    public Database(FileManager fileManager,
+    public Database(FileResolver fileResolver,
                     Injector injector,
                     @Named("projectPath") Path projectPath,
                     SystemVariableResolver systemVariableResolver,
@@ -55,13 +55,13 @@ public class Database {
                     FLogger fLogger) {
 
         this.injector = injector;
-        this.fileManager = fileManager;
+        this.fileResolver = fileResolver;
         this.projectPath = projectPath;
         this.systemVariableResolver = systemVariableResolver;
         this.platformServerAdapter = platformServerAdapter;
         this.fLogger = fLogger;
 
-        config = fileManager.getConfig().getDatabase();
+        config = fileResolver.getConfig().getDatabase();
     }
 
     public void connect() throws IOException {
@@ -85,7 +85,7 @@ public class Database {
         InputStream SQLFile = platformServerAdapter.getResource("sqls/" + config.getType().name().toLowerCase() + ".sql");
         executeSQLFile(SQLFile);
 
-        if (fileManager.isOlderThan(fileManager.getPreInitVersion(), "0.6.0")) {
+        if (fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "0.6.0")) {
             MIGRATION_0_9_0();
         }
 

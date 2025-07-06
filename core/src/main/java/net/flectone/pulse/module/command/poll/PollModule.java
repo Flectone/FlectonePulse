@@ -7,7 +7,7 @@ import lombok.NonNull;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -38,7 +38,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     private final Command.Poll command;
     private final Permission.Command.Poll permission;
 
-    private final FileManager fileManager;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final ProxySender proxySender;
     private final TaskScheduler taskScheduler;
@@ -47,7 +47,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     private final Gson gson;
 
     @Inject
-    public PollModule(FileManager fileManager,
+    public PollModule(FileResolver fileResolver,
                       FPlayerService fPlayerService,
                       ProxySender proxySender,
                       TaskScheduler taskScheduler,
@@ -56,7 +56,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                       Gson gson) {
         super(localization -> localization.getCommand().getPoll(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.POLL));
 
-        this.fileManager = fileManager;
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.proxySender = proxySender;
         this.taskScheduler = taskScheduler;
@@ -64,8 +64,8 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         this.messagePipeline = messagePipeline;
         this.gson = gson;
 
-        command = fileManager.getCommand().getPoll();
-        permission = fileManager.getPermission().getCommand().getPoll();
+        command = fileResolver.getCommand().getPoll();
+        permission = fileResolver.getPermission().getCommand().getPoll();
     }
 
     @Override
@@ -229,7 +229,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     public void saveAndUpdateLast(Poll poll) {
         pollMap.put(poll.getId(), poll);
         command.setLastId(poll.getId() + 1);
-        fileManager.getCommand().save();
+        fileResolver.getCommand().save();
     }
 
     public void vote(FEntity fPlayer, int id, int numberVote) {

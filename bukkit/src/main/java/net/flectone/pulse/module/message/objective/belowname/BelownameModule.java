@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.module.AbstractModule;
@@ -33,7 +33,7 @@ public class BelownameModule extends AbstractModule {
     private ScoreboardObjective scoreboardObjective;
 
     @Inject
-    public BelownameModule(FileManager fileManager,
+    public BelownameModule(FileResolver fileResolver,
                            ObjectiveManager objectiveManager,
                            PlatformPlayerAdapter platformPlayerAdapter,
                            FPlayerService fPlayerService,
@@ -43,8 +43,8 @@ public class BelownameModule extends AbstractModule {
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
 
-        message = fileManager.getMessage().getObjective().getBelowname();
-        permission = fileManager.getPermission().getMessage().getObjective().getBelowname();
+        message = fileResolver.getMessage().getObjective().getBelowname();
+        permission = fileResolver.getPermission().getMessage().getObjective().getBelowname();
     }
 
     @Override

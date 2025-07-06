@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.model.Ticker;
@@ -25,7 +25,7 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
     private final FPlayerService fPlayerService;
 
     @Inject
-    public AutoModule(FileManager fileManager,
+    public AutoModule(FileResolver fileResolver,
                       TaskScheduler taskScheduler,
                       FPlayerService fPlayerService) {
         super(localization -> localization.getMessage().getAuto());
@@ -33,8 +33,8 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
         this.taskScheduler = taskScheduler;
         this.fPlayerService = fPlayerService;
 
-        message = fileManager.getMessage().getAuto();
-        permission = fileManager.getPermission().getMessage().getAuto();
+        message = fileResolver.getMessage().getAuto();
+        permission = fileResolver.getPermission().getMessage().getAuto();
     }
 
     @Override

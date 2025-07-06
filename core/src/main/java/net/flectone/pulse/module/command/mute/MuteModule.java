@@ -7,7 +7,7 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
@@ -40,7 +40,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
     private final Gson gson;
 
     @Inject
-    public MuteModule(FileManager fileManager,
+    public MuteModule(FileResolver fileResolver,
                       FPlayerService fPlayerService,
                       ModerationService moderationService,
                       ModerationMessageFormatter moderationMessageFormatter,
@@ -56,8 +56,8 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         this.proxySender = proxySender;
         this.gson = gson;
 
-        command = fileManager.getCommand().getMute();
-        permission = fileManager.getPermission().getCommand().getMute();
+        command = fileResolver.getCommand().getMute();
+        permission = fileResolver.getPermission().getCommand().getMute();
     }
 
     @Override

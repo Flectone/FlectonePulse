@@ -2,7 +2,7 @@ package net.flectone.pulse.module.message.sidebar;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.scheduler.TaskScheduler;
@@ -26,12 +26,12 @@ public class BukkitSidebarModule extends SidebarModule {
     private final MessagePipeline messagePipeline;
 
     @Inject
-    public BukkitSidebarModule(FileManager fileManager,
+    public BukkitSidebarModule(FileResolver fileResolver,
                                TaskScheduler taskScheduler,
                                FPlayerService fPlayerService,
                                ScoreboardLibrary scoreboardLibrary,
                                MessagePipeline messagePipeline) {
-        super(fileManager, fPlayerService, taskScheduler);
+        super(fileResolver, fPlayerService, taskScheduler);
 
         this.scoreboardLibrary = scoreboardLibrary;
         this.messagePipeline = messagePipeline;

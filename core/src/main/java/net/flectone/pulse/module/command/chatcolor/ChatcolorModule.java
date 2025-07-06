@@ -8,7 +8,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.sender.ProxySender;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
@@ -34,7 +34,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
     private final ColorConverter colorConverter;
 
     @Inject
-    public ChatcolorModule(FileManager fileManager,
+    public ChatcolorModule(FileResolver fileResolver,
                            FPlayerService fPlayerService,
                            PermissionChecker permissionChecker,
                            ProxySender proxySender,
@@ -47,9 +47,9 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         this.commandRegistry = commandRegistry;
         this.colorConverter = colorConverter;
 
-        color = fileManager.getMessage().getFormat().getColor();
-        command = fileManager.getCommand().getChatcolor();
-        permission = fileManager.getPermission().getCommand().getChatcolor();
+        color = fileResolver.getMessage().getFormat().getColor();
+        command = fileResolver.getCommand().getChatcolor();
+        permission = fileResolver.getPermission().getCommand().getChatcolor();
 
         addPredicate(this::checkCooldown);
     }

@@ -8,7 +8,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -41,7 +41,7 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
     private final Gson gson;
 
     @Inject
-    public AdvancementModule(FileManager fileManager,
+    public AdvancementModule(FileResolver fileResolver,
                              FPlayerService fPlayerService,
                              ListenerRegistry listenerRegistry,
                              IntegrationModule integrationModule,
@@ -54,8 +54,8 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
         this.messagePipeline = messagePipeline;
         this.gson = gson;
 
-        message = fileManager.getMessage().getAdvancement();
-        permission = fileManager.getPermission().getMessage().getAdvancement();
+        message = fileResolver.getMessage().getAdvancement();
+        permission = fileResolver.getPermission().getMessage().getAdvancement();
 
         addPredicate(integrationModule::isVanished);
     }

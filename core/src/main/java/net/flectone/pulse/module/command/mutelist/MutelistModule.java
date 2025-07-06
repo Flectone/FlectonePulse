@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -38,7 +38,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
     private final MessageSender messageSender;
 
     @Inject
-    public MutelistModule(FileManager fileManager,
+    public MutelistModule(FileResolver fileResolver,
                           FPlayerService fPlayerService,
                           ModerationService moderationService,
                           ModerationMessageFormatter moderationMessageFormatter,
@@ -56,8 +56,8 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
         this.commandRegistry = commandRegistry;
         this.messageSender = messageSender;
 
-        command = fileManager.getCommand().getMutelist();
-        permission = fileManager.getPermission().getCommand().getMutelist();
+        command = fileResolver.getCommand().getMutelist();
+        permission = fileResolver.getPermission().getCommand().getMutelist();
 
         addPredicate(this::checkCooldown);
     }

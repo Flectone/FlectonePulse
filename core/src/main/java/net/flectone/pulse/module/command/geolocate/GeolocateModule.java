@@ -6,7 +6,7 @@ import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
@@ -35,7 +35,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
     private final CommandRegistry commandRegistry;
 
     @Inject
-    public GeolocateModule(FileManager fileManager,
+    public GeolocateModule(FileResolver fileResolver,
                            FPlayerService fPlayerService,
                            PlatformPlayerAdapter platformPlayerAdapter,
                            CommandRegistry commandRegistry) {
@@ -45,8 +45,8 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.commandRegistry = commandRegistry;
 
-        command = fileManager.getCommand().getGeolocate();
-        permission = fileManager.getPermission().getCommand().getGeolocate();
+        command = fileResolver.getCommand().getGeolocate();
+        permission = fileResolver.getPermission().getCommand().getGeolocate();
 
         addPredicate(this::checkCooldown);
         addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));

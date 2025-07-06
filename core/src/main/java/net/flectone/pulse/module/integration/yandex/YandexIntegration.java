@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.integration.FIntegration;
 import yandex.cloud.api.ai.translate.v2.TranslationServiceGrpc;
 import yandex.cloud.api.ai.translate.v2.TranslationServiceOuterClass;
@@ -22,9 +22,9 @@ public class YandexIntegration implements FIntegration {
     private ServiceFactory factory;
 
     @Inject
-    public YandexIntegration(FileManager fileManager,
+    public YandexIntegration(FileResolver fileResolver,
                              FLogger fLogger) {
-        integration = fileManager.getIntegration().getYandex();
+        integration = fileResolver.getIntegration().getYandex();
 
         this.fLogger = fLogger;
     }

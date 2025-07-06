@@ -6,7 +6,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.processor.MessageProcessor;
@@ -21,13 +21,13 @@ public class FloodModule extends AbstractModule implements MessageProcessor {
     private final PermissionChecker permissionChecker;
 
     @Inject
-    public FloodModule(FileManager fileManager,
+    public FloodModule(FileResolver fileResolver,
                        PermissionChecker permissionChecker,
                        MessageProcessRegistry messageProcessRegistry) {
         this.permissionChecker = permissionChecker;
 
-        message = fileManager.getMessage().getFormat().getModeration().getFlood();
-        permission = fileManager.getPermission().getMessage().getFormat().getModeration().getFlood();
+        message = fileResolver.getMessage().getFormat().getModeration().getFlood();
+        permission = fileResolver.getPermission().getMessage().getFormat().getModeration().getFlood();
 
         messageProcessRegistry.register(100, this);
     }

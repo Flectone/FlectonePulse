@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.database.sql.FPlayerSQL;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.logging.FLogger;
 import org.jetbrains.annotations.NotNull;
@@ -25,11 +25,11 @@ public class FPlayerDAO extends BaseDAO<FPlayerSQL> {
     private final Provider<SettingDAO> settingDAOProvider;
 
     @Inject
-    public FPlayerDAO(FileManager fileManager, Database database,
+    public FPlayerDAO(FileResolver fileResolver, Database database,
                       FLogger logger, Provider<SettingDAO> settingDAOProvider) {
         super(database, FPlayerSQL.class);
 
-        this.config = fileManager.getConfig().getDatabase();
+        this.config = fileResolver.getConfig().getDatabase();
         this.logger = logger;
         this.settingDAOProvider = settingDAOProvider;
     }

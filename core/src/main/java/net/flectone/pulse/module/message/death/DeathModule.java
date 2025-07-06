@@ -10,7 +10,7 @@ import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -44,7 +44,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
     private final Gson gson;
 
     @Inject
-    public DeathModule(FileManager fileManager,
+    public DeathModule(FileResolver fileResolver,
                        MessagePipeline messagePipeline,
                        PacketSender packetSender,
                        FPlayerService fPlayerService,
@@ -59,8 +59,8 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
         this.listenerRegistry = listenerRegistry;
         this.gson = gson;
 
-        message = fileManager.getMessage().getDeath();
-        permission = fileManager.getPermission().getMessage().getDeath();
+        message = fileResolver.getMessage().getDeath();
+        permission = fileResolver.getPermission().getMessage().getDeath();
 
         addPredicate(integrationModule::isVanished);
     }

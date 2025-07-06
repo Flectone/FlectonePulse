@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
@@ -34,7 +34,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
     private final TimeFormatter timeFormatter;
 
     @Inject
-    public IgnorelistModule(FileManager fileManager,
+    public IgnorelistModule(FileResolver fileResolver,
                             FPlayerService fPlayerService,
                             MessageSender messageSender,
                             MessagePipeline messagePipeline,
@@ -48,8 +48,8 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         this.commandRegistry = commandRegistry;
         this.timeFormatter = timeFormatter;
 
-        command = fileManager.getCommand().getIgnorelist();
-        permission = fileManager.getPermission().getCommand().getIgnorelist();
+        command = fileResolver.getCommand().getIgnorelist();
+        permission = fileResolver.getPermission().getCommand().getIgnorelist();
 
         addPredicate(this::checkCooldown);
     }

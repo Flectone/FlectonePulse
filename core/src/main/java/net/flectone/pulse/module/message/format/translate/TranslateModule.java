@@ -8,7 +8,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -43,15 +43,15 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
     private final MessagePipeline messagePipeline;
 
     @Inject
-    public TranslateModule(FileManager fileManager,
+    public TranslateModule(FileResolver fileResolver,
                            MessagePipeline messagePipeline,
                            MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getMessage().getFormat().getTranslate());
 
         this.messagePipeline = messagePipeline;
 
-        message = fileManager.getMessage().getFormat().getTranslate();
-        permission = fileManager.getPermission().getMessage().getFormat().getTranslate();
+        message = fileResolver.getMessage().getFormat().getTranslate();
+        permission = fileResolver.getPermission().getMessage().getFormat().getTranslate();
 
         messageProcessRegistry.register(100, this);
     }

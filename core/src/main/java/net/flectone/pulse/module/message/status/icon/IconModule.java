@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.util.FileUtil;
@@ -32,7 +32,7 @@ public class IconModule extends AbstractModule {
     private int index;
 
     @Inject
-    public IconModule(FileManager fileManager,
+    public IconModule(FileResolver fileResolver,
                       @Named("projectPath") Path projectPath,
                       RandomUtil randomUtil,
                       FileUtil fileUtil) {
@@ -40,8 +40,8 @@ public class IconModule extends AbstractModule {
         this.fileUtil = fileUtil;
         this.randomUtil = randomUtil;
 
-        message = fileManager.getMessage().getStatus().getIcon();
-        permission = fileManager.getPermission().getMessage().getStatus().getIcon();
+        message = fileResolver.getMessage().getStatus().getIcon();
+        permission = fileResolver.getPermission().getMessage().getStatus().getIcon();
     }
 
     @Override

@@ -7,7 +7,7 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
@@ -34,7 +34,7 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
     private final Gson gson;
 
     @Inject
-    public DiceModule(FileManager fileManager,
+    public DiceModule(FileResolver fileResolver,
                       CommandRegistry commandRegistry,
                       RandomUtil randomUtil,
                       Gson gson) {
@@ -44,8 +44,8 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
         this.randomUtil = randomUtil;
         this.gson = gson;
 
-        command = fileManager.getCommand().getDice();
-        permission = fileManager.getPermission().getCommand().getDice();
+        command = fileResolver.getCommand().getDice();
+        permission = fileResolver.getPermission().getCommand().getDice();
 
         addPredicate(this::checkCooldown);
         addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));

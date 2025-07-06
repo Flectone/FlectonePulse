@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 
@@ -17,12 +17,12 @@ public class SkinsRestorerModule extends AbstractModule {
     private final SkinsRestorerIntegration skinsRestorerIntegration;
 
     @Inject
-    public SkinsRestorerModule(FileManager fileManager,
+    public SkinsRestorerModule(FileResolver fileResolver,
                                SkinsRestorerIntegration skinsRestorerIntegration) {
         this.skinsRestorerIntegration = skinsRestorerIntegration;
 
-        config = fileManager.getIntegration().getSkinsrestorer();
-        permission = fileManager.getPermission().getIntegration().getSkinsrestorer();
+        config = fileResolver.getIntegration().getSkinsrestorer();
+        permission = fileResolver.getPermission().getIntegration().getSkinsrestorer();
     }
 
     @Override
