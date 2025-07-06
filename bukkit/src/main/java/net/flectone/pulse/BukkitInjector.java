@@ -15,6 +15,7 @@ import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.checker.BukkitPermissionChecker;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.converter.LegacyMiniConvertor;
+import net.flectone.pulse.database.Database;
 import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.module.command.spy.BukkitSpyModule;
 import net.flectone.pulse.module.command.spy.SpyModule;
@@ -102,6 +103,7 @@ public class BukkitInjector extends AbstractModule {
             return;
         }
         bind(FileManager.class).toInstance(fileManager);
+        bind(Database.class).asEagerSingleton();
 
         // Adapters
         bind(PlatformPlayerAdapter.class).to(BukkitPlayerAdapter.class);

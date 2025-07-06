@@ -73,6 +73,12 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
             return;
         }
 
+        try {
+            injector.getInstance(Database.class).connect();
+        } catch (Exception e) {
+            return;
+        }
+
         FileManager fileManager = injector.getInstance(FileManager.class);
 
         fLogger.reload(fileManager.getConfig().getLogFilter());
@@ -83,12 +89,6 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         PacketEvents.getAPI().init();
 
         injector.getInstance(Module.class).reloadWithChildren();
-
-        try {
-            injector.getInstance(Database.class).connect();
-        } catch (Exception e) {
-            return;
-        }
 
         injector.getInstance(FPlayerService.class).reload();
         injector.getInstance(ProxySender.class).reload();
