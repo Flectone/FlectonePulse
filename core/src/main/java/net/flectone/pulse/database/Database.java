@@ -10,20 +10,23 @@ import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
 import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.configuration.Config;
+import net.flectone.pulse.database.dao.ColorsDAO;
 import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.model.Mail;
+import net.flectone.pulse.model.Moderation;
+import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.logging.FLogger;
+import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.mapper.reflect.ConstructorMapper;
+import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -40,6 +43,7 @@ public class Database {
     private final FLogger fLogger;
 
     private HikariDataSource dataSource;
+    private Jdbi jdbi;
 
     @Inject
     public Database(FileManager fileManager,
@@ -59,38 +63,47 @@ public class Database {
         config = fileManager.getConfig().getDatabase();
     }
 
-    public void connect() throws SQLException, IOException {
+    public void connect() throws IOException {
         HikariConfig hikariConfig = createHikaryConfig();
 
         try {
             dataSource = new HikariDataSource(hikariConfig);
+            jdbi = Jdbi.create(dataSource);
+            jdbi.installPlugin(new SqlObjectPlugin());
+            jdbi.registerRowMapper(ConstructorMapper.factory(ColorsDAO.ColorEntry.class));
+            jdbi.registerRowMapper(ConstructorMapper.factory(FPlayerDAO.PlayerInfo.class));
+            jdbi.registerRowMapper(ConstructorMapper.factory(Ignore.class));
+            jdbi.registerRowMapper(ConstructorMapper.factory(Mail.class));
+            jdbi.registerRowMapper(ConstructorMapper.factory(Moderation.class));
         } catch (HikariPool.PoolInitializationException e) {
             fLogger.warning("Failed to initialize Database. Check database settings");
 
             throw new RuntimeException(e);
         }
 
-        try (Connection ignored = getConnection()){
-            InputStream SQLFile = platformServerAdapter.getResource("sqls/" + config.getType().name().toLowerCase() + ".sql");
-            executeSQLFile(SQLFile);
+        InputStream SQLFile = platformServerAdapter.getResource("sqls/" + config.getType().name().toLowerCase() + ".sql");
+        executeSQLFile(SQLFile);
 
-            if (fileManager.isOlderThan(fileManager.getPreInitVersion(), "0.6.0")) {
-                MIGRATION_0_6_0();
-            }
+        if (fileManager.isOlderThan(fileManager.getPreInitVersion(), "0.6.0")) {
+            MIGRATION_0_6_0();
+        }
 
             if (config.getType() == Config.Database.Type.SQLITE) {
                 injector.getInstance(FPlayerDAO.class).updateAllToOffline();
             }
 
-            init();
+        if (config.getType() == Config.Database.Type.SQLITE) {
+            injector.getInstance(FPlayerDAO.class).updateAllToOffline();
         }
+
+        init();
     }
 
     @NotNull
-    public Connection getConnection() throws SQLException {
-        if (dataSource == null) throw new SQLException("Not initialized");
+    public Jdbi getJdbi() throws IllegalStateException {
+        if (jdbi == null) throw new IllegalStateException("JDBI not initialized");
 
-        return dataSource.getConnection();
+        return jdbi;
     }
 
     public void init() {
@@ -155,31 +168,42 @@ public class Database {
         return hikariConfig;
     }
 
-    private void executeSQLFile(InputStream inputStream) throws SQLException, IOException {
+    private void executeSQLFile(InputStream inputStream) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        StringBuilder builder = new StringBuilder();
 
-        try (Connection connection = getConnection()) {
-            Statement statement = connection.createStatement();
-            StringBuilder builder = new StringBuilder();
+        String line;
+        while ((line = bufferedReader.readLine()) != null) {
+            line = line.trim();
+            if (line.isEmpty() || line.startsWith("--")) continue;
 
-            String line;
+            builder.append(line);
 
-            while ((line = bufferedReader.readLine()) != null) {
-                line = line.trim();
-
-                if (line.isEmpty() || line.startsWith("--")) continue;
-
-                builder.append(line);
-
-                if (line.endsWith(";")) {
-                    statement.execute(builder.toString());
-                    builder.setLength(0);
-                }
+            if (line.endsWith(";")) {
+                String sql = builder.toString();
+                getJdbi().useHandle(handle -> handle.execute(sql));
+                builder.setLength(0);
             }
         }
     }
 
     private void MIGRATION_0_6_0() {
+        backupDatabase();
+
+        injector.getInstance(SettingDAO.class).MIGRATION_0_6_0();
+
+        getJdbi().useHandle(handle -> {
+            handle.execute("ALTER TABLE `player` DROP COLUMN `chat`");
+            handle.execute("ALTER TABLE `player` DROP COLUMN `locale`");
+            handle.execute("ALTER TABLE `player` DROP COLUMN `world_prefix`");
+            handle.execute("ALTER TABLE `player` DROP COLUMN `stream_prefix`");
+            handle.execute("ALTER TABLE `player` DROP COLUMN `afk_suffix`");
+            handle.execute("ALTER TABLE `player` DROP COLUMN `setting`");
+        });
+    }
+
+
+    private void backupDatabase() {
         if (config.getType() == Config.Database.Type.SQLITE) {
             String databaseName = systemVariableResolver.substituteEnvVars(config.getName()) + ".db";
 
@@ -191,26 +215,6 @@ public class Database {
             } catch (IOException e) {
                 fLogger.warning(e);
             }
-        }
-
-        injector.getInstance(SettingDAO.class).MIGRATION_0_6_0();
-
-        try (Connection connection = getConnection()) {
-            PreparedStatement preparedStatement;
-            preparedStatement = connection.prepareStatement("ALTER TABLE `player` DROP COLUMN `chat`");
-            preparedStatement.executeUpdate();
-            preparedStatement = connection.prepareStatement("ALTER TABLE `player` DROP COLUMN `locale`");
-            preparedStatement.executeUpdate();
-            preparedStatement = connection.prepareStatement("ALTER TABLE `player` DROP COLUMN `world_prefix`");
-            preparedStatement.executeUpdate();
-            preparedStatement = connection.prepareStatement("ALTER TABLE `player` DROP COLUMN `stream_prefix`");
-            preparedStatement.executeUpdate();
-            preparedStatement = connection.prepareStatement("ALTER TABLE `player` DROP COLUMN `afk_suffix`");
-            preparedStatement.executeUpdate();
-            preparedStatement = connection.prepareStatement("ALTER TABLE `player` DROP COLUMN `setting`");
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            fLogger.warning(e);
         }
     }
 }

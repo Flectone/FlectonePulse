@@ -53,6 +53,8 @@ subprojects {
         compileOnly "org.incendo:cloud-core:$cloud_core_version"
         compileOnly "org.incendo:cloud-minecraft-extras:$cloud_minecraft_extras_version"
         compileOnly "com.zaxxer:HikariCP:$HikariCP_version"
+        compileOnly "org.jdbi:jdbi3-core:$jdbi3_core_version"
+        compileOnly "org.jdbi:jdbi3-sqlobject:$jdbi3_core_version"
         compileOnly "org.xerial:sqlite-jdbc:$sqlite_jdbc_version"
         compileOnly "net.kyori:adventure-text-serializer-legacy:$adventure_api"
         compileOnly "net.kyori:adventure-text-minimessage:$adventure_api"
@@ -79,11 +81,12 @@ subprojects {
     }
 
     shadowJar {
+        relocate("com.zaxxer", "net.flectone.pulse.library.hikaricp")
+        relocate("org.jdbi", "net.flectone.pulse.library.jdbi3")
         relocate("com.alessiodp.libby", "net.flectone.pulse.library.libby")
         relocate("net.elytrium.serializer", "net.flectone.pulse.library.elytrium")
         relocate("com.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents")
         relocate("io.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents.impl")
-        relocate("com.zaxxer", "net.flectone.pulse.library.database")
 
         if (!project.name.is("paper")) {
             relocate("net.kyori.adventure", "net.flectone.pulse.library.adventure")
