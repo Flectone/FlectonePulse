@@ -113,7 +113,7 @@ public class FPlayerService {
         loadIgnores(fPlayer);
 
         // update old database data
-        fPlayerRepository.saveOrUpdate(fPlayer);
+        fPlayerRepository.update(fPlayer);
     }
 
     public int getPing(FPlayer player) {
@@ -149,13 +149,14 @@ public class FPlayerService {
 
     public void clearAndSave(FPlayer fPlayer) {
         fPlayer.setOnline(false);
+        fPlayer.setIp(platformPlayerAdapter.getIp(fPlayer));
         invalidateOnline(fPlayer.getUuid());
         platformPlayerAdapter.clear(fPlayer);
-        saveOrUpdateFPlayer(fPlayer);
+        updateFPlayer(fPlayer);
     }
 
-    public void saveOrUpdateFPlayer(FPlayer fPlayer) {
-        fPlayerRepository.saveOrUpdate(fPlayer);
+    public void updateFPlayer(FPlayer fPlayer) {
+        fPlayerRepository.update(fPlayer);
     }
 
     public int getEntityId(FPlayer fPlayer) {

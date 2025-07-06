@@ -79,7 +79,7 @@ public class FPlayerDAO extends BaseDAO<FPlayerSQL> {
         });
     }
 
-    public void save(FPlayer fPlayer) {
+    public void update(FPlayer fPlayer) {
         if (fPlayer.isUnknown()) return;
 
         useHandle(sql -> sql.update(

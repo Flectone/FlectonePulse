@@ -128,8 +128,8 @@ public class FPlayerRepository {
         return fPlayerDAO.insert(uuid, name);
     }
 
-    public void saveOrUpdate(FPlayer fPlayer) {
-        fPlayerDAO.save(fPlayer);
+    public void update(FPlayer fPlayer) {
+        fPlayerDAO.update(fPlayer);
     }
 
     public void saveOrIgnore(FPlayer fPlayer) {

@@ -118,7 +118,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         fPlayerService.getFPlayers().forEach(fPlayer -> {
             fPlayer.setOnline(false);
-            fPlayerService.saveOrUpdateFPlayer(fPlayer);
+            fPlayerService.updateFPlayer(fPlayer);
         });
 
         fPlayerService.clear();
