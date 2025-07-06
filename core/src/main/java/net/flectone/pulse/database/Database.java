@@ -12,7 +12,9 @@ import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.database.dao.ColorsDAO;
 import net.flectone.pulse.database.dao.FPlayerDAO;
+import net.flectone.pulse.database.dao.SettingDAO;
 import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Mail;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
@@ -82,6 +84,10 @@ public class Database {
 
         InputStream SQLFile = platformServerAdapter.getResource("sqls/" + config.getType().name().toLowerCase() + ".sql");
         executeSQLFile(SQLFile);
+
+        if (fileManager.isOlderThan(fileManager.getPreInitVersion(), "0.6.0")) {
+            MIGRATION_0_9_0();
+        }
 
         if (config.getType() == Config.Database.Type.SQLITE) {
             injector.getInstance(FPlayerDAO.class).updateAllToOffline();
@@ -176,6 +182,15 @@ public class Database {
                 builder.setLength(0);
             }
         }
+    }
+
+    private void MIGRATION_0_9_0() {
+        backupDatabase();
+
+        SettingDAO settingDAO = injector.getInstance(SettingDAO.class);
+        injector.getInstance(FPlayerDAO.class).getFPlayers().forEach(fPlayer -> {
+            settingDAO.insert(fPlayer, FPlayer.Setting.ANON);
+        });
     }
 
     private void backupDatabase() {
