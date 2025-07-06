@@ -123,16 +123,22 @@ public class FLogger extends Logger {
         info(PlainTextComponentSerializer.plainText().serialize(component));
     }
 
-    public void warning(String message) {
+    public void warning(String exception) {
         LogRecord warn = new LogRecord(Level.WARNING, "An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues");
-        warn.setMessage(message);
+        warn.setMessage(exception);
 
         log(warn);
     }
 
-    public void warning(Exception e) {
+    public void warning(String format, Object... args) {
+        String formattedMessage = String.format(format, args);
+        LogRecord warn = new LogRecord(Level.WARNING, formattedMessage);
+        log(warn);
+    }
+
+    public void warning(Exception exception) {
         LogRecord warn = new LogRecord(Level.WARNING, "An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues");
-        warn.setThrown(e);
+        warn.setThrown(exception);
 
         log(warn);
     }
