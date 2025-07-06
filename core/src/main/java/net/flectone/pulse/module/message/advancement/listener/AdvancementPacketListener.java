@@ -57,9 +57,18 @@ public class AdvancementPacketListener extends AbstractPacketListener {
 
         Advancement advancement;
         if (titleComponent.args().get(0) instanceof TranslatableComponent title) {
+
+            HoverEvent<?> hoverEvent = title.hoverEvent();
+
+            if (hoverEvent == null) return;
+            if (!(hoverEvent.value() instanceof Component descriptionComponent)) return;
+            if (descriptionComponent.children().size() < 2) return;
+            if (!(descriptionComponent.children().get(1) instanceof TranslatableComponent component)) return;
+
             String titleKey = title.key();
-            String descriptionKey = titleKey.substring(0, titleKey.lastIndexOf(".") + 1) + "description";
+            String descriptionKey = component.key();
             advancement = new Advancement(titleKey, descriptionKey, type);
+
         } else if (titleComponent.args().get(0) instanceof TextComponent title) {
 
             HoverEvent<?> hoverEvent = title.hoverEvent();
@@ -104,13 +113,16 @@ public class AdvancementPacketListener extends AbstractPacketListener {
                 if (argument instanceof TranslatableComponent argumentIn) {
                     if (argumentIn.args().isEmpty()) return;
                     if (argumentIn.args().get(0) instanceof TranslatableComponent titleComponent) {
-                        String titleKey = titleComponent.key();
-                        String descriptionKey = titleKey.substring(0, titleKey.lastIndexOf(".") + 1) + "description";
 
                         HoverEvent<?> hoverEvent = titleComponent.hoverEvent();
 
                         if (hoverEvent == null) return;
                         if (!(hoverEvent.value() instanceof TranslatableComponent description)) return;
+                        if (description.children().size() < 2) return;
+                        if (!(description.children().get(1) instanceof TranslatableComponent childrenComponent)) return;
+
+                        String titleKey = titleComponent.key();
+                        String descriptionKey = childrenComponent.key();
 
                         MinecraftTranslationKeys advancementType = NamedTextColor.DARK_PURPLE.equals(description.color())
                                 ? MinecraftTranslationKeys.CHAT_TYPE_ADVANCEMENT_CHALLENGE
