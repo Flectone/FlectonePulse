@@ -234,6 +234,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.chatsetting.checkbox.types.clear();
         command.chatsetting.checkbox.types.put(FPlayer.Setting.ADVANCEMENT, "<fcolor:2>Достижения");
         command.chatsetting.checkbox.types.put(FPlayer.Setting.AFK, "<fcolor:2>Команда /afk");
+        command.chatsetting.checkbox.types.put(FPlayer.Setting.ANON, "<fcolor:2>Команда /anon");
         command.chatsetting.checkbox.types.put(FPlayer.Setting.AUTO, "<fcolor:2>Авто-сообщения");
         command.chatsetting.checkbox.types.put(FPlayer.Setting.BALL, "<fcolor:2>Команда /ball");
         command.chatsetting.checkbox.types.put(FPlayer.Setting.BAN, "<fcolor:2>Команда /ban");
