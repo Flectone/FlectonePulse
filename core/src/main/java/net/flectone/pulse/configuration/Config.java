@@ -55,10 +55,10 @@ public final class Config extends FileSerializable {
             "Exception in thread \"ForkJoinPool"
     ));
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/config#database")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/config/#database")})
     private Database database = new Database();
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/config#module")})
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/config/#module")})
     private Module module = new Module();
 
     @Getter
