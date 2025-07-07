@@ -1,13 +1,13 @@
 <div align="center">
   <h3>
     <a href="README.md">EN</a> | 
-    <a href="README-RU.md">РУ</a>
+    <a href="README-RU.md">RU</a>
   </h3>
 </div>
 
 ![pulse](https://flectone.net/pulse/flectonepulse.png)
 <div class="center-row" align="center">
-    <h1> FlectonePulse — Every Message Under Your Control! </h1>
+    <h1>FlectonePulse — Every message under your control!</h1>
     <a href="https://www.spigotmc.org/"><img src="https://flectone.net/pulse/bukkit.svg" alt="bukkit" class="hover-brightness"></a>
     <a href="https://www.spigotmc.org/"><img src="https://flectone.net/pulse/spigot.svg" alt="spigot" class="hover-brightness"></a>
     <a href="https://papermc.io/"><img src="https://flectone.net/pulse/paper.svg" alt="paper" class="hover-brightness"></a>
@@ -19,26 +19,26 @@
 
 ---
 
-## 🏆 Advantages That Will Blow Your Mind
+## 🏆 Key Features
 
-- ⚡ **Maximized Asynchrony**  
-  All operations **never lag** the main thread, and configs load in the background. Your server **won’t stutter** even under peak load!
+- ⚡ **Optimized Performance**  
+  All operations run asynchronously, ensuring the main thread remains unaffected. Configuration files load in the background, keeping your server smooth even during high traffic
 
-- 🏭 **Flexible Architecture with Google Guice**  
-  Dependency injection? Easy! **Guice** keeps code clean and logic modular. Want to add your own feature? **No problem**—the system is built for extensions!
+- 🏭 **Modular Architecture with Google Guice**  
+  Built with dependency injection for clean, maintainable code. Easily extend functionality to suit your server’s needs
 
-- 🔄 **Versatility Is Our Middle Name**  
-  Supports **all** popular platforms: Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Velocity. No matter your server’s "engine"—**Pulse** adapts to any setup!
+- 🔄 **Broad Compatibility**  
+  Seamlessly supports Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, and Velocity. FlectonePulse adapts to any server environment
 
-- 🎨 **Customize Every Detail**  
-  Colors, animations, Discord/Telegram/Twitch integrations — **everything** under your control. Even death messages can become memes! 😈
+- 🎨 **Extensive Customization**  
+  Tailor colors, animations, and integrations with Discord, Telegram, or Twitch. Transform even death messages into unique experiences!
 
 ---
 
 <div align="center">
 
 [![logo](https://github.com/user-attachments/assets/dc68fd41-8341-43e5-9c07-843e1ad839f1)](https://flectone.net/pulse/)  
-<h3>🚀 Install FlectonePulse — Let Your Server Pulse with Rhythm! 💖</h3>
+<h3>🚀 Install FlectonePulse — Bring Your Server to Life! 💖</h3>
   <div>
     <a href="https://boosty.to/thefaser"><img src="https://flectone.net/pulse/boosty.svg" alt="boosty" class="hover-brightness"></a>
     <a href="https://modrinth.com/plugin/flectonepulse"><img src="https://flectone.net/pulse/modrinth.svg" alt="modrinth" class="hover-brightness"></a>
@@ -49,126 +49,136 @@
 
 ---
 
-## 🎨 **Universal Formatting**
+## 🎨 **Flexible Text Formatting**
 
-**FlectonePulse** has one of the most versatile text formatting systems available, supporting virtually all color formats from legacy codes to modern gradients.
+FlectonePulse offers a highly versatile text formatting system, supporting legacy color codes, modern gradients, and MiniMessage tags for maximum flexibility
 
 | **Input Code**                                        | **Converts To**                                             |  
 |-------------------------------------------------------|-------------------------------------------------------------|  
-| `&0`-`&9`, `&a`-`&f`                                  | `<black>`, `<dark_blue>` ... `<white>`                      |  
+| `&0`-`&9`, `&a`-`&f`                                  | `<black>`, `<dark_blue>`, ..., `<white>`                    |  
 | `&l`/`&m`/`&n`/`&o`/`&k`/`&r`                         | `<b>` / `<st>` / `<u>` / `<i>` / `<obf>` / `<reset>`        |  
 | `&#rrggbb`, `#rrggbb`, `&x&r&r&g&g&b&b`, `<##rrggbb>` | `<#rrggbb>`                                                 |  
-| `&@#abcdef-red-a@`                                    | `<gradient:#abcdef:red:green>`                              |  
-| MiniMessage Tags	                                     | `<color:#rrggbb`, `<rainbow>`, `<click:...>`, `<font>` etc. |
+| MiniMessage Tags                                      | `<color:#rrggbb>`, `<rainbow>`, `<click:...>`, `<font>`, etc. |
 
-*You can use `&` or `§` alternately for maximum flexibility*
+*Use `&` or `§` interchangeably for convenience*
 
-**Example message with formatting**
 ```yaml
 welcome-message: "<gradient:#FF0000:#00FF00>&lWelcome</gradient> <rainbow><player></rainbow>!"
 ```
 
----
-
-## 🌈 Custom Colors — Paint Your Reality!
-
-![color](https://cdn.modrinth.com/data/cached_images/918bc78d4897d0453625d35b3b1f4271b092651b.gif)
-
-Create unique chat designs — players will gasp at the style 💥. Even the server console becomes more colorful!
+![color](https://flectone.net/pulse/welcomemessage.png)
 
 ---
 
-## 🌍 **Smart Localization — Speak Your Players’ Language!**
+## 🌈 **Chat Customization with /chatsetting**
+
+![chatsetting](https://flectone.net/pulse/commandchatsetting.gif)
+
+Use the `/chatsetting` command to create stunning chat designs. Customize messages with vibrant colors and styles
+
+---
+
+## 🌍 **Intelligent Localization**
 
 ### ⚙️ How It Works
 [![locale](https://flectone.net/pulse/locale.gif)](https://flectone.net/pulse/docs/config#language-player)
 
-- 🔄 **Auto-Language Detection**  
-  If `language-player` is enabled in config, the plugin **automatically** detects players’ Minecraft language and displays messages accordingly!
+- 🔄 **Automatic Language Detection**  
+  With `language-player` enabled, FlectonePulse detects players’ Minecraft language settings and displays messages in their preferred language
 
-- 🛠️ **Fallback System**  
-  If localization isn’t found for a player’s language, it uses the default language from the config.
+- 🛠️ **Fallback Mechanism**  
+  If a player’s language isn’t available, the plugin defaults to the configured language
 
-**→ Full localization guide in the** [documentation](https://flectone.net/pulse/docs/config#language-player) 🔗
+**→ Learn more in the** [documentation](https://flectone.net/pulse/docs/config#language-player) 🔗
 
 ---
 
-## ✨ Personalize EVERYTHING That Moves!
-**Customize default messages to match your unique vibe:**
+## ✨ **Customizable Features**
+
+Tailor every aspect of your server’s messaging to match your vision:
 
 | 🖼️ **Visual** | 💬 **Description** |  
 |---------------|-----------------|  
-| ![status](https://flectone.net/pulse/version.png) | **Server MOTD** <br> Turn boring text into epic billboards! Add animations or hidden Easter eggs 🥚 |  
-| ![join](https://flectone.net/pulse/join.png) | **Join Messages** <br> Welcome players like rockstars: sounds, custom Title messages 🎸 |  
-| ![tab](https://flectone.net/pulse/tab.png) | **TAB** <br> Show top info directly in Tab: ping, online status, donor status 🔝 |  
-| ![death](https://flectone.net/pulse/deathserver.png) | **Deaths** <br> Add dark humor, epic soundtracks 💀 |  
-| ![brand](https://flectone.net/pulse/brand.png) | **Branding** <br> Your logo in the F3 menu? Easy! Promote your server even here 🔍 |  
-| ![advancement](https://flectone.net/pulse/task.png) | **Advancements** <br> Create unique achievement messages 🏆 |  
+| ![status](https://flectone.net/pulse/version.png) | **Server MOTD** <br> Transform the MOTD with animations or custom messages |  
+| ![join](https://flectone.net/pulse/join.png) | **Join Messages** <br> Greet players with custom sounds or Title messages |  
+| ![tab](https://flectone.net/pulse/tab.png) | **TAB** <br> Display key info like ping, online status, or ranks in the Tab menu |  
+| ![death](https://flectone.net/pulse/deathserver.png) | **Death Messages** <br> Add flair with custom text or sounds |  
+| ![brand](https://flectone.net/pulse/brand.png) | **Branding** <br> Showcase your server logo in the F3 menu |  
+| ![advancement](https://flectone.net/pulse/task.png) | **Advancements** <br> Create unique achievement announcements |  
+| ...                                                | ...                                                               |
 
-**...and many more settings!** Full list in [message.yml docs](https://flectone.net/pulse/docs/message/) 🚀
+**...and more!** Full details in the [message.yml documentation](https://flectone.net/pulse/docs/message/) 🚀
 
 ---
 
-## 🤝 Integrations
+## 🤝 **Integrations**
 
-### 🌍 With External Platforms
+### 🌍 External Platforms
 
 | 🖼️ **Visual** | 💬 **Description** |  
 |---------|----------|  
-| [![discord](https://flectone.net/pulse/discordmessage.png)](https://flectone.net/pulse/docs/integration/discord/) | **Discord** <br> Server chat in your channel + synchronized notifications 💬 |  
-| [![telegram](https://flectone.net/pulse/telegrammessage2.png)](https://flectone.net/pulse/docs/integration/telegram/) | **Telegram** <br> Receive player messages and admin commands via bot 📲 |  
-| [![twitch](https://flectone.net/pulse/twitchmessage.png)](https://flectone.net/pulse/docs/integration/twitch/) | **Twitch** <br> Stream alerts directly in Minecraft chat 🎥 |  
+| [![discord](https://flectone.net/pulse/discordmessage.png)](https://flectone.net/pulse/docs/integration/discord/) | **Discord** <br> Sync server chat with Discord channels and notifications |  
+| [![telegram](https://flectone.net/pulse/telegrammessage2.png)](https://flectone.net/pulse/docs/integration/telegram/) | **Telegram** <br> Relay player messages and admin commands via a bot |  
+| [![twitch](https://flectone.net/pulse/twitchmessage.png)](https://flectone.net/pulse/docs/integration/twitch/) | **Twitch** <br> Display stream alerts in Minecraft chat |  
 
-### 🔌 With Plugins
+### 🔌 Plugins
 
 | 🖼️ **Plugin**                                                                                | 💬 **Description**                                                 |  
 |-----------------------------------------------------------------------------------------------|--------------------------------------------------------------------|  
-| 💬 **[InteractiveChat](https://flectone.net/pulse/docs/integration/interactivechat/)**        | Advanced chat formatting with interactive elements                 | 
-| 🛡️ **[LuckPerms](https://flectone.net/pulse/docs/integration/luckperms/)**                   | Roles, permissions, and weighted groups—all under control          |  
-| 🧩 **[PlaceholderAPI](https://flectone.net/pulse/docs/integration/placeholderapi/)**          | Dynamic variables like <code>%player_level%</code> in any message  |  
-| 🎙️ **[PlasmoVoice & SimpleVoice](https://flectone.net/pulse/docs/integration/plasmovoice/)** | Sync ignores/mutes between voice chat and server                   |  
-| 🖼️ **[SkinsRestorer](https://flectone.net/pulse/docs/integration/skinsrestorer/)**           | Custom skins in chat/TAB without hassle                            |  
-| 👻 **[SuperVanish](https://flectone.net/pulse/docs/integration/supervanish/)**                | Hidden players don’t break chat/command logic                      |  
-| 💰 **[Vault](https://flectone.net/pulse/docs/integration/vault/)**                            | Unified permissions via vanilla permissions                        |  
+| 💬 **[InteractiveChat](https://flectone.net/pulse/docs/integration/interactivechat/)**        | Enhanced chat formatting with interactive components              | 
+| 🛡️ **[LuckPerms](https://flectone.net/pulse/docs/integration/luckperms/)**                   | Manage roles, permissions, and weighted groups seamlessly         |  
+| 🧩 **[PlaceholderAPI](https://flectone.net/pulse/docs/integration/placeholderapi/)**          | Use dynamic variables like `%player_level%` in messages           |  
+| 🎙️ **[PlasmoVoice & SimpleVoice](https://flectone.net/pulse/docs/integration/plasmovoice/)** | Synchronize ignores/mutes between voice and server chat           |  
+| 🖼️ **[SkinsRestorer](https://flectone.net/pulse/docs/integration/skinsrestorer/)**           | Display custom skins in chat and TAB effortlessly                 |  
+| 👻 **[SuperVanish](https://flectone.net/pulse/docs/integration/supervanish/)**                | Ensure hidden players don’t disrupt chat or commands              |  
+| 💰 **[Vault](https://flectone.net/pulse/docs/integration/vault/)**                            | Support unified permissions via standard APIs                     |  
+| ...                                                                                           | ...                                                               |
 
-**→ Full integration list in** [documentation](https://flectone.net/pulse/docs/integration/) 🔗
+**→ Full integration details in the** [documentation](https://flectone.net/pulse/docs/integration/) 🔗
 
 ---
 
-## 🎮 30+ Commands
+## 🎮 **30+ Commands**
 
 | 🖼️ **Visual** | 💬 **Description** |  
 |--------------|------------------------|  
-| [![ball](https://flectone.net/pulse/commandball.png)](https://flectone.net/pulse/docs/command/) | **/ball** <br> Magic 8-ball with 20+ response options |  
-| [![tictactoe](https://flectone.net/pulse/commandtictactoe.png)](https://flectone.net/pulse/docs/command/) | **/tictactoe** <br> 3D board with animated win lines. Modes: <br> 🤖 Chinese 👥 Classic |  
-| [![stream](https://flectone.net/pulse/commandstream.png)](https://flectone.net/pulse/docs/command/) | **/stream** <br> Stream alerts + auto-posting to Discord, with streamer prefix |  
-| [![try](https://flectone.net/pulse/commandtry.png)](https://flectone.net/pulse/docs/command/) | **/try** <br> 0-100% roulette! |  
+| [![ball](https://flectone.net/pulse/commandball.png)](https://flectone.net/pulse/docs/command/) | **/ball** <br> Magic 8-ball with over 20 response options |  
+| [![tictactoe](https://flectone.net/pulse/commandtictactoe.png)](https://flectone.net/pulse/docs/command/) | **/tictactoe** <br> Play on a 3D board |  
+| [![stream](https://flectone.net/pulse/commandstream.png)](https://flectone.net/pulse/docs/command/) | **/stream** <br> Stream alerts directly in Minecraft chat |  
+| [![try](https://flectone.net/pulse/commandtry.png)](https://flectone.net/pulse/docs/command/) | **/try** <br> Test your luck with a 0-100% chance roulette |  
+| ...                                                                                           | ...                                                              |
 
-**→ Full command list in** [documentation](https://flectone.net/pulse/docs/command/) 🔗
+**→ Full command list in the** [documentation](https://flectone.net/pulse/docs/command/) 🔗
 
 ---
 
-## 🙏 Credits — Thank You for Existing!
+## ❓ **FAQ**
 
-**These projects are our foundation and inspiration:**
+Have questions? Check our [FAQ page](https://flectone.net/pulse/docs/) in the documentation for answers to common queries about setup, configuration, and troubleshooting
 
-- 🏗️ **[Google Guice](https://github.com/google/guice)** — Boss-level dependency injection
-- 📦 **[Elytrium Java Serializer](https://github.com/Elytrium/java-serializer)** — Faster data serialization than Minecraft crashes without OptiFine
-- 🧙 **[PacketEvents](https://github.com/retrooper/packetevents)** — Minecraft packet magic at Dumbledore’s level
-- 🎨 **[Adventure](https://github.com/KyoriPowered/adventure)** — Text styling cooler than Banksy’s graffiti
-- ⌨️ **[Cloud](https://github.com/Incendo/cloud)** — Powerful command creation with advanced autocomplete
-- 📊 **[Scoreboard](https://github.com/MegavexNetwork/scoreboard-library)** — Scoreboards stable on a Pentium III
-- ⏱️ **[Universal Scheduler](https://github.com/Anon8281/UniversalScheduler)** — Timers more precise than a robot’s metronome
-- 🔣 **[Symbol Chat](https://github.com/replaceitem/symbol-chat)** — 200+ symbols for when emojis aren’t enough 😏
-- 🖥️ **[PacketUxUi](https://github.com/OceJlot/PacketUxUi)** — GUIs that shame vanilla interfaces
-- 💬 **[LightChatBubbles](https://github.com/atesin/LightChatBubbles)** — Non-annoying chat bubbles even after 10 hours of play
-- 🌐 **[MiniTranslator](https://github.com/imDaniX/MiniTranslator)** — A lightweight utility for converting Minecraft's legacy formatting codes
-- 🌱 **[FlectoneChat](https://github.com/Flectone/FlectoneChat)** — This project’s granddaddy, still trending
+---
 
-**...and you, stars!** Every GitHub star is like RedBull for our code ⭐
+## 🙏 **Credits**
 
-## 📊 **Stats — We’re Trending!**
-Yes, we track stats like Elon tracks Twitter 🚀
+FlectonePulse is built on the shoulders of these excellent projects:
+
+- 🏗️ **[Google Guice](https://github.com/google/guice)** — Dependency injection framework for modular code
+- 📚 **[JDBI](https://jdbi.org/)** with **[HikariCP](https://github.com/brettwooldridge/HikariCP)** — Efficient database access with connection pooling for optimal performance
+- 📦 **[Elytrium Java Serializer](https://github.com/Elytrium/java-serializer)** — Efficient data serialization
+- 🧙 **[PacketEvents](https://github.com/retrooper/packetevents)** — Advanced packet handling for Minecraft
+- 🎨 **[Adventure](https://github.com/KyoriPowered/adventure)** — Modern text formatting and styling
+- ⌨️ **[Cloud](https://github.com/Incendo/cloud)** — Command framework with robust autocomplete
+- 📊 **[Scoreboard](https://github.com/MegavexNetwork/scoreboard-library)** — Reliable scoreboard management
+- ⏱️ **[Universal Scheduler](https://github.com/Anon8281/UniversalScheduler)** — Precise task scheduling
+- 🔣 **[Symbol Chat](https://github.com/replaceitem/symbol-chat)** — Extended symbol support for chat
+- 🖥️ **[PacketUxUi](https://github.com/OceJlot/PacketUxUi)** — Enhanced GUI components
+- 💬 **[LightChatBubbles](https://github.com/atesin/LightChatBubbles)** — Lightweight chat bubble system
+- 🌐 **[MiniTranslator](https://github.com/imDaniX/MiniTranslator)** — Converts legacy Minecraft formatting codes
+- 🌱 **[FlectoneChat](https://github.com/Flectone/FlectoneChat)** — This project’s granddaddy of FlectonePulse
+
+**Thank you to our community!** Every GitHub star fuels our motivation ⭐
+
+## 📊 **Project Stats**
 <div align="center">
   <a href="https://flectone.net/en/pulse/metrics" target="_blank">
     <img src="https://flectone.net/api/pulse/metrics/svg" alt="FlectonePulse stats">
@@ -177,22 +187,23 @@ Yes, we track stats like Elon tracks Twitter 🚀
 
 ---
 
-## ❤️ Project — Open Source & Free Forever
-**Download, modify, use—we encourage it!** Want **priority fixes** and **personalized advice**? Support us on Boosty:  
+## ❤️ **Open Source & Free**
+
+FlectonePulse is free to download, modify, and use. For **priority support** and **custom solutions**, consider supporting us on Boosty:  
 [![boosty](https://flectone.net/pulse/boosty.svg)](https://boosty.to/thefaser)
 
-**What you get:**
+**Benefits of supporting:**
 - 🚀 Technical Q&A access
-- 🛠️ Custom server solutions
-- 🔥 Early access to experimental features
+- 🛠️ Tailored server solutions
+- 🔥 Early access to new features
 
-**For others:**
-- 📚 Everything’s in the [documentation](https://flectone.net/pulse/)
-- 🐞 Report bugs via [Issues](https://github.com/Flectone/FlectonePulse/issues)
+**For everyone:**
+- 📚 Explore the [documentation](https://flectone.net/pulse/)
+- 🐞 Report issues via [GitHub Issues](https://github.com/Flectone/FlectonePulse/issues)
 
 <div align="center">
-  <h2> <b>FlectonePulse Awaits! Ready to Deploy? 😏</b> </h2>
+  <h2><b>FlectonePulse Awaits! Ready to Deploy? 😎</b></h2>
   <a href="https://modrinth.com/plugin/flectonepulse"><img src="https://flectone.net/pulse/modrinth.svg" width="200" alt="modrinth"></a>
   <br>
-  <h3>P.S. Join our <a href="https://discord.flectone.net/">Discord</a> 🎨</h3>
+  <h3>P.S. Join our <a href="https://discord.flectone.net/">Discord</a> 🎉</h3>
 </div>
