@@ -63,7 +63,7 @@ FlectonePulse предлагает универсальную систему ф�
 *Используйте `&` или `§` взаимозаменяемо для удобства*
 
 ```yaml
-welcome-message: "<gradient:#FF0000:#00FF00>&lДобро пожаловать</gradient> <rainbow><player></rainbow>!"
+welcome-message: "<gradient:#FF0000:#00FF00>&lПривет</gradient> <rainbow><player></rainbow>!"
 ```
 
 ![color](https://flectone.net/pulse/welcomemessage.png)

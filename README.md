@@ -63,7 +63,7 @@ FlectonePulse offers a highly versatile text formatting system, supporting legac
 *Use `&` or `§` interchangeably for convenience*
 
 ```yaml
-welcome-message: "<gradient:#FF0000:#00FF00>&lWelcome</gradient> <rainbow><player></rainbow>!"
+welcome-message: "<gradient:#FF0000:#00FF00>&lПривет</gradient> <rainbow><player></rainbow>!"
 ```
 
 ![color](https://flectone.net/pulse/welcomemessage.png)
