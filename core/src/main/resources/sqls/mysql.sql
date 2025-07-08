@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS `setting` (
     `player` INTEGER NOT NULL,
     `type` VARCHAR(255) NOT NULL,
     `value` TEXT,
-FOREIGN KEY(`player`) REFERENCES `player`(`id`)
+FOREIGN KEY(`player`) REFERENCES `player`(`id`),
+UNIQUE(`player`, `type`)
 );
 
 CREATE TABLE IF NOT EXISTS `mail` (

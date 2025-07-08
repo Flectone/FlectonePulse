@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface SettingSQL extends SQL {
 
-    @SqlQuery("SELECT `value` FROM `setting` WHERE `player` = :player AND `type` = :type")
+    @SqlQuery("SELECT `value` FROM `setting` WHERE `player` = :player AND `type` = :type LIMIT 1")
     Optional<String> getSetting(@Bind("player") int playerId, @Bind("type") String type);
 
     @SqlUpdate("DELETE FROM `setting` WHERE `player` = :player AND `type` = :type")
