@@ -312,6 +312,7 @@ public final class LegacyMiniConvertor implements MessageProcessor {
 
         if (prevChar == '&') return false; // &#123456
         if (prevChar == '<' && nextChar == '>') return false; // <#123456>
+        if (prevChar == '/' && nextChar == '>') return false; // </#123456>
         if (prevChar == ':' && (nextChar == '>' || nextChar == ':')) return false; // <color:#123456> | <gradient:#123456:#654321>
 
         return isHexPattern(text, index + 1);
