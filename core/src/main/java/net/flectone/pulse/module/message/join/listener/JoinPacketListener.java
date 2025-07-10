@@ -30,6 +30,7 @@ public class JoinPacketListener extends AbstractPacketListener {
             if (uuid == null) return;
 
             joinModule.send(uuid);
+            return;
         }
 
         TranslatableComponent translatableComponent = getTranslatableComponent(event);
