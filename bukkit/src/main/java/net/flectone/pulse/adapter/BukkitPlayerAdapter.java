@@ -21,7 +21,6 @@ import net.flectone.pulse.module.message.bubble.service.BubbleService;
 import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.module.message.greeting.GreetingModule;
-import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
 import net.flectone.pulse.module.message.objective.belowname.BelownameModule;
 import net.flectone.pulse.module.message.objective.tabname.TabnameModule;
@@ -44,7 +43,10 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 @Singleton
 public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
@@ -358,10 +360,6 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         injector.getInstance(WorldModule.class).update(fPlayer);
         injector.getInstance(AfkModule.class).remove("", fPlayer);
         injector.getInstance(StreamModule.class).setStreamPrefix(fPlayer, fPlayer.isSetting(FPlayer.Setting.STREAM));
-
-        if (!silent) {
-            injector.getInstance(JoinModule.class).send(fPlayer, true);
-        }
 
         onJoinLater(fPlayer, silent);
     }

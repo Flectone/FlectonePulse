@@ -14,7 +14,10 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.join.listener.JoinPacketListener;
+import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MessageTag;
+
+import java.util.UUID;
 
 @Singleton
 public class JoinModule extends AbstractModuleMessage<Localization.Message.Join> {
@@ -23,17 +26,20 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
     private final Permission.Message.Join permission;
 
     private final ListenerRegistry listenerRegistry;
+    private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final IntegrationModule integrationModule;
 
     @Inject
     public JoinModule(FileResolver fileResolver,
                       ListenerRegistry listenerRegistry,
+                      FPlayerService fPlayerService,
                       PlatformPlayerAdapter platformPlayerAdapter,
                       IntegrationModule integrationModule) {
         super(localization -> localization.getMessage().getJoin());
 
         this.listenerRegistry = listenerRegistry;
+        this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.integrationModule =  integrationModule;
 
@@ -53,6 +59,11 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
     @Override
     protected boolean isConfigEnable() {
         return message.isEnable();
+    }
+
+    public void send(UUID uuid) {
+        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+        send(fPlayer, false);
     }
 
     @Async
