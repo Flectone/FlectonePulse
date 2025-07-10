@@ -378,7 +378,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         injector.getInstance(BubbleService.class).clear(fPlayer);
     }
 
-    @Async(delay = 10L)
+    @Async(delay = 15L)
     public void onJoinLater(FPlayer fPlayer, boolean silent) {
         if (!silent) {
             injector.getInstance(GreetingModule.class).send(fPlayer);
