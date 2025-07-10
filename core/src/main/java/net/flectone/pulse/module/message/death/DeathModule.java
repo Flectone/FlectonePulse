@@ -41,6 +41,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
     private final PacketSender packetSender;
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
+    private final IntegrationModule integrationModule;
     private final Gson gson;
 
     @Inject
@@ -57,12 +58,11 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
         this.packetSender = packetSender;
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
+        this.integrationModule = integrationModule;
         this.gson = gson;
 
         message = fileResolver.getMessage().getDeath();
         permission = fileResolver.getPermission().getMessage().getDeath();
-
-        addPredicate(integrationModule::isVanished);
     }
 
     @Override
@@ -90,6 +90,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
             builder(fTarget)
                     .destination(message.getDestination())
                     .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DEATH))
+                    .filter(fPlayer -> integrationModule.isVanishedVisible(fTarget, fPlayer))
                     .receiver(fReceiver)
                     .format(s -> s.getTypes().get(death.getKey()))
                     .tagResolvers(fResolver -> new TagResolver[]{killerTag(fResolver, death.getKiller()), byItemTag(death.getItem())})
@@ -104,6 +105,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
                 .range(message.getRange())
                 .destination(message.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DEATH))
+                .filter(fPlayer -> integrationModule.isVanishedVisible(fTarget, fPlayer))
                 .tag(MessageTag.DEATH)
                 .format(s -> s.getTypes().get(death.getKey()))
                 .tagResolvers(fResolver -> new TagResolver[]{killerTag(fResolver, death.getKiller()), byItemTag(death.getItem())})

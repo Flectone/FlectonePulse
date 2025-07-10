@@ -89,8 +89,12 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
             return;
         }
 
-        if (fReceiver.isOnline() && !integrationModule.isVanished(fReceiver)) {
-            if (!tellModule.isEnable()) return;
+        if (fReceiver.isOnline() && integrationModule.isVanishedVisible(fReceiver, fPlayer)) {
+            if (!tellModule.isEnable()) {
+                // TODO: add custom message
+                return;
+            }
+
             tellModule.execute(fPlayer, commandContext);
             return;
         }

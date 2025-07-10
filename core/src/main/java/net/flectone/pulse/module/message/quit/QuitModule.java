@@ -21,6 +21,7 @@ public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit>
     private final Permission.Message.Quit permission;
 
     private final ListenerRegistry listenerRegistry;
+    private final IntegrationModule integrationModule;
 
     @Inject
     public QuitModule(FileResolver fileResolver,
@@ -29,11 +30,10 @@ public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit>
         super(localization -> localization.getMessage().getQuit());
 
         this.listenerRegistry = listenerRegistry;
+        this.integrationModule = integrationModule;
 
         message = fileResolver.getMessage().getQuit();
         permission = fileResolver.getPermission().getMessage().getQuit();
-
-        addPredicate(integrationModule::isVanished);
     }
 
     @Override
@@ -59,6 +59,7 @@ public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit>
                 .destination(message.getDestination())
                 .range(message.getRange())
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.QUIT))
+                .filter(fReceiver -> integrationModule.isVanishedVisible(fPlayer, fReceiver))
                 .format(Localization.Message.Quit::getFormat)
                 .integration()
                 .proxy()

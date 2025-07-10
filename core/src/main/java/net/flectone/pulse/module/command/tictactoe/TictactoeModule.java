@@ -107,7 +107,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         boolean isHard = optionalBoolean.orElse(true);
 
         FPlayer fReceiver = fPlayerService.getFPlayer(receiverName);
-        if (!fReceiver.isOnline() || integrationModule.isVanished(fReceiver)) {
+        if (!fReceiver.isOnline() || !integrationModule.isVanishedVisible(fReceiver, fPlayer)) {
             builder(fPlayer)
                     .format(Localization.Command.Tictactoe::getNullPlayer)
                     .sendBuilt();
@@ -148,7 +148,8 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
     // /tictactoe %d create
     public void sendCreateMessage(FPlayer fPlayer, FPlayer fReceiver, TicTacToe ticTacToe) {
         if (checkModulePredicates(fPlayer)) return;
-        if (integrationModule.isVanished(fReceiver)) return;
+        if (!integrationModule.isVanishedVisible(fPlayer, fReceiver)
+                || !integrationModule.isVanishedVisible(fReceiver, fPlayer)) return;
 
         builder(fPlayer)
                 .receiver(fReceiver)
@@ -160,7 +161,8 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
     // /tictactoe %d <move>
     public void sendMoveMessage(FPlayer fPlayer, FPlayer fReceiver, TicTacToe ticTacToe, int typeTitle, String move) {
         if (checkModulePredicates(fPlayer)) return;
-        if (integrationModule.isVanished(fReceiver)) return;
+        if (!integrationModule.isVanishedVisible(fPlayer, fReceiver)
+                || !integrationModule.isVanishedVisible(fReceiver, fPlayer)) return;
         if (ticTacToe == null) return;
 
         builder(fPlayer)
@@ -192,7 +194,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         }
 
         FPlayer fReceiver = fPlayerService.getFPlayer(ticTacToe.getNextPlayer());
-        if (!fReceiver.isOnline() || integrationModule.isVanished(fReceiver)) {
+        if (!fReceiver.isOnline() || !integrationModule.isVanishedVisible(fReceiver, fPlayer)) {
             ticTacToe.setEnded(true);
             builder(fPlayer)
                     .format(Localization.Command.Tictactoe::getWrongByPlayer)

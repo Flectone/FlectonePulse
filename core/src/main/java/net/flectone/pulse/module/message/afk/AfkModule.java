@@ -180,13 +180,12 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> i
             return;
         }
 
-        if (integrationModule.isVanished(fPlayer)) return;
-
         builder(fPlayer)
                 .range(range)
                 .destination(message.getDestination())
                 .tag(MessageTag.AFK)
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.AFK))
+                .filter(fReceiver -> integrationModule.isVanishedVisible(fPlayer, fReceiver))
                 .format(s -> isAfk
                         ? s.getFormatFalse().getGlobal()
                         : s.getFormatTrue().getGlobal()

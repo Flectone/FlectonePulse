@@ -81,10 +81,10 @@ public class BubbleRenderer {
         Message.Bubble config = fileResolver.getMessage().getBubble();
         double viewDistance = config.getDistance();
 
-        CompletableFuture<List<UUID>> nearbyEntitiesFuture = new CompletableFuture<>();
+        CompletableFuture<Set<UUID>> nearbyEntitiesFuture = new CompletableFuture<>();
 
         taskScheduler.runSync(() -> {
-            List<UUID> nearbyEntities = platformPlayerAdapter.getNearbyEntities(sender, viewDistance, viewDistance, viewDistance);
+            Set<UUID> nearbyEntities = platformPlayerAdapter.getNearbyEntities(sender, viewDistance, viewDistance, viewDistance);
             nearbyEntitiesFuture.complete(nearbyEntities);
         });
 
@@ -93,6 +93,7 @@ public class BubbleRenderer {
                 .map(fPlayerService::getFPlayer)
                 .filter(fViewer -> !fViewer.isUnknown())
                 .filter(fViewer -> !fViewer.isIgnored(sender))
+                .filter(fViewer -> integrationModule.isVanishedVisible(sender, fViewer))
                 .forEach(fViewer -> {
                     Component formattedMessage = createFormattedMessage(bubble, fViewer);
 
@@ -139,6 +140,7 @@ public class BubbleRenderer {
         if (bubbleEntities == null) return;
         if (bubbleEntities.isEmpty()) return;
         if (!isCorrectPlayer(sender)) return;
+        if (!integrationModule.isVanishedVisible(sender, viewer)) return;
 
         boolean hasSeenVisible = false;
         boolean hasSpawnedSpace = false;
@@ -341,7 +343,6 @@ public class BubbleRenderer {
 
         return platformPlayerAdapter.getGamemode(sender) != GameMode.SPECTATOR
                 && !platformPlayerAdapter.hasPotionEffect(sender, PotionTypes.INVISIBILITY)
-                && passengers.isEmpty()
-                && !integrationModule.isVanished(sender);
+                && passengers.isEmpty();
     }
 }

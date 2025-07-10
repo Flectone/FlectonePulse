@@ -60,7 +60,7 @@ public class SuperVanishIntegration implements Listener, FIntegration {
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
 
-        joinModule.send(fPlayer, false);
+        joinModule.send(fPlayer);
         event.setSilent(true);
     }
 }

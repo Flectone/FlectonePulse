@@ -164,7 +164,7 @@ public class StatusModule extends AbstractModule {
         samples = samples == null ? List.of(new Localization.Message.Status.Players.Sample()) : samples;
 
         Collection<FPlayer> onlineFPlayers = fPlayerService.getFPlayers().stream()
-                .filter(filter -> !integrationModule.isVanished(filter))
+                .filter(filter -> integrationModule.isVanishedVisible(filter, fPlayer))
                 .toList();
 
         samples.forEach(sample -> {

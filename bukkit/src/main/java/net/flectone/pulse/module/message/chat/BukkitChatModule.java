@@ -158,8 +158,8 @@ public class BukkitChatModule extends ChatModule {
         builder.send(receivers);
 
         List<UUID> receiversUUID = receivers.stream()
-                .filter(filterFPlayer -> !filterFPlayer.isUnknown())
-                .filter(receiver -> !integrationModule.isVanished(receiver))
+                .filter(fReceiver -> !fReceiver.isUnknown())
+                .filter(fReceiver -> integrationModule.isVanishedVisible(fReceiver, fPlayer))
                 .map(FEntity::getUuid)
                 .toList();
 

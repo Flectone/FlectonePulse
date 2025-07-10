@@ -37,6 +37,7 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
 
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
+    private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
     private final Gson gson;
 
@@ -51,13 +52,12 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
 
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
+        this.integrationModule = integrationModule;
         this.messagePipeline = messagePipeline;
         this.gson = gson;
 
         message = fileResolver.getMessage().getAdvancement();
         permission = fileResolver.getPermission().getMessage().getAdvancement();
-
-        addPredicate(integrationModule::isVanished);
     }
 
     @Override
@@ -87,6 +87,7 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
                 .range(message.getRange())
                 .destination(message.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.ADVANCEMENT))
+                .filter(fPlayer -> integrationModule.isVanishedVisible(fTarget, fPlayer))
                 .tag(MessageTag.ADVANCEMENT)
                 .format(s -> convert(s, advancement))
                 .tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fResolver, advancement)})
