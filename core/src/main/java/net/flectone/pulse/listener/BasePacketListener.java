@@ -3,7 +3,6 @@ package net.flectone.pulse.listener;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.event.UserDisconnectEvent;
-import com.github.retrooper.packetevents.event.UserLoginEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
@@ -57,15 +56,6 @@ public class BasePacketListener extends AbstractPacketListener {
     }
 
     @Override
-    public void onUserLogin(UserLoginEvent event) {
-        UUID uuid = event.getUser().getUUID();
-        if (uuid == null) return;
-
-        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
-        platformPlayerAdapter.onJoin(fPlayer, false);
-    }
-
-    @Override
     public void onUserDisconnect(UserDisconnectEvent event) {
         UUID uuid = event.getUser().getUUID();
         if (uuid == null) return;
@@ -77,6 +67,18 @@ public class BasePacketListener extends AbstractPacketListener {
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
+        handleClientSettingsEvent(event);
+    }
+
+    @Override
+    public void onPacketSend(PacketSendEvent event) {
+        if (event.isCancelled()) return;
+
+        handleUserLoginEvent(event);
+        handleUserJoinEvent(event);
+    }
+
+    public void handleClientSettingsEvent(PacketReceiveEvent event) {
         PacketTypeCommon packetType = event.getPacketType();
 
         if (packetType != PacketType.Play.Client.CLIENT_SETTINGS
@@ -99,10 +101,18 @@ public class BasePacketListener extends AbstractPacketListener {
         updateLocaleLater(uuid, locale);
     }
 
-    @Override
-    public void onPacketSend(PacketSendEvent event) {
+    public void handleUserJoinEvent(PacketSendEvent event) {
+        if (event.getPacketType() != PacketType.Play.Server.JOIN_GAME) return;
+
+        UUID uuid = event.getUser().getUUID();
+        if (uuid == null) return;
+
+        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+        platformPlayerAdapter.onJoin(fPlayer, false);
+    }
+
+    public void handleUserLoginEvent(PacketSendEvent event) {
         if (event.getPacketType() != PacketType.Login.Server.LOGIN_SUCCESS) return;
-        if (event.isCancelled()) return;
 
         // if no one was on the server, the cache may be invalid for other servers
         // because FlectonePulse on Proxy cannot send a message for servers that have no player
