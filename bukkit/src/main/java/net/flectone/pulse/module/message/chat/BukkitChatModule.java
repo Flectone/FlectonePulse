@@ -159,6 +159,7 @@ public class BukkitChatModule extends ChatModule {
 
         List<UUID> receiversUUID = receivers.stream()
                 .filter(filterFPlayer -> !filterFPlayer.isUnknown())
+                .filter(receiver -> !integrationModule.isVanished(receiver))
                 .map(FEntity::getUuid)
                 .toList();
 
@@ -183,7 +184,6 @@ public class BukkitChatModule extends ChatModule {
                                     List<UUID> receiversUUID, Message.Chat.Type.NullReceiver nullReceiver) {
         Set<UUID> onlinePlayers = fPlayerService.findOnlineFPlayers()
                 .stream()
-                .filter(receiver -> !integrationModule.isVanished(receiver))
                 .map(FEntity::getUuid)
                 .collect(Collectors.toSet());
 
