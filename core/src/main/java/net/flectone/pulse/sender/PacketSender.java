@@ -36,10 +36,9 @@ public class PacketSender {
         packetEvents.getProtocolManager().sendPacket(channel, packetWrapper);
     }
 
-    public static void staticSend(FPlayer fPlayer, PacketWrapper<?> packetWrapper) {
-        Object channel = PacketEvents.getAPI().getProtocolManager().getChannel(fPlayer.getUuid());
-        if (channel == null) return;
-
-        PacketEvents.getAPI().getProtocolManager().sendPacket(channel, packetWrapper);
+    public void send(PacketWrapper<?> packetWrapper) {
+        packetEvents.getProtocolManager()
+                .getUsers()
+                .forEach(user -> user.sendPacket(packetWrapper));
     }
 }
