@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface PlatformPlayerAdapter {
@@ -89,7 +90,7 @@ public interface PlatformPlayerAdapter {
     void onJoin(@NotNull FPlayer fPlayer, boolean silent);
     void onQuit(@NotNull FPlayer fPlayer);
     @NotNull List<UUID> getOnlinePlayers();
-    @NotNull List<UUID> getNearbyEntities(FPlayer fPlayer, double x, double y, double z);
+    @NotNull Set<UUID> getNearbyEntities(FPlayer fPlayer, double x, double y, double z);
     @NotNull List<Integer> getPassengers(FPlayer fPlayer);
     @NotNull List<PlayedTimePlayer> getPlayedTimePlayers();
 }

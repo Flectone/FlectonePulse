@@ -31,6 +31,7 @@ import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
@@ -43,10 +44,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Singleton
 public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
@@ -311,18 +310,24 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public @NotNull List<UUID> getNearbyEntities(FPlayer fPlayer, double x, double y, double z) {
+    public @NotNull Set<UUID> getNearbyEntities(FPlayer fPlayer, double x, double y, double z) {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
-        if (player == null) return Collections.emptyList();
+        if (player == null) return Collections.emptySet();
 
         World world = player.getWorld();
         Location location = player.getLocation();
 
-        return world.getNearbyEntities(location, x, y, z)
+        Set<UUID> entities = world.getNearbyEntities(location, x, y, z)
                 .stream()
                 .filter(player::canSee)
                 .map(Entity::getUniqueId)
-                .toList();
+                .collect(Collectors.toSet());
+
+        world.getPlayers().stream()
+                .filter(receiver -> receiver.canSee(player))
+                .forEach(receiver -> entities.add(receiver.getUniqueId()));
+
+        return entities;
     }
 
     @Override
