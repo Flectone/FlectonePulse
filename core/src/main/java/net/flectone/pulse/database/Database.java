@@ -85,7 +85,7 @@ public class Database {
         InputStream SQLFile = platformServerAdapter.getResource("sqls/" + config.getType().name().toLowerCase() + ".sql");
         executeSQLFile(SQLFile);
 
-        if (fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "0.6.0")) {
+        if (fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "0.9.0")) {
             MIGRATION_0_9_0();
         }
 
@@ -189,7 +189,10 @@ public class Database {
 
         SettingDAO settingDAO = injector.getInstance(SettingDAO.class);
         injector.getInstance(FPlayerDAO.class).getFPlayers().forEach(fPlayer -> {
-            settingDAO.insert(fPlayer, FPlayer.Setting.ANON);
+            if (fPlayer.isUnknown()) return;
+
+            fPlayer.setSetting(FPlayer.Setting.ANON);
+            settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.ANON);
         });
     }
 
