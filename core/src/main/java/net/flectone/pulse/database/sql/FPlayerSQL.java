@@ -16,6 +16,12 @@ public interface FPlayerSQL extends SQL {
     @SqlQuery("SELECT * FROM `player` WHERE `uuid` = :uuid")
     Optional<FPlayerDAO.PlayerInfo> findByUUID(@Bind("uuid") String name);
 
+    @SqlQuery("SELECT * FROM `player` WHERE `ip` = :ip LIMIT 1")
+    Optional<FPlayerDAO.PlayerInfo> findByIp(@Bind("ip") String ip);
+
+    @SqlQuery("SELECT * FROM `player` WHERE `id` = :id")
+    Optional<FPlayerDAO.PlayerInfo> findById(@Bind("id") int id);
+
     @SqlUpdate("INSERT INTO `player` (`uuid`, `name`) VALUES (:uuid, :name)")
     void insert(@Bind("uuid") String uuid, @Bind("name") String name);
 
@@ -36,17 +42,5 @@ public interface FPlayerSQL extends SQL {
 
     @SqlQuery("SELECT * FROM `player`")
     List<FPlayerDAO.PlayerInfo> getAllPlayers();
-
-    @SqlQuery("SELECT * FROM `player` WHERE UPPER(`name`) = UPPER(:name)")
-    Optional<FPlayerDAO.PlayerInfo> getPlayerByName(@Bind("name") String name);
-
-    @SqlQuery("SELECT * FROM `player` WHERE `ip` = :ip")
-    Optional<FPlayerDAO.PlayerInfo> getPlayerByIp(@Bind("ip") String ip);
-
-    @SqlQuery("SELECT * FROM `player` WHERE `uuid` = :uuid")
-    Optional<FPlayerDAO.PlayerInfo> getPlayerByUuid(@Bind("uuid") String uuid);
-
-    @SqlQuery("SELECT * FROM `player` WHERE `id` = :id")
-    Optional<FPlayerDAO.PlayerInfo> getPlayerById(@Bind("id") int id);
 
 }
