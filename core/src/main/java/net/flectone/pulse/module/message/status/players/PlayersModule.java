@@ -10,12 +10,12 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.PacketSender;
+import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 
 import java.util.List;
@@ -25,7 +25,6 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
 
     @Getter private final Message.Status.Players message;
     private final Permission.Message.Status.Players permission;
-
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final PlatformServerAdapter platformServerAdapter;
@@ -41,14 +40,13 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
                          PacketSender packetSender) {
         super(module -> module.getMessage().getStatus().getPlayers());
 
+        this.message = fileResolver.getMessage().getStatus().getPlayers();
+        this.permission = fileResolver.getPermission().getMessage().getStatus().getPlayers();
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
         this.platformServerAdapter = platformServerAdapter;
         this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
-
-        message = fileResolver.getMessage().getStatus().getPlayers();
-        permission = fileResolver.getPermission().getMessage().getStatus().getPlayers();
     }
 
     @Override

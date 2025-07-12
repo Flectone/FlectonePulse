@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.command.afk.AfkModule;
 import net.flectone.pulse.module.command.anon.AnonModule;
@@ -49,6 +48,7 @@ import net.flectone.pulse.module.command.unmute.UnmuteModule;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
 import net.flectone.pulse.module.command.warn.WarnModule;
 import net.flectone.pulse.module.command.warnlist.WarnlistModule;
+import net.flectone.pulse.resolver.FileResolver;
 
 @Singleton
 public class CommandModule extends AbstractModule {
@@ -58,8 +58,10 @@ public class CommandModule extends AbstractModule {
 
     @Inject
     public CommandModule(FileResolver fileResolver) {
-        command = fileResolver.getCommand();
-        permission = fileResolver.getPermission().getCommand();
+        this.command = fileResolver.getCommand();
+        this.permission = fileResolver.getPermission().getCommand();
+    }
+
     @Override
     public void onEnable() {
         registerModulePermission(permission);

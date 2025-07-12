@@ -8,7 +8,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.module.command.ignore.model.Ignore;
+import net.flectone.pulse.model.Ignore;
 import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
@@ -42,16 +42,13 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
                             TimeFormatter timeFormatter) {
         super(localization -> localization.getCommand().getIgnorelist(), null);
 
+        this.command = fileResolver.getCommand().getIgnorelist();
+        this.permission = fileResolver.getPermission().getCommand().getIgnorelist();
         this.fPlayerService = fPlayerService;
         this.messageSender = messageSender;
         this.messagePipeline = messagePipeline;
         this.commandRegistry = commandRegistry;
         this.timeFormatter = timeFormatter;
-
-        command = fileResolver.getCommand().getIgnorelist();
-        permission = fileResolver.getPermission().getCommand().getIgnorelist();
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
@@ -74,6 +71,8 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
                         .optional(promptNumber, commandRegistry.integerParser())
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
     }
 
     @Override

@@ -31,10 +31,10 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
 
     private final Message.Format.Moderation.Swear message;
     private final Permission.Message.Format.Moderation.Swear permission;
-
     private final PermissionChecker permissionChecker;
     private final FLogger fLogger;
     private final MessagePipeline messagePipeline;
+    private final MessageProcessRegistry messageProcessRegistry;
 
     private Pattern combinedPattern;
 
@@ -46,14 +46,12 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
                        MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getMessage().getFormat().getModeration().getSwear());
 
+        this.message = fileResolver.getMessage().getFormat().getModeration().getSwear();
+        this.permission = fileResolver.getPermission().getMessage().getFormat().getModeration().getSwear();
         this.permissionChecker = permissionChecker;
         this.fLogger = fLogger;
         this.messagePipeline = messagePipeline;
-
-        message = fileResolver.getMessage().getFormat().getModeration().getSwear();
-        permission = fileResolver.getPermission().getMessage().getFormat().getModeration().getSwear();
-
-        messageProcessRegistry.register(100, this);
+        this.messageProcessRegistry = messageProcessRegistry;
     }
 
     @Override
@@ -68,6 +66,8 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
         } catch (PatternSyntaxException e) {
             fLogger.warning(e);
         }
+
+        messageProcessRegistry.register(100, this);
     }
 
     @Override

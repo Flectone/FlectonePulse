@@ -18,8 +18,10 @@ public class TabModule extends AbstractModule {
 
     @Inject
     public TabModule(FileResolver fileResolver) {
-        message = fileResolver.getMessage().getTab();
-        permission = fileResolver.getPermission().getMessage().getTab();
+        this.message = fileResolver.getMessage().getTab();
+        this.permission = fileResolver.getPermission().getMessage().getTab();
+    }
+
     @Override
     public void onEnable() {
         registerModulePermission(permission);
@@ -27,11 +29,6 @@ public class TabModule extends AbstractModule {
         addChildren(FooterModule.class);
         addChildren(HeaderModule.class);
         addChildren(PlayerlistnameModule.class);
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
     }
 
     @Override

@@ -25,8 +25,8 @@ public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Fo
 
     private final Message.Format.Spoiler message;
     private final Permission.Message.Format.Spoiler permission;
-
     private final MessagePipeline messagePipeline;
+    private final MessageProcessRegistry messageProcessRegistry;
 
     @Inject
     public SpoilerModule(FileResolver fileResolver,
@@ -34,17 +34,17 @@ public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Fo
                          MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getMessage().getFormat().getSpoiler());
 
+        this.message = fileResolver.getMessage().getFormat().getSpoiler();
+        this.permission = fileResolver.getPermission().getMessage().getFormat().getSpoiler();
         this.messagePipeline = messagePipeline;
-
-        message = fileResolver.getMessage().getFormat().getSpoiler();
-        permission = fileResolver.getPermission().getMessage().getFormat().getSpoiler();
-
-        messageProcessRegistry.register(100, this);
+        this.messageProcessRegistry = messageProcessRegistry;
     }
 
     @Override
     public void onEnable() {
         registerModulePermission(permission);
+
+        messageProcessRegistry.register(100, this);
     }
 
     @Override

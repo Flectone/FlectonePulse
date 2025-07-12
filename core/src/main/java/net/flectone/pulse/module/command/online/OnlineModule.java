@@ -7,14 +7,14 @@ import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.formatter.TimeFormatter;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.formatter.TimeFormatter;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
@@ -27,7 +27,6 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
 
     private final Command.Online command;
     private final Permission.Command.Online permission;
-
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final CommandRegistry commandRegistry;
@@ -43,17 +42,13 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
                         TimeFormatter timeFormatter) {
         super(localization -> localization.getCommand().getOnline(), null);
 
+        this.command = fileResolver.getCommand().getOnline();
+        this.permission = fileResolver.getPermission().getCommand().getOnline();
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.commandRegistry = commandRegistry;
         this.integrationModule = integrationModule;
         this.timeFormatter = timeFormatter;
-
-        command = fileResolver.getCommand().getOnline();
-        permission = fileResolver.getPermission().getCommand().getOnline();
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
     }
 
     @Override
@@ -78,6 +73,9 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
                         .required(promptPlayer, commandRegistry.playerParser(command.isSuggestOfflinePlayers()))
                         .handler(commandContext -> execute(commandContext.sender(), commandContext))
         );
+
+        addPredicate(this::checkCooldown);
+        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {

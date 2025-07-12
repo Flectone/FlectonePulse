@@ -13,16 +13,14 @@ public class PlasmoVoiceModule extends AbstractModule {
 
     private final Integration.Plasmovoice config;
     private final Permission.Integration.Plasmovoice permission;
-
     private final PlasmoVoiceIntegration plasmoVoiceIntegration;
 
     @Inject
     public PlasmoVoiceModule(FileResolver fileResolver,
                              PlasmoVoiceIntegration plasmoVoiceIntegration) {
+        this.config = fileResolver.getIntegration().getPlasmovoice();
+        this.permission = fileResolver.getPermission().getIntegration().getPlasmovoice();
         this.plasmoVoiceIntegration = plasmoVoiceIntegration;
-
-        config = fileResolver.getIntegration().getPlasmovoice();
-        permission = fileResolver.getPermission().getIntegration().getPlasmovoice();
     }
 
     @Override

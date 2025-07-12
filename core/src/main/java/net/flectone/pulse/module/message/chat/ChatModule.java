@@ -25,11 +25,11 @@ public abstract class ChatModule extends AbstractModuleMessage<Localization.Mess
 
     @Inject private PermissionChecker permissionChecker;
 
-    public ChatModule(FileResolver fileResolver) {
+    protected ChatModule(FileResolver fileResolver) {
         super(localization -> localization.getMessage().getChat());
 
-        message = fileResolver.getMessage().getChat();
-        permission = fileResolver.getPermission().getMessage().getChat();
+        this.message = fileResolver.getMessage().getChat();
+        this.permission = fileResolver.getPermission().getMessage().getChat();
     }
 
     @Override
@@ -58,6 +58,7 @@ public abstract class ChatModule extends AbstractModuleMessage<Localization.Mess
     }
 
     public abstract void send(FPlayer fPlayer, Object event);
+
     public abstract void send(FEntity fPlayer, String chatName, String string);
 
     protected Message.Chat.Type getPlayerChat(FPlayer fPlayer, String message) {

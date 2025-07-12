@@ -29,7 +29,6 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
 
     @Getter private final Command.Kick command;
     private final Permission.Command.Kick permission;
-
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
@@ -47,15 +46,14 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
                       Gson gson) {
         super(localization -> localization.getCommand().getKick(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.KICK));
 
+        this.command = fileResolver.getCommand().getKick();
+        this.permission = fileResolver.getPermission().getCommand().getKick();
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.commandRegistry = commandRegistry;
         this.messagePipeline = messagePipeline;
         this.gson = gson;
-
-        command = fileResolver.getCommand().getKick();
-        permission = fileResolver.getPermission().getCommand().getKick();
     }
 
     @Override
@@ -64,7 +62,6 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
     }
 
     @Override
-    public void reload() {
     public void onEnable() {
         if (checkModulePredicates(FPlayer.UNKNOWN)) return;
 

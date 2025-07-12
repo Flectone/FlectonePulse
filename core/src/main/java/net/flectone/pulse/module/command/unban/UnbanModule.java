@@ -28,7 +28,6 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
 
     @Getter private final Command.Unban command;
     private final Permission.Command.Unban permission;
-
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final CommandRegistry commandRegistry;
@@ -44,14 +43,13 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
                        Gson gson) {
         super(localization -> localization.getCommand().getUnban(), null);
 
+        this.command = fileResolver.getCommand().getUnban();
+        this.permission = fileResolver.getPermission().getCommand().getUnban();
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.commandRegistry = commandRegistry;
         this.proxySender = proxySender;
         this.gson = gson;
-
-        command = fileResolver.getCommand().getUnban();
-        permission = fileResolver.getPermission().getCommand().getUnban();
     }
 
     @Override

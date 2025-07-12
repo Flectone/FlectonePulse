@@ -6,36 +6,34 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.event.message.TranslatableMessageEvent;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.module.message.clear.listener.ClearPacketListener;
-import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MinecraftTranslationKeys;
-
-import java.util.UUID;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TranslatableComponent;
 
 @Singleton
 public class ClearModule extends AbstractModuleMessage<Localization.Message.Clear> {
 
     private final Message.Clear message;
     private final Permission.Message.Clear permission;
-
     private final FPlayerService fPlayerService;
-    private final ListenerRegistry listenerRegistry;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public ClearModule(FileResolver fileResolver,
                        FPlayerService fPlayerService,
-                       ListenerRegistry listenerRegistry) {
+                       EventProcessRegistry eventProcessRegistry) {
         super(localization -> localization.getMessage().getClear());
 
+        this.message = fileResolver.getMessage().getClear();
+        this.permission = fileResolver.getPermission().getMessage().getClear();
         this.fPlayerService = fPlayerService;
-        this.listenerRegistry = listenerRegistry;
-
-        message = fileResolver.getMessage().getClear();
-        permission = fileResolver.getPermission().getMessage().getClear();
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override

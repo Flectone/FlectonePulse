@@ -44,6 +44,8 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
                         Gson gson) {
         super(localization -> localization.getCommand().getUnmute(), null);
 
+        this.command = fileResolver.getCommand().getUnmute();
+        this.permission = fileResolver.getPermission().getCommand().getUnmute();
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.commandRegistry = commandRegistry;

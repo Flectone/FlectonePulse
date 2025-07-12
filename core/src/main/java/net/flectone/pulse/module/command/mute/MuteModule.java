@@ -31,7 +31,6 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
     @Getter private final Command.Mute command;
     private final Permission.Command.Mute permission;
-
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
@@ -49,15 +48,14 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
                       Gson gson) {
         super(localization -> localization.getCommand().getMute(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.MUTE));
 
+        this.command = fileResolver.getCommand().getMute();
+        this.permission = fileResolver.getPermission().getCommand().getMute();
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.commandRegistry = commandRegistry;
         this.proxySender = proxySender;
         this.gson = gson;
-
-        command = fileResolver.getCommand().getMute();
-        permission = fileResolver.getPermission().getCommand().getMute();
     }
 
     @Override
@@ -66,7 +64,6 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
     }
 
     @Override
-    public void reload() {
     public void onEnable() {
         if (checkModulePredicates(FPlayer.UNKNOWN)) return;
 

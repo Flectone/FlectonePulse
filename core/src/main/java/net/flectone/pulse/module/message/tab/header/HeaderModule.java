@@ -1,16 +1,22 @@
 package net.flectone.pulse.module.message.tab.header;
 
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerListHeaderAndFooter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.model.Destination;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleListMessage;
+import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.sender.PacketSender;
 import net.flectone.pulse.service.FPlayerService;
+import net.kyori.adventure.text.Component;
 
 import java.util.List;
 
@@ -19,21 +25,25 @@ public class HeaderModule extends AbstractModuleListMessage<Localization.Message
 
     private final Message.Tab.Header message;
     private final Permission.Message.Tab.Header permission;
-
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
+    private final EventProcessRegistry eventProcessRegistry;
+    private final PacketSender packetSender;
 
     @Inject
     public HeaderModule(FileResolver fileResolver,
                         FPlayerService fPlayerService,
-                        TaskScheduler taskScheduler) {
+                        TaskScheduler taskScheduler,
+                        EventProcessRegistry eventProcessRegistry,
+                        PacketSender packetSender) {
         super(module -> module.getMessage().getTab().getHeader());
 
+        this.message = fileResolver.getMessage().getTab().getHeader();
+        this.permission = fileResolver.getPermission().getMessage().getTab().getHeader();
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
-
-        message = fileResolver.getMessage().getTab().getHeader();
-        permission = fileResolver.getPermission().getMessage().getTab().getHeader();
+        this.eventProcessRegistry = eventProcessRegistry;
+        this.packetSender = packetSender;
     }
 
     @Override
@@ -45,6 +55,10 @@ public class HeaderModule extends AbstractModuleListMessage<Localization.Message
         if (ticker.isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::send), ticker.getPeriod());
         }
+
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, this::send);
+    }
+
     @Override
     public void onDisable() {
     }

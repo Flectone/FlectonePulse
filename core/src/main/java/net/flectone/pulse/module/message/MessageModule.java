@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
 import net.flectone.pulse.module.message.afk.AfkModule;
@@ -36,6 +35,7 @@ import net.flectone.pulse.module.message.sleep.SleepModule;
 import net.flectone.pulse.module.message.spawn.SpawnModule;
 import net.flectone.pulse.module.message.status.StatusModule;
 import net.flectone.pulse.module.message.tab.TabModule;
+import net.flectone.pulse.resolver.FileResolver;
 
 @Singleton
 public class MessageModule extends AbstractModule {
@@ -45,8 +45,10 @@ public class MessageModule extends AbstractModule {
 
     @Inject
     public MessageModule(FileResolver fileResolver) {
-        message = fileResolver.getMessage();
-        permission = fileResolver.getPermission().getMessage();
+        this.message = fileResolver.getMessage();
+        this.permission = fileResolver.getPermission().getMessage();
+    }
+
     @Override
     public void onEnable() {
         registerModulePermission(permission);

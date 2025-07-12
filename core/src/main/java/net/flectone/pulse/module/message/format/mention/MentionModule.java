@@ -33,11 +33,11 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
 
     private final Message.Format.Mention message;
     private final Permission.Message.Format.Mention permission;
-
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
+    private final MessageProcessRegistry messageProcessRegistry;
 
     @Inject
     public MentionModule(FileResolver fileResolver,
@@ -48,15 +48,13 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
                          MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getMessage().getFormat().getMention());
 
+        this.message = fileResolver.getMessage().getFormat().getMention();
+        this.permission = fileResolver.getPermission().getMessage().getFormat().getMention();
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
         this.integrationModule = integrationModule;
         this.messagePipeline = messagePipeline;
-
-        message = fileResolver.getMessage().getFormat().getMention();
-        permission = fileResolver.getPermission().getMessage().getFormat().getMention();
-
-        messageProcessRegistry.register(100, this);
+        this.messageProcessRegistry = messageProcessRegistry;
     }
 
     @Override
@@ -67,6 +65,10 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
 
         registerPermission(permission.getGroup());
         registerPermission(permission.getBypass());
+
+        messageProcessRegistry.register(100, this);
+    }
+
     @Override
     public void onDisable() {
         processedMentions.clear();
@@ -81,8 +83,8 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
     public void process(MessageContext messageContext) {
         if (!messageContext.isMention()) return;
 
-        String message = replace(messageContext.getSender(), messageContext.getMessage());
-        messageContext.setMessage(message);
+        String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
+        messageContext.setMessage(processedMessage);
         messageContext.addTagResolvers(mentionTag(messageContext.getProcessId(), messageContext.getSender(), messageContext.getReceiver()));
     }
 

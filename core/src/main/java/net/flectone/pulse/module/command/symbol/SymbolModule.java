@@ -24,7 +24,6 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
 
     @Getter private final Command.Symbol command;
     @Getter private final Permission.Command.Symbol permission;
-
     private final CommandRegistry commandRegistry;
 
     @Inject
@@ -32,12 +31,9 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
                         CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getSymbol(), null);
 
+        this.command = fileResolver.getCommand().getSymbol();
+        this.permission = fileResolver.getPermission().getCommand().getSymbol();
         this.commandRegistry = commandRegistry;
-
-        command = fileResolver.getCommand().getSymbol();
-        permission = fileResolver.getPermission().getCommand().getSymbol();
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
@@ -62,6 +58,8 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
                         .permission(permission.getName())
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> categorySuggestion() {

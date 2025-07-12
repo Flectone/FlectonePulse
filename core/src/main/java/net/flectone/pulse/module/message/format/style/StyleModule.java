@@ -16,15 +16,14 @@ public class StyleModule extends AbstractModule implements MessageProcessor {
 
     private final Message.Format.Style message;
     private final Permission.Message.Format.Style permission;
+    private final MessageProcessRegistry messageProcessRegistry;
 
     @Inject
     public StyleModule(FileResolver fileResolver,
                        MessageProcessRegistry messageProcessRegistry) {
-
-        message = fileResolver.getMessage().getFormat().getStyle();
-        permission = fileResolver.getPermission().getMessage().getFormat().getStyle();
-
-        messageProcessRegistry.register(150, this);
+        this.message = fileResolver.getMessage().getFormat().getStyle();
+        this.permission = fileResolver.getPermission().getMessage().getFormat().getStyle();
+        this.messageProcessRegistry = messageProcessRegistry;
     }
 
     @Override

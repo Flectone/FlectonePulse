@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.afk.listener.AfkListener;
@@ -26,15 +27,14 @@ public class BukkitAfkModule extends AfkModule {
                            IntegrationModule integrationModule,
                            PermissionChecker permissionChecker,
                            PlatformPlayerAdapter platformPlayerAdapter,
-                           BukkitListenerRegistry bukkitListenerRegistry) {
-        super(fileResolver, messageProcessRegistry, fPlayerService, taskScheduler, integrationModule, permissionChecker, platformPlayerAdapter);
+                           BukkitListenerRegistry bukkitListenerRegistry,
+                           EventProcessRegistry eventProcessRegistry) {
+        super(fileResolver, fPlayerService, taskScheduler, integrationModule, permissionChecker, platformPlayerAdapter, messageProcessRegistry, eventProcessRegistry);
 
         this.bukkitListenerManager = bukkitListenerRegistry;
     }
 
     @Override
-    public void reload() {
-        super.reload();
     public void onEnable() {
         super.onEnable();
 

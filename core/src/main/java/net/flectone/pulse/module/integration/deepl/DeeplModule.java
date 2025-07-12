@@ -17,7 +17,6 @@ public class DeeplModule extends AbstractModule {
 
     private final Integration.Deepl integration;
     private final Permission.Integration.Deepl permission;
-
     private final LibraryResolver libraryResolver;
     private final Injector injector;
 
@@ -25,11 +24,10 @@ public class DeeplModule extends AbstractModule {
     public DeeplModule(FileResolver fileResolver,
                        LibraryResolver libraryResolver,
                        Injector injector) {
+        this.integration = fileResolver.getIntegration().getDeepl();
+        this.permission = fileResolver.getPermission().getIntegration().getDeepl();
         this.libraryResolver = libraryResolver;
         this.injector = injector;
-
-        integration = fileResolver.getIntegration().getDeepl();
-        permission = fileResolver.getPermission().getIntegration().getDeepl();
     }
 
     @Override

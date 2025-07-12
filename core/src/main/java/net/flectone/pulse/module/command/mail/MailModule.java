@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Mail;
@@ -24,27 +26,28 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
 
     private final Command.Mail command;
     private final Permission.Command.Mail permission;
-
     private final TellModule tellModule;
     private final IntegrationModule integrationModule;
     private final FPlayerService fPlayerService;
     private final CommandRegistry commandRegistry;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public MailModule(FileResolver fileResolver,
                       TellModule tellModule,
                       IntegrationModule integrationModule,
                       FPlayerService fPlayerService,
-                      CommandRegistry commandRegistry) {
+                      CommandRegistry commandRegistry,
+                      EventProcessRegistry eventProcessRegistry) {
         super(localization -> localization.getCommand().getMail(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.MAIL));
 
+        this.command = fileResolver.getCommand().getMail();
+        this.permission = fileResolver.getPermission().getCommand().getMail();
         this.tellModule = tellModule;
         this.integrationModule = integrationModule;
         this.fPlayerService = fPlayerService;
         this.commandRegistry = commandRegistry;
-
-        command = fileResolver.getCommand().getMail();
-        permission = fileResolver.getPermission().getCommand().getMail();
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override

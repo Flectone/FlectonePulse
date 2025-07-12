@@ -10,8 +10,6 @@ import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -19,11 +17,19 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.death.listener.DeathPacketListener;
 import net.flectone.pulse.module.message.death.model.Death;
 import net.flectone.pulse.module.message.death.model.Item;
-import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.PacketSender;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.EntityUtil;
+import net.flectone.pulse.util.MessageTag;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
@@ -36,13 +42,14 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
 
     @Getter private final Message.Death message;
     private final Permission.Message.Death permission;
-
     private final MessagePipeline messagePipeline;
     private final PacketSender packetSender;
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
     private final Gson gson;
+    private final EntityUtil entityUtil;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public DeathModule(FileResolver fileResolver,
@@ -51,18 +58,21 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
                        FPlayerService fPlayerService,
                        ListenerRegistry listenerRegistry,
                        IntegrationModule integrationModule,
-                       Gson gson) {
+                       Gson gson,
+                       EntityUtil entityUtil,
+                       EventProcessRegistry eventProcessRegistry) {
         super(localization -> localization.getMessage().getDeath());
 
+        this.message = fileResolver.getMessage().getDeath();
+        this.permission = fileResolver.getPermission().getMessage().getDeath();
         this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
         this.integrationModule = integrationModule;
         this.gson = gson;
-
-        message = fileResolver.getMessage().getDeath();
-        permission = fileResolver.getPermission().getMessage().getDeath();
+        this.entityUtil = entityUtil;
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override

@@ -7,13 +7,13 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.processor.MessageProcessor;
-import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.image.model.FImage;
+import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -40,15 +40,18 @@ public class ImageModule extends AbstractModule implements MessageProcessor {
 
     private final Message.Format.Image message;
     private final Permission.Message.Format.Image permission;
-
     private final MessagePipeline messagePipeline;
+    private final MessageProcessRegistry messageProcessRegistry;
 
     @Inject
     public ImageModule(FileResolver fileResolver,
                        MessagePipeline messagePipeline,
                        MessageProcessRegistry messageProcessRegistry) {
-
+        this.message = fileResolver.getMessage().getFormat().getImage();
+        this.permission = fileResolver.getPermission().getMessage().getFormat().getImage();
         this.messagePipeline = messagePipeline;
+        this.messageProcessRegistry = messageProcessRegistry;
+    }
 
     @Override
     public void onEnable() {

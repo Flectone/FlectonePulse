@@ -24,6 +24,7 @@ public class BukkitAnvilModule extends AnvilModule {
                              BukkitListenerRegistry bukkitListenerManager,
                              MessagePipeline messagePipeline) {
         super(fileResolver);
+
         this.bukkitListenerManager = bukkitListenerManager;
         this.messagePipeline = messagePipeline;
     }

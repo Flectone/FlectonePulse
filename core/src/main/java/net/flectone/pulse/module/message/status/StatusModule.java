@@ -33,7 +33,6 @@ public class StatusModule extends AbstractModule {
 
     private final Message.Status message;
     private final Permission.Message.Status permission;
-
     private final MOTDModule MOTDModule;
     private final IconModule iconModule;
     private final PlayersModule playersModule;
@@ -55,6 +54,8 @@ public class StatusModule extends AbstractModule {
                         FPlayerService fPlayerService,
                         ListenerRegistry listenerRegistry,
                         IntegrationModule integrationModule) {
+        this.message = fileResolver.getMessage().getStatus();
+        this.permission = fileResolver.getPermission().getMessage().getStatus();
         this.MOTDModule = MOTDModule;
         this.iconModule = iconModule;
         this.playersModule = playersModule;
@@ -64,24 +65,18 @@ public class StatusModule extends AbstractModule {
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
         this.integrationModule = integrationModule;
+    }
 
-        message = fileResolver.getMessage().getStatus();
-        permission = fileResolver.getPermission().getMessage().getStatus();
     @Override
     public void onEnable() {
         registerModulePermission(permission);
+
+        listenerRegistry.register(StatusPacketListener.class);
 
         addChildren(MOTDModule.class);
         addChildren(IconModule.class);
         addChildren(PlayersModule.class);
         addChildren(VersionModule.class);
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
-
-        listenerRegistry.register(StatusPacketListener.class);
     }
 
     @Override

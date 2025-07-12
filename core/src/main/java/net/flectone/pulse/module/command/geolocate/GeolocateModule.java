@@ -29,7 +29,6 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
 
     private final Command.Geolocate command;
     private final Permission.Command.Geolocate permission;
-
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final CommandRegistry commandRegistry;
@@ -41,15 +40,11 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
                            CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getGeolocate(), null);
 
+        this.command = fileResolver.getCommand().getGeolocate();
+        this.permission = fileResolver.getPermission().getCommand().getGeolocate();
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.commandRegistry = commandRegistry;
-
-        command = fileResolver.getCommand().getGeolocate();
-        permission = fileResolver.getPermission().getCommand().getGeolocate();
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
     }
 
     @Override
@@ -72,6 +67,9 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
                         .required(promptPlayer, commandRegistry.playerParser(command.isSuggestOfflinePlayers()))
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
+        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
     }
 
     @Override

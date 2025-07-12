@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
@@ -19,21 +21,22 @@ public class BrandModule extends AbstractModuleListMessage<Localization.Message.
 
     private final Message.Brand message;
     private final Permission.Message.Brand permission;
-
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public BrandModule(FileResolver fileResolver,
                        FPlayerService fPlayerService,
-                       TaskScheduler taskScheduler) {
+                       TaskScheduler taskScheduler,
+                       EventProcessRegistry eventProcessRegistry) {
         super(localization -> localization.getMessage().getBrand());
 
+        this.message = fileResolver.getMessage().getBrand();
+        this.permission = fileResolver.getPermission().getMessage().getBrand();
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
-
-        message = fileResolver.getMessage().getBrand();
-        permission = fileResolver.getPermission().getMessage().getBrand();
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override
@@ -44,6 +47,8 @@ public class BrandModule extends AbstractModuleListMessage<Localization.Message.
         if (ticker.isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::send), ticker.getPeriod());
         }
+
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, this::send);
     }
 
     @Override

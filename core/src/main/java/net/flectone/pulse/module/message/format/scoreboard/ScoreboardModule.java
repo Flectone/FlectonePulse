@@ -3,13 +3,15 @@ package net.flectone.pulse.module.message.format.scoreboard;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.message.format.scoreboard.model.Team;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.PacketSender;
@@ -30,12 +32,11 @@ public class ScoreboardModule extends AbstractModule {
 
     private final Message.Format.Scoreboard message;
     private final Permission.Message.Format.Scoreboard permission;
-
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
     private final PacketSender packetSender;
-    private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public ScoreboardModule(FileResolver fileResolver,
@@ -43,15 +44,14 @@ public class ScoreboardModule extends AbstractModule {
                             TaskScheduler taskScheduler,
                             MessagePipeline messagePipeline,
                             PacketSender packetSender,
-                            PlatformPlayerAdapter platformPlayerAdapter) {
-        message = fileResolver.getMessage().getFormat().getScoreboard();
-        permission = fileResolver.getPermission().getMessage().getFormat().getScoreboard();
-
+                            EventProcessRegistry eventProcessRegistry) {
+        this.message = fileResolver.getMessage().getFormat().getScoreboard();
+        this.permission = fileResolver.getPermission().getMessage().getFormat().getScoreboard();
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
-        this.platformPlayerAdapter = platformPlayerAdapter;
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override

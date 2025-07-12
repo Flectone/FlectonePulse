@@ -22,10 +22,8 @@ import java.util.Optional;
 @Singleton
 public class ChatstyleModule extends AbstractModuleCommand<Localization.Command.Chatstyle> {
 
-
     private final Command.Chatstyle command;
     private final Permission.Command.Chatstyle permission;
-
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final ProxySender proxySender;
@@ -45,11 +43,8 @@ public class ChatstyleModule extends AbstractModuleCommand<Localization.Command.
         this.proxySender = proxySender;
         this.commandRegistry = commandRegistry;
         this.colorConverter = colorConverter;
-
-        command = fileResolver.getCommand().getChatstyle();
-        permission = fileResolver.getPermission().getCommand().getChatstyle();
-
-        addPredicate(this::checkCooldown);
+        this.command = fileResolver.getCommand().getChatstyle();
+        this.permission = fileResolver.getPermission().getCommand().getChatstyle();
     }
 
     @Override
@@ -75,6 +70,8 @@ public class ChatstyleModule extends AbstractModuleCommand<Localization.Command.
                 .optional(promptPlayer, commandRegistry.offlinePlayerParser(), commandRegistry.playerSuggestionPermission(permission.getOther()))
                 .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
     }
 
     @Override

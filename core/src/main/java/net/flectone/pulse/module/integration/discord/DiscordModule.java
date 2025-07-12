@@ -4,17 +4,16 @@ import com.alessiodp.libby.Library;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import lombok.SneakyThrows;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.LibraryResolver;
 import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.function.UnaryOperator;
 
@@ -23,7 +22,6 @@ public class DiscordModule extends AbstractModule {
 
     private final Integration.Discord integration;
     private final Permission.Integration.Discord permission;
-
     private final LibraryResolver libraryResolver;
     private final Injector injector;
     private final FLogger fLogger;
@@ -33,14 +31,11 @@ public class DiscordModule extends AbstractModule {
                          LibraryResolver libraryResolver,
                          Injector injector,
                          FLogger fLogger) {
+        this.integration = fileResolver.getIntegration().getDiscord();
+        this.permission = fileResolver.getPermission().getIntegration().getDiscord();
         this.libraryResolver = libraryResolver;
         this.injector = injector;
         this.fLogger = fLogger;
-
-        integration = fileResolver.getIntegration().getDiscord();
-        permission = fileResolver.getPermission().getIntegration().getDiscord();
-
-        addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.isSetting(FPlayer.Setting.DISCORD));
     }
 
     @Override
@@ -49,8 +44,7 @@ public class DiscordModule extends AbstractModule {
 
         loadLibraries();
 
-        DiscordIntegration discordIntegration = injector.getInstance(DiscordIntegration.class);
-        discordIntegration.setEnable(isEnable());
+        addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.isSetting(FPlayer.Setting.DISCORD));
 
         try {
             discordIntegration.reload();
@@ -99,12 +93,5 @@ public class DiscordModule extends AbstractModule {
         if (checkModulePredicates(sender)) return;
 
         injector.getInstance(DiscordIntegration.class).sendMessage(sender, messageTag, discordString);
-    }
-
-    @SneakyThrows
-    public void disconnect() {
-        if (!isEnable()) return;
-
-        injector.getInstance(DiscordIntegration.class).disconnect();
     }
 }

@@ -25,7 +25,6 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
     @Getter private final Command.Spy command;
     private final Permission.Command.Spy permission;
-
     private final CommandRegistry commandRegistry;
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
@@ -37,12 +36,11 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
                      PermissionChecker permissionChecker) {
         super(localization -> localization.getCommand().getSpy(), null);
 
+        this.command = fileResolver.getCommand().getSpy();
+        this.permission = fileResolver.getPermission().getCommand().getSpy();
         this.commandRegistry = commandRegistry;
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
-
-        command = fileResolver.getCommand().getSpy();
-        permission = fileResolver.getPermission().getCommand().getSpy();
     }
 
     @Override

@@ -36,11 +36,12 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
             .expireAfterWrite(1, TimeUnit.HOURS)
             .build();
 
+    private final Set<String> TAG = Set.of("translate", "translateto");
+
     private final Message.Format.Translate message;
     private final Permission.Message.Format.Translate permission;
-
-    private final Set<String> TAG = Set.of("translate", "translateto");
     private final MessagePipeline messagePipeline;
+    private final MessageProcessRegistry messageProcessRegistry;
 
     @Inject
     public TranslateModule(FileResolver fileResolver,
@@ -48,7 +49,11 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
                            MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getMessage().getFormat().getTranslate());
 
+        this.message = fileResolver.getMessage().getFormat().getTranslate();
+        this.permission = fileResolver.getPermission().getMessage().getFormat().getTranslate();
         this.messagePipeline = messagePipeline;
+        this.messageProcessRegistry = messageProcessRegistry;
+    }
 
     @Override
     public void onEnable() {

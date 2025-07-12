@@ -11,6 +11,8 @@ import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
@@ -27,13 +29,13 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
 
     private final Message.Tab.Playerlistname message;
     private final Permission.Message.Tab.Playerlistname permission;
-
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MessagePipeline messagePipeline;
     private final PacketSender packetSender;
     private final PacketProvider packetProvider;
     private final TaskScheduler taskScheduler;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public PlayerlistnameModule(FPlayerService fPlayerService,
@@ -42,18 +44,19 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
                                 MessagePipeline messagePipeline,
                                 PacketSender packetSender,
                                 PacketProvider packetProvider,
-                                TaskScheduler taskScheduler) {
+                                TaskScheduler taskScheduler,
+                                EventProcessRegistry eventProcessRegistry) {
         super(module -> module.getMessage().getTab().getPlayerlistname());
 
+        this.message = fileResolver.getMessage().getTab().getPlayerlistname();
+        this.permission = fileResolver.getPermission().getMessage().getTab().getPlayerlistname();
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
         this.packetProvider = packetProvider;
         this.taskScheduler = taskScheduler;
-
-        message = fileResolver.getMessage().getTab().getPlayerlistname();
-        permission = fileResolver.getPermission().getMessage().getTab().getPlayerlistname();
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override

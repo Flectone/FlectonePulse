@@ -6,14 +6,18 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.event.message.TranslatableMessageEvent;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.module.message.kill.listener.KillPacketListener;
-import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.EntityUtil;
 import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.event.HoverEvent;
 
 import java.util.UUID;
 
@@ -22,21 +26,22 @@ public class KillModule extends AbstractModuleMessage<Localization.Message.Kill>
 
     private final Message.Kill message;
     private final Permission.Message.Kill permission;
-
     private final FPlayerService fPlayerService;
-    private final ListenerRegistry listenerRegistry;
+    private final EntityUtil entityUtil;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public KillModule(FileResolver fileResolver,
                       FPlayerService fPlayerService,
-                      ListenerRegistry listenerRegistry) {
+                      EntityUtil entityUtil,
+                      EventProcessRegistry eventProcessRegistry) {
         super(localization -> localization.getMessage().getKill());
 
+        this.message = fileResolver.getMessage().getKill();
+        this.permission = fileResolver.getPermission().getMessage().getKill();
         this.fPlayerService = fPlayerService;
-        this.listenerRegistry = listenerRegistry;
-
-        message = fileResolver.getMessage().getKill();
-        permission = fileResolver.getPermission().getMessage().getKill();
+        this.entityUtil = entityUtil;
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override

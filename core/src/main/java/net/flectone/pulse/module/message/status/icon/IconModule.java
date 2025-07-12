@@ -20,11 +20,10 @@ import java.util.List;
 @Singleton
 public class IconModule extends AbstractModule {
 
-    private final Message.Status.Icon message;
-    private final Permission.Message.Status.Icon permission;
-
     private final List<String> iconList = new ArrayList<>();
 
+    private final Message.Status.Icon message;
+    private final Permission.Message.Status.Icon permission;
     private final RandomUtil randomUtil;
     private final FileUtil fileUtil;
     private final Path iconPath;
@@ -36,12 +35,11 @@ public class IconModule extends AbstractModule {
                       @Named("projectPath") Path projectPath,
                       RandomUtil randomUtil,
                       FileUtil fileUtil) {
+        this.message = fileResolver.getMessage().getStatus().getIcon();
+        this.permission = fileResolver.getPermission().getMessage().getStatus().getIcon();
         this.iconPath = projectPath.resolve("images");
         this.fileUtil = fileUtil;
         this.randomUtil = randomUtil;
-
-        message = fileResolver.getMessage().getStatus().getIcon();
-        permission = fileResolver.getPermission().getMessage().getStatus().getIcon();
     }
 
     @Override

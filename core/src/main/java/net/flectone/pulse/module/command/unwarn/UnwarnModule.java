@@ -28,7 +28,6 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
 
     @Getter private final Command.Unwarn command;
     private final Permission.Command.Unwarn permission;
-
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final CommandRegistry commandRegistry;
@@ -44,14 +43,13 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
                         Gson gson) {
         super(localization -> localization.getCommand().getUnwarn(), null);
 
+        this.command = fileResolver.getCommand().getUnwarn();
+        this.permission = fileResolver.getPermission().getCommand().getUnwarn();
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.commandRegistry = commandRegistry;
         this.proxySender = proxySender;
         this.gson = gson;
-
-        command = fileResolver.getCommand().getUnwarn();
-        permission = fileResolver.getPermission().getCommand().getUnwarn();
     }
 
     @Override

@@ -10,13 +10,15 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.processor.MessageProcessor;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MessageTag;
@@ -41,34 +43,35 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> i
     @Getter private final Message.Afk message;
     private final Permission.Message.Afk permission;
     private final Permission.Message.Format formatPermission;
-
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final IntegrationModule integrationModule;
     private final PermissionChecker permissionChecker;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final MessageProcessRegistry messageProcessRegistry;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public AfkModule(FileResolver fileResolver,
-                     MessageProcessRegistry messageProcessRegistry,
                      FPlayerService fPlayerService,
                      TaskScheduler taskScheduler,
                      IntegrationModule integrationModule,
                      PermissionChecker permissionChecker,
-                     PlatformPlayerAdapter platformPlayerAdapter) {
+                     PlatformPlayerAdapter platformPlayerAdapter,
+                     MessageProcessRegistry messageProcessRegistry,
+                     EventProcessRegistry eventProcessRegistry) {
         super(localization -> localization.getMessage().getAfk());
 
-        message = fileResolver.getMessage().getAfk();
-        permission = fileResolver.getPermission().getMessage().getAfk();
-        formatPermission = fileResolver.getPermission().getMessage().getFormat();
-
+        this.message = fileResolver.getMessage().getAfk();
+        this.permission = fileResolver.getPermission().getMessage().getAfk();
+        this.formatPermission = fileResolver.getPermission().getMessage().getFormat();
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.integrationModule = integrationModule;
         this.permissionChecker = permissionChecker;
         this.platformPlayerAdapter = platformPlayerAdapter;
-
-        messageProcessRegistry.register(150, this);
+        this.messageProcessRegistry = messageProcessRegistry;
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override

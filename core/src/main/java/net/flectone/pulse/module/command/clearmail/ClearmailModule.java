@@ -22,7 +22,6 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
 
     private final Command.Clearmail command;
     private final Permission.Command.Clearmail permission;
-
     private final FPlayerService fPlayerService;
     private final CommandRegistry commandRegistry;
 
@@ -32,13 +31,10 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
                            CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getClearmail(), null);
 
+        this.command = fileResolver.getCommand().getClearmail();
+        this.permission = fileResolver.getPermission().getCommand().getClearmail();
         this.fPlayerService = fPlayerService;
         this.commandRegistry = commandRegistry;
-
-        command = fileResolver.getCommand().getClearmail();
-        permission = fileResolver.getPermission().getCommand().getClearmail();
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
@@ -68,6 +64,8 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
                         }))
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
     }
 
     @Override

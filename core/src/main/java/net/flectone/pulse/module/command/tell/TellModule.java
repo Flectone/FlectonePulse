@@ -32,7 +32,6 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
     private final Command.Tell command;
     private final Permission.Command.Tell permission;
-
     private final FPlayerService fPlayerService;
     private final ProxySender proxySender;
     private final IntegrationModule integrationModule;
@@ -48,14 +47,13 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                       PlatformPlayerAdapter platformPlayerAdapter) {
         super(localization -> localization.getCommand().getTell(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELL));
 
+        this.command = fileResolver.getCommand().getTell();
+        this.permission = fileResolver.getPermission().getCommand().getTell();
         this.fPlayerService = fPlayerService;
         this.proxySender = proxySender;
         this.integrationModule = integrationModule;
         this.commandRegistry = commandRegistry;
         this.platformPlayerAdapter = platformPlayerAdapter;
-
-        command = fileResolver.getCommand().getTell();
-        permission = fileResolver.getPermission().getCommand().getTell();
     }
 
     @Override
@@ -80,6 +78,11 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                         .permission(permission.getName())
                         .handler(this)
         );
+    }
+
+    @Override
+    public void onDisable() {
+        senderReceiverMap.clear();
     }
 
     @Override

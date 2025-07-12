@@ -28,7 +28,6 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
 
     private final Command.Banlist command;
     private final Permission.Command.Banlist permission;
-
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final CommandRegistry commandRegistry;
@@ -48,6 +47,8 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
                          MessageSender messageSender) {
         super(localization -> localization.getCommand().getBanlist(), null);
 
+        this.command = fileResolver.getCommand().getBanlist();
+        this.permission = fileResolver.getPermission().getCommand().getBanlist();
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.commandRegistry = commandRegistry;
@@ -55,11 +56,6 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         this.unbanModule = unbanModule;
         this.messagePipeline = messagePipeline;
         this.messageSender = messageSender;
-
-        command = fileResolver.getCommand().getBanlist();
-        permission = fileResolver.getPermission().getCommand().getBanlist();
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
@@ -68,7 +64,6 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
     }
 
     @Override
-    public void reload() {
     public void onEnable() {
         if (checkModulePredicates(FPlayer.UNKNOWN)) return;
 
@@ -88,6 +83,8 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
                         .optional(promptNumber, commandRegistry.integerParser())
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
     }
 
     @Override

@@ -20,8 +20,8 @@ public class VersionModule extends AbstractModuleMessage<Localization.Message.St
     public VersionModule(FileResolver fileResolver) {
         super(module -> module.getMessage().getStatus().getVersion());
 
-        message = fileResolver.getMessage().getStatus().getVersion();
-        permission = fileResolver.getPermission().getMessage().getStatus().getVersion();
+        this.message = fileResolver.getMessage().getStatus().getVersion();
+        this.permission = fileResolver.getPermission().getMessage().getStatus().getVersion();
     }
 
     @Override

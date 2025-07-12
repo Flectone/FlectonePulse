@@ -30,25 +30,25 @@ public class ColorModule extends AbstractModule implements MessageProcessor {
     @Getter private final Message.Format.Color message;
     private final Permission.Message.Format.Color permission;
     private final Permission.Message.Format formatPermission;
-
     private final PermissionChecker permissionChecker;
+    private final MessageProcessRegistry messageProcessRegistry;
 
     @Inject
     public ColorModule(FileResolver fileResolver,
                        PermissionChecker permissionChecker,
                        MessageProcessRegistry messageProcessRegistry) {
+        this.message = fileResolver.getMessage().getFormat().getColor();
+        this.permission = fileResolver.getPermission().getMessage().getFormat().getColor();
+        this.formatPermission = fileResolver.getPermission().getMessage().getFormat();
         this.permissionChecker = permissionChecker;
-
-        message = fileResolver.getMessage().getFormat().getColor();
-        permission = fileResolver.getPermission().getMessage().getFormat().getColor();
-        formatPermission = fileResolver.getPermission().getMessage().getFormat();
-
-        messageProcessRegistry.register(150, this);
+        this.messageProcessRegistry = messageProcessRegistry;
     }
 
     @Override
     public void onEnable() {
         registerModulePermission(permission);
+
+        messageProcessRegistry.register(150, this);
     }
 
     @Override

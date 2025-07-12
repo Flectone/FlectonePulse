@@ -35,7 +35,6 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
     @Getter private final Command.Ban command;
     private final Permission.Command.Ban permission;
-
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final CommandRegistry commandRegistry;
@@ -59,6 +58,8 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
                      Gson gson) {
         super(localization -> localization.getCommand().getBan(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.BAN));
 
+        this.command = fileResolver.getCommand().getBan();
+        this.permission = fileResolver.getPermission().getCommand().getBan();
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.commandRegistry = commandRegistry;
@@ -68,9 +69,6 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         this.packetSender = packetSender;
         this.proxySender = proxySender;
         this.gson = gson;
-
-        command = fileResolver.getCommand().getBan();
-        permission = fileResolver.getPermission().getCommand().getBan();
     }
 
     @Override
@@ -79,7 +77,6 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     }
 
     @Override
-    public void reload() {
     public void onEnable() {
         if (checkModulePredicates(FPlayer.UNKNOWN)) return;
 

@@ -17,16 +17,14 @@ public class BookModule extends AbstractModule {
 
     private final Message.Book message;
     private final Permission.Message.Book permission;
-
     private final MessagePipeline messagePipeline;
 
     @Inject
     public BookModule(FileResolver fileResolver,
                       MessagePipeline messagePipeline) {
+        this.message = fileResolver.getMessage().getBook();
+        this.permission = fileResolver.getPermission().getMessage().getBook();
         this.messagePipeline = messagePipeline;
-
-        message = fileResolver.getMessage().getBook();
-        permission = fileResolver.getPermission().getMessage().getBook();
     }
 
     @Override

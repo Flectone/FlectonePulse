@@ -4,10 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.banlist.BanlistModule;
 import net.flectone.pulse.module.command.kick.KickModule;
@@ -18,14 +17,26 @@ import net.flectone.pulse.module.command.unmute.UnmuteModule;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
 import net.flectone.pulse.module.command.warn.WarnModule;
 import net.flectone.pulse.module.command.warnlist.WarnlistModule;
+import net.flectone.pulse.resolver.FileResolver;
+
+import java.util.function.Predicate;
 
 @Singleton
 public class LiteBansModule extends AbstractModule {
 
     private final Integration.Litebans integration;
     private final Permission.Integration.Litebans permission;
-
     private final LiteBansIntegration liteBansIntegration;
+    private final BanModule banModule;
+    private final BanlistModule banlistModule;
+    private final UnbanModule unbanModule;
+    private final MuteModule muteModule;
+    private final MutelistModule mutelistModule;
+    private final UnmuteModule unmuteModule;
+    private final WarnModule warnModule;
+    private final WarnlistModule warnlistModule;
+    private final UnwarnModule unwarnModule;
+    private final KickModule kickModule;
 
     @Inject
     public LiteBansModule(FileResolver fileResolver,
@@ -40,24 +51,19 @@ public class LiteBansModule extends AbstractModule {
                           WarnlistModule warnlistModule,
                           UnwarnModule unwarnModule,
                           KickModule kickModule) {
+        this.integration = fileResolver.getIntegration().getLitebans();
+        this.permission = fileResolver.getPermission().getIntegration().getLitebans();
         this.liteBansIntegration = liteBansIntegration;
-
-        integration = fileResolver.getIntegration().getLitebans();
-        permission = fileResolver.getPermission().getIntegration().getLitebans();
-
-        banModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseBan() && isHooked());
-        banlistModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseBan() && isHooked());
-        unbanModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseBan() && isHooked());
-
-        muteModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseMute() && isHooked());
-        mutelistModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseMute() && isHooked());
-        unmuteModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseMute() && isHooked());
-
-        warnModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseWarn() && isHooked());
-        warnlistModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseWarn() && isHooked());
-        unwarnModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseWarn() && isHooked());
-
-        kickModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseKick() && isHooked());
+        this.banModule = banModule;
+        this.banlistModule = banlistModule;
+        this.unbanModule = unbanModule;
+        this.muteModule = muteModule;
+        this.mutelistModule = mutelistModule;
+        this.unmuteModule = unmuteModule;
+        this.warnModule = warnModule;
+        this.warnlistModule = warnlistModule;
+        this.unwarnModule = unwarnModule;
+        this.kickModule = kickModule;
     }
 
     @Override
@@ -65,6 +71,25 @@ public class LiteBansModule extends AbstractModule {
         registerModulePermission(permission);
 
         liteBansIntegration.hook();
+
+        Predicate<FEntity> disablePredicateBan = fPlayer -> integration.isDisableFlectonepulseBan() && isHooked();
+        banModule.addPredicate(disablePredicateBan);
+        banlistModule.addPredicate(disablePredicateBan);
+        unbanModule.addPredicate(disablePredicateBan);
+
+        Predicate<FEntity> disablePredicateMute = fPlayer -> integration.isDisableFlectonepulseMute() && isHooked();
+        muteModule.addPredicate(disablePredicateMute);
+        mutelistModule.addPredicate(disablePredicateMute);
+        unmuteModule.addPredicate(disablePredicateMute);
+
+        Predicate<FEntity> disablePredicateWarn = fPlayer -> integration.isDisableFlectonepulseWarn() && isHooked();
+        warnModule.addPredicate(disablePredicateWarn);
+        warnlistModule.addPredicate(disablePredicateWarn);
+        unwarnModule.addPredicate(disablePredicateWarn);
+
+        kickModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseKick() && isHooked());
+    }
+
     }
 
     @Override

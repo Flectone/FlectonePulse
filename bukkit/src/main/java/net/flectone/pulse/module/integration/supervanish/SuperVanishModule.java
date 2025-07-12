@@ -18,7 +18,6 @@ public class SuperVanishModule extends AbstractModule {
 
     private final Integration.Supervanish config;
     private final Permission.Integration.Supervanish permission;
-
     private final SuperVanishIntegration superVanishIntegration;
     private final BukkitListenerRegistry bukkitListenerManager;
 
@@ -26,11 +25,10 @@ public class SuperVanishModule extends AbstractModule {
     public SuperVanishModule(FileResolver fileResolver,
                              SuperVanishIntegration superVanishIntegration,
                              BukkitListenerRegistry bukkitListenerManager) {
+        this.config = fileResolver.getIntegration().getSupervanish();
+        this.permission = fileResolver.getPermission().getIntegration().getSupervanish();
         this.superVanishIntegration = superVanishIntegration;
         this.bukkitListenerManager = bukkitListenerManager;
-
-        config = fileResolver.getIntegration().getSupervanish();
-        permission = fileResolver.getPermission().getIntegration().getSupervanish();
     }
 
     @Override

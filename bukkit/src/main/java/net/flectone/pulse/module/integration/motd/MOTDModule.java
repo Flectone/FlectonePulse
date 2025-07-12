@@ -13,19 +13,17 @@ public class MOTDModule extends AbstractModule {
 
     private final Integration.MOTD integration;
     private final Permission.Integration.MOTD permission;
-
     private final MOTDIntegration motdIntegration;
+    private final StatusModule statusModule;
 
     @Inject
     public MOTDModule(FileResolver fileResolver,
                       MOTDIntegration motdIntegration,
                       StatusModule statusModule) {
-        integration = fileResolver.getIntegration().getMotd();
-        permission = fileResolver.getPermission().getIntegration().getMotd();
-
+        this.integration = fileResolver.getIntegration().getMotd();
+        this.permission = fileResolver.getPermission().getIntegration().getMotd();
         this.motdIntegration = motdIntegration;
-
-        statusModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseStatus() && isHooked());
+        this.statusModule = statusModule;
     }
 
     @Override

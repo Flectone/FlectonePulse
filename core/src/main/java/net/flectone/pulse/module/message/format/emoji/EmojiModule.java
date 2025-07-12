@@ -26,22 +26,23 @@ public class EmojiModule extends AbstractModule implements MessageProcessor {
     private final Message.Format.Emoji message;
     private final Permission.Message.Format.Emoji permission;
     private final MessagePipeline messagePipeline;
+    private final MessageProcessRegistry messageProcessRegistry;
 
     @Inject
     public EmojiModule(FileResolver fileResolver,
                        MessagePipeline messagePipeline,
                        MessageProcessRegistry messageProcessRegistry) {
+        this.message = fileResolver.getMessage().getFormat().getEmoji();
+        this.permission = fileResolver.getPermission().getMessage().getFormat().getEmoji();
         this.messagePipeline = messagePipeline;
-
-        message = fileResolver.getMessage().getFormat().getEmoji();
-        permission = fileResolver.getPermission().getMessage().getFormat().getEmoji();
-
-        messageProcessRegistry.register(100, this);
+        this.messageProcessRegistry = messageProcessRegistry;
     }
 
     @Override
     public void onEnable() {
         registerModulePermission(permission);
+
+        messageProcessRegistry.register(100, this);
     }
 
     @Override

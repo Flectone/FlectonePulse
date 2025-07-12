@@ -6,10 +6,10 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 import org.incendo.cloud.context.CommandContext;
@@ -18,10 +18,8 @@ import org.incendo.cloud.meta.CommandMeta;
 @Singleton
 public class AnonModule extends AbstractModuleCommand<Localization.Command.Anon> {
 
-    @Getter
-    private final Command.Anon command;
+    @Getter private final Command.Anon command;
     private final Permission.Command.Anon permission;
-
     private final CommandRegistry commandRegistry;
 
     @Inject
@@ -29,14 +27,9 @@ public class AnonModule extends AbstractModuleCommand<Localization.Command.Anon>
                       CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getAnon(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.ANON));
 
+        this.command = fileResolver.getCommand().getAnon();
+        this.permission = fileResolver.getPermission().getCommand().getAnon();
         this.commandRegistry = commandRegistry;
-
-        command = fileResolver.getCommand().getAnon();
-        permission = fileResolver.getPermission().getCommand().getAnon();
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
-        addPredicate(this::checkMute);
     }
 
     @Override
@@ -59,6 +52,10 @@ public class AnonModule extends AbstractModuleCommand<Localization.Command.Anon>
                         .required(promptMessage, commandRegistry.nativeMessageParser())
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
+        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
+        addPredicate(this::checkMute);
     }
 
     @Override

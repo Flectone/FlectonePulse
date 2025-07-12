@@ -17,16 +17,14 @@ public class SignModule extends AbstractModule {
 
     private final Message.Sign message;
     private final Permission.Message.Sign permission;
-
     private final MessagePipeline messagePipeline;
 
     @Inject
     public SignModule(FileResolver fileResolver,
                       MessagePipeline messagePipeline) {
+        this.message = fileResolver.getMessage().getSign();
+        this.permission = fileResolver.getPermission().getMessage().getSign();
         this.messagePipeline = messagePipeline;
-
-        message = fileResolver.getMessage().getSign();
-        permission = fileResolver.getPermission().getMessage().getSign();
     }
 
     @Override

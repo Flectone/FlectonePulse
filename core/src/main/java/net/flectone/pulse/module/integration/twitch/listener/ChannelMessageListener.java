@@ -21,7 +21,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
 
     @Inject
     public ChannelMessageListener(FileResolver fileResolver) {
-        integration = fileResolver.getIntegration().getTwitch();
+        this.integration = fileResolver.getIntegration().getTwitch();
     }
 
     public Class<ChannelMessageEvent> getEventType() {

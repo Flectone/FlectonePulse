@@ -5,6 +5,8 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -20,20 +22,22 @@ public class GreetingModule extends AbstractModuleMessage<Localization.Message.G
 
     private final Message.Greeting message;
     private final Permission.Message.Greeting permission;
-
     private final SkinService skinService;
     private final FLogger fLogger;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public GreetingModule(FileResolver fileResolver,
                           SkinService skinService,
-                          FLogger fLogger) {
+                          FLogger fLogger,
+                          EventProcessRegistry eventProcessRegistry) {
         super(localization -> localization.getMessage().getGreeting());
+
+        this.message = fileResolver.getMessage().getGreeting();
+        this.permission = fileResolver.getPermission().getMessage().getGreeting();
         this.skinService = skinService;
         this.fLogger = fLogger;
-
-        message = fileResolver.getMessage().getGreeting();
-        permission = fileResolver.getPermission().getMessage().getGreeting();
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override

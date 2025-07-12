@@ -23,7 +23,6 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
 
     @Getter private final Command.Try command;
     private final Permission.Command.Try permission;
-
     private final RandomUtil randomUtil;
     private final CommandRegistry commandRegistry;
 
@@ -33,15 +32,10 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
                      CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getTry(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TRY));
 
+        this.command = fileResolver.getCommand().getTry();
+        this.permission = fileResolver.getPermission().getCommand().getTry();
         this.randomUtil = randomUtil;
         this.commandRegistry = commandRegistry;
-
-        command = fileResolver.getCommand().getTry();
-        permission = fileResolver.getPermission().getCommand().getTry();
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
-        addPredicate(this::checkMute);
     }
 
     @Override

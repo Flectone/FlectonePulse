@@ -17,7 +17,6 @@ public class YandexModule extends AbstractModule {
 
     private final Integration.Yandex integration;
     private final Permission.Integration.Yandex permission;
-
     private final LibraryResolver libraryResolver;
     private final Injector injector;
 
@@ -25,11 +24,10 @@ public class YandexModule extends AbstractModule {
     public YandexModule(FileResolver fileResolver,
                         LibraryResolver libraryResolver,
                         Injector injector) {
+        this.integration = fileResolver.getIntegration().getYandex();
+        this.permission = fileResolver.getPermission().getIntegration().getYandex();
         this.libraryResolver = libraryResolver;
         this.injector = injector;
-
-        integration = fileResolver.getIntegration().getYandex();
-        permission = fileResolver.getPermission().getIntegration().getYandex();
     }
 
     @Override

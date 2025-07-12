@@ -25,7 +25,6 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
     private final Command.Flectonepulse command;
     private final Permission.Command.Flectonepulse permission;
-
     private final FlectonePulse flectonePulse;
     private final FileResolver fileResolver;
     private final CommandRegistry commandRegistry;
@@ -40,16 +39,13 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                                FLogger fLogger) {
         super(localization -> localization.getCommand().getFlectonepulse(), null);
 
+        this.command = fileResolver.getCommand().getFlectonepulse();
+        this.permission = fileResolver.getPermission().getCommand().getFlectonepulse();
         this.flectonePulse = flectonePulse;
         this.fileResolver = fileResolver;
         this.commandRegistry = commandRegistry;
         this.timeFormatter = timeFormatter;
         this.fLogger = fLogger;
-
-        command = fileResolver.getCommand().getFlectonepulse();
-        permission = fileResolver.getPermission().getCommand().getFlectonepulse();
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
@@ -58,7 +54,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
@@ -73,6 +69,8 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                         .optional(promptType, commandRegistry.playerParser(), SuggestionProvider.suggestingStrings("text"))
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
     }
 
     @Override

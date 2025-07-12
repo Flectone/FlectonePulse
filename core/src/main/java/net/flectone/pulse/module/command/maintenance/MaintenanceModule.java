@@ -37,7 +37,6 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
 
     @Getter private final Command.Maintenance command;
     private final Permission.Command.Maintenance permission;
-
     private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
@@ -62,6 +61,8 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                              PacketSender packetSender) {
         super(module -> module.getCommand().getMaintenance(), null);
 
+        this.command = fileResolver.getCommand().getMaintenance();
+        this.permission = fileResolver.getPermission().getCommand().getMaintenance();
         this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
@@ -71,11 +72,6 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         this.fileUtil = fileUtil;
         this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
-
-        command = fileResolver.getCommand().getMaintenance();
-        permission = fileResolver.getPermission().getCommand().getMaintenance();
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
@@ -112,6 +108,8 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                         .permission(permission.getName())
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
     }
 
     @Override

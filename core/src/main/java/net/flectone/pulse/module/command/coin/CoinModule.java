@@ -6,10 +6,10 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.RandomUtil;
@@ -23,7 +23,6 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
 
     @Getter private final Command.Coin command;
     private final Permission.Command.Coin permission;
-
     private final CommandRegistry commandRegistry;
     private final RandomUtil randomUtil;
 
@@ -33,15 +32,10 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
                       RandomUtil randomUtil) {
         super(localization -> localization.getCommand().getCoin(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.COIN));
 
+        this.command = fileResolver.getCommand().getCoin();
+        this.permission = fileResolver.getPermission().getCommand().getCoin();
         this.commandRegistry = commandRegistry;
         this.randomUtil = randomUtil;
-
-        command = fileResolver.getCommand().getCoin();
-        permission = fileResolver.getPermission().getCommand().getCoin();
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
-        addPredicate(this::checkMute);
     }
 
     @Override
@@ -62,6 +56,10 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
                         .permission(permission.getName())
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
+        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
+        addPredicate(this::checkMute);
     }
 
     @Override

@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.bubble;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.message.bubble.listener.BubbleListener;
 import net.flectone.pulse.module.message.bubble.service.BubbleService;
@@ -19,8 +20,9 @@ public class BukkitBubbleModule extends BubbleModule {
     public BukkitBubbleModule(FileResolver fileResolver,
                               BubbleService bubbleService,
                               BukkitListenerRegistry bukkitListenerRegistry,
-                              ChatModule bukkitChatModule) {
-        super(fileResolver, bubbleService);
+                              ChatModule bukkitChatModule,
+                              EventProcessRegistry eventProcessRegistry) {
+        super(fileResolver, bubbleService, eventProcessRegistry);
 
         this.bukkitListenerRegistry = bukkitListenerRegistry;
         this.chatModule = bukkitChatModule;

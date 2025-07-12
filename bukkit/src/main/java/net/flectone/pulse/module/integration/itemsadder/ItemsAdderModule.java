@@ -13,19 +13,17 @@ public class ItemsAdderModule extends AbstractModule {
 
     private final Integration.Itemsadder integration;
     private final Permission.Integration.Itemsadder permission;
-
     private final ItemsAdderIntegration itemsAdderIntegration;
+    private final MessageProcessRegistry messageProcessRegistry;
 
     @Inject
     public ItemsAdderModule(FileResolver fileResolver,
                             ItemsAdderIntegration itemsAdderIntegration,
                             MessageProcessRegistry messageProcessRegistry) {
-        integration = fileResolver.getIntegration().getItemsadder();
-        permission = fileResolver.getPermission().getIntegration().getItemsadder();
-
+        this.integration = fileResolver.getIntegration().getItemsadder();
+        this.permission = fileResolver.getPermission().getIntegration().getItemsadder();
         this.itemsAdderIntegration = itemsAdderIntegration;
-
-        messageProcessRegistry.register(30, itemsAdderIntegration);
+        this.messageProcessRegistry = messageProcessRegistry;
     }
 
     @Override

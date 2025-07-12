@@ -9,6 +9,8 @@ import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -41,28 +43,29 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     @Getter private final Command.Stream command;
     private final Permission.Command.Stream permission;
     private final Permission.Message.Format formatPermission;
-
     private final FPlayerService fPlayerService;
     private final CommandRegistry commandRegistry;
     private final PermissionChecker permissionChecker;
+    private final MessageProcessRegistry messageProcessRegistry;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public StreamModule(FileResolver fileResolver,
                         FPlayerService fPlayerService,
                         CommandRegistry commandRegistry,
                         PermissionChecker permissionChecker,
-                        MessageProcessRegistry messageProcessRegistry) {
+                        MessageProcessRegistry messageProcessRegistry,
+                        EventProcessRegistry eventProcessRegistry) {
         super(localization -> localization.getCommand().getStream(), null);
 
+        this.command = fileResolver.getCommand().getStream();
+        this.permission = fileResolver.getPermission().getCommand().getStream();
+        this.formatPermission = fileResolver.getPermission().getMessage().getFormat();
         this.fPlayerService = fPlayerService;
         this.commandRegistry = commandRegistry;
         this.permissionChecker = permissionChecker;
-
-        command = fileResolver.getCommand().getStream();
-        permission = fileResolver.getPermission().getCommand().getStream();
-        formatPermission = fileResolver.getPermission().getMessage().getFormat();
-
-        messageProcessRegistry.register(150, this);
+        this.messageProcessRegistry = messageProcessRegistry;
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override
@@ -87,6 +90,8 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                         .optional(promptUrl, commandRegistry.nativeMessageParser())
                         .handler(this)
         );
+
+        messageProcessRegistry.register(150, this);
     }
 
     @Override

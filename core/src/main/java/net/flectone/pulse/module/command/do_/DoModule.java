@@ -6,10 +6,10 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 import org.incendo.cloud.context.CommandContext;
@@ -20,7 +20,6 @@ public class DoModule extends AbstractModuleCommand<Localization.Command.Do> {
 
     @Getter private final Command.Do command;
     private final Permission.Command.Do permission;
-
     private final CommandRegistry commandRegistry;
 
     @Inject
@@ -28,14 +27,9 @@ public class DoModule extends AbstractModuleCommand<Localization.Command.Do> {
                     CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getDo(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.DO));
 
+        this.command = fileResolver.getCommand().getDo();
+        this.permission = fileResolver.getPermission().getCommand().getDo();
         this.commandRegistry = commandRegistry;
-
-        command = fileResolver.getCommand().getDo();
-        permission = fileResolver.getPermission().getCommand().getDo();
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
-        addPredicate(this::checkMute);
     }
 
     @Override
@@ -58,6 +52,10 @@ public class DoModule extends AbstractModuleCommand<Localization.Command.Do> {
                         .required(promptMessage, commandRegistry.nativeMessageParser())
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
+        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
+        addPredicate(this::checkMute);
     }
 
     @Override

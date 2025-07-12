@@ -16,17 +16,16 @@ public class InteractiveChatModule extends AbstractModule {
     private final Integration.Interactivechat integration;
     private final Permission.Integration.Interactivechat permission;
     private final InteractiveChatIntegration interactiveChatIntegration;
+    private final MessageProcessRegistry messageProcessRegistry;
 
     @Inject
     public InteractiveChatModule(FileResolver fileResolver,
                                  InteractiveChatIntegration interactiveChatIntegration,
                                  MessageProcessRegistry messageProcessRegistry) {
+        this.integration = fileResolver.getIntegration().getInteractivechat();
+        this.permission = fileResolver.getPermission().getIntegration().getInteractivechat();
         this.interactiveChatIntegration = interactiveChatIntegration;
-
-        integration = fileResolver.getIntegration().getInteractivechat();
-        permission = fileResolver.getPermission().getIntegration().getInteractivechat();
-
-        messageProcessRegistry.register(0, interactiveChatIntegration);
+        this.messageProcessRegistry = messageProcessRegistry;
     }
 
     @Override

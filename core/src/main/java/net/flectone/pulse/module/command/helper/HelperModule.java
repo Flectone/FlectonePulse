@@ -7,11 +7,11 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.sender.ProxySender;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
@@ -26,7 +26,6 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
 
     @Getter private final Command.Helper command;
     private final Permission.Command.Helper permission;
-
     private final FPlayerService fPlayerService;
     private final ProxySender proxySender;
     private final PermissionChecker permissionChecker;
@@ -40,17 +39,12 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
                         CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getHelper(), null);
 
+        this.command = fileResolver.getCommand().getHelper();
+        this.permission = fileResolver.getPermission().getCommand().getHelper();
         this.fPlayerService = fPlayerService;
         this.proxySender = proxySender;
         this.permissionChecker = permissionChecker;
         this.commandRegistry = commandRegistry;
-
-        command = fileResolver.getCommand().getHelper();
-        permission = fileResolver.getPermission().getCommand().getHelper();
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
-        addPredicate(this::checkMute);
     }
 
     @Override
@@ -75,6 +69,10 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
                         .required(promptMessage, commandRegistry.nativeMessageParser())
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
+        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
+        addPredicate(this::checkMute);
     }
 
     @Override

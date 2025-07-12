@@ -20,7 +20,6 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
 
     private final Message.Auto message;
     private final Permission.Message.Auto permission;
-
     private final TaskScheduler taskScheduler;
     private final FPlayerService fPlayerService;
 
@@ -30,11 +29,10 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
                       FPlayerService fPlayerService) {
         super(localization -> localization.getMessage().getAuto());
 
+        this.message = fileResolver.getMessage().getAuto();
+        this.permission = fileResolver.getPermission().getMessage().getAuto();
         this.taskScheduler = taskScheduler;
         this.fPlayerService = fPlayerService;
-
-        message = fileResolver.getMessage().getAuto();
-        permission = fileResolver.getPermission().getMessage().getAuto();
     }
 
     @Override

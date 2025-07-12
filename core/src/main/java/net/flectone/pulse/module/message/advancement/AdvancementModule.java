@@ -34,30 +34,28 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
 
     @Getter private final Message.Advancement message;
     private final Permission.Message.Advancement permission;
-
     private final FPlayerService fPlayerService;
-    private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
     private final Gson gson;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public AdvancementModule(FileResolver fileResolver,
                              FPlayerService fPlayerService,
-                             ListenerRegistry listenerRegistry,
                              IntegrationModule integrationModule,
                              MessagePipeline messagePipeline,
-                             Gson gson) {
+                             Gson gson,
+                             EventProcessRegistry eventProcessRegistry) {
         super(localization -> localization.getMessage().getAdvancement());
 
+        this.message = fileResolver.getMessage().getAdvancement();
+        this.permission = fileResolver.getPermission().getMessage().getAdvancement();
         this.fPlayerService = fPlayerService;
-        this.listenerRegistry = listenerRegistry;
         this.integrationModule = integrationModule;
         this.messagePipeline = messagePipeline;
         this.gson = gson;
-
-        message = fileResolver.getMessage().getAdvancement();
-        permission = fileResolver.getPermission().getMessage().getAdvancement();
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override

@@ -17,24 +17,19 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
 
     private final Command.Afk command;
     private final Permission.Command.Afk permission;
-
-    private final net.flectone.pulse.module.message.afk.AfkModule afkModule;
+    private final net.flectone.pulse.module.message.afk.AfkModule afkMessageModule;
     private final CommandRegistry commandRegistry;
 
     @Inject
     public AfkModule(FileResolver fileResolver,
-                     net.flectone.pulse.module.message.afk.AfkModule afkModule,
+                     net.flectone.pulse.module.message.afk.AfkModule afkMessageModule,
                      CommandRegistry commandRegistry) {
         super(Localization::getCommand, fPlayer -> fPlayer.isSetting(FPlayer.Setting.AFK));
 
-        this.afkModule = afkModule;
+        this.command = fileResolver.getCommand().getAfk();
+        this.permission = fileResolver.getPermission().getCommand().getAfk();
+        this.afkMessageModule = afkMessageModule;
         this.commandRegistry = commandRegistry;
-
-        command = fileResolver.getCommand().getAfk();
-        permission = fileResolver.getPermission().getCommand().getAfk();
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> !afkModule.isEnable());
     }
 
     @Override
@@ -55,6 +50,9 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
                         .permission(permission.getName())
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
+        addPredicate(fPlayer -> !afkMessageModule.isEnable());
     }
 
     @Override
@@ -62,9 +60,9 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
         if (checkModulePredicates(fPlayer)) return;
 
         if (fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX)) {
-            afkModule.remove("afk", fPlayer);
+            afkMessageModule.remove("afk", fPlayer);
         } else {
-            afkModule.setAfk(fPlayer);
+            afkMessageModule.setAfk(fPlayer);
         }
 
         playSound(fPlayer);

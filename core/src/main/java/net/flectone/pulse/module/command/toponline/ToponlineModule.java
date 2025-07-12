@@ -27,7 +27,6 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
 
     private final Command.Toponline command;
     private final Permission.Command.Toponline permission;
-
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final CommandRegistry commandRegistry;
     private final MessagePipeline messagePipeline;
@@ -43,6 +42,8 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
                            TimeFormatter timeFormatter) {
         super(localization -> localization.getCommand().getToponline(), null);
 
+        this.command = fileResolver.getCommand().getToponline();
+        this.permission = fileResolver.getPermission().getCommand().getToponline();
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.commandRegistry = commandRegistry;
         this.messagePipeline = messagePipeline;
@@ -76,6 +77,9 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
                         .optional(promptNumber, commandRegistry.integerParser())
                         .handler(commandContext -> execute(commandContext.sender(), commandContext))
         );
+
+        addPredicate(this::checkCooldown);
+        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
     }
 
     @Override

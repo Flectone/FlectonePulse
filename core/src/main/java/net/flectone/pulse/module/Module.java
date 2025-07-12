@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.command.CommandModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.MessageModule;
+import net.flectone.pulse.resolver.FileResolver;
 
 @Singleton
 public class Module extends AbstractModule {
@@ -17,8 +17,9 @@ public class Module extends AbstractModule {
 
     @Inject
     public Module(FileResolver fileResolver) {
-        config = fileResolver.getConfig().getModule();
-        permission = fileResolver.getPermission();
+        this.config = fileResolver.getConfig().getModule();
+        this.permission = fileResolver.getPermission();
+    }
 
     @Override
     public void onEnable() {
@@ -26,11 +27,6 @@ public class Module extends AbstractModule {
         addChildren(CommandModule.class);
         addChildren(IntegrationModule.class);
         addChildren(MessageModule.class);
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission.getModule());
     }
 
     @Override

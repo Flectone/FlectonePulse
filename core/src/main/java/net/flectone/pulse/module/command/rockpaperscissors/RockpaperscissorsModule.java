@@ -30,7 +30,6 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
     private final Command.Rockpaperscissors command;
     private final Permission.Command.Rockpaperscissors permission;
-
     private final ProxySender proxySender;
     private final FPlayerService fPlayerService;
     private final CommandRegistry commandRegistry;
@@ -44,13 +43,12 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                                    IntegrationModule integrationModule) {
         super(localization -> localization.getCommand().getRockpaperscissors(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.ROCKPAPERSCISSORS));
 
+        this.command = fileResolver.getCommand().getRockpaperscissors();
+        this.permission = fileResolver.getPermission().getCommand().getRockpaperscissors();
         this.proxySender = proxySender;
         this.fPlayerService = fPlayerService;
         this.commandRegistry = commandRegistry;
         this.integrationModule = integrationModule;
-
-        command = fileResolver.getCommand().getRockpaperscissors();
-        permission = fileResolver.getPermission().getCommand().getRockpaperscissors();
     }
 
     @Override

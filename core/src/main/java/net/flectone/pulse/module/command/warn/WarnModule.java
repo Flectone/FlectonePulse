@@ -54,6 +54,8 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
                       Gson gson) {
         super(localization -> localization.getCommand().getWarn(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.WARN));
 
+        this.command = fileResolver.getCommand().getWarn();
+        this.permission = fileResolver.getPermission().getCommand().getWarn();
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.moderationMessageFormatter = moderationMessageFormatter;
@@ -61,9 +63,6 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         this.platformServerAdapter = platformServerAdapter;
         this.proxySender = proxySender;
         this.gson = gson;
-
-        command = fileResolver.getCommand().getWarn();
-        permission = fileResolver.getPermission().getCommand().getWarn();
     }
 
     @Override

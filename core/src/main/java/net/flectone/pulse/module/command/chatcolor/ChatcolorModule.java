@@ -26,7 +26,6 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
     private final Message.Format.Color color;
     private final Command.Chatcolor command;
     private final Permission.Command.Chatcolor permission;
-
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final ProxySender proxySender;
@@ -41,17 +40,15 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
                            CommandRegistry commandRegistry,
                            ColorConverter colorConverter) {
         super(localization -> localization.getCommand().getChatcolor(), null);
+
+        this.color = fileResolver.getMessage().getFormat().getColor();
+        this.command = fileResolver.getCommand().getChatcolor();
+        this.permission = fileResolver.getPermission().getCommand().getChatcolor();
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
         this.proxySender = proxySender;
         this.commandRegistry = commandRegistry;
         this.colorConverter = colorConverter;
-
-        color = fileResolver.getMessage().getFormat().getColor();
-        command = fileResolver.getCommand().getChatcolor();
-        permission = fileResolver.getPermission().getCommand().getChatcolor();
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
@@ -80,6 +77,8 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
 
             return builder.handler(this);
         });
+
+        addPredicate(this::checkCooldown);
     }
 
     @Override

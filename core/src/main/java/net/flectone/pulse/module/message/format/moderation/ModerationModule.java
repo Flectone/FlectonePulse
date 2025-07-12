@@ -4,12 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.moderation.caps.CapsModule;
 import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
+import net.flectone.pulse.resolver.FileResolver;
 
 @Singleton
 public class ModerationModule extends AbstractModule {
@@ -19,8 +19,10 @@ public class ModerationModule extends AbstractModule {
 
     @Inject
     public ModerationModule(FileResolver fileResolver) {
-        message = fileResolver.getMessage().getFormat().getModeration();
-        permission = fileResolver.getPermission().getMessage().getFormat().getModeration();
+        this.message = fileResolver.getMessage().getFormat().getModeration();
+        this.permission = fileResolver.getPermission().getMessage().getFormat().getModeration();
+    }
+
     @Override
     public void onEnable() {
         registerModulePermission(permission);
@@ -29,11 +31,6 @@ public class ModerationModule extends AbstractModule {
         addChildren(NewbieModule.class);
         addChildren(FloodModule.class);
         addChildren(SwearModule.class);
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
     }
 
     @Override

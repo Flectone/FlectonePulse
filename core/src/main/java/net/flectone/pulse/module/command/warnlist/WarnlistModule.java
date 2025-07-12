@@ -48,6 +48,8 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
                           MessageSender messageSender) {
         super(localization -> localization.getCommand().getWarnlist(), null);
 
+        this.command = fileResolver.getCommand().getWarnlist();
+        this.permission = fileResolver.getPermission().getCommand().getWarnlist();
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.moderationMessageFormatter = moderationMessageFormatter;
@@ -55,9 +57,6 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
         this.messagePipeline = messagePipeline;
         this.messageSender = messageSender;
         this.commandRegistry = commandRegistry;
-
-        command = fileResolver.getCommand().getWarnlist();
-        permission = fileResolver.getPermission().getCommand().getWarnlist();
     }
 
     @Override

@@ -35,17 +35,16 @@ import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 @Singleton
 public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Message.Format.QuestionAnswer> implements MessageProcessor {
 
-    private final WeakHashMap<UUID, Boolean> processedQuestions = new WeakHashMap<>();
-
+    private final Map<UUID, Boolean> processedQuestions = new WeakHashMap<>();
     private final Map<String, Sound> soundMap = new HashMap<>();
     private final Map<String, Cooldown> cooldownMap = new HashMap<>();
     private final Map<String, Pattern> patternMap = new HashMap<>();
 
     private final Message.Format.QuestionAnswer message;
     private final Permission.Message.Format.QuestionAnswer permission;
-
     private final PermissionChecker permissionChecker;
     private final FLogger fLogger;
+    private final MessageProcessRegistry messageProcessRegistry;
 
     @Inject
     public QuestionAnswerModule(FileResolver fileResolver,
@@ -54,17 +53,15 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
                                 MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getMessage().getFormat().getQuestionAnswer());
 
+        this.message = fileResolver.getMessage().getFormat().getQuestionAnswer();
+        this.permission = fileResolver.getPermission().getMessage().getFormat().getQuestionAnswer();
         this.permissionChecker = permissionChecker;
         this.fLogger = fLogger;
-
-        message = fileResolver.getMessage().getFormat().getQuestionAnswer();
-        permission = fileResolver.getPermission().getMessage().getFormat().getQuestionAnswer();
-
-        messageProcessRegistry.register(100, this);
+        this.messageProcessRegistry = messageProcessRegistry;
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         message.getQuestions().forEach((key, questionMessage) -> {
@@ -82,6 +79,12 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
             soundMap.put(key, createSound(questionMessage.getSound(), questionPermission.getSound()));
             cooldownMap.put(key, createCooldown(questionMessage.getCooldown(), questionPermission.getCooldownBypass()));
         });
+    @Override
+    public void onDisable() {
+        processedQuestions.clear();
+        soundMap.clear();
+        cooldownMap.clear();
+        patternMap.clear();
     }
 
     @Override
@@ -94,14 +97,16 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
         if (!messageContext.isQuestion()) return;
         if (!messageContext.isUserMessage()) return;
 
-        String message = replace(messageContext.getSender(), messageContext.getMessage());
+        String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
 
-        messageContext.setMessage(message);
+        messageContext.setMessage(processedMessage);
         messageContext.addTagResolvers(questionAnswerTag(messageContext.getProcessId(), messageContext.getSender(), messageContext.getReceiver()));
     }
 
     private String replace(FEntity sender, String message) {
         if (checkModulePredicates(sender)) return message;
+
+        StringBuilder result = new StringBuilder(message);
 
         for (Map.Entry<String, Pattern> entry : patternMap.entrySet()) {
             Permission.Message.Format.QuestionAnswer.Question questionPermission = permission.getQuestions().get(entry.getKey());
@@ -113,10 +118,10 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
             Cooldown cooldown = cooldownMap.get(entry.getKey());
             if (cooldown != null && cooldown.isCooldown(sender.getUuid())) continue;
 
-            message += "<question:'" + entry.getKey() + "'>";
+            result.append("<question:'").append(entry.getKey()).append("'>");
         }
 
-        return message;
+        return result.toString();
     }
 
     private TagResolver questionAnswerTag(UUID processId, FEntity sender, FEntity receiver) {

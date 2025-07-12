@@ -21,7 +21,6 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
 
     private final Command.Clearchat command;
     private final Permission.Command.Clearchat permission;
-
     private final FPlayerService fPlayerService;
     private final CommandRegistry commandRegistry;
     private final PermissionChecker permissionChecker;
@@ -33,14 +32,11 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
                            PermissionChecker permissionChecker) {
         super(localization -> localization.getCommand().getClearchat(), null);
 
+        this.command = fileResolver.getCommand().getClearchat();
+        this.permission = fileResolver.getPermission().getCommand().getClearchat();
         this.fPlayerService = fPlayerService;
         this.commandRegistry = commandRegistry;
         this.permissionChecker = permissionChecker;
-
-        command = fileResolver.getCommand().getClearchat();
-        permission = fileResolver.getPermission().getCommand().getClearchat();
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
@@ -65,6 +61,8 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
                         .optional(promptPlayer, commandRegistry.playerParser(), commandRegistry.playerSuggestionPermission(permission.getOther()))
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
     }
 
     @Override

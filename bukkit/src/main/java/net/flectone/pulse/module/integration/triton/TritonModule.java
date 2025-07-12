@@ -16,7 +16,6 @@ public class TritonModule extends AbstractModule {
 
     private final Integration.Triton config;
     private final Permission.Integration.Triton permission;
-
     private final TritonIntegration tritonIntegration;
     private final BukkitListenerRegistry bukkitListenerManager;
 
@@ -24,11 +23,10 @@ public class TritonModule extends AbstractModule {
     public TritonModule(FileResolver fileResolver,
                         TritonIntegration tritonIntegration,
                         BukkitListenerRegistry bukkitListenerManager) {
+        this.config = fileResolver.getIntegration().getTriton();
+        this.permission = fileResolver.getPermission().getIntegration().getTriton();
         this.tritonIntegration = tritonIntegration;
         this.bukkitListenerManager = bukkitListenerManager;
-
-        config = fileResolver.getIntegration().getTriton();
-        permission = fileResolver.getPermission().getIntegration().getTriton();
     }
 
     @Override

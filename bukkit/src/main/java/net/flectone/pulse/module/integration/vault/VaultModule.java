@@ -16,16 +16,14 @@ public class VaultModule extends AbstractModule {
 
     private final Integration.Vault integration;
     private final Permission.Integration.Vault permission;
-
     private final VaultIntegration vaultIntegration;
 
     @Inject
     public VaultModule(FileResolver fileResolver,
                        VaultIntegration vaultIntegration) {
+        this.integration = fileResolver.getIntegration().getVault();
+        this.permission = fileResolver.getPermission().getIntegration().getVault();
         this.vaultIntegration = vaultIntegration;
-
-        integration = fileResolver.getIntegration().getVault();
-        permission = fileResolver.getPermission().getIntegration().getVault();
     }
 
     @Override

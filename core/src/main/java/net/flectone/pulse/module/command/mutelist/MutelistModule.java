@@ -28,7 +28,6 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
 
     private final Command.Mutelist command;
     private final Permission.Command.Mutelist permission;
-
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
@@ -48,6 +47,8 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
                           MessageSender messageSender) {
         super(localization -> localization.getCommand().getMutelist(), null);
 
+        this.command = fileResolver.getCommand().getMutelist();
+        this.permission = fileResolver.getPermission().getCommand().getMutelist();
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.moderationMessageFormatter = moderationMessageFormatter;
@@ -55,11 +56,6 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
         this.messagePipeline = messagePipeline;
         this.commandRegistry = commandRegistry;
         this.messageSender = messageSender;
-
-        command = fileResolver.getCommand().getMutelist();
-        permission = fileResolver.getPermission().getCommand().getMutelist();
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
@@ -68,7 +64,6 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
     }
 
     @Override
-    public void reload() {
     public void onEnable() {
         if (checkModulePredicates(FPlayer.UNKNOWN)) return;
 
@@ -87,6 +82,8 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
                         .optional(promptNumber, commandRegistry.integerParser())
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
     }
 
     @Override

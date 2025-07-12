@@ -6,10 +6,10 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 import org.incendo.cloud.context.CommandContext;
@@ -20,7 +20,6 @@ public class BroadcastModule extends AbstractModuleCommand<Localization.Command.
 
     @Getter private final Command.Broadcast command;
     private final Permission.Command.Broadcast permission;
-
     private final CommandRegistry commandRegistry;
 
     @Inject
@@ -28,14 +27,9 @@ public class BroadcastModule extends AbstractModuleCommand<Localization.Command.
                            CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getBroadcast(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.BROADCAST));
 
+        this.command = fileResolver.getCommand().getBroadcast();
+        this.permission = fileResolver.getPermission().getCommand().getBroadcast();
         this.commandRegistry = commandRegistry;
-
-        command = fileResolver.getCommand().getBroadcast();
-        permission = fileResolver.getPermission().getCommand().getBroadcast();
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
-        addPredicate(this::checkMute);
     }
 
     @Override
@@ -58,6 +52,10 @@ public class BroadcastModule extends AbstractModuleCommand<Localization.Command.
                         .required(promptMessage, commandRegistry.nativeMessageParser())
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
+        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
+        addPredicate(this::checkMute);
     }
 
     @Override

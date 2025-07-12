@@ -8,7 +8,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.module.command.ignore.model.Ignore;
+import net.flectone.pulse.model.Ignore;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
@@ -22,7 +22,6 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
 
     private final Command.Ignore command;
     private final Permission.Command.Ignore permission;
-
     private final FPlayerService fPlayerService;
     private final CommandRegistry commandRegistry;
 
@@ -32,14 +31,10 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
                         CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getIgnore(), null);
 
+        this.command = fileResolver.getCommand().getIgnore();
+        this.permission = fileResolver.getPermission().getCommand().getIgnore();
         this.fPlayerService = fPlayerService;
         this.commandRegistry = commandRegistry;
-
-        command = fileResolver.getCommand().getIgnore();
-        permission = fileResolver.getPermission().getCommand().getIgnore();
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
     }
 
     @Override
@@ -62,6 +57,9 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
                         .required(promptPlayer, commandRegistry.playerParser(command.isSuggestOfflinePlayers()))
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
+        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
     }
 
     @Override

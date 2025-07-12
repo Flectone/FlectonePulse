@@ -16,20 +16,18 @@ public class LuckPermsModule extends AbstractModule {
 
     private final Integration.Luckperms integration;
     private final Permission.Integration.Luckperms permission;
-
     private final LuckPermsIntegration luckPermsIntegration;
 
     @Inject
     public LuckPermsModule(FileResolver fileResolver,
                            LuckPermsIntegration luckPermsIntegration) {
+        this.integration = fileResolver.getIntegration().getLuckperms();
+        this.permission = fileResolver.getPermission().getIntegration().getLuckperms();
         this.luckPermsIntegration = luckPermsIntegration;
-
-        integration = fileResolver.getIntegration().getLuckperms();
-        permission = fileResolver.getPermission().getIntegration().getLuckperms();
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         luckPermsIntegration.hook();

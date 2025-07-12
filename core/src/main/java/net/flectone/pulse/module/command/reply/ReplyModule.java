@@ -5,11 +5,11 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.DisableAction;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -19,7 +19,6 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
 
     private final Command.Reply command;
     private final Permission.Command.Reply permission;
-
     private final TellModule tellModule;
     private final CommandRegistry commandRegistry;
 
@@ -29,15 +28,10 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
                        CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getReply(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.REPLY));
 
+        this.command = fileResolver.getCommand().getReply();
+        this.permission = fileResolver.getPermission().getCommand().getReply();
         this.tellModule = tellModule;
         this.commandRegistry = commandRegistry;
-
-        command = fileResolver.getCommand().getReply();
-        permission = fileResolver.getPermission().getCommand().getReply();
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
-        addPredicate(this::checkMute);
     }
 
     @Override
@@ -46,7 +40,7 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
@@ -60,6 +54,10 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
                         .required(promptMessage, commandRegistry.nativeMessageParser())
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
+        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
+        addPredicate(this::checkMute);
     }
 
     @Override

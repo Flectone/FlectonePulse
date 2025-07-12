@@ -6,16 +6,20 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.event.message.TranslatableMessageEvent;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.spawn.listener.ChangeGameStatePacketListener;
-import net.flectone.pulse.module.message.spawn.listener.SetSpawnPacketListener;
-import net.flectone.pulse.module.message.spawn.listener.SpawnpointPacketListener;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TranslatableComponent;
 
+import java.util.List;
 import java.util.UUID;
 
 @Singleton
@@ -23,21 +27,22 @@ public class SpawnModule extends AbstractModuleMessage<Localization.Message.Spaw
 
     private final Message.Spawn message;
     private final Permission.Message.Spawn permission;
-
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public SpawnModule(FileResolver fileResolver,
                        FPlayerService fPlayerService,
-                       ListenerRegistry listenerRegistry) {
+                       ListenerRegistry listenerRegistry,
+                       EventProcessRegistry eventProcessRegistry) {
         super(localization -> localization.getMessage().getSpawn());
 
+        this.message = fileResolver.getMessage().getSpawn();
+        this.permission = fileResolver.getPermission().getMessage().getSpawn();
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
-
-        message = fileResolver.getMessage().getSpawn();
-        permission = fileResolver.getPermission().getMessage().getSpawn();
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override

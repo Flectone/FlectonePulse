@@ -30,13 +30,10 @@ public class TwitchModule extends AbstractModule {
     public TwitchModule(FileResolver fileResolver,
                         LibraryResolver libraryResolver,
                         Injector injector) {
+        this.integration = fileResolver.getIntegration().getTwitch();
+        this.permission = fileResolver.getPermission().getIntegration().getTwitch();
         this.libraryResolver = libraryResolver;
         this.injector = injector;
-
-        integration = fileResolver.getIntegration().getTwitch();
-        permission = fileResolver.getPermission().getIntegration().getTwitch();
-
-        addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.isSetting(FPlayer.Setting.TWITCH));
     }
 
     @Override

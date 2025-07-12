@@ -35,7 +35,6 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
 
     @Getter private final Command.Translateto command;
     private final Permission.Command.Translateto permission;
-
     private final CommandRegistry commandRegistry;
     private final IntegrationModule integrationModule;
     private final Provider<TranslateModule> translateModuleProvider;
@@ -47,16 +46,11 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
                              Provider<TranslateModule> translateModuleProvider) {
         super(localization -> localization.getCommand().getTranslateto(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TRANSLATETO));
 
+        this.command = fileResolver.getCommand().getTranslateto();
+        this.permission = fileResolver.getPermission().getCommand().getTranslateto();
         this.commandRegistry = commandRegistry;
         this.integrationModule = integrationModule;
         this.translateModuleProvider = translateModuleProvider;
-
-        command = fileResolver.getCommand().getTranslateto();
-        permission = fileResolver.getPermission().getCommand().getTranslateto();
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
-        addPredicate(this::checkMute);
     }
 
     @Override

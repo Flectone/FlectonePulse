@@ -17,24 +17,24 @@ public class CapsModule extends AbstractModule implements MessageProcessor {
 
     private final Message.Format.Moderation.Caps message;
     private final Permission.Message.Format.Moderation.Caps permission;
-
     private final PermissionChecker permissionChecker;
+    private final MessageProcessRegistry messageProcessRegistry;
 
     @Inject
     public CapsModule(FileResolver fileResolver,
                       PermissionChecker permissionChecker,
                       MessageProcessRegistry messageProcessRegistry) {
+        this.message = fileResolver.getMessage().getFormat().getModeration().getCaps();
+        this.permission = fileResolver.getPermission().getMessage().getFormat().getModeration().getCaps();
         this.permissionChecker = permissionChecker;
-
-        message = fileResolver.getMessage().getFormat().getModeration().getCaps();
-        permission = fileResolver.getPermission().getMessage().getFormat().getModeration().getCaps();
-
-        messageProcessRegistry.register(100, this);
+        this.messageProcessRegistry = messageProcessRegistry;
     }
 
     @Override
     public void onEnable() {
         registerModulePermission(permission);
+
+        messageProcessRegistry.register(100, this);
     }
 
     @Override

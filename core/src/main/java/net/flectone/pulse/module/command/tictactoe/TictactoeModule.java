@@ -28,7 +28,6 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
     private final Command.Tictactoe command;
     private final Permission.Command.Tictactoe permission;
-
     private final FPlayerService fPlayerService;
     private final TictactoeManager tictactoeManager;
     private final ProxySender proxySender;
@@ -46,15 +45,14 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                            Gson gson) {
         super(localization -> localization.getCommand().getTictactoe(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TICTACTOE));
 
+        this.command = fileResolver.getCommand().getTictactoe();
+        this.permission = fileResolver.getPermission().getCommand().getTictactoe();
         this.fPlayerService = fPlayerService;
         this.tictactoeManager = tictactoeManager;
         this.proxySender = proxySender;
         this.integrationModule = integrationModule;
         this.commandRegistry = commandRegistry;
         this.gson = gson;
-
-        command = fileResolver.getCommand().getTictactoe();
-        permission = fileResolver.getPermission().getCommand().getTictactoe();
     }
 
     @Override

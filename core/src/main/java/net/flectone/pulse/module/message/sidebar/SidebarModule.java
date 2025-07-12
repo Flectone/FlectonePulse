@@ -13,10 +13,10 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleListMessage;
-import net.flectone.pulse.module.message.sidebar.listener.SidebarPacketListener;
 import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.PacketSender;
@@ -31,12 +31,11 @@ public class SidebarModule extends AbstractModuleListMessage<Localization.Messag
 
     @Getter private final Message.Sidebar message;
     private final Permission.Message.Sidebar permission;
-
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
     private final PacketSender packetSender;
-    private final ListenerRegistry listenerRegistry;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public SidebarModule(FileResolver fileResolver,
@@ -44,22 +43,16 @@ public class SidebarModule extends AbstractModuleListMessage<Localization.Messag
                          TaskScheduler taskScheduler,
                          MessagePipeline messagePipeline,
                          PacketSender packetSender,
-                         ListenerRegistry listenerRegistry) {
+                         EventProcessRegistry eventProcessRegistry) {
         super(localization -> localization.getMessage().getSidebar());
 
+        this.message = fileResolver.getMessage().getSidebar();
+        this.permission = fileResolver.getPermission().getMessage().getSidebar();
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
-        this.listenerRegistry = listenerRegistry;
-
-        message = fileResolver.getMessage().getSidebar();
-        permission = fileResolver.getPermission().getMessage().getSidebar();
-    }
-
-    @Override
-    public void onDisable() {
-        fPlayerService.getFPlayers().forEach(this::remove);
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override

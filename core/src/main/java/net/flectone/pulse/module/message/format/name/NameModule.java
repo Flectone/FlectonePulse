@@ -28,10 +28,10 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
     private final Message.Format.Name message;
     private final Permission.Message.Format.Name permission;
     private final Permission.Message.Format formatPermission;
-
     private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
     private final PermissionChecker permissionChecker;
+    private final MessageProcessRegistry messageProcessRegistry;
 
     @Inject
     public NameModule(FileResolver fileResolver,
@@ -41,20 +41,20 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
                       MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getMessage().getFormat().getName_());
 
+        this.message = fileResolver.getMessage().getFormat().getName_();
+        this.permission = fileResolver.getPermission().getMessage().getFormat().getName_();
+        this.formatPermission = fileResolver.getPermission().getMessage().getFormat();
         this.integrationModule = integrationModule;
         this.permissionChecker = permissionChecker;
         this.messagePipeline = messagePipeline;
-
-        message = fileResolver.getMessage().getFormat().getName_();
-        permission = fileResolver.getPermission().getMessage().getFormat().getName_();
-        formatPermission = fileResolver.getPermission().getMessage().getFormat();
-
-        messageProcessRegistry.register(150, this);
+        this.messageProcessRegistry = messageProcessRegistry;
     }
 
     @Override
     public void onEnable() {
         registerModulePermission(permission);
+
+        messageProcessRegistry.register(150, this);
     }
 
     @Override

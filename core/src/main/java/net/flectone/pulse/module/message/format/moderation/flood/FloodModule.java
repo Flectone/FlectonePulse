@@ -17,24 +17,24 @@ public class FloodModule extends AbstractModule implements MessageProcessor {
 
     private final Message.Format.Moderation.Flood message;
     private final Permission.Message.Format.Moderation.Flood permission;
-
     private final PermissionChecker permissionChecker;
+    private final MessageProcessRegistry messageProcessRegistry;
 
     @Inject
     public FloodModule(FileResolver fileResolver,
                        PermissionChecker permissionChecker,
                        MessageProcessRegistry messageProcessRegistry) {
+        this.message = fileResolver.getMessage().getFormat().getModeration().getFlood();
+        this.permission = fileResolver.getPermission().getMessage().getFormat().getModeration().getFlood();
         this.permissionChecker = permissionChecker;
-
-        message = fileResolver.getMessage().getFormat().getModeration().getFlood();
-        permission = fileResolver.getPermission().getMessage().getFormat().getModeration().getFlood();
-
-        messageProcessRegistry.register(100, this);
+        this.messageProcessRegistry = messageProcessRegistry;
     }
 
     @Override
     public void onEnable() {
         registerModulePermission(permission);
+
+        messageProcessRegistry.register(100, this);
     }
 
     @Override

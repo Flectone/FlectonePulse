@@ -22,7 +22,6 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
 
     private final Command.Ping command;
     private final Permission.Command.Ping permission;
-
     private final FPlayerService fPlayerService;
     private final CommandRegistry commandRegistry;
     private final IntegrationModule integrationModule;
@@ -36,15 +35,12 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
                       PlatformPlayerAdapter platformPlayerAdapter) {
         super(localization -> localization.getCommand().getPing(), null);
 
+        this.command = fileResolver.getCommand().getPing();
+        this.permission = fileResolver.getPermission().getCommand().getPing();
         this.fPlayerService = fPlayerService;
         this.commandRegistry = commandRegistry;
         this.integrationModule = integrationModule;
         this.platformPlayerAdapter = platformPlayerAdapter;
-
-        command = fileResolver.getCommand().getPing();
-        permission = fileResolver.getPermission().getCommand().getPing();
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
@@ -67,6 +63,8 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
                         .optional(promptPlayer, commandRegistry.playerParser())
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
     }
 
     @Override

@@ -7,15 +7,14 @@ import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.controller.InventoryController;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.inventory.Inventory;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
@@ -27,11 +26,9 @@ import java.util.Map;
 @Singleton
 public class ChatsettingModule extends AbstractModuleCommand<Localization.Command.Chatsetting> {
 
-    private final Message.Chat chatMessage;
     private final Permission.Message.Chat chatPermission;
     private final Command.Chatsetting command;
     private final Permission.Command.Chatsetting permission;
-
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
     private final CommandRegistry commandRegistry;
@@ -49,19 +46,15 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                              PlatformServerAdapter platformServerAdapter) {
         super(localization -> localization.getCommand().getChatsetting(), null);
 
+        this.chatPermission = fileResolver.getPermission().getMessage().getChat();
+        this.command = fileResolver.getCommand().getChatsetting();
+        this.permission = fileResolver.getPermission().getCommand().getChatsetting();
         this.fPlayerService = fPlayerService;
         this.messagePipeline = messagePipeline;
         this.commandRegistry = commandRegistry;
         this.permissionChecker = permissionChecker;
         this.inventoryController = inventoryController;
         this.platformServerAdapter = platformServerAdapter;
-
-        chatMessage = fileResolver.getMessage().getChat();
-        chatPermission = fileResolver.getPermission().getMessage().getChat();
-        command = fileResolver.getCommand().getChatsetting();
-        permission = fileResolver.getPermission().getCommand().getChatsetting();
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
@@ -84,6 +77,8 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                         .permission(permission.getName())
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
     }
 
     @Override

@@ -6,34 +6,33 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.quit.listener.QuitPacketListener;
-import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.util.MinecraftTranslationKeys;
 
 @Singleton
 public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit> {
 
     @Getter private final Message.Quit message;
     private final Permission.Message.Quit permission;
-
-    private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public QuitModule(FileResolver fileResolver,
-                      ListenerRegistry listenerRegistry,
-                      IntegrationModule integrationModule) {
+                      IntegrationModule integrationModule,
+                      EventProcessRegistry eventProcessRegistry) {
         super(localization -> localization.getMessage().getQuit());
 
-        this.listenerRegistry = listenerRegistry;
+        this.message = fileResolver.getMessage().getQuit();
+        this.permission = fileResolver.getPermission().getMessage().getQuit();
         this.integrationModule = integrationModule;
-
-        message = fileResolver.getMessage().getQuit();
-        permission = fileResolver.getPermission().getMessage().getQuit();
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override

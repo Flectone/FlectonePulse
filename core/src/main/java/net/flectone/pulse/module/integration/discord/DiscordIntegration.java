@@ -19,16 +19,15 @@ import discord4j.rest.util.MultipartRequest;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
-import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.discord.listener.MessageCreateListener;
+import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.resolver.SystemVariableResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.SkinService;
-import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
@@ -40,12 +39,11 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 @Singleton
-public class DiscordIntegration extends AbstractModule implements FIntegration {
-
-    private final Integration.Discord integration;
+public class DiscordIntegration implements FIntegration {
 
     private final List<Long> webhooks = new ArrayList<>();
 
+    private final Integration.Discord integration;
     private final FileResolver fileResolver;
     private final TaskScheduler taskScheduler;
     private final SkinService skinService;
@@ -66,6 +64,7 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
                               SystemVariableResolver systemVariableResolver,
                               MessageCreateListener messageCreateListener,
                               FLogger fLogger) {
+        this.integration = fileResolver.getIntegration().getDiscord();
         this.fileResolver = fileResolver;
         this.taskScheduler = taskScheduler;
         this.skinService = skinService;
@@ -73,8 +72,6 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
         this.systemVariableResolver = systemVariableResolver;
         this.messageCreateListener = messageCreateListener;
         this.fLogger = fLogger;
-
-        integration = fileResolver.getIntegration().getDiscord();
     }
 
     public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> discordString) {
@@ -225,7 +222,6 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
         return embedBuilder.build();
     }
 
-    @Async
     @Override
     public void hook() {
         String token = systemVariableResolver.substituteEnvVars(integration.getToken());
@@ -293,25 +289,5 @@ public class DiscordIntegration extends AbstractModule implements FIntegration {
                                 .block();
                     });
         }
-    }
-
-    @Override
-    public void reload() {
-        disconnect();
-
-        if (!isEnable()) return;
-        hook();
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
-    }
-
-    public void disconnect() {
-        if (gateway == null) return;
-
-        gateway.logout().block();
-        webhooks.clear();
     }
 }

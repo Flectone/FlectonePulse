@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformServerAdapter;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -27,6 +26,7 @@ import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.triton.TritonModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.vault.VaultModule;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -40,6 +40,8 @@ import java.util.Set;
 public class BukkitIntegrationModule extends IntegrationModule {
 
     private final Injector injector;
+    private final FLogger fLogger;
+    private final PlatformServerAdapter platformServerAdapter;
 
     @Inject
     public BukkitIntegrationModule(FileResolver fileResolver,
@@ -48,7 +50,11 @@ public class BukkitIntegrationModule extends IntegrationModule {
                                    Injector injector) {
         super(fileResolver, injector);
 
+        this.fLogger = fLogger;
+        this.platformServerAdapter = platformServerAdapter;
         this.injector = injector;
+    }
+
     @Override
     public void onEnable() {
         super.onEnable();

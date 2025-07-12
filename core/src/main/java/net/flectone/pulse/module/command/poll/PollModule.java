@@ -37,7 +37,6 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
     private final Command.Poll command;
     private final Permission.Command.Poll permission;
-
     private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final ProxySender proxySender;
@@ -56,6 +55,8 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                       Gson gson) {
         super(localization -> localization.getCommand().getPoll(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.POLL));
 
+        this.command = fileResolver.getCommand().getPoll();
+        this.permission = fileResolver.getPermission().getCommand().getPoll();
         this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.proxySender = proxySender;
@@ -63,9 +64,6 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         this.commandRegistry = commandRegistry;
         this.messagePipeline = messagePipeline;
         this.gson = gson;
-
-        command = fileResolver.getCommand().getPoll();
-        permission = fileResolver.getPermission().getCommand().getPoll();
     }
 
     @Override

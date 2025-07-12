@@ -24,9 +24,12 @@ public abstract class IntegrationModule extends AbstractModule {
     private final Permission.Integration permission;
     private final Injector injector;
 
-    public IntegrationModule(FileResolver fileResolver,
-                             Injector injector) {
+    protected IntegrationModule(FileResolver fileResolver,
+                                Injector injector) {
+        this.integration = fileResolver.getIntegration();
+        this.permission = fileResolver.getPermission().getIntegration();
         this.injector = injector;
+    }
 
     @Override
     public void onEnable() {

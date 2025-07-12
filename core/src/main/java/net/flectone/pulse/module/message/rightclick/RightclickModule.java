@@ -22,7 +22,6 @@ public class RightclickModule extends AbstractModuleMessage<Localization.Message
 
     private final Message.Rightclick message;
     private final Permission.Message.Rightclick permission;
-
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ListenerRegistry listenerRegistry;
@@ -33,14 +32,12 @@ public class RightclickModule extends AbstractModuleMessage<Localization.Message
                             PlatformPlayerAdapter platformPlayerAdapter,
                             ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getRightclick());
+
+        this.message = fileResolver.getMessage().getRightclick();
+        this.permission = fileResolver.getPermission().getMessage().getRightclick();
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.listenerRegistry = listenerRegistry;
-
-        message = fileResolver.getMessage().getRightclick();
-        permission = fileResolver.getPermission().getMessage().getRightclick();
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
@@ -51,6 +48,8 @@ public class RightclickModule extends AbstractModuleMessage<Localization.Message
         createCooldown(message.getCooldown(), permission.getCooldownBypass());
 
         listenerRegistry.register(RightclickPacketListener.class);
+
+        addPredicate(this::checkCooldown);
     }
 
     @Override

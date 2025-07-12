@@ -10,10 +10,6 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.module.message.format.style.StyleModule;
-import net.flectone.pulse.processor.MessageProcessor;
-import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -27,19 +23,23 @@ import net.flectone.pulse.module.message.format.name.NameModule;
 import net.flectone.pulse.module.message.format.questionanswer.QuestionAnswerModule;
 import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.format.spoiler.SpoilerModule;
+import net.flectone.pulse.module.message.format.style.StyleModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
+import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SkinService;
-import net.flectone.pulse.util.*;
+import net.flectone.pulse.util.TagType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
@@ -47,17 +47,17 @@ import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 @Singleton
 public class FormatModule extends AbstractModuleMessage<Localization.Message.Format> implements MessageProcessor {
 
-    @Getter private final Map<TagType, TagResolver> tagResolverMap = new HashMap<>();
+    @Getter private final Map<TagType, TagResolver> tagResolverMap = new EnumMap<>(TagType.class);
 
     private final Message.Format message;
     @Getter private final Permission.Message.Format permission;
-
     private final PlatformServerAdapter platformServerAdapter;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final SkinService skinService;
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
+    private final MessageProcessRegistry messageProcessRegistry;
 
     @Inject
     public FormatModule(FileResolver fileResolver,
@@ -70,31 +70,15 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
                         MessageProcessRegistry messageProcessRegistry) {
         super(localization -> localization.getMessage().getFormat());
 
+        this.message = fileResolver.getMessage().getFormat();
+        this.permission = fileResolver.getPermission().getMessage().getFormat();
         this.platformServerAdapter = platformServerAdapter;
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.skinService = skinService;
         this.permissionChecker = permissionChecker;
         this.messagePipeline = messagePipeline;
-
-        message = fileResolver.getMessage().getFormat();
-        permission = fileResolver.getPermission().getMessage().getFormat();
-
-        addChildren(ColorModule.class);
-        addChildren(EmojiModule.class);
-        addChildren(FixationModule.class);
-        addChildren(ImageModule.class);
-        addChildren(MentionModule.class);
-        addChildren(ModerationModule.class);
-        addChildren(NameModule.class);
-        addChildren(QuestionAnswerModule.class);
-        addChildren(ScoreboardModule.class);
-        addChildren(StyleModule.class);
-        addChildren(SpoilerModule.class);
-        addChildren(TranslateModule.class);
-        addChildren(WorldModule.class);
-
-        messageProcessRegistry.register(100, this);
+        this.messageProcessRegistry = messageProcessRegistry;
     }
 
     @Override
@@ -128,6 +112,24 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         putKyoriTag(TagType.NBT, StandardTags.nbt());
         putKyoriTag(TagType.PRIDE, StandardTags.pride());
         putKyoriTag(TagType.SHADOW_COLOR, StandardTags.shadowColor());
+
+        addChildren(ColorModule.class);
+        addChildren(EmojiModule.class);
+        addChildren(FixationModule.class);
+        addChildren(ImageModule.class);
+        addChildren(MentionModule.class);
+        addChildren(ModerationModule.class);
+        addChildren(NameModule.class);
+        addChildren(QuestionAnswerModule.class);
+        addChildren(ScoreboardModule.class);
+        addChildren(StyleModule.class);
+        addChildren(SpoilerModule.class);
+        addChildren(TranslateModule.class);
+        addChildren(WorldModule.class);
+
+        messageProcessRegistry.register(100, this);
+    }
+
     @Override
     public void onDisable() {
         tagResolverMap.clear();

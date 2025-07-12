@@ -27,7 +27,6 @@ public class TwitchIntegration implements FIntegration {
 
     private final Integration.Twitch integration;
     private final Localization.Integration.Twitch localization;
-
     private final ChannelMessageListener channelMessageListener;
     private final PlatformServerAdapter platformServerAdapter;
     private final SystemVariableResolver systemVariableResolver;
@@ -43,13 +42,12 @@ public class TwitchIntegration implements FIntegration {
                              ChannelMessageListener channelMessageListener,
                              FLogger fLogger) {
 
+        this.integration = fileResolver.getIntegration().getTwitch();
+        this.localization = fileResolver.getLocalization().getIntegration().getTwitch();
         this.channelMessageListener = channelMessageListener;
         this.platformServerAdapter = platformServerAdapter;
         this.systemVariableResolver = systemVariableResolver;
         this.fLogger = fLogger;
-
-        integration = fileResolver.getIntegration().getTwitch();
-        localization = fileResolver.getLocalization().getIntegration().getTwitch();
     }
 
     @Async

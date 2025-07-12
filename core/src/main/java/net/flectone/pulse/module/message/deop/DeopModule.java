@@ -6,12 +6,14 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.module.message.deop.listener.DeopPacketListener;
-import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TranslatableComponent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -21,21 +23,19 @@ public class DeopModule extends AbstractModuleMessage<Localization.Message.Deop>
 
     private final Message.Deop message;
     private final Permission.Message.Deop permission;
-
     private final FPlayerService fPlayerService;
-    private final ListenerRegistry listenerRegistry;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public DeopModule(FileResolver fileResolver,
                       FPlayerService fPlayerService,
-                      ListenerRegistry listenerRegistry) {
+                      EventProcessRegistry eventProcessRegistry) {
         super(localization -> localization.getMessage().getDeop());
 
+        this.message = fileResolver.getMessage().getDeop();
+        this.permission = fileResolver.getPermission().getMessage().getDeop();
         this.fPlayerService = fPlayerService;
-        this.listenerRegistry = listenerRegistry;
-
-        message = fileResolver.getMessage().getDeop();
-        permission = fileResolver.getPermission().getMessage().getDeop();
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override

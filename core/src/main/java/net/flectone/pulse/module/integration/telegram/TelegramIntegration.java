@@ -25,7 +25,6 @@ import java.util.function.UnaryOperator;
 public class TelegramIntegration implements FIntegration {
 
     private final Integration.Telegram integration;
-
     private final FileResolver fileResolver;
     private final SystemVariableResolver systemVariableResolver;
     private final FLogger fLogger;
@@ -39,13 +38,11 @@ public class TelegramIntegration implements FIntegration {
                                SystemVariableResolver systemVariableResolver,
                                FLogger fLogger,
                                MessageListener messageListener) {
-
+        this.integration = fileResolver.getIntegration().getTelegram();
         this.fileResolver = fileResolver;
         this.systemVariableResolver = systemVariableResolver;
         this.fLogger = fLogger;
         this.messageListener = messageListener;
-
-        integration = fileResolver.getIntegration().getTelegram();
     }
 
     @Async

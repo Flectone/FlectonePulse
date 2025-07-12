@@ -14,7 +14,6 @@ public class SimpleVoiceModule extends AbstractModule {
 
     private final Integration.Simplevoice config;
     private final Permission.Integration.Simplevoice permission;
-
     private final Plugin plugin;
     private final SimpleVoiceIntegration simpleVoiceIntegration;
 
@@ -22,11 +21,11 @@ public class SimpleVoiceModule extends AbstractModule {
     public SimpleVoiceModule(FileResolver fileResolver,
                              Plugin plugin,
                              SimpleVoiceIntegration simpleVoiceIntegration) {
+
+        this.config = fileResolver.getIntegration().getSimplevoice();
+        this.permission = fileResolver.getPermission().getIntegration().getSimplevoice();
         this.plugin = plugin;
         this.simpleVoiceIntegration = simpleVoiceIntegration;
-
-        config = fileResolver.getIntegration().getSimplevoice();
-        permission = fileResolver.getPermission().getIntegration().getSimplevoice();
     }
 
     @Override
