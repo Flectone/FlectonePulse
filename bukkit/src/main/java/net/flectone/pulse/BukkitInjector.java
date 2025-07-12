@@ -16,7 +16,6 @@ import net.flectone.pulse.checker.BukkitPermissionChecker;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.converter.LegacyMiniConvertor;
 import net.flectone.pulse.database.Database;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.command.spy.BukkitSpyModule;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.BukkitIntegrationModule;
@@ -31,19 +30,14 @@ import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.bubble.BukkitBubbleModule;
 import net.flectone.pulse.module.message.chat.BukkitChatModule;
 import net.flectone.pulse.module.message.chat.ChatModule;
-import net.flectone.pulse.module.message.format.scoreboard.BukkitScoreboardModule;
-import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.join.BukkitJoinModule;
 import net.flectone.pulse.module.message.join.JoinModule;
-import net.flectone.pulse.module.message.objective.BukkitObjectiveModule;
-import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.quit.BukkitQuitModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
-import net.flectone.pulse.module.message.sidebar.BukkitSidebarModule;
-import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.sign.BukkitSignModule;
 import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.registry.*;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.LibraryResolver;
 import net.flectone.pulse.scheduler.BukkitTaskScheduler;
 import net.flectone.pulse.scheduler.TaskScheduler;
@@ -59,11 +53,6 @@ import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
-import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableException;
-import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary;
-import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
-import net.megavex.scoreboardlibrary.api.team.TeamManager;
 import org.bukkit.plugin.Plugin;
 
 import java.nio.file.Path;
@@ -146,8 +135,6 @@ public class BukkitInjector extends AbstractModule {
         // MiniMessage
         bind(MiniMessage.class).toInstance(MiniMessage.builder().tags(TagResolver.builder().build()).build());
 
-        // Scoreboard
-        setupScoreboard();
 //        try {
 //            Package[] packs = Package.getPackages();
 //
@@ -164,9 +151,6 @@ public class BukkitInjector extends AbstractModule {
 
     private void bindModules() {
         bind(IntegrationModule.class).to(BukkitIntegrationModule.class);
-        bind(ScoreboardModule.class).to(BukkitScoreboardModule.class);
-        bind(ObjectiveModule.class).to(BukkitObjectiveModule.class);
-        bind(SidebarModule.class).to(BukkitSidebarModule.class);
         bind(AnvilModule.class).to(BukkitAnvilModule.class);
         bind(BookModule.class).to(BukkitBookModule.class);
         bind(AfkModule.class).to(BukkitAfkModule.class);
@@ -193,19 +177,5 @@ public class BukkitInjector extends AbstractModule {
                 asyncInterceptor,
                 syncInterceptor
         );
-    }
-
-    private void setupScoreboard() {
-        ScoreboardLibrary scoreboardLibrary;
-        try {
-            scoreboardLibrary = ScoreboardLibrary.loadScoreboardLibrary(plugin);
-        } catch (NoPacketAdapterAvailableException e) {
-            scoreboardLibrary = new NoopScoreboardLibrary();
-            fLogger.warning("No scoreboard packet adapter available!");
-        }
-
-        bind(ScoreboardLibrary.class).toInstance(scoreboardLibrary);
-        bind(ObjectiveManager.class).toInstance(scoreboardLibrary.createObjectiveManager());
-        bind(TeamManager.class).toInstance(scoreboardLibrary.createTeamManager());
     }
 }

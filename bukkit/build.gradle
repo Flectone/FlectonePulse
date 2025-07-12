@@ -4,9 +4,6 @@ dependencies {
     compileOnly "com.github.Anon8281:UniversalScheduler:$UniversalScheduler_version"
     compileOnly "org.incendo:cloud-paper:$cloud_paper_version"
     compileOnly "org.spigotmc:spigot-api:$spigot_version"
-    compileOnly "net.megavex:scoreboard-library-api:$scoreboard_library_api_version"
-    compileOnly "net.megavex:scoreboard-library-implementation:$scoreboard_library_api_version"
-    compileOnly "net.megavex:scoreboard-library-packetevents:$scoreboard_library_api_version"
     compileOnly "com.github.retrooper:packetevents-spigot:$packetevents_spigot_version"
     compileOnly "me.clip:placeholderapi:$placeholderapi_version"
     compileOnly "com.github.MilkBowl:VaultAPI:$vaultapi_version"
@@ -27,7 +24,6 @@ dependencies {
 
 shadowJar {
     relocate("com.github.Anon8281", "net.flectone.pulse.library.universalscheduler")
-    relocate("net.megavex.scoreboardlibrary", "net.flectone.pulse.library.scoreboardlibrary")
 }
 
 processResources {

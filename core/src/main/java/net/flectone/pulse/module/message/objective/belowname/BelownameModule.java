@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.objective.tabname;
+package net.flectone.pulse.module.message.objective.belowname;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -17,10 +17,10 @@ import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton
-public class TabnameModule extends AbstractModule {
+public class BelownameModule extends AbstractModule {
 
-    private final Message.Objective.Tabname config;
-    private final Permission.Message.Objective.Tabname permission;
+    private final Message.Objective.Belowname config;
+    private final Permission.Message.Objective.Belowname permission;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
@@ -28,14 +28,14 @@ public class TabnameModule extends AbstractModule {
     private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
-    public TabnameModule(FileResolver fileResolver,
-                         FPlayerService fPlayerService,
-                         PlatformPlayerAdapter platformPlayerAdapter,
-                         TaskScheduler taskScheduler,
-                         ObjectiveModule objectiveModule,
-                         EventProcessRegistry eventProcessRegistry) {
-        this.config = fileResolver.getMessage().getObjective().getTabname();
-        this.permission = fileResolver.getPermission().getMessage().getObjective().getTabname();
+    public BelownameModule(FileResolver fileResolver,
+                           FPlayerService fPlayerService,
+                           PlatformPlayerAdapter platformPlayerAdapter,
+                           TaskScheduler taskScheduler,
+                           ObjectiveModule objectiveModule,
+                           EventProcessRegistry eventProcessRegistry) {
+        this.config = fileResolver.getMessage().getObjective().getBelowname();
+        this.permission = fileResolver.getPermission().getMessage().getObjective().getBelowname();
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.taskScheduler = taskScheduler;
@@ -71,7 +71,7 @@ public class TabnameModule extends AbstractModule {
     public void create(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
-        objectiveModule.createObjective(fPlayer, ScoreboardPosition.TABLIST);
+        objectiveModule.createObjective(fPlayer, ScoreboardPosition.BELOWNAME);
         update(fPlayer);
     }
 
@@ -79,12 +79,12 @@ public class TabnameModule extends AbstractModule {
         if (checkModulePredicates(fPlayer)) return;
 
         int score = platformPlayerAdapter.getObjectiveScore(fPlayer.getUuid(), config.getMode());
-        objectiveModule.updateObjective(fPlayer, score, ScoreboardPosition.TABLIST);
+        objectiveModule.updateObjective(fPlayer, score, ScoreboardPosition.BELOWNAME);
     }
 
     public void remove(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
-        objectiveModule.removeObjective(fPlayer, ScoreboardPosition.TABLIST);
+        objectiveModule.removeObjective(fPlayer, ScoreboardPosition.BELOWNAME);
     }
 }
