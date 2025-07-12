@@ -15,6 +15,7 @@ import net.flectone.pulse.module.message.objective.tabname.TabnameModule;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.PacketSender;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
 @Singleton
 public class ObjectiveModule extends AbstractModule {
@@ -44,7 +45,7 @@ public class ObjectiveModule extends AbstractModule {
         return message.isEnable();
     }
 
-    public void createObjective(FPlayer fPlayer, ScoreboardPosition scoreboardPosition) {
+    public void createObjective(FPlayer fPlayer, @Nullable Component displayName, ScoreboardPosition scoreboardPosition) {
         removeObjective(fPlayer, scoreboardPosition);
 
         String objectiveName = scoreboardPosition.name() + fPlayer.getUuid();
@@ -52,7 +53,7 @@ public class ObjectiveModule extends AbstractModule {
         packetSender.send(fPlayer, new WrapperPlayServerScoreboardObjective(
                 objectiveName,
                 WrapperPlayServerScoreboardObjective.ObjectiveMode.CREATE,
-                Component.text(objectiveName),
+                displayName == null ? Component.text(objectiveName) : displayName,
                 WrapperPlayServerScoreboardObjective.RenderType.INTEGER,
                 null
         ));
@@ -63,11 +64,11 @@ public class ObjectiveModule extends AbstractModule {
         ));
     }
 
-    public void updateObjective(FPlayer fPlayer, int score, ScoreboardPosition scoreboardPosition) {
+    public void updateObjective(FPlayer fPlayer, FPlayer fObjective, int score, ScoreboardPosition scoreboardPosition) {
         String objectiveName = scoreboardPosition.name() + fPlayer.getUuid();
 
         packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
-                fPlayer.getName(),
+                fObjective.getName(),
                 WrapperPlayServerUpdateScore.Action.CREATE_OR_UPDATE_ITEM,
                 objectiveName,
                 score,

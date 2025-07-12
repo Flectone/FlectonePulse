@@ -71,15 +71,17 @@ public class TabnameModule extends AbstractModule {
     public void create(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
-        objectiveModule.createObjective(fPlayer, ScoreboardPosition.TABLIST);
+        objectiveModule.createObjective(fPlayer, null, ScoreboardPosition.TABLIST);
         update(fPlayer);
     }
 
     public void update(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
-        int score = platformPlayerAdapter.getObjectiveScore(fPlayer.getUuid(), config.getMode());
-        objectiveModule.updateObjective(fPlayer, score, ScoreboardPosition.TABLIST);
+        fPlayerService.getPlatformFPlayers().forEach(fObjective -> {
+            int score = platformPlayerAdapter.getObjectiveScore(fObjective.getUuid(), config.getMode());
+            objectiveModule.updateObjective(fPlayer, fObjective, score, ScoreboardPosition.TABLIST);
+        });
     }
 
     public void remove(FPlayer fPlayer) {

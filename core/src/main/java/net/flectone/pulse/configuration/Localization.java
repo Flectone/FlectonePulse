@@ -569,6 +569,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.kill.single = "<color:#778899>🪦 <fcolor:1><display_name> убит";
         message.kill.multiple = "<color:#778899>🪦 <fcolor:1>Уничтожено <fcolor:2><count></fcolor:2> сущностей";
 
+        message.objective.belowname.format = "<fcolor:1>мс";
+
         message.op.format = "<fcolor:1>\uD83E\uDD16 <display_name> назначен оператором сервера";
 
         message.sidebar.values.clear();
@@ -1596,11 +1598,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Join join = new Join();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/kill/")})
         private Kill kill = new Kill();
-        @Override
-        public ObjectiveMessageConfig getObjective() {
-            return null;
-        }
-
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/objective/")})
+        private Objective objective = new Objective();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/op/")})
         private Op op = new Op();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/quit/")})
@@ -2020,6 +2019,25 @@ public final class Localization extends FileSerializable implements ModuleConfig
         public static final class Kill implements SubMessageConfig, Localizable {
             private String single = "<color:#778899>🪦 <fcolor:1>Killed <display_name>";
             private String multiple = "<color:#778899>🪦 <fcolor:1>Killed <fcolor:2><count></fcolor:2> entities";
+        }
+
+        @Getter
+        public static final class Objective implements ObjectiveMessageConfig, Localizable {
+
+
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/objective/belowname/")})
+            private Belowname belowname = new Belowname();
+
+            @Override
+            public SubObjectiveMessageConfig getTabname() {
+                return null;
+            }
+
+            @Getter
+            public static final class Belowname implements SubObjectiveMessageConfig, Localizable {
+                private String format = "<fcolor:1>ms";
+            }
+
         }
 
         @Getter
