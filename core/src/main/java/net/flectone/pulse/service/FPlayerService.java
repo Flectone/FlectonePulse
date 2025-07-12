@@ -7,10 +7,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Config;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Mail;
-import net.flectone.pulse.module.command.ignore.model.Ignore;
+import net.flectone.pulse.model.Ignore;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.repository.FPlayerRepository;
@@ -34,6 +36,7 @@ public class FPlayerService {
     private final IntegrationModule integrationModule;
     private final PacketSender packetSender;
     private final PacketProvider packetProvider;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public FPlayerService(FileResolver fileResolver,
@@ -43,7 +46,8 @@ public class FPlayerService {
                           ModerationService moderationService,
                           IntegrationModule integrationModule,
                           PacketSender packetSender,
-                          PacketProvider packetProvider) {
+                          PacketProvider packetProvider,
+                          EventProcessRegistry eventProcessRegistry) {
         this.config = fileResolver.getConfig();
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.fPlayerRepository = fPlayerRepository;
@@ -52,6 +56,7 @@ public class FPlayerService {
         this.integrationModule = integrationModule;
         this.packetSender = packetSender;
         this.packetProvider = packetProvider;
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     public void clear() {
@@ -69,8 +74,9 @@ public class FPlayerService {
             String name = platformPlayerAdapter.getName(uuid);
             FPlayer fPlayer = addFPlayer(uuid, name);
             loadData(fPlayer);
-            platformPlayerAdapter.onJoin(fPlayer, true);
         });
+
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_PERSIST_AND_DISPOSE, this::clearAndSave);
     }
 
     public FPlayer addFPlayer(UUID uuid, String name) {

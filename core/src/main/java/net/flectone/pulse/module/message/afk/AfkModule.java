@@ -81,6 +81,12 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> i
         if (message.getTicker().isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::check), message.getTicker().getPeriod());
         }
+
+        messageProcessRegistry.register(150, this);
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, fPlayer -> remove("", fPlayer));
+    }
+
+    @Override
     public void onDisable() {
         playersCoordinates.clear();
     }

@@ -66,7 +66,10 @@ public class SidebarModule extends AbstractModuleListMessage<Localization.Messag
             taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::update), ticker.getPeriod());
         }
 
-        listenerRegistry.register(SidebarPacketListener.class);
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, this::create);
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_QUIT, this::remove);
+    }
+
     @Override
     public void onDisable() {
         fPlayerService.getFPlayers().forEach(this::remove);

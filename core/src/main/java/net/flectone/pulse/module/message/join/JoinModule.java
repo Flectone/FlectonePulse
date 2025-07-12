@@ -45,7 +45,12 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerRegistry.register(JoinPacketListener.class);
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_JOIN, this::send);
+        eventProcessRegistry.registerMessageHandler(event -> {
+            if (event.getKey() != MinecraftTranslationKeys.MULTIPLAYER_PLAYER_JOINED) return;
+
+            event.cancel();
+        });
     }
 
     @Override

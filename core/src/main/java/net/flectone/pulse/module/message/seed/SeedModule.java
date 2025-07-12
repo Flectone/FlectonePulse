@@ -44,7 +44,19 @@ public class SeedModule extends AbstractModuleMessage<Localization.Message.Seed>
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerRegistry.register(SeedPacketListener.class);
+        eventProcessRegistry.registerMessageHandler(event -> {
+            if (event.getKey() != MinecraftTranslationKeys.COMMANDS_SEED_SUCCESS) return;
+
+            TranslatableComponent translatableComponent = event.getComponent();
+            if (translatableComponent.args().isEmpty()) return;
+            if (!(translatableComponent.args().get(0) instanceof TranslatableComponent chatComponent)) return;
+            if (chatComponent.args().isEmpty()) return;
+            if (!(chatComponent.args().get(0) instanceof TextComponent seedComponent)) return;
+
+            event.cancel();
+
+            send(event.getUserUUID(), seedComponent.content());
+        });
     }
 
     @Override

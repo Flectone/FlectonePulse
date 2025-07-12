@@ -36,6 +36,10 @@ public class BubbleModule extends AbstractModule {
         bubbleService.startTicker();
 
         registerModulePermission(permission);
+
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_QUIT, bubbleService::clear);
+    }
+
     @Override
     public void onDisable() {
         bubbleService.clear();

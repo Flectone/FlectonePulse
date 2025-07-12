@@ -39,7 +39,12 @@ public class BedModule extends AbstractModuleMessage<Localization.Message.Bed> {
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerRegistry.register(BedPacketListener.class);
+        eventProcessRegistry.registerMessageHandler(event -> {
+            if (!event.getKey().startsWith("block.minecraft.bed.")) return;
+
+            event.cancel();
+            send(event);
+        });
     }
 
     @Override
@@ -48,14 +53,14 @@ public class BedModule extends AbstractModuleMessage<Localization.Message.Bed> {
     }
 
     @Async
-    public void send(UUID receiver, MinecraftTranslationKeys key) {
-        FPlayer fPlayer = fPlayerService.getFPlayer(receiver);
+    public void send(TranslatableMessageEvent event) {
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getUserUUID());
         if (checkModulePredicates(fPlayer)) return;
 
         builder(fPlayer)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(bed -> switch (key) {
+                .format(bed -> switch (event.getKey()) {
                     case BLOCK_MINECRAFT_BED_NO_SLEEP -> bed.getNoSleep();
                     case BLOCK_MINECRAFT_BED_NOT_SAFE -> bed.getNotSafe();
                     case BLOCK_MINECRAFT_BED_OBSTRUCTED -> bed.getObstructed();

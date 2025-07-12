@@ -44,7 +44,16 @@ public class OpModule extends AbstractModuleMessage<Localization.Message.Op> {
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerRegistry.register(OpPacketListener.class);
+        eventProcessRegistry.registerMessageHandler(event -> {
+            if (event.getKey() != MinecraftTranslationKeys.COMMANDS_OP_SUCCESS) return;
+
+            TranslatableComponent translatableComponent = event.getComponent();
+            if (translatableComponent.args().isEmpty()) return;
+            if (!(translatableComponent.args().get(0) instanceof TextComponent targetComponent)) return;
+
+            event.cancel();
+            send(event.getUserUUID(), targetComponent.content());
+        });
     }
 
     @Override

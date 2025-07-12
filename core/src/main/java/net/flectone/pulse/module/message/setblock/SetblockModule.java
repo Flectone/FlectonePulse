@@ -46,8 +46,8 @@ public class SetblockModule extends AbstractModuleMessage<Localization.Message.S
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerRegistry.register(SetblockPacketListener.class);
         eventProcessRegistry.registerMessageHandler(event -> {
+            if (event.getKey() != MinecraftTranslationKeys.COMMANDS_SETBLOCK_SUCCESS) return;
 
             TranslatableComponent translatableComponent = event.getComponent();
             List<Component> translationArguments = translatableComponent.args();

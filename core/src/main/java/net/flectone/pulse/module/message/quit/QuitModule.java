@@ -41,7 +41,12 @@ public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit>
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerRegistry.register(QuitPacketListener.class);
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_QUIT, this::send);
+        eventProcessRegistry.registerMessageHandler(event -> {
+            if (event.getKey() != MinecraftTranslationKeys.MULTIPLAYER_PLAYER_LEFT) return;
+
+            event.cancel();
+        });
     }
 
     @Override

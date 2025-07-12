@@ -52,8 +52,35 @@ public class SpawnModule extends AbstractModuleMessage<Localization.Message.Spaw
         createSound(message.getSound(), permission.getSound());
 
         listenerRegistry.register(ChangeGameStatePacketListener.class);
-        listenerRegistry.register(SetSpawnPacketListener.class);
-        listenerRegistry.register(SpawnpointPacketListener.class);
+        eventProcessRegistry.registerMessageHandler(event -> {
+            if (event.getKey() == MinecraftTranslationKeys.BLOCK_MINECRAFT_SET_SPAWN) {
+                event.cancel();
+                send(event.getUserUUID(), event.getKey());
+                return;
+            }
+
+            if (event.getKey().startsWith("commands.spawnpoint.success")) {
+                TranslatableComponent translatableComponent = event.getComponent();
+                List<Component> translationArguments = translatableComponent.args();
+                if (translationArguments.size() < 6) return;
+                if (!(translationArguments.get(0) instanceof TextComponent xComponent)) return;
+                if (!(translationArguments.get(1) instanceof TextComponent yComponent)) return;
+                if (!(translationArguments.get(2) instanceof TextComponent zComponent)) return;
+                if (!(translationArguments.get(3) instanceof TextComponent angleComponent)) return;
+                if (!(translationArguments.get(4) instanceof TextComponent worldComponent)) return;
+                if (!(translationArguments.get(5) instanceof TextComponent targetComponent)) return;
+
+                String x = xComponent.content();
+                String y = yComponent.content();
+                String z = zComponent.content();
+                String angle = angleComponent.content();
+                String world = worldComponent.content();
+                String value = targetComponent.content();
+
+                event.cancel();
+                send(event, x, y, z, angle, world, value);
+            }
+        });
     }
 
     @Override
@@ -76,13 +103,13 @@ public class SpawnModule extends AbstractModuleMessage<Localization.Message.Spaw
     }
 
     @Async
-    public void send(UUID receiver, MinecraftTranslationKeys key, String x, String y, String z, String angle, String world, String value) {
-        FPlayer fPlayer = fPlayerService.getFPlayer(receiver);
+    public void send(TranslatableMessageEvent event, String x, String y, String z, String angle, String world, String value) {
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getUserUUID());
         if (checkModulePredicates(fPlayer)) return;
 
         FPlayer fTarget = fPlayer;
 
-        if (key == MinecraftTranslationKeys.COMMANDS_SPAWNPOINT_SUCCESS_SINGLE) {
+        if (event.getKey() == MinecraftTranslationKeys.COMMANDS_SPAWNPOINT_SUCCESS_SINGLE) {
             fTarget = fPlayerService.getFPlayer(value);
             if (fTarget.isUnknown()) return;
         }
@@ -90,7 +117,7 @@ public class SpawnModule extends AbstractModuleMessage<Localization.Message.Spaw
         builder(fTarget)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> (key == MinecraftTranslationKeys.COMMANDS_SPAWNPOINT_SUCCESS_SINGLE
+                .format(s -> (event.getKey() == MinecraftTranslationKeys.COMMANDS_SPAWNPOINT_SUCCESS_SINGLE
                         ? s.getSingle() : s.getMultiple().replace("<count>", value))
                         .replace("<x>", x)
                         .replace("<y>", y)

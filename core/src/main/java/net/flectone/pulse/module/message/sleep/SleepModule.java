@@ -42,7 +42,25 @@ public class SleepModule extends AbstractModuleMessage<Localization.Message.Slee
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerRegistry.register(SleepPacketListener.class);
+        eventProcessRegistry.registerMessageHandler(event -> {
+            if (!event.getKey().startsWith("sleep.")) return;
+
+            String sleepCount = "";
+            String allCount = "";
+
+            TranslatableComponent translatableComponent = event.getComponent();
+            if (event.getKey() == MinecraftTranslationKeys.SLEEP_PLAYERS_SLEEPING && translatableComponent.args().size() == 2) {
+                if ((translatableComponent.args().get(0) instanceof TextComponent sleepComponent)) {
+                    sleepCount = sleepComponent.content();
+                }
+                if ((translatableComponent.args().get(1) instanceof TextComponent allComponent)) {
+                    allCount = allComponent.content();
+                }
+            }
+
+            event.cancel();
+            send(event, sleepCount, allCount);
+        });
     }
 
     @Override
@@ -51,14 +69,14 @@ public class SleepModule extends AbstractModuleMessage<Localization.Message.Slee
     }
 
     @Async
-    public void send(UUID receiver, MinecraftTranslationKeys key, String sleepCount, String allCount) {
-        FPlayer fPlayer = fPlayerService.getFPlayer(receiver);
+    public void send(TranslatableMessageEvent event, String sleepCount, String allCount) {
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getUserUUID());
         if (checkModulePredicates(fPlayer)) return;
 
         builder(fPlayer)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(bed -> switch (key) {
+                .format(bed -> switch (event.getKey()) {
                     case SLEEP_NOT_POSSIBLE -> bed.getNotPossible();
                     case SLEEP_PLAYERS_SLEEPING -> bed.getPlayersSleeping()
                             .replace("<sleep_count>", sleepCount)

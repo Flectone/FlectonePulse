@@ -72,6 +72,8 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
                         .required(promptMessage, commandRegistry.nativeMessageParser())
                         .handler(this)
         );
+
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, this::send);
     }
 
     @Override

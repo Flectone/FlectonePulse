@@ -92,6 +92,9 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         );
 
         messageProcessRegistry.register(150, this);
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, fPlayer ->
+                setStreamPrefix(fPlayer, fPlayer.isSetting(FPlayer.Setting.STREAM))
+        );
     }
 
     @Override

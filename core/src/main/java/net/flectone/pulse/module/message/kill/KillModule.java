@@ -50,7 +50,12 @@ public class KillModule extends AbstractModuleMessage<Localization.Message.Kill>
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerRegistry.register(KillPacketListener.class);
+        eventProcessRegistry.registerMessageHandler(event -> {
+            switch (event.getKey()) {
+                case COMMANDS_KILL_SUCCESS_MULTIPLE -> handleKillMultiple(event);
+                case COMMANDS_KILL_SUCCESS_SINGLE -> handleKillSingle(event);
+            }
+        });
     }
 
     @Override
@@ -82,5 +87,47 @@ public class KillModule extends AbstractModuleMessage<Localization.Message.Kill>
                 )
                 .sound(getSound())
                 .sendBuilt();
+    }
+
+    private void handleKillMultiple(TranslatableMessageEvent event) {
+        TranslatableComponent translatableComponent = event.getComponent();
+        if (!(translatableComponent.args().get(0) instanceof TextComponent firstArgument)) return;
+
+        String value = firstArgument.content();
+
+        event.cancel();
+        send(event.getUserUUID(), MinecraftTranslationKeys.COMMANDS_KILL_SUCCESS_MULTIPLE, value, null);
+    }
+
+    private void handleKillSingle(TranslatableMessageEvent event) {
+        TranslatableComponent translatableComponent = event.getComponent();
+
+        HoverEvent<?> hoverEvent = null;
+        String type = "";
+        if (translatableComponent.args().get(0) instanceof TextComponent firstArgument) {
+            hoverEvent = firstArgument.hoverEvent();
+        } else if (translatableComponent.args().get(0) instanceof TranslatableComponent firstArgument)  {
+            hoverEvent = firstArgument.hoverEvent();
+            type = firstArgument.key();
+        }
+
+        if (hoverEvent == null) return;
+        HoverEvent.ShowEntity showEntity = (HoverEvent.ShowEntity) hoverEvent.value();
+        if (type.isEmpty()) {
+            type = entityUtil.resolveEntityTranslationKey(showEntity.type().key().value());
+        }
+
+        String name;
+        if (showEntity.name() instanceof TextComponent hoverComponent) {
+            name = hoverComponent.content();
+        } else if (showEntity.name() instanceof TranslatableComponent hoverComponent) {
+            name = hoverComponent.key();
+        } else return;
+
+        UUID uuid = showEntity.id();
+        FEntity fEntity = new FEntity(name, uuid, type);
+
+        event.cancel();
+        send(event.getUserUUID(), MinecraftTranslationKeys.COMMANDS_KILL_SUCCESS_SINGLE, "", fEntity);
     }
 }

@@ -42,7 +42,27 @@ public class GamemodeModule extends AbstractModuleMessage<Localization.Message.G
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerRegistry.register(GamemodePacketListener.class);
+        eventProcessRegistry.registerMessageHandler(event -> {
+            MinecraftTranslationKeys key = event.getKey();
+            if (!key.startsWith("commands.gamemode.success") && key != MinecraftTranslationKeys.GAMEMODE_CHANGED) return;
+
+            TranslatableComponent translatableComponent = event.getComponent();
+            if (translatableComponent.args().isEmpty()) return;
+
+            String target = event.getUserName();
+            String gamemodeKey = "gameMode.survival";
+            if (translatableComponent.args().get(0) instanceof TranslatableComponent gamemodeComponent) {
+                gamemodeKey = gamemodeComponent.key();
+            } else if (translatableComponent.args().size() > 1
+                    && translatableComponent.args().get(0) instanceof TextComponent playerComponent
+                    && translatableComponent.args().get(1) instanceof TranslatableComponent gamemodeComponent) {
+                target = playerComponent.content();
+                gamemodeKey = gamemodeComponent.key();
+            }
+
+            event.cancel();
+            send(event, gamemodeKey, target);
+        });
     }
 
     @Override
@@ -51,8 +71,8 @@ public class GamemodeModule extends AbstractModuleMessage<Localization.Message.G
     }
 
     @Async
-    public void send(UUID sender, String gameModeKey, String target, MinecraftTranslationKeys key) {
-        FPlayer fPlayer = fPlayerService.getFPlayer(sender);
+    public void send(TranslatableMessageEvent event, String gameModeKey, String target) {
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getUserUUID());
         if (checkModulePredicates(fPlayer)) return;
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);

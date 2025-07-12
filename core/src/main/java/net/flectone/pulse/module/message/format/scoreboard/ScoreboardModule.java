@@ -79,6 +79,11 @@ public class ScoreboardModule extends AbstractModule {
 
             }), ticker.getPeriod());
         }
+
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, this::create);
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_QUIT, this::remove);
+    }
+
     @Override
     public void onDisable() {
         uuidTeamMap.clear();

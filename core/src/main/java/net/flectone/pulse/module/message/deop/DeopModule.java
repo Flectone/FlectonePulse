@@ -44,7 +44,16 @@ public class DeopModule extends AbstractModuleMessage<Localization.Message.Deop>
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerRegistry.register(DeopPacketListener.class);
+        eventProcessRegistry.registerMessageHandler(event -> {
+            if (event.getKey() != MinecraftTranslationKeys.COMMANDS_DEOP_SUCCESS) return;
+
+            TranslatableComponent translatableComponent = event.getComponent();
+            if (translatableComponent.args().isEmpty()) return;
+            if (!(translatableComponent.args().get(0) instanceof TextComponent targetComponent)) return;
+
+            event.cancel();
+            send(event.getUserUUID(), targetComponent.content());
+        });
     }
 
     @Override

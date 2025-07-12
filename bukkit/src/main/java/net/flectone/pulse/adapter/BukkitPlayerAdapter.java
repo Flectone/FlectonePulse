@@ -10,28 +10,13 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.command.mail.MailModule;
-import net.flectone.pulse.module.command.stream.StreamModule;
 import net.flectone.pulse.module.message.afk.AfkModule;
-import net.flectone.pulse.module.message.brand.BrandModule;
-import net.flectone.pulse.module.message.bubble.service.BubbleService;
-import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
-import net.flectone.pulse.module.message.format.world.WorldModule;
-import net.flectone.pulse.module.message.greeting.GreetingModule;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
-import net.flectone.pulse.module.message.objective.belowname.BelownameModule;
-import net.flectone.pulse.module.message.objective.tabname.TabnameModule;
-import net.flectone.pulse.module.message.quit.QuitModule;
-import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
-import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
@@ -355,48 +340,5 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public void clear(@NotNull FPlayer fPlayer) {
         injector.getInstance(AfkModule.class).remove("quit", fPlayer);
-        injector.getInstance(ScoreboardModule.class).remove(fPlayer);
-        injector.getInstance(BelownameModule.class).remove(fPlayer);
-        injector.getInstance(TabnameModule.class).remove(fPlayer);
-    }
-
-    @Override
-    public void onJoin(@NotNull FPlayer fPlayer, boolean silent) {
-        injector.getInstance(WorldModule.class).update(fPlayer);
-        injector.getInstance(AfkModule.class).remove("", fPlayer);
-        injector.getInstance(StreamModule.class).setStreamPrefix(fPlayer, fPlayer.isSetting(FPlayer.Setting.STREAM));
-
-        onJoinLater(fPlayer, silent);
-    }
-
-    @Override
-    public void onQuit(@NotNull FPlayer fPlayer) {
-        if (!fPlayer.isOnline()) return;
-
-        onQuitAsync(fPlayer);
-    }
-
-    @Async
-    public void onQuitAsync(FPlayer fPlayer) {
-        injector.getInstance(QuitModule.class).send(fPlayer);
-        injector.getInstance(FPlayerService.class).clearAndSave(fPlayer);
-        injector.getInstance(BubbleService.class).clear(fPlayer);
-    }
-
-    @Async(delay = 15L)
-    public void onJoinLater(FPlayer fPlayer, boolean silent) {
-        if (!silent) {
-            injector.getInstance(GreetingModule.class).send(fPlayer);
-        }
-
-        injector.getInstance(MailModule.class).send(fPlayer);
-        injector.getInstance(ScoreboardModule.class).update(fPlayer);
-        injector.getInstance(BelownameModule.class).update(fPlayer);
-        injector.getInstance(TabnameModule.class).update(fPlayer);
-        injector.getInstance(PlayerlistnameModule.class).update();
-        injector.getInstance(SidebarModule.class).send(fPlayer);
-        injector.getInstance(FooterModule.class).send(fPlayer);
-        injector.getInstance(HeaderModule.class).send(fPlayer);
-        injector.getInstance(BrandModule.class).send(fPlayer);
     }
 }

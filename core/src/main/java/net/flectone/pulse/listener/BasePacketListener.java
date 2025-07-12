@@ -1,26 +1,32 @@
 package net.flectone.pulse.listener;
 
+import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
-import com.github.retrooper.packetevents.event.UserDisconnectEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSettings;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.event.message.TranslatableMessageEvent;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.sender.PacketSender;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
 
 import java.util.UUID;
 
@@ -30,39 +36,29 @@ public class BasePacketListener implements PacketListener {
     private final FPlayerService fPlayerService;
     private final PacketSender packetSender;
     private final ProxySender proxySender;
-    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final Provider<IntegrationModule> integrationModuleProvider;
     private final Provider<BanModule> banModuleProvider;
     private final Provider<PlayersModule> playersModuleProvider;
     private final Provider<MaintenanceModule> maintenanceModuleProvider;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public BasePacketListener(FPlayerService fPlayerService,
                               PacketSender packetSender,
                               ProxySender proxySender,
-                              PlatformPlayerAdapter platformPlayerAdapter,
                               Provider<IntegrationModule> integrationModuleProvider,
                               Provider<BanModule> banModuleProvider,
                               Provider<PlayersModule> playersModuleProvider,
-                              Provider<MaintenanceModule> maintenanceModuleProvider) {
+                              Provider<MaintenanceModule> maintenanceModuleProvider,
+                              EventProcessRegistry eventProcessRegistry) {
         this.fPlayerService = fPlayerService;
         this.packetSender = packetSender;
         this.proxySender = proxySender;
-        this.platformPlayerAdapter = platformPlayerAdapter;
         this.integrationModuleProvider = integrationModuleProvider;
         this.banModuleProvider = banModuleProvider;
         this.playersModuleProvider = playersModuleProvider;
         this.maintenanceModuleProvider = maintenanceModuleProvider;
-    }
-
-    @Override
-    public void onUserDisconnect(UserDisconnectEvent event) {
-        UUID uuid = event.getUser().getUUID();
-        if (uuid == null) return;
-
-        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
-
-        platformPlayerAdapter.onQuit(fPlayer);
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override
@@ -75,7 +71,40 @@ public class BasePacketListener implements PacketListener {
         if (event.isCancelled()) return;
 
         handleUserLoginEvent(event);
-        handleUserJoinEvent(event);
+        handleMessageEvent(event);
+    }
+
+    public void handleMessageEvent(PacketSendEvent event) {
+        TranslatableComponent translatableComponent = parseTranslatableComponent(event);
+        if (translatableComponent == null) return;
+
+        MinecraftTranslationKeys key = MinecraftTranslationKeys.fromString(translatableComponent.key());
+
+        // skip minecraft warning
+        if (key == MinecraftTranslationKeys.MULTIPLAYER_MESSAGE_NOT_DELIVERED) {
+            event.setCancelled(true);
+            return;
+        }
+
+        eventProcessRegistry.processEvent(new TranslatableMessageEvent(key, translatableComponent, event));
+    }
+
+    private TranslatableComponent parseTranslatableComponent(PacketSendEvent event) {
+        Component component = null;
+
+        if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+            WrapperPlayServerChatMessage wrapper = new WrapperPlayServerChatMessage(event);
+            component = wrapper.getMessage().getChatContent();
+        } else if (event.getPacketType() == PacketType.Play.Server.SYSTEM_CHAT_MESSAGE) {
+            WrapperPlayServerSystemChatMessage wrapper = new WrapperPlayServerSystemChatMessage(event);
+            component = wrapper.getMessage();
+        }
+
+        if (component instanceof TranslatableComponent translatableComponent) {
+            return translatableComponent;
+        }
+
+        return null;
     }
 
     public void handleClientSettingsEvent(PacketReceiveEvent event) {
@@ -99,16 +128,6 @@ public class BasePacketListener implements PacketListener {
 
         // first time player joined, wait for it to be added
         updateLocaleLater(uuid, locale);
-    }
-
-    public void handleUserJoinEvent(PacketSendEvent event) {
-        if (event.getPacketType() != PacketType.Play.Server.JOIN_GAME) return;
-
-        UUID uuid = event.getUser().getUUID();
-        if (uuid == null) return;
-
-        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
-        platformPlayerAdapter.onJoin(fPlayer, false);
     }
 
     public void handleUserLoginEvent(PacketSendEvent event) {

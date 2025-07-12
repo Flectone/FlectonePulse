@@ -73,4 +73,11 @@ public class BukkitListenerRegistry extends ListenerRegistry {
         listeners.forEach(HandlerList::unregisterAll);
         listeners.clear();
     }
+
+    @Override
+    public void registerDefaultListeners() {
+        super.registerDefaultListeners();
+
+        register(BukkitBaseListener.class, EventPriority.LOWEST);
+    }
 }

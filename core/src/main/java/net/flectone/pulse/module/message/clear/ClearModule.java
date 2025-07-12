@@ -42,7 +42,20 @@ public class ClearModule extends AbstractModuleMessage<Localization.Message.Clea
 
         createSound(message.getSound(), permission.getSound());
 
-        listenerRegistry.register(ClearPacketListener.class);
+        eventProcessRegistry.registerMessageHandler(event -> {
+            if (!event.getKey().startsWith("commands.clear.success")) return;
+
+            TranslatableComponent translatableComponent = event.getComponent();
+            if (translatableComponent.args().size() < 2) return;
+            if (!(translatableComponent.args().get(0) instanceof TextComponent numberComponent)) return;
+            if (!(translatableComponent.args().get(1) instanceof TextComponent targetComponent)) return;
+
+            String number = numberComponent.content();
+            String value = targetComponent.content();
+
+            event.cancel();
+            send(event, number, value);
+        });
     }
 
     @Override
@@ -51,13 +64,13 @@ public class ClearModule extends AbstractModuleMessage<Localization.Message.Clea
     }
 
     @Async
-    public void send(UUID receiver, MinecraftTranslationKeys key, String count, String value) {
-        FPlayer fPlayer = fPlayerService.getFPlayer(receiver);
+    public void send(TranslatableMessageEvent event, String count, String value) {
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getUserUUID());
         if (checkModulePredicates(fPlayer)) return;
 
         FPlayer fTarget = fPlayer;
 
-        if (key == MinecraftTranslationKeys.COMMANDS_CLEAR_SUCCESS_SINGLE) {
+        if (event.getKey() == MinecraftTranslationKeys.COMMANDS_CLEAR_SUCCESS_SINGLE) {
             fTarget = fPlayerService.getFPlayer(value);
             if (fTarget.isUnknown()) return;
         }
@@ -65,7 +78,7 @@ public class ClearModule extends AbstractModuleMessage<Localization.Message.Clea
         builder(fTarget)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> (key == MinecraftTranslationKeys.COMMANDS_CLEAR_SUCCESS_SINGLE
+                .format(s -> (event.getKey() == MinecraftTranslationKeys.COMMANDS_CLEAR_SUCCESS_SINGLE
                         ? s.getSingle() : s.getMultiple().replace("<count>", value))
                         .replace("<number>", count)
                 )

@@ -45,6 +45,7 @@ public class GreetingModule extends AbstractModuleMessage<Localization.Message.G
         registerModulePermission(permission);
 
         createSound(message.getSound(), permission.getSound());
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_JOIN, this::send);
     }
 
     @Override
