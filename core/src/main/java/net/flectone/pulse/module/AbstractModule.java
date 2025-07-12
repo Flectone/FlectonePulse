@@ -9,16 +9,13 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.registry.PermissionRegistry;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 @Getter
 public abstract class AbstractModule {
 
-    private final Set<Class<? extends AbstractModule>> children = new HashSet<>();
+    private final Set<Class<? extends AbstractModule>> children = new LinkedHashSet<>();
     private final Set<Predicate<FEntity>> predicates = new HashSet<>();
 
     @Inject private PermissionRegistry permissionRegistry;
