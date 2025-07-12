@@ -90,6 +90,9 @@ public class LiteBansModule extends AbstractModule {
         kickModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseKick() && isHooked());
     }
 
+    @Override
+    public void onDisable() {
+        liteBansIntegration.unhook();
     }
 
     @Override

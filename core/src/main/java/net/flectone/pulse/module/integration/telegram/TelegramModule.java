@@ -4,14 +4,13 @@ import com.alessiodp.libby.Library;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import lombok.SneakyThrows;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.LibraryResolver;
 import net.flectone.pulse.util.MessageTag;
 
@@ -35,8 +34,6 @@ public class TelegramModule extends AbstractModule {
 
         integration = fileResolver.getIntegration().getTelegram();
         permission = fileResolver.getPermission().getIntegration().getTelegram();
-
-        addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.isSetting(FPlayer.Setting.TELEGRAM));
     }
 
     @Override
@@ -48,8 +45,13 @@ public class TelegramModule extends AbstractModule {
         disconnect();
 
         injector.getInstance(TelegramIntegration.class).hook();
+
+        addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.isSetting(FPlayer.Setting.TELEGRAM));
+    }
+
     @Override
     public void onDisable() {
+        injector.getInstance(TelegramIntegration.class).unhook();
     }
 
     private void loadLibraries() {
@@ -87,12 +89,5 @@ public class TelegramModule extends AbstractModule {
         if (checkModulePredicates(sender)) return;
 
         injector.getInstance(TelegramIntegration.class).sendMessage(sender, messageTag, telegramString);
-    }
-
-    @SneakyThrows
-    public void disconnect() {
-        if (!isEnable()) return;
-
-        injector.getInstance(TelegramIntegration.class).disconnect();
     }
 }

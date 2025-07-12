@@ -47,7 +47,7 @@ public class DiscordModule extends AbstractModule {
         addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.isSetting(FPlayer.Setting.DISCORD));
 
         try {
-            discordIntegration.reload();
+            injector.getInstance(DiscordIntegration.class).hook();
         } catch (Exception e) {
             fLogger.warning(e);
         }

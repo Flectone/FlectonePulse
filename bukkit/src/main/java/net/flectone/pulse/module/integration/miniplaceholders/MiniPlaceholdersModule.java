@@ -56,6 +56,7 @@ public class MiniPlaceholdersModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        miniPlaceholdersIntegration.unhook();
     }
 
     @Override

@@ -28,7 +28,12 @@ public class TritonIntegration implements Listener, FIntegration {
 
     @Override
     public void hook() {
-        fLogger.info("Triton hooked");
+        fLogger.info("✔ Triton hooked");
+    }
+
+    @Override
+    public void unhook() {
+        fLogger.info("✖ Triton unhooked");
     }
 
     @EventHandler

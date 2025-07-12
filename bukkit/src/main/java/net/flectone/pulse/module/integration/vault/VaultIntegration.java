@@ -44,7 +44,12 @@ public class VaultIntegration implements FIntegration {
             this.chat = chatProvider.getProvider();
         }
 
-        fLogger.info("Vault hooked");
+        fLogger.info("✔ Vault hooked");
+    }
+
+    @Override
+    public void unhook() {
+        fLogger.info("✖ Vault unhooked");
     }
 
     public boolean hasPermission(FPlayer fPlayer, String permissionName) {

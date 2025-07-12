@@ -25,7 +25,13 @@ public class LiteBansIntegration implements FIntegration {
     @Override
     public void hook() {
         hooked = true;
-        fLogger.info("LiteBans hooked");
+        fLogger.info("✔ LiteBans hooked");
+    }
+
+    @Override
+    public void unhook() {
+        hooked = false;
+        fLogger.info("✖ LiteBans unhooked");
     }
 
     public boolean isMuted(FEntity fEntity) {

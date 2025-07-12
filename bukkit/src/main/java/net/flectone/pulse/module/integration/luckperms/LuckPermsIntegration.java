@@ -29,7 +29,12 @@ public class LuckPermsIntegration implements FIntegration {
     @Override
     public void hook() {
         this.luckPerms = LuckPermsProvider.get();
-        fLogger.info("LuckPerms hooked");
+        fLogger.info("✔ LuckPerms hooked");
+    }
+
+    @Override
+    public void unhook() {
+        fLogger.info("✖ LuckPerms unhooked");
     }
 
     public boolean hasPermission(FPlayer fPlayer, String permission) {

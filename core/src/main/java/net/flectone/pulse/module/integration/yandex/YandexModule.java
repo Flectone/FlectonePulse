@@ -34,13 +34,20 @@ public class YandexModule extends AbstractModule {
     public void onEnable() {
         registerModulePermission(permission);
 
-        loadLibraries();
+        try {
+            Class.forName("yandex.cloud.sdk.auth.Auth");
+        } catch (ClassNotFoundException e) {
+            loadLibraries();
+        }
 
         injector.getInstance(YandexIntegration.class).hook();
     }
 
     @Override
     public void onDisable() {
+        injector.getInstance(YandexIntegration.class).unhook();
+    }
+
     private void loadLibraries() {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("com{}yandex{}cloud")

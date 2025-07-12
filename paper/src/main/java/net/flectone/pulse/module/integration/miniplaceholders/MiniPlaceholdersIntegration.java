@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 // only for modern paper based servers
 public class MiniPlaceholdersIntegration implements FIntegration, MessageProcessor {
 
-    private final Pattern BRACES_PATTERN = Pattern.compile("\\{([^}]*)}");
+    private final Pattern bracesPattern = Pattern.compile("\\{([^}]*)}");
 
     private final FLogger fLogger;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
@@ -30,7 +30,12 @@ public class MiniPlaceholdersIntegration implements FIntegration, MessageProcess
 
     @Override
     public void hook() {
-        fLogger.info("MiniPlaceholders hooked");
+        fLogger.info("✔ MiniPlaceholders hooked");
+    }
+
+    @Override
+    public void unhook() {
+        fLogger.info("✖ MiniPlaceholders unhooked");
     }
 
     @Override
@@ -62,7 +67,7 @@ public class MiniPlaceholdersIntegration implements FIntegration, MessageProcess
     }
 
     public String replaceMiniPlaceholders(String text, TagResolver[] resolvers) {
-        Matcher matcher = BRACES_PATTERN.matcher(text);
+        Matcher matcher = bracesPattern.matcher(text);
         StringBuilder result = new StringBuilder();
         while (matcher.find()) {
             String content = matcher.group(1);

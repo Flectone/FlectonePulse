@@ -22,6 +22,12 @@ public class MiniMOTDIntegration implements FIntegration {
     @Override
     public void hook() {
         hooked = true;
-        fLogger.info("MiniMOTD hooked");
+        fLogger.info("✔ MiniMOTD hooked");
+    }
+
+    @Override
+    public void unhook() {
+        hooked = false;
+        fLogger.info("✖ MiniMOTD unhooked");
     }
 }

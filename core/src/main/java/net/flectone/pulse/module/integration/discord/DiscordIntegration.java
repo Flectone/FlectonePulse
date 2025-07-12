@@ -267,6 +267,16 @@ public class DiscordIntegration implements FIntegration {
         fLogger.info("Discord integration enabled");
     }
 
+    @Override
+    public void unhook() {
+        if (gateway == null) return;
+
+        gateway.logout().block();
+        webhooks.clear();
+
+        fLogger.info("Discord integration disabled");
+    }
+
     public void updateChannelInfo() {
         if (gateway == null) return;
 

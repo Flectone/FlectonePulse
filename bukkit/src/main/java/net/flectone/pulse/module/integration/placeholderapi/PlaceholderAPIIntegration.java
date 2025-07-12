@@ -58,15 +58,26 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
         return BuildConfig.PROJECT_VERSION;
     }
 
-    @Sync
     @Override
     public void hook() {
-        if (isRegistered()) {
-            unregister();
-        }
+        syncHook();
+        fLogger.info("✔ PlaceholderAPI hooked");
+    }
 
+    @Override
+    public void unhook() {
+        syncUnhook();
+        fLogger.info("✖ PlaceholderAPI unhooked");
+    }
+
+    @Sync
+    public void syncHook() {
         register();
-        fLogger.info("PlaceholderAPI hooked");
+    }
+
+    @Sync
+    public void syncUnhook() {
+        unregister();
     }
 
     @Override
@@ -126,7 +137,9 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
 
             message = PlaceholderAPI.setRelationalPlaceholders(offlinePlayer.getPlayer(), receiver, message);
 
-        } catch (NullPointerException | ClassCastException ignored) {}
+        } catch (NullPointerException | ClassCastException ignored) {
+            // ignore placeholderapi exceptions
+        }
 
         messageContext.setMessage(message);
     }

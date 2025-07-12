@@ -28,9 +28,14 @@ public class ItemsAdderIntegration implements FIntegration, MessageProcessor {
     @Override
     public void hook() {
         hooked = true;
-        fLogger.info("ItemsAdder hooked");
+        fLogger.info("✔ ItemsAdder hooked");
     }
 
+    @Override
+    public void unhook() {
+        hooked = false;
+        fLogger.info("✖ ItemsAdder unhooked");
+    }
 
     @Override
     public void process(MessageContext messageContext) {

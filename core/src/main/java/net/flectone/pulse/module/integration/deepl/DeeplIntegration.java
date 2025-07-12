@@ -40,9 +40,15 @@ public class DeeplIntegration implements FIntegration {
         try {
             client = new DeepLClient(integration.getAuthKey(), new DeepLClientOptions());
 
-            fLogger.info("Deepl integration enabled");
+            fLogger.info("✔ Deepl integration enabled");
         } catch (Exception e) {
             fLogger.warning(e);
         }
     }
+
+    @Override
+    public void unhook() {
+        fLogger.info("✖ Deepl integration disabled");
+    }
+
 }

@@ -33,6 +33,9 @@ public class PlasmoVoiceModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        plasmoVoiceIntegration.unhook();
+    }
+
     @Override
     protected boolean isConfigEnable() {
         return config.isEnable();

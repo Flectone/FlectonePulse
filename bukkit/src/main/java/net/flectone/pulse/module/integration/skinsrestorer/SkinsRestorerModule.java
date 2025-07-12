@@ -34,6 +34,9 @@ public class SkinsRestorerModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        skinsRestorerIntegration.unhook();
+    }
+
     @Override
     protected boolean isConfigEnable() {
         return config.isEnable();

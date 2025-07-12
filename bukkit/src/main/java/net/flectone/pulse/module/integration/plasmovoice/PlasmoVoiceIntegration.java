@@ -51,7 +51,12 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
 
     @Override
     public void hook() {
-        fLogger.info("PlasmoVoice hooked");
+        fLogger.info("✔ PlasmoVoice hooked");
+    }
+
+    @Override
+    public void unhook() {
+        fLogger.info("✖ PlasmoVoice unhooked");
     }
 
     @EventSubscribe

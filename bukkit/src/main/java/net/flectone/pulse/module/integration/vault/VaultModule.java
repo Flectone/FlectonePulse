@@ -35,6 +35,9 @@ public class VaultModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        vaultIntegration.unhook();
+    }
+
     @Override
     protected boolean isConfigEnable() {
         return integration.isEnable();

@@ -4,14 +4,13 @@ import com.alessiodp.libby.Library;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import lombok.SneakyThrows;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.LibraryResolver;
 import net.flectone.pulse.util.MessageTag;
 
@@ -45,12 +44,16 @@ public class TwitchModule extends AbstractModule {
         disconnect();
 
         injector.getInstance(TwitchIntegration.class).hook();
+
+        addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.isSetting(FPlayer.Setting.TWITCH));
+    }
+
     @Override
     public void onDisable() {
+        injector.getInstance(TwitchIntegration.class).unhook();
     }
 
     private void loadLibraries() {
-
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("com{}github{}philippheuer{}credentialmanager")
                 .artifactId("credentialmanager")
@@ -207,7 +210,7 @@ public class TwitchModule extends AbstractModule {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("io{}github{}openfeign")
                 .artifactId("feign-slf4j")
-                .version("13.4")
+                .version("13.6")
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -215,7 +218,7 @@ public class TwitchModule extends AbstractModule {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("io{}github{}openfeign")
                 .artifactId("feign-okhttp")
-                .version("13.4")
+                .version("13.6")
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -223,7 +226,7 @@ public class TwitchModule extends AbstractModule {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("io{}github{}openfeign")
                 .artifactId("feign-jackson")
-                .version("13.4")
+                .version("13.6")
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -231,7 +234,7 @@ public class TwitchModule extends AbstractModule {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("io{}github{}openfeign")
                 .artifactId("feign-hystrix")
-                .version("13.4")
+                .version("13.6")
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -247,7 +250,7 @@ public class TwitchModule extends AbstractModule {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("com{}fasterxml{}jackson{}core")
                 .artifactId("jackson-databind")
-                .version("2.18.0-rc1")
+                .version("2.19.1")
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -256,7 +259,7 @@ public class TwitchModule extends AbstractModule {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("com{}fasterxml{}jackson{}core")
                 .artifactId("jackson-annotations")
-                .version("2.18.0-rc1")
+                .version("2.19.1")
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -264,7 +267,7 @@ public class TwitchModule extends AbstractModule {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("com{}fasterxml{}jackson{}datatype")
                 .artifactId("jackson-datatype-jsr310")
-                .version("2.18.0-rc1")
+                .version("2.19.1")
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -280,7 +283,7 @@ public class TwitchModule extends AbstractModule {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("org{}jetbrains")
                 .artifactId("annotations")
-                .version("24.1.0")
+                .version("26.0.2")
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -296,7 +299,7 @@ public class TwitchModule extends AbstractModule {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("com{}squareup{}okhttp3")
                 .artifactId("okhttp")
-                .version("5.0.0-alpha.14")
+                .version("4.12.0")
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -312,7 +315,7 @@ public class TwitchModule extends AbstractModule {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("commons-io")
                 .artifactId("commons-io")
-                .version("2.17.0")
+                .version("2.19.0")
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -343,12 +346,5 @@ public class TwitchModule extends AbstractModule {
         if (checkModulePredicates(sender)) return;
 
         injector.getInstance(TwitchIntegration.class).sendMessage(sender, messageTag, twitchString);
-    }
-
-    @SneakyThrows
-    public void disconnect() {
-        if (!isEnable()) return;
-
-        injector.getInstance(TwitchIntegration.class).disconnect();
     }
 }

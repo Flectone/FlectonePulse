@@ -37,6 +37,7 @@ public class MiniMOTDModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        miniMOTDIntegration.unhook();
     }
 
     @Override

@@ -41,6 +41,9 @@ public class SimpleVoiceModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        simpleVoiceIntegration.unhook();
+    }
+
     @Override
     protected boolean isConfigEnable() {
         return config.isEnable();

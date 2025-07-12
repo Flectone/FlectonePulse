@@ -2,16 +2,15 @@ package net.flectone.pulse.module.integration.telegram;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.telegram.listener.MessageListener;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.SystemVariableResolver;
+import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.util.logging.FLogger;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethod;
@@ -45,11 +44,8 @@ public class TelegramIntegration implements FIntegration {
         this.messageListener = messageListener;
     }
 
-    @Async
     @Override
     public void hook() {
-        disconnect();
-
         String token = systemVariableResolver.substituteEnvVars(integration.getToken());
         if (token.isEmpty()) return;
 
@@ -58,9 +54,7 @@ public class TelegramIntegration implements FIntegration {
             this.botsApplication = botsApplication;
             botsApplication.registerBot(token, messageListener);
 
-            fLogger.info("Telegram integration enabled");
-
-            Thread.currentThread().join();
+            fLogger.info("✔ Telegram integration enabled");
 
         } catch (Exception e) {
             fLogger.warning(e);
@@ -68,6 +62,8 @@ public class TelegramIntegration implements FIntegration {
     }
 
     public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> telegramString) {
+        if (botsApplication == null) return;
+
         List<String> channels = integration.getMessageChannel().get(messageTag);
         if (channels == null) return;
         if (channels.isEmpty()) return;
@@ -94,7 +90,8 @@ public class TelegramIntegration implements FIntegration {
         }
     }
 
-    public void disconnect() {
+    @Override
+    public void unhook() {
         if (botsApplication == null) return;
 
         try {
@@ -102,6 +99,8 @@ public class TelegramIntegration implements FIntegration {
         } catch (Exception e) {
             fLogger.warning(e);
         }
+
+        fLogger.info("✖ Telegram integration disabled");
     }
 
     public void executeMethod(BotApiMethod<?> method) {

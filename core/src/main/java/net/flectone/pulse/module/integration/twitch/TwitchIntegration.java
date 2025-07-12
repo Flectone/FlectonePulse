@@ -8,16 +8,15 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import feign.Logger;
 import net.flectone.pulse.adapter.PlatformServerAdapter;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.twitch.listener.ChannelMessageListener;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.SystemVariableResolver;
+import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.List;
 import java.util.function.UnaryOperator;
@@ -50,11 +49,8 @@ public class TwitchIntegration implements FIntegration {
         this.fLogger = fLogger;
     }
 
-    @Async
     @Override
     public void hook() {
-        disconnect();
-
         String token = systemVariableResolver.substituteEnvVars(integration.getToken());
         String identityProvider = systemVariableResolver.substituteEnvVars(integration.getClientID());
         if (token.isEmpty() || identityProvider.isEmpty()) return;
@@ -93,7 +89,7 @@ public class TwitchIntegration implements FIntegration {
             twitchClient.getEventManager().onEvent(channelMessageListener.getEventType(), channelMessageListener::execute);
         }
 
-        fLogger.info("Twitch integration enabled");
+        fLogger.info("✔ Twitch integration enabled");
     }
 
     public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> twitchString) {
@@ -111,9 +107,12 @@ public class TwitchIntegration implements FIntegration {
         }
     }
 
-    public void disconnect() {
+    @Override
+    public void unhook() {
         if (twitchClient == null) return;
 
         twitchClient.close();
+
+        fLogger.info("✖ Twitch integration disabled");
     }
 }

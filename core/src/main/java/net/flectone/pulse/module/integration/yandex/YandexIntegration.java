@@ -52,9 +52,14 @@ public class YandexIntegration implements FIntegration {
                     .requestTimeout(Duration.ofMinutes(1))
                     .build();
 
-            fLogger.info("Yandex integration enabled");
+            fLogger.info("✔ Yandex integration enabled");
         } catch (Exception e) {
             fLogger.warning(e);
         }
+    }
+
+    @Override
+    public void unhook() {
+        fLogger.info("✖ Yandex integration disabled");
     }
 }

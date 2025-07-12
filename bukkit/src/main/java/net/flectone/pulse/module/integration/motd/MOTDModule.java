@@ -31,8 +31,13 @@ public class MOTDModule extends AbstractModule {
         registerModulePermission(permission);
 
         motdIntegration.hook();
+
+        statusModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseStatus() && isHooked());
+    }
+
     @Override
     public void onDisable() {
+        motdIntegration.unhook();
     }
 
     @Override

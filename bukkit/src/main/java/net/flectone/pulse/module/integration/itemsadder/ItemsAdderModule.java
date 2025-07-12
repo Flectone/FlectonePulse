@@ -31,8 +31,13 @@ public class ItemsAdderModule extends AbstractModule {
         registerModulePermission(permission);
 
         itemsAdderIntegration.hook();
+
+        messageProcessRegistry.register(30, itemsAdderIntegration);
+    }
+
     @Override
     public void onDisable() {
+        itemsAdderIntegration.unhook();
     }
 
     @Override

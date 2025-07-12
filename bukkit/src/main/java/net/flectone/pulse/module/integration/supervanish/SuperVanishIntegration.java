@@ -33,10 +33,14 @@ public class SuperVanishIntegration implements Listener, FIntegration {
         this.fLogger = fLogger;
     }
 
-
     @Override
     public void hook() {
-        fLogger.info("SuperVanish hooked");
+        fLogger.info("✔ SuperVanish hooked");
+    }
+
+    @Override
+    public void unhook() {
+        fLogger.info("✖ SuperVanish unhooked");
     }
 
     @EventHandler

@@ -22,6 +22,12 @@ public class MOTDIntegration implements FIntegration {
     @Override
     public void hook() {
         hooked = true;
-        fLogger.info("MOTD hooked");
+        fLogger.info("✔ MOTD hooked");
+    }
+
+    @Override
+    public void unhook() {
+        hooked = false;
+        fLogger.info("✖ MOTD unhooked");
     }
 }

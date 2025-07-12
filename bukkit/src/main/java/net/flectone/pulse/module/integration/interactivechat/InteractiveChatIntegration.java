@@ -34,8 +34,13 @@ public class InteractiveChatIntegration implements FIntegration, MessageProcesso
 
     @Override
     public void hook() {
-        fLogger.info("InteractiveChat hooked");
+        fLogger.info("✔ InteractiveChat hooked");
         fLogger.warning("If you are having problems with some messages not being displayed (such as advancements), this is a problem InteractiveChat and its packet changes");
+    }
+
+    @Override
+    public void unhook() {
+        fLogger.info("✖ InteractiveChat unhooked");
     }
 
     // from InteractiveChat

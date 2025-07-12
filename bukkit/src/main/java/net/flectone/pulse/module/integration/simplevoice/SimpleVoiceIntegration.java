@@ -55,7 +55,12 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
 
     @Override
     public void hook() {
-        fLogger.info("SimpleVoice hooked");
+        fLogger.info("✔ SimpleVoice hooked");
+    }
+
+    @Override
+    public void unhook() {
+        fLogger.info("✖ SimpleVoice unhooked");
     }
 
     private void onEntitySoundPacketEvent(EntitySoundPacketEvent event) {

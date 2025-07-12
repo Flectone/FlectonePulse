@@ -31,10 +31,15 @@ public class SkinsRestorerIntegration implements FIntegration {
         try {
             skinsRestorer = SkinsRestorerProvider.get();
 
-            fLogger.info("SkinsRestorer hooked");
+            fLogger.info("✔ SkinsRestorer hooked");
         } catch (IllegalStateException e) {
             fLogger.warning("SkinsRestorer hook is failed, check https://github.com/SkinsRestorer/SkinsRestorer/blob/dev/shared/src/main/resources/proxy_warning.txt");
         }
+    }
+
+    @Override
+    public void unhook() {
+        fLogger.info("✖ SkinsRestorer unhooked");
     }
 
     public String getTextureUrl(FPlayer fPlayer) {

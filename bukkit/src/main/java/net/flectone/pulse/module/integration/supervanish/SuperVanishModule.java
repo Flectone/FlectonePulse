@@ -42,6 +42,9 @@ public class SuperVanishModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        superVanishIntegration.unhook();
+    }
+
     @Override
     protected boolean isConfigEnable() {
         return config.isEnable();

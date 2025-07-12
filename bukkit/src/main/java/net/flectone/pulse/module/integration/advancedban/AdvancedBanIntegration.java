@@ -27,7 +27,13 @@ public class AdvancedBanIntegration implements FIntegration {
     @Override
     public void hook() {
         hooked = true;
-        fLogger.info("AdvancedBan hooked");
+        fLogger.info("✔ AdvancedBan hooked");
+    }
+
+    @Override
+    public void unhook() {
+        hooked = false;
+        fLogger.info("✖ AdvancedBan unhooked");
     }
 
     public boolean isMuted(FEntity fEntity) {
