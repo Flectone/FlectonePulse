@@ -613,7 +613,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
         private List<String> aliases = new ArrayList<>(List.of("spy"));
         private Map<String, List<String>> categories = new LinkedHashMap<>(){
             {
-                put("command", List.of("tell"));
+                put("command", List.of("tell", "anon"));
                 put("action", List.of("anvil", "book", "sign", "local"));
             }
         };
