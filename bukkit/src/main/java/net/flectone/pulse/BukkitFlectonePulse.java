@@ -8,24 +8,20 @@ import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import lombok.Setter;
 import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.database.Database;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.model.event.player.PlayerLoadEvent;
+import net.flectone.pulse.model.exception.ReloadException;
 import net.flectone.pulse.module.Module;
-import net.flectone.pulse.module.integration.discord.DiscordModule;
-import net.flectone.pulse.module.integration.telegram.TelegramModule;
-import net.flectone.pulse.module.integration.twitch.TwitchModule;
-import net.flectone.pulse.registry.CommandRegistry;
-import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.registry.*;
 import net.flectone.pulse.resolver.BukkitLibraryResolver;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.LibraryResolver;
+import net.flectone.pulse.scheduler.BukkitTaskScheduler;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MetricsService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.logging.FLogger;
-import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
-import net.megavex.scoreboardlibrary.api.objective.ObjectiveManager;
-import net.megavex.scoreboardlibrary.api.team.TeamManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Singleton
@@ -106,9 +102,6 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
     public void onDisable() {
         if (injector == null || disableSilently) return;
 
-        BukkitTaskScheduler taskScheduler = injector.getInstance(BukkitTaskScheduler.class);
-        taskScheduler.setDisabled(true);
-
         fLogger.logDisabling();
 
         if (injector.getInstance(FileResolver.class).getConfig().isMetrics()) {
@@ -126,17 +119,18 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         fPlayerService.clear();
 
-        injector.getInstance(ScoreboardLibrary.class).close();
-        injector.getInstance(Database.class).disconnect();
-        injector.getInstance(ObjectiveManager.class).close();
-        injector.getInstance(TeamManager.class).close();
+        BukkitTaskScheduler taskScheduler = injector.getInstance(BukkitTaskScheduler.class);
+        taskScheduler.setDisabled(true);
+
+        // disable all modules
+        injector.getInstance(Module.class).disable();
+
         injector.getInstance(ListenerRegistry.class).unregisterAll();
         PacketEvents.getAPI().terminate();
 
         injector.getInstance(ProxySender.class).disable();
 
-        // disable all modules
-        injector.getInstance(Module.class).disable();
+        injector.getInstance(Database.class).disconnect();
 
         taskScheduler.reload();
 
@@ -153,8 +147,13 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         injector.getInstance(InventoryController.class).closeAll();
 
+        // reload registries
+        injector.getInstance(CommandParserRegistry.class).reload();
         injector.getInstance(CommandRegistry.class).reload();
         injector.getInstance(ListenerRegistry.class).reload();
+        injector.getInstance(MessageProcessRegistry.class).reload();
+        injector.getInstance(PermissionRegistry.class).reload();
+
         EventProcessRegistry eventProcessRegistry = injector.getInstance(EventProcessRegistry.class);
         eventProcessRegistry.reload();
 
@@ -178,7 +177,10 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         }
 
         injector.getInstance(ProxySender.class).reload();
-        injector.getInstance(FPlayerService.class).reload();
+
+        FPlayerService fPlayerService = injector.getInstance(FPlayerService.class);
+        fPlayerService.reload();
+
         injector.getInstance(ModerationService.class).reload();
         injector.getInstance(Module.class).reloadWithChildren();
 
