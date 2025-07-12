@@ -25,7 +25,7 @@ import net.flectone.pulse.service.FPlayerService;
 import java.util.UUID;
 
 @Singleton
-public class BasePacketListener extends AbstractPacketListener {
+public class BasePacketListener implements PacketListener {
 
     private final FPlayerService fPlayerService;
     private final PacketSender packetSender;

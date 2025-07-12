@@ -1,41 +1,29 @@
 package net.flectone.pulse.module.message.death.listener;
 
+import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDeathCombatEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.listener.AbstractPacketListener;
 import net.flectone.pulse.module.message.death.DeathModule;
-import net.flectone.pulse.module.message.death.model.Death;
-import net.flectone.pulse.module.message.death.model.Item;
-import net.flectone.pulse.util.EntityUtil;
-import net.flectone.pulse.util.MinecraftTranslationKeys;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.TextDecoration;
 
 @Singleton
-public class DeathPacketListener extends AbstractPacketListener {
+public class DeathPacketListener implements PacketListener {
 
     private final DeathModule deathModule;
-    private final EntityUtil entityUtil;
 
     @Inject
-    public DeathPacketListener(DeathModule deathModule,
-                               EntityUtil entityUtil) {
+    public DeathPacketListener(DeathModule deathModule) {
         this.deathModule = deathModule;
-        this.entityUtil = entityUtil;
     }
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.isCancelled()) return;
         if (!deathModule.getMessage().isEnable()) return;
-
-        if (event.getPacketType() == PacketType.Play.Server.DEATH_COMBAT_EVENT) {
+        if (event.getPacketType() != PacketType.Play.Server.DEATH_COMBAT_EVENT) return;
 
             WrapperPlayServerDeathCombatEvent wrapperPlayServerDeathCombatEvent = new WrapperPlayServerDeathCombatEvent(event);
             if (wrapperPlayServerDeathCombatEvent.getDeathMessage() instanceof TranslatableComponent) {

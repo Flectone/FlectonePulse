@@ -1,16 +1,16 @@
 package net.flectone.pulse.module.message.format.world.listener;
 
+import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.listener.AbstractPacketListener;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton
-public class WorldPacketListener extends AbstractPacketListener {
+public class WorldPacketListener implements PacketListener {
 
     private final WorldModule worldModule;
     private final FPlayerService fPlayerService;

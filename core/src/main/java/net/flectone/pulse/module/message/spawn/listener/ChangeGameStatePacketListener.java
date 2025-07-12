@@ -1,16 +1,16 @@
 package net.flectone.pulse.module.message.spawn.listener;
 
+import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChangeGameState;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.listener.AbstractPacketListener;
 import net.flectone.pulse.module.message.spawn.SpawnModule;
 import net.flectone.pulse.util.MinecraftTranslationKeys;
 
 @Singleton
-public class ChangeGameStatePacketListener extends AbstractPacketListener {
+public class ChangeGameStatePacketListener implements PacketListener {
 
     private final SpawnModule spawnModule;
 

@@ -11,7 +11,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.status.StatusModule;
 
 @Singleton
-public class StatusPacketListener extends AbstractPacketListener {
+public class StatusPacketListener implements PacketListener {
 
     private final Command.Maintenance maintenance;
     private final StatusModule statusModule;

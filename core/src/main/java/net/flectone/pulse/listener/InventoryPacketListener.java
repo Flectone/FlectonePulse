@@ -1,5 +1,6 @@
 package net.flectone.pulse.listener;
 
+import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
@@ -11,7 +12,7 @@ import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.model.inventory.Inventory;
 
 @Singleton
-public class InventoryPacketListener extends AbstractPacketListener {
+public class InventoryPacketListener implements PacketListener {
 
     private final InventoryController inventoryController;
 
