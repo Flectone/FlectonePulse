@@ -74,6 +74,9 @@ public class SidebarModule extends AbstractModuleListMessage<Localization.Messag
         }
 
         listenerRegistry.register(SidebarPacketListener.class);
+    @Override
+    public void onDisable() {
+        fPlayerService.getFPlayers().forEach(this::remove);
     }
 
     @Override

@@ -30,7 +30,7 @@ public class SimpleVoiceModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         BukkitVoicechatService service = plugin.getServer().getServicesManager().load(BukkitVoicechatService.class);
@@ -40,6 +40,8 @@ public class SimpleVoiceModule extends AbstractModule {
         simpleVoiceIntegration.hook();
     }
 
+    @Override
+    public void onDisable() {
     @Override
     protected boolean isConfigEnable() {
         return config.isEnable();

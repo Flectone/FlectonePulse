@@ -32,12 +32,17 @@ public class TritonModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         bukkitListenerManager.register(TritonIntegration.class, EventPriority.NORMAL);
 
         tritonIntegration.hook();
+    }
+
+    @Override
+    public void onDisable() {
+        tritonIntegration.unhook();
     }
 
     @Override

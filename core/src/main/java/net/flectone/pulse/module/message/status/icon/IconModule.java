@@ -45,10 +45,15 @@ public class IconModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         initIcons();
+    }
+
+    @Override
+    public void onDisable() {
+        iconList.clear();
     }
 
     @Override
@@ -57,8 +62,6 @@ public class IconModule extends AbstractModule {
     }
 
     public void initIcons() {
-        iconList.clear();
-
         List<String> iconNames = message.getValues();
         if (iconNames.isEmpty()) return;
 

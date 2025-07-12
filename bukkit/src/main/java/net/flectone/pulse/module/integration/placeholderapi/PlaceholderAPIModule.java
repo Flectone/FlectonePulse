@@ -25,8 +25,12 @@ public class PlaceholderAPIModule extends AbstractModule {
                                 MessageProcessRegistry messageProcessRegistry) {
         this.placeholderAPIIntegration = placeholderAPIIntegration;
 
-        integration = fileResolver.getIntegration().getPlaceholderapi();
-        permission = fileResolver.getPermission().getIntegration().getPlaceholderapi();
+    @Override
+    public void onEnable() {
+        registerModulePermission(permission);
+        registerPermission(permission.getUse());
+
+        placeholderAPIIntegration.hook();
 
         messageProcessRegistry.register(10, messageContext -> {
             FEntity sender = messageContext.getSender();

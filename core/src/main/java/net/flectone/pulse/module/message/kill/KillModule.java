@@ -40,7 +40,7 @@ public class KillModule extends AbstractModuleMessage<Localization.Message.Kill>
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createSound(message.getSound(), permission.getSound());

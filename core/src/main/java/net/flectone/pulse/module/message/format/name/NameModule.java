@@ -53,7 +53,7 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
     }
 

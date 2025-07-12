@@ -30,9 +30,12 @@ public class InteractiveChatModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
         interactiveChatIntegration.hook();
+    @Override
+    public void onDisable() {
+        interactiveChatIntegration.unhook();
     }
 
     @Override

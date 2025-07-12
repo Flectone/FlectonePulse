@@ -33,7 +33,7 @@ public class MOTDModule extends AbstractModuleListMessage<Localization.Message.S
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
     }
 

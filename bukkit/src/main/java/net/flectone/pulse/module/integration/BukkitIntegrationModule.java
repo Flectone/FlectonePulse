@@ -49,6 +49,9 @@ public class BukkitIntegrationModule extends IntegrationModule {
         super(fileResolver, injector);
 
         this.injector = injector;
+    @Override
+    public void onEnable() {
+        super.onEnable();
 
         if (platformServerAdapter.hasProject("AdvancedBan")) {
             addChildren(AdvancedBanModule.class);

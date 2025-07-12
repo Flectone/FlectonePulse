@@ -60,10 +60,8 @@ public class ScoreboardModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
-        uuidTeamMap.values().forEach(this::sendRemovePacket);
-        uuidTeamMap.clear();
-        fPlayerService.getFPlayers().forEach(this::create);
+    public void onEnable() {
+        fPlayerService.getPlatformFPlayers().forEach(this::create);
 
         registerModulePermission(permission);
 
@@ -81,6 +79,9 @@ public class ScoreboardModule extends AbstractModule {
 
             }), ticker.getPeriod());
         }
+    @Override
+    public void onDisable() {
+        uuidTeamMap.clear();
     }
 
     public void create(FPlayer fPlayer) {

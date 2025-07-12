@@ -47,7 +47,7 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

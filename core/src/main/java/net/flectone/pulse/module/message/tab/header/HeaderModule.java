@@ -38,12 +38,15 @@ public class HeaderModule extends AbstractModuleListMessage<Localization.Message
 
     @Override
     public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         Ticker ticker = message.getTicker();
         if (ticker.isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::send), ticker.getPeriod());
         }
+    @Override
+    public void onDisable() {
     }
 
     public void send(FPlayer fPlayer) {

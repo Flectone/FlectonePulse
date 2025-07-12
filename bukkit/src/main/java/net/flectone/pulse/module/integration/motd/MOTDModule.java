@@ -29,10 +29,12 @@ public class MOTDModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         motdIntegration.hook();
+    @Override
+    public void onDisable() {
     }
 
     @Override

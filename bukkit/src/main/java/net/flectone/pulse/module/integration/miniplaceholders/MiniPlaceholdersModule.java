@@ -29,6 +29,12 @@ public class MiniPlaceholdersModule extends AbstractModule {
 
         integration = fileResolver.getIntegration().getMiniplaceholders();
         permission = fileResolver.getPermission().getIntegration().getMiniplaceholders();
+    @Override
+    public void onEnable() {
+        registerModulePermission(permission);
+        registerPermission(permission.getUse());
+
+        miniPlaceholdersIntegration.hook();
 
         messageProcessRegistry.register(180, messageContext -> {
             FEntity sender = messageContext.getSender();
@@ -49,6 +55,7 @@ public class MiniPlaceholdersModule extends AbstractModule {
         registerPermission(permission.getUse());
 
         miniPlaceholdersIntegration.hook();
+    public void onDisable() {
     }
 
     @Override

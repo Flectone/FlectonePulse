@@ -58,7 +58,7 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

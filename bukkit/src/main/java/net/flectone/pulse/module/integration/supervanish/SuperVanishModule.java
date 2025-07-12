@@ -34,7 +34,7 @@ public class SuperVanishModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         bukkitListenerManager.register(SuperVanishIntegration.class, EventPriority.NORMAL);
@@ -42,6 +42,8 @@ public class SuperVanishModule extends AbstractModule {
         superVanishIntegration.hook();
     }
 
+    @Override
+    public void onDisable() {
     @Override
     protected boolean isConfigEnable() {
         return config.isEnable();

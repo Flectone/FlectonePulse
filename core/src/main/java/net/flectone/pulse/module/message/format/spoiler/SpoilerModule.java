@@ -43,7 +43,7 @@ public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Fo
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
     }
 

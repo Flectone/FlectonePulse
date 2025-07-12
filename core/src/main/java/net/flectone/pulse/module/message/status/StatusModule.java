@@ -67,6 +67,9 @@ public class StatusModule extends AbstractModule {
 
         message = fileResolver.getMessage().getStatus();
         permission = fileResolver.getPermission().getMessage().getStatus();
+    @Override
+    public void onEnable() {
+        registerModulePermission(permission);
 
         addChildren(MOTDModule.class);
         addChildren(IconModule.class);

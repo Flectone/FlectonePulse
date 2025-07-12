@@ -16,7 +16,7 @@ public abstract class ObjectiveModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
     }
 

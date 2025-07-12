@@ -60,13 +60,16 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createSound(message.getSound(), permission.getSound());
 
         registerPermission(permission.getGroup());
         registerPermission(permission.getBypass());
+    @Override
+    public void onDisable() {
+        processedMentions.clear();
     }
 
     @Override

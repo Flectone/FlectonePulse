@@ -38,7 +38,7 @@ public class AutoModule extends AbstractModuleListMessage<Localization.Message.A
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         message.getTypes().forEach((key, value) -> {

@@ -30,8 +30,8 @@ public class BukkitJoinModule extends JoinModule {
 
 
     @Override
-    public void reload() {
-        super.reload();
+    public void onEnable() {
+        super.onEnable();
 
         bukkitListenerRegistry.register(JoinListener.class, EventPriority.NORMAL);
     }

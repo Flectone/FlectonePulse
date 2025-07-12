@@ -41,7 +41,7 @@ public class SpawnModule extends AbstractModuleMessage<Localization.Message.Spaw
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createSound(message.getSound(), permission.getSound());

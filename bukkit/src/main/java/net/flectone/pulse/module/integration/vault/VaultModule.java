@@ -29,12 +29,14 @@ public class VaultModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         vaultIntegration.hook();
     }
 
+    @Override
+    public void onDisable() {
     @Override
     protected boolean isConfigEnable() {
         return integration.isEnable();

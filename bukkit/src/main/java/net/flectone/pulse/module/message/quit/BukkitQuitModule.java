@@ -25,8 +25,8 @@ public class BukkitQuitModule extends QuitModule {
     }
 
     @Override
-    public void reload() {
-        super.reload();
+    public void onEnable() {
+        super.onEnable();
 
         bukkitListenerRegistry.register(QuitListener.class, EventPriority.NORMAL);
     }

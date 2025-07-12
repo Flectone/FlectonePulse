@@ -50,7 +50,7 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

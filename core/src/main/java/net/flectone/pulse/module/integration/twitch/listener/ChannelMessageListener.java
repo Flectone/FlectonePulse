@@ -62,7 +62,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
     }
 
     @Override
-    public void reload() {}
+    public void onEnable() {}
 
     @Override
     protected boolean isConfigEnable() {

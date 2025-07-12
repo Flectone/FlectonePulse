@@ -80,6 +80,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
     @Override
     public void reload() {
+    public void onEnable() {
         if (checkModulePredicates(FPlayer.UNKNOWN)) return;
 
         registerModulePermission(permission);

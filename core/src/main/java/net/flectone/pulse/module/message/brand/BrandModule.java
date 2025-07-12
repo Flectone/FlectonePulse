@@ -37,7 +37,7 @@ public class BrandModule extends AbstractModuleListMessage<Localization.Message.
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         Ticker ticker = message.getTicker();

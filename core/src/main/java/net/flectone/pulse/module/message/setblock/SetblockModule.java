@@ -39,7 +39,7 @@ public class SetblockModule extends AbstractModuleMessage<Localization.Message.S
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createSound(message.getSound(), permission.getSound());

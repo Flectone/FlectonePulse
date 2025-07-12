@@ -51,7 +51,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

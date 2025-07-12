@@ -25,7 +25,7 @@ public class VersionModule extends AbstractModuleMessage<Localization.Message.St
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
     }
 

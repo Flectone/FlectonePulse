@@ -59,9 +59,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     }
 
     @Override
-    public void reload() {
-        gameMap.clear();
-
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
@@ -79,6 +77,11 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                         .optional(promptUUID, UUIDParser.uuidParser())
                         .handler(this)
         );
+    }
+
+    @Override
+    public void onDisable() {
+        gameMap.clear();
     }
 
     @Override

@@ -63,7 +63,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
@@ -90,6 +90,11 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                         .permission(permission.getName())
                         .handler(commandContext -> executeMove(commandContext.sender(), commandContext))
         );
+    }
+
+    @Override
+    public void onDisable() {
+        tictactoeManager.clear();
     }
 
     @Override

@@ -57,7 +57,7 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         registerPermission(permission.getBypass());

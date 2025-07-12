@@ -39,7 +39,7 @@ public class DeopModule extends AbstractModuleMessage<Localization.Message.Deop>
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createSound(message.getSound(), permission.getSound());

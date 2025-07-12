@@ -44,7 +44,7 @@ public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

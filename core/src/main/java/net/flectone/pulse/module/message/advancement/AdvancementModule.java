@@ -61,7 +61,7 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createSound(message.getSound(), permission.getSound());

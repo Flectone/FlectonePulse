@@ -61,6 +61,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
 
     @Override
     public void reload() {
+    public void onEnable() {
         if (checkModulePredicates(FPlayer.UNKNOWN)) return;
 
         registerModulePermission(permission);

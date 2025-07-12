@@ -45,7 +45,7 @@ public class AnonModule extends AbstractModuleCommand<Localization.Command.Anon>
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

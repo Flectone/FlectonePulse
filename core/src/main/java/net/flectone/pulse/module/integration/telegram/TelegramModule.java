@@ -40,7 +40,7 @@ public class TelegramModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         loadLibraries();
@@ -48,6 +48,8 @@ public class TelegramModule extends AbstractModule {
         disconnect();
 
         injector.getInstance(TelegramIntegration.class).hook();
+    @Override
+    public void onDisable() {
     }
 
     private void loadLibraries() {

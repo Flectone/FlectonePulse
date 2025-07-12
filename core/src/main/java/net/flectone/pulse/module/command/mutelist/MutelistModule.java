@@ -69,6 +69,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
 
     @Override
     public void reload() {
+    public void onEnable() {
         if (checkModulePredicates(FPlayer.UNKNOWN)) return;
 
         registerModulePermission(permission);

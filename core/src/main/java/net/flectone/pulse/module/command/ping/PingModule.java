@@ -53,7 +53,7 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

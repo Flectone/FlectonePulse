@@ -72,14 +72,14 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> i
     }
 
     @Override
-    public void reload() {
-        playersCoordinates.clear();
-
+    public void onEnable() {
         registerModulePermission(permission);
 
         if (message.getTicker().isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::check), message.getTicker().getPeriod());
         }
+    public void onDisable() {
+        playersCoordinates.clear();
     }
 
     @Override

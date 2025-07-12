@@ -57,7 +57,7 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         Ticker ticker = message.getTicker();

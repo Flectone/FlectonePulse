@@ -37,8 +37,7 @@ public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit>
     }
 
     @Override
-    public void reload() {
-
+    public void onEnable() {
         registerModulePermission(permission);
 
         createSound(message.getSound(), permission.getSound());

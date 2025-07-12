@@ -62,7 +62,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

@@ -52,7 +52,7 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
         registerPermission(permission.getBypass());
     }

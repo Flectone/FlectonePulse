@@ -20,6 +20,9 @@ public class TabModule extends AbstractModule {
     public TabModule(FileResolver fileResolver) {
         message = fileResolver.getMessage().getTab();
         permission = fileResolver.getPermission().getMessage().getTab();
+    @Override
+    public void onEnable() {
+        registerModulePermission(permission);
 
         addChildren(FooterModule.class);
         addChildren(HeaderModule.class);

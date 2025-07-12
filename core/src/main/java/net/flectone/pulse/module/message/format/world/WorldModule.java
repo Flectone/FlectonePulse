@@ -56,7 +56,7 @@ public class WorldModule extends AbstractModule implements MessageProcessor {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         listenerRegistry.register(WorldPacketListener.class);

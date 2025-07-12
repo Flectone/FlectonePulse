@@ -48,7 +48,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

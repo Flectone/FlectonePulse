@@ -48,7 +48,7 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createSound(message.getSound(), permission.getSound());

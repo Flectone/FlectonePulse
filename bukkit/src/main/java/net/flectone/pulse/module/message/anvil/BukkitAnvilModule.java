@@ -29,8 +29,8 @@ public class BukkitAnvilModule extends AnvilModule {
     }
 
     @Override
-    public void reload() {
-        super.reload();
+    public void onEnable() {
+        super.onEnable();
 
         bukkitListenerManager.register(AnvilListener.class, EventPriority.NORMAL);
     }

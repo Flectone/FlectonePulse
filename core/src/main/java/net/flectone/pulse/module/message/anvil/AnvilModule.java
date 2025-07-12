@@ -19,7 +19,7 @@ public abstract class AnvilModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
     }
 

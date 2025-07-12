@@ -33,7 +33,7 @@ public class FloodModule extends AbstractModule implements MessageProcessor {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
     }
 

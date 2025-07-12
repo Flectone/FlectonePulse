@@ -36,6 +36,8 @@ public class LuckPermsModule extends AbstractModule {
     }
 
     @Override
+    public void onDisable() {
+    @Override
     protected boolean isConfigEnable() {
         return integration.isEnable();
     }

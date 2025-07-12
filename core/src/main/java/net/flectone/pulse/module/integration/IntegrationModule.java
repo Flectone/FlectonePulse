@@ -28,19 +28,15 @@ public abstract class IntegrationModule extends AbstractModule {
                              Injector injector) {
         this.injector = injector;
 
-        integration = fileResolver.getIntegration();
-        permission = fileResolver.getPermission().getIntegration();
+    @Override
+    public void onEnable() {
+        registerModulePermission(permission);
 
         addChildren(DeeplModule.class);
         addChildren(DiscordModule.class);
         addChildren(TelegramModule.class);
         addChildren(TwitchModule.class);
         addChildren(YandexModule.class);
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
     }
 
     @Override

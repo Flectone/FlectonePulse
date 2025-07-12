@@ -33,7 +33,7 @@ public abstract class ChatModule extends AbstractModuleMessage<Localization.Mess
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         message.getTypes().forEach((key, value) -> {
@@ -44,6 +44,12 @@ public abstract class ChatModule extends AbstractModuleMessage<Localization.Mess
             cooldownMap.put(key, createCooldown(value.getCooldown(), permissions.getCooldownBypass()));
             soundMap.put(key, createSound(value.getSound(), permissions.getSound()));
         });
+    }
+
+    @Override
+    public void onDisable() {
+        cooldownMap.clear();
+        soundMap.clear();
     }
 
     @Override

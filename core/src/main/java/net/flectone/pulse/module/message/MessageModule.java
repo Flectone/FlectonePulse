@@ -47,6 +47,9 @@ public class MessageModule extends AbstractModule {
     public MessageModule(FileResolver fileResolver) {
         message = fileResolver.getMessage();
         permission = fileResolver.getPermission().getMessage();
+    @Override
+    public void onEnable() {
+        registerModulePermission(permission);
 
         addChildren(AdvancementModule.class);
         addChildren(AfkModule.class);
@@ -78,11 +81,6 @@ public class MessageModule extends AbstractModule {
         addChildren(SpawnModule.class);
         addChildren(StatusModule.class);
         addChildren(TabModule.class);
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
     }
 
     @Override

@@ -31,7 +31,9 @@ public abstract class AbstractModule {
         addPredicate(fPlayer -> !permissionChecker.check(fPlayer, modulePermission));
     }
 
-    public abstract void reload();
+    public abstract void onEnable();
+
+    public void onDisable() {}
 
     protected abstract boolean isConfigEnable();
 
@@ -76,6 +78,10 @@ public abstract class AbstractModule {
         reloadWithChildren(this.getClass(), AbstractModule::isConfigEnable);
     }
 
+    public void disable() {
+        reloadWithChildren(this.getClass(), module -> false);
+    }
+
     private Map<String, String> collectModuleStatuses(Class<? extends AbstractModule> clazz) {
         AbstractModule module = injector.getInstance(clazz);
 
@@ -92,10 +98,15 @@ public abstract class AbstractModule {
 
     private void reloadWithChildren(Class<? extends AbstractModule> clazz, Predicate<AbstractModule> predicate) {
         AbstractModule module = injector.getInstance(clazz);
-        module.setEnable(predicate.test(module));
-
         if (module.isEnable()) {
-            module.reload();
+            module.onDisable();
+        }
+
+        boolean isEnabled = predicate.test(module);
+        module.setEnable(isEnabled);
+
+        if (isEnabled) {
+            module.onEnable();
             module.getChildren().forEach(subModule -> reloadWithChildren(subModule, AbstractModule::isConfigEnable));
         } else {
             module.getChildren().forEach(subModule -> reloadWithChildren(subModule, m -> false));

@@ -20,6 +20,9 @@ public class Module extends AbstractModule {
         config = fileResolver.getConfig().getModule();
         permission = fileResolver.getPermission();
 
+    @Override
+    public void onEnable() {
+        registerModulePermission(permission.getModule());
         addChildren(CommandModule.class);
         addChildren(IntegrationModule.class);
         addChildren(MessageModule.class);

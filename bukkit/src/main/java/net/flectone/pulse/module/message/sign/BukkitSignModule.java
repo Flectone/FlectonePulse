@@ -23,8 +23,8 @@ public class BukkitSignModule extends SignModule {
     }
 
     @Override
-    public void reload() {
-        super.reload();
+    public void onEnable() {
+        super.onEnable();
 
         bukkitListenerManager.register(SignListener.class, EventPriority.NORMAL);
     }

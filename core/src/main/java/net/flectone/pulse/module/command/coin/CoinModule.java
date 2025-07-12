@@ -50,7 +50,7 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

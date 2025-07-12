@@ -27,8 +27,8 @@ public class BukkitBubbleModule extends BubbleModule {
     }
 
     @Override
-    public void reload() {
-        super.reload();
+    public void onEnable() {
+        super.onEnable();
 
         if (!chatModule.isEnable()) {
             bukkitListenerRegistry.register(BubbleListener.class, EventPriority.MONITOR);

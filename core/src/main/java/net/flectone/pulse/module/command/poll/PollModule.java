@@ -74,7 +74,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
@@ -138,6 +138,11 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
             toRemove.forEach(pollMap::remove);
         }, 20L);
+    }
+
+    @Override
+    public void onDisable() {
+        pollMap.clear();
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> mapSuggestion() {

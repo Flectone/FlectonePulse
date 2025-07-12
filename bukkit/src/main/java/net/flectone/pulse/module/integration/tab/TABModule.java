@@ -34,6 +34,9 @@ public class TABModule extends AbstractModule {
         permission = fileResolver.getPermission().getIntegration().getTAB();
 
         this.tabIntegration = tabIntegration;
+    @Override
+    public void onEnable() {
+        registerModulePermission(permission);
 
         headerModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseHeader() && isHooked());
         footerModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseFooter() && isHooked());

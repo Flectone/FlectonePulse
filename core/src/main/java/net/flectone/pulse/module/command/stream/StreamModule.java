@@ -71,7 +71,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

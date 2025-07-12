@@ -39,7 +39,7 @@ public class GamemodeModule extends AbstractModuleMessage<Localization.Message.G
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createSound(message.getSound(), permission.getSound());

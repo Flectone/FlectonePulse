@@ -60,6 +60,9 @@ public class CommandModule extends AbstractModule {
     public CommandModule(FileResolver fileResolver) {
         command = fileResolver.getCommand();
         permission = fileResolver.getPermission().getCommand();
+    @Override
+    public void onEnable() {
+        registerModulePermission(permission);
 
         addChildren(AfkModule.class);
         addChildren(AnonModule.class);
@@ -104,11 +107,6 @@ public class CommandModule extends AbstractModule {
         addChildren(UnwarnModule.class);
         addChildren(WarnModule.class);
         addChildren(WarnlistModule.class);
-    }
-
-    @Override
-    public void reload() {
-        registerModulePermission(permission);
     }
 
     @Override

@@ -64,7 +64,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

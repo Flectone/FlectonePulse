@@ -53,7 +53,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

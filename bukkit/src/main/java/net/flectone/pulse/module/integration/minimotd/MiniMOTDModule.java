@@ -29,10 +29,12 @@ public class MiniMOTDModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         miniMOTDIntegration.hook();
+    @Override
+    public void onDisable() {
     }
 
     @Override

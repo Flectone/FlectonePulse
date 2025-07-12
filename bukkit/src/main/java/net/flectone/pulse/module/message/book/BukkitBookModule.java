@@ -23,8 +23,8 @@ public class BukkitBookModule extends BookModule {
     }
 
     @Override
-    public void reload() {
-        super.reload();
+    public void onEnable() {
+        super.onEnable();
 
         bukkitListenerManager.register(BookListener.class, EventPriority.NORMAL);
     }

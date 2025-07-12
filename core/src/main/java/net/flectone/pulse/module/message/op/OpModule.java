@@ -39,7 +39,7 @@ public class OpModule extends AbstractModuleMessage<Localization.Message.Op> {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createSound(message.getSound(), permission.getSound());

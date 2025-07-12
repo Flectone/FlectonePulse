@@ -84,7 +84,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

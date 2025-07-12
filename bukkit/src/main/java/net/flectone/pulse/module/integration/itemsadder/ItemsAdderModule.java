@@ -29,10 +29,12 @@ public class ItemsAdderModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         itemsAdderIntegration.hook();
+    @Override
+    public void onDisable() {
     }
 
     @Override

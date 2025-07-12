@@ -80,7 +80,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
     }
 
     @Override
-    public void reload() {}
+    public void onEnable() {}
 
     @Override
     protected boolean isConfigEnable() {

@@ -61,7 +61,7 @@ public class LiteBansModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         liteBansIntegration.hook();

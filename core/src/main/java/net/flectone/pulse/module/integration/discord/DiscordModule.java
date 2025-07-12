@@ -44,7 +44,7 @@ public class DiscordModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         loadLibraries();
@@ -57,6 +57,11 @@ public class DiscordModule extends AbstractModule {
         } catch (Exception e) {
             fLogger.warning(e);
         }
+    }
+
+    @Override
+    public void onDisable() {
+        injector.getInstance(DiscordIntegration.class).unhook();
     }
 
     private void loadLibraries() {

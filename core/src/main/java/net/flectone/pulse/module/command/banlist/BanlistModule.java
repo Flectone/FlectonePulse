@@ -69,6 +69,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
 
     @Override
     public void reload() {
+    public void onEnable() {
         if (checkModulePredicates(FPlayer.UNKNOWN)) return;
 
         registerModulePermission(permission);

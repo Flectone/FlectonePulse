@@ -43,8 +43,8 @@ public class BukkitSpyModule extends SpyModule {
     }
 
     @Override
-    public void reload() {
-        super.reload();
+    public void onEnable() {
+        super.onEnable();
 
         bukkitListenerManager.register(SpyListener.class, EventPriority.NORMAL);
     }

@@ -63,8 +63,8 @@ public class BukkitChatModule extends ChatModule {
     }
 
     @Override
-    public void reload() {
-        super.reload();
+    public void onEnable() {
+        super.onEnable();
 
         bukkitListenerManager.register(ChatListener.class, EventPriority.HIGHEST);
     }

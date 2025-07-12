@@ -33,7 +33,7 @@ public class MessageListener extends EventListener {
     }
 
     @Override
-    public void reload() {}
+    public void onEnable() {}
 
     @Override
     protected boolean isConfigEnable() {

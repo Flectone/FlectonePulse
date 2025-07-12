@@ -61,6 +61,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
 
     @Override
     public void reload() {
+    public void onEnable() {
         if (checkModulePredicates(FPlayer.UNKNOWN)) return;
 
         registerModulePermission(permission);

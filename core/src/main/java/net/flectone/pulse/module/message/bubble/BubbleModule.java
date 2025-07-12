@@ -29,10 +29,13 @@ public class BubbleModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
-        bubbleService.reload();
+    public void onEnable() {
+        bubbleService.startTicker();
 
         registerModulePermission(permission);
+    @Override
+    public void onDisable() {
+        bubbleService.clear();
     }
 
     @Override

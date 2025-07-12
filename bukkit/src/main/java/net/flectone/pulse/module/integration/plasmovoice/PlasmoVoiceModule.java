@@ -26,13 +26,15 @@ public class PlasmoVoiceModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         PlasmoVoiceServer.getAddonsLoader().load(plasmoVoiceIntegration);
         plasmoVoiceIntegration.hook();
     }
 
+    @Override
+    public void onDisable() {
     @Override
     protected boolean isConfigEnable() {
         return config.isEnable();

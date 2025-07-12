@@ -39,7 +39,7 @@ public class SeedModule extends AbstractModuleMessage<Localization.Message.Seed>
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         createSound(message.getSound(), permission.getSound());

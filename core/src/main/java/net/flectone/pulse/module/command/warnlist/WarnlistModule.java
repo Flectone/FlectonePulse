@@ -67,6 +67,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
 
     @Override
     public void reload() {
+    public void onEnable() {
         if (checkModulePredicates(FPlayer.UNKNOWN)) return;
 
         registerModulePermission(permission);

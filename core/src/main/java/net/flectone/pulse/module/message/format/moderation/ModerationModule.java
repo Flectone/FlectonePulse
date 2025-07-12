@@ -21,6 +21,9 @@ public class ModerationModule extends AbstractModule {
     public ModerationModule(FileResolver fileResolver) {
         message = fileResolver.getMessage().getFormat().getModeration();
         permission = fileResolver.getPermission().getMessage().getFormat().getModeration();
+    @Override
+    public void onEnable() {
+        registerModulePermission(permission);
 
         addChildren(CapsModule.class);
         addChildren(NewbieModule.class);

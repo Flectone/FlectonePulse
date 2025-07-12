@@ -50,15 +50,15 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
 
         this.messagePipeline = messagePipeline;
 
-        message = fileResolver.getMessage().getFormat().getTranslate();
-        permission = fileResolver.getPermission().getMessage().getFormat().getTranslate();
+    @Override
+    public void onEnable() {
+        registerModulePermission(permission);
 
         messageProcessRegistry.register(100, this);
     }
 
     @Override
-    public void reload() {
-        registerModulePermission(permission);
+    public void onDisable() {
         messageCache.invalidateAll();
     }
 

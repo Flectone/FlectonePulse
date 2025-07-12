@@ -33,7 +33,7 @@ public class YandexModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         loadLibraries();
@@ -41,6 +41,8 @@ public class YandexModule extends AbstractModule {
         injector.getInstance(YandexIntegration.class).hook();
     }
 
+    @Override
+    public void onDisable() {
     private void loadLibraries() {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("com{}yandex{}cloud")

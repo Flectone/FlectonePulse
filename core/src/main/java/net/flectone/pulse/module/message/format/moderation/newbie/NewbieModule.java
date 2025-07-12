@@ -34,7 +34,7 @@ public class NewbieModule extends AbstractModuleMessage<Localization.Message.For
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
         registerPermission(permission.getBypass());
     }

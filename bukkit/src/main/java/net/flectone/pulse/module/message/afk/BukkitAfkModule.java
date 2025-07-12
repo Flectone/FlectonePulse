@@ -35,6 +35,8 @@ public class BukkitAfkModule extends AfkModule {
     @Override
     public void reload() {
         super.reload();
+    public void onEnable() {
+        super.onEnable();
 
         bukkitListenerManager.register(AfkListener.class, EventPriority.NORMAL);
     }

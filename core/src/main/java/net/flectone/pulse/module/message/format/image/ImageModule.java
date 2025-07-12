@@ -50,16 +50,16 @@ public class ImageModule extends AbstractModule implements MessageProcessor {
 
         this.messagePipeline = messagePipeline;
 
-        message = fileResolver.getMessage().getFormat().getImage();
-        permission = fileResolver.getPermission().getMessage().getFormat().getImage();
+    @Override
+    public void onEnable() {
+        registerModulePermission(permission);
 
         messageProcessRegistry.register(100, this);
     }
 
     @Override
-    public void reload() {
+    public void onDisable() {
         imageCache.invalidateAll();
-        registerModulePermission(permission);
     }
 
     @Override

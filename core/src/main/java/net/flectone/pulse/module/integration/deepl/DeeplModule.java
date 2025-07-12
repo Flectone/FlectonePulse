@@ -33,12 +33,17 @@ public class DeeplModule extends AbstractModule {
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         loadLibraries();
 
         injector.getInstance(DeeplIntegration.class).hook();
+    }
+
+    @Override
+    public void onDisable() {
+        injector.getInstance(DeeplIntegration.class).unhook();
     }
 
     private void loadLibraries() {

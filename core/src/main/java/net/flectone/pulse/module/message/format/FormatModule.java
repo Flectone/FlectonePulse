@@ -98,7 +98,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
     }
 
     @Override
-    public void reload() {
+    public void onEnable() {
         registerModulePermission(permission);
 
         message.getTags().forEach((key, value) -> {
@@ -128,6 +128,9 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         putKyoriTag(TagType.NBT, StandardTags.nbt());
         putKyoriTag(TagType.PRIDE, StandardTags.pride());
         putKyoriTag(TagType.SHADOW_COLOR, StandardTags.shadowColor());
+    @Override
+    public void onDisable() {
+        tagResolverMap.clear();
     }
 
     @Override
