@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.command.ignore.model;
+package net.flectone.pulse.model;
 
 import org.jdbi.v3.core.mapper.reflect.ColumnName;
 

@@ -1,6 +1,6 @@
 package net.flectone.pulse.database.sql;
 
-import net.flectone.pulse.module.command.ignore.model.Ignore;
+import net.flectone.pulse.model.Ignore;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;

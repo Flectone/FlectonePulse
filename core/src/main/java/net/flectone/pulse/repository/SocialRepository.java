@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.database.dao.IgnoreDAO;
 import net.flectone.pulse.database.dao.MailDAO;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.command.ignore.model.Ignore;
+import net.flectone.pulse.model.Ignore;
 import net.flectone.pulse.model.Mail;
 
 import java.util.List;
