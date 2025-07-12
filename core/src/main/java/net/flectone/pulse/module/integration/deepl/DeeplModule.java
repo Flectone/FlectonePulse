@@ -34,7 +34,11 @@ public class DeeplModule extends AbstractModule {
     public void onEnable() {
         registerModulePermission(permission);
 
-        loadLibraries();
+        try {
+            Class.forName("com.deepl.api.DeepLClient");
+        } catch (ClassNotFoundException e) {
+            loadLibraries();
+        }
 
         injector.getInstance(DeeplIntegration.class).hook();
     }

@@ -42,7 +42,11 @@ public class DiscordModule extends AbstractModule {
     public void onEnable() {
         registerModulePermission(permission);
 
-        loadLibraries();
+        try {
+            Class.forName("discord4j.core.DiscordClient");
+        } catch (ClassNotFoundException e) {
+            loadLibraries();
+        }
 
         addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.isSetting(FPlayer.Setting.DISCORD));
 

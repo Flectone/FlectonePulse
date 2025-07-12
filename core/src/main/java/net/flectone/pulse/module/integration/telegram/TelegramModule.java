@@ -40,9 +40,11 @@ public class TelegramModule extends AbstractModule {
     public void onEnable() {
         registerModulePermission(permission);
 
-        loadLibraries();
-
-        disconnect();
+        try {
+            Class.forName("org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient");
+        } catch (ClassNotFoundException e) {
+            loadLibraries();
+        }
 
         injector.getInstance(TelegramIntegration.class).hook();
 

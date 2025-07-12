@@ -39,9 +39,11 @@ public class TwitchModule extends AbstractModule {
     public void onEnable() {
         registerModulePermission(permission);
 
-        loadLibraries();
-
-        disconnect();
+        try {
+            Class.forName("com.github.twitch4j.TwitchClient");
+        } catch (ClassNotFoundException e) {
+            loadLibraries();
+        }
 
         injector.getInstance(TwitchIntegration.class).hook();
 
