@@ -54,8 +54,16 @@ public class FooterModule extends AbstractModuleListMessage<Localization.Message
         if (ticker.isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::send), ticker.getPeriod());
         }
+
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, this::send);
+    }
+
     @Override
     public void onDisable() {
+        Destination.Type destinationType = message.getDestination().getType();
+        if (destinationType == Destination.Type.TAB_HEADER || destinationType == Destination.Type.TAB_FOOTER) {
+            packetSender.send(new WrapperPlayServerPlayerListHeaderAndFooter(Component.empty(), Component.empty()));
+        }
     }
 
     public void send(FPlayer fPlayer) {

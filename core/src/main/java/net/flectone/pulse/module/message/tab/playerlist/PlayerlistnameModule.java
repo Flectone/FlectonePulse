@@ -63,16 +63,20 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
     public void onEnable() {
         registerModulePermission(permission);
 
+        fPlayerService.getPlatformFPlayers().forEach(this::send);
+
         Ticker ticker = message.getTicker();
         if (ticker.isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::send), ticker.getPeriod());
         }
+
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, fPlayer -> update());
     }
 
     public void update() {
         if (!isEnable()) return;
 
-        fPlayerService.getFPlayers().stream().filter(FPlayer::isOnline).forEach(this::send);
+        fPlayerService.getPlatformFPlayers().forEach(this::send);
     }
 
     public void send(FPlayer fPlayer) {

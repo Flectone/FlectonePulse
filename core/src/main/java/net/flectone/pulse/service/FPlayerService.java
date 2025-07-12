@@ -213,6 +213,12 @@ public class FPlayerService {
         return fPlayerRepository.getOnlinePlayers();
     }
 
+    public List<FPlayer> getPlatformFPlayers() {
+        return fPlayerRepository.getOnlinePlayers().stream()
+                .filter(platformPlayerAdapter::isOnline)
+                .toList();
+    }
+
     public List<FPlayer> getFPlayersWithConsole() {
         return fPlayerRepository.getOnlineFPlayersWithConsole();
     }

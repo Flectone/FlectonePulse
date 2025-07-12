@@ -47,8 +47,9 @@ public class HeaderModule extends AbstractModuleListMessage<Localization.Message
     }
 
     @Override
-    public void reload() {
     public void onEnable() {
+        fPlayerService.getPlatformFPlayers().forEach(this::send);
+
         registerModulePermission(permission);
 
         Ticker ticker = message.getTicker();
@@ -61,6 +62,10 @@ public class HeaderModule extends AbstractModuleListMessage<Localization.Message
 
     @Override
     public void onDisable() {
+        Destination.Type destinationType = message.getDestination().getType();
+        if (destinationType == Destination.Type.TAB_HEADER || destinationType == Destination.Type.TAB_FOOTER) {
+            packetSender.send(new WrapperPlayServerPlayerListHeaderAndFooter(Component.empty(), Component.empty()));
+        }
     }
 
     public void send(FPlayer fPlayer) {

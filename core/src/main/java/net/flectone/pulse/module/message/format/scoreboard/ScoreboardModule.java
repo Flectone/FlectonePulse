@@ -86,25 +86,25 @@ public class ScoreboardModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        uuidTeamMap.values().forEach(this::sendRemovePacket);
         uuidTeamMap.clear();
     }
 
     public void create(FPlayer fPlayer) {
-        removeTeam(fPlayer);
-
-        // skip proxy players
-        if (!platformPlayerAdapter.isOnline(fPlayer)) return;
+        if (checkModulePredicates(fPlayer)) return;
 
         Team team = createTeam(fPlayer);
         sendCreatePacket(team);
         uuidTeamMap.put(fPlayer.getUuid(), team);
 
-        uuidTeamMap.forEach((uuid, cacheTeam) -> {
-            packetSender.send(fPlayer, new WrapperPlayServerTeams(cacheTeam.name(), WrapperPlayServerTeams.TeamMode.CREATE, cacheTeam.info(), List.of(cacheTeam.owner())));
-        });
+        uuidTeamMap.forEach((uuid, cacheTeam) ->
+                packetSender.send(fPlayer, new WrapperPlayServerTeams(cacheTeam.name(), WrapperPlayServerTeams.TeamMode.CREATE, cacheTeam.info(), List.of(cacheTeam.owner())))
+        );
     }
 
-    private void removeTeam(FPlayer fPlayer) {
+    public void remove(FPlayer fPlayer) {
+        if (checkModulePredicates(fPlayer)) return;
+
         Team team = uuidTeamMap.get(fPlayer.getUuid());
         if (team == null) return;
 
