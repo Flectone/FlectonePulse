@@ -144,10 +144,10 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
     }
 
     @Override
-    public void reload() throws Exception {
+    public void reload() throws ReloadException {
         if (injector == null) return;
 
-        Exception reloadException = null;
+        ReloadException reloadException = null;
 
         fLogger.logReloading();
 
@@ -162,7 +162,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         try {
             fileResolver.reload();
         } catch (Exception e) {
-            reloadException = e;
+            reloadException = new ReloadException(e.getMessage(), e);
         }
 
         fLogger.reload(fileResolver.getConfig().getLogFilter());
@@ -171,7 +171,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
             injector.getInstance(Database.class).disconnect();
             injector.getInstance(Database.class).connect();
         } catch (Exception e) {
-            reloadException = e;
+            reloadException = new ReloadException(e.getMessage(), e);
         }
 
         injector.getInstance(ProxySender.class).reload();

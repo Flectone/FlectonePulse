@@ -2,21 +2,21 @@ package net.flectone.pulse.scheduler;
 
 public interface TaskScheduler {
 
-    void runAsync(RunnableException runnable);
+    void runAsync(SchedulerRunnable runnable);
 
-    void runAsyncTimer(RunnableException runnable, long tick, long period);
+    void runAsyncTimer(SchedulerRunnable runnable, long tick, long period);
 
-    void runAsyncTimer(RunnableException runnable, long tick);
+    void runAsyncTimer(SchedulerRunnable runnable, long tick);
 
-    void runAsyncLater(RunnableException runnable, long tick);
+    void runAsyncLater(SchedulerRunnable runnable, long tick);
 
-    void runSync(RunnableException runnable);
+    void runSync(SchedulerRunnable runnable);
 
-    void runSyncTimer(RunnableException runnable, long tick, long period);
+    void runSyncTimer(SchedulerRunnable runnable, long tick, long period);
 
-    void runSyncTimer(RunnableException runnable, long tick);
+    void runSyncTimer(SchedulerRunnable runnable, long tick);
 
-    void runSyncLater(RunnableException runnable, long tick);
+    void runSyncLater(SchedulerRunnable runnable, long tick);
 
     void reload();
 

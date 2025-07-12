@@ -26,9 +26,8 @@ public class BukkitTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runAsync(RunnableException runnable) {
+    public void runAsync(SchedulerRunnable runnable) {
         if (disabled) {
-            runSync(runnable);
             return;
         }
 
@@ -44,9 +43,8 @@ public class BukkitTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runAsyncTimer(RunnableException runnable, long tick, long period) {
+    public void runAsyncTimer(SchedulerRunnable runnable, long tick, long period) {
         if (disabled) {
-            runSyncTimer(runnable, tick, period);
             return;
         }
 
@@ -62,14 +60,13 @@ public class BukkitTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runAsyncTimer(RunnableException runnable, long tick) {
+    public void runAsyncTimer(SchedulerRunnable runnable, long tick) {
         runAsyncTimer(runnable, tick, tick);
     }
 
     @Override
-    public void runAsyncLater(RunnableException runnable, long tick) {
+    public void runAsyncLater(SchedulerRunnable runnable, long tick) {
         if (disabled) {
-            runSyncLater(runnable, tick);
             return;
         }
 
@@ -86,6 +83,7 @@ public class BukkitTaskScheduler implements TaskScheduler {
 
     @Override
     public void runSync(RunnableException runnable) {
+    public void runSync(SchedulerRunnable runnable) {
         taskScheduler.runTask(() -> {
             try {
                 runnable.run();
@@ -99,6 +97,7 @@ public class BukkitTaskScheduler implements TaskScheduler {
 
     @Override
     public void runSyncTimer(RunnableException runnable, long tick, long period) {
+    public void runSyncTimer(SchedulerRunnable runnable, long tick, long period) {
         taskScheduler.runTaskTimer(() -> {
             try {
                 runnable.run();
@@ -111,12 +110,13 @@ public class BukkitTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runSyncTimer(RunnableException runnable, long tick) {
+    public void runSyncTimer(SchedulerRunnable runnable, long tick) {
         runSyncTimer(runnable, tick, tick);
     }
 
     @Override
     public void runSyncLater(RunnableException runnable, long tick) {
+    public void runSyncLater(SchedulerRunnable runnable, long tick) {
         taskScheduler.runTaskLater(() -> {
             try {
                 runnable.run();
