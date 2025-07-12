@@ -28,7 +28,6 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
 
     @Getter private final Command.Unmute command;
     private final Permission.Command.Unmute permission;
-
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final CommandRegistry commandRegistry;
@@ -51,9 +50,6 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
         this.commandRegistry = commandRegistry;
         this.proxySender = proxySender;
         this.gson = gson;
-
-        command = fileResolver.getCommand().getUnmute();
-        permission = fileResolver.getPermission().getCommand().getUnmute();
     }
 
     @Override
@@ -62,8 +58,9 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
     }
 
     @Override
-    public void reload() {
     public void onEnable() {
+        // if FPlayer.UNKNOWN (all-permissions) fails check (method will return true),
+        // a moderation plugin is intercepting this command
         if (checkModulePredicates(FPlayer.UNKNOWN)) return;
 
         registerModulePermission(permission);

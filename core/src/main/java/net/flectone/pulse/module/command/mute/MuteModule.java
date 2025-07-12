@@ -65,6 +65,8 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
     @Override
     public void onEnable() {
+        // if FPlayer.UNKNOWN (all-permissions) fails check (method will return true),
+        // a moderation plugin is intercepting this command
         if (checkModulePredicates(FPlayer.UNKNOWN)) return;
 
         registerModulePermission(permission);

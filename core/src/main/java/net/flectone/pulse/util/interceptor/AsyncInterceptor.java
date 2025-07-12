@@ -3,7 +3,7 @@ package net.flectone.pulse.util.interceptor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.scheduler.RunnableException;
+import net.flectone.pulse.scheduler.SchedulerRunnable;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.logging.FLogger;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -27,7 +27,7 @@ public class AsyncInterceptor implements MethodInterceptor {
 
         long delay = method.getAnnotation(Async.class).delay();
 
-        RunnableException task = () -> proceedSafely(invocation);
+        SchedulerRunnable task = () -> proceedSafely(invocation);
 
         if (delay > 0) {
             taskScheduler.runAsyncLater(task, delay);

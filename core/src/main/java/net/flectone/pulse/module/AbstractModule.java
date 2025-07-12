@@ -26,7 +26,7 @@ public abstract class AbstractModule {
 
     @Setter private boolean enable;
 
-    public AbstractModule() {
+    protected AbstractModule() {
         addPredicate(fPlayer -> !isEnable());
         addPredicate(fPlayer -> !permissionChecker.check(fPlayer, modulePermission));
     }

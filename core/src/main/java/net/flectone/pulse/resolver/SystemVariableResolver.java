@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 @Singleton
 public class SystemVariableResolver {
 
-    private final Pattern ENV_VAR_PATTERN = Pattern.compile("\\$\\{([A-Za-z0-9_.-]+)(?::([^}]*))?}");
+    private final Pattern envVarPattern = Pattern.compile("\\$\\{([A-Za-z0-9_.-]+)(?::([^}]*))?}");
 
     @Inject
     public SystemVariableResolver() {
@@ -24,14 +24,14 @@ public class SystemVariableResolver {
 
     private String process(String text) {
         StringBuilder stringBuilder = new StringBuilder();
-        Matcher matcher = ENV_VAR_PATTERN.matcher(text);
+        Matcher matcher = envVarPattern.matcher(text);
 
         int index = 0;
         while (matcher.find()) {
             stringBuilder.append(text, index, matcher.start());
 
-            String var = matcher.group(1);
-            Object obj =  System.getenv(var);
+            String variable = matcher.group(1);
+            Object obj =  System.getenv(variable);
 
             String value;
             if (obj != null) {

@@ -14,7 +14,7 @@ import java.util.Map;
 @Singleton
 public class ColorConverter {
 
-    private final int DEFAULT_ARGB = 0x40000000;
+    private final int defaultBackground = 0x40000000;
 
     private final Map<String, String> minecraftHexMap = new HashMap<>();
     private final Map<String, String> legacyHexMap = new HashMap<>();
@@ -110,7 +110,7 @@ public class ColorConverter {
 
         if (hex.length() != 3 && hex.length() != 4 && hex.length() != 6 && hex.length() != 8) {
             fLogger.warning("Incorrect HEX string length");
-            return DEFAULT_ARGB;
+            return defaultBackground;
         }
 
         // #RGB -> RRGGBB, #RGBA -> RRGGBBAA
@@ -139,7 +139,7 @@ public class ColorConverter {
             return (alpha << 24) | (r << 16) | (g << 8) | b;
         } catch (NumberFormatException e) {
             fLogger.warning("Incorrect HEX characters");
-            return DEFAULT_ARGB;
+            return defaultBackground;
         }
     }
 

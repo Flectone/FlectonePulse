@@ -82,8 +82,11 @@ public class BukkitTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runSync(RunnableException runnable) {
     public void runSync(SchedulerRunnable runnable) {
+        if (disabled) {
+            return;
+        }
+
         taskScheduler.runTask(() -> {
             try {
                 runnable.run();
@@ -96,8 +99,11 @@ public class BukkitTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runSyncTimer(RunnableException runnable, long tick, long period) {
     public void runSyncTimer(SchedulerRunnable runnable, long tick, long period) {
+        if (disabled) {
+            return;
+        }
+
         taskScheduler.runTaskTimer(() -> {
             try {
                 runnable.run();
@@ -115,8 +121,11 @@ public class BukkitTaskScheduler implements TaskScheduler {
     }
 
     @Override
-    public void runSyncLater(RunnableException runnable, long tick) {
     public void runSyncLater(SchedulerRunnable runnable, long tick) {
+        if (disabled) {
+            return;
+        }
+
         taskScheduler.runTaskLater(() -> {
             try {
                 runnable.run();

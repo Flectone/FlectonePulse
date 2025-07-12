@@ -11,7 +11,7 @@ import net.md_5.bungee.event.EventHandler;
 
 public final class FlectonePulseBungeecord extends Plugin implements Listener, FlectonePulse {
 
-    private final String CHANNEL = "BungeeCord";
+    private static final String CHANNEL = "BungeeCord";
 
     private FLogger fLogger;
 

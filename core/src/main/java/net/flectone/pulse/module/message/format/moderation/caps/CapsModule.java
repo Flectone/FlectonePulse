@@ -47,8 +47,8 @@ public class CapsModule extends AbstractModule implements MessageProcessor {
         if (!messageContext.isCaps()) return;
         if (!messageContext.isUserMessage()) return;
 
-        String message = replace(messageContext.getSender(), messageContext.getMessage());
-        messageContext.setMessage(message);
+        String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
+        messageContext.setMessage(processedMessage);
     }
 
     private String replace(FEntity sender, String message) {
@@ -64,13 +64,12 @@ public class CapsModule extends AbstractModule implements MessageProcessor {
         int totalLetters = 0;
 
         for (char symbol : message.toCharArray()) {
-            if (!Character.isLetter(symbol)) continue;
-
-            totalLetters++;
-
-            if (!Character.isUpperCase(symbol)) continue;
-
-            uppercaseCount++;
+            if (Character.isLetter(symbol)) {
+                totalLetters++;
+                if (Character.isUpperCase(symbol)) {
+                    uppercaseCount++;
+                }
+            }
         }
 
         return totalLetters > 0 && ((double) uppercaseCount / totalLetters) > this.message.getTrigger();

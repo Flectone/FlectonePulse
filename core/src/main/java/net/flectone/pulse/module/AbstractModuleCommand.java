@@ -23,7 +23,7 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
 
     @Inject private FileResolver fileResolver;
 
-    public AbstractModuleCommand(Function<Localization, M> messageFunction, Predicate<FPlayer> commandPredicate) {
+    protected AbstractModuleCommand(Function<Localization, M> messageFunction, Predicate<FPlayer> commandPredicate) {
         super(messageFunction);
 
         this.commandPredicate = commandPredicate;

@@ -34,7 +34,6 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
     @Getter private final Command.Warn command;
     private final Permission.Command.Warn permission;
-
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
@@ -71,8 +70,9 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
     }
 
     @Override
-    public void reload() {
     public void onEnable() {
+        // if FPlayer.UNKNOWN (all-permissions) fails check (method will return true),
+        // a moderation plugin is intercepting this command
         if (checkModulePredicates(FPlayer.UNKNOWN)) return;
 
         registerModulePermission(permission);

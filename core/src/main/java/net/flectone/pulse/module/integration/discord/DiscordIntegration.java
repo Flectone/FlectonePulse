@@ -75,6 +75,8 @@ public class DiscordIntegration implements FIntegration {
     }
 
     public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> discordString) {
+        if (gateway == null) return;
+
         String integrationChannel = integration.getMessageChannel().get(messageTag);
         if (integrationChannel == null) return;
         if (integrationChannel.isEmpty()) return;

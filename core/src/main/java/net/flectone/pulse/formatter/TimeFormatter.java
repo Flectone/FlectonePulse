@@ -16,7 +16,7 @@ public class TimeFormatter {
     // 1s = 20ticks -> 20ticks * 50 = 1000ms -> 1s = 1000ms
     public static final long MULTIPLIER = 50L;
 
-    private final Format DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final Format simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private final FileResolver fileResolver;
 
@@ -84,6 +84,6 @@ public class TimeFormatter {
     }
 
     public String formatDate(long date) {
-        return DATE_FORMATTER.format(date);
+        return simpleDateFormat.format(date);
     }
 }

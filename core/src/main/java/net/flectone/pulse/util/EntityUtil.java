@@ -16,9 +16,15 @@ public class EntityUtil {
     public String resolveEntityTranslationKey(String entityType) {
         ItemType itemType = ItemTypes.getByName(entityType);
 
-        return itemType == null
-                ? "entity.minecraft." + entityType
-                : itemType.getPlacedType() == null ? "item.minecraft." + entityType : "block.minecraft." + entityType;
+        if (itemType == null) {
+            return "entity.minecraft." + entityType;
+        }
+
+        if (itemType.getPlacedType() == null) {
+            return "item.minecraft." + entityType;
+        }
+
+        return "block.minecraft." + entityType;
     }
     
 }

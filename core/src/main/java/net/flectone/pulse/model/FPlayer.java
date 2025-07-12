@@ -1,7 +1,6 @@
 package net.flectone.pulse.model;
 
 import lombok.Getter;
-import net.flectone.pulse.module.command.ignore.model.Ignore;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +13,7 @@ public class FPlayer extends FEntity {
 
     private final int id;
     private final Map<String, String> colors = new HashMap<>();
-    private final Map<Setting, String> settings = new HashMap<>();
+    private final Map<Setting, String> settings = new EnumMap<>(Setting.class);
     private final List<Ignore> ignores = new ArrayList<>();
 
     private boolean online;

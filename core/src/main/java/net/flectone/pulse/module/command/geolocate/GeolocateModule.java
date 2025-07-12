@@ -25,7 +25,7 @@ import java.util.List;
 @Singleton
 public class GeolocateModule extends AbstractModuleCommand<Localization.Command.Geolocate> {
 
-    private final String HTTP_URL = "http://ip-api.com/line/<ip>?fields=17031449";
+    private final String apiUrl = "http://ip-api.com/line/<ip>?fields=17031449";
 
     private final Command.Geolocate command;
     private final Permission.Command.Geolocate permission;
@@ -90,7 +90,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
 
         String ip = platformPlayerAdapter.isOnline(fTarget) ? fPlayerService.getIp(fTarget) : fTarget.getIp();
 
-        List<String> request = ip == null ? List.of() : readResponse(HTTP_URL.replace("<ip>", ip));
+        List<String> request = ip == null ? List.of() : readResponse(apiUrl.replace("<ip>", ip));
         if (request.isEmpty() || request.get(0).equals("fail")) {
             builder(fPlayer)
                     .format(Localization.Command.Geolocate::getNullOrError)
@@ -118,16 +118,16 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
     private List<String> readResponse(String url) {
         List<String> arrayList = new ArrayList<>();
 
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader((new URL(url)).openStream()));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader((new URL(url)).openStream()))) {
 
             String line;
             while((line = reader.readLine()) != null) {
                 arrayList.add(line);
             }
 
-            reader.close();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+            // ignore, return empty list
+        }
 
         return arrayList;
     }

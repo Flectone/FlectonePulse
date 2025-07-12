@@ -58,7 +58,9 @@ public class BukkitAnvilModule extends AnvilModule {
 
             return true;
 
-        } catch (ParsingException ignored) {}
+        } catch (ParsingException ignored) {
+            // ignore problem string
+        }
 
         return false;
     }

@@ -126,7 +126,9 @@ public class ImageModule extends AbstractModule implements MessageProcessor {
 
             imageCache.put(link, component);
 
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+            // return empty component
+        }
 
         return component;
     }

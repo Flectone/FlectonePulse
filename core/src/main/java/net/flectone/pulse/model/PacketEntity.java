@@ -12,7 +12,7 @@ public abstract class PacketEntity {
 
     @Setter private boolean created;
 
-    public PacketEntity(int id, EntityType entityType) {
+    protected PacketEntity(int id, EntityType entityType) {
         this.id = id;
         this.entityType = entityType;
     }

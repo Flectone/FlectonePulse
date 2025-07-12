@@ -6,10 +6,10 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.RandomUtil;
@@ -58,6 +58,10 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
                         .required(promptMessage, commandRegistry.nativeMessageParser())
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
+        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
+        addPredicate(this::checkMute);
     }
 
     @Override

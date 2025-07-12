@@ -20,6 +20,7 @@ public class MailDAO extends BaseDAO<MailSQL> {
         super(database, MailSQL.class);
     }
 
+    @Override
     public MailSQL getSQL(Handle handle) {
         return handle.attach(MailSQL.class);
     }

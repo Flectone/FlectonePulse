@@ -8,12 +8,12 @@ import lombok.NonNull;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 import org.incendo.cloud.context.CommandContext;
@@ -76,6 +76,10 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
                         .permission(permission.getName())
                         .handler(this)
         );
+
+        addPredicate(this::checkCooldown);
+        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
+        addPredicate(this::checkMute);
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> languageSuggestion() {

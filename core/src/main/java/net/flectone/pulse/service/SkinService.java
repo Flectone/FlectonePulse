@@ -8,8 +8,8 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 @Singleton
 public class SkinService {
 
-    private final String AVATAR_URL_TEMPLATE = "https://mc-heads.net/avatar/<skin>/8.png";
-    private final String BODY_URL_TEMPLATE = "https://mc-heads.net/player/<skin>/16";
+    private final String avatarApiUrl = "https://mc-heads.net/avatar/<skin>/8.png";
+    private final String bodyApiUrl = "https://mc-heads.net/player/<skin>/16";
 
     private final IntegrationModule integrationModule;
 
@@ -24,11 +24,11 @@ public class SkinService {
     }
 
     public String getAvatarUrl(FEntity entity) {
-        return AVATAR_URL_TEMPLATE.replace("<skin>", getSkin(entity));
+        return avatarApiUrl.replace("<skin>", getSkin(entity));
     }
 
     public String getBodyUrl(FEntity entity) {
-        return BODY_URL_TEMPLATE.replace("<skin>", getSkin(entity));
+        return bodyApiUrl.replace("<skin>", getSkin(entity));
     }
 
 }

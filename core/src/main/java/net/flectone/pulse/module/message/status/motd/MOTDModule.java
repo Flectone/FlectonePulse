@@ -39,10 +39,10 @@ public class MOTDModule extends AbstractModuleListMessage<Localization.Message.S
     public JsonElement next(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return null;
 
-        String message = getNextMessage(fPlayer, this.message.isRandom());
-        if (message == null) return null;
+        String nextMessage = getNextMessage(fPlayer, this.message.isRandom());
+        if (nextMessage == null) return null;
 
-        return messagePipeline.builder(fPlayer, message).jsonSerializerBuild();
+        return messagePipeline.builder(fPlayer, nextMessage).jsonSerializerBuild();
     }
 
     @Override

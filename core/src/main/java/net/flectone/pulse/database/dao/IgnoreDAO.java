@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.database.sql.IgnoreSQL;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.command.ignore.model.Ignore;
+import net.flectone.pulse.model.Ignore;
 import org.jdbi.v3.core.Handle;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,6 +19,7 @@ public class IgnoreDAO extends BaseDAO<IgnoreSQL> {
         super(database, IgnoreSQL.class);
     }
 
+    @Override
     public IgnoreSQL getSQL(Handle handle) {
         return handle.attach(IgnoreSQL.class);
     }

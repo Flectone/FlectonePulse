@@ -12,11 +12,11 @@ import java.util.function.Function;
 
 public abstract class AbstractModuleListMessage<M extends Localization.Localizable> extends AbstractModuleMessage<M> {
 
-    private final HashMap<Integer, Integer> MESSAGE_INDEX_MAP = new HashMap<>();
+    private final HashMap<Integer, Integer> messageIndexMap = new HashMap<>();
 
     @Inject private RandomUtil randomUtil;
 
-    public AbstractModuleListMessage(Function<Localization, M> messageFunction) {
+    protected AbstractModuleListMessage(Function<Localization, M> messageFunction) {
         super(messageFunction);
     }
 
@@ -34,7 +34,7 @@ public abstract class AbstractModuleListMessage<M extends Localization.Localizab
         if (messages.isEmpty()) return null;
 
         int fPlayerID = fPlayer.getId();
-        int playerIndex = MESSAGE_INDEX_MAP.getOrDefault(fPlayerID, 0) % messages.size();
+        int playerIndex = messageIndexMap.getOrDefault(fPlayerID, 0) % messages.size();
 
         return messages.get(playerIndex);
     }
@@ -58,7 +58,7 @@ public abstract class AbstractModuleListMessage<M extends Localization.Localizab
     private String incrementAndGetMessage(int id, boolean random, List<String> messages) {
         if (messages.isEmpty()) return null;
 
-        int playerIndex = MESSAGE_INDEX_MAP.getOrDefault(id, 0);
+        int playerIndex = messageIndexMap.getOrDefault(id, 0);
 
         if (random) {
             playerIndex = randomUtil.nextInt(0, messages.size());
@@ -67,7 +67,7 @@ public abstract class AbstractModuleListMessage<M extends Localization.Localizab
             playerIndex = playerIndex % messages.size();
         }
 
-        MESSAGE_INDEX_MAP.put(id, playerIndex);
+        messageIndexMap.put(id, playerIndex);
 
         return messages.get(playerIndex);
     }

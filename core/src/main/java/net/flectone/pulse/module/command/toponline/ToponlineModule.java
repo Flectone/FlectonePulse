@@ -7,11 +7,11 @@ import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.formatter.TimeFormatter;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.util.DisableAction;
 import net.kyori.adventure.text.Component;
@@ -49,12 +49,6 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
         this.messagePipeline = messagePipeline;
         this.messageSender = messageSender;
         this.timeFormatter = timeFormatter;
-
-        command = fileResolver.getCommand().getToponline();
-        permission = fileResolver.getPermission().getCommand().getToponline();
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
     }
 
     @Override

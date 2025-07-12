@@ -46,7 +46,7 @@ public class BubbleService {
         this.messagePipeline = messagePipeline;
     }
 
-    private void startTicker() {
+    public void startTicker() {
         taskScheduler.runAsyncTimer(() -> playerBubbleQueues.forEach(this::processBubbleQueue), 5L, 5L);
     }
 
@@ -182,10 +182,9 @@ public class BubbleService {
         playerBubbleQueues.remove(fPlayer.getUuid());
     }
 
-    public void reload() {
+    public void clear() {
         playerBubbleQueues.clear();
         bubbleRenderer.removeAllBubbles();
-        startTicker();
     }
     
     private long calculateDuration(String message) {

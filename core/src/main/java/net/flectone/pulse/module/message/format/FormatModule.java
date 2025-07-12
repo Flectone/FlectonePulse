@@ -165,8 +165,8 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         }
 
         if (messageContext.isUserMessage()) {
-            String message = replaceAll(sender, receiver, messageContext.getMessage());
-            messageContext.setMessage(message);
+            String messageContent = replaceAll(sender, receiver, messageContext.getMessage());
+            messageContext.setMessage(messageContent);
         }
     }
 

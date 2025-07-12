@@ -8,6 +8,8 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -30,11 +32,12 @@ public class WorldModule extends AbstractModule implements MessageProcessor {
     private final Message.Format.World message;
     private final Permission.Message.Format.World permission;
     private final Permission.Message.Format formatPermission;
-
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
+    private final MessageProcessRegistry messageProcessRegistry;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public WorldModule(FileResolver fileResolver,
@@ -42,17 +45,17 @@ public class WorldModule extends AbstractModule implements MessageProcessor {
                        PlatformPlayerAdapter platformPlayerAdapter,
                        ListenerRegistry listenerRegistry,
                        PermissionChecker permissionChecker,
-                       MessageProcessRegistry messageProcessRegistry) {
+                       MessageProcessRegistry messageProcessRegistry,
+                       EventProcessRegistry eventProcessRegistry) {
+        this.message = fileResolver.getMessage().getFormat().getWorld();
+        this.permission = fileResolver.getPermission().getMessage().getFormat().getWorld();
+        this.formatPermission = fileResolver.getPermission().getMessage().getFormat();
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.listenerRegistry = listenerRegistry;
         this.permissionChecker = permissionChecker;
-
-        message = fileResolver.getMessage().getFormat().getWorld();
-        permission = fileResolver.getPermission().getMessage().getFormat().getWorld();
-        formatPermission = fileResolver.getPermission().getMessage().getFormat();
-
-        messageProcessRegistry.register(150, this);
+        this.messageProcessRegistry = messageProcessRegistry;
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override
@@ -60,6 +63,8 @@ public class WorldModule extends AbstractModule implements MessageProcessor {
         registerModulePermission(permission);
 
         listenerRegistry.register(WorldPacketListener.class);
+        messageProcessRegistry.register(150, this);
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, this::update);
     }
 
     @Override

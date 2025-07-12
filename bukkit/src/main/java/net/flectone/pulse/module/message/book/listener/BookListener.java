@@ -34,12 +34,12 @@ public class BookListener implements Listener {
         for (int x = 1; x <= event.getNewBookMeta().getPages().size(); x++) {
             String string = bookMeta.getPage(x);
 
-            if (string.isEmpty()) continue;
-
-            string = bookModule.format(fPlayer, string);
-            if (string == null) continue;
-
-            bookMeta.setPage(x, string);
+            if (!string.isEmpty()) {
+                String formatted = bookModule.format(fPlayer, string);
+                if (formatted != null) {
+                    bookMeta.setPage(x, formatted);
+                }
+            }
         }
 
         if (event.isSigning() && bookMeta.getTitle() != null) {

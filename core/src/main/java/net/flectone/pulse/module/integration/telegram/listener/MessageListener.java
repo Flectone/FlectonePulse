@@ -27,9 +27,8 @@ public class MessageListener extends EventListener {
     @Inject
     public MessageListener(FileResolver fileResolver,
                            Provider<TelegramIntegration> telegramIntegration) {
+        this.integration = fileResolver.getIntegration().getTelegram();
         this.telegramIntegration = telegramIntegration;
-
-        integration = fileResolver.getIntegration().getTelegram();
     }
 
     @Override

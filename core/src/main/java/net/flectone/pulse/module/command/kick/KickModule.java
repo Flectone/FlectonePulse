@@ -63,6 +63,8 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
 
     @Override
     public void onEnable() {
+        // if FPlayer.UNKNOWN (all-permissions) fails check (method will return true),
+        // a moderation plugin is intercepting this command
         if (checkModulePredicates(FPlayer.UNKNOWN)) return;
 
         registerModulePermission(permission);

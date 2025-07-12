@@ -70,9 +70,9 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
         fPlayerService.loadSettings(fPlayer);
         fPlayerService.loadColors(fPlayer);
 
-        String message = resolveLocalization(fPlayer).getFull();
+        String reasonMessage = resolveLocalization(fPlayer).getFull();
 
-        Component reason = messagePipeline.builder(fPlayer, message).build();
+        Component reason = messagePipeline.builder(fPlayer, reasonMessage).build();
 
         packetSender.send(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
         return true;

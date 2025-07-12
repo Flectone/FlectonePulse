@@ -67,4 +67,8 @@ public class TictactoeManager {
 
         return null;
     }
+
+    public void clear() {
+        ticTacToeMap.clear();
+    }
 }

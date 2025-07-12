@@ -8,18 +8,18 @@ import java.util.Random;
 @Singleton
 public class RandomUtil {
 
-    private final Random RANDOM = new Random();
+    private final Random random = new Random();
 
     @Inject
     public RandomUtil() {}
 
     public int nextInt(int start, int end) {
         if (start > end) return 0;
-        return start == end ? start : start + RANDOM.nextInt(end - start);
+        return start == end ? start : start + random.nextInt(end - start);
     }
 
     public int nextInt(int bound) {
-        return RANDOM.nextInt(bound);
+        return random.nextInt(bound);
     }
 
 }

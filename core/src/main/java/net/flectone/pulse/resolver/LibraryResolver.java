@@ -15,7 +15,7 @@ public abstract class LibraryResolver {
 
     @Getter private final LibraryManager libraryManager;
 
-    public LibraryResolver(LibraryManager libraryManager) {
+    protected LibraryResolver(LibraryManager libraryManager) {
         this.libraryManager = libraryManager;
     }
 

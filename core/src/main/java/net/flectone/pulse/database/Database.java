@@ -17,7 +17,7 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Mail;
 import net.flectone.pulse.model.Moderation;
-import net.flectone.pulse.module.command.ignore.model.Ignore;
+import net.flectone.pulse.model.Ignore;
 import net.flectone.pulse.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import org.jdbi.v3.core.Jdbi;
@@ -82,8 +82,8 @@ public class Database {
             throw new RuntimeException(e);
         }
 
-        InputStream SQLFile = platformServerAdapter.getResource("sqls/" + config.getType().name().toLowerCase() + ".sql");
-        executeSQLFile(SQLFile);
+        InputStream sqlFile = platformServerAdapter.getResource("sqls/" + config.getType().name().toLowerCase() + ".sql");
+        executeSQLFile(sqlFile);
 
         if (fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "0.9.0")) {
             MIGRATION_0_9_0();
@@ -157,6 +157,7 @@ public class Database {
                 hikariConfig.addDataSourceProperty("useServerPrepStmts", "true");
                 hikariConfig.addDataSourceProperty("rewriteBatchedStatements", "true");
             }
+            default -> throw new IllegalStateException(config.getType() + " not supported");
         }
 
         hikariConfig.setJdbcUrl(connectionURL);

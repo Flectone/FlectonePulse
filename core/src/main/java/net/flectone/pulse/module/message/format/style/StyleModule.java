@@ -29,6 +29,8 @@ public class StyleModule extends AbstractModule implements MessageProcessor {
     @Override
     public void onEnable() {
         registerModulePermission(permission);
+
+        messageProcessRegistry.register(150, this);
     }
 
     @Override
@@ -43,11 +45,11 @@ public class StyleModule extends AbstractModule implements MessageProcessor {
 
         String style = sender.getSettingValue(FPlayer.Setting.STYLE);
 
-        // only possible solution
-        String message = messageContext.getMessage()
+        // bad practice, but only it works
+        String processedMessage = messageContext.getMessage()
                 .replace("<style>", style == null ? "" : style)
                 .replace("</style>", "");
 
-        messageContext.setMessage(message);
+        messageContext.setMessage(processedMessage);
     }
 }

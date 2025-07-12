@@ -47,8 +47,8 @@ public class FloodModule extends AbstractModule implements MessageProcessor {
         if (!messageContext.isFlood()) return;
         if (!messageContext.isUserMessage()) return;
 
-        String message = replace(messageContext.getSender(), messageContext.getMessage());
-        messageContext.setMessage(message);
+        String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
+        messageContext.setMessage(processedMessage);
     }
 
     private String replace(FEntity sender, String message) {

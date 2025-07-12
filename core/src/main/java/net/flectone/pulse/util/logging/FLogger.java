@@ -21,9 +21,9 @@ import java.util.logging.Logger;
 @Singleton
 public class FLogger extends Logger {
 
-    private final String PLUGIN_NAME = "\033[0;34m(FlectonePulse) \033[0m";
+    private final String pluginName = "\033[0;34m(FlectonePulse) \033[0m";
 
-    private final List<String> PLUGIN_INFO = List.of(
+    private final List<String> pluginInfo = List.of(
             " \033[0;34m ___       ___  __  ___  __        ___ \033[0m",
             " \033[0;34m|__  |    |__  /  `  |  /  \\ |\\ | |__  \033[0m",
             " \033[0;34m|    |___ |___ \\__,  |  \\__/ | \\| |___ \033[0m",
@@ -78,7 +78,7 @@ public class FLogger extends Logger {
         };
 
         logRecord.setLoggerName("");
-        logRecord.setMessage(PLUGIN_NAME + colorLog + logRecord.getMessage() + "\033[0m");
+        logRecord.setMessage(pluginName + colorLog + logRecord.getMessage() + "\033[0m");
 
         logConsumer.accept(logRecord);
     }
@@ -113,7 +113,7 @@ public class FLogger extends Logger {
     }
 
     public void logPluginInfo() {
-        PLUGIN_INFO.forEach(string -> {
+        pluginInfo.forEach(string -> {
             string = string.replace("<version>", BuildConfig.PROJECT_VERSION);
             info(string);
         });

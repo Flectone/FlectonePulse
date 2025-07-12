@@ -79,6 +79,10 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
             soundMap.put(key, createSound(questionMessage.getSound(), questionPermission.getSound()));
             cooldownMap.put(key, createCooldown(questionMessage.getCooldown(), questionPermission.getCooldownBypass()));
         });
+
+        messageProcessRegistry.register(100, this);
+    }
+
     @Override
     public void onDisable() {
         processedQuestions.clear();

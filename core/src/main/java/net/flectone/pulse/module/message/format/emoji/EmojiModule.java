@@ -54,9 +54,9 @@ public class EmojiModule extends AbstractModule implements MessageProcessor {
     public void process(MessageContext messageContext) {
         if (!messageContext.isEmoji()) return;
 
-        String message = replace(messageContext.getSender(), messageContext.getMessage());
+        String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
 
-        messageContext.setMessage(message);
+        messageContext.setMessage(processedMessage);
         messageContext.addTagResolvers(emojiTag(messageContext.getSender(), messageContext.getReceiver()));
     }
 

@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 )
 public class FlectonePulseVelocity implements FlectonePulse {
 
-    private final MinecraftChannelIdentifier IDENTIFIER = MinecraftChannelIdentifier.from("flectonepulse:main");
+    private static final MinecraftChannelIdentifier IDENTIFIER = MinecraftChannelIdentifier.from("flectonepulse:main");
 
     private final ProxyServer proxyServer;
     private final FLogger fLogger;

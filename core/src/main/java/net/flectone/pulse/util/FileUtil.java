@@ -12,7 +12,7 @@ public abstract class FileUtil {
 
     private final FLogger fLogger;
 
-    public FileUtil(FLogger fLogger) {
+    protected FileUtil(FLogger fLogger) {
         this.fLogger = fLogger;
     }
 

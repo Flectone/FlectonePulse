@@ -17,19 +17,21 @@ public class FixationModule extends AbstractModule implements MessageProcessor {
 
     private final Message.Format.Fixation message;
     private final Permission.Message.Format.Fixation permission;
+    private final MessageProcessRegistry messageProcessRegistry;
 
     @Inject
     public FixationModule(FileResolver fileResolver,
                           MessageProcessRegistry messageProcessRegistry) {
-        message = fileResolver.getMessage().getFormat().getFixation();
-        permission = fileResolver.getPermission().getMessage().getFormat().getFixation();
-
-        messageProcessRegistry.register(100, this);
+        this.message = fileResolver.getMessage().getFormat().getFixation();
+        this.permission = fileResolver.getPermission().getMessage().getFormat().getFixation();
+        this.messageProcessRegistry = messageProcessRegistry;
     }
 
     @Override
     public void onEnable() {
         registerModulePermission(permission);
+
+        messageProcessRegistry.register(100, this);
     }
 
     @Override
@@ -42,18 +44,16 @@ public class FixationModule extends AbstractModule implements MessageProcessor {
         if (!messageContext.isFixation()) return;
         if (!messageContext.isUserMessage()) return;
 
-        String message = replace(messageContext.getSender(), messageContext.getMessage());
-        messageContext.setMessage(message);
+        String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
+        messageContext.setMessage(processedMessage);
     }
 
     private String replace(@Nullable FEntity sender, String message) {
         if (checkModulePredicates(sender)) return message;
         if (message.isBlank()) return message;
 
-        if (this.message.isEndDot()) {
-            if (this.message.getNonDotSymbols().stream().noneMatch(message::endsWith)) {
-                message = message + ".";
-            }
+        if (this.message.isEndDot() && this.message.getNonDotSymbols().stream().noneMatch(message::endsWith)) {
+            message = message + ".";
         }
 
         if (this.message.isFirstLetterUppercase()) {

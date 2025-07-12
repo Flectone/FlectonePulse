@@ -3,7 +3,7 @@ package net.flectone.pulse.util.interceptor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.scheduler.RunnableException;
+import net.flectone.pulse.scheduler.SchedulerRunnable;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.util.logging.FLogger;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -27,7 +27,7 @@ public class SyncInterceptor implements MethodInterceptor {
 
         long delay = method.getAnnotation(Sync.class).delay();
 
-        RunnableException task = () -> proceedSafely(invocation);
+        SchedulerRunnable task = () -> proceedSafely(invocation);
 
         if (delay > 0) {
             taskScheduler.runSyncLater(task, delay);

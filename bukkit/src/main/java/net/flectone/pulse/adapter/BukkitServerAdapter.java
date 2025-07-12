@@ -42,9 +42,9 @@ import java.util.regex.Pattern;
 @Singleton
 public class BukkitServerAdapter implements PlatformServerAdapter {
 
-    public final static boolean IS_FOLIA;
-    public final static boolean IS_PAPER;
-    public final static boolean IS_1_20_5_OR_NEWER;
+    public static final boolean IS_FOLIA;
+    public static final boolean IS_PAPER;
+    public static final boolean IS_1_20_5_OR_NEWER;
 
     static {
         IS_FOLIA = detectFolia();
@@ -244,7 +244,9 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
                 JsonElement element = PaperItemStackUtil.serialize(itemStack);
                 return component.hoverEvent(AdventureSerializer.serializer().fromJsonTree(element).hoverEvent());
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            // ignore incorrect hover
+        }
 
         Key key = Key.key(itemStack.getType().name().toLowerCase());
         return component.hoverEvent(HoverEvent.showItem(key, itemStack.getAmount()));
@@ -266,7 +268,9 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         try {
             Class.forName("io.papermc.paper.threadedregions.ThreadedRegionizer");
             return true;
-        } catch (ClassNotFoundException ignored) {}
+        } catch (ClassNotFoundException ignored) {
+            // ignore not folia server
+        }
 
         return false;
     }
@@ -275,7 +279,9 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         try {
             Class.forName("com.destroystokyo.paper.ParticleBuilder");
             return true;
-        } catch (ClassNotFoundException ignored) {}
+        } catch (ClassNotFoundException ignored) {
+            // ignore not paper server
+        }
 
         return false;
     }
@@ -286,7 +292,9 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         if (m.find()) {
             try {
                 finalVersion = Double.parseDouble(m.group(1));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                // ignore incorrect version
+            }
         }
 
         return finalVersion;

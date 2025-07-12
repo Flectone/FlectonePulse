@@ -50,7 +50,9 @@ public class SignModule extends AbstractModule {
 
             return LegacyComponentSerializer.legacySection().serialize(component);
 
-        } catch (ParsingException ignored) {}
+        } catch (ParsingException ignored) {
+            // ignore problem string
+        }
 
         return string;
     }

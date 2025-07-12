@@ -31,12 +31,12 @@ public class SignListener implements Listener {
         for (int x = 0; x < event.getLines().length; x++) {
             String string = event.getLine(x);
 
-            if (string == null || string.isEmpty()) continue;
-
-            string = signModule.format(fPlayer, string);
-            if (string == null) continue;
-
-            event.setLine(x, string);
+            if (string != null && !string.isEmpty()) {
+                string = signModule.format(fPlayer, string);
+                if (string != null) {
+                    event.setLine(x, string);
+                }
+            }
         }
     }
 }

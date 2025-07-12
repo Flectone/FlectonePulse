@@ -60,7 +60,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
     @Getter private Cooldown cooldown;
     @Getter private Sound sound;
 
-    public AbstractModuleMessage(Function<Localization, M> messageFunction) {
+    protected AbstractModuleMessage(Function<Localization, M> messageFunction) {
         this.messageResolver = messageFunction;
     }
 
@@ -184,36 +184,45 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             return sender::equals;
         }
 
-        if (sender instanceof FPlayer fPlayer && !fPlayer.isUnknown()) {
-            return fReceiver -> {
-                if (fReceiver.isUnknown()) return true;
-                if (fReceiver.isIgnored(fPlayer)) return false;
-
-                if (range > 0) {
-                    double distance = platformPlayerAdapter.distance(fPlayer, fReceiver);
-
-                    return distance != -1.0 && distance <= range;
-                }
-
-                if (range == Range.WORLD_NAME) {
-                    String worldName = platformPlayerAdapter.getWorldName(fPlayer);
-                    if (worldName.isEmpty()) return true;
-
-                    return permissionChecker.check(fReceiver, "flectonepulse.world.name." + worldName);
-                }
-
-                if (range == Range.WORLD_TYPE) {
-                    String worldType = platformPlayerAdapter.getWorldEnvironment(fPlayer);
-                    if (worldType.isEmpty()) return true;
-
-                    return permissionChecker.check(fReceiver, "flectonepulse.world.type." + worldType);
-                }
-
-                return true;
-            };
+        if (!(sender instanceof FPlayer fPlayer) || fPlayer.isUnknown()) {
+            return player -> true;
         }
 
-        return fPlayer -> true;
+        return createRangePredicate(fPlayer, range);
+    }
+
+    private Predicate<FPlayer> createRangePredicate(FPlayer fPlayer, int range) {
+        return fReceiver -> {
+            if (fReceiver.isUnknown()) return true;
+            if (fReceiver.isIgnored(fPlayer)) return false;
+
+            if (range > 0) {
+                return checkDistance(fPlayer, fReceiver, range);
+            }
+
+            return switch (range) {
+                case Range.WORLD_NAME -> checkWorldNamePermission(fPlayer, fReceiver);
+                case Range.WORLD_TYPE -> checkWorldTypePermission(fPlayer, fReceiver);
+                default -> true;
+            };
+        };
+    }
+
+    private boolean checkDistance(FPlayer fPlayer, FPlayer fReceiver, int range) {
+        double distance = platformPlayerAdapter.distance(fPlayer, fReceiver);
+        return distance != -1.0 && distance <= range;
+    }
+
+    private boolean checkWorldNamePermission(FPlayer fPlayer, FPlayer fReceiver) {
+        String worldName = platformPlayerAdapter.getWorldName(fPlayer);
+        if (worldName.isEmpty()) return true;
+        return permissionChecker.check(fReceiver, "flectonepulse.world.name." + worldName);
+    }
+
+    private boolean checkWorldTypePermission(FPlayer fPlayer, FPlayer fReceiver) {
+        String worldType = platformPlayerAdapter.getWorldEnvironment(fPlayer);
+        if (worldType.isEmpty()) return true;
+        return permissionChecker.check(fReceiver, "flectonepulse.world.type." + worldType);
     }
 
     public class Builder {
@@ -359,28 +368,28 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         }
 
         public void send(List<FPlayer> recipients) {
-            recipients.forEach(fReceiver -> {
+            recipients.forEach(recipient -> {
 
                 // example
                 // format: TheFaser > <message>
                 // message: hello world!
                 // final formatted message: TheFaser > hello world!
-                Component message = buildMessageComponent(fReceiver);
-                Component format = buildFormatComponent(fReceiver, message);
+                Component messageComponent = buildMessageComponent(recipient);
+                Component formatComponent = buildFormatComponent(recipient, messageComponent);
 
                 // destination subtext
-                Component subcomponent = Component.empty();
+                Component subComponent = Component.empty();
                 if (destination.getType() == Destination.Type.TITLE
                         || destination.getType() == Destination.Type.SUBTITLE) {
-                    subcomponent = buildSubcomponent(fReceiver, message);
+                    subComponent = buildSubcomponent(recipient, messageComponent);
                 }
 
-                messageSender.send(fReceiver, format, subcomponent, destination);
+                messageSender.send(recipient, formatComponent, subComponent, destination);
 
                 if (sound != null) {
                     if (!permissionChecker.check(fPlayer, sound.getPermission())) return;
 
-                    soundPlayer.play(sound, fReceiver);
+                    soundPlayer.play(sound, recipient);
                 }
             });
         }
@@ -398,10 +407,10 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         }
 
         private Component buildMessageComponent(FPlayer fReceiver) {
-            String message = resolveString(fReceiver, this.message);
-            if (message == null || message.isBlank()) return Component.empty();
+            String messageContent = resolveString(fReceiver, this.message);
+            if (messageContent == null || messageContent.isBlank()) return Component.empty();
 
-            MessagePipeline.Builder messageBuilder = messagePipeline.builder(fPlayer, fReceiver, message)
+            MessagePipeline.Builder messageBuilder = messagePipeline.builder(fPlayer, fReceiver, messageContent)
                     .userMessage(true)
                     .mention(!fReceiver.isUnknown());
 
@@ -413,17 +422,17 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         }
 
         private Component buildFormatComponent(FPlayer fReceiver, Component message) {
-            String format = resolveString(fReceiver, this.format);
-            if (format == null) return Component.empty();
+            String formatContent = resolveString(fReceiver, this.format);
+            if (formatContent == null) return Component.empty();
 
             MessagePipeline.Builder formatBuilder = messagePipeline
-                    .builder(fPlayer, fReceiver, format)
+                    .builder(fPlayer, fReceiver, formatContent)
                     .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(fReceiver))
                     .tagResolvers(messageTag(message));
 
             if (!fReceiver.isUnknown()) {
                 String messageToTranslate = resolveString(fReceiver, this.message);
-                formatBuilder = formatBuilder.translate(messageToTranslate, format.contains("<translate>"));
+                formatBuilder = formatBuilder.translate(messageToTranslate, formatContent.contains("<translate>"));
             }
 
             if (formatComponentBuilder != null) {
@@ -439,16 +448,21 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             if (range != Range.SERVER && range != Range.PROXY) return;
             if (!integrationModule.hasMessenger()) return;
 
-            Component componentFormat = messagePipeline.builder(fPlayer, FPlayer.UNKNOWN, resolveString(FPlayer.UNKNOWN, format))
+            String formatContent = resolveString(FPlayer.UNKNOWN, format);
+            if (formatContent == null) {
+                formatContent = "";
+            }
+
+            Component componentFormat = messagePipeline.builder(fPlayer, FPlayer.UNKNOWN, formatContent)
                     .translate(false)
                     .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(FPlayer.UNKNOWN))
                     .build();
 
-            String message = resolveString(FPlayer.UNKNOWN, this.message);
-            Component componentMessage = message == null
+            String messageContent = resolveString(FPlayer.UNKNOWN, this.message);
+            Component componentMessage = messageContent == null
                     ? Component.empty()
                     : messagePipeline
-                    .builder(fPlayer, FPlayer.UNKNOWN, message)
+                    .builder(fPlayer, FPlayer.UNKNOWN, messageContent)
                     .translate(false)
                     .userMessage(true)
                     .mention(false)
