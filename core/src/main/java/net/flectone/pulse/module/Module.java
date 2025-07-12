@@ -24,8 +24,9 @@ public class Module extends AbstractModule {
     @Override
     public void onEnable() {
         registerModulePermission(permission.getModule());
-        addChildren(CommandModule.class);
+
         addChildren(IntegrationModule.class);
+        addChildren(CommandModule.class);
         addChildren(MessageModule.class);
     }
 
