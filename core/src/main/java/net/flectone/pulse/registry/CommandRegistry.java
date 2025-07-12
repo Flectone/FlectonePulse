@@ -16,19 +16,20 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 
-public abstract class CommandRegistry {
+public abstract class CommandRegistry implements Registry {
 
     private final Set<String> registeredCommands = new HashSet<>();
 
     private final CommandParserRegistry parsers;
     private final PermissionChecker permissionChecker;
 
-    public CommandRegistry(CommandParserRegistry parsers,
+    protected CommandRegistry(CommandParserRegistry parsers,
                            PermissionChecker permissionChecker) {
         this.parsers = parsers;
         this.permissionChecker = permissionChecker;
     }
 
+    @Override
     public void reload() {
         registeredCommands.forEach(this::unregisterCommand);
         registeredCommands.clear();

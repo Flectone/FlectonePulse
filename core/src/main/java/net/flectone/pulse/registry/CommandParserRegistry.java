@@ -24,7 +24,7 @@ import org.incendo.cloud.parser.standard.StringParser;
 import java.time.Duration;
 
 @Singleton
-public class CommandParserRegistry {
+public class CommandParserRegistry implements Registry {
 
     private final PlayerParser playerParser;
     private final OfflinePlayerParser offlinePlayerParser;
@@ -61,6 +61,9 @@ public class CommandParserRegistry {
         this.messageParser = messageParser;
         this.singleMessageParser = singleMessageParser;
     }
+
+    @Override
+    public void reload() {}
 
     public @NonNull ParserDescriptor<FPlayer, String> playerParser(boolean offlinePlayers) {
         return offlinePlayers ? offlinePlayerParser() : playerParser();

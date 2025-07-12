@@ -17,7 +17,10 @@ public class MessageProcessRegistry {
 
     @Inject
     public MessageProcessRegistry() {
+    }
 
+    public void reload() {
+        processors.clear();
     }
 
     public void register(int priority, MessageProcessor messageProcessor) {
