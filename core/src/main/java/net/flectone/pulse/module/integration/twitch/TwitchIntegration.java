@@ -72,8 +72,8 @@ public class TwitchIntegration implements FIntegration {
             }
         }
 
-        for (String channel : integration.getFollowChannel().keySet()) {
-            twitchClient.getClientHelper().enableStreamEventListener(channel);
+        if (!integration.getFollowChannel().isEmpty()) {
+            fLogger.warning("Follow channel is currently not supported");
         }
 
         twitchClient.getEventManager().onEvent(ChannelGoLiveEvent.class, event -> {
