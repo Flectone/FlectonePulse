@@ -12,7 +12,12 @@ public interface TaskScheduler {
 
     void runSync(RunnableException runnable);
 
+    void runSyncTimer(RunnableException runnable, long tick, long period);
+
+    void runSyncTimer(RunnableException runnable, long tick);
+
     void runSyncLater(RunnableException runnable, long tick);
 
     void reload();
+
 }

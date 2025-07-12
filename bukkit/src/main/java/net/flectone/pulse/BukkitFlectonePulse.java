@@ -106,6 +106,9 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
     public void onDisable() {
         if (injector == null || disableSilently) return;
 
+        BukkitTaskScheduler taskScheduler = injector.getInstance(BukkitTaskScheduler.class);
+        taskScheduler.setDisabled(true);
+
         fLogger.logDisabling();
 
         if (injector.getInstance(FileResolver.class).getConfig().isMetrics()) {
@@ -132,10 +135,10 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
         injector.getInstance(ProxySender.class).disable();
 
-        injector.getInstance(DiscordModule.class).disconnect();
-        injector.getInstance(TwitchModule.class).disconnect();
-        injector.getInstance(TelegramModule.class).disconnect();
-        injector.getInstance(TaskScheduler.class).reload();
+        // disable all modules
+        injector.getInstance(Module.class).disable();
+
+        taskScheduler.reload();
 
         fLogger.logDisabled();
     }
