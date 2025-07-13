@@ -96,7 +96,9 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
 
         if (fReceiver.isOnline() && integrationModule.isVanishedVisible(fReceiver, fPlayer)) {
             if (!tellModule.isEnable()) {
-                // TODO: add custom message
+                builder(fPlayer)
+                        .format(Localization.Command.Mail::getOnlinePlayer)
+                        .sendBuilt();
                 return;
             }
 

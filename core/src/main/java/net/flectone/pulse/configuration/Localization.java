@@ -315,6 +315,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.symbol.format = "<click:suggest_command:\"<message>\"><fcolor:2>\uD83D\uDDA5 Нажми, чтобы использовать: <fcolor:1><style><message>";
 
         command.mail.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
+        command.mail.onlinePlayer = "<color:#ff7171><b>⁉</b> Игрок в сети";
         command.mail.sender = "<fcolor:2>✉ Письмо #<id> для <display_name> » <fcolor:1><style><message>";
         command.mail.receiver = "<fcolor:2>✉ Письмо от <display_name> » <fcolor:1><style><message>";
 
@@ -1104,6 +1105,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Mail implements SubCommandConfig, Localizable {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
+            private String onlinePlayer = "<color:#ff7171><b>⁉</b> This player is online";
             private String sender = "<fcolor:2>✉ Mail #<id> for <display_name> » <fcolor:1><style><message>";
             private String receiver = "<fcolor:2>✉ Mail from <display_name> » <fcolor:1><style><message>";
         }
