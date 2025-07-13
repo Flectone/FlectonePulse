@@ -7,12 +7,12 @@ import reactor.core.publisher.Mono;
 
 public abstract class EventListener<T extends Event> extends AbstractModuleMessage<Localization.Integration.Discord> {
 
-    public EventListener() {
+    protected EventListener() {
         super(localization -> localization.getIntegration().getDiscord());
     }
 
     public abstract Class<T> getEventType();
 
-    public abstract Mono<?> execute(T event);
+    public abstract Mono<T> execute(T event);
 
 }

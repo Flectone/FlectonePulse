@@ -52,7 +52,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
                         .replace("<name>", nickname)
                         .replace("<channel>", channel))
                 .message(message)
-                .proxy((output) -> {
+                .proxy(output -> {
                     output.writeUTF(nickname);
                     output.writeUTF(channel);
                     output.writeUTF(message);

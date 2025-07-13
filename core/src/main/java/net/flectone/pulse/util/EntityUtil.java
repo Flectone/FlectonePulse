@@ -7,8 +7,7 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class EntityUtil {
-    
-    
+
     @Inject
     public EntityUtil() {
     }

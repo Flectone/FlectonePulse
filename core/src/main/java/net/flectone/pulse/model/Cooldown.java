@@ -10,7 +10,7 @@ import java.util.UUID;
 @Getter
 public class Cooldown {
 
-    private final HashMap<UUID, Long> PLAYER_DURATION = new HashMap<>();
+    private final HashMap<UUID, Long> playerDuration = new HashMap<>();
 
     private final boolean enable;
     private final long duration;
@@ -31,10 +31,10 @@ public class Cooldown {
 
         long currentTime = System.currentTimeMillis();
 
-        Long time = PLAYER_DURATION.get(uuid);
+        Long time = playerDuration.get(uuid);
 
         if (time == null || currentTime >= time) {
-            PLAYER_DURATION.put(uuid, currentTime + duration * TimeFormatter.MULTIPLIER);
+            playerDuration.put(uuid, currentTime + duration * TimeFormatter.MULTIPLIER);
             return false;
         }
 
@@ -42,6 +42,6 @@ public class Cooldown {
     }
 
     public long getTimeLeft(FPlayer fPlayer) {
-        return PLAYER_DURATION.getOrDefault(fPlayer.getUuid(), 0L) - System.currentTimeMillis();
+        return playerDuration.getOrDefault(fPlayer.getUuid(), 0L) - System.currentTimeMillis();
     }
 }

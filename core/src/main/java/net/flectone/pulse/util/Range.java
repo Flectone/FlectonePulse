@@ -1,5 +1,8 @@
 package net.flectone.pulse.util;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public final class Range {
 
     public static final int WORLD_TYPE = -4;

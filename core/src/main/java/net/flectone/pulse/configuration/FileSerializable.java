@@ -246,7 +246,7 @@ public abstract class FileSerializable extends YamlSerializable {
     @Transient
     private final Path path;
 
-    public FileSerializable(Path path) {
+    protected FileSerializable(Path path) {
         super(CONFIG);
         this.path = path;
     }

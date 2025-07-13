@@ -9,7 +9,7 @@ import java.util.*;
 @Getter
 public class FPlayer extends FEntity {
 
-    public static final FPlayer UNKNOWN = new FPlayer(FEntity.UNKNOWN_NAME);
+    public static final FPlayer UNKNOWN = new FPlayer(FEntity.unknownName);
 
     private final int id;
     private final Map<String, String> colors = new HashMap<>();
@@ -30,7 +30,7 @@ public class FPlayer extends FEntity {
     }
 
     public FPlayer(String name) {
-        this(-1, name, FEntity.UNKNOWN_UUID, "unknown");
+        this(-1, name, FEntity.unknownUUID, "unknown");
 
         setDefaultSettings();
     }

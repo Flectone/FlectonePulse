@@ -22,7 +22,7 @@ import java.util.stream.IntStream;
 @Singleton
 public class DurationReasonParser implements ArgumentParser<FPlayer, Pair<Long, String>>, BlockingSuggestionProvider.Strings<FPlayer> {
 
-    private static final Pattern DURATION_PATTERN = Pattern.compile("((\\d+|[1-9])[dhms])");
+    private static final Pattern DURATION_PATTERN = Pattern.compile("(\\d+[dhms])");
     private static final List<String> TIME_UNITS = List.of("d", "h", "m", "s");
 
     @Inject

@@ -32,7 +32,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
     }
 
     @Override
-    public Mono<?> execute(MessageCreateEvent event) {
+    public Mono<MessageCreateEvent> execute(MessageCreateEvent event) {
         Message discordMessage = event.getMessage();
 
         String channel = integration.getMessageChannel().get(MessageTag.FROM_DISCORD_TO_MINECRAFT);

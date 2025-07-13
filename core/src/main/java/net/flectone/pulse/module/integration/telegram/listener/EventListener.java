@@ -6,7 +6,8 @@ import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateC
 
 public abstract class EventListener extends AbstractModuleMessage<Localization.Integration.Telegram> implements LongPollingSingleThreadUpdateConsumer {
 
-    public EventListener() {
+    protected EventListener() {
         super(localization -> localization.getIntegration().getTelegram());
     }
+
 }

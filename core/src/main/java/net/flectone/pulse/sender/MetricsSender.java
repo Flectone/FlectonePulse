@@ -14,7 +14,7 @@ import java.util.zip.GZIPOutputStream;
 @Singleton
 public class MetricsSender {
 
-    private final String API_URL = "https://flectone.net/api/pulse/metrics";
+    private final String apiUrl = "https://flectone.net/api/pulse/metrics";
 
     private final Gson gson;
 
@@ -27,7 +27,7 @@ public class MetricsSender {
         try {
             String jsonData = gson.toJson(metrics);
 
-            URL url = new URL(API_URL);
+            URL url = new URL(apiUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Length", String.valueOf(jsonData.getBytes(StandardCharsets.UTF_8).length));

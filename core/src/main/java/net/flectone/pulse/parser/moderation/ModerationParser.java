@@ -17,7 +17,7 @@ public abstract class ModerationParser implements ArgumentParser<FPlayer, String
     private final ModerationService moderationService;
     private final StringParser<FPlayer> stringParser;
 
-    public ModerationParser(Moderation.Type type,
+    protected ModerationParser(Moderation.Type type,
                             ModerationService moderationService) {
         this.type = type;
         this.moderationService = moderationService;

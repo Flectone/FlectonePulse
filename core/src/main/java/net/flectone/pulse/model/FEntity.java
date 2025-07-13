@@ -8,8 +8,8 @@ import java.util.UUID;
 @Getter
 public class FEntity {
 
-    protected static UUID UNKNOWN_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
-    protected static String UNKNOWN_NAME = "UNKNOWN_FLECTONEPULSE";
+    protected static UUID unknownUUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    protected static String unknownName = "UNKNOWN_FLECTONEPULSE";
 
     private final String name;
     private final UUID uuid;
@@ -18,7 +18,7 @@ public class FEntity {
     @Setter private String constantName;
 
     public FEntity(String name, UUID uuid, String type) {
-        this.name = name == null ? UNKNOWN_NAME : name;
+        this.name = name == null ? unknownName : name;
         this.type = type;
         this.uuid = uuid;
     }
@@ -28,6 +28,6 @@ public class FEntity {
     }
 
     public boolean isUnknown() {
-        return this.uuid.equals(UNKNOWN_UUID);
+        return this.uuid.equals(unknownUUID);
     }
 }
