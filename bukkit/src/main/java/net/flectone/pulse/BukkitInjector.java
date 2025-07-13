@@ -84,7 +84,7 @@ public class BukkitInjector extends AbstractModule {
         // Initialize and bind FileManager
         FileResolver fileResolver;
         try {
-            fileResolver = new FileResolver(projectPath);
+            fileResolver = new FileResolver(projectPath, fLogger);
             fileResolver.reload();
         } catch (Exception e) {
             fLogger.warning(e);

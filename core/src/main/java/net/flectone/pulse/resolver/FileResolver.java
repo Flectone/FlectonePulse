@@ -10,12 +10,18 @@ import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.configuration.*;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.util.logging.FLogger;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 
 @Singleton
@@ -29,20 +35,22 @@ public class FileResolver {
     @Getter private final Integration integration;
     @Getter private final Message message;
     @Getter private final Permission permission;
+    private final FLogger fLogger;
 
     @Getter private String preInitVersion;
 
     private Localization defaultLocalization;
 
     @Inject
-    public FileResolver(@Named("projectPath") Path projectPath) {
+    public FileResolver(@Named("projectPath") Path projectPath,
+                        FLogger fLogger) {
         this.projectPath = projectPath;
-
-        command = new Command(projectPath);
-        config = new Config(projectPath);
-        integration = new Integration(projectPath);
-        message = new Message(projectPath);
-        permission = new Permission(projectPath);
+        this.command = new Command(projectPath);
+        this.config = new Config(projectPath);
+        this.integration = new Integration(projectPath);
+        this.message = new Message(projectPath);
+        this.permission = new Permission(projectPath);
+        this.fLogger = fLogger;
     }
 
     public Localization getLocalization() {
@@ -89,6 +97,21 @@ public class FileResolver {
     private void reloadLanguages() {
         Set<String> newLanguages = new HashSet<>(Set.of("ru_ru", "en_us"));
         newLanguages.add(config.getLanguage());
+
+        try (Stream<Path> paths = Files.walk(projectPath.resolve(Localization.FOLDER_NAME))) {
+            paths.filter(Files::isRegularFile).forEach(path -> {
+                File localization = path.toFile();
+                String localizationName = localization.getName();
+                if (localizationName.endsWith(".yml")) {
+                    newLanguages.add(localizationName.replace(".yml", ""));
+                }
+            });
+        } catch (NoSuchFileException ignored) {
+            // ignore first startup
+        } catch (IOException e) {
+            fLogger.warning(e);
+        }
+
         newLanguages.forEach(this::loadLanguage);
     }
 
