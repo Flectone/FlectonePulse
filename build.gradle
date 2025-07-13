@@ -56,6 +56,7 @@ subprojects {
         compileOnly "org.jdbi:jdbi3-core:$jdbi3_core_version"
         compileOnly "org.jdbi:jdbi3-sqlobject:$jdbi3_core_version"
         compileOnly "org.xerial:sqlite-jdbc:$sqlite_jdbc_version"
+        compileOnly "io.lettuce:lettuce-core:$lettuce_version"
         compileOnly "net.kyori:adventure-text-serializer-legacy:$adventure_api"
         compileOnly "net.kyori:adventure-text-minimessage:$adventure_api"
         compileOnly "net.kyori:adventure-text-serializer-gson:$adventure_api"
