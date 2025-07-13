@@ -80,15 +80,9 @@ public class BukkitInjector extends AbstractModule {
         bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
 
         // Initialize and bind FileManager
-        FileResolver fileResolver;
-        try {
-            fileResolver = new FileResolver(projectPath, fLogger);
-            fileResolver.reload();
-        } catch (Exception e) {
-            fLogger.warning(e);
-            instance.setDisableSilently(true);
-            return;
-        }
+        FileResolver fileResolver = new FileResolver(projectPath, fLogger);
+        fileResolver.reload();
+
         bind(FileResolver.class).toInstance(fileResolver);
         bind(Database.class).asEagerSingleton();
 
