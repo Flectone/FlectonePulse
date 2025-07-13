@@ -32,8 +32,10 @@ import java.util.*;
 @Getter
 public final class Localization extends FileSerializable implements ModuleConfig {
 
+    public static final String FOLDER_NAME = "localizations";
+
     public Localization(Path projectPath, String language) {
-        super(Paths.get(projectPath.toString(), "localizations", language + ".yml"));
+        super(Paths.get(projectPath.toString(), FOLDER_NAME, language + ".yml"));
 
         if (language.equalsIgnoreCase("ru_ru")) {
             initRU_RU();
