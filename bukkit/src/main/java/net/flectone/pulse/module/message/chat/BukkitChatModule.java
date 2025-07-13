@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class BukkitChatModule extends ChatModule {
 
+    private final Message.Chat config;
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final BukkitListenerRegistry bukkitListenerManager;
@@ -53,6 +54,7 @@ public class BukkitChatModule extends ChatModule {
                             Provider<SpyModule> spyModuleProvider) {
         super(fileResolver);
 
+        this.config = fileResolver.getMessage().getChat();
         this.fPlayerService = fPlayerService;
         this.bukkitListenerManager = bukkitListenerManager;
         this.integrationModule = integrationModule;
@@ -66,7 +68,7 @@ public class BukkitChatModule extends ChatModule {
     public void onEnable() {
         super.onEnable();
 
-        bukkitListenerManager.register(ChatListener.class, EventPriority.HIGHEST);
+        bukkitListenerManager.register(ChatListener.class, EventPriority.valueOf(config.getEventPriority().name()));
     }
 
     @Override

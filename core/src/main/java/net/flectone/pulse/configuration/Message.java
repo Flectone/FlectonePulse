@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.*;
+import net.flectone.pulse.model.event.EventPriority;
 import net.flectone.pulse.module.message.format.world.WorldMode;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
 import net.flectone.pulse.util.Range;
@@ -210,6 +211,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Chat implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private EventPriority eventPriority = EventPriority.NORMAL;
         private Map<String, Type> types = new LinkedHashMap<>(){
             {
                 put("local", new Type("", true, true, 100, 0));
