@@ -21,8 +21,8 @@ import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
 import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.registry.ProxyRegistry;
 import net.flectone.pulse.sender.PacketSender;
-import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MinecraftTranslationKeys;
 import net.kyori.adventure.text.Component;
@@ -35,7 +35,7 @@ public class BasePacketListener implements PacketListener {
 
     private final FPlayerService fPlayerService;
     private final PacketSender packetSender;
-    private final ProxySender proxySender;
+    private final ProxyRegistry proxyRegistry;
     private final Provider<IntegrationModule> integrationModuleProvider;
     private final Provider<BanModule> banModuleProvider;
     private final Provider<PlayersModule> playersModuleProvider;
@@ -45,7 +45,7 @@ public class BasePacketListener implements PacketListener {
     @Inject
     public BasePacketListener(FPlayerService fPlayerService,
                               PacketSender packetSender,
-                              ProxySender proxySender,
+                              ProxyRegistry proxyRegistry,
                               Provider<IntegrationModule> integrationModuleProvider,
                               Provider<BanModule> banModuleProvider,
                               Provider<PlayersModule> playersModuleProvider,
@@ -53,7 +53,7 @@ public class BasePacketListener implements PacketListener {
                               EventProcessRegistry eventProcessRegistry) {
         this.fPlayerService = fPlayerService;
         this.packetSender = packetSender;
-        this.proxySender = proxySender;
+        this.proxyRegistry = proxyRegistry;
         this.integrationModuleProvider = integrationModuleProvider;
         this.banModuleProvider = banModuleProvider;
         this.playersModuleProvider = playersModuleProvider;
@@ -135,7 +135,7 @@ public class BasePacketListener implements PacketListener {
 
         // if no one was on the server, the cache may be invalid for other servers
         // because FlectonePulse on Proxy cannot send a message for servers that have no player
-        if (fPlayerService.getFPlayers().isEmpty() && proxySender.isEnable()) {
+        if (fPlayerService.getFPlayers().isEmpty() && proxyRegistry.hasEnabledProxy()) {
             // clears the cache of players who might have left from other servers
             fPlayerService.clear();
         }

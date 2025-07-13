@@ -7,11 +7,11 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
@@ -126,7 +126,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
 
         moderationService.remove(fTarget, mutes);
 
-        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_MUTE, dataOutputStream -> {});
+        proxySender.send(fTarget, MessageTag.SYSTEM_MUTE, dataOutputStream -> {});
 
         builder(fTarget)
                 .tag(MessageTag.COMMAND_UNMUTE)

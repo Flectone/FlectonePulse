@@ -6,14 +6,14 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.sender.ProxySender;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tictactoe.manager.TictactoeManager;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
@@ -137,7 +137,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 .sound(getSound())
                 .sendBuilt();
 
-        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_TICTACTOE_CREATE, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, MessageTag.COMMAND_TICTACTOE_CREATE, dataOutputStream -> {
             dataOutputStream.writeUTF(gson.toJson(fReceiver));
             dataOutputStream.writeInt(ticTacToe.getId());
             dataOutputStream.writeBoolean(isHard);
@@ -224,7 +224,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 .format(getMoveMessage(ticTacToe, fReceiver, fPlayer, finalTypeTitle, move))
                 .sendBuilt();
 
-        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_TICTACTOE_MOVE, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, MessageTag.COMMAND_TICTACTOE_MOVE, dataOutputStream -> {
             dataOutputStream.writeUTF(gson.toJson(fReceiver));
             dataOutputStream.writeUTF(ticTacToe.toString());
             dataOutputStream.writeInt(finalTypeTitle);

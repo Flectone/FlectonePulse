@@ -7,10 +7,10 @@ import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.converter.ColorConverter;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MessageTag;
@@ -98,7 +98,7 @@ public class ChatstyleModule extends AbstractModuleCommand<Localization.Command.
                 return;
             }
 
-            proxySender.sendMessage(fTarget, MessageTag.COMMAND_CHATSTYLE, dataOutputStream ->
+            proxySender.send(fTarget, MessageTag.COMMAND_CHATSTYLE, dataOutputStream ->
                     dataOutputStream.writeUTF(String.valueOf(style))
             );
         }

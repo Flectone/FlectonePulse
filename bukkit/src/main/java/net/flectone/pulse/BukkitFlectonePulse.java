@@ -17,7 +17,6 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.LibraryResolver;
 import net.flectone.pulse.scheduler.BukkitTaskScheduler;
 import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MetricsService;
 import net.flectone.pulse.service.ModerationService;
@@ -87,7 +86,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(Module.class).reloadWithChildren();
 
         injector.getInstance(FPlayerService.class).reload();
-        injector.getInstance(ProxySender.class).reload();
+        injector.getInstance(ProxyRegistry.class).onEnable();
 
         if (fileResolver.getConfig().isMetrics()) {
             injector.getInstance(MetricsService.class).reload();
@@ -128,7 +127,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(ListenerRegistry.class).unregisterAll();
         PacketEvents.getAPI().terminate();
 
-        injector.getInstance(ProxySender.class).disable();
+        injector.getInstance(ProxyRegistry.class).onDisable();
 
         injector.getInstance(Database.class).disconnect();
 
@@ -153,6 +152,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         injector.getInstance(ListenerRegistry.class).reload();
         injector.getInstance(MessageProcessRegistry.class).reload();
         injector.getInstance(PermissionRegistry.class).reload();
+        injector.getInstance(ProxyRegistry.class).reload();
 
         EventProcessRegistry eventProcessRegistry = injector.getInstance(EventProcessRegistry.class);
         eventProcessRegistry.reload();
@@ -175,8 +175,6 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         } catch (Exception e) {
             reloadException = new ReloadException(e.getMessage(), e);
         }
-
-        injector.getInstance(ProxySender.class).reload();
 
         FPlayerService fPlayerService = injector.getInstance(FPlayerService.class);
         fPlayerService.reload();

@@ -10,8 +10,8 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.registry.ProxyRegistry;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
@@ -27,14 +27,14 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
     @Getter private final Command.Helper command;
     private final Permission.Command.Helper permission;
     private final FPlayerService fPlayerService;
-    private final ProxySender proxySender;
+    private final ProxyRegistry proxyRegistry;
     private final PermissionChecker permissionChecker;
     private final CommandRegistry commandRegistry;
 
     @Inject
     public HelperModule(FileResolver fileResolver,
                         FPlayerService fPlayerService,
-                        ProxySender proxySender,
+                        ProxyRegistry proxyRegistry,
                         PermissionChecker permissionChecker,
                         CommandRegistry commandRegistry) {
         super(localization -> localization.getCommand().getHelper(), null);
@@ -42,7 +42,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
         this.command = fileResolver.getCommand().getHelper();
         this.permission = fileResolver.getPermission().getCommand().getHelper();
         this.fPlayerService = fPlayerService;
-        this.proxySender = proxySender;
+        this.proxyRegistry = proxyRegistry;
         this.permissionChecker = permissionChecker;
         this.commandRegistry = commandRegistry;
     }
@@ -83,7 +83,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
 
         List<FPlayer> recipients = fPlayerService.getFPlayers().stream().filter(filter).toList();
         if (recipients.isEmpty()) {
-            boolean nullHelper = !proxySender.isEnable() || fPlayerService.findOnlineFPlayers().stream()
+            boolean nullHelper = !proxyRegistry.hasEnabledProxy() || fPlayerService.findOnlineFPlayers().stream()
                     .noneMatch(online -> permissionChecker.check(online, permission.getSee()));
 
             if (nullHelper) {

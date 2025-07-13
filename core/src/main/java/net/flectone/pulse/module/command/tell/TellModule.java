@@ -7,13 +7,13 @@ import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.sender.ProxySender;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
@@ -132,7 +132,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
         String receiverUUID = fReceiver.getUuid().toString();
 
-        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_TELL, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, MessageTag.COMMAND_TELL, dataOutputStream -> {
             dataOutputStream.writeUTF(receiverUUID);
             dataOutputStream.writeUTF(message);
 

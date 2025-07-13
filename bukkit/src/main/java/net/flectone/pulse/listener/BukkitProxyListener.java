@@ -3,7 +3,7 @@ package net.flectone.pulse.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.handler.ProxyMessageHandler;
-import net.flectone.pulse.sender.ProxySender;
+import net.flectone.pulse.proxy.BukkitProxy;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.jetbrains.annotations.NotNull;
@@ -11,19 +11,19 @@ import org.jetbrains.annotations.NotNull;
 @Singleton
 public class BukkitProxyListener implements PluginMessageListener {
 
-    private final ProxySender proxySender;
+    private final BukkitProxy bukkitProxy;
     private final ProxyMessageHandler proxyMessageHandler;
 
     @Inject
-    public BukkitProxyListener(ProxySender proxySender,
+    public BukkitProxyListener(BukkitProxy bukkitProxy,
                                ProxyMessageHandler proxyMessageHandler) {
-        this.proxySender = proxySender;
+        this.bukkitProxy = bukkitProxy;
         this.proxyMessageHandler = proxyMessageHandler;
     }
 
     @Override
     public void onPluginMessageReceived(@NotNull String channel, @NotNull Player player, byte[] bytes) {
-        if (!channel.equals(proxySender.getChannel()) || !proxySender.isEnable()) {
+        if (!channel.equals(bukkitProxy.getChannel()) || !bukkitProxy.isEnable()) {
             return;
         }
 

@@ -7,13 +7,13 @@ import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.sender.ProxySender;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.converter.ColorConverter;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.converter.ColorConverter;
 import net.flectone.pulse.util.MessageTag;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -130,7 +130,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
                 }
 
                 String[] finalInputColors = inputColors;
-                proxySender.sendMessage(fTarget, MessageTag.COMMAND_CHATCOLOR, dataOutputStream ->
+                proxySender.send(fTarget, MessageTag.COMMAND_CHATCOLOR, dataOutputStream ->
                         dataOutputStream.writeUTF(String.join(" ", finalInputColors))
                 );
 

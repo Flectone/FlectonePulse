@@ -487,7 +487,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             if (proxyOutput == null) return false;
             if (range != Range.PROXY) return false;
 
-            return proxySender.sendMessage(fPlayer, tag, proxyOutput);
+            return proxySender.send(fPlayer, tag, proxyOutput);
         }
 
         private String resolveString(FPlayer fPlayer, BiFunction<FPlayer, M, String> stringResolver) {

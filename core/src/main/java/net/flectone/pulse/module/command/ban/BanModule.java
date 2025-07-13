@@ -10,19 +10,21 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.PacketSender;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.*;
+import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.util.Pair;
+import net.flectone.pulse.util.Range;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -145,7 +147,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         Moderation ban = moderationService.ban(fTarget, databaseTime, reason, fPlayer.getId());
         if (ban == null) return;
 
-        proxySender.sendMessage(fTarget, MessageTag.SYSTEM_BAN, dataOutputStream -> {});
+        proxySender.send(fTarget, MessageTag.SYSTEM_BAN, dataOutputStream -> {});
 
         kick(fPlayer, fTarget, ban);
 

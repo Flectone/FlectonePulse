@@ -7,13 +7,13 @@ import lombok.NonNull;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.poll.model.Poll;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
@@ -165,7 +165,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         String promptNumber = getPrompt().getNumber();
         int numberVote = commandContext.get(promptNumber);
 
-        boolean isSent = proxySender.sendMessage(fPlayer, MessageTag.COMMAND_POLL_VOTE, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, MessageTag.COMMAND_POLL_VOTE, dataOutputStream -> {
             dataOutputStream.writeInt(id);
             dataOutputStream.writeInt(numberVote);
         });
