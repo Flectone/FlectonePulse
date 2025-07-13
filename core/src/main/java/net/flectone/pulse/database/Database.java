@@ -77,8 +77,6 @@ public class Database {
             jdbi.registerRowMapper(ConstructorMapper.factory(Mail.class));
             jdbi.registerRowMapper(ConstructorMapper.factory(Moderation.class));
         } catch (HikariPool.PoolInitializationException e) {
-            fLogger.warning("Failed to initialize Database. Check database settings");
-
             throw new RuntimeException(e);
         }
 
