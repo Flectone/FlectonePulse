@@ -68,7 +68,7 @@ public final class Config extends FileSerializable {
     public static final class Database {
         private Type type = Type.SQLITE;
         private String name = "flectonepulse";
-        private String host = "localhost";
+        private String host = "127.0.0.1";
         private String port = "3306";
         private String user = "root";
         private String password = "1234";
