@@ -29,6 +29,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.processor.MessageProcessor;
@@ -45,7 +46,7 @@ import java.util.regex.Pattern;
  */
 
 @Singleton
-public final class LegacyMiniConvertor implements MessageProcessor {
+public final class LegacyMiniConvertor extends AbstractModule implements MessageProcessor {
 
     private final Set<Option> DEF_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
             Option.COLOR,
@@ -59,19 +60,28 @@ public final class LegacyMiniConvertor implements MessageProcessor {
     ));
 
     private final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
-    private final Permission.Message.Format formatPermission;
 
+    private final Permission.Message.Format formatPermission;
+    private final MessageProcessRegistry messageProcessRegistry;
     private final PermissionChecker permissionChecker;
 
     @Inject
     public LegacyMiniConvertor(FileResolver fileResolver,
                                MessageProcessRegistry messageProcessRegistry,
                                PermissionChecker permissionChecker) {
+        this.formatPermission = fileResolver.getPermission().getMessage().getFormat();
+        this.messageProcessRegistry = messageProcessRegistry;
         this.permissionChecker = permissionChecker;
+    }
 
-        formatPermission = fileResolver.getPermission().getMessage().getFormat();
+    @Override
+    public void onEnable() {
+        messageProcessRegistry.register(1000, this);
+    }
 
-        messageProcessRegistry.register(200, this);
+    @Override
+    protected boolean isConfigEnable() {
+        return true;
     }
 
     @Override

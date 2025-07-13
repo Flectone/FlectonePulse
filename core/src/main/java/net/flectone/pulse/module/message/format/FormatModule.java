@@ -10,6 +10,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.converter.LegacyMiniConvertor;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -126,6 +127,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         addChildren(SpoilerModule.class);
         addChildren(TranslateModule.class);
         addChildren(WorldModule.class);
+        addChildren(LegacyMiniConvertor.class);
 
         messageProcessRegistry.register(100, this);
     }
