@@ -95,7 +95,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     public @Nullable String getIp(@NotNull FPlayer fPlayer) {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player != null) {
-            return player.getAddress().getHostName();
+            return player.getAddress().getAddress().getHostAddress();
         }
 
         ProtocolManager protocolManager = packetEvents.getProtocolManager();
@@ -106,7 +106,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         User user = protocolManager.getUser(channel);
         if (user == null) return null;
 
-        return user.getAddress().getAddress().getHostName();
+        return user.getAddress().getAddress().getHostAddress();
     }
 
     @Override

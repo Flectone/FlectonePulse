@@ -64,7 +64,7 @@ public class FPlayerRepository {
     }
 
     public FPlayer get(InetAddress inetAddress) {
-        String ip = inetAddress.getHostName();
+        String ip = inetAddress.getHostAddress();
 
         Optional<FPlayer> onlinePlayer = onlinePlayers.values()
                 .stream()
