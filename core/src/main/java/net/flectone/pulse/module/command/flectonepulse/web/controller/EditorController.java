@@ -65,7 +65,7 @@ public class EditorController {
             return;
         }
 
-        ctx.html(renderEditor(token));
+        ctx.html(renderEditor());
     }
 
     private void serveFile(Context ctx) {
@@ -106,28 +106,7 @@ public class EditorController {
     }
 
     private void handleRoot(Context ctx) {
-        String message = ctx.queryParam("message");
-
-        Localization.Command.Flectonepulse.Editor locale = fileResolver.getLocalization().getCommand().getFlectonepulse().getEditor();
-        String title = locale.getSessionTerminated();
-        String description = locale.getTokenExpired();
-        String icon = "fa-exclamation-triangle";
-        String gradient = "linear-gradient(135deg, #ff5e7d 0%, #ff8e9e 100%)";
-
-        if ("logged_out".equals(message)) {
-            title = locale.getSuccessLogout();
-            description = "";
-            icon = "fa-check-circle";
-            gradient = "linear-gradient(135deg, #42f5c5 0%, #42d9f5 100%)";
-        }
-
-        String html = loadTemplate("logout.html")
-                .replace("{{gradient}}", gradient)
-                .replace("{{icon}}", icon)
-                .replace("{{title}}", title)
-                .replace("{{description}}", description)
-                .replace("{{logout_link}}", locale.getLogoutLink());
-
+        String html = loadTemplate("logout.html");
         ctx.html(html).status(401);
     }
 
@@ -141,7 +120,6 @@ public class EditorController {
         urlService.resetToken();
         ctx.json(Map.of(
                 "success", true,
-                "message", fileResolver.getLocalization().getCommand().getFlectonepulse().getEditor().getSuccessLogout(),
                 "redirect", "/?message=logged_out"
         ));
     }
@@ -188,7 +166,7 @@ public class EditorController {
         throw new FileNotFoundException("File not found: " + fileName);
     }
 
-    private String renderEditor(String token) {
+    private String renderEditor() {
         StringBuilder mainFiles = new StringBuilder();
         for (String fileName : configFiles.keySet()) {
             mainFiles.append(String.format(
@@ -206,24 +184,11 @@ public class EditorController {
             ));
         }
 
-        Localization.Command.Flectonepulse.Editor locale = fileResolver.getLocalization().getCommand().getFlectonepulse().getEditor();
         String template = loadTemplate("editor.html");
 
         return template
-                .replace("{{main_files}}", mainFiles.toString())
-                .replace("{{locale_files}}", localeFiles.toString())
-                .replace("{{token}}", token)
-                .replace("{{title}}", locale.getTitle())
-                .replace("{{documentation}}", locale.getDocumentation())
-                .replace("{{logout}}", locale.getLogout())
-                .replace("{{main_configs}}", locale.getMainConfigs())
-                .replace("{{localizations}}", locale.getLocalizations())
-                .replace("{{select_file}}", locale.getSelectFile())
-                .replace("{{save_changes}}", locale.getSaveChanges())
-                .replace("{{success_save}}", locale.getSuccessSave())
-                .replace("{{error_save}}", locale.getErrorSave())
-                .replace("{{error_logout}}", locale.getErrorLogout())
-                .replace("{{command_copied}}", locale.getCommandCopied());
+                .replace("{{mainFiles}}", mainFiles.toString())
+                .replace("{{localeFiles}}", localeFiles.toString());
     }
 
     private String loadTemplate(String name) {

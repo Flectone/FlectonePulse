@@ -1,0 +1,77 @@
+body {
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background: var(--vp-c-bg);
+    color: var(--vp-c-text-1);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+.logout-container {
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+    padding: 40px;
+    background: var(--vp-c-bg-elv);
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.logo-icon {
+    width: 52px;
+    height: 52px;
+}
+
+.logo-text {
+    font-size: 2.5rem;
+}
+
+.logout-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.logout-title {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: var(--vp-c-text-1);
+    font-weight: 600;
+}
+
+.logout-message {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    color: var(--vp-c-text-1);
+    line-height: 1.6;
+}
+
+.footer {
+    margin-top: 30px;
+    font-size: 0.9rem;
+    color: var(--vp-c-indigo-1);
+}
+
+.clickable-link {
+    color: var(--vp-c-indigo-1);
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.clickable-link:hover {
+    color: var(--vp-c-indigo-1);
+    text-decoration: none;
+}

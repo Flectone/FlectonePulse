@@ -223,22 +223,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.flectonepulse.formatTrue = "<fcolor:2>★ <u>FlectonePulse</u> успешно перезагружен! (<i><time></i>)";
         command.flectonepulse.formatEditor = "<fcolor:2>★ <u><fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\">Ссылка для веб-редактирования";
 
-        command.flectonepulse.editor.title = "Редактор FlectonePulse";
-        command.flectonepulse.editor.documentation = "Документация";
-        command.flectonepulse.editor.logout = "Выйти";
-        command.flectonepulse.editor.mainConfigs = "Основные файлы";
-        command.flectonepulse.editor.localizations = "Локализации";
-        command.flectonepulse.editor.selectFile = "Выберите файл для редактирования";
-        command.flectonepulse.editor.saveChanges = "Сохранить изменения";
-        command.flectonepulse.editor.successSave = "Файл успешно сохранён. Не забудьте выполнить /flectonepulse reload на сервере";
-        command.flectonepulse.editor.errorSave = "Ошибка сохранения файла:";
-        command.flectonepulse.editor.commandCopied = "Команда скопирована в буфер обмена";
-        command.flectonepulse.editor.successLogout = "Успешный выход из системы";
-        command.flectonepulse.editor.errorLogout = "Ошибка выхода из системы";
-        command.flectonepulse.editor.sessionTerminated = "Сессия завершена";
-        command.flectonepulse.editor.tokenExpired = "Ваш токен больше недействителен или истёк";
-        command.flectonepulse.editor.logoutLink = "Пожалуйста, получите новую ссылку с помощью";
-
         command.chatcolor.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.chatcolor.format = "<color:#98FB98>★ Теперь цвета <fcolor:1>сообщение</fcolor> <fcolor:2>сообщение</fcolor> <fcolor:3>сообщение <fcolor:4>сообщение";
         command.chatcolor.nullColor = "<color:#ff7171><b>⁉</b> Цвета введены неверно";
@@ -1072,27 +1056,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String formatFalse = "<color:#ff7171>★ An has error occurred while reloading <br>Error: <message>";
             private String formatTrue = "<fcolor:2>★ <u>FlectonePulse</u> successfully reloaded! (<i><time></i>)";
             private String formatEditor = "<fcolor:2>★ <u><fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\">Link for web editing";
-
-            private Editor editor = new Editor();
-
-            @Getter
-            public static final class Editor {
-                private String title = "FlectonePulse Editor";
-                private String documentation = "Documentation";
-                private String logout = "Logout";
-                private String mainConfigs = "Main Configs";
-                private String localizations = "Localizations";
-                private String selectFile = "Select a file to edit";
-                private String saveChanges = "Save changes";
-                private String successSave = "File saved successfully. Don't forget to run /flectonepulse reload on the server";
-                private String errorSave = "Error saving file:";
-                private String commandCopied = "Command copied to clipboard";
-                private String successLogout = "Logged out successfully";
-                private String errorLogout = "Logout failed";
-                private String sessionTerminated = "Session Terminated";
-                private String tokenExpired = "Your token is no longer valid or has expired";
-                private String logoutLink = "Please get a new link using";
-            }
         }
 
         @Getter

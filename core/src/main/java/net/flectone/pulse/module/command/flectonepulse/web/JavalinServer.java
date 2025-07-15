@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.flectonepulse.web;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.javalin.Javalin;
+import io.javalin.http.staticfiles.Location;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.module.command.flectonepulse.web.controller.EditorController;
 import net.flectone.pulse.resolver.FileResolver;
@@ -48,6 +49,12 @@ public class JavalinServer {
             threadPool.setMinThreads(1);
             threadPool.setIdleTimeout(60000);
             threadPool.setReservedThreads(0);
+
+            javalinConfig.staticFiles.add(staticFiles -> {
+                staticFiles.directory = "/web";
+                staticFiles.hostedPath = "/web";
+                staticFiles.location = Location.CLASSPATH;
+            });
 
             javalinConfig.jetty.threadPool = threadPool;
         }).start(config.getPort());
