@@ -218,9 +218,26 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.warnlist.player.line = "<hover:show_text:\"<fcolor:1>Снять предупреждение <display_name>\"><click:run_command:\"<command>\"><color:#ff7171>☒ <display_name></click></hover> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
         command.warnlist.player.footer = "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
 
+        command.flectonepulse.nullHostEditor = "<color:#ff7171><b>⁉</b> Параметр host должен быть настроен в <u>config.yml";
         command.flectonepulse.formatFalse = "<color:#ff7171>★ Возникла проблема при перезагрузке <br>Ошибка: <message>";
         command.flectonepulse.formatTrue = "<fcolor:2>★ <u>FlectonePulse</u> успешно перезагружен! (<i><time></i>)";
-        command.flectonepulse.formatTrueText = "<fcolor:2>★ ВАЖНО! Перезагружен только текст, для ПОЛНОЙ перезагрузки нужно использовать: <br><fcolor:1>/flectonepulse reload";
+        command.flectonepulse.formatEditor = "<fcolor:2>★ Ссылка для веб-редактирования <url>";
+
+        command.flectonepulse.editor.title = "Редактор FlectonePulse";
+        command.flectonepulse.editor.documentation = "Документация";
+        command.flectonepulse.editor.logout = "Выйти";
+        command.flectonepulse.editor.mainConfigs = "Основные файлы";
+        command.flectonepulse.editor.localizations = "Локализации";
+        command.flectonepulse.editor.selectFile = "Выберите файл для редактирования";
+        command.flectonepulse.editor.saveChanges = "Сохранить изменения";
+        command.flectonepulse.editor.successSave = "Файл успешно сохранён. Не забудьте выполнить /flectonepulse reload на сервере";
+        command.flectonepulse.editor.errorSave = "Ошибка сохранения файла:";
+        command.flectonepulse.editor.commandCopied = "Команда скопирована в буфер обмена";
+        command.flectonepulse.editor.successLogout = "Успешный выход из системы";
+        command.flectonepulse.editor.errorLogout = "Ошибка выхода из системы";
+        command.flectonepulse.editor.sessionTerminated = "Сессия завершена";
+        command.flectonepulse.editor.tokenExpired = "Ваш токен больше недействителен или истёк";
+        command.flectonepulse.editor.logoutLink = "Пожалуйста, получите новую ссылку с помощью";
 
         command.chatcolor.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.chatcolor.format = "<color:#98FB98>★ Теперь цвета <fcolor:1>сообщение</fcolor> <fcolor:2>сообщение</fcolor> <fcolor:3>сообщение <fcolor:4>сообщение";
@@ -1051,9 +1068,31 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Flectonepulse implements SubCommandConfig, Localizable {
+            private String nullHostEditor = "<color:#ff7171><b>⁉</b> The host parameter cannot be empty and must be configured in <u>config.yml";
             private String formatFalse = "<color:#ff7171>★ An has error occurred while reloading <br>Error: <message>";
             private String formatTrue = "<fcolor:2>★ <u>FlectonePulse</u> successfully reloaded! (<i><time></i>)";
-            private String formatTrueText = "<fcolor:2>★ IMPORTANT! <br>Only texts have been updated, for a FULL reload you need to use: <br><fcolor:1>/flectonepulse reload";
+            private String formatEditor = "<fcolor:2>★ Link for web editing <url>";
+
+            private Editor editor = new Editor();
+
+            @Getter
+            public static final class Editor {
+                private String title = "FlectonePulse Editor";
+                private String documentation = "Documentation";
+                private String logout = "Logout";
+                private String mainConfigs = "Main Configs";
+                private String localizations = "Localizations";
+                private String selectFile = "Select a file to edit";
+                private String saveChanges = "Save changes";
+                private String successSave = "File saved successfully. Don't forget to run /flectonepulse reload on the server";
+                private String errorSave = "Error saving file:";
+                private String commandCopied = "Command copied to clipboard";
+                private String successLogout = "Logged out successfully";
+                private String errorLogout = "Logout failed";
+                private String sessionTerminated = "Session Terminated";
+                private String tokenExpired = "Your token is no longer valid or has expired";
+                private String logoutLink = "Please get a new link using";
+            }
         }
 
         @Getter

@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 @Singleton
 public class FileResolver {
 
-    private final Map<String, Localization> localizationMap = new HashMap<>();
+    @Getter private final Map<String, Localization> localizationMap = new HashMap<>();
 
     @Getter private final Path projectPath;
     @Getter private final Command command;

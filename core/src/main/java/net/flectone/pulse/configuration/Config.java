@@ -64,6 +64,9 @@ public final class Config extends FileSerializable {
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/config/#redis")})
     private Redis redis = new Redis();
 
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/config/#editor")})
+    private Editor editor = new Editor();
+
     @Getter
     public static final class Database {
         private Type type = Type.SQLITE;
@@ -79,17 +82,6 @@ public final class Config extends FileSerializable {
             SQLITE,
             MYSQL
         }
-    }
-
-    @Getter
-    public static final class Redis {
-        private boolean enable = false;
-        private String host = "127.0.0.1";
-        private int port = 6379;
-        private boolean ssl = false;
-        private String user = "";
-        private String password = "";
-        public Redis() {}
     }
 
     @Getter
@@ -111,6 +103,24 @@ public final class Config extends FileSerializable {
         public MessageConfig getMessage() {
             return null;
         }
+    }
+
+    @Getter
+    public static final class Redis implements IEnable {
+        private boolean enable = false;
+        private String host = "127.0.0.1";
+        private int port = 6379;
+        private boolean ssl = false;
+        private String user = "";
+        private String password = "";
+        public Redis() {}
+    }
+
+    @Getter
+    public static final class Editor {
+        private String host = "";
+        private boolean https = false;
+        private int port = 25566;
     }
 
     public interface IEnable {

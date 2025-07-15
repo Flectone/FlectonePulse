@@ -67,6 +67,7 @@ subprojects {
         compileOnly "org.telegram:telegrambots-client:$telegrambots_version"
         compileOnly "com.yandex.cloud:java-sdk-services:$yandexsdk_version"
         compileOnly "com.deepl.api:deepl-java:$deepl_version"
+        compileOnly "io.javalin:javalin:$javalin_version"
 
         annotationProcessor "org.projectlombok:lombok:$lombok_version"
     }
