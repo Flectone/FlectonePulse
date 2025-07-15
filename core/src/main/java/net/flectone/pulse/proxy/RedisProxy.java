@@ -13,6 +13,7 @@ import net.flectone.pulse.listener.RedisListener;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.Proxy;
 import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -25,6 +26,7 @@ public class RedisProxy implements Proxy {
     private final Config.Database database;
     private final FLogger fLogger;
     private final Provider<RedisListener> redisListenerProvider;
+    private final SystemVariableResolver systemVariableResolver;
 
     private RedisClient redisClient;
     private StatefulRedisPubSubConnection<byte[], byte[]> pubSubConnection;
@@ -32,11 +34,13 @@ public class RedisProxy implements Proxy {
     @Inject
     public RedisProxy(FileResolver fileResolver,
                       FLogger fLogger,
-                      Provider<RedisListener> redisListenerProvider) {
+                      Provider<RedisListener> redisListenerProvider,
+                      SystemVariableResolver systemVariableResolver) {
         this.config = fileResolver.getConfig().getRedis();
         this.database = fileResolver.getConfig().getDatabase();
         this.fLogger = fLogger;
         this.redisListenerProvider = redisListenerProvider;
+        this.systemVariableResolver = systemVariableResolver;
     }
 
     @Override
@@ -57,7 +61,10 @@ public class RedisProxy implements Proxy {
                 .withSsl(config.isSsl());
 
         if (!config.getUser().isEmpty() && !config.getPassword().isEmpty()) {
-            uriBuilder.withAuthentication(config.getUser(), config.getPassword());
+            uriBuilder.withAuthentication(
+                    systemVariableResolver.substituteEnvVars(config.getUser()),
+                    systemVariableResolver.substituteEnvVars(config.getPassword())
+            );
         }
 
         this.redisClient = RedisClient.create(uriBuilder.build());
