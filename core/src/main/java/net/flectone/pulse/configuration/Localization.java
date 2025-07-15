@@ -221,7 +221,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.flectonepulse.nullHostEditor = "<color:#ff7171><b>⁉</b> Параметр host должен быть настроен в <u>config.yml";
         command.flectonepulse.formatFalse = "<color:#ff7171>★ Возникла проблема при перезагрузке <br>Ошибка: <message>";
         command.flectonepulse.formatTrue = "<fcolor:2>★ <u>FlectonePulse</u> успешно перезагружен! (<i><time></i>)";
-        command.flectonepulse.formatEditor = "<fcolor:2>★ Ссылка для веб-редактирования <url>";
+        command.flectonepulse.formatEditor = "<fcolor:2>★ <u><fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\">Ссылка для веб-редактирования";
 
         command.flectonepulse.editor.title = "Редактор FlectonePulse";
         command.flectonepulse.editor.documentation = "Документация";
@@ -1071,7 +1071,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String nullHostEditor = "<color:#ff7171><b>⁉</b> The host parameter cannot be empty and must be configured in <u>config.yml";
             private String formatFalse = "<color:#ff7171>★ An has error occurred while reloading <br>Error: <message>";
             private String formatTrue = "<fcolor:2>★ <u>FlectonePulse</u> successfully reloaded! (<i><time></i>)";
-            private String formatEditor = "<fcolor:2>★ Link for web editing <url>";
+            private String formatEditor = "<fcolor:2>★ <u><fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\">Link for web editing";
 
             private Editor editor = new Editor();
 
