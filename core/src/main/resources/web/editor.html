@@ -550,6 +550,7 @@
 
             const content = await response.text();
             editor.setValue(content);
+            editor.clearHistory();
             currentFile = { type: fileType, name: fileName };
         } catch (error) {
             console.error('Failed to load file:', error.message);
