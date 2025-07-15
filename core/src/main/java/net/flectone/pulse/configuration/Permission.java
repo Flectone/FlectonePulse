@@ -1275,11 +1275,11 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private String name = "flectonepulse.module.message.tab";
             private Type type = Type.TRUE;
 
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/footer/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/footer/")})
             private Footer footer = new Footer();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/header/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/header/")})
             private Header header = new Tab.Header();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/playerlistname/")})
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/playerlistname/")})
             private Playerlistname playerlistname = new Playerlistname();
 
             @Getter
