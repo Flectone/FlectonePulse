@@ -498,6 +498,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         @Getter
         public static final class Name implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
+            private boolean shouldCheckInvisibility = false;
         }
 
         @Getter

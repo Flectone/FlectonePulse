@@ -556,6 +556,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.format.name_.display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <player>\"><vault_prefix><stream_prefix><fcolor:2><player></fcolor><afk_suffix><vault_suffix></hover></click>";
         message.format.name_.entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<name>'> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><lang:'<name>'></hover></fcolor:2>";
         message.format.name_.unknown = "<fcolor:2><name></fcolor:2>";
+        message.format.name_.invisible = "<fcolor:2>\uD83D\uDC7B Невидимка";
 
         message.format.translate.action = "<click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Перевести сообщение\"><fcolor:1>⇄";
 
@@ -1978,6 +1979,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 private String display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <player>\"><vault_prefix><stream_prefix><fcolor:2><player></fcolor><afk_suffix><vault_suffix></hover></click>";
                 private String entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<name>'> <br><fcolor:1>Type <fcolor:2><lang:'<type>'> <br><fcolor:1>ID <fcolor:2><uuid>\"><lang:'<name>'></hover></fcolor:2>";
                 private String unknown = "<fcolor:2><name></fcolor:2>";
+                private String invisible = "<fcolor:2>\uD83D\uDC7B Invisible";
             }
 
             @Getter

@@ -1,13 +1,14 @@
 package net.flectone.pulse.module.message.format.name;
 
+import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -15,6 +16,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -32,13 +34,15 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
     private final MessagePipeline messagePipeline;
     private final PermissionChecker permissionChecker;
     private final MessageProcessRegistry messageProcessRegistry;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Inject
     public NameModule(FileResolver fileResolver,
                       IntegrationModule integrationModule,
                       PermissionChecker permissionChecker,
                       MessagePipeline messagePipeline,
-                      MessageProcessRegistry messageProcessRegistry) {
+                      MessageProcessRegistry messageProcessRegistry,
+                      PlatformPlayerAdapter platformPlayerAdapter) {
         super(localization -> localization.getMessage().getFormat().getName_());
 
         this.message = fileResolver.getMessage().getFormat().getName_();
@@ -48,6 +52,7 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
         this.permissionChecker = permissionChecker;
         this.messagePipeline = messagePipeline;
         this.messageProcessRegistry = messageProcessRegistry;
+        this.platformPlayerAdapter = platformPlayerAdapter;
     }
 
     @Override
@@ -67,22 +72,23 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
         FEntity sender = messageContext.getSender();
         if (messageContext.isUserMessage() && !permissionChecker.check(sender, formatPermission.getAll())) return;
 
-        if (messageContext.isPlayer()) {
-            messageContext.addTagResolvers(playerTag(sender));
-        }
-
         messageContext.addTagResolvers(constantTag(sender));
 
         FEntity receiver = messageContext.getReceiver();
         messageContext.addTagResolvers(displayTag(sender, receiver));
         messageContext.addTagResolvers(vaultSuffixTag(sender, receiver));
         messageContext.addTagResolvers(vaultPrefixTag(sender, receiver));
+
+        if (messageContext.isPlayer()) {
+            messageContext.addTagResolvers(playerTag(sender, receiver));
+        }
     }
 
     private TagResolver vaultSuffixTag(FEntity sender, FEntity fReceiver) {
         String tag = "vault_suffix";
         if (checkModulePredicates(sender)) return emptyTagResolver(tag);
         if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);
+        if (isInvisible(sender)) return emptyTagResolver(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
             String suffix = integrationModule.getSuffix(fPlayer);
@@ -100,6 +106,7 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
         String tag = "vault_prefix";
         if (checkModulePredicates(sender)) return emptyTagResolver(tag);
         if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);
+        if (isInvisible(sender)) return emptyTagResolver(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
             String prefix = integrationModule.getPrefix(fPlayer);
@@ -115,6 +122,7 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
     private TagResolver constantTag(FEntity player) {
         String tag = "constant";
         if (checkModulePredicates(player)) return emptyTagResolver(tag);
+        if (isInvisible(player)) return emptyTagResolver(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
             String constantName = player.getConstantName();
@@ -134,9 +142,10 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
         });
     }
 
-    private TagResolver playerTag(@NotNull FEntity player) {
+    private TagResolver playerTag(@NotNull FEntity player, FEntity receiver) {
         String tag = "player";
         if (checkModulePredicates(player)) return emptyTagResolver(tag);
+        if (isInvisible(player)) return invisibleTag(tag, player, receiver);
 
         return TagResolver.resolver(tag, (argumentQueue, context) ->
                 Tag.preProcessParsed(player.getName())
@@ -146,6 +155,7 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
     private TagResolver displayTag(FEntity sender, FEntity fReceiver) {
         String tag = "display_name";
         if (checkModulePredicates(sender)) return emptyTagResolver(tag);
+        if (isInvisible(sender)) return invisibleTag(tag, sender, fReceiver);
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
             if (sender instanceof FPlayer fPlayer) {
@@ -168,5 +178,21 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
                     .replace("<uuid>", sender.getUuid().toString())
             );
         });
+    }
+
+    private TagResolver invisibleTag(String tag, FEntity sender, FEntity fReceiver) {
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
+
+            String formatInvisible = resolveLocalization(fReceiver).getInvisible();
+            Component name = messagePipeline.builder(sender, fReceiver, formatInvisible)
+                    .build();
+
+            return Tag.selfClosingInserting(name);
+        });
+    }
+
+    private boolean isInvisible(FEntity entity) {
+        return message.isShouldCheckInvisibility()
+                && platformPlayerAdapter.hasPotionEffect(entity, PotionTypes.INVISIBILITY);
     }
 }
