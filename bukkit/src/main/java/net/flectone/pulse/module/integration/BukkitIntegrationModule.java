@@ -246,7 +246,7 @@ public class BukkitIntegrationModule extends IntegrationModule {
         Player player = Bukkit.getPlayer(sender.getUuid());
         if (player == null) return false;
 
-        return player.hasPermission("sv.see");
+        return player.hasPermission("sv.see") || player.hasPermission("cmi.seevanished");
     }
 
     @Override
