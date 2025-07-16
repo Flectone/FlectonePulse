@@ -75,7 +75,7 @@ public interface PlatformPlayerAdapter {
     // Player state methods
     boolean isConsole(@NotNull Object platformPlayer);
     boolean hasPlayedBefore(@NotNull FPlayer fPlayer);
-    boolean hasPotionEffect(@NotNull FPlayer fPlayer, @NotNull PotionType potionType);
+    boolean hasPotionEffect(@NotNull FEntity fPlayer, @NotNull PotionType potionType);
     boolean isOnline(@NotNull FPlayer fPlayer);
     long getFirstPlayed(@NotNull FPlayer fPlayer);
     long getLastPlayed(@NotNull FPlayer fPlayer);

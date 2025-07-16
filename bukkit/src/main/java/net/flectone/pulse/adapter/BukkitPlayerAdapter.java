@@ -124,8 +124,8 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public boolean hasPotionEffect(@NotNull FPlayer fPlayer, @NotNull PotionType potionType) {
-        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+    public boolean hasPotionEffect(@NotNull FEntity fEntity, @NotNull PotionType potionType) {
+        Player player = Bukkit.getPlayer(fEntity.getUuid());
         if (player == null) return false;
 
         return player.hasPotionEffect(SpigotConversionUtil.toBukkitPotionEffectType(potionType));
