@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.processor.MessageProcessor;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -24,7 +24,7 @@ public class MessageProcessRegistry {
     }
 
     public void register(int priority, MessageProcessor messageProcessor) {
-        processors.computeIfAbsent(priority, i -> new HashSet<>())
+        processors.computeIfAbsent(priority, i -> new LinkedHashSet<>())
                 .add(messageProcessor);
     }
 
