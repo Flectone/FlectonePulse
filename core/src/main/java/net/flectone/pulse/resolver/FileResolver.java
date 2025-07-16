@@ -135,6 +135,10 @@ public class FileResolver {
             if (intFirst < intSecond) {
                 return true;
             }
+
+            if (intFirst > intSecond) {
+                return false;
+            }
         }
 
         return false;
