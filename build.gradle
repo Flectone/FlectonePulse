@@ -88,7 +88,9 @@ subprojects {
         relocate("com.alessiodp.libby", "net.flectone.pulse.library.libby")
         relocate("net.elytrium.serializer", "net.flectone.pulse.library.elytrium")
         relocate("com.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents")
-        relocate("io.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents.impl")
+        relocate("io.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents.impl") {
+            exclude("io.github.retrooper.packetevents.adventure.**")
+        }
 
         if (!project.name.is("paper")) {
             relocate("net.kyori.adventure", "net.flectone.pulse.library.adventure")
