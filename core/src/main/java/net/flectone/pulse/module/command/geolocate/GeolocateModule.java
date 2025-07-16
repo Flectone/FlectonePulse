@@ -88,7 +88,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
             return;
         }
 
-        String ip = platformPlayerAdapter.isOnline(fTarget) ? fPlayerService.getIp(fTarget) : fTarget.getIp();
+        String ip = platformPlayerAdapter.isOnline(fTarget) ? platformPlayerAdapter.getIp(fTarget) : fTarget.getIp();
 
         List<String> request = ip == null ? List.of() : readResponse(apiUrl.replace("<ip>", ip));
         if (request.isEmpty() || request.get(0).equals("fail")) {

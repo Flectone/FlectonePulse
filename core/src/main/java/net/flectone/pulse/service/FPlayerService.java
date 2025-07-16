@@ -129,10 +129,6 @@ public class FPlayerService {
         return packetProvider.getPing(platformPlayer);
     }
 
-    public String getIp(FPlayer fPlayer) {
-        return platformPlayerAdapter.getIp(fPlayer);
-    }
-
     public String getSortedName(FPlayer fPlayer) {
         if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_17)) {
             return fPlayer.getName();
