@@ -112,6 +112,11 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                 return;
             }
 
+            builder(fPlayer)
+                    .destination(command.getDestination())
+                    .format(Localization.Command.Flectonepulse::getFormatWebStarting)
+                    .sendBuilt();
+
             UrlService urlService = injector.getInstance(UrlService.class);
             String url = urlService.generateUrl();
 
