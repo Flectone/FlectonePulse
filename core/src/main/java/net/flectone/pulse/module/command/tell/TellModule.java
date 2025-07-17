@@ -135,11 +135,12 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         boolean isSent = proxySender.send(fPlayer, MessageTag.COMMAND_TELL, dataOutputStream -> {
             dataOutputStream.writeUTF(receiverUUID);
             dataOutputStream.writeUTF(message);
-
-            send(fReceiver, fPlayer, (fResolver, s) -> s.getSender(), message);
         });
 
-        if (isSent) return;
+        if (isSent) {
+            send(fReceiver, fPlayer, (fResolver, s) -> s.getSender(), message);
+            return;
+        }
 
         FPlayer fNewReceiver = fPlayerService.getFPlayer(fReceiver.getUuid());
         if (!integrationModule.isVanishedVisible(fNewReceiver, fPlayer)) {
