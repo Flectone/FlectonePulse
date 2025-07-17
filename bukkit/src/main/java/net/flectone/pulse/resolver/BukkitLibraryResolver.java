@@ -110,7 +110,6 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .relocate(Relocation.builder()
                         .pattern("io{}github{}retrooper{}packetevents")
                         .relocatedPattern("net.flectone.pulse.library.packetevents.impl")
-                        .exclude("io{}github{}retrooper{}packetevents{}adventure{}**")
                         .build()
                 )
                 .relocate(Relocation.builder()
