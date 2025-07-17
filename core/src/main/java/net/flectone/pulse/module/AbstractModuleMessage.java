@@ -432,7 +432,8 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
 
             if (!fReceiver.isUnknown()) {
                 String messageToTranslate = resolveString(fReceiver, this.message);
-                formatBuilder = formatBuilder.translate(messageToTranslate, formatContent.contains("<translate>"));
+                // support new <translate> and old <translateto>
+                formatBuilder = formatBuilder.translate(messageToTranslate, formatContent.contains("<translate"));
             }
 
             if (formatComponentBuilder != null) {
