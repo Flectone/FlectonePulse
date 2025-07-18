@@ -12,6 +12,7 @@ public class Event {
     }
 
     public enum Type {
+        PLAYER_PRE_LOGIN,
         PLAYER_LOAD,
         PLAYER_JOIN,
         PLAYER_QUIT,

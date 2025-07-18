@@ -2,6 +2,7 @@ package net.flectone.pulse.provider;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.PacketEventsAPI;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -35,5 +36,9 @@ public class PacketProvider {
 
     public int getPing(Object player) {
         return packetEvents.getPlayerManager().getPing(player);
+    }
+
+    public ServerVersion getServerVersion() {
+        return packetEvents.getServerManager().getVersion();
     }
 }

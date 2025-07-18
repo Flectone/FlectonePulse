@@ -1,7 +1,5 @@
 package net.flectone.pulse.module.message.status.players;
 
-import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerDisconnect;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
@@ -11,10 +9,12 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.sender.PacketSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 
@@ -29,7 +29,7 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
     private final PermissionChecker permissionChecker;
     private final PlatformServerAdapter platformServerAdapter;
     private final MessagePipeline messagePipeline;
-    private final PacketSender packetSender;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public PlayersModule(FileResolver fileResolver,
@@ -37,7 +37,7 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
                          PermissionChecker permissionChecker,
                          PlatformServerAdapter platformServerAdapter,
                          MessagePipeline messagePipeline,
-                         PacketSender packetSender) {
+                         EventProcessRegistry eventProcessRegistry) {
         super(module -> module.getMessage().getStatus().getPlayers());
 
         this.message = fileResolver.getMessage().getStatus().getPlayers();
@@ -46,36 +46,41 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
         this.permissionChecker = permissionChecker;
         this.platformServerAdapter = platformServerAdapter;
         this.messagePipeline = messagePipeline;
-        this.packetSender = packetSender;
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override
     public void onEnable() {
         registerModulePermission(permission);
         registerPermission(permission.getBypass());
+
+        eventProcessRegistry.registerHandler(Event.Type.PLAYER_PRE_LOGIN, event -> {
+            PlayerPreLoginEvent playerPreLoginEvent = (PlayerPreLoginEvent) event;
+            FPlayer fPlayer = playerPreLoginEvent.getPlayer();
+
+            if (isAllowed(fPlayer)) return;
+
+            playerPreLoginEvent.setAllowed(false);
+
+            fPlayerService.loadSettings(fPlayer);
+            fPlayerService.loadColors(fPlayer);
+
+            String reasonMessage = resolveLocalization(fPlayer).getFull();
+            Component reason = messagePipeline.builder(fPlayer, reasonMessage).build();
+
+            playerPreLoginEvent.setKickReason(reason);
+        });
     }
 
-    public boolean isKicked(UserProfile userProfile) {
-        if (!isEnable()) return false;
-        if (!message.isControl()) return false;
+    public boolean isAllowed(FPlayer fPlayer) {
+        if (!isEnable()) return true;
+        if (!message.isControl()) return true;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(userProfile.getUUID());
-
-        if (checkModulePredicates(fPlayer)) return false;
-        if (permissionChecker.check(fPlayer, permission.getBypass())) return false;
+        if (checkModulePredicates(fPlayer)) return true;
+        if (permissionChecker.check(fPlayer, permission.getBypass())) return true;
 
         int online = platformServerAdapter.getOnlinePlayerCount();
-        if (online < message.getMax()) return false;
-
-        fPlayerService.loadSettings(fPlayer);
-        fPlayerService.loadColors(fPlayer);
-
-        String reasonMessage = resolveLocalization(fPlayer).getFull();
-
-        Component reason = messagePipeline.builder(fPlayer, reasonMessage).build();
-
-        packetSender.send(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
-        return true;
+        return online < message.getMax();
     }
 
     @Override

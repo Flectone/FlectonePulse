@@ -1,8 +1,6 @@
 package net.flectone.pulse.module.command.maintenance;
 
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerDisconnect;
 import com.github.retrooper.packetevents.wrapper.status.server.WrapperStatusServerResponse;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -15,16 +13,19 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.maintenance.listener.MaintenancePacketListener;
-import net.flectone.pulse.registry.CommandRegistry;
-import net.flectone.pulse.registry.ListenerRegistry;
-import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.util.FileUtil;
+import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.PacketSender;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.FileUtil;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -46,6 +47,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     private final MessagePipeline messagePipeline;
     private final CommandRegistry commandRegistry;
     private final PacketSender packetSender;
+    private final EventProcessRegistry eventProcessRegistry;
 
     private String icon;
 
@@ -58,7 +60,8 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                              FileUtil fileUtil,
                              CommandRegistry commandRegistry,
                              MessagePipeline messagePipeline,
-                             PacketSender packetSender) {
+                             PacketSender packetSender,
+                             EventProcessRegistry eventProcessRegistry) {
         super(module -> module.getCommand().getMaintenance(), null);
 
         this.command = fileResolver.getCommand().getMaintenance();
@@ -72,6 +75,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         this.fileUtil = fileUtil;
         this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override
@@ -110,6 +114,23 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         );
 
         addPredicate(this::checkCooldown);
+
+        eventProcessRegistry.registerHandler(Event.Type.PLAYER_PRE_LOGIN, event -> {
+            PlayerPreLoginEvent playerPreLoginEvent = (PlayerPreLoginEvent) event;
+            FPlayer fPlayer = playerPreLoginEvent.getPlayer();
+
+            if (isAllowed(fPlayer)) return;
+
+            playerPreLoginEvent.setAllowed(false);
+
+            fPlayerService.loadSettings(fPlayer);
+            fPlayerService.loadColors(fPlayer);
+
+            String reasonMessage = resolveLocalization(fPlayer).getKick();
+            Component reason = messagePipeline.builder(fPlayer, reasonMessage).build();
+
+            playerPreLoginEvent.setKickReason(reason);
+        });
     }
 
     @Override
@@ -153,21 +174,11 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         user.sendPacket(wrapperStatusServerResponse);
     }
 
-    public boolean isKicked(UserProfile userProfile) {
-        if (!isEnable()) return false;
-        if (!command.isTurnedOn()) return false;
+    public boolean isAllowed(FPlayer fPlayer) {
+        if (!isEnable()) return true;
+        if (!command.isTurnedOn()) return true;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(userProfile.getUUID());
-        if (permissionChecker.check(fPlayer, permission.getJoin())) return false;
-
-        fPlayerService.loadSettings(fPlayer);
-        fPlayerService.loadColors(fPlayer);
-
-        String messageKick = resolveLocalization(fPlayer).getKick();
-
-        Component reason = messagePipeline.builder(fPlayer, messageKick).build();
-        packetSender.send(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
-        return true;
+        return permissionChecker.check(fPlayer, permission.getJoin());
     }
 
     private JsonElement getVersionJson(String message) {

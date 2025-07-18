@@ -1,7 +1,5 @@
 package net.flectone.pulse.module.command.ban;
 
-import com.github.retrooper.packetevents.protocol.player.UserProfile;
-import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerDisconnect;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -14,9 +12,12 @@ import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.PacketSender;
 import net.flectone.pulse.sender.ProxySender;
@@ -46,6 +47,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     private final PacketSender packetSender;
     private final ProxySender proxySender;
     private final Gson gson;
+    private final EventProcessRegistry eventProcessRegistry;
 
     @Inject
     public BanModule(FileResolver fileResolver,
@@ -57,7 +59,8 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
                      MessagePipeline messagePipeline,
                      PacketSender packetSender,
                      ProxySender proxySender,
-                     Gson gson) {
+                     Gson gson,
+                     EventProcessRegistry eventProcessRegistry) {
         super(localization -> localization.getCommand().getBan(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.BAN));
 
         this.command = fileResolver.getCommand().getBan();
@@ -71,6 +74,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         this.packetSender = packetSender;
         this.proxySender = proxySender;
         this.gson = gson;
+        this.eventProcessRegistry = eventProcessRegistry;
     }
 
     @Override
@@ -100,6 +104,10 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
                         .required(promptPlayer, commandRegistry.playerParser(command.isSuggestOfflinePlayers()))
                         .optional(promptTime + " " + promptReason, commandRegistry.durationReasonParser())
                         .handler(this)
+        );
+
+        eventProcessRegistry.registerHandler(Event.Type.PLAYER_PRE_LOGIN, event ->
+                isAllowed((PlayerPreLoginEvent) event)
         );
     }
 
@@ -185,12 +193,13 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         fPlayerService.kick(fTarget, messagePipeline.builder(fModerator, fTarget, formatPlayer).build());
     }
 
-    public boolean isKicked(UserProfile userProfile) {
-        if (!isEnable()) return false;
+    public void isAllowed(PlayerPreLoginEvent event) {
+        if (!isEnable()) return;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(userProfile.getUUID());
-
+        FPlayer fPlayer = event.getPlayer();
         for (Moderation ban : moderationService.getValidBans(fPlayer)) {
+            event.setAllowed(false);
+
             FPlayer fModerator = fPlayerService.getFPlayer(ban.getModerator());
 
             fPlayerService.loadSettings(fPlayer);
@@ -200,7 +209,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
             String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.getPerson(), fPlayer, ban);
 
             Component reason = messagePipeline.builder(fModerator, fPlayer, formatPlayer).build();
-            packetSender.send(userProfile.getUUID(), new WrapperLoginServerDisconnect(reason));
+            event.setKickReason(reason);
 
             if (command.isShowConnectionAttempts()) {
                 builder(fPlayer)
@@ -212,10 +221,6 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
                         })
                         .sendBuilt();
             }
-
-            return true;
         }
-
-        return false;
     }
 }
