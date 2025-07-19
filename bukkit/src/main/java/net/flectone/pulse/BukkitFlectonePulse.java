@@ -54,6 +54,13 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
 
     @Override
     public void onEnable() {
+        getLogger().info("\n" +
+                "██╗░░██╗██╗░░░██╗██╗░░░██╗\n" +
+                "██║░░██║██║░░░██║╚██╗░██╔╝\n" +
+                "███████║██║░░░██║░╚████╔╝░\n" +
+                "██╔══██║██║░░░██║░░╚██╔╝░░\n" +
+                "██║░░██║╚██████╔╝░░░██║░░░\n" +
+                "╚═╝░░╚═╝░╚═════╝░░░░╚═╝░░░");
         try {
             // create guice injector for dependency injection
             injector = Guice.createInjector(new BukkitInjector(this, this, libraryResolver, fLogger));
