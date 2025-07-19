@@ -3,6 +3,7 @@ package net.flectone.pulse.listener;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
@@ -66,7 +67,8 @@ public class BukkitBaseListener implements Listener {
         asyncProcessQuitEvent(event);
     }
 
-    private void asyncProcessJoinEvent(PlayerJoinEvent event) {
+    @Async
+    public void asyncProcessJoinEvent(PlayerJoinEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
 
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
@@ -74,7 +76,8 @@ public class BukkitBaseListener implements Listener {
         eventProcessRegistry.processEvent(new net.flectone.pulse.model.event.player.PlayerJoinEvent(fPlayer));
     }
 
-    private void asyncProcessQuitEvent(PlayerQuitEvent event) {
+    @Async
+    public void asyncProcessQuitEvent(PlayerQuitEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
