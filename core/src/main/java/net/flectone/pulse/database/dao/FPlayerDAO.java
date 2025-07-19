@@ -71,10 +71,10 @@ public class FPlayerDAO extends BaseDAO<FPlayerSQL> {
         if (fPlayer.isUnknown()) return;
 
         useHandle(sql -> {
-            if (config.getType() == Config.Database.Type.MYSQL) {
-                sql.insertOrIgnoreMySQL(fPlayer.getId(), fPlayer.getUuid().toString(), fPlayer.getName());
-            } else {
-                sql.insertOrIgnoreSQLite(fPlayer.getId(), fPlayer.getUuid().toString(), fPlayer.getName());
+            switch (config.getType()) {
+                case H2 -> sql.insertOrIgnoreH2(fPlayer.getId(), fPlayer.getUuid().toString(), fPlayer.getName());
+                case SQLITE -> sql.insertOrIgnoreSQLite(fPlayer.getId(), fPlayer.getUuid().toString(), fPlayer.getName());
+                case MYSQL -> sql.insertOrIgnoreMySQL(fPlayer.getId(), fPlayer.getUuid().toString(), fPlayer.getName());
             }
         });
     }

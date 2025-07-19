@@ -42,6 +42,7 @@ public class Database {
     private final SystemVariableResolver systemVariableResolver;
     private final PlatformServerAdapter platformServerAdapter;
     private final FLogger fLogger;
+    private final LibraryResolver libraryResolver;
 
     private HikariDataSource dataSource;
     private Jdbi jdbi;
@@ -54,6 +55,9 @@ public class Database {
                     PlatformServerAdapter platformServerAdapter,
                     FLogger fLogger) {
 
+                    FLogger fLogger,
+                    LibraryResolver libraryResolver) {
+        this.config = fileResolver.getConfig().getDatabase();
         this.injector = injector;
         this.fileResolver = fileResolver;
         this.projectPath = projectPath;
@@ -62,6 +66,7 @@ public class Database {
         this.fLogger = fLogger;
 
         config = fileResolver.getConfig().getDatabase();
+        this.libraryResolver = libraryResolver;
     }
 
     public void connect() throws IOException {
@@ -119,6 +124,24 @@ public class Database {
 
         String connectionURL = "jdbc:" + config.getType().name().toLowerCase() + ":";
         switch (config.getType()) {
+            case H2 -> {
+                setupH2Library();
+
+                connectionURL = connectionURL +
+                        "file:./" + projectPath.toString() +
+                        File.separator +
+                        systemVariableResolver.substituteEnvVars(config.getName()) + ".h2" +
+                        ";DB_CLOSE_DELAY=-1;MODE=MySQL";
+
+                hikariConfig.setDriverClassName("org.h2.Driver");
+                hikariConfig.setMaximumPoolSize(5);
+                hikariConfig.setMinimumIdle(1);
+                hikariConfig.setConnectionTimeout(30000);
+                hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
+                hikariConfig.addDataSourceProperty("prepStmtCacheSize", "500");
+                hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "4096");
+            }
+
             case SQLITE -> {
                 connectionURL = connectionURL +
                         projectPath.toString() +
@@ -207,6 +230,19 @@ public class Database {
             } catch (IOException e) {
                 fLogger.warning(e);
             }
+        }
+    }
+
+    private void setupH2Library() {
+        try {
+            Class.forName("org.h2");
+        } catch (ClassNotFoundException ignored) {
+            libraryResolver.loadLibrary(Library.builder()
+                    .groupId("com{}h2database")
+                    .artifactId("h2")
+                    .version(BuildConfig.H2_VERSION)
+                    .build()
+            );
         }
     }
 }

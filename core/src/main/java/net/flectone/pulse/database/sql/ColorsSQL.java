@@ -34,6 +34,10 @@ public interface ColorsSQL extends SQL {
     @GetGeneratedKeys("id")
     int upsertSQLite(@Bind("colorName") String colorName);
 
+    @SqlUpdate("MERGE INTO color (name) KEY(name) VALUES (:colorName)")
+    @GetGeneratedKeys("id")
+    int upsertH2(@Bind("colorName") String colorName);
+
     @SqlUpdate("UPDATE `player_color` SET `color` = :colorId WHERE `player` = :playerId AND `number` = :number")
     void updatePlayerColor(@Bind("playerId") int playerId, @Bind("number") int number, @Bind("colorId") int colorId);
 

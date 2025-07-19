@@ -79,6 +79,7 @@ public final class Config extends FileSerializable {
         public Database() {}
 
         public enum Type {
+            H2,
             SQLITE,
             MYSQL
         }

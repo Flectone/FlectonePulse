@@ -37,10 +37,11 @@ public class ColorsDAO extends BaseDAO<ColorsSQL> {
             colors.forEach((key, colorName) -> {
                 int number = Integer.parseInt(key);
                 int colorId = sql.findColorIdByName(colorName)
-                        .orElseGet(() -> config.getType() == Config.Database.Type.MYSQL
-                                ? sql.upsertMySQL(colorName)
-                                : sql.upsertSQLite(colorName)
-                        );
+                        .orElseGet(() -> switch (config.getType()) {
+                            case H2 -> sql.upsertH2(colorName);
+                            case SQLITE -> sql.upsertSQLite(colorName);
+                            case MYSQL -> sql.upsertMySQL(colorName);
+                        });
 
                 if (currentColors.containsKey(number)) {
                     if (currentColors.get(number) != colorId) {
