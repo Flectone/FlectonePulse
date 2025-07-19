@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
@@ -58,6 +59,8 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
         return message.isEnable();
     }
 
+    // delay for vanish plugins
+    @Async(delay = 10)
     public void send(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
