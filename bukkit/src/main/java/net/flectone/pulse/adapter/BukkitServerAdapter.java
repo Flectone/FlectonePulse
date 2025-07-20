@@ -36,20 +36,16 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Singleton
 public class BukkitServerAdapter implements PlatformServerAdapter {
 
     public static final boolean IS_FOLIA;
     public static final boolean IS_PAPER;
-    public static final boolean IS_1_20_5_OR_NEWER;
 
     static {
         IS_FOLIA = detectFolia();
         IS_PAPER = detectPaper();
-        IS_1_20_5_OR_NEWER = parseBukkitVersion() >= 20.5;
     }
 
     private final Plugin plugin;
@@ -143,7 +139,12 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
     @Override
     public @NotNull ItemStack buildItemStack(FPlayer fPlayer, String material, String title, String[] lore) {
-        Material itemMaterial = Material.valueOf(material);
+        Material itemMaterial;
+        try {
+            itemMaterial = Material.valueOf(material);
+        } catch (IllegalArgumentException e) {
+            itemMaterial = Material.DIAMOND_BLOCK;
+        }
 
         Component componentName = buildItemNameComponent(fPlayer, title);
 
@@ -230,7 +231,9 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     public @NotNull Component translateItemName(Object item, boolean translatable) {
         if (!(item instanceof org.bukkit.inventory.ItemStack itemStack)) return Component.empty();
 
-        Component component = itemStack.getItemMeta() == null || itemStack.getItemMeta().getDisplayName().isEmpty()
+        Component component = itemStack.getItemMeta() == null
+                || itemStack.getItemMeta().getDisplayName() == null // support legacy versions
+                || itemStack.getItemMeta().getDisplayName().isEmpty()
                 ? createTranslatableItemName(itemStack, translatable)
                 : Component.text(itemStack.getItemMeta().getDisplayName()).decorate(TextDecoration.ITALIC);
 
@@ -284,19 +287,5 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         }
 
         return false;
-    }
-
-    private static double parseBukkitVersion() {
-        double finalVersion = 0.0;
-        Matcher m = Pattern.compile("1\\.(\\d+(\\.\\d+)?)").matcher(Bukkit.getVersion());
-        if (m.find()) {
-            try {
-                finalVersion = Double.parseDouble(m.group(1));
-            } catch (Exception ignored) {
-                // ignore incorrect version
-            }
-        }
-
-        return finalVersion;
     }
 }
