@@ -69,8 +69,10 @@ public class Inventory {
             return this;
         }
 
-        public Inventory build() {
-            WrapperPlayServerOpenWindow wrapperWindow = new WrapperPlayServerOpenWindow(126, size >= 24 ? 5 : size, name);
+        public Inventory build(boolean modern) {
+            WrapperPlayServerOpenWindow wrapperWindow = modern
+                    ? new WrapperPlayServerOpenWindow(126, size >= 24 ? 5 : size, name)
+                    : new WrapperPlayServerOpenWindow(126, "chest", name, size, 0);
 
             List<ItemStack> items = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {

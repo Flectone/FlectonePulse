@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.command.chatsetting;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -13,6 +14,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.inventory.Inventory;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
@@ -35,6 +37,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     private final PermissionChecker permissionChecker;
     private final InventoryController inventoryController;
     private final PlatformServerAdapter platformServerAdapter;
+    private final boolean modernVersion;
 
     @Inject
     public ChatsettingModule(FileResolver fileResolver,
@@ -43,7 +46,8 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                              CommandRegistry commandRegistry,
                              PermissionChecker permissionChecker,
                              InventoryController inventoryController,
-                             PlatformServerAdapter platformServerAdapter) {
+                             PlatformServerAdapter platformServerAdapter,
+                             PacketProvider packetProvider) {
         super(localization -> localization.getCommand().getChatsetting(), null);
 
         this.chatPermission = fileResolver.getPermission().getMessage().getChat();
@@ -55,6 +59,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         this.permissionChecker = permissionChecker;
         this.inventoryController = inventoryController;
         this.platformServerAdapter = platformServerAdapter;
+        this.modernVersion = packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_14);
     }
 
     @Override
@@ -108,7 +113,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
             };
         }
 
-        inventoryController.open(fPlayer, inventoryBuilder.build());
+        inventoryController.open(fPlayer, inventoryBuilder.build(modernVersion));
     }
 
     private Inventory.Builder handleChat(FPlayer fPlayer, Inventory.Builder inventoryBuilder) {
@@ -186,7 +191,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                                 });
                     }
 
-                    inventoryController.open(fPlayer, inventoryChatsBuilder.build());
+                    inventoryController.open(fPlayer, inventoryChatsBuilder.build(modernVersion));
                 });
     }
 
@@ -255,7 +260,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                                 });
                     }
 
-                    inventoryController.open(fPlayer, inventoryColorsBuilder.build());
+                    inventoryController.open(fPlayer, inventoryColorsBuilder.build(modernVersion));
                 });
     }
 
@@ -319,7 +324,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                                 });
                     }
 
-                    inventoryController.open(fPlayer, inventoryStylesBuilder.build());
+                    inventoryController.open(fPlayer, inventoryStylesBuilder.build(modernVersion));
                 });
     }
 
