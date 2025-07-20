@@ -7,6 +7,7 @@ import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.sender.MessageSender;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.exception.ArgumentParseException;
 import org.incendo.cloud.exception.CommandExecutionException;
@@ -24,14 +25,17 @@ public class CommandExceptionHandler {
     private final FileResolver fileResolver;
     private final MessageSender messageSender;
     private final MessagePipeline messagePipeline;
+    private final FLogger fLogger;
 
     @Inject
     public CommandExceptionHandler(FileResolver fileResolver,
                                    MessageSender messageSender,
-                                   MessagePipeline messagePipeline) {
+                                   MessagePipeline messagePipeline,
+                                   FLogger fLogger) {
         this.fileResolver = fileResolver;
         this.messageSender = messageSender;
         this.messagePipeline = messagePipeline;
+        this.fLogger = fLogger;
     }
 
     public void handleArgumentParseException(ExceptionContext<FPlayer, ArgumentParseException> context) {
@@ -96,6 +100,11 @@ public class CommandExceptionHandler {
     }
 
     public void handleCommandExecutionException(ExceptionContext<FPlayer, CommandExecutionException> context) {
+        // send logs to console
+        if (!context.context().sender().isUnknown()) {
+            fLogger.warning(context.exception());
+        }
+
         FPlayer fPlayer = context.context().sender();
 
         String message = fileResolver.getLocalization(fPlayer)
