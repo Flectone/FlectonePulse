@@ -1,8 +1,5 @@
 package net.flectone.pulse.adapter;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.PacketEventsAPI;
-import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
@@ -23,12 +20,11 @@ import net.flectone.pulse.provider.PassengersProvider;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,14 +37,19 @@ import java.util.stream.Collectors;
 public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     private final Injector injector;
-    private final PacketEventsAPI<?> packetEvents = PacketEvents.getAPI();
+    private final PacketProvider packetProvider;
     private final AttributesProvider attributesProvider;
+    private final PassengersProvider passengersProvider;
 
     @Inject
-    public BukkitPlayerAdapter(Injector injector) {
+    public BukkitPlayerAdapter(Injector injector,
+                               PacketProvider packetProvider,
                                AttributesProvider attributesProvider,
+                               PassengersProvider passengersProvider) {
         this.injector = injector;
+        this.packetProvider = packetProvider;
         this.attributesProvider = attributesProvider;
+        this.passengersProvider = passengersProvider;
     }
 
     @Override
@@ -106,12 +107,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
             return getHostAddress(player.getAddress());
         }
 
-        ProtocolManager protocolManager = packetEvents.getProtocolManager();
-
-        Object channel = protocolManager.getChannel(fPlayer.getUuid());
-        if (channel == null) return null;
-
-        User user = protocolManager.getUser(channel);
+        User user = packetProvider.getUser(fPlayer);
         if (user == null) return null;
 
         return getHostAddress(user.getAddress());
@@ -273,9 +269,16 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) return null;
 
-        return player.getInventory().getItemInMainHand().getType() == Material.AIR
-                ? player.getInventory().getItemInOffHand()
-                : player.getInventory().getItemInMainHand();
+        PlayerInventory playerInventory = player.getInventory();
+        try {
+            PlayerInventory.class.getMethod("getItemInMainHand");
+            return playerInventory.getItemInMainHand().getType() == Material.AIR
+                    ? playerInventory.getItemInOffHand()
+                    : playerInventory.getItemInMainHand();
+
+        } catch (NoSuchMethodException e) {
+            return playerInventory.getItemInHand();
+        }
     }
 
     @Override
@@ -319,12 +322,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return Collections.emptyList();
 
-        List<Entity> passengers = player.getPassengers();
-        if (passengers.isEmpty()) return Collections.emptyList();
-
-        return passengers.stream()
-                .map(Entity::getEntityId)
-                .toList();
+        return passengersProvider.getPassengers(player);
     }
 
     @Override
