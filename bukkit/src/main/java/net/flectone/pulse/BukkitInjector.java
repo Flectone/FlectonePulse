@@ -36,6 +36,7 @@ import net.flectone.pulse.module.message.quit.BukkitQuitModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.sign.BukkitSignModule;
 import net.flectone.pulse.module.message.sign.SignModule;
+import net.flectone.pulse.provider.*;
 import net.flectone.pulse.registry.*;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.LibraryResolver;
@@ -51,6 +52,7 @@ import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.nio.file.Path;
@@ -96,6 +98,13 @@ public class BukkitInjector extends AbstractModule {
             bind(AttributesProvider.class).to(ModernAttributesProvider.class);
         } catch (ClassNotFoundException e) {
             bind(AttributesProvider.class).to(LegacyAttributesProvider.class);
+        }
+
+        try {
+            Player.class.getMethod("getPassengers");
+            bind(PassengersProvider.class).to(ModernPassengersProvider.class);
+        } catch (NoSuchMethodException e) {
+            bind(PassengersProvider.class).to(LegacyPassengersProvider.class);
         }
 
         // Registries

@@ -14,6 +14,7 @@ import net.flectone.pulse.parser.integer.ColorParser;
 import net.flectone.pulse.parser.integer.DurationReasonParser;
 import net.flectone.pulse.parser.player.PlayerParser;
 import net.flectone.pulse.parser.string.MessageParser;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.Plugin;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
@@ -32,18 +33,20 @@ import org.incendo.cloud.setting.ManagerSetting;
 import java.util.function.Function;
 
 @Singleton
-public class BukkitCommandRegistry extends CommandRegistry {
+public class ModernBukkitCommandRegistry extends CommandRegistry {
 
+    private final Plugin plugin;
     private final LegacyPaperCommandManager<FPlayer> manager;
 
     @Inject
-    public BukkitCommandRegistry(CommandParserRegistry parsers,
-                                 CommandExceptionHandler commandExceptionHandler,
-                                 PermissionChecker permissionChecker,
-                                 Plugin plugin,
-                                 FPlayerMapper fPlayerMapper) {
+    public ModernBukkitCommandRegistry(CommandParserRegistry parsers,
+                                       CommandExceptionHandler commandExceptionHandler,
+                                       PermissionChecker permissionChecker,
+                                       Plugin plugin,
+                                       FPlayerMapper fPlayerMapper) {
         super(parsers, permissionChecker);
 
+        this.plugin = plugin;
         this.manager = new LegacyPaperCommandManager<>(plugin, ExecutionCoordinator.asyncCoordinator(), fPlayerMapper);
 
         if (manager.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
@@ -99,6 +102,9 @@ public class BukkitCommandRegistry extends CommandRegistry {
         if (!containsCommand(commandName)) {
             unregisterCommand(commandName);
         }
+
+        PluginCommand pluginCommand = plugin.getServer().getPluginCommand(commandName);
+        if (pluginCommand != null) return;
 
         // save to cache
         addCommand(commandName);
