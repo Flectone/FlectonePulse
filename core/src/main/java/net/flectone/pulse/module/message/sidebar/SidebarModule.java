@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.message.sidebar;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.score.ScoreFormat;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisplayScoreboard;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerScoreboardObjective;
@@ -16,6 +17,7 @@ import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleListMessage;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
@@ -23,11 +25,12 @@ import net.flectone.pulse.sender.PacketSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Singleton
 public class SidebarModule extends AbstractModuleListMessage<Localization.Message.Sidebar> {
+
+    private final Map<UUID, List<String>> playerSidebar = new HashMap<>();
 
     @Getter private final Message.Sidebar message;
     private final Permission.Message.Sidebar permission;
@@ -36,6 +39,7 @@ public class SidebarModule extends AbstractModuleListMessage<Localization.Messag
     private final MessagePipeline messagePipeline;
     private final PacketSender packetSender;
     private final EventProcessRegistry eventProcessRegistry;
+    private final PacketProvider packetProvider;
 
     @Inject
     public SidebarModule(FileResolver fileResolver,
@@ -43,7 +47,8 @@ public class SidebarModule extends AbstractModuleListMessage<Localization.Messag
                          TaskScheduler taskScheduler,
                          MessagePipeline messagePipeline,
                          PacketSender packetSender,
-                         EventProcessRegistry eventProcessRegistry) {
+                         EventProcessRegistry eventProcessRegistry,
+                         PacketProvider packetProvider) {
         super(localization -> localization.getMessage().getSidebar());
 
         this.message = fileResolver.getMessage().getSidebar();
@@ -53,6 +58,7 @@ public class SidebarModule extends AbstractModuleListMessage<Localization.Messag
         this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
         this.eventProcessRegistry = eventProcessRegistry;
+        this.packetProvider = packetProvider;
     }
 
     @Override
@@ -73,6 +79,7 @@ public class SidebarModule extends AbstractModuleListMessage<Localization.Messag
     @Override
     public void onDisable() {
         fPlayerService.getFPlayers().forEach(this::remove);
+        // no clear playerSidebar map for next sidebars
     }
 
     @Override
@@ -128,11 +135,22 @@ public class SidebarModule extends AbstractModuleListMessage<Localization.Messag
                 objectiveName
         ));
 
-        for (int i = 1; i < lines.length; i++) {
-            Component line = messagePipeline.builder(fPlayer, lines[i]).build();
+        if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_3)) {
+            modernSidebarLines(fPlayer, objectiveName, lines);
+        } else {
+            legacySidebarLines(fPlayer, objectiveName, lines);
+        }
 
+    }
+
+    private void modernSidebarLines(FPlayer fPlayer, String objectiveName, String[] lines) {
+        for (int i = 1; i < lines.length; i++) {
             int lineIndex = i - 1;
-            String lineId = createLineId(lineIndex, fPlayer);
+
+            String lineId;
+            Component line;
+            lineId = createLineId(lineIndex, fPlayer);
+            line = messagePipeline.builder(fPlayer, lines[i]).build();
 
             packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
                     lineId,
@@ -143,6 +161,46 @@ public class SidebarModule extends AbstractModuleListMessage<Localization.Messag
                     ScoreFormat.blankScore()
             ));
         }
+    }
+
+
+    private void legacySidebarLines(FPlayer fPlayer, String objectiveName, String[] lines) {
+        List<String> sidebars = playerSidebar.getOrDefault(fPlayer.getUuid(), new ArrayList<>(15));
+
+        for (int i = 0; i < sidebars.size(); i++) {
+            String oldLine = sidebars.get(i);
+            packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
+                    oldLine,
+                    WrapperPlayServerUpdateScore.Action.REMOVE_ITEM,
+                    objectiveName,
+                    lines.length - i,
+                    null,
+                    null
+            ));
+        }
+
+        for (int i = 1; i < lines.length; i++) {
+            int lineIndex = i - 1;
+
+            String line = messagePipeline.builder(fPlayer, lines[i]).legacySerializerBuild();
+
+            packetSender.send(fPlayer, new WrapperPlayServerUpdateScore(
+                    line,
+                    WrapperPlayServerUpdateScore.Action.CREATE_OR_UPDATE_ITEM,
+                    objectiveName,
+                    lines.length - lineIndex,
+                    null,
+                    null
+            ));
+
+            if (lineIndex < sidebars.size()) {
+                sidebars.set(lineIndex, line);
+            } else {
+                sidebars.add(line);
+            }
+        }
+
+        playerSidebar.put(fPlayer.getUuid(), sidebars);
     }
 
     @Override
