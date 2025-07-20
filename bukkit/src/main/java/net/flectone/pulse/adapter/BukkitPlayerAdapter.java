@@ -17,6 +17,9 @@ import net.flectone.pulse.module.message.objective.ObjectiveMode;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.provider.AttributesProvider;
+import net.flectone.pulse.provider.PacketProvider;
+import net.flectone.pulse.provider.PassengersProvider;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
@@ -39,10 +42,13 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     private final Injector injector;
     private final PacketEventsAPI<?> packetEvents = PacketEvents.getAPI();
+    private final AttributesProvider attributesProvider;
 
     @Inject
     public BukkitPlayerAdapter(Injector injector) {
+                               AttributesProvider attributesProvider,
         this.injector = injector;
+        this.attributesProvider = attributesProvider;
     }
 
     @Override
@@ -210,18 +216,9 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
             case LEVEL -> player.getLevel();
             case FOOD -> player.getFoodLevel();
             case PING -> player.getPing();
-            case ARMOR -> (int) getAttributeValue(player, Attribute.GENERIC_ARMOR);
-            case ATTACK -> (int) getAttributeValue(player, Attribute.GENERIC_ATTACK_DAMAGE);
+            case ARMOR -> (int) attributesProvider.getArmorValue(player);
+            case ATTACK -> (int) attributesProvider.getAttackDamage(player);
         };
-    }
-
-    private double getAttributeValue(@NotNull Player player, @NotNull Attribute attribute) {
-        try {
-            AttributeInstance instance = player.getAttribute(attribute);
-            return instance != null ? Math.round(instance.getValue() * 10.0) / 10.0 : 0.0;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return 0.0;
-        }
     }
 
     @Override
@@ -231,10 +228,10 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
         return new Statistics(
                 Math.round(player.getHealth() * 10.0) / 10.0,
-                getAttributeValue(player, Attribute.GENERIC_ARMOR),
+                attributesProvider.getArmorValue(player),
                 player.getLevel(),
                 player.getFoodLevel(),
-                getAttributeValue(player, Attribute.GENERIC_ATTACK_DAMAGE)
+                attributesProvider.getAttackDamage(player)
         );
     }
 

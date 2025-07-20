@@ -90,6 +90,14 @@ public class BukkitInjector extends AbstractModule {
         bind(PlatformPlayerAdapter.class).to(BukkitPlayerAdapter.class);
         bind(PlatformServerAdapter.class).to(BukkitServerAdapter.class);
 
+        // Providers
+        try {
+            Class.forName("org.bukkit.attribute.Attribute");
+            bind(AttributesProvider.class).to(ModernAttributesProvider.class);
+        } catch (ClassNotFoundException e) {
+            bind(AttributesProvider.class).to(LegacyAttributesProvider.class);
+        }
+
         // Registries
         bind(PermissionRegistry.class).to(BukkitPermissionRegistry.class);
         bind(ListenerRegistry.class).to(BukkitListenerRegistry.class);
