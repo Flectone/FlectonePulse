@@ -252,8 +252,8 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
                     .replace("<hp>", String.valueOf(statistics.health()))
                     .replace("<armor>", String.valueOf(statistics.armor()))
                     .replace("<exp>", String.valueOf(statistics.level()))
-                    .replace("<food>", String.valueOf(statistics.food())
-                    .replace("<attack>", String.valueOf(statistics.damage())));
+                    .replace("<food>", String.valueOf(statistics.food()))
+                    .replace("<attack>", String.valueOf(statistics.damage()));
 
             Component component = messagePipeline.builder(sender, fReceiver, string).build();
 
