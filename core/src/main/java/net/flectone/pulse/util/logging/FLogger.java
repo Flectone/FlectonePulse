@@ -1,15 +1,9 @@
 package net.flectone.pulse.util.logging;
 
 import com.google.inject.Singleton;
+import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
 import net.flectone.pulse.BuildConfig;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.TranslatableComponent;
-import net.kyori.adventure.text.TranslationArgument;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.Style;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import java.util.List;
@@ -144,58 +138,8 @@ public class FLogger extends Logger {
     }
 
     public void warningTree(Component component) {
-        warningTree(component, 0);
-    }
-
-    private void warningTree(Component component, int indentLevel) {
-        String indent = "| ".repeat(indentLevel);
-
-        warning(indent + "|- Component: " + component.getClass().getSimpleName());
-
-        if (component instanceof TranslatableComponent translatable) {
-            warning(indent + "| Key: " + translatable.key());
-            warning(indent + "|= Arguments:");
-            for (TranslationArgument arg : translatable.arguments()) {
-                if (arg.value() instanceof Component argComp) {
-                    warningTree(argComp, indentLevel + 1);
-                } else {
-                    warning(indent + "| " + arg.value());
-                }
-            }
-        } else if (component instanceof TextComponent textComponent) {
-            warning(indent + "| Content: " + textComponent.content());
-        }
-
-        Style style = component.style();
-        warning(indent + "| Style:");
-        warning(indent + "| | Bold: " + style.decoration(TextDecoration.BOLD));
-        warning(indent + "| | Italic: " + style.decoration(TextDecoration.ITALIC));
-        warning(indent + "| | Underlined: " + style.decoration(TextDecoration.UNDERLINED));
-        warning(indent + "| | Strikethrough: " + style.decoration(TextDecoration.STRIKETHROUGH));
-        warning(indent + "| | Obfuscated: " + style.decoration(TextDecoration.OBFUSCATED));
-        warning(indent + "| | Color: " + style.color());
-
-        ClickEvent clickEvent = style.clickEvent();
-        if (clickEvent != null) {
-            warning(indent + "| ClickEvent:");
-            warning(indent + "| | Action: " + clickEvent.action());
-            warning(indent + "| | Value: " + clickEvent.value());
-        }
-
-        HoverEvent<?> hoverEvent = style.hoverEvent();
-        if (hoverEvent != null) {
-            warning(indent + "| HoverEvent:");
-            warning(indent + "| | Action: " + hoverEvent.action());
-
-            warning(indent + "| | Value: " + hoverEvent.value());
-        }
-
-        if (!component.children().isEmpty()) {
-            warning(indent + "| Children from : " + component);
-            for (Component child : component.children()) {
-                warningTree(child, indentLevel + 1);
-            }
-        }
+        String json = GsonComponentSerializer.gson().serialize(component);
+        warning(json);
     }
 
     private LogRecord buildLogRecord(Level level, String message) {
