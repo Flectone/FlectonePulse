@@ -68,8 +68,6 @@ public class FPlayerDAO extends BaseDAO<FPlayerSQL> {
     }
 
     public void insertOrIgnore(FPlayer fPlayer) {
-        if (fPlayer.isUnknown()) return;
-
         useHandle(sql -> {
             switch (config.getType()) {
                 case H2 -> sql.insertOrIgnoreH2(fPlayer.getId(), fPlayer.getUuid().toString(), fPlayer.getName());
