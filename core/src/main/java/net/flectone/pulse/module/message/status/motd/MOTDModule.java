@@ -1,11 +1,14 @@
 package net.flectone.pulse.module.message.status.motd;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleListMessage;
@@ -19,15 +22,18 @@ public class MOTDModule extends AbstractModuleListMessage<Localization.Message.S
     private final Message.Status.MOTD message;
     private final Permission.Message.Status.MOTD permission;
     private final MessagePipeline messagePipeline;
+    private final PacketProvider packetProvider;
 
     @Inject
     public MOTDModule(FileResolver fileResolver,
-                      MessagePipeline messagePipeline) {
+                      MessagePipeline messagePipeline,
+                      PacketProvider packetProvider) {
         super(localization -> localization.getMessage().getStatus().getMotd());
 
         this.message = fileResolver.getMessage().getStatus().getMotd();
         this.permission = fileResolver.getPermission().getMessage().getStatus().getMotd();
         this.messagePipeline = messagePipeline;
+        this.packetProvider = packetProvider;
     }
 
     @Override
@@ -42,7 +48,14 @@ public class MOTDModule extends AbstractModuleListMessage<Localization.Message.S
         String nextMessage = getNextMessage(fPlayer, this.message.isRandom());
         if (nextMessage == null) return null;
 
-        return messagePipeline.builder(fPlayer, nextMessage).jsonSerializerBuild();
+        if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
+            return messagePipeline.builder(fPlayer, nextMessage).jsonSerializerBuild();
+        } else {
+            String serializedText = messagePipeline.builder(fPlayer, nextMessage).legacySerializerBuild();
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("text", serializedText);
+            return jsonObject;
+        }
     }
 
     @Override
