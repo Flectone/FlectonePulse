@@ -40,6 +40,7 @@ public enum MinecraftTranslationKeys {
 
     COMMANDS_CLEAR_SUCCESS_MULTIPLE("commands.clear.success.multiple"),
     COMMANDS_CLEAR_SUCCESS_SINGLE("commands.clear.success.single"),
+    COMMANDS_CLEAR_SUCCESS("commands.clear.success"), // legacy
     COMMANDS_DEOP_SUCCESS("commands.deop.success"),
     COMMANDS_ENCHANT_SUCCESS_MULTIPLE("commands.enchant.success.multiple"),
     COMMANDS_ENCHANT_SUCCESS_SINGLE("commands.enchant.success.single"),

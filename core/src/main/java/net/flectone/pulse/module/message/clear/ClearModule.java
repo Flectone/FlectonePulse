@@ -13,6 +13,7 @@ import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 
@@ -47,14 +48,17 @@ public class ClearModule extends AbstractModuleMessage<Localization.Message.Clea
 
             TranslatableComponent translatableComponent = event.getComponent();
             if (translatableComponent.args().size() < 2) return;
-            if (!(translatableComponent.args().get(0) instanceof TextComponent numberComponent)) return;
-            if (!(translatableComponent.args().get(1) instanceof TextComponent targetComponent)) return;
-
-            String number = numberComponent.content();
-            String value = targetComponent.content();
+            if (!(translatableComponent.args().get(0) instanceof TextComponent firstArg)) return;
+            if (!(translatableComponent.args().get(1) instanceof TextComponent secondArg)) return;
 
             event.cancel();
-            send(event, number, value);
+
+            if (event.getKey() == MinecraftTranslationKeys.COMMANDS_CLEAR_SUCCESS) {
+                send(event, secondArg.content(), firstArg.content());
+            } else {
+                send(event, firstArg.content(), secondArg.content());
+            }
+
         });
     }
 
@@ -69,8 +73,10 @@ public class ClearModule extends AbstractModuleMessage<Localization.Message.Clea
         if (checkModulePredicates(fPlayer)) return;
 
         FPlayer fTarget = fPlayer;
+        boolean isSingle = event.getKey() == MinecraftTranslationKeys.COMMANDS_CLEAR_SUCCESS_SINGLE
+                || event.getKey() == MinecraftTranslationKeys.COMMANDS_CLEAR_SUCCESS;
 
-        if (event.getKey() == MinecraftTranslationKeys.COMMANDS_CLEAR_SUCCESS_SINGLE) {
+        if (isSingle) {
             fTarget = fPlayerService.getFPlayer(value);
             if (fTarget.isUnknown()) return;
         }
@@ -78,10 +84,13 @@ public class ClearModule extends AbstractModuleMessage<Localization.Message.Clea
         builder(fTarget)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> (event.getKey() == MinecraftTranslationKeys.COMMANDS_CLEAR_SUCCESS_SINGLE
-                        ? s.getSingle() : s.getMultiple().replace("<count>", value))
-                        .replace("<number>", count)
-                )
+                .format(s -> {
+                    String format = isSingle
+                            ? s.getSingle()
+                            : s.getMultiple().replace("<count>", value);
+
+                    return format.replace("<number>", count);
+                })
                 .sound(getSound())
                 .sendBuilt();
     }
