@@ -60,7 +60,7 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
     }
 
     // delay for vanish plugins
-    @Async(delay = 10)
+    @Async(delay = 5)
     public void send(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
