@@ -135,6 +135,25 @@ public class Database {
 
         String connectionURL = "jdbc:" + config.getType().name().toLowerCase() + ":";
         switch (config.getType()) {
+            case POSTGRESQL -> {
+                setupPostgreSQLLibrary();
+
+                connectionURL = connectionURL +
+                        "postgresql://" +
+                        systemVariableResolver.substituteEnvVars(config.getHost()) +
+                        ":" +
+                        systemVariableResolver.substituteEnvVars(config.getPort()) +
+                        "/" +
+                        systemVariableResolver.substituteEnvVars(config.getName()) +
+                        config.getParameters();
+
+                hikariConfig.setUsername(systemVariableResolver.substituteEnvVars(config.getUser()));
+                hikariConfig.setPassword(systemVariableResolver.substituteEnvVars(config.getPassword()));
+                hikariConfig.setMaximumPoolSize(8);
+                hikariConfig.setMinimumIdle(2);
+                hikariConfig.addDataSourceProperty("prepStmtCacheSize", "500");
+                hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "4096");
+            }
             case H2 -> {
                 setupH2Library();
 
@@ -152,7 +171,6 @@ public class Database {
                 hikariConfig.addDataSourceProperty("prepStmtCacheSize", "500");
                 hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "4096");
             }
-
             case SQLITE -> {
                 connectionURL = connectionURL +
                         projectPath.toString() +
@@ -168,7 +186,6 @@ public class Database {
                 hikariConfig.addDataSourceProperty("synchronous", "NORMAL");
                 hikariConfig.addDataSourceProperty("journal_size_limit", "6144000");
             }
-
             case MYSQL -> {
                 connectionURL = connectionURL +
                         "//" +
@@ -246,12 +263,25 @@ public class Database {
 
     private void setupH2Library() {
         try {
-            Class.forName("org.h2");
+            Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException ignored) {
             libraryResolver.loadLibrary(Library.builder()
                     .groupId("com{}h2database")
                     .artifactId("h2")
                     .version(BuildConfig.H2_VERSION)
+                    .build()
+            );
+        }
+    }
+
+    private void setupPostgreSQLLibrary() {
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException ignored) {
+            libraryResolver.loadLibrary(Library.builder()
+                    .groupId("org{}postgresql")
+                    .artifactId("posrgresql")
+                    .version(BuildConfig.POSTGRESQL_VERSION)
                     .build()
             );
         }

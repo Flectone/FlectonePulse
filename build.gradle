@@ -71,6 +71,7 @@ subprojects {
         compileOnly "com.deepl.api:deepl-java:$deepl_version"
         compileOnly "com.sparkjava:spark-core:$spark_version"
         compileOnly "com.h2database:h2:$h2_version"
+        compileOnly "org.postgresql:postgresql:$postgresql_version"
 
         annotationProcessor "org.projectlombok:lombok:$lombok_version"
     }
