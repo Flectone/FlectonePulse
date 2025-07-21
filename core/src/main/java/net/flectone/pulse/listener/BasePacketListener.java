@@ -13,12 +13,9 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSe
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.event.message.TranslatableMessageEvent;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.registry.EventProcessRegistry;
@@ -34,7 +31,6 @@ import java.util.UUID;
 public class BasePacketListener implements PacketListener {
 
     private final FPlayerService fPlayerService;
-    private final Provider<IntegrationModule> integrationModuleProvider;
     private final EventProcessRegistry eventProcessRegistry;
     private final PacketProvider packetProvider;
     private final PacketSender packetSender;
@@ -42,13 +38,11 @@ public class BasePacketListener implements PacketListener {
 
     @Inject
     public BasePacketListener(FPlayerService fPlayerService,
-                              Provider<IntegrationModule> integrationModuleProvider,
                               EventProcessRegistry eventProcessRegistry,
                               PacketProvider packetProvider,
                               PacketSender packetSender,
                               PlayerPreLoginProcessor playerPreLoginProcessor) {
         this.fPlayerService = fPlayerService;
-        this.integrationModuleProvider = integrationModuleProvider;
         this.eventProcessRegistry = eventProcessRegistry;
         this.packetProvider = packetProvider;
         this.packetSender = packetSender;
@@ -67,16 +61,13 @@ public class BasePacketListener implements PacketListener {
 
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
-        String locale = getLocale(fPlayer, event);
+        WrapperPlayClientSettings wrapperPlayClientSettings = new WrapperPlayClientSettings(event);
+        String wrapperLocale = wrapperPlayClientSettings.getLocale();
 
-        if (locale.equals(fPlayer.getSettingValue(FPlayer.Setting.LOCALE))) return;
-        if (!fPlayer.isUnknown()) {
-            fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.LOCALE, locale);
-            return;
-        }
+        fPlayerService.updateLocale(fPlayer, wrapperLocale);
 
         // first time player joined, wait for it to be added
-        updateLocaleLater(uuid, locale);
+        fPlayerService.updateLocaleLater(uuid, wrapperLocale);
     }
 
     @Override
@@ -135,21 +126,5 @@ public class BasePacketListener implements PacketListener {
         }
 
         return null;
-    }
-
-    @Async(delay = 40L)
-    public void updateLocaleLater(UUID uuid, String locale) {
-        FPlayer newFPlayer = fPlayerService.getFPlayer(uuid);
-        fPlayerService.saveOrUpdateSetting(newFPlayer, FPlayer.Setting.LOCALE, locale);
-    }
-
-    private String getLocale(FPlayer fPlayer, PacketReceiveEvent event) {
-        String locale = integrationModuleProvider.get().getTritonLocale(fPlayer);
-        if (locale == null) {
-            WrapperPlayClientSettings wrapperPlayClientSettings = new WrapperPlayClientSettings(event);
-            locale = wrapperPlayClientSettings.getLocale();
-        }
-
-        return locale;
     }
 }

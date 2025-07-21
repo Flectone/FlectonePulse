@@ -6,17 +6,18 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDi
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Config;
-import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.registry.EventProcessRegistry;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.Mail;
 import net.flectone.pulse.model.Ignore;
+import net.flectone.pulse.model.Mail;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.provider.PacketProvider;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.repository.FPlayerRepository;
 import net.flectone.pulse.repository.SocialRepository;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.PacketSender;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
@@ -276,5 +277,23 @@ public class FPlayerService {
     public void saveOrUpdateSetting(FPlayer fPlayer, FPlayer.Setting setting, @Nullable String value) {
         fPlayer.setSetting(setting, value);
         fPlayerRepository.saveOrUpdateSetting(fPlayer, setting);
+    }
+
+    @Async(delay = 40L)
+    public void updateLocaleLater(UUID uuid, String wrapperLocale) {
+        FPlayer fPlayer = getFPlayer(uuid);
+        updateLocale(fPlayer, wrapperLocale);
+    }
+
+    public void updateLocale(FPlayer fPlayer, String newLocale) {
+        String locale = integrationModule.getTritonLocale(fPlayer);
+        if (locale == null) {
+            locale = newLocale;
+        }
+
+        if (locale.equals(fPlayer.getSettingValue(FPlayer.Setting.LOCALE))) return;
+        if (fPlayer.isUnknown()) return;
+
+        saveOrUpdateSetting(fPlayer, FPlayer.Setting.LOCALE, locale);
     }
 }
