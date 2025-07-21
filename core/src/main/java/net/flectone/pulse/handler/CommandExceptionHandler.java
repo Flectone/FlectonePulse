@@ -101,9 +101,7 @@ public class CommandExceptionHandler {
 
     public void handleCommandExecutionException(ExceptionContext<FPlayer, CommandExecutionException> context) {
         // send logs to console
-        if (!context.context().sender().isUnknown()) {
-            fLogger.warning(context.exception());
-        }
+        fLogger.warning(context.exception());
 
         FPlayer fPlayer = context.context().sender();
 
