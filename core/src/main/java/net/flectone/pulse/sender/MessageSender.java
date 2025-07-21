@@ -1,8 +1,10 @@
 package net.flectone.pulse.sender;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.advancements.*;
+import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
+import com.github.retrooper.packetevents.protocol.chat.message.ChatMessageLegacy;
+import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_16;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
@@ -88,10 +90,14 @@ public class MessageSender {
     }
 
     public void sendActionBar(FPlayer fPlayer, Component component, int stayTicks) {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
+        if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19)) {
             packetSender.send(fPlayer, new WrapperPlayServerSystemChatMessage(true, component));
-        } else {
+        } else if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_17)) {
             packetSender.send(fPlayer, new WrapperPlayServerActionBar(component));
+        } else if (packetProvider.getServerVersion().isNewerThan(ServerVersion.V_1_16)) {
+            packetSender.send(fPlayer, new WrapperPlayServerChatMessage(new ChatMessage_v1_16(component, ChatTypes.GAME_INFO, fPlayer.getUuid())));
+        } else {
+            packetSender.send(fPlayer, new WrapperPlayServerChatMessage(new ChatMessageLegacy(component, ChatTypes.GAME_INFO)));
         }
 
         // cannot set stay ticks for action bar, so
