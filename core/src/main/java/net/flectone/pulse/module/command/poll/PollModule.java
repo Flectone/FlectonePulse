@@ -9,6 +9,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.poll.model.Poll;
 import net.flectone.pulse.pipeline.MessagePipeline;
@@ -124,7 +125,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 if (status == null) return;
 
                 FPlayer fPlayer = fPlayerService.getFPlayer(poll.getCreator());
-                int range = command.getRange();
+                Range range = command.getRange();
 
                 builder(fPlayer)
                         .range(range)
@@ -217,7 +218,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
         saveAndUpdateLast(poll);
 
-        int range = command.getRange();
+        Range range = command.getRange();
 
         builder(fPlayer)
                 .range(range)

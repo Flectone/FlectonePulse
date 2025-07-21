@@ -10,7 +10,6 @@ import net.flectone.pulse.model.*;
 import net.flectone.pulse.model.event.EventPriority;
 import net.flectone.pulse.module.message.format.world.WorldMode;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
-import net.flectone.pulse.util.Range;
 import net.flectone.pulse.util.TagType;
 
 import java.nio.file.Path;
@@ -109,7 +108,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         private boolean enable = true;
         private boolean grant = true;
         private boolean revoke = true;
-        private int range = Range.SERVER;
+        private Range range = Range.get(Range.Type.SERVER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -117,7 +116,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Afk implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
-        private int range = Range.SERVER;
+        private Range range = Range.get(Range.Type.SERVER);
         private int delay = 3000;
         private List<String> ignore = new ArrayList<>(List.of("afk"));
         private Destination destination = new Destination();
@@ -214,8 +213,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         private EventPriority eventPriority = EventPriority.NORMAL;
         private Map<String, Type> types = new LinkedHashMap<>(){
             {
-                put("local", new Type("", true, true, 100, 0));
-                put("global", new Type("!", true, false, Range.PROXY, 5));
+                put("local", new Type("", true, true, Range.get(100), 0));
+                put("global", new Type("!", true, false, Range.get(Range.Type.PROXY), 5));
             }
         };
 
@@ -224,7 +223,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         public static final class Type {
             private boolean enable = true;
             private boolean cancel = false;
-            private int range = 0;
+            private Range range = Range.get(0);
             private int priority = 0;
             private String trigger = "";
             private NullReceiver nullReceiver = new NullReceiver();
@@ -232,7 +231,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             private Cooldown cooldown = new Cooldown();
             private Sound sound = new Sound();
 
-            public Type(String trigger, boolean nullReceiver, boolean cancel, int range, int priority) {
+            public Type(String trigger, boolean nullReceiver, boolean cancel, Range range, int priority) {
                 this.trigger = trigger;
                 this.cancel = cancel;
                 this.nullReceiver = new NullReceiver(nullReceiver);
@@ -263,7 +262,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Death implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
-        private int range = Range.SERVER;
+        private Range range = Range.get(Range.Type.SERVER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -514,7 +513,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             @Getter
             @NoArgsConstructor
             public static final class Question {
-                private int range = Range.PLAYER;
+                private Range range = Range.get(Range.Type.PLAYER);
                 private Destination destination = new Destination(Destination.Type.CHAT);
                 private Cooldown cooldown = new Cooldown();
                 private Sound sound = new Sound();
@@ -588,7 +587,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     public static final class Join implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private boolean first = true;
-        private int range = Range.SERVER;
+        private Range range = Range.get(Range.Type.SERVER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -636,7 +635,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Quit implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
-        private int range = Range.SERVER;
+        private Range range = Range.get(Range.Type.SERVER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }

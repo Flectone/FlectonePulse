@@ -12,6 +12,7 @@ import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
+import net.flectone.pulse.model.Range;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -24,7 +25,6 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.Pair;
-import net.flectone.pulse.util.Range;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -209,7 +209,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
             if (command.isShowConnectionAttempts()) {
                 builder(fPlayer)
-                        .range(Range.SERVER)
+                        .range(Range.get(Range.Type.SERVER))
                         .filter(filter -> permissionChecker.check(filter, getModulePermission()))
                         .format((fReceiver, message) -> {
                             String format = message.getConnectionAttempt();

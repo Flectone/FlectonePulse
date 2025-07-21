@@ -9,10 +9,10 @@ import discord4j.core.object.entity.User;
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
+import net.flectone.pulse.model.Range;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.Range;
 import reactor.core.publisher.Mono;
 
 @Getter
@@ -64,7 +64,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
     @Async
     public void sendMessage(String nickname, String rawMessage, String message) {
         builder(FPlayer.UNKNOWN)
-                .range(Range.PROXY)
+                .range(Range.get(Range.Type.PROXY))
                 .destination(integration.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DISCORD))
                 .tag(MessageTag.FROM_DISCORD_TO_MINECRAFT)

@@ -21,6 +21,35 @@ public abstract class FileSerializable extends YamlSerializable {
     private static final SerializerConfig CONFIG = new SerializerConfig
             .Builder()
             .setBackupOnErrors(true)
+            .registerSerializer(new ClassSerializer<Range, Object>() {
+
+                @Override
+                public Object serialize(Range range) {
+                    if (range.getType() == Range.Type.BLOCKS) {
+                        return range.getValue();
+                    }
+
+                    return range.getType();
+                }
+
+                @Override
+                public Range deserialize(Object object) {
+                    String string = String.valueOf(object);
+
+                    try {
+                        int value = Integer.parseInt(string);
+                        Range.Type type = Range.Type.fromInt(value);
+                        if (type == Range.Type.BLOCKS) {
+                            return new Range(value);
+                        }
+
+                        return new Range(type);
+                    } catch (NumberFormatException e) {
+                        Range.Type type = Range.Type.fromString(string);
+                        return new Range(type);
+                    }
+                }
+            })
             .registerSerializer(new ClassSerializer<Sound, Map<String, Object>>() {
 
                 @Override

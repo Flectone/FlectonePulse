@@ -3,11 +3,11 @@ package net.flectone.pulse.module;
 import com.google.inject.Inject;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.model.Range;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.Range;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.execution.CommandExecutionHandler;
@@ -55,10 +55,10 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
     }
 
     @Override
-    public Predicate<FPlayer> rangeFilter(FEntity sender, int range) {
+    public Predicate<FPlayer> rangeFilter(FEntity sender, Range range) {
         Predicate<FPlayer> filter = super.rangeFilter(sender, range);
 
-        if (range == Range.PLAYER) {
+        if (range.is(Range.Type.PLAYER)) {
             return filter;
         }
 

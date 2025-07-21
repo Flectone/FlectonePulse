@@ -8,15 +8,11 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.model.*;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.model.Cooldown;
-import net.flectone.pulse.model.FEntity;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.registry.MessageProcessRegistry;
-import net.flectone.pulse.util.Range;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -158,8 +154,8 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
         Message.Format.QuestionAnswer.Question questionMessage = message.getQuestions().get(question);
         if (questionMessage == null) return;
 
-        int range = questionMessage.getRange();
-        if (range == Range.PLAYER && !sender.equals(receiver)) return;
+        Range range = questionMessage.getRange();
+        if (range.is(Range.Type.PLAYER) && !sender.equals(receiver)) return;
         if (!(receiver instanceof FPlayer fReceiver)) return;
 
         builder(sender)

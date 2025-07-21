@@ -12,6 +12,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.Range;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -23,7 +24,6 @@ import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.Pair;
-import net.flectone.pulse.util.Range;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -171,10 +171,10 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> i
     private void send(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
-        int range = message.getRange();
+        Range range = message.getRange();
         boolean isAfk = !fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX);
 
-        if (range == Range.PLAYER) {
+        if (range.is(Range.Type.PLAYER)) {
             if (!fPlayer.isSetting(FPlayer.Setting.AFK)) return;
 
             builder(fPlayer)

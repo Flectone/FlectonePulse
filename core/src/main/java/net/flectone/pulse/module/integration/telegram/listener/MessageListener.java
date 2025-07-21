@@ -6,11 +6,11 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
+import net.flectone.pulse.model.Range;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.telegram.TelegramIntegration;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.Range;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
@@ -74,7 +74,7 @@ public class MessageListener extends EventListener {
     @Async
     public void sendMessage(String author, String chat, String message) {
         builder(FPlayer.UNKNOWN)
-                .range(Range.PROXY)
+                .range(Range.get(Range.Type.PROXY))
                 .destination(integration.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELEGRAM))
                 .tag(MessageTag.FROM_TELEGRAM_TO_MINECRAFT)

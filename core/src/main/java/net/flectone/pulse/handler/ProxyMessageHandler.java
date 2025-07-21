@@ -7,6 +7,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.model.Range;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -52,7 +53,6 @@ import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.Range;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
@@ -208,7 +208,7 @@ public class ProxyMessageHandler {
         String message = input.readUTF();
 
         module.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(module.getCommand().getDestination())
                 .format(Localization.Command.Anon::getFormat)
                 .message(message)
@@ -223,7 +223,7 @@ public class ProxyMessageHandler {
         String message = input.readUTF();
 
         module.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(module.getCommand().getDestination())
                 .format(Localization.Command.Me::getFormat)
                 .message(message)
@@ -239,7 +239,7 @@ public class ProxyMessageHandler {
         String message = input.readUTF();
 
         module.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(module.getCommand().getDestination())
                 .format(module.replaceAnswer(answer))
                 .message(message)
@@ -256,7 +256,7 @@ public class ProxyMessageHandler {
         module.kick(moderator, (FPlayer) fEntity, ban);
 
         module.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(module.getCommand().getDestination())
                 .format(module.buildFormat(ban))
                 .sound(module.getSound())
@@ -270,7 +270,7 @@ public class ProxyMessageHandler {
         String message = input.readUTF();
 
         broadcastModule.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(broadcastModule.getCommand().getDestination())
                 .format(Localization.Command.Broadcast::getFormat)
                 .message(message)
@@ -293,7 +293,7 @@ public class ProxyMessageHandler {
         int percent = input.readInt();
 
         coinModule.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(coinModule.getCommand().getDestination())
                 .format(coinModule.replaceResult(percent))
                 .sound(coinModule.getSound())
@@ -307,7 +307,7 @@ public class ProxyMessageHandler {
         List<Integer> cubes = gson.fromJson(input.readUTF(), new TypeToken<List<Integer>>() {}.getType());
 
         diceModule.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(diceModule.getCommand().getDestination())
                 .format(diceModule.replaceResult(cubes))
                 .sound(diceModule.getSound())
@@ -321,7 +321,7 @@ public class ProxyMessageHandler {
         String message = input.readUTF();
 
         doModule.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(doModule.getCommand().getDestination())
                 .format(Localization.Command.Do::getFormat)
                 .message(message)
@@ -353,7 +353,7 @@ public class ProxyMessageHandler {
         Moderation mute = gson.fromJson(input.readUTF(), Moderation.class);
 
         muteModule.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(muteModule.getCommand().getDestination())
                 .format(muteModule.buildFormat(mute))
                 .sound(muteModule.getSound())
@@ -370,7 +370,7 @@ public class ProxyMessageHandler {
 
         unbanModule.builder(fEntity)
                 .destination(unbanModule.getCommand().getDestination())
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .filter(filter -> filter.isSetting(FPlayer.Setting.BAN))
                 .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
                 .sound(unbanModule.getCommand().getSound())
@@ -385,7 +385,7 @@ public class ProxyMessageHandler {
 
         unmuteModule.builder(fEntity)
                 .destination(unmuteModule.getCommand().getDestination())
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .filter(filter -> filter.isSetting(FPlayer.Setting.MUTE))
                 .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
                 .sound(unmuteModule.getCommand().getSound())
@@ -400,7 +400,7 @@ public class ProxyMessageHandler {
 
         unwarnModule.builder(fEntity)
                 .destination(unwarnModule.getCommand().getDestination())
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .filter(filter -> filter.isSetting(FPlayer.Setting.WARN))
                 .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
                 .sound(unwarnModule.getCommand().getSound())
@@ -419,7 +419,7 @@ public class ProxyMessageHandler {
         pollModule.saveAndUpdateLast(poll);
 
         pollModule.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .format(pollModule.resolvePollFormat(fEntity, poll, PollModule.Status.START))
                 .message(poll.getTitle())
                 .sound(pollModule.getSound())
@@ -434,7 +434,7 @@ public class ProxyMessageHandler {
         if (!spyModule.isEnable()) return;
 
         spyModule.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(spyModule.getCommand().getDestination())
                 .filter(fReceiver -> !fEntity.equals(fReceiver)
                         && !spyModule.checkModulePredicates(fReceiver)
@@ -452,7 +452,7 @@ public class ProxyMessageHandler {
 
         String message = input.readUTF();
         streamModule.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(streamModule.getCommand().getDestination())
                 .format(streamModule.replaceUrls(message))
                 .sendBuilt();
@@ -482,7 +482,7 @@ public class ProxyMessageHandler {
         String message = input.readUTF();
 
         translatetoModule.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(translatetoModule.getCommand().getDestination())
                 .format(translatetoModule.replaceLanguage(targetLang))
                 .message(message)
@@ -498,7 +498,7 @@ public class ProxyMessageHandler {
         String message = input.readUTF();
 
         tryModule.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(tryModule.getCommand().getDestination())
                 .tag(MessageTag.COMMAND_TRY)
                 .format(tryModule.replacePercent(value))
@@ -516,7 +516,7 @@ public class ProxyMessageHandler {
         Moderation warn = gson.fromJson(input.readUTF(), Moderation.class);
 
         warnModule.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(warnModule.getCommand().getDestination())
                 .format(warnModule.buildFormat(warn))
                 .sound(warnModule.getSound())
@@ -534,7 +534,7 @@ public class ProxyMessageHandler {
         Moderation kick = gson.fromJson(input.readUTF(), Moderation.class);
 
         kickModule.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(kickModule.getCommand().getDestination())
                 .format(kickModule.buildFormat(kick))
                 .sound(kickModule.getSound())
@@ -606,7 +606,7 @@ public class ProxyMessageHandler {
 
         MessageCreateListener messageCreateListener = injector.getInstance(MessageCreateListener.class);
         messageCreateListener.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(messageCreateListener.getIntegration().getDestination())
                 .tag(MessageTag.FROM_DISCORD_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft().replace("<name>", nickname))
@@ -622,7 +622,7 @@ public class ProxyMessageHandler {
 
         ChannelMessageListener channelMessageListener = injector.getInstance(ChannelMessageListener.class);
         channelMessageListener.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(channelMessageListener.getIntegration().getDestination())
                 .tag(MessageTag.FROM_TWITCH_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft()
@@ -641,7 +641,7 @@ public class ProxyMessageHandler {
 
         MessageListener messageListener = injector.getInstance(MessageListener.class);
         messageListener.builder(fEntity)
-                .range(Range.PROXY)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(messageListener.getIntegration().getDestination())
                 .tag(MessageTag.FROM_TELEGRAM_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft()
@@ -660,7 +660,7 @@ public class ProxyMessageHandler {
         Advancement advancement = gson.fromJson(input.readUTF(), Advancement.class);
 
         advancementModule.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(advancementModule.getMessage().getDestination())
                 .tag(MessageTag.ADVANCEMENT)
                 .format((fResolver, s) -> advancementModule.convert(s, advancement))
@@ -676,7 +676,7 @@ public class ProxyMessageHandler {
         Death death = gson.fromJson(input.readUTF(), Death.class);
 
         deathModule.builder(fEntity)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(deathModule.getMessage().getDestination())
                 .tag(MessageTag.DEATH)
                 .format((fResolver, s) -> s.getTypes().get(death.getKey()))
@@ -694,7 +694,7 @@ public class ProxyMessageHandler {
         joinModule.builder(fEntity)
                 .tag(MessageTag.JOIN)
                 .destination(joinModule.getMessage().getDestination())
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.JOIN))
                 .format(s -> hasPlayedBefore || !joinModule.getMessage().isFirst() ? s.getFormat() : s.getFormatFirstTime())
                 .sound(joinModule.getSound())
@@ -708,7 +708,7 @@ public class ProxyMessageHandler {
         quitModule.builder(fEntity)
                 .tag(MessageTag.QUIT)
                 .destination(quitModule.getMessage().getDestination())
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.QUIT))
                 .format(Localization.Message.Quit::getFormat)
                 .sound(quitModule.getSound())

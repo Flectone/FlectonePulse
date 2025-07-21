@@ -9,6 +9,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.registry.CommandRegistry;
@@ -17,7 +18,6 @@ import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.Range;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
@@ -112,13 +112,13 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
             return;
         }
 
-        int range = command.getRange();
+        Range range = command.getRange();
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
 
         if (fReceiver.isUnknown()
                 || !fReceiver.isOnline()
                 || !rangeFilter(fPlayer, range).test(fReceiver)
-                || range != Range.PROXY && !platformPlayerAdapter.isOnline(fReceiver)) {
+                || !range.is(Range.Type.PROXY) && !platformPlayerAdapter.isOnline(fReceiver)) {
             builder(fPlayer)
                     .format(Localization.Command.Tell::getNullPlayer)
                     .sendBuilt();

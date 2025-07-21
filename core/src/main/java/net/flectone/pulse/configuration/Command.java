@@ -9,7 +9,6 @@ import lombok.Setter;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.*;
-import net.flectone.pulse.util.Range;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -130,7 +129,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Anon implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("anon"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
@@ -148,7 +147,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Ball implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("ball"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
@@ -160,7 +159,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
         private boolean showConnectionAttempts = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("ban", "tempban"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
@@ -179,7 +178,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Broadcast implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("broadcast"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
@@ -400,7 +399,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     public static final class Coin implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean draw = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("coin"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
@@ -410,7 +409,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Dice implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private int min = 1;
         private int max = 6;
         private List<String> aliases = new ArrayList<>(List.of("dice"));
@@ -422,7 +421,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Do implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("do"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
@@ -456,7 +455,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Helper implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("helper"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
@@ -485,7 +484,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Kick implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("kick"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
@@ -515,7 +514,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Me implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("me"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
@@ -526,7 +525,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     public static final class Mute implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("mute"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
@@ -546,7 +545,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     public static final class Online implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("online"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
@@ -565,7 +564,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Poll implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         @Setter
         private int lastId = 1;
         private List<String> aliases = new ArrayList<>(List.of("poll"));
@@ -609,7 +608,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Spy implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("spy"));
         private Map<String, List<String>> categories = new LinkedHashMap<>(){
             {
@@ -625,7 +624,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Stream implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("stream"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
@@ -666,7 +665,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     public static final class Tell implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean suggestOfflinePlayers = false;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(){
             {
                 add("tell");
@@ -707,7 +706,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Translateto implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
-        private int range = Range.PLAYER;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Service service = Service.GOOGLE;
         private List<String> aliases = new ArrayList<>(List.of("translateto"));
         private List<String> languages = new ArrayList<>(List.of("en_us", "ru_ru"));
@@ -725,7 +724,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Try implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private int min = 0;
         private int max = 100;
         private int good = 50;
@@ -738,7 +737,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Unban implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(){
             {
                 add("unban");
@@ -753,7 +752,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Unmute implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("unmute"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
@@ -763,7 +762,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Unwarn implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("unwarn"));
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
@@ -774,7 +773,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     public static final class Warn implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
-        private int range = Range.PROXY;
+        private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("warn"));
         private Map<Integer, String> actions = new LinkedHashMap<>(){
             {

@@ -22,7 +22,6 @@ import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.DataConsumer;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.Range;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -179,8 +178,8 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         return false;
     }
 
-    public Predicate<FPlayer> rangeFilter(FEntity sender, int range) {
-        if (range == Range.PLAYER) {
+    public Predicate<FPlayer> rangeFilter(FEntity sender, Range range) {
+        if (range.is(Range.Type.PLAYER)) {
             return sender::equals;
         }
 
@@ -191,18 +190,15 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         return createRangePredicate(fPlayer, range);
     }
 
-    private Predicate<FPlayer> createRangePredicate(FPlayer fPlayer, int range) {
+    private Predicate<FPlayer> createRangePredicate(FPlayer fPlayer, Range range) {
         return fReceiver -> {
             if (fReceiver.isUnknown()) return true;
             if (fReceiver.isIgnored(fPlayer)) return false;
 
-            if (range > 0) {
-                return checkDistance(fPlayer, fReceiver, range);
-            }
-
-            return switch (range) {
-                case Range.WORLD_NAME -> checkWorldNamePermission(fPlayer, fReceiver);
-                case Range.WORLD_TYPE -> checkWorldTypePermission(fPlayer, fReceiver);
+            return switch (range.getType()) {
+                case BLOCKS -> checkDistance(fPlayer, fReceiver, range.getValue());
+                case WORLD_NAME -> checkWorldNamePermission(fPlayer, fReceiver);
+                case WORLD_TYPE -> checkWorldTypePermission(fPlayer, fReceiver);
                 default -> true;
             };
         };
@@ -232,7 +228,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         private final FEntity fPlayer;
         private FPlayer fReceiver = FPlayer.UNKNOWN;
         private MessageTag tag = null;
-        private Integer range;
+        private Range range;
         private Destination destination = new Destination();
         private Sound sound = null;
         private Predicate<FPlayer> builderFilter = player -> true;
@@ -246,7 +242,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
 
         public Builder(FEntity fEntity) {
             this.fPlayer = fEntity;
-            range = Range.PLAYER;
+            this.range = Range.get(Range.Type.PLAYER);
 
             if (fEntity instanceof FPlayer builderFPlayer) {
                 fReceiver = builderFPlayer;
@@ -255,7 +251,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
 
         public Builder receiver(FPlayer fPlayer) {
             this.fReceiver = fPlayer;
-            range = Range.PLAYER;
+            this.range = Range.get(Range.Type.PLAYER);
             return this;
         }
 
@@ -264,7 +260,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             return this;
         }
 
-        public Builder range(int range) {
+        public Builder range(Range range) {
             this.range = range;
             return this;
         }
@@ -446,7 +442,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         public void sendToIntegrations() {
             if (tag == null) return;
             if (integrationString == null) return;
-            if (range != Range.SERVER && range != Range.PROXY) return;
+            if (!range.is(Range.Type.SERVER) && !range.is(Range.Type.PROXY)) return;
             if (!integrationModule.hasMessenger()) return;
 
             String formatContent = resolveString(FPlayer.UNKNOWN, format);
@@ -486,7 +482,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         public boolean sendToProxy() {
             if (tag == null) return false;
             if (proxyOutput == null) return false;
-            if (range != Range.PROXY) return false;
+            if (!range.is(Range.Type.PROXY)) return false;
 
             return proxySender.send(fPlayer, tag, proxyOutput);
         }

@@ -8,6 +8,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.formatter.TimeFormatter;
+import net.flectone.pulse.model.Range;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.Cooldown;
 import net.flectone.pulse.model.FEntity;
@@ -19,7 +20,6 @@ import net.flectone.pulse.module.message.chat.listener.ChatListener;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.Range;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
@@ -130,14 +130,14 @@ public class BukkitChatModule extends ChatModule {
 
         Predicate<FPlayer> chatPermissionFilter = fReceiver -> permissionChecker.check(fReceiver, permission.getTypes().get(chatName));
 
-        int chatRange = playerChat.getRange();
+        Range chatRange = playerChat.getRange();
 
         // in local chat you can mention it too,
         // but I don't want to full support InteractiveChat
-        String finalMessage = chatRange == Range.PROXY
-                || chatRange == Range.SERVER
-                || chatRange == Range.WORLD_NAME
-                || chatRange == Range.WORLD_TYPE
+        String finalMessage = chatRange.is(Range.Type.PROXY)
+                || chatRange.is(Range.Type.SERVER)
+                || chatRange.is(Range.Type.WORLD_NAME)
+                || chatRange.is(Range.Type.WORLD_TYPE)
                 ? integrationModule.checkMention(fPlayer, eventMessage)
                 : eventMessage;
 
@@ -170,9 +170,7 @@ public class BukkitChatModule extends ChatModule {
         int countReceivers = receiversUUID.size();
         Message.Chat.Type.NullReceiver nullReceiver = playerChat.getNullReceiver();
 
-        if (nullReceiver.isEnable() && countReceivers < 2) {
-            checkReceiversLater(fPlayer, countReceivers, chatRange, receiversUUID, nullReceiver);
-        }
+        checkReceiversLater(fPlayer, countReceivers, chatRange, receiversUUID, nullReceiver);
 
         event.setMessage(finalMessage);
         event.setCancelled(playerChat.isCancel());
@@ -182,15 +180,19 @@ public class BukkitChatModule extends ChatModule {
     }
 
     @Async(delay = 5L)
-    public void checkReceiversLater(FPlayer fPlayer, int countReceiver, int chatRange,
+    public void checkReceiversLater(FPlayer fPlayer, int countReceivers, Range chatRange,
                                     List<UUID> receiversUUID, Message.Chat.Type.NullReceiver nullReceiver) {
+        if (!nullReceiver.isEnable() || countReceivers > 1) {
+            return;
+        }
+
         Set<UUID> onlinePlayers = fPlayerService.findOnlineFPlayers()
                 .stream()
                 .map(FEntity::getUuid)
                 .collect(Collectors.toSet());
 
-        if ((onlinePlayers.containsAll(receiversUUID) && onlinePlayers.size() <= countReceiver)
-                || chatRange > -1) {
+        if ((onlinePlayers.containsAll(receiversUUID) && onlinePlayers.size() <= countReceivers)
+                || chatRange.is(Range.Type.BLOCKS)) {
             builder(fPlayer)
                     .destination(nullReceiver.getDestination())
                     .format(Localization.Message.Chat::getNullReceiver)
@@ -217,7 +219,7 @@ public class BukkitChatModule extends ChatModule {
         });
 
         builder(fPlayer)
-                .range(Range.SERVER)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(playerChat.getDestination())
                 .filter(filter)
                 .format(s -> s.getTypes().get(playerChatName))

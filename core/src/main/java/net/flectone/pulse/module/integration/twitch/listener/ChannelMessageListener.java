@@ -6,10 +6,10 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
+import net.flectone.pulse.model.Range;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.Range;
 
 import java.util.List;
 
@@ -44,7 +44,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
     @Async
     public void sendMessage(String nickname, String channel, String message) {
         builder(FPlayer.UNKNOWN)
-                .range(Range.PROXY)
+                .range(Range.get(Range.Type.PROXY))
                 .destination(integration.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.TWITCH))
                 .tag(MessageTag.FROM_TWITCH_TO_MINECRAFT)
