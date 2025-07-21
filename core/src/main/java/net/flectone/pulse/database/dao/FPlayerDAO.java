@@ -3,10 +3,8 @@ package net.flectone.pulse.database.dao;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.database.sql.FPlayerSQL;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.logging.FLogger;
 import org.jetbrains.annotations.NotNull;
@@ -20,16 +18,15 @@ import java.util.UUID;
 @Singleton
 public class FPlayerDAO extends BaseDAO<FPlayerSQL> {
 
-    private final Config.Database config;
     private final FLogger logger;
     private final Provider<SettingDAO> settingDAOProvider;
 
     @Inject
-    public FPlayerDAO(FileResolver fileResolver, Database database,
-                      FLogger logger, Provider<SettingDAO> settingDAOProvider) {
+    public FPlayerDAO(Database database,
+                      FLogger logger,
+                      Provider<SettingDAO> settingDAOProvider) {
         super(database, FPlayerSQL.class);
 
-        this.config = fileResolver.getConfig().getDatabase();
         this.logger = logger;
         this.settingDAOProvider = settingDAOProvider;
     }
@@ -69,10 +66,10 @@ public class FPlayerDAO extends BaseDAO<FPlayerSQL> {
 
     public void insertOrIgnore(FPlayer fPlayer) {
         useHandle(sql -> {
-            switch (config.getType()) {
-                case H2 -> sql.insertOrIgnoreH2(fPlayer.getId(), fPlayer.getUuid().toString(), fPlayer.getName());
-                case SQLITE -> sql.insertOrIgnoreSQLite(fPlayer.getId(), fPlayer.getUuid().toString(), fPlayer.getName());
-                case MYSQL -> sql.insertOrIgnoreMySQL(fPlayer.getId(), fPlayer.getUuid().toString(), fPlayer.getName());
+            Optional<FPlayerDAO.PlayerInfo> existingPlayer = sql.findByUUID(fPlayer.getUuid().toString());
+
+            if (existingPlayer.isEmpty()) {
+                sql.insertWithId(fPlayer.getId(), fPlayer.getUuid().toString(), fPlayer.getName());
             }
         });
     }

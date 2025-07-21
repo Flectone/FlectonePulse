@@ -2,10 +2,8 @@ package net.flectone.pulse.database.dao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.database.sql.ColorsSQL;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 
 import java.util.List;
@@ -14,12 +12,9 @@ import java.util.Map;
 @Singleton
 public class ColorsDAO extends BaseDAO<ColorsSQL> {
 
-    private final Config.Database config;
-
     @Inject
-    public ColorsDAO(FileResolver fileResolver, Database database) {
+    public ColorsDAO(Database database) {
         super(database, ColorsSQL.class);
-        this.config = fileResolver.getConfig().getDatabase();
     }
 
     public record ColorEntry(int number, String name) {}
@@ -37,11 +32,7 @@ public class ColorsDAO extends BaseDAO<ColorsSQL> {
             colors.forEach((key, colorName) -> {
                 int number = Integer.parseInt(key);
                 int colorId = sql.findColorIdByName(colorName)
-                        .orElseGet(() -> switch (config.getType()) {
-                            case H2 -> sql.upsertH2(colorName);
-                            case SQLITE -> sql.upsertSQLite(colorName);
-                            case MYSQL -> sql.upsertMySQL(colorName);
-                        });
+                        .orElseGet(() -> sql.insertColor(colorName));
 
                 if (currentColors.containsKey(number)) {
                     if (currentColors.get(number) != colorId) {

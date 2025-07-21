@@ -26,17 +26,9 @@ public interface ColorsSQL extends SQL {
     @SqlQuery("SELECT `id` FROM `color` WHERE `name` = :colorName")
     Optional<Integer> findColorIdByName(@Bind("colorName") String colorName);
 
-    @SqlUpdate("INSERT INTO `color` (`name`) VALUES (:colorName) ON DUPLICATE KEY UPDATE `id` = LAST_INSERT_ID(`id`)")
+    @SqlUpdate("INSERT INTO `color` (`name`) VALUES (:colorName)")
     @GetGeneratedKeys("id")
-    int upsertMySQL(@Bind("colorName") String colorName);
-
-    @SqlUpdate("INSERT INTO `color` (`name`) VALUES (:colorName) ON CONFLICT(`name`) DO UPDATE SET `name` = EXCLUDED.`name` RETURNING `id`")
-    @GetGeneratedKeys("id")
-    int upsertSQLite(@Bind("colorName") String colorName);
-
-    @SqlUpdate("MERGE INTO color (name) KEY(name) VALUES (:colorName)")
-    @GetGeneratedKeys("id")
-    int upsertH2(@Bind("colorName") String colorName);
+    int insertColor(@Bind("colorName") String colorName);
 
     @SqlUpdate("UPDATE `player_color` SET `color` = :colorId WHERE `player` = :playerId AND `number` = :number")
     void updatePlayerColor(@Bind("playerId") int playerId, @Bind("number") int number, @Bind("colorId") int colorId);

@@ -25,14 +25,8 @@ public interface FPlayerSQL extends SQL {
     @SqlUpdate("INSERT INTO `player` (`uuid`, `name`) VALUES (:uuid, :name)")
     void insert(@Bind("uuid") String uuid, @Bind("name") String name);
 
-    @SqlUpdate("INSERT IGNORE INTO `player` (`id`, `uuid`, `name`) VALUES (:id, :uuid, :name)")
-    void insertOrIgnoreMySQL(@Bind("id") int id, @Bind("uuid") String uuid, @Bind("name") String name);
-
-    @SqlUpdate("INSERT OR IGNORE INTO `player` (`id`, `uuid`, `name`) VALUES (:id, :uuid, :name)")
-    void insertOrIgnoreSQLite(@Bind("id") int id, @Bind("uuid") String uuid, @Bind("name") String name);
-
-    @SqlUpdate("MERGE INTO `player` (`id`, `uuid`, `name`) KEY (`uuid`, `name`) VALUES (:id, :uuid, :name)")
-    void insertOrIgnoreH2(@Bind("id") int id, @Bind("uuid") String uuid, @Bind("name") String name);
+    @SqlUpdate("INSERT INTO `player` (`id`, `uuid`, `name`) VALUES (:id, :uuid, :name)")
+    void insertWithId(@Bind("id") int id, @Bind("uuid") String uuid, @Bind("name") String name);
 
     @SqlUpdate("UPDATE `player` SET `online` = :online, `uuid` = :uuid, `name` = :name, `ip` = :ip WHERE `id` = :id")
     void update(@Bind("id") int id, @Bind("online") boolean online, @Bind("uuid") String uuid, @Bind("name") String name, @Bind("ip") String ip);
