@@ -9,6 +9,7 @@ import io.lettuce.core.codec.ByteArrayCodec;
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 import io.lettuce.core.pubsub.api.async.RedisPubSubAsyncCommands;
 import net.flectone.pulse.configuration.Config;
+import net.flectone.pulse.database.Database;
 import net.flectone.pulse.listener.RedisListener;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.Proxy;
@@ -45,7 +46,7 @@ public class RedisProxy implements Proxy {
 
     @Override
     public boolean isEnable() {
-        return config.isEnable() && database.getType() == Config.Database.Type.MYSQL
+        return config.isEnable() && database.getType() == Database.Type.MYSQL
                 && pubSubConnection != null && pubSubConnection.isOpen();
     }
 

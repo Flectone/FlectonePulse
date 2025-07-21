@@ -7,6 +7,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.configuration.Config;
+import net.flectone.pulse.database.Database;
 import net.flectone.pulse.model.Proxy;
 import net.flectone.pulse.proxy.RedisProxy;
 import net.flectone.pulse.resolver.FileResolver;
@@ -65,7 +66,7 @@ public class ProxyRegistry implements Registry {
 
     protected void warnIfLocalDatabase() {
         Config.Database database = fileResolver.getConfig().getDatabase();
-        if (database.getType() == Config.Database.Type.SQLITE) {
+        if (database.getType() == Database.Type.SQLITE) {
             fLogger.warning("SQLITE database and Proxy are incompatible");
         }
     }

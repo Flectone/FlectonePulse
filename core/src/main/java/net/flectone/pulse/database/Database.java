@@ -34,6 +34,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 @Singleton
@@ -75,10 +76,10 @@ public class Database {
 
     public void connect() throws IOException {
         if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_10_2)
-                && config.getType() == Config.Database.Type.SQLITE) {
+                && config.getType() == Type.SQLITE) {
             fLogger.warning("SQLite database is not supported on this version of Minecraft");
             fLogger.warning("H2 Database will be used");
-            config.setType(Config.Database.Type.H2);
+            config.setType(Type.H2);
         }
 
         HikariConfig hikariConfig = createHikaryConfig();
@@ -103,7 +104,7 @@ public class Database {
             MIGRATION_0_9_0();
         }
 
-        if (config.getType() == Config.Database.Type.SQLITE) {
+        if (config.getType() == Type.SQLITE) {
             injector.getInstance(FPlayerDAO.class).updateAllToOffline();
         }
 
@@ -247,7 +248,7 @@ public class Database {
     }
 
     private void backupDatabase() {
-        if (config.getType() == Config.Database.Type.SQLITE) {
+        if (config.getType() == Type.SQLITE) {
             String databaseName = systemVariableResolver.substituteEnvVars(config.getName()) + ".db";
 
             String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss").format(new Date());
@@ -284,6 +285,15 @@ public class Database {
                     .version(BuildConfig.POSTGRESQL_VERSION)
                     .build()
             );
+        }
+    }
+
+    public enum Type {
+        POSTGRESQL,
+        H2,
+        SQLITE,
+        MYSQL;
+
         }
     }
 }
