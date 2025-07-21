@@ -19,7 +19,6 @@ import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.sender.PacketSender;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
@@ -44,7 +43,6 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
-    private final PacketSender packetSender;
     private final ProxySender proxySender;
     private final Gson gson;
     private final EventProcessRegistry eventProcessRegistry;
@@ -57,7 +55,6 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
                      ModerationMessageFormatter moderationMessageFormatter,
                      PermissionChecker permissionChecker,
                      MessagePipeline messagePipeline,
-                     PacketSender packetSender,
                      ProxySender proxySender,
                      Gson gson,
                      EventProcessRegistry eventProcessRegistry) {
@@ -71,7 +68,6 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.permissionChecker = permissionChecker;
         this.messagePipeline = messagePipeline;
-        this.packetSender = packetSender;
         this.proxySender = proxySender;
         this.gson = gson;
         this.eventProcessRegistry = eventProcessRegistry;
