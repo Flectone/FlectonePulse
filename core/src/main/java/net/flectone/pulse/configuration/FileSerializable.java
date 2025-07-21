@@ -8,6 +8,7 @@ import net.elytrium.serializer.SerializerConfig;
 import net.elytrium.serializer.annotations.Transient;
 import net.elytrium.serializer.custom.ClassSerializer;
 import net.elytrium.serializer.language.object.YamlSerializable;
+import net.flectone.pulse.database.Database;
 import net.flectone.pulse.model.*;
 import net.kyori.adventure.bossbar.BossBar;
 
@@ -21,6 +22,20 @@ public abstract class FileSerializable extends YamlSerializable {
     private static final SerializerConfig CONFIG = new SerializerConfig
             .Builder()
             .setBackupOnErrors(true)
+            .registerSerializer(new ClassSerializer<Database.Type, Object>() {
+
+                @Override
+                public Object serialize(Database.Type type) {
+                    return type.name();
+                }
+
+                @Override
+                public Database.Type deserialize(Object object) {
+                    String string = String.valueOf(object);
+
+                    return Database.Type.fromString(string);
+                }
+            })
             .registerSerializer(new ClassSerializer<Range, Object>() {
 
                 @Override

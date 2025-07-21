@@ -294,6 +294,11 @@ public class Database {
         SQLITE,
         MYSQL;
 
+        public static Database.Type fromString(String string) {
+            return Arrays.stream(Type.values())
+                    .filter(type -> type.name().equalsIgnoreCase(string))
+                    .findAny()
+                    .orElseThrow(() -> new IllegalArgumentException("Unknown database type: " + string));
         }
     }
 }
