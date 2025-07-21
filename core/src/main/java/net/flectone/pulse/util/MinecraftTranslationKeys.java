@@ -11,6 +11,11 @@ public enum MinecraftTranslationKeys {
     BLOCK_MINECRAFT_BED_OBSTRUCTED("block.minecraft.bed.obstructed"),
     BLOCK_MINECRAFT_BED_OCCUPIED("block.minecraft.bed.occupied"),
     BLOCK_MINECRAFT_BED_TOO_FAR_AWAY("block.minecraft.bed.too_far_away"),
+    TILE_BED_NO_SLEEP("tile.bed.noSleep"), // legacy
+    TILE_BED_NOT_SAFE("tile.bed.notSafe"), // legacy
+    TILE_BED_NOT_VALID("tile.bed.notValid"), // legacy
+    TILE_BED_OCCUPIED("tile.bed.occupied"), // legacy
+
     BLOCK_MINECRAFT_SET_SPAWN("block.minecraft.set_spawn"),
     BLOCK_MINECRAFT_SPAWN_NOT_VALID("block.minecraft.spawn.not_valid"),
 
