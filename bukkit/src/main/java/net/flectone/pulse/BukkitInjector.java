@@ -1,6 +1,7 @@
 package net.flectone.pulse;
 
 import com.github.Anon8281.universalScheduler.UniversalScheduler;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.gson.Gson;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
@@ -64,6 +65,7 @@ public class BukkitInjector extends AbstractModule {
     private final Plugin plugin;
     private final LibraryResolver libraryResolver;
     private final FLogger fLogger;
+    private final PacketProvider packetProvider;
 
     public BukkitInjector(BukkitFlectonePulse instance,
                           Plugin plugin,
@@ -73,10 +75,13 @@ public class BukkitInjector extends AbstractModule {
         this.plugin = plugin;
         this.libraryResolver = libraryResolver;
         this.fLogger = fLogger;
+        this.packetProvider = new PacketProvider();
     }
 
     @Override
     protected void configure() {
+        bind(PacketProvider.class).toInstance(packetProvider);
+
         // Bind project path
         Path projectPath = plugin.getDataFolder().toPath();
         bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
@@ -174,7 +179,7 @@ public class BukkitInjector extends AbstractModule {
         bind(SignModule.class).to(BukkitSignModule.class);
         bind(SpyModule.class).to(BukkitSpyModule.class);
 
-        if (!BukkitServerAdapter.IS_PAPER) {
+        if (!BukkitServerAdapter.IS_PAPER || packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_16_5)) {
             bind(JoinModule.class).to(BukkitJoinModule.class);
             bind(QuitModule.class).to(BukkitQuitModule.class);
         }
