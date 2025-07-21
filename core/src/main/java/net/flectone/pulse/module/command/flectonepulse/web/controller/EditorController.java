@@ -2,12 +2,13 @@ package net.flectone.pulse.module.command.flectonepulse.web.controller;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.javalin.Javalin;
-import io.javalin.http.Context;
 import net.flectone.pulse.configuration.FileSerializable;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
 import net.flectone.pulse.resolver.FileResolver;
+import spark.Request;
+import spark.Response;
+import spark.Service;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -50,79 +51,83 @@ public class EditorController {
         }
     }
 
-    public void setupRoutes(Javalin app) {
-        app.get("/", this::handleRoot);
-        app.get("/editor/{token}", this::serveEditor);
-        app.get("/editor/file/{token}/{fileType}/{fileName}", this::serveFile);
-        app.post("/editor/save/{token}/{fileType}/{fileName}", this::handleSave);
-        app.post("/logout/{token}", this::handleLogout);
+    public void setupRoutes(Service spark) {
+        spark.get("/", this::handleRoot);
+        spark.get("/editor/:token", this::serveEditor);
+        spark.get("/editor/file/:token/:fileType/:fileName", this::serveFile);
+        spark.post("/editor/save/:token/:fileType/:fileName", this::handleSave);
+        spark.post("/logout/:token", this::handleLogout);
     }
 
-    private void serveEditor(Context ctx) {
-        String token = ctx.pathParam("token");
+    private String handleRoot(Request req, Response res) {
+        res.status(401);
+        return loadTemplate("logout.html");
+    }
+
+    private String serveEditor(Request req, Response res) {
+        String token = req.params("token");
         if (!urlService.validateToken(token)) {
-            ctx.status(403).redirect("/");
-            return;
+            res.redirect("/");
+            return null;
         }
 
-        ctx.html(renderEditor());
+        return renderEditor();
     }
 
-    private void serveFile(Context ctx) {
-        String token = ctx.pathParam("token");
-        String fileType = ctx.pathParam("fileType");
-        String fileName = ctx.pathParam("fileName");
+    private String serveFile(Request req, Response res) {
+        String token = req.params("token");
+        String fileType = req.params("fileType");
+        String fileName = req.params("fileName");
 
         if (!urlService.validateToken(token)) {
-            ctx.status(403).redirect("/");
-            return;
+            res.redirect("/");
+            return null;
         }
 
         try {
             String yamlContent = getFileContent(fileType, fileName);
-            ctx.result(yamlContent).contentType("text/yaml; charset=utf-8");
+            res.type("text/yaml; charset=utf-8");
+            return yamlContent;
         } catch (Exception e) {
-            ctx.status(500).result("Failed to load file: " + e.getMessage());
+            res.status(500);
+            return "Failed to load file: " + e.getMessage();
         }
     }
 
-    private void handleSave(Context ctx) {
-        String token = ctx.pathParam("token");
-        String fileType = ctx.pathParam("fileType");
-        String fileName = ctx.pathParam("fileName");
+    private String handleSave(Request req, Response res) {
+        String token = req.params("token");
+        String fileType = req.params("fileType");
+        String fileName = req.params("fileName");
 
         if (!urlService.validateToken(token)) {
-            ctx.status(403).redirect("/");
-            return;
+            res.redirect("/");
+            return null;
         }
 
         try {
-            String yamlContent = ctx.body();
+            String yamlContent = req.body();
             saveFileContent(fileType, fileName, yamlContent);
-            ctx.json(Map.of("success", true));
+            res.type("application/json");
+            return "{\"success\": true}";
         } catch (Exception e) {
-            ctx.status(500).json(Map.of("error", "Failed to save file: " + e.getMessage()));
+            res.status(500);
+            res.type("application/json");
+            return "{\"error\": \"Failed to save file: " + e.getMessage() + "\"}";
         }
     }
 
-    private void handleRoot(Context ctx) {
-        String html = loadTemplate("logout.html");
-        ctx.html(html).status(401);
-    }
-
-    private void handleLogout(Context ctx) {
-        String token = ctx.pathParam("token");
+    private Object handleLogout(Request req, Response res) {
+        String token = req.params("token");
         if (!urlService.validateToken(token)) {
-            ctx.status(403).redirect("/");
-            return;
+            res.redirect("/");
+            return null;
         }
 
         urlService.resetToken();
-        ctx.json(Map.of(
-                "success", true,
-                "redirect", "/?message=logged_out"
-        ));
+        res.type("application/json");
+        return "{\"success\": true, \"redirect\": \"/?message=logged_out\"}";
     }
+
 
     private String getFileContent(String fileType, String fileName) throws IOException {
         if ("main".equals(fileType)) {

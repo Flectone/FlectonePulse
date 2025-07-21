@@ -69,7 +69,7 @@ subprojects {
         compileOnly "org.telegram:telegrambots-client:$telegrambots_version"
         compileOnly "com.yandex.cloud:java-sdk-services:$yandexsdk_version"
         compileOnly "com.deepl.api:deepl-java:$deepl_version"
-        compileOnly "io.javalin:javalin:$javalin_version"
+        compileOnly "com.sparkjava:spark-core:$spark_version"
         compileOnly "com.h2database:h2:$h2_version"
 
         annotationProcessor "org.projectlombok:lombok:$lombok_version"
@@ -92,6 +92,7 @@ subprojects {
         relocate("net.elytrium.serializer", "net.flectone.pulse.library.elytrium")
         relocate("com.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents")
         relocate("io.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents.impl")
+        relocate("spark.", "net.flectone.pulse.library.spark.")
 
         if (!project.name.is("paper")) {
             relocate("net.kyori.adventure", "net.flectone.pulse.library.adventure")

@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.command.flectonepulse;
 
 import com.alessiodp.libby.Library;
+import com.alessiodp.libby.relocation.Relocation;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
@@ -14,7 +15,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.formatter.TimeFormatter;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.module.command.flectonepulse.web.JavalinServer;
+import net.flectone.pulse.module.command.flectonepulse.web.SparkServer;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.resolver.FileResolver;
@@ -86,15 +87,15 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
         addPredicate(this::checkCooldown);
 
-        if (hasJavalin()) {
-            enableJavalin();
+        if (hasSparkClass()) {
+            enableSpark();
         }
     }
 
     @Override
     public void onDisable() {
-        if (hasJavalin()) {
-            injector.getInstance(JavalinServer.class).onDisable();
+        if (hasSparkClass()) {
+            injector.getInstance(SparkServer.class).onDisable();
         }
     }
 
@@ -120,11 +121,11 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
             UrlService urlService = injector.getInstance(UrlService.class);
             String url = urlService.generateUrl();
 
-            if (!hasJavalin()) {
-                loadJavalinLibrary();
+            if (!hasSparkClass()) {
+                loadSparkLibrary();
             }
 
-            enableJavalin();
+            enableSpark();
 
             builder(fPlayer)
                     .destination(command.getDestination())
@@ -160,10 +161,10 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
         }
     }
 
-    private void enableJavalin() {
-        JavalinServer javalinServer = injector.getInstance(JavalinServer.class);
-        if (!javalinServer.isEnable()) {
-            javalinServer.onEnable();
+    private void enableSpark() {
+        SparkServer sparkServer = injector.getInstance(SparkServer.class);
+        if (!sparkServer.isEnable()) {
+            sparkServer.onEnable();
         }
     }
 
@@ -174,19 +175,24 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
         );
     }
 
-    private void loadJavalinLibrary() {
+    private void loadSparkLibrary() {
         libraryResolver.loadLibrary(Library.builder()
-                .groupId("io{}javalin")
-                .artifactId("javalin")
-                .version(BuildConfig.JAVALIN_VERSION)
+                .groupId("com{}sparkjava")
+                .artifactId("spark-core")
+                .version(BuildConfig.SPARK_VERSION)
                 .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("spark")
+                        .relocatedPattern("net.flectone.pulse.library.spark")
+                        .build()
+                )
                 .build()
         );
     }
 
-    private boolean hasJavalin() {
+    private boolean hasSparkClass() {
         try {
-            Class.forName("io.javalin.Javalin");
+            Class.forName("net.flectone.pulse.library.spark.Service");
             return true;
         } catch (ClassNotFoundException ignored) {
             return false;
