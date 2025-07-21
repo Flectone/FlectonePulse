@@ -120,6 +120,8 @@ public class ModernBukkitCommandRegistry extends CommandRegistry {
 
     @Override
     public void reload() {
+        if (!config.isUnregisterOwnCommands()) return;
+
         if (BukkitServerAdapter.IS_PAPER) {
             super.reload();
         } else {

@@ -42,6 +42,7 @@ public final class Config extends FileSerializable {
     @Setter
     private String language = "en_us";
     private boolean languagePlayer = true;
+    private boolean unregisterOwnCommands = false;
     private boolean metrics = true;
     private boolean bungeecord = false;
     private boolean velocity = false;
@@ -68,6 +69,7 @@ public final class Config extends FileSerializable {
     private Editor editor = new Editor();
 
     @Getter
+    @Setter
     public static final class Database {
         private Type type = Type.SQLITE;
         private String name = "flectonepulse";

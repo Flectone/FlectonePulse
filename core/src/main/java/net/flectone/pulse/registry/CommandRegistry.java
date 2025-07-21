@@ -12,36 +12,22 @@ import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 
 import java.time.Duration;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Function;
 
 public abstract class CommandRegistry implements Registry {
 
-    private final Set<String> registeredCommands = new HashSet<>();
 
     private final CommandParserRegistry parsers;
     private final PermissionChecker permissionChecker;
 
     protected CommandRegistry(CommandParserRegistry parsers,
-                           PermissionChecker permissionChecker) {
+                              PermissionChecker permissionChecker) {
         this.parsers = parsers;
         this.permissionChecker = permissionChecker;
     }
 
     @Override
-    public void reload() {
-        registeredCommands.forEach(this::unregisterCommand);
-        registeredCommands.clear();
-    }
-
-    public void addCommand(String command) {
-        registeredCommands.add(command);
-    }
-
-    public boolean containsCommand(String command) {
-        return registeredCommands.contains(command);
-    }
+    public abstract void reload();
 
     public abstract void registerCommand(Function<CommandManager<FPlayer>, Command.Builder<FPlayer>> builder);
 
