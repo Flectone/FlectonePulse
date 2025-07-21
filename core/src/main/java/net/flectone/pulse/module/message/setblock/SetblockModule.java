@@ -51,14 +51,19 @@ public class SetblockModule extends AbstractModuleMessage<Localization.Message.S
 
             TranslatableComponent translatableComponent = event.getComponent();
             List<Component> translationArguments = translatableComponent.args();
-            if (translationArguments.size() < 3) return;
-            if (!(translationArguments.get(0) instanceof TextComponent xComponent)) return;
-            if (!(translationArguments.get(1) instanceof TextComponent yComponent)) return;
-            if (!(translationArguments.get(2) instanceof TextComponent zComponent)) return;
 
-            String y = yComponent.content();
-            String x = xComponent.content();
-            String z = zComponent.content();
+            String x = "";
+            String y = "";
+            String z = "";
+            if (translationArguments.size() > 2) {
+                if (!(translationArguments.get(0) instanceof TextComponent xComponent)) return;
+                if (!(translationArguments.get(1) instanceof TextComponent yComponent)) return;
+                if (!(translationArguments.get(2) instanceof TextComponent zComponent)) return;
+
+                x = xComponent.content();
+                y = yComponent.content();
+                z = zComponent.content();
+            }
 
             event.cancel();
 
