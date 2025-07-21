@@ -1,6 +1,8 @@
 package net.flectone.pulse.database;
 
 
+import com.alessiodp.libby.Library;
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
@@ -8,16 +10,19 @@ import com.google.inject.name.Named;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
+import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.database.dao.ColorsDAO;
 import net.flectone.pulse.database.dao.FPlayerDAO;
 import net.flectone.pulse.database.dao.SettingDAO;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.Ignore;
 import net.flectone.pulse.model.Mail;
 import net.flectone.pulse.model.Moderation;
-import net.flectone.pulse.model.Ignore;
+import net.flectone.pulse.provider.PacketProvider;
+import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.resolver.LibraryResolver;
 import net.flectone.pulse.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import org.jdbi.v3.core.Jdbi;
@@ -42,6 +47,7 @@ public class Database {
     private final SystemVariableResolver systemVariableResolver;
     private final PlatformServerAdapter platformServerAdapter;
     private final FLogger fLogger;
+    private final PacketProvider packetProvider;
     private final LibraryResolver libraryResolver;
 
     private HikariDataSource dataSource;
@@ -53,9 +59,8 @@ public class Database {
                     @Named("projectPath") Path projectPath,
                     SystemVariableResolver systemVariableResolver,
                     PlatformServerAdapter platformServerAdapter,
-                    FLogger fLogger) {
-
                     FLogger fLogger,
+                    PacketProvider packetProvider,
                     LibraryResolver libraryResolver) {
         this.config = fileResolver.getConfig().getDatabase();
         this.injector = injector;
@@ -64,12 +69,18 @@ public class Database {
         this.systemVariableResolver = systemVariableResolver;
         this.platformServerAdapter = platformServerAdapter;
         this.fLogger = fLogger;
-
-        config = fileResolver.getConfig().getDatabase();
+        this.packetProvider = packetProvider;
         this.libraryResolver = libraryResolver;
     }
 
     public void connect() throws IOException {
+        if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_10_2)
+                && config.getType() == Config.Database.Type.SQLITE) {
+            fLogger.warning("SQLite database is not supported on this version of Minecraft");
+            fLogger.warning("H2 Database will be used");
+            config.setType(Config.Database.Type.H2);
+        }
+
         HikariConfig hikariConfig = createHikaryConfig();
 
         try {
