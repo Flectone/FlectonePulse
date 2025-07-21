@@ -12,6 +12,7 @@ import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 import org.jetbrains.annotations.NotNull;
@@ -49,13 +50,26 @@ public class SeedModule extends AbstractModuleMessage<Localization.Message.Seed>
 
             TranslatableComponent translatableComponent = event.getComponent();
             if (translatableComponent.args().isEmpty()) return;
-            if (!(translatableComponent.args().get(0) instanceof TranslatableComponent chatComponent)) return;
-            if (chatComponent.args().isEmpty()) return;
-            if (!(chatComponent.args().get(0) instanceof TextComponent seedComponent)) return;
+
+            Component firstArg = translatableComponent.args().get(0);
+            String seed = switch (firstArg) {
+                // modern format with chat.square_brackets
+                case TranslatableComponent chatComponent when chatComponent.key().equals("chat.square_brackets")
+                        && !chatComponent.args().isEmpty()
+                        && chatComponent.args().get(0) instanceof TextComponent seedComponent -> seedComponent.content();
+                // legacy format with extra
+                case TextComponent textComponent when textComponent.content().equals("[")
+                        && !textComponent.children().isEmpty()
+                        && textComponent.children().get(0) instanceof TextComponent seedComponent -> seedComponent.content();
+                // legacy format
+                case TextComponent textComponent when !textComponent.content().isEmpty() -> textComponent.content();
+                default -> null;
+            };
+
+            if (seed == null) return;
 
             event.cancel();
-
-            send(event.getUserUUID(), seedComponent.content());
+            send(event.getUserUUID(), seed);
         });
     }
 
