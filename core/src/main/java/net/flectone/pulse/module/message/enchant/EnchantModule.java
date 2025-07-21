@@ -44,6 +44,11 @@ public class EnchantModule extends AbstractModuleMessage<Localization.Message.En
 
         eventProcessRegistry.registerMessageHandler(event -> {
             if (!event.getKey().startsWith("commands.enchant.success")) return;
+            if (event.getKey() == MinecraftTranslationKeys.COMMANDS_ENCHANT_SUCCESS) {
+                event.cancel();
+                send(event, "", "", "");
+                return;
+            }
 
             TranslatableComponent translatableComponent = event.getComponent();
             if (translatableComponent.args().size() < 2) return;
@@ -76,7 +81,10 @@ public class EnchantModule extends AbstractModuleMessage<Localization.Message.En
 
         FPlayer fTarget = fPlayer;
 
-        if (event.getKey() == MinecraftTranslationKeys.COMMANDS_ENCHANT_SUCCESS_SINGLE) {
+        boolean isSingle = event.getKey() == MinecraftTranslationKeys.COMMANDS_ENCHANT_SUCCESS_SINGLE
+                || event.getKey() == MinecraftTranslationKeys.COMMANDS_ENCHANT_SUCCESS;
+
+        if (isSingle && !value.isEmpty()) {
             fTarget = fPlayerService.getFPlayer(value);
             if (fTarget.isUnknown()) return;
         }
@@ -84,8 +92,7 @@ public class EnchantModule extends AbstractModuleMessage<Localization.Message.En
         builder(fTarget)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> (event.getKey() == MinecraftTranslationKeys.COMMANDS_ENCHANT_SUCCESS_SINGLE
-                        ? s.getSingle() : s.getMultiple().replace("<count>", value))
+                .format(s -> (isSingle ? s.getSingle() : s.getMultiple().replace("<count>", value))
                         .replace("<enchant>", enchant)
                         .replace("<level>", level)
                 )
