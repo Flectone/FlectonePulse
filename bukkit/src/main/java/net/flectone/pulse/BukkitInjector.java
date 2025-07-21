@@ -110,8 +110,14 @@ public class BukkitInjector extends AbstractModule {
         // Registries
         bind(PermissionRegistry.class).to(BukkitPermissionRegistry.class);
         bind(ListenerRegistry.class).to(BukkitListenerRegistry.class);
-        bind(CommandRegistry.class).to(BukkitCommandRegistry.class);
         bind(ProxyRegistry.class).to(BukkitProxyRegistry.class);
+
+        try {
+            Class.forName("com.mojang.brigadier.arguments.ArgumentType");
+            bind(CommandRegistry.class).to(ModernBukkitCommandRegistry.class);
+        } catch (ClassNotFoundException e) {
+            bind(CommandRegistry.class).to(LegacyBukkitCommandRegistry.class);
+        }
 
         // Checkers and utilities
         bind(PermissionChecker.class).to(BukkitPermissionChecker.class);

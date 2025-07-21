@@ -5,8 +5,8 @@ import com.google.inject.Singleton;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import io.leangen.geantyref.TypeToken;
 import net.flectone.pulse.adapter.BukkitServerAdapter;
-import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.handler.CommandExceptionHandler;
 import net.flectone.pulse.mapper.FPlayerMapper;
 import net.flectone.pulse.model.FPlayer;
@@ -14,40 +14,28 @@ import net.flectone.pulse.parser.integer.ColorParser;
 import net.flectone.pulse.parser.integer.DurationReasonParser;
 import net.flectone.pulse.parser.player.PlayerParser;
 import net.flectone.pulse.parser.string.MessageParser;
-import org.bukkit.command.PluginCommand;
+import net.flectone.pulse.resolver.FileResolver;
 import org.bukkit.plugin.Plugin;
-import org.incendo.cloud.Command;
-import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.brigadier.BrigadierSetting;
 import org.incendo.cloud.brigadier.CloudBrigadierManager;
 import org.incendo.cloud.bukkit.CloudBukkitCapabilities;
-import org.incendo.cloud.exception.ArgumentParseException;
-import org.incendo.cloud.exception.CommandExecutionException;
-import org.incendo.cloud.exception.InvalidSyntaxException;
-import org.incendo.cloud.exception.NoPermissionException;
-import org.incendo.cloud.execution.ExecutionCoordinator;
-import org.incendo.cloud.paper.LegacyPaperCommandManager;
 import org.incendo.cloud.parser.standard.StringParser;
-import org.incendo.cloud.setting.ManagerSetting;
-
-import java.util.function.Function;
 
 @Singleton
-public class ModernBukkitCommandRegistry extends CommandRegistry {
+public class ModernBukkitCommandRegistry extends LegacyBukkitCommandRegistry {
 
-    private final Plugin plugin;
-    private final LegacyPaperCommandManager<FPlayer> manager;
+    private final Config config;
 
     @Inject
-    public ModernBukkitCommandRegistry(CommandParserRegistry parsers,
+    public ModernBukkitCommandRegistry(FileResolver fileResolver,
+                                       CommandParserRegistry parsers,
                                        CommandExceptionHandler commandExceptionHandler,
                                        PermissionChecker permissionChecker,
                                        Plugin plugin,
                                        FPlayerMapper fPlayerMapper) {
-        super(parsers, permissionChecker);
+        super(fileResolver, parsers, commandExceptionHandler, permissionChecker, plugin, fPlayerMapper);
 
-        this.plugin = plugin;
-        this.manager = new LegacyPaperCommandManager<>(plugin, ExecutionCoordinator.asyncCoordinator(), fPlayerMapper);
+        this.config = fileResolver.getConfig();
 
         if (manager.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
             manager.registerBrigadier();
@@ -79,43 +67,6 @@ public class ModernBukkitCommandRegistry extends CommandRegistry {
         } else if (manager.hasCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
             manager.registerAsynchronousCompletions();
         }
-
-        manager.settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);
-
-        manager.exceptionController().registerHandler(ArgumentParseException.class, commandExceptionHandler::handleArgumentParseException);
-        manager.exceptionController().registerHandler(InvalidSyntaxException.class, commandExceptionHandler::handleInvalidSyntaxException);
-        manager.exceptionController().registerHandler(NoPermissionException.class, commandExceptionHandler::handleNoPermissionException);
-        manager.exceptionController().registerHandler(CommandExecutionException.class, commandExceptionHandler::handleCommandExecutionException);
-    }
-
-    @Override
-    public final void registerCommand(Function<CommandManager<FPlayer>, Command.Builder<FPlayer>> builder) {
-        Command<FPlayer> command = builder.apply(manager).build();
-
-        // root name
-        String commandName = command.rootComponent().name();
-
-        // spigot issue
-        if (!BukkitServerAdapter.IS_PAPER && containsCommand(commandName)) return;
-
-        // unregister minecraft and other plugins command
-        if (!containsCommand(commandName)) {
-            unregisterCommand(commandName);
-        }
-
-        PluginCommand pluginCommand = plugin.getServer().getPluginCommand(commandName);
-        if (pluginCommand != null) return;
-
-        // save to cache
-        addCommand(commandName);
-
-        // register new command
-        manager.command(command);
-    }
-
-    @Override
-    public void unregisterCommand(String name) {
-        manager.deleteRootCommand(name);
     }
 
     @Override
@@ -123,15 +74,9 @@ public class ModernBukkitCommandRegistry extends CommandRegistry {
         if (!config.isUnregisterOwnCommands()) return;
 
         if (BukkitServerAdapter.IS_PAPER) {
-            super.reload();
+            manager.commands().forEach(command -> unregisterCommand(command.rootComponent().name()));
         } else {
-            // only for spigot
-            syncReload();
+            super.syncReload();
         }
-    }
-
-    @Sync
-    public void syncReload() {
-        super.reload();
     }
 }
