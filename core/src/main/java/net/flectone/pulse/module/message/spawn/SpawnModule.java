@@ -62,20 +62,48 @@ public class SpawnModule extends AbstractModuleMessage<Localization.Message.Spaw
             if (event.getKey().startsWith("commands.spawnpoint.success")) {
                 TranslatableComponent translatableComponent = event.getComponent();
                 List<Component> translationArguments = translatableComponent.args();
-                if (translationArguments.size() < 6) return;
-                if (!(translationArguments.get(0) instanceof TextComponent xComponent)) return;
-                if (!(translationArguments.get(1) instanceof TextComponent yComponent)) return;
-                if (!(translationArguments.get(2) instanceof TextComponent zComponent)) return;
-                if (!(translationArguments.get(3) instanceof TextComponent angleComponent)) return;
-                if (!(translationArguments.get(4) instanceof TextComponent worldComponent)) return;
-                if (!(translationArguments.get(5) instanceof TextComponent targetComponent)) return;
 
-                String x = xComponent.content();
-                String y = yComponent.content();
-                String z = zComponent.content();
-                String angle = angleComponent.content();
-                String world = worldComponent.content();
-                String value = targetComponent.content();
+                if (translationArguments.size() < 4) return;
+
+                Component targetComponent;
+                Component xComponent;
+                Component yComponent;
+                Component zComponent;
+                String angle = "";
+                String world = "";
+
+                if (event.getKey() == MinecraftTranslationKeys.COMMANDS_SPAWNPOINT_SUCCESS) {
+                    // legacy format, player first
+                    targetComponent = translationArguments.get(0);
+                    xComponent = translationArguments.get(1);
+                    yComponent = translationArguments.get(2);
+                    zComponent = translationArguments.get(3);
+                } else {
+                    // coordinates first, player last
+                    xComponent = translationArguments.get(0);
+                    yComponent = translationArguments.get(1);
+                    zComponent = translationArguments.get(2);
+                    targetComponent = translationArguments.getLast();
+
+                    // check for optional angle and world
+                    if (translationArguments.size() >= 5 && translationArguments.get(3) instanceof TextComponent angleComponent) {
+                        angle = angleComponent.content();
+                    }
+
+                    if (translationArguments.size() >= 6 && translationArguments.get(4) instanceof TextComponent worldComponent) {
+                        world = worldComponent.content();
+                    }
+                }
+
+                if (!(xComponent instanceof TextComponent xComp)) return;
+                if (!(yComponent instanceof TextComponent yComp)) return;
+                if (!(zComponent instanceof TextComponent zComp)) return;
+                if (!(targetComponent instanceof TextComponent tgtComp)) return;
+
+                String x = xComp.content();
+                String y = yComp.content();
+                String z = zComp.content();
+                String value = tgtComp.content();
 
                 event.cancel();
                 send(event, x, y, z, angle, world, value);
@@ -109,7 +137,10 @@ public class SpawnModule extends AbstractModuleMessage<Localization.Message.Spaw
 
         FPlayer fTarget = fPlayer;
 
-        if (event.getKey() == MinecraftTranslationKeys.COMMANDS_SPAWNPOINT_SUCCESS_SINGLE) {
+        boolean isSingle = event.getKey() == MinecraftTranslationKeys.COMMANDS_SPAWNPOINT_SUCCESS_SINGLE
+                || event.getKey() == MinecraftTranslationKeys.COMMANDS_SPAWNPOINT_SUCCESS;
+
+        if (isSingle) {
             fTarget = fPlayerService.getFPlayer(value);
             if (fTarget.isUnknown()) return;
         }
@@ -117,8 +148,7 @@ public class SpawnModule extends AbstractModuleMessage<Localization.Message.Spaw
         builder(fTarget)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> (event.getKey() == MinecraftTranslationKeys.COMMANDS_SPAWNPOINT_SUCCESS_SINGLE
-                        ? s.getSingle() : s.getMultiple().replace("<count>", value))
+                .format(s -> (isSingle ? s.getSingle() : s.getMultiple().replace("<count>", value))
                         .replace("<x>", x)
                         .replace("<y>", y)
                         .replace("<z>", z)

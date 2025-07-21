@@ -56,6 +56,7 @@ public enum MinecraftTranslationKeys {
     COMMANDS_SETBLOCK_SUCCESS("commands.setblock.success"),
     COMMANDS_SPAWNPOINT_SUCCESS_MULTIPLE("commands.spawnpoint.success.multiple"),
     COMMANDS_SPAWNPOINT_SUCCESS_SINGLE("commands.spawnpoint.success.single"),
+    COMMANDS_SPAWNPOINT_SUCCESS("commands.spawnpoint.success"), // legacy
 
     DEATH_ATTACK_ANVIL("death.attack.anvil"),
     DEATH_ATTACK_ANVIL_PLAYER("death.attack.anvil.player"),
