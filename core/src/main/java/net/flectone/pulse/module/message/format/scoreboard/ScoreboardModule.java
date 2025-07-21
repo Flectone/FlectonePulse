@@ -19,7 +19,6 @@ import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -72,7 +71,7 @@ public class ScoreboardModule extends AbstractModule {
 
                 // new info
                 Team newTeam = createTeam(fPlayer);
-                sendUpdatePacket(newTeam);
+                sendPacket(newTeam, WrapperPlayServerTeams.TeamMode.UPDATE);
 
                 // update info
                 uuidTeamMap.put(uuid, newTeam);
@@ -86,7 +85,7 @@ public class ScoreboardModule extends AbstractModule {
 
     @Override
     public void onDisable() {
-        uuidTeamMap.values().forEach(this::sendRemovePacket);
+        uuidTeamMap.values().forEach(team -> sendPacket(team, WrapperPlayServerTeams.TeamMode.REMOVE));
         uuidTeamMap.clear();
     }
 
@@ -94,7 +93,7 @@ public class ScoreboardModule extends AbstractModule {
         if (checkModulePredicates(fPlayer)) return;
 
         Team team = createTeam(fPlayer);
-        sendCreatePacket(team);
+        sendPacket(team, WrapperPlayServerTeams.TeamMode.CREATE);
         uuidTeamMap.put(fPlayer.getUuid(), team);
 
         uuidTeamMap.forEach((uuid, cacheTeam) ->
@@ -109,7 +108,7 @@ public class ScoreboardModule extends AbstractModule {
         if (team == null) return;
 
         uuidTeamMap.remove(fPlayer.getUuid());
-        sendRemovePacket(team);
+        sendPacket(team, WrapperPlayServerTeams.TeamMode.REMOVE);
     }
 
     private Team createTeam(FPlayer fPlayer) {
@@ -146,16 +145,8 @@ public class ScoreboardModule extends AbstractModule {
         return new Team(teamName, fPlayer.getName(), info);
     }
 
-    private void sendCreatePacket(Team team) {
-        packetSender.send(new WrapperPlayServerTeams(team.name(), WrapperPlayServerTeams.TeamMode.CREATE, team.info(), List.of(team.owner())));
-    }
-
-    private void sendRemovePacket(Team team) {
-        packetSender.send(new WrapperPlayServerTeams(team.name(), WrapperPlayServerTeams.TeamMode.REMOVE, (WrapperPlayServerTeams.ScoreBoardTeamInfo) null, Collections.emptyList()));
-    }
-
-    private void sendUpdatePacket(Team team) {
-        packetSender.send(new WrapperPlayServerTeams(team.name(), WrapperPlayServerTeams.TeamMode.UPDATE, team.info(), Collections.emptyList()));
+    private void sendPacket(Team team, WrapperPlayServerTeams.TeamMode teamMode) {
+        packetSender.send(new WrapperPlayServerTeams(team.name(), teamMode, team.info(), List.of(team.owner())));
     }
 
 }
