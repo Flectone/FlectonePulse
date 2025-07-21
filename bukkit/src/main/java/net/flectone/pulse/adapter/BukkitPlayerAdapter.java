@@ -211,7 +211,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
             case HEALTH -> (int) Math.round(player.getHealth() * 10.0) / 10;
             case LEVEL -> player.getLevel();
             case FOOD -> player.getFoodLevel();
-            case PING -> player.getPing();
+            case PING -> packetProvider.getPing(player);
             case ARMOR -> (int) attributesProvider.getArmorValue(player);
             case ATTACK -> (int) attributesProvider.getAttackDamage(player);
         };
