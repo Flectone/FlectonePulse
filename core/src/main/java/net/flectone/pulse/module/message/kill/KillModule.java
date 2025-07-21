@@ -15,9 +15,11 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.EntityUtil;
 import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.HoverEvent;
+import org.incendo.cloud.type.tuple.Triplet;
 
 import java.util.UUID;
 
@@ -53,7 +55,7 @@ public class KillModule extends AbstractModuleMessage<Localization.Message.Kill>
         eventProcessRegistry.registerMessageHandler(event -> {
             switch (event.getKey()) {
                 case COMMANDS_KILL_SUCCESS_MULTIPLE -> handleKillMultiple(event);
-                case COMMANDS_KILL_SUCCESS_SINGLE -> handleKillSingle(event);
+                case COMMANDS_KILL_SUCCESS_SINGLE, COMMANDS_KILL_SUCCESS -> handleKillSingle(event);
             }
         });
     }
@@ -70,7 +72,10 @@ public class KillModule extends AbstractModuleMessage<Localization.Message.Kill>
 
         FEntity fTarget = fPlayer;
 
-        if (key == MinecraftTranslationKeys.COMMANDS_KILL_SUCCESS_SINGLE && fEntity != null) {
+        boolean isSingle = key == MinecraftTranslationKeys.COMMANDS_KILL_SUCCESS_SINGLE
+                || key == MinecraftTranslationKeys.COMMANDS_KILL_SUCCESS;
+
+        if (isSingle && fEntity != null && fEntity.getUuid() != null) {
             fTarget = fPlayerService.getFPlayer(fEntity.getUuid());
 
             if (fTarget.isUnknown()) {
@@ -101,33 +106,55 @@ public class KillModule extends AbstractModuleMessage<Localization.Message.Kill>
 
     private void handleKillSingle(TranslatableMessageEvent event) {
         TranslatableComponent translatableComponent = event.getComponent();
+        if (translatableComponent.args().isEmpty()) return;
 
-        HoverEvent<?> hoverEvent = null;
-        String type = "";
-        if (translatableComponent.args().get(0) instanceof TextComponent firstArgument) {
-            hoverEvent = firstArgument.hoverEvent();
-        } else if (translatableComponent.args().get(0) instanceof TranslatableComponent firstArgument)  {
-            hoverEvent = firstArgument.hoverEvent();
-            type = firstArgument.key();
-        }
+        Component firstArgument = translatableComponent.args().get(0);
+        UUID uuid = null;
 
-        if (hoverEvent == null) return;
-        HoverEvent.ShowEntity showEntity = (HoverEvent.ShowEntity) hoverEvent.value();
-        if (type.isEmpty()) {
-            type = entityUtil.resolveEntityTranslationKey(showEntity.type().key().value());
-        }
+        String content = switch (firstArgument) {
+            case TranslatableComponent translatableArg -> {
+                String insertion = translatableArg.insertion();
+                if (insertion != null && !insertion.isEmpty()) {
+                    try {
+                        uuid = UUID.fromString(insertion);
+                    } catch (IllegalArgumentException e) {
+                        // invalid UUID
+                    }
+                }
 
-        String name;
-        if (showEntity.name() instanceof TextComponent hoverComponent) {
-            name = hoverComponent.content();
-        } else if (showEntity.name() instanceof TranslatableComponent hoverComponent) {
-            name = hoverComponent.key();
-        } else return;
+                yield translatableArg.key();
+            }
+            case TextComponent textArg -> textArg.content();
+            default -> null;
+        };
 
-        UUID uuid = showEntity.id();
-        FEntity fEntity = new FEntity(name, uuid, type);
+        if (content == null) return;
+
+        Triplet<String, String, UUID> triplet = processHoverKillComponent(content, content, uuid, firstArgument.hoverEvent());
+        String name = triplet.first();
+        if (name.isEmpty()) return;
+
+        String type = triplet.second();
+        uuid = triplet.third();
 
         event.cancel();
-        send(event.getUserUUID(), MinecraftTranslationKeys.COMMANDS_KILL_SUCCESS_SINGLE, "", fEntity);
+        send(event.getUserUUID(), event.getKey(), "", new FEntity(name, uuid, type));
+    }
+
+    private Triplet<String, String, UUID> processHoverKillComponent(String name, String type, UUID uuid, HoverEvent<?> hoverEvent) {
+        if (hoverEvent != null && hoverEvent.action() == HoverEvent.Action.SHOW_ENTITY) {
+            HoverEvent.ShowEntity showEntity = (HoverEvent.ShowEntity) hoverEvent.value();
+            uuid = showEntity.id();
+            type = entityUtil.resolveEntityTranslationKey(showEntity.type().key().value());
+            if (showEntity.name() instanceof TextComponent hoverText) {
+                name = hoverText.content();
+            } else if (showEntity.name() instanceof TranslatableComponent hoverTranslatable) {
+                name = hoverTranslatable.key();
+            }
+        } else if (uuid == null) {
+            uuid = fPlayerService.getFPlayer(name).getUuid();
+        }
+
+        return Triplet.of(name, type, uuid);
     }
 }

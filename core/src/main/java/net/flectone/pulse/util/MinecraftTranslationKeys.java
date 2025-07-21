@@ -50,6 +50,7 @@ public enum MinecraftTranslationKeys {
     GAMEMODE_CHANGED("gameMode.changed"),
     COMMANDS_KILL_SUCCESS_MULTIPLE("commands.kill.success.multiple"),
     COMMANDS_KILL_SUCCESS_SINGLE("commands.kill.success.single"),
+    COMMANDS_KILL_SUCCESS("commands.kill.successful"), // legacy
     COMMANDS_OP_SUCCESS("commands.op.success"),
     COMMANDS_SEED_SUCCESS("commands.seed.success"),
     COMMANDS_SETBLOCK_SUCCESS("commands.setblock.success"),
