@@ -27,6 +27,8 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.incendo.cloud.type.tuple.Pair;
+import org.incendo.cloud.type.tuple.Triplet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,10 +74,15 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
 
         eventProcessRegistry.registerMessageHandler(translatableMessageEvent -> {
             switch (translatableMessageEvent.getKey()) {
-                case CHAT_TYPE_ADVANCEMENT_TASK, CHAT_TYPE_ADVANCEMENT_GOAL, CHAT_TYPE_ADVANCEMENT_CHALLENGE ->
+                case CHAT_TYPE_ADVANCEMENT_TASK, CHAT_TYPE_ADVANCEMENT_GOAL, CHAT_TYPE_ADVANCEMENT_CHALLENGE,
+                     CHAT_TYPE_ACHIEVEMENT, CHAT_TYPE_ACHIEVEMENT_TAKEN ->
                         processAdvancement(translatableMessageEvent);
                 case COMMANDS_ADVANCEMENT_GRANT_ONE_TO_ONE_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_MANY_TO_ONE_SUCCESS,
-                     COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS, COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS ->
+                     COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS, COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS,
+                     COMMANDS_ACHIEVEMENT_GIVE_ONE, COMMANDS_ACHIEVEMENT_GIVE_MANY,
+                     COMMANDS_ACHIEVEMENT_TAKE_ONE, COMMANDS_ACHIEVEMENT_TAKE_MANY,
+                     COMMANDS_ADVANCEMENT_REVOKE_ONLY_SUCCESS, COMMANDS_ADVANCEMENT_REVOKE_EVERYTHING_SUCCESS,
+                     COMMANDS_ADVANCEMENT_GRANT_ONLY_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_EVERYTHING_SUCCESS ->
                         processCommand(translatableMessageEvent);
             }
         });
@@ -146,10 +153,10 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
 
     public String convert(Localization.Message.Advancement message, Advancement advancement) {
         String string = switch (advancement.type()) {
-            case CHAT_TYPE_ADVANCEMENT_TASK -> message.getTask().getFormat();
+            case CHAT_TYPE_ACHIEVEMENT_TAKEN -> message.getTaken().getFormat();
             case CHAT_TYPE_ADVANCEMENT_GOAL -> message.getGoal().getFormat();
             case CHAT_TYPE_ADVANCEMENT_CHALLENGE -> message.getChallenge().getFormat();
-            default -> "";
+            default -> message.getTask().getFormat();
         };
 
         return string
@@ -165,10 +172,10 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
             Localization.Message.Advancement localization = resolveLocalization(receiver);
 
             String title = switch (advancement.type()) {
-                case CHAT_TYPE_ADVANCEMENT_TASK -> localization.getTask().getTag();
+                case CHAT_TYPE_ACHIEVEMENT_TAKEN -> localization.getTaken().getTag();
                 case CHAT_TYPE_ADVANCEMENT_GOAL -> localization.getGoal().getTag();
                 case CHAT_TYPE_ADVANCEMENT_CHALLENGE -> localization.getChallenge().getTag();
-                default -> "";
+                default -> localization.getTask().getTag();
             };
 
             Component component = messagePipeline.builder(sender, receiver, title
@@ -185,40 +192,28 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
         TranslatableComponent translatableComponent = event.getComponent();
         List<Component> translationArguments = translatableComponent.args();
         if (translationArguments.size() < 2) return;
+
         if (!(translationArguments.get(0) instanceof TextComponent targetComponent)) return;
         String target = targetComponent.content();
 
-        if (!(translationArguments.get(1) instanceof TranslatableComponent titleComponent)) return;
-        if (titleComponent.args().isEmpty()) return;
+        Component achievementComp = translationArguments.get(1);
+        Pair<String, String> pair = switch (achievementComp) {
+            case TranslatableComponent titleComponent when titleComponent.key().equals("chat.square_brackets") && !titleComponent.args().isEmpty() ->
+                    processAdvancementChatComponent(titleComponent.args().get(0));
+            case TextComponent textComp when textComp.content().equals("[") && !textComp.children().isEmpty() ->
+                    processAdvancementChatComponent(textComp.children().get(0));
+            default -> null;
+        };
+        if (pair == null) return;
 
-        Advancement advancement;
-        if (titleComponent.args().get(0) instanceof TranslatableComponent title) {
+        String title = pair.first();
+        String description = pair.second();
 
-            HoverEvent<?> hoverEvent = title.hoverEvent();
+        if (description.isBlank()) {
+            description = title.replace(".title", ".description");
+        }
 
-            if (hoverEvent == null) return;
-            if (!(hoverEvent.value() instanceof Component descriptionComponent)) return;
-            if (descriptionComponent.children().size() < 2) return;
-            if (!(descriptionComponent.children().get(1) instanceof TranslatableComponent component)) return;
-
-            String titleKey = title.key();
-            String descriptionKey = component.key();
-            advancement = new Advancement(titleKey, descriptionKey, event.getKey());
-
-        } else if (titleComponent.args().get(0) instanceof TextComponent title) {
-
-            HoverEvent<?> hoverEvent = title.hoverEvent();
-
-            if (hoverEvent == null) return;
-            if (!(hoverEvent.value() instanceof TextComponent descriptionComponent)) return;
-            if (descriptionComponent.children().size() < 2) return;
-            if (!(descriptionComponent.children().get(1) instanceof TextComponent childrenComponent)) return;
-
-            String titleKey = title.content();
-            String descriptionKey = childrenComponent.content();
-            advancement = new Advancement(titleKey, descriptionKey, event.getKey());
-        } else return;
-
+        Advancement advancement = new Advancement(title, description, event.getKey());
         event.cancel();
         send(event.getUserUUID(), target, advancement);
     }
@@ -227,15 +222,29 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
         MinecraftTranslationKeys type = event.getKey();
 
         boolean revoke = type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS
-                || type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS;
+                || type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS
+                || type == MinecraftTranslationKeys.COMMANDS_ACHIEVEMENT_TAKE_MANY
+                || type == MinecraftTranslationKeys.COMMANDS_ACHIEVEMENT_TAKE_ONE
+                || type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_REVOKE_EVERYTHING_SUCCESS
+                || type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_REVOKE_ONLY_SUCCESS;
         if (revoke && !message.isRevoke()) return;
         if (!revoke && !message.isGrant()) return;
 
         TranslatableComponent translatableComponent = event.getComponent();
         if (translatableComponent.args().size() < 2) return;
 
-        Component argument = translatableComponent.args().get(0);
-        Component playerArgument = translatableComponent.args().get(1);
+        Component argument;
+        Component playerArgument;
+
+        if (type == MinecraftTranslationKeys.COMMANDS_ACHIEVEMENT_GIVE_ONE
+                || type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_GRANT_EVERYTHING_SUCCESS
+                || type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_REVOKE_EVERYTHING_SUCCESS) {
+            playerArgument = translatableComponent.args().get(0);
+            argument = translatableComponent.args().get(1);
+        } else {
+            argument = translatableComponent.args().get(0);
+            playerArgument = translatableComponent.args().get(1);
+        }
 
         if (!(playerArgument instanceof TextComponent playerComponent)) return;
 
@@ -246,57 +255,51 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
         Relation relation;
 
         switch (type) {
-            case COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_ONE_TO_ONE_SUCCESS -> {
-                if (argument instanceof TranslatableComponent argumentIn) {
-                    if (argumentIn.args().isEmpty()) return;
-                    if (argumentIn.args().get(0) instanceof TranslatableComponent titleComponent) {
+            case COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_ONE_TO_ONE_SUCCESS,
+                 COMMANDS_ACHIEVEMENT_TAKE_ONE, COMMANDS_ACHIEVEMENT_GIVE_ONE -> {
+                String title;
+                String description;
+                MinecraftTranslationKeys advancementType;
 
-                        HoverEvent<?> hoverEvent = titleComponent.hoverEvent();
+                switch (argument) {
+                    case TranslatableComponent argumentIn when argumentIn.key().equals("chat.square_brackets") && !argumentIn.args().isEmpty() -> {
+                        Triplet<String, String, MinecraftTranslationKeys> triplet = processAdvancementCommandComponent(argumentIn.args().get(0));
+                        title = triplet.first();
+                        description = triplet.second();
+                        advancementType = triplet.third();
+                    }
+                    case TextComponent textComponent when textComponent.content().equals("[") && !textComponent.children().isEmpty() -> {
+                        Triplet<String, String, MinecraftTranslationKeys> triplet = processAdvancementCommandComponent(textComponent.children().get(0));
+                        title = triplet.first();
+                        description = triplet.second();
+                        advancementType = triplet.third();
+                    }
+                    case TextComponent textComponent -> {
+                        content = textComponent.content();
+                        relation = Relation.ONE_TO_ONE_TEXT;
+                        event.cancel();
+                        send(relation, revoke, event.getUserUUID(), target, null, content);
+                        return;
+                    }
+                    default -> {
+                        return;
+                    }
+                }
 
-                        if (hoverEvent == null) return;
-                        if (!(hoverEvent.value() instanceof TranslatableComponent description)) return;
-                        if (description.children().size() < 2) return;
-                        if (!(description.children().get(1) instanceof TranslatableComponent childrenComponent)) return;
-
-                        String titleKey = titleComponent.key();
-                        String descriptionKey = childrenComponent.key();
-
-                        MinecraftTranslationKeys advancementType = NamedTextColor.DARK_PURPLE.equals(description.color())
-                                ? MinecraftTranslationKeys.CHAT_TYPE_ADVANCEMENT_CHALLENGE
-                                : MinecraftTranslationKeys.CHAT_TYPE_ADVANCEMENT_TASK;
-
-                        advancement = new Advancement(titleKey, descriptionKey, advancementType);
-
-                    } else if (argumentIn.args().get(0) instanceof TextComponent titleComponent) {
-
-                        HoverEvent<?> hoverEvent = titleComponent.hoverEvent();
-
-                        if (hoverEvent == null) return;
-                        if (!(hoverEvent.value() instanceof TextComponent descriptionComponent)) return;
-                        if (descriptionComponent.children().size() < 2) return;
-                        if (!(descriptionComponent.children().get(1) instanceof TextComponent childrenComponent)) return;
-
-                        String title = titleComponent.content();
-                        String description = childrenComponent.content();
-
-                        MinecraftTranslationKeys advancementType = NamedTextColor.DARK_PURPLE.equals(descriptionComponent.color())
-                                ? MinecraftTranslationKeys.CHAT_TYPE_ADVANCEMENT_CHALLENGE
-                                : MinecraftTranslationKeys.CHAT_TYPE_ADVANCEMENT_TASK;
-
-                        advancement = new Advancement(title, description, advancementType);
-                    } else return;
-
-                    relation = Relation.ONE_TO_ONE_ADVANCEMENT;
-                } else if (argument instanceof TextComponent textComponent){
-                    content = textComponent.content();
-                    relation = Relation.ONE_TO_ONE_TEXT;
-                } else return;
+                advancement = new Advancement(title, description, advancementType);
+                relation = Relation.ONE_TO_ONE_ADVANCEMENT;
             }
-            case COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_MANY_TO_ONE_SUCCESS -> {
+            case COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_MANY_TO_ONE_SUCCESS,
+                 COMMANDS_ACHIEVEMENT_TAKE_MANY, COMMANDS_ACHIEVEMENT_GIVE_MANY,
+                 COMMANDS_ADVANCEMENT_GRANT_EVERYTHING_SUCCESS, COMMANDS_ADVANCEMENT_REVOKE_EVERYTHING_SUCCESS,
+                 COMMANDS_ADVANCEMENT_REVOKE_ONLY_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_ONLY_SUCCESS -> {
                 if (!(argument instanceof TextComponent textComponent)) return;
 
                 content = textComponent.content();
-                relation = Relation.MANY_TO_ONE;
+                relation = type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_REVOKE_ONLY_SUCCESS
+                        || type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_GRANT_ONLY_SUCCESS
+                        ? Relation.ONE_TO_ONE_TEXT
+                        : Relation.MANY_TO_ONE;
             }
             default -> {
                 return;
@@ -305,6 +308,59 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
 
         event.cancel();
         send(relation, revoke, event.getUserUUID(), target, advancement, content);
+    }
+
+    private Triplet<String, String, MinecraftTranslationKeys> processAdvancementCommandComponent(Component component) {
+        String title = "";
+        String description = "";
+        MinecraftTranslationKeys advancementType = MinecraftTranslationKeys.CHAT_TYPE_ADVANCEMENT_TASK;
+        if (component instanceof TranslatableComponent titleComponent) {
+            title = titleComponent.key();
+            HoverEvent<?> hoverEvent = titleComponent.hoverEvent();
+            if (hoverEvent != null && hoverEvent.action() == HoverEvent.Action.SHOW_TEXT) {
+                Component hoverValue = (Component) hoverEvent.value();
+                if (hoverValue.children().size() > 1) {
+                    Component descComponent = hoverValue.children().get(1);
+
+                    description = descComponent instanceof TranslatableComponent descTranslatable
+                            ? descTranslatable.key()
+                            : descComponent instanceof TextComponent descText
+                            ? descText.content()
+                            : "";
+
+                    advancementType = NamedTextColor.DARK_PURPLE.equals(hoverValue.color())
+                            ? MinecraftTranslationKeys.CHAT_TYPE_ADVANCEMENT_CHALLENGE
+                            : MinecraftTranslationKeys.CHAT_TYPE_ADVANCEMENT_TASK;
+                }
+            } else {
+                title = titleComponent.key();
+                description = "";
+            }
+        }
+
+        return Triplet.of(title, description, advancementType);
+    }
+
+    private Pair<String, String> processAdvancementChatComponent(Component component) {
+        String title = "";
+        String description = "";
+        if (component instanceof TranslatableComponent extraTranslatable) {
+            title = extraTranslatable.key();
+            HoverEvent<?> hoverEvent = extraTranslatable.hoverEvent();
+            if (hoverEvent != null && hoverEvent.action() == HoverEvent.Action.SHOW_TEXT) {
+                Component hoverValue = (Component) hoverEvent.value();
+                if (hoverValue.children().size() > 1) {
+                    Component descComponent = hoverValue.children().get(1);
+                    description = descComponent instanceof TranslatableComponent descTranslatable
+                            ? descTranslatable.key()
+                            : descComponent instanceof TextComponent descText
+                            ? descText.content()
+                            : "";
+                }
+            }
+        }
+
+        return Pair.of(title, description);
     }
 
     public enum Relation {

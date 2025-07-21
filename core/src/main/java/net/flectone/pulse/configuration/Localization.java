@@ -396,6 +396,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.advancement.task.format = "<color:#4eff52>🌠 <fcolor:2><display_name> <fcolor:1>получил достижение <advancement>";
         message.advancement.task.tag = "<color:#4eff52>[<hover:show_text:\"<color:#4eff52><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]";
+        message.advancement.taken.format = "<color:#4eff52>🌠 <fcolor:2><display_name> <fcolor:1>потерял достижение <advancement>";
+        message.advancement.taken.tag = "<color:#4eff52>[<hover:show_text:\"<color:#4eff52><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]";
         message.advancement.goal.format = "<color:#FFFF00>🌠 <fcolor:2><display_name> <fcolor:1>выполнил цель <advancement>";
         message.advancement.goal.tag = "<color:#FFFF00>[<hover:show_text:\"<color:#FFFF00><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]";
         message.advancement.challenge.format = "<color:#834eff>🌠 <fcolor:2><display_name> <fcolor:1>завершил испытание <advancement>";
@@ -1641,6 +1643,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
             private Type task = new Type(
                     "<color:#4eff52>🌠 <fcolor:2><display_name> <fcolor:1>has completed the task <advancement>",
+                    "<color:#4eff52>[<hover:show_text:\"<color:#4eff52><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]"
+            );
+
+            private Type taken = new Type(
+                    "<color:#4eff52>🌠 <fcolor:2><display_name> <fcolor:1>has lost the achievement <advancement>",
                     "<color:#4eff52>[<hover:show_text:\"<color:#4eff52><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]"
             );
 

@@ -17,11 +17,22 @@ public enum MinecraftTranslationKeys {
     CHAT_TYPE_ADVANCEMENT_CHALLENGE("chat.type.advancement.challenge"),
     CHAT_TYPE_ADVANCEMENT_GOAL("chat.type.advancement.goal"),
     CHAT_TYPE_ADVANCEMENT_TASK("chat.type.advancement.task"),
+    CHAT_TYPE_ACHIEVEMENT("chat.type.achievement"), // legacy, < 1.12
+    CHAT_TYPE_ACHIEVEMENT_TAKEN("chat.type.achievement.taken"), // legacy < 1.12
 
     COMMANDS_ADVANCEMENT_GRANT_MANY_TO_ONE_SUCCESS("commands.advancement.grant.many.to.one.success"),
     COMMANDS_ADVANCEMENT_GRANT_ONE_TO_ONE_SUCCESS("commands.advancement.grant.one.to.one.success"),
     COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS("commands.advancement.revoke.many.to.one.success"),
     COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS("commands.advancement.revoke.one.to.one.success"),
+    COMMANDS_ADVANCEMENT_GRANT_ONLY_SUCCESS("commands.advancement.grant.only.success"), // legacy, 1.12
+    COMMANDS_ADVANCEMENT_GRANT_EVERYTHING_SUCCESS("commands.advancement.grant.everything.success"), // legacy, 1.12
+    COMMANDS_ADVANCEMENT_REVOKE_ONLY_SUCCESS("commands.advancement.revoke.only.success"), // legacy, 1.12
+    COMMANDS_ADVANCEMENT_REVOKE_EVERYTHING_SUCCESS("commands.advancement.revoke.everything.success"), // legacy, 1.12
+    COMMANDS_ACHIEVEMENT_GIVE_ONE("commands.achievement.give.success.one"), // legacy, < 1.12
+    COMMANDS_ACHIEVEMENT_GIVE_MANY("commands.achievement.give.success.many"), // legacy, < 1.12
+    COMMANDS_ACHIEVEMENT_TAKE_ONE("commands.achievement.take.success.one"), // legacy, < 1.12
+    COMMANDS_ACHIEVEMENT_TAKE_MANY("commands.achievement.take.success.many"), // legacy, < 1.12
+
     COMMANDS_CLEAR_SUCCESS_MULTIPLE("commands.clear.success.multiple"),
     COMMANDS_CLEAR_SUCCESS_SINGLE("commands.clear.success.single"),
     COMMANDS_DEOP_SUCCESS("commands.deop.success"),
