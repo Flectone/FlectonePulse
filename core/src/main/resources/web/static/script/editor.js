@@ -1,6 +1,7 @@
 const token = window.location.pathname.split('/')[2];
 let editor = null;
 let currentFile = { type: null, name: null };
+let cursorPositions = {};
 
 const translations = {
     en: {
@@ -245,6 +246,17 @@ function initEditor() {
 
 async function loadFile(fileType, fileName) {
     try {
+        if (currentFile.type && currentFile.name) {
+            const oldKey = `${currentFile.type}/${currentFile.name}`;
+            const selections = editor.listSelections();
+            const scrollInfo = editor.getScrollInfo();
+            cursorPositions[oldKey] = {
+                selections: selections,
+                scrollTop: scrollInfo.top,
+                scrollLeft: scrollInfo.left
+            };
+        }
+
         document.querySelectorAll('.file').forEach(el => {
             el.classList.remove('active');
         });
@@ -260,6 +272,21 @@ async function loadFile(fileType, fileName) {
         const content = await response.text();
         editor.setValue(content);
         editor.clearHistory();
+
+        const newKey = `${fileType}/${fileName}`;
+        if (cursorPositions[newKey]) {
+            const savedState = cursorPositions[newKey];
+            editor.setSelections(savedState.selections);
+
+            const line = savedState.selections[0].anchor.line;
+            const pos = { line: line, ch: 0 };
+            const coords = editor.charCoords(pos, "local");
+            const scroller = editor.getScrollerElement();
+            const viewportHeight = scroller.clientHeight;
+            const targetScrollTop = coords.top - (viewportHeight / 2);
+            editor.scrollTo(null, targetScrollTop);
+        }
+
         currentFile = { type: fileType, name: fileName };
     } catch (error) {
         console.error('Failed to load file:', error.message);
