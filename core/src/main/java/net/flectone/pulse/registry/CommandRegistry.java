@@ -26,9 +26,6 @@ public abstract class CommandRegistry implements Registry {
         this.permissionChecker = permissionChecker;
     }
 
-    @Override
-    public abstract void reload();
-
     public abstract void registerCommand(Function<CommandManager<FPlayer>, Command.Builder<FPlayer>> builder);
 
     public abstract void unregisterCommand(String name);

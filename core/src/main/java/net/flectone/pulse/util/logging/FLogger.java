@@ -117,6 +117,7 @@ public class FLogger extends Logger {
         info(PlainTextComponentSerializer.plainText().serialize(component));
     }
 
+    @Override
     public void warning(String exception) {
         LogRecord warn = new LogRecord(Level.WARNING, "An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues");
         warn.setMessage(exception);

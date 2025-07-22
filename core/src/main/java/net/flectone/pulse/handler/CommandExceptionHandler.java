@@ -44,24 +44,19 @@ public class CommandExceptionHandler {
         Localization.Command.Exception localizationException = fileResolver.getLocalization(fPlayer)
                 .getCommand().getException();
 
-        String message;
         Throwable throwable = context.exception().getCause();
-        if (throwable instanceof BooleanParser.BooleanParseException e) {
-            message = localizationException.getParseBoolean()
+        String message = switch (throwable) {
+            case BooleanParser.BooleanParseException e -> localizationException.getParseBoolean()
                     .replace("<input>", e.input());
-        } else if (throwable instanceof NumberParseException e) {
-            message = localizationException.getParseNumber()
+            case NumberParseException e -> localizationException.getParseNumber()
                     .replace("<input>", e.input());
-        } else if (throwable instanceof DurationParser.DurationParseException e) {
-            message = localizationException.getParseNumber()
+            case DurationParser.DurationParseException e -> localizationException.getParseNumber()
                     .replace("<input>", e.input());
-        } else if (throwable instanceof StringParser.StringParseException e) {
-            message = localizationException.getParseString()
+            case StringParser.StringParseException e -> localizationException.getParseString()
                     .replace("<input>", e.input());
-        } else {
-            message = localizationException.getParseUnknown()
+            default -> localizationException.getParseUnknown()
                     .replace("<input>", throwable.getMessage());
-        }
+        };
 
         Component componentMessage = messagePipeline.builder(fPlayer, message)
                 .player(false)

@@ -80,6 +80,6 @@ public class FImage {
     }
 
     private int clamp(int value, int max) {
-        return Math.max(0, Math.min(value, max));
+        return Math.clamp(value, 0, max);
     }
 }

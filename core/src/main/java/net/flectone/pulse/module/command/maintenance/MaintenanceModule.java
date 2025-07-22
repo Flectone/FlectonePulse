@@ -23,7 +23,6 @@ import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.sender.PacketSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.FileUtil;
 import net.kyori.adventure.text.Component;
@@ -46,7 +45,6 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     private final FileUtil fileUtil;
     private final MessagePipeline messagePipeline;
     private final CommandRegistry commandRegistry;
-    private final PacketSender packetSender;
     private final EventProcessRegistry eventProcessRegistry;
 
     private String icon;
@@ -60,7 +58,6 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                              FileUtil fileUtil,
                              CommandRegistry commandRegistry,
                              MessagePipeline messagePipeline,
-                             PacketSender packetSender,
                              EventProcessRegistry eventProcessRegistry) {
         super(module -> module.getCommand().getMaintenance(), null);
 
@@ -74,7 +71,6 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         this.iconPath = projectPath.resolve("images");
         this.fileUtil = fileUtil;
         this.messagePipeline = messagePipeline;
-        this.packetSender = packetSender;
         this.eventProcessRegistry = eventProcessRegistry;
     }
 
