@@ -27,6 +27,7 @@ import net.flectone.pulse.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.ConstructorMapper;
+import org.jdbi.v3.core.statement.SqlStatements;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -88,6 +89,13 @@ public class Database {
             dataSource = new HikariDataSource(hikariConfig);
             jdbi = Jdbi.create(dataSource);
             jdbi.installPlugin(new SqlObjectPlugin());
+
+            if (config.getType() == Type.POSTGRESQL) {
+                jdbi.getConfig(SqlStatements.class).setTemplateEngine((sql, ctx) ->
+                        sql.replace("`", "\"")
+                );
+            }
+
             jdbi.registerRowMapper(ConstructorMapper.factory(ColorsDAO.ColorEntry.class));
             jdbi.registerRowMapper(ConstructorMapper.factory(FPlayerDAO.PlayerInfo.class));
             jdbi.registerRowMapper(ConstructorMapper.factory(Ignore.class));
@@ -140,7 +148,7 @@ public class Database {
                 setupPostgreSQLLibrary();
 
                 connectionURL = connectionURL +
-                        "postgresql://" +
+                        "//" +
                         systemVariableResolver.substituteEnvVars(config.getHost()) +
                         ":" +
                         systemVariableResolver.substituteEnvVars(config.getPort()) +
@@ -148,6 +156,7 @@ public class Database {
                         systemVariableResolver.substituteEnvVars(config.getName()) +
                         config.getParameters();
 
+                hikariConfig.setDriverClassName("org.postgresql.Driver");
                 hikariConfig.setUsername(systemVariableResolver.substituteEnvVars(config.getUser()));
                 hikariConfig.setPassword(systemVariableResolver.substituteEnvVars(config.getPassword()));
                 hikariConfig.setMaximumPoolSize(8);
@@ -281,7 +290,7 @@ public class Database {
         } catch (ClassNotFoundException ignored) {
             libraryResolver.loadLibrary(Library.builder()
                     .groupId("org{}postgresql")
-                    .artifactId("posrgresql")
+                    .artifactId("postgresql")
                     .version(BuildConfig.POSTGRESQL_VERSION)
                     .build()
             );

@@ -31,7 +31,7 @@ public class FPlayerDAO extends BaseDAO<FPlayerSQL> {
         this.settingDAOProvider = settingDAOProvider;
     }
 
-    public record PlayerInfo(int id, int online, String uuid, String name, @Nullable String ip) {}
+    public record PlayerInfo(int id, boolean online, String uuid, String name, @Nullable String ip) {}
 
     public boolean insert(UUID uuid, String name) {
         return inTransaction(sql -> {
@@ -141,10 +141,10 @@ public class FPlayerDAO extends BaseDAO<FPlayerSQL> {
         return convertToFPlayer(entity, true);
     }
 
-    private FPlayer convertToFPlayer(PlayerInfo entity, boolean loadSetting) {
-        FPlayer fPlayer = new FPlayer(entity.id(), entity.name(), UUID.fromString(entity.uuid()));
-        fPlayer.setOnline(entity.online() == 1);
-        fPlayer.setIp(entity.ip());
+    private FPlayer convertToFPlayer(PlayerInfo info, boolean loadSetting) {
+        FPlayer fPlayer = new FPlayer(info.id(), info.name(), UUID.fromString(info.uuid()));
+        fPlayer.setOnline(info.online());
+        fPlayer.setIp(info.ip());
 
         if (loadSetting) {
             settingDAOProvider.get().load(fPlayer);

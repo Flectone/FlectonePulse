@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS "setting" (
 
 CREATE TABLE IF NOT EXISTS "mail" (
     "id" SERIAL PRIMARY KEY,
-    "date" TIMESTAMP NOT NULL,
+    "date" BIGINT NOT NULL,
     "sender" INTEGER NOT NULL,
     "receiver" INTEGER NOT NULL,
     "message" TEXT NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS "mail" (
 
 CREATE TABLE IF NOT EXISTS "ignore" (
     "id" SERIAL PRIMARY KEY,
-    "date" TIMESTAMP NOT NULL,
+    "date" BIGINT NOT NULL,
     "initiator" INTEGER NOT NULL,
     "target" INTEGER NOT NULL,
     FOREIGN KEY("initiator") REFERENCES "player"("id"),
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS "ignore" (
 CREATE TABLE IF NOT EXISTS "moderation" (
     "id" SERIAL PRIMARY KEY,
     "player" INTEGER NOT NULL,
-    "date" TIMESTAMP NOT NULL,
+    "date" BIGINT NOT NULL,
     "time" INTEGER NOT NULL,
     "reason" TEXT,
     "moderator" INTEGER NOT NULL,
