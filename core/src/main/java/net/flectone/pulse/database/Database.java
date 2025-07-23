@@ -134,9 +134,9 @@ public class Database {
         if (dataSource != null) {
             dataSource.getHikariPoolMXBean().softEvictConnections();
             dataSource.close();
-        }
 
-        fLogger.info(config.getType() + " database disconnected");
+            fLogger.info("Database disconnected");
+        }
     }
 
     private HikariConfig createHikaryConfig() {
