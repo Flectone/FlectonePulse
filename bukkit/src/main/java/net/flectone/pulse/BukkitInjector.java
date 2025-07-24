@@ -1,7 +1,6 @@
 package net.flectone.pulse;
 
 import com.github.Anon8281.universalScheduler.UniversalScheduler;
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.gson.Gson;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
@@ -131,7 +130,16 @@ public class BukkitInjector extends AbstractModule {
         bind(MessageSender.class).to(BukkitMessageSender.class);
 
         // Modules
-        bindModules();
+        bind(IntegrationModule.class).to(BukkitIntegrationModule.class);
+        bind(AnvilModule.class).to(BukkitAnvilModule.class);
+        bind(BookModule.class).to(BukkitBookModule.class);
+        bind(AfkModule.class).to(BukkitAfkModule.class);
+        bind(BubbleModule.class).to(BukkitBubbleModule.class);
+        bind(ChatModule.class).to(BukkitChatModule.class);
+        bind(SignModule.class).to(BukkitSignModule.class);
+        bind(SpyModule.class).to(BukkitSpyModule.class);
+        bind(JoinModule.class).to(BukkitJoinModule.class);
+        bind(QuitModule.class).to(BukkitQuitModule.class);
 
         // Libraries and serialization
         bind(LibraryResolver.class).toInstance(libraryResolver);
@@ -167,22 +175,6 @@ public class BukkitInjector extends AbstractModule {
 //        } catch (Exception e) {
 //            fLogger.warning(e);
 //        }
-    }
-
-    private void bindModules() {
-        bind(IntegrationModule.class).to(BukkitIntegrationModule.class);
-        bind(AnvilModule.class).to(BukkitAnvilModule.class);
-        bind(BookModule.class).to(BukkitBookModule.class);
-        bind(AfkModule.class).to(BukkitAfkModule.class);
-        bind(BubbleModule.class).to(BukkitBubbleModule.class);
-        bind(ChatModule.class).to(BukkitChatModule.class);
-        bind(SignModule.class).to(BukkitSignModule.class);
-        bind(SpyModule.class).to(BukkitSpyModule.class);
-
-        if (!BukkitServerAdapter.IS_PAPER || packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_16_5)) {
-            bind(JoinModule.class).to(BukkitJoinModule.class);
-            bind(QuitModule.class).to(BukkitQuitModule.class);
-        }
     }
 
     private void setupInterceptors() {
