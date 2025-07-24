@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.formatter.TimeFormatter;
@@ -26,13 +27,15 @@ public class BukkitChatModule extends ChatModule {
     protected BukkitChatModule(FileResolver fileResolver,
                                FPlayerService fPlayerService,
                                PlatformPlayerAdapter platformPlayerAdapter,
+                               PlatformServerAdapter platformServerAdapter,
                                PermissionChecker permissionChecker,
                                IntegrationModule integrationModule,
                                TimeFormatter timeFormatter,
                                Provider<BubbleModule> bubbleModuleProvider,
                                Provider<SpyModule> spyModuleProvider,
                                BukkitListenerRegistry bukkitListenerRegistry) {
-        super(fileResolver, fPlayerService, platformPlayerAdapter, permissionChecker, integrationModule, timeFormatter, bubbleModuleProvider, spyModuleProvider);
+        super(fileResolver, fPlayerService, platformPlayerAdapter, platformServerAdapter, permissionChecker,
+                integrationModule, timeFormatter, bubbleModuleProvider, spyModuleProvider, bukkitListenerRegistry);
 
         this.message = fileResolver.getMessage().getChat();
         this.bukkitListenerRegistry = bukkitListenerRegistry;
@@ -42,6 +45,8 @@ public class BukkitChatModule extends ChatModule {
     public void onEnable() {
         super.onEnable();
 
-        bukkitListenerRegistry.register(ChatListener.class, EventPriority.valueOf(message.getEventPriority().name()));
+        if (!message.isPacketBased()) {
+            bukkitListenerRegistry.register(ChatListener.class, EventPriority.valueOf(message.getEventPriority().name()));
+        }
     }
 }

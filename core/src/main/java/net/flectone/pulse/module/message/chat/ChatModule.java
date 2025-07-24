@@ -1,18 +1,24 @@
 package net.flectone.pulse.module.message.chat;
 
+import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.PlatformType;
 import net.flectone.pulse.formatter.TimeFormatter;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
+import net.flectone.pulse.module.message.chat.listener.ChatListener;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MessageTag;
@@ -22,40 +28,48 @@ import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public abstract class ChatModule extends AbstractModuleMessage<Localization.Message.Chat> {
+@Singleton
+public class ChatModule extends AbstractModuleMessage<Localization.Message.Chat> {
 
-    protected final Map<String, Cooldown> cooldownMap = new HashMap<>();
-    protected final Map<String, Sound> soundMap = new HashMap<>();
+    private final Map<String, Cooldown> cooldownMap = new HashMap<>();
+    private final Map<String, Sound> soundMap = new HashMap<>();
 
     private final Message.Chat message;
     private final Permission.Message.Chat permission;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
     private final IntegrationModule integrationModule;
     private final TimeFormatter timeFormatter;
     private final Provider<BubbleModule> bubbleModuleProvider;
     private final Provider<SpyModule> spyModuleProvider;
+    private final ListenerRegistry listenerRegistry;
 
-    protected ChatModule(FileResolver fileResolver,
-                         FPlayerService fPlayerService,
-                         PlatformPlayerAdapter platformPlayerAdapter,
-                         PermissionChecker permissionChecker,
-                         IntegrationModule integrationModule,
-                         TimeFormatter timeFormatter,
-                         Provider<BubbleModule> bubbleModuleProvider,
-                         Provider<SpyModule> spyModuleProvider) {
+    @Inject
+    public ChatModule(FileResolver fileResolver,
+                      FPlayerService fPlayerService,
+                      PlatformPlayerAdapter platformPlayerAdapter,
+                      PlatformServerAdapter platformServerAdapter,
+                      PermissionChecker permissionChecker,
+                      IntegrationModule integrationModule,
+                      TimeFormatter timeFormatter,
+                      Provider<BubbleModule> bubbleModuleProvider,
+                      Provider<SpyModule> spyModuleProvider,
+                      ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getChat());
 
         this.message = fileResolver.getMessage().getChat();
         this.permission = fileResolver.getPermission().getMessage().getChat();
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
+        this.platformServerAdapter = platformServerAdapter;
         this.permissionChecker = permissionChecker;
         this.integrationModule = integrationModule;
         this.timeFormatter = timeFormatter;
         this.bubbleModuleProvider = bubbleModuleProvider;
         this.spyModuleProvider = spyModuleProvider;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -70,6 +84,10 @@ public abstract class ChatModule extends AbstractModuleMessage<Localization.Mess
             cooldownMap.put(key, createCooldown(value.getCooldown(), permissions.getCooldownBypass()));
             soundMap.put(key, createSound(value.getSound(), permissions.getSound()));
         });
+
+        if (message.isPacketBased() || platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
+            listenerRegistry.register(ChatListener.class);
+        }
     }
 
     @Override

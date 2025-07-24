@@ -210,6 +210,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Chat implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private boolean packetBased = false;
         private EventPriority eventPriority = EventPriority.NORMAL;
         private Map<String, Type> types = new LinkedHashMap<>(){
             {
@@ -558,11 +559,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             private Map<String, String> values = new LinkedHashMap<>(){
                 {
                     put("normal", "<color:#98FB98>");
-                    put("nether", "<color:#F08080>");
-                    put("the_end", "<color:#9370DB>");
-                    put("custom", "<color:#98FB98>");
                     put("world", "<color:#98FB98>");
+                    put("overworld", "<color:#98FB98>");
+                    put("custom", "<color:#98FB98>");
+                    put("nether", "<color:#F08080>");
+                    put("the_nether", "<color:#F08080>");
                     put("world_nether", "<color:#F08080>");
+                    put("the_end", "<color:#9370DB>");
                     put("world_the_end", "<color:#9370DB>");
                 }
             };
