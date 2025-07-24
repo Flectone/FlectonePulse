@@ -38,7 +38,7 @@ public class FabricPermissionChecker implements PermissionChecker {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return true;
 
-        int fabricPermission = fabricPermissionRegistry.getPermissions().getOrDefault(permission, 0);
+        int fabricPermission = fabricPermissionRegistry.getPermissions().getOrDefault(permission, minecraftServer.getOpPermissionLevel());
 
         boolean value = fabricPermission == 0;
 
