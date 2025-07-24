@@ -9,15 +9,15 @@ import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.registry.EventProcessRegistry;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
@@ -30,10 +30,14 @@ import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 import org.jetbrains.annotations.NotNull;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
@@ -152,13 +156,17 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
             Optional<String> optionalUrl = commandContext.optional(promptUrl);
             String rawString = optionalUrl.orElse("");
 
+            String urls = Arrays.stream(rawString.split("\\s+"))
+                    .filter(this::isUrl)
+                    .collect(Collectors.joining(" "));
+
             builder(fPlayer)
                     .range(command.getRange())
                     .destination(command.getDestination())
                     .tag(MessageTag.COMMAND_STREAM)
-                    .format(replaceUrls(rawString))
-                    .proxy(output -> output.writeUTF(rawString))
-                    .integration(s -> s.replace("<urls>", rawString))
+                    .format(replaceUrls(urls))
+                    .proxy(output -> output.writeUTF(urls))
+                    .integration(s -> s.replace("<urls>", urls))
                     .sound(getSound())
                     .sendBuilt();
 
@@ -193,6 +201,15 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
 
         fPlayerService.deleteSetting(fPlayer, FPlayer.Setting.STREAM);
         fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.STREAM_PREFIX, resolveLocalization().getPrefixFalse());
+    }
+
+    private boolean isUrl(String string) {
+        try {
+            new URL(string).toURI();
+            return true;
+        } catch (MalformedURLException | URISyntaxException e) {
+            return false;
+        }
     }
 
     private TagResolver streamTag(@NotNull FEntity sender) {
