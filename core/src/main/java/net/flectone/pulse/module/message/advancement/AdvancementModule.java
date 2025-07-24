@@ -209,7 +209,7 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
         String title = pair.first();
         String description = pair.second();
 
-        if (description.isBlank()) {
+        if (description.isBlank() && title.contains(".title")) {
             description = title.replace(".title", ".description");
         }
 
@@ -314,7 +314,10 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
         String title = "";
         String description = "";
         MinecraftTranslationKeys advancementType = MinecraftTranslationKeys.CHAT_TYPE_ADVANCEMENT_TASK;
-        if (component instanceof TranslatableComponent titleComponent) {
+
+        if (component instanceof TextComponent textComponent) {
+            title = textComponent.content();
+        } else if (component instanceof TranslatableComponent titleComponent) {
             title = titleComponent.key();
             HoverEvent<?> hoverEvent = titleComponent.hoverEvent();
             if (hoverEvent != null && hoverEvent.action() == HoverEvent.Action.SHOW_TEXT) {
@@ -344,9 +347,11 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
     private Pair<String, String> processAdvancementChatComponent(Component component) {
         String title = "";
         String description = "";
-        if (component instanceof TranslatableComponent extraTranslatable) {
-            title = extraTranslatable.key();
-            HoverEvent<?> hoverEvent = extraTranslatable.hoverEvent();
+        if (component instanceof TextComponent textComponent) {
+            title = textComponent.content();
+        } else if (component instanceof TranslatableComponent translatableComponent) {
+            title = translatableComponent.key();
+            HoverEvent<?> hoverEvent = translatableComponent.hoverEvent();
             if (hoverEvent != null && hoverEvent.action() == HoverEvent.Action.SHOW_TEXT) {
                 Component hoverValue = (Component) hoverEvent.value();
                 if (hoverValue.children().size() > 1) {
