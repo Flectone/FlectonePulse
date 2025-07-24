@@ -121,7 +121,7 @@ subprojects {
 tasks.named("shadowJar").configure { enabled = false }
 tasks.named("jar").configure { enabled = false }
 
-tasks.register("mergeJars", Jar) {
+tasks.register("bukkitMergeJars", Jar) {
     archiveBaseName.set("${project_name}-bukkit")
     archiveVersion.set("${project_version}")
 
