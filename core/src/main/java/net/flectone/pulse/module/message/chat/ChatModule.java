@@ -1,35 +1,61 @@
 package net.flectone.pulse.module.message.chat;
 
-import com.google.inject.Inject;
+import com.google.inject.Provider;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.model.Cooldown;
-import net.flectone.pulse.model.FEntity;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.Sound;
+import net.flectone.pulse.formatter.TimeFormatter;
+import net.flectone.pulse.model.*;
 import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.command.spy.SpyModule;
+import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.message.bubble.BubbleModule;
+import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.MessageTag;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public abstract class ChatModule extends AbstractModuleMessage<Localization.Message.Chat> {
 
     protected final Map<String, Cooldown> cooldownMap = new HashMap<>();
     protected final Map<String, Sound> soundMap = new HashMap<>();
 
-    protected final Message.Chat message;
-    protected final Permission.Message.Chat permission;
+    private final Message.Chat message;
+    private final Permission.Message.Chat permission;
+    private final FPlayerService fPlayerService;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final PermissionChecker permissionChecker;
+    private final IntegrationModule integrationModule;
+    private final TimeFormatter timeFormatter;
+    private final Provider<BubbleModule> bubbleModuleProvider;
+    private final Provider<SpyModule> spyModuleProvider;
 
-    @Inject private PermissionChecker permissionChecker;
-
-    protected ChatModule(FileResolver fileResolver) {
+    protected ChatModule(FileResolver fileResolver,
+                         FPlayerService fPlayerService,
+                         PlatformPlayerAdapter platformPlayerAdapter,
+                         PermissionChecker permissionChecker,
+                         IntegrationModule integrationModule,
+                         TimeFormatter timeFormatter,
+                         Provider<BubbleModule> bubbleModuleProvider,
+                         Provider<SpyModule> spyModuleProvider) {
         super(localization -> localization.getMessage().getChat());
 
         this.message = fileResolver.getMessage().getChat();
         this.permission = fileResolver.getPermission().getMessage().getChat();
+        this.fPlayerService = fPlayerService;
+        this.platformPlayerAdapter = platformPlayerAdapter;
+        this.permissionChecker = permissionChecker;
+        this.integrationModule = integrationModule;
+        this.timeFormatter = timeFormatter;
+        this.bubbleModuleProvider = bubbleModuleProvider;
+        this.spyModuleProvider = spyModuleProvider;
     }
 
     @Override
@@ -57,11 +83,153 @@ public abstract class ChatModule extends AbstractModuleMessage<Localization.Mess
         return message.isEnable();
     }
 
-    public abstract void send(FPlayer fPlayer, Object event);
+    public void send(FPlayer fPlayer, String eventMessage, Runnable cancelEvent, BiConsumer<String, Boolean> successEvent) {
+        if (checkModulePredicates(fPlayer)) return;
 
-    public abstract void send(FEntity fPlayer, String chatName, String string);
+        if (checkMute(fPlayer)) {
+            cancelEvent.run();
+            return;
+        }
 
-    protected Message.Chat.Type getPlayerChat(FPlayer fPlayer, String message) {
+        Message.Chat.Type playerChat = message.getTypes().getOrDefault(fPlayer.getSettingValue(FPlayer.Setting.CHAT), getPlayerChat(fPlayer, eventMessage));
+
+        var configChatEntry = message.getTypes().entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().equals(playerChat))
+                .findAny();
+
+        if (playerChat == null || !playerChat.isEnable() || configChatEntry.isEmpty()) {
+            builder(fPlayer)
+                    .format(Localization.Message.Chat::getNullChat)
+                    .sendBuilt();
+            cancelEvent.run();
+            return;
+        }
+
+        String chatName = configChatEntry.get().getKey();
+
+        if (cooldownMap.containsKey(chatName)) {
+            Cooldown cooldown = cooldownMap.get(chatName);
+            if (cooldown != null
+                    && cooldown.isEnable()
+                    && !permissionChecker.check(fPlayer, cooldown.getPermissionBypass())
+                    && cooldown.isCooldown(fPlayer.getUuid())) {
+                long timeLeft = cooldownMap.get(chatName).getTimeLeft(fPlayer);
+
+                builder(fPlayer)
+                        .format(timeFormatter.format(fPlayer, timeLeft, getCooldownMessage(fPlayer)))
+                        .sendBuilt();
+                cancelEvent.run();
+                return;
+            }
+        }
+
+        String trigger = playerChat.getTrigger();
+
+        if (trigger != null && !trigger.isEmpty() && eventMessage.startsWith(trigger)) {
+            eventMessage = eventMessage.substring(trigger.length()).trim();
+        }
+
+        Predicate<FPlayer> chatPermissionFilter = fReceiver -> permissionChecker.check(fReceiver, permission.getTypes().get(chatName));
+
+        Range chatRange = playerChat.getRange();
+
+        // in local chat you can mention it too,
+        // but I don't want to full support InteractiveChat
+        String finalMessage = chatRange.is(Range.Type.PROXY)
+                || chatRange.is(Range.Type.SERVER)
+                || chatRange.is(Range.Type.WORLD_NAME)
+                || chatRange.is(Range.Type.WORLD_TYPE)
+                ? integrationModule.checkMention(fPlayer, eventMessage)
+                : eventMessage;
+
+        Builder builder = builder(fPlayer)
+                .tag(MessageTag.CHAT)
+                .destination(playerChat.getDestination())
+                .range(chatRange)
+                .filter(chatPermissionFilter)
+                .format(message -> message.getTypes().get(chatName))
+                .message(finalMessage)
+                .proxy(output -> {
+                    output.writeUTF(chatName);
+                    output.writeUTF(finalMessage);
+                })
+                .integration(s -> s.replace("<message>", finalMessage))
+                .sound(soundMap.get(chatName));
+
+        List<FPlayer> receivers = builder.build();
+
+        builder.send(receivers);
+
+        List<UUID> receiversUUID = receivers.stream()
+                .filter(fReceiver -> !fReceiver.isUnknown())
+                .filter(fReceiver -> integrationModule.isVanishedVisible(fReceiver, fPlayer))
+                .map(FEntity::getUuid)
+                .toList();
+
+        spyModuleProvider.get().checkChat(fPlayer, chatName, finalMessage);
+
+        int countReceivers = receiversUUID.size();
+        Message.Chat.Type.NullReceiver nullReceiver = playerChat.getNullReceiver();
+
+        checkReceiversLater(fPlayer, countReceivers, chatRange, receiversUUID, nullReceiver);
+
+        successEvent.accept(finalMessage, playerChat.isCancel());
+
+        bubbleModuleProvider.get().add(fPlayer, eventMessage);
+    }
+
+
+    @Async(delay = 5L)
+    public void checkReceiversLater(FPlayer fPlayer, int countReceivers, Range chatRange,
+                                    List<UUID> receiversUUID, Message.Chat.Type.NullReceiver nullReceiver) {
+        if (!nullReceiver.isEnable() || countReceivers > 1) {
+            return;
+        }
+
+        Set<UUID> onlinePlayers = fPlayerService.findOnlineFPlayers()
+                .stream()
+                .map(FEntity::getUuid)
+                .collect(Collectors.toSet());
+
+        if ((onlinePlayers.containsAll(receiversUUID) && onlinePlayers.size() <= countReceivers)
+                || chatRange.is(Range.Type.BLOCKS)) {
+            builder(fPlayer)
+                    .destination(nullReceiver.getDestination())
+                    .format(Localization.Message.Chat::getNullReceiver)
+                    .sendBuilt();
+        }
+    }
+
+    public void send(FEntity fPlayer, String chatName, String string) {
+        if (checkModulePredicates(fPlayer)) return;
+
+        var optionalChat = message.getTypes().entrySet().stream()
+                .filter(chat -> chat.getKey().equals(chatName))
+                .findAny();
+
+        if (optionalChat.isEmpty()) return;
+
+        String playerChatName = optionalChat.get().getKey();
+        Message.Chat.Type playerChat = optionalChat.get().getValue();
+
+        Predicate<FPlayer> filter = rangeFilter(fPlayer, playerChat.getRange()).and(fReceiver -> {
+            if (!permissionChecker.check(fReceiver, permission.getTypes().get(playerChatName))) return false;
+
+            return platformPlayerAdapter.isOnline(fReceiver);
+        });
+
+        builder(fPlayer)
+                .range(Range.get(Range.Type.SERVER))
+                .destination(playerChat.getDestination())
+                .filter(filter)
+                .format(s -> s.getTypes().get(playerChatName))
+                .message(string)
+                .sound(getSound())
+                .sendBuilt();
+    }
+
+    private Message.Chat.Type getPlayerChat(FPlayer fPlayer, String message) {
         Message.Chat.Type playerChat = null;
 
         int priority = Integer.MIN_VALUE;

@@ -9,6 +9,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import java.util.function.BiConsumer;
+
 @Singleton
 public class ChatListener implements Listener {
 
@@ -31,6 +33,17 @@ public class ChatListener implements Listener {
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
         if (!chatModule.isEnable()) return;
 
-        chatModule.send(fPlayer, event);
+        Runnable cancelRunnable = () -> {
+            event.setCancelled(true);
+            event.getRecipients().clear();
+        };
+
+        BiConsumer<String, Boolean> successConsumer = (finalMessage, isCancel) -> {
+            event.setMessage(finalMessage);
+            event.setCancelled(isCancel);
+            event.getRecipients().clear();
+        };
+
+        chatModule.send(fPlayer, event.getMessage(), cancelRunnable, successConsumer);
     }
 }
