@@ -13,6 +13,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import net.flectone.pulse.annotation.Sync;
+import net.flectone.pulse.constant.PlatformType;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
@@ -118,6 +119,11 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     @Override
     public @NotNull String getServerCore() {
         return Bukkit.getServer().getName();
+    }
+
+    @Override
+    public PlatformType getPlatformType() {
+        return PlatformType.BUKKIT;
     }
 
     @Override

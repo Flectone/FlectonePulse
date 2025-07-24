@@ -3,6 +3,7 @@ package net.flectone.pulse.adapter;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.google.gson.JsonElement;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.constant.PlatformType;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,6 +46,8 @@ public interface PlatformServerAdapter {
      * @return A string representing the name of the server core
      */
     @NotNull String getServerCore();
+
+    PlatformType getPlatformType();
 
     /**
      * Gets the server MOTD

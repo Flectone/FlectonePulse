@@ -12,6 +12,7 @@ import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.PlatformType;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
@@ -24,6 +25,7 @@ import net.flectone.pulse.module.message.status.version.VersionModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.Collection;
 import java.util.List;
@@ -42,6 +44,7 @@ public class StatusModule extends AbstractModule {
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
+    private final FLogger fLogger;
 
     @Inject
     public StatusModule(FileResolver fileResolver,
@@ -53,7 +56,8 @@ public class StatusModule extends AbstractModule {
                         PlatformServerAdapter platformServerAdapter,
                         FPlayerService fPlayerService,
                         ListenerRegistry listenerRegistry,
-                        IntegrationModule integrationModule) {
+                        IntegrationModule integrationModule,
+                        FLogger fLogger) {
         this.message = fileResolver.getMessage().getStatus();
         this.permission = fileResolver.getPermission().getMessage().getStatus();
         this.MOTDModule = MOTDModule;
@@ -65,10 +69,16 @@ public class StatusModule extends AbstractModule {
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
         this.integrationModule = integrationModule;
+        this.fLogger = fLogger;
     }
 
     @Override
     public void onEnable() {
+        if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
+            fLogger.warning("Status module disabled! This is not supported on Fabric");
+            return;
+        }
+
         registerModulePermission(permission);
 
         listenerRegistry.register(StatusPacketListener.class);
