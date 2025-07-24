@@ -26,8 +26,6 @@ import net.flectone.pulse.module.message.anvil.AnvilModule;
 import net.flectone.pulse.module.message.anvil.BukkitAnvilModule;
 import net.flectone.pulse.module.message.book.BookModule;
 import net.flectone.pulse.module.message.book.BukkitBookModule;
-import net.flectone.pulse.module.message.bubble.BubbleModule;
-import net.flectone.pulse.module.message.bubble.BukkitBubbleModule;
 import net.flectone.pulse.module.message.chat.BukkitChatModule;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.join.BukkitJoinModule;
@@ -131,7 +129,6 @@ public class BukkitInjector extends AbstractModule {
         bind(AnvilModule.class).to(BukkitAnvilModule.class);
         bind(BookModule.class).to(BukkitBookModule.class);
         bind(AfkModule.class).to(BukkitAfkModule.class);
-        bind(BubbleModule.class).to(BukkitBubbleModule.class);
         bind(ChatModule.class).to(BukkitChatModule.class);
         bind(SignModule.class).to(BukkitSignModule.class);
         bind(SpyModule.class).to(BukkitSpyModule.class);
