@@ -68,7 +68,7 @@ processResources {
 	}
 }
 
-tasks.register('remappedShadowJar', RemapJarTask) {
+tasks.register('fabricRemapJar', RemapJarTask) {
 	dependsOn tasks.shadowJar
 	input = tasks.shadowJar.archiveFile
 	addNestedDependencies = true
@@ -76,9 +76,9 @@ tasks.register('remappedShadowJar', RemapJarTask) {
 	destinationDirectory = file("$rootDir/build/libs")
 }
 
-tasks.assemble.dependsOn tasks.remappedShadowJar
+tasks.assemble.dependsOn tasks.fabricRemapJar
 
 artifacts {
-	archives remappedShadowJar
+	archives fabricRemapJar
 	shadow shadowJar
 }
