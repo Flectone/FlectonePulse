@@ -38,8 +38,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -145,7 +143,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         User user = packetProvider.getUser(fPlayer);
         if (user == null) return null;
 
-        return getHostAddress(user.getAddress());
+        return packetProvider.getHostAddress(user.getAddress());
     }
 
     @Override
@@ -387,14 +385,5 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         if (playerManager == null) return null;
 
         return playerManager.getPlayer(uuid);
-    }
-
-    private @Nullable String getHostAddress(@Nullable InetSocketAddress inetSocketAddress) {
-        if (inetSocketAddress == null) return null;
-
-        InetAddress inetAddress = inetSocketAddress.getAddress();
-        if (inetAddress == null) return null;
-
-        return inetAddress.getHostAddress();
     }
 }

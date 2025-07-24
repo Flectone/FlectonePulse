@@ -28,8 +28,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -104,13 +102,13 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     public @Nullable String getIp(@NotNull FPlayer fPlayer) {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player != null) {
-            return getHostAddress(player.getAddress());
+            return packetProvider.getHostAddress(player.getAddress());
         }
 
         User user = packetProvider.getUser(fPlayer);
         if (user == null) return null;
 
-        return getHostAddress(user.getAddress());
+        return packetProvider.getHostAddress(user.getAddress());
     }
 
     @Override
@@ -337,14 +335,5 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public void clear(@NotNull FPlayer fPlayer) {
         injector.getInstance(AfkModule.class).remove("quit", fPlayer);
-    }
-
-    private @Nullable String getHostAddress(@Nullable InetSocketAddress inetSocketAddress) {
-        if (inetSocketAddress == null) return null;
-
-        InetAddress inetAddress = inetSocketAddress.getAddress();
-        if (inetAddress == null) return null;
-
-        return inetAddress.getHostAddress();
     }
 }

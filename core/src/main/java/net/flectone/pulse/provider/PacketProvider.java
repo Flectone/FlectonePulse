@@ -7,7 +7,10 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.model.FPlayer;
+import org.jetbrains.annotations.Nullable;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.UUID;
 
 @Singleton
@@ -40,5 +43,14 @@ public class PacketProvider {
 
     public ServerVersion getServerVersion() {
         return packetEvents.getServerManager().getVersion();
+    }
+
+    public @Nullable String getHostAddress(@Nullable InetSocketAddress inetSocketAddress) {
+        if (inetSocketAddress == null) return null;
+
+        InetAddress inetAddress = inetSocketAddress.getAddress();
+        if (inetAddress == null) return null;
+
+        return inetAddress.getHostAddress();
     }
 }
