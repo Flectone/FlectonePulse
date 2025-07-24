@@ -1,58 +1,72 @@
 package net.flectone.pulse.adapter;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.command.stream.StreamModule;
 import net.flectone.pulse.module.message.afk.AfkModule;
-import net.flectone.pulse.module.message.brand.BrandModule;
-import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
-import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.module.message.objective.ObjectiveMode;
-import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
-import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.provider.PacketProvider;
 import net.kyori.adventure.text.Component;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
+import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Singleton
 public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
-    private final MinecraftServer minecraftServer;
+    private final FabricFlectonePulse fabricFlectonePulse;
+    private final PacketProvider packetProvider;
     private final Injector injector;
 
     @Inject
-    public FabricPlayerAdapter(MinecraftServer minecraftServer,
+    public FabricPlayerAdapter(FabricFlectonePulse fabricFlectonePulse,
+                               PacketProvider packetProvider,
                                Injector injector) {
-        this.minecraftServer = minecraftServer;
+        this.fabricFlectonePulse = fabricFlectonePulse;
+        this.packetProvider = packetProvider;
         this.injector = injector;
     }
 
     @Override
     public int getEntityId(@NotNull UUID uuid) {
+        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return 0;
+
         for (ServerWorld world : minecraftServer.getWorlds()) {
             Entity entity = world.getEntity(uuid);
             if (entity != null) {
@@ -65,19 +79,27 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @Nullable UUID getPlayerByEntityId(int entityId) {
-        for (ServerWorld world : minecraftServer.getWorlds()) {
-            Entity entity = world.getEntityById(entityId);
-            if (entity != null) {
-                return entity.getUuid();
-            }
-        }
+        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return null;
 
-        return null;
+        return minecraftServer.getPlayerManager().getPlayerList()
+                .stream()
+                .filter(serverPlayerEntity -> serverPlayerEntity.getId() == entityId)
+                .findAny()
+                .map(Entity::getUuid)
+                .orElse(null);
     }
 
     @Override
     public @Nullable UUID getUUID(@NotNull Object platformPlayer) {
-        return platformPlayer instanceof ServerPlayerEntity player ? player.getUuid() : null;
+        return switch (platformPlayer) {
+            case ServerPlayerEntity player -> player.getUuid();
+            case ServerCommandSource commandSource -> {
+                ServerPlayerEntity player = commandSource.getPlayer();
+                yield player == null ? null : player.getUuid();
+            }
+            default -> null;
+        };
     }
 
     @Override
@@ -95,7 +117,11 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NotNull String getName(@NotNull Object platformPlayer) {
-        return platformPlayer instanceof ServerCommandSource source ? source.getName() : "";
+        return switch (platformPlayer) {
+            case ServerPlayerEntity player -> player.getName().getString();
+            case ServerCommandSource commandSource -> commandSource.getName();
+            default -> "";
+        };
     }
 
     @Override
@@ -114,9 +140,12 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public @Nullable String getIp(@NotNull FPlayer fPlayer) {
         ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
-        if (player == null) return "";
+        if (player != null) return player.getIp();
 
-        return player.getIp();
+        User user = packetProvider.getUser(fPlayer);
+        if (user == null) return null;
+
+        return getHostAddress(user.getAddress());
     }
 
     @Override
@@ -133,13 +162,6 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         if (header != null) {
             return injector.getInstance(MessagePipeline.class).builder(fPlayer, header).build();
         }
-
-//        for (ServerWorld world : minecraftServer.getWorlds()) {
-//            Entity entity = world.getEntity(fPlayer.getUuid());
-//            if (entity instanceof ServerPlayerEntity player) {
-//                return player.;
-//            }
-//        }
 
         return Component.empty();
     }
@@ -226,21 +248,66 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
+    public boolean hasPotionEffect(@NotNull FEntity fPlayer, @NotNull PotionType potionType) {
+        ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
+        if (player == null) return false;
+
+        ClientVersion clientVersion = packetProvider.getServerVersion().toClientVersion();
+        Optional<RegistryEntry.Reference<StatusEffect>> statusEffect = Registries.STATUS_EFFECT.getEntry(potionType.getId(clientVersion));
+        return statusEffect.filter(player::hasStatusEffect).isPresent();
+    }
+
+    @Override
     public boolean isOnline(@NotNull FPlayer fPlayer) {
         ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
         return player != null;
     }
 
+    // not full correctly
     @Override
     public long getFirstPlayed(@NotNull FPlayer fPlayer) {
+        MinecraftServer server = fabricFlectonePulse.getMinecraftServer();
+        if (server == null) return 0;
+
+        try {
+            Path playerDataDir = server.getSavePath(WorldSavePath.PLAYERDATA);
+            Path playerFile = playerDataDir.resolve(fPlayer.getUuid().toString() + ".dat");
+            if (Files.exists(playerFile)) {
+                BasicFileAttributes fileAttributes = Files.readAttributes(playerFile, BasicFileAttributes.class);
+                return fileAttributes.creationTime().toMillis();
+            }
+        } catch (IOException ignored) {}
+
         return 0;
     }
 
     @Override
     public long getLastPlayed(@NotNull FPlayer fPlayer) {
+        MinecraftServer server = fabricFlectonePulse.getMinecraftServer();
+        if (server == null) return 0;
+
+        PlayerManager playerList = server.getPlayerManager();
+        ServerPlayerEntity player = playerList.getPlayer(fPlayer.getUuid());
+        if (player != null) return player.getLastActionTime();
+
+        try {
+            Path playerDataDir = server.getSavePath(WorldSavePath.PLAYERDATA);
+            Path playerFile = playerDataDir.resolve(fPlayer.getUuid().toString() + ".dat");
+            if (Files.exists(playerFile)) {
+                NbtCompound playerData = NbtIo.read(playerFile);
+                if (playerData != null && playerData.contains("FirstPlayed")) {
+                    return playerData.getLong("FirstPlayed").orElse(0L);
+                }
+
+                BasicFileAttributes fileAttributes = Files.readAttributes(playerFile, BasicFileAttributes.class);
+                return fileAttributes.creationTime().toMillis();
+            }
+        } catch (IOException ignored) {}
+
         return 0;
     }
 
+    // not full correctly
     @Override
     public long getAllTimePlayed(@NotNull FPlayer fPlayer) {
         ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
@@ -268,45 +335,23 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     @Override
     public void clear(@NotNull FPlayer fPlayer) {
         injector.getInstance(AfkModule.class).remove("quit", fPlayer);
-        injector.getInstance(ScoreboardModule.class).remove(fPlayer);
-//        injector.getInstance(BelownameModule.class).remove(fPlayer);
-//        injector.getInstance(TabnameModule.class).remove(fPlayer);
-    }
-
-    @Override
-    public void update(@NotNull FPlayer fPlayer) {
-        injector.getInstance(WorldModule.class).update(fPlayer);
-        injector.getInstance(AfkModule.class).remove("", fPlayer);
-        injector.getInstance(StreamModule.class).setStreamPrefix(fPlayer, fPlayer.isSetting(FPlayer.Setting.STREAM));
-
-        injector.getInstance(TaskScheduler.class).runAsyncLater(() -> {
-            injector.getInstance(ScoreboardModule.class).add(fPlayer);
-//            injector.getInstance(BelownameModule.class).add(fPlayer);
-//            injector.getInstance(TabnameModule.class).add(fPlayer);
-            injector.getInstance(PlayerlistnameModule.class).update();
-            injector.getInstance(SidebarModule.class).send(fPlayer);
-        }, 10L);
-
-        injector.getInstance(FooterModule.class).send(fPlayer);
-        injector.getInstance(HeaderModule.class).send(fPlayer);
-        injector.getInstance(BrandModule.class).send(fPlayer);
     }
 
     @Override
     public @NotNull List<UUID> getOnlinePlayers() {
-        List<UUID> onlinePlayers = new ArrayList<>();
+        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return Collections.emptyList();
 
-        for (ServerWorld world : minecraftServer.getWorlds()) {
-            onlinePlayers.addAll(world.getPlayers().stream().map(Entity::getUuid).toList());
-        }
-
-        return onlinePlayers;
+        return minecraftServer.getPlayerManager().getPlayerList()
+                .stream()
+                .map(Entity::getUuid)
+                .toList();
     }
 
     @Override
-    public @NotNull List<UUID> getNearbyEntities(FPlayer fPlayer, double x, double y, double z) {
+    public @NotNull Set<UUID> getNearbyEntities(FPlayer fPlayer, double x, double y, double z) {
         ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
-        if (player == null) return Collections.emptyList();
+        if (player == null) return Collections.emptySet();
 
         Vec3d position = new Vec3d(player.getX(), player.getY(), player.getZ());
 
@@ -314,7 +359,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         return player.getWorld().getOtherEntities(null, searchBox)
                 .stream()
                 .map(Entity::getUuid)
-                .toList();
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -329,23 +374,27 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public boolean hasPotionEffect(@NotNull FPlayer fPlayer, @NotNull PotionType potionType) {
-        ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
-        if (player == null) return false;
-
-        Optional<RegistryEntry.Reference<StatusEffect>> statusEffect = Registries.STATUS_EFFECT.getEntry(potionType.getId(PacketEvents.getAPI().getServerManager().getVersion().toClientVersion()));
-        return statusEffect.filter(player::hasStatusEffect).isPresent();
+    public @NotNull List<PlayedTimePlayer> getPlayedTimePlayers() {
+        return Collections.emptyList();
     }
 
     @Nullable
     public ServerPlayerEntity getPlayer(UUID uuid) {
-        for (ServerWorld world : minecraftServer.getWorlds()) {
-            Entity entity = world.getPlayerByUuid(uuid);
-            if (entity instanceof ServerPlayerEntity serverPlayerEntity) {
-                return serverPlayerEntity;
-            }
-        }
+        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return null;
 
-        return null;
+        PlayerManager playerManager = minecraftServer.getPlayerManager();
+        if (playerManager == null) return null;
+
+        return playerManager.getPlayer(uuid);
+    }
+
+    private @Nullable String getHostAddress(@Nullable InetSocketAddress inetSocketAddress) {
+        if (inetSocketAddress == null) return null;
+
+        InetAddress inetAddress = inetSocketAddress.getAddress();
+        if (inetAddress == null) return null;
+
+        return inetAddress.getHostAddress();
     }
 }

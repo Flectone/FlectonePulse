@@ -3,64 +3,34 @@ package net.flectone.pulse.module.integration;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-
-import java.util.Set;
+import net.flectone.pulse.resolver.FileResolver;
 
 @Singleton
 public class FabricIntegrationModule extends IntegrationModule {
 
     @Inject
-    public FabricIntegrationModule(FileManager fileManager,
+    public FabricIntegrationModule(FileResolver fileManager,
+                                   PlatformServerAdapter platformServerAdapter,
                                    Injector injector) {
-        super(fileManager, injector);
+        super(fileManager, platformServerAdapter, injector);
     }
 
     @Override
     public String checkMention(FEntity fPlayer, String message) {
-        return "";
-    }
-
-    @Override
-    public boolean hasFPlayerPermission(FPlayer fPlayer, String permission) {
-        return false;
-    }
-
-    @Override
-    public String getPrefix(FPlayer fPlayer) {
-        return "";
-    }
-
-    @Override
-    public String getSuffix(FPlayer fPlayer) {
-        return "";
-    }
-
-    @Override
-    public Set<String> getGroups() {
-        return Set.of();
-    }
-
-    @Override
-    public int getGroupWeight(FPlayer fPlayer) {
-        return 0;
-    }
-
-    @Override
-    public String getTextureUrl(FEntity sender) {
-        return "";
-    }
-
-    @Override
-    public boolean hasMessenger() {
-        return false;
+        return message;
     }
 
     @Override
     public boolean isVanished(FEntity sender) {
+        return false;
+    }
+
+    @Override
+    public boolean hasSeeVanishPermission(FEntity sender) {
         return false;
     }
 
@@ -76,6 +46,6 @@ public class FabricIntegrationModule extends IntegrationModule {
 
     @Override
     public String getTritonLocale(FPlayer fPlayer) {
-        return "";
+        return null;
     }
 }

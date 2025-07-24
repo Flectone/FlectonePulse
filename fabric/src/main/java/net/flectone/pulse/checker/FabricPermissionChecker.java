@@ -2,6 +2,7 @@ package net.flectone.pulse.checker;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.adapter.FabricPlayerAdapter;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -13,17 +14,17 @@ import net.minecraft.server.network.ServerPlayerEntity;
 @Singleton
 public class FabricPermissionChecker implements PermissionChecker {
 
-    private final MinecraftServer minecraftServer;
+    private final FabricFlectonePulse fabricFlectonePulse;
     private final FabricIntegrationModule integrationModule;
     private final FabricPlayerAdapter fabricPlayerAdapter;
     private final FabricPermissionRegistry fabricPermissionRegistry;
 
     @Inject
-    public FabricPermissionChecker(MinecraftServer minecraftServer,
+    public FabricPermissionChecker(FabricFlectonePulse fabricFlectonePulse,
                                    FabricIntegrationModule integrationModule,
                                    FabricPlayerAdapter fabricPlayerAdapter,
                                    FabricPermissionRegistry fabricPermissionRegistry) {
-        this.minecraftServer = minecraftServer;
+        this.fabricFlectonePulse = fabricFlectonePulse;
         this.integrationModule = integrationModule;
         this.fabricPlayerAdapter = fabricPlayerAdapter;
         this.fabricPermissionRegistry = fabricPermissionRegistry;
@@ -34,14 +35,16 @@ public class FabricPermissionChecker implements PermissionChecker {
         if (permission == null) return true;
         if (!(entity instanceof FPlayer fPlayer) || fPlayer.isUnknown()) return true;
 
+        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return true;
 
-        int bukkitPermission = fabricPermissionRegistry.getPermissions().get(permission);
+        int fabricPermission = fabricPermissionRegistry.getPermissions().getOrDefault(permission, 0);
 
-        boolean value = bukkitPermission == 0;
+        boolean value = fabricPermission == 0;
 
         ServerPlayerEntity player = fabricPlayerAdapter.getPlayer(entity.getUuid());
         if (player != null) {
-            value = player.hasPermissionLevel(bukkitPermission) || player.hasPermissionLevel(minecraftServer.getOpPermissionLevel());
+            value = player.hasPermissionLevel(fabricPermission) || player.hasPermissionLevel(minecraftServer.getOpPermissionLevel());
         }
 
         return value || integrationModule.hasFPlayerPermission(fPlayer, permission);

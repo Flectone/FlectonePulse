@@ -3,25 +3,21 @@ package net.flectone.pulse;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.PacketEventsServerMod;
+import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.database.Database;
-import net.flectone.pulse.manager.FileManager;
+import net.flectone.pulse.model.event.player.PlayerLoadEvent;
+import net.flectone.pulse.model.exception.ReloadException;
 import net.flectone.pulse.module.Module;
-import net.flectone.pulse.module.integration.discord.DiscordModule;
-import net.flectone.pulse.module.integration.telegram.TelegramModule;
-import net.flectone.pulse.module.integration.twitch.TwitchModule;
-import net.flectone.pulse.registry.CommandRegistry;
-import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.registry.*;
 import net.flectone.pulse.resolver.FabricLibraryResolver;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.LibraryResolver;
-import net.flectone.pulse.scheduler.FabricTaskScheduler;
 import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MetricsService;
 import net.flectone.pulse.service.ModerationService;
@@ -30,159 +26,212 @@ import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class FabricFlectonePulse implements ModInitializer, FlectonePulse {
 
-	private final String MOD_ID = "flectonepulse";
-
-	private MinecraftServer minecraftServer;
-	private LibraryResolver libraryResolver;
-
+	@Getter
 	@Setter
-	private boolean disableSilently = false;
+	private MinecraftServer minecraftServer;
+
+	private LibraryResolver libraryResolver;
 
 	private FLogger fLogger;
 	private Injector injector;
 
 	@Override
 	public void onInitialize() {
-		Logger logger = LoggerFactory.getLogger(MOD_ID);
+		Logger logger = LoggerFactory.getLogger(BuildConfig.PROJECT_MOD_ID);
 		fLogger = new FLogger(logRecord -> logger.info(logRecord.getMessage()));
 
 		fLogger.logEnabling();
-		libraryResolver = new FabricLibraryResolver(MOD_ID, logger);
+		libraryResolver = new FabricLibraryResolver(logger);
 		libraryResolver.addLibraries();
 		libraryResolver.resolveRepositories();
 		libraryResolver.loadLibraries();
 
-		PacketEventsServerMod.constructApi(MOD_ID).init();
+		PacketEventsServerMod.constructApi(BuildConfig.PROJECT_MOD_ID).init();
 
-		registerListeners();
+		onEnable();
 	}
 
 	public void onEnable() {
-		injector = Guice.createInjector(new FabricInjector(MOD_ID, this, minecraftServer, libraryResolver, fLogger));
+		try {
+			// create guice injector for dependency injection
+			injector = Guice.createInjector(new FabricInjector(this, libraryResolver, fLogger));
+		} catch (RuntimeException e) {
+			fLogger.warning("FAILED TO ENABLE");
+			fLogger.warning(e);
+			e.printStackTrace();
+			return;
+		}
 
+		// log plugin information
 		fLogger.logPluginInfo();
 
-		if (injector == null || disableSilently) {
-			fLogger.warning("FAILED TO ENABLE");
-			fLogger.warning("Report a problem on github https://github.com/Flectone/FlectonePulse/issues");
-			fLogger.warning("or in discord https://discord.com/channels/861147957365964810/1271850075064369152");
-			return;
-		}
-
-		FileManager fileManager = injector.getInstance(FileManager.class);
-
-		fLogger.reload(fileManager.getConfig().getLogFilter());
-
-		injector.getInstance(Module.class).reloadWithChildren();
+		// register default listeners
+		injector.getInstance(ListenerRegistry.class).registerDefaultListeners();
 
 		try {
+			// connect to database
 			injector.getInstance(Database.class).connect();
 		} catch (Exception e) {
-			e.printStackTrace();
-			fLogger.warning("Failed to connect database");
 			fLogger.warning(e);
-			return;
 		}
 
-		injector.getInstance(FPlayerService.class).reload();
-		injector.getInstance(ProxySender.class).reload();
+		// get file resolver for configuration
+		FileResolver fileResolver = injector.getInstance(FileResolver.class);
 
-		if (fileManager.getConfig().isMetrics()) {
+		// reload logger with new configuration
+		fLogger.reload(fileResolver.getConfig().getLogFilter());
+
+		// initialize packetevents
+		PacketEvents.getAPI().init();
+
+		// reload modules and their children
+		injector.getInstance(Module.class).reloadWithChildren();
+
+		// reload fplayer service
+		injector.getInstance(FPlayerService.class).reload();
+
+		// enable proxy registry
+		injector.getInstance(ProxyRegistry.class).onEnable();
+
+		// reload metrics service if enabled
+		if (fileResolver.getConfig().isMetrics()) {
 			injector.getInstance(MetricsService.class).reload();
 		}
 
-		injector.getInstance(ListenerRegistry.class).registerDefaultListeners();
-
+		// log plugin enabled
 		fLogger.logEnabled();
 	}
 
 	public void onDisable() {
-		if (injector == null || disableSilently) return;
+		if (injector == null) {
+			// terminate packetevents if injector is not initialized
+			PacketEvents.getAPI().terminate();
+			return;
+		}
 
+		// log plugin disabling
 		fLogger.logDisabling();
 
+		// send metrics data if enabled
+		if (injector.getInstance(FileResolver.class).getConfig().isMetrics()) {
+			injector.getInstance(MetricsService.class).send();
+		}
+
+		// close all open inventories
 		injector.getInstance(InventoryController.class).closeAll();
 
+		// get fplayer service
 		FPlayerService fPlayerService = injector.getInstance(FPlayerService.class);
 
+		// update and clear all fplayers
 		fPlayerService.getFPlayers().forEach(fPlayer -> {
 			fPlayer.setOnline(false);
-			fPlayerService.saveOrUpdateFPlayer(fPlayer);
+			fPlayerService.updateFPlayer(fPlayer);
 		});
-
 		fPlayerService.clear();
 
-//		injector.getInstance(ScoreboardLibrary.class).close();
-		injector.getInstance(Database.class).disconnect();
-//		injector.getInstance(ObjectiveManager.class).close();
-//		injector.getInstance(TeamManager.class).close();
+		// disable all modules
+		injector.getInstance(Module.class).disable();
+
+		// unregister all listeners
 		injector.getInstance(ListenerRegistry.class).unregisterAll();
+
+		// terminate packetevents
 		PacketEvents.getAPI().terminate();
 
-		injector.getInstance(ProxySender.class).disable();
+		// disable proxy registry
+		injector.getInstance(ProxyRegistry.class).onDisable();
 
-		injector.getInstance(DiscordModule.class).disconnect();
-		injector.getInstance(TwitchModule.class).disconnect();
-		injector.getInstance(TelegramModule.class).disconnect();
+		// disconnect from database
+		injector.getInstance(Database.class).disconnect();
+
+		// reload task scheduler
 		injector.getInstance(TaskScheduler.class).reload();
 
+		// log plugin disabled
 		fLogger.logDisabled();
 	}
 
 	@Override
-	public void reload() {
+	public void reload() throws ReloadException {
 		if (injector == null) return;
 
+		ReloadException reloadException = null;
+
+		// log plugin reloading
 		fLogger.logReloading();
 
+		// close all open inventories
 		injector.getInstance(InventoryController.class).closeAll();
 
+		// reload registries
+		injector.getInstance(CommandParserRegistry.class).reload();
 		injector.getInstance(CommandRegistry.class).reload();
 		injector.getInstance(ListenerRegistry.class).reload();
+		injector.getInstance(MessageProcessRegistry.class).reload();
+		injector.getInstance(PermissionRegistry.class).reload();
+		injector.getInstance(ProxyRegistry.class).reload();
+
+		// reload event process registry
+		EventProcessRegistry eventProcessRegistry = injector.getInstance(EventProcessRegistry.class);
+		eventProcessRegistry.reload();
+
+		// reload task scheduler
 		injector.getInstance(TaskScheduler.class).reload();
 
-		FileManager fileManager = injector.getInstance(FileManager.class);
-		fileManager.reload();
-
-		fLogger.reload(fileManager.getConfig().getLogFilter());
+		// get file resolver for configuration
+		FileResolver fileResolver = injector.getInstance(FileResolver.class);
 
 		try {
+			// reload configuration files
+			fileResolver.reload();
+		} catch (Exception e) {
+			reloadException = new ReloadException(e.getMessage(), e);
+		}
+
+		// reload logger with new configuration
+		fLogger.reload(fileResolver.getConfig().getLogFilter());
+
+		// get fplayer service
+		FPlayerService fPlayerService = injector.getInstance(FPlayerService.class);
+
+		try {
+			// disconnect and reconnect to database
 			injector.getInstance(Database.class).disconnect();
 			injector.getInstance(Database.class).connect();
 
-		} catch (Exception e) {
-			fLogger.warning("Failed to connect database");
+			// reload fplayer service
+			fPlayerService.reload();
 
-			throw new RuntimeException(e);
+		} catch (Exception e) {
+			reloadException = new ReloadException(e.getMessage(), e);
 		}
 
-		injector.getInstance(ProxySender.class).reload();
-		injector.getInstance(FPlayerService.class).reload();
+		// reload moderation service
 		injector.getInstance(ModerationService.class).reload();
+
+		// reload modules and their children
 		injector.getInstance(Module.class).reloadWithChildren();
 
-		if (fileManager.getConfig().isMetrics()) {
+		// process player load event for all platform fplayers
+		fPlayerService.getPlatformFPlayers().forEach(fPlayer ->
+				eventProcessRegistry.processEvent(new PlayerLoadEvent(fPlayer))
+		);
+
+		// reload metrics service if enabled
+		if (fileResolver.getConfig().isMetrics()) {
 			injector.getInstance(MetricsService.class).reload();
 		}
 
+		// log plugin reloaded
 		fLogger.logReloaded();
-	}
 
-	private void registerListeners() {
-		ServerTickEvents.START_SERVER_TICK.register(server -> {
-			if (injector == null) return;
-			injector.getInstance(FabricTaskScheduler.class).onTick();
-		});
-
-		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
-			minecraftServer = server;
-			onEnable();
-		});
-
-		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-			onDisable();
-		});
+		// throw reload exception if occurred
+		if (reloadException != null) {
+			throw reloadException;
+		}
 	}
 }

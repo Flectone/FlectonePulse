@@ -1,7 +1,7 @@
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
-	id 'fabric-loom' version '1.10-SNAPSHOT'
+	id 'fabric-loom' version '1.11-SNAPSHOT'
 }
 
 dependencies {
@@ -10,44 +10,36 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
 
 	implementation("com.alessiodp.libby:libby-fabric:$libby_version")
+	implementation("org.apache.commons:commons-lang3:3.18.0")
 	implementation(project(":core"))
 
 	Set<String> apiModules = [
 			'fabric-api-base',
 			'fabric-command-api-v2',
 			'fabric-lifecycle-events-v1',
-			'fabric-networking-api-v1',
-			'fabric-entity-events-v1'
+			'fabric-networking-api-v1'
 	]
 
 	apiModules.forEach {
-		modImplementation(fabricApi.module(it, '0.119.0+1.21.5'))
+		modImplementation(fabricApi.module(it, '0.129.0+1.21.8'))
 	}
 
-	include(modImplementation('me.lucko:fabric-permissions-api:0.3.3'))
+	modImplementation(include("org.incendo:cloud-fabric:${cloud_paper_version}"))
+
+	include "net.kyori:adventure-text-minimessage:$adventure_api"
+	include "net.kyori:adventure-api:$adventure_api"
+	include "net.kyori:adventure-nbt:$adventure_api"
+	include "net.kyori:adventure-key:$adventure_api"
+	include "net.kyori:adventure-text-serializer-gson:$adventure_api"
+	include "net.kyori:adventure-text-serializer-json-legacy-impl:$adventure_api"
+	include "net.kyori:adventure-text-serializer-legacy:$adventure_api"
 
 	modCompileOnlyApi("com.github.retrooper:packetevents-fabric:$packetevents_spigot_version")
-	modCompileOnly("org.incendo:cloud-fabric:${cloud_paper_version}")
-
-//	implementation("org.slf4j:slf4j-api:2.1.0-alpha1")
-
-	compileOnly("net.kyori:adventure-api:$adventure_api")
-	compileOnly("net.kyori:adventure-text-minimessage:$adventure_api")
 	compileOnly("net.elytrium:serializer:$elytrium_serializer_version")
 }
 
 shadowJar {
 	archiveFileName = "flectonepulsedev-" + project.name + "-" + project_version + ".jar"
-
-	relocate("com.alessiodp.libby", "net.flectone.pulse.library.libby")
-	relocate("com.google.inject", "net.flectone.pulse.library.guice")
-	relocate("com.google.common", "net.flectone.pulse.library.guava")
-	relocate("net.elytrium.serializer", "net.flectone.pulse.library.elytrium")
-
-//	relocate("com.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents")
-//	relocate("io.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents.impl")
-
-	relocate("net.kyori.adventure", "net.flectone.pulse.library.adventure")
 
 	outputs.cacheIf { true }
 
@@ -64,16 +56,15 @@ shadowJar {
 		include(project(":core"))
 	}
 
-//	minimize()
+	minimize()
 }
 
 processResources {
-	inputs.property "version", "$project_version"
-	inputs.property "description", "$project_description"
-
+	def props = [version: "$project_version", author: "$project_author", description: "$project_description"]
+	inputs.properties props
+	filteringCharset 'UTF-8'
 	filesMatching('**/fabric.mod.json') {
-		expand "version": "1.0.0",
-				"description": "11111"
+		expand props
 	}
 }
 
@@ -82,6 +73,7 @@ tasks.register('remappedShadowJar', RemapJarTask) {
 	input = tasks.shadowJar.archiveFile
 	addNestedDependencies = true
 	archiveFileName = "FlectonePulse-" + project.name + "-" + project_version + ".jar"
+	destinationDirectory = file("$rootDir/build/libs")
 }
 
 tasks.assemble.dependsOn tasks.remappedShadowJar

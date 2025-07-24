@@ -2,14 +2,14 @@ package net.flectone.pulse.module.message.anvil;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.manager.FileManager;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.resolver.FileResolver;
 
 @Singleton
 public class FabricAnvilModule extends AnvilModule {
 
     @Inject
-    public FabricAnvilModule(FileManager fileManager) {
+    public FabricAnvilModule(FileResolver fileManager) {
         super(fileManager);
     }
 

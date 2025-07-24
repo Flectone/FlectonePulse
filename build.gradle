@@ -91,11 +91,15 @@ subprojects {
         relocate("org.jdbi", "net.flectone.pulse.library.jdbi3")
         relocate("com.alessiodp.libby", "net.flectone.pulse.library.libby")
         relocate("net.elytrium.serializer", "net.flectone.pulse.library.elytrium")
-        relocate("com.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents")
-        relocate("io.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents.impl")
+
+        if (!project.name.is("fabric")) {
+            relocate("com.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents")
+            relocate("io.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents.impl")
+        }
+
         relocate("spark.", "net.flectone.pulse.library.spark.")
 
-        if (!project.name.is("paper")) {
+        if (!project.name.is("paper") && !project.name.is("fabric")) {
             relocate("net.kyori.adventure", "net.flectone.pulse.library.adventure")
         }
 
@@ -118,6 +122,7 @@ tasks.named("shadowJar").configure { enabled = false }
 tasks.named("jar").configure { enabled = false }
 
 tasks.register("mergeJars", Jar) {
+    archiveBaseName.set("${project_name}-bukkit")
     archiveVersion.set("${project_version}")
 
     def platforms = subprojects.findAll {

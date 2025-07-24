@@ -47,7 +47,9 @@ public final class Config extends FileSerializable {
     private boolean bungeecord = false;
     private boolean velocity = false;
     private Set<String> clusters = new HashSet<>();
-
+    private Set<String> fabricDisabledCommands = new HashSet<>(Set.of(
+            "tell", "msg", "w", "me", "ban", "kick", "pardon", "banlist"
+    ));
     private List<String> logFilter = new ArrayList<>(List.of(
             "Paper Async Command Builder",
             "Caught previously unhandled exception :",

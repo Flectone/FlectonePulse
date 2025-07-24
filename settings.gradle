@@ -14,5 +14,5 @@ include "bukkit"
 include "paper"
 include "velocity"
 include "bungeecord"
-//include "fabric"
+include "fabric"
 
