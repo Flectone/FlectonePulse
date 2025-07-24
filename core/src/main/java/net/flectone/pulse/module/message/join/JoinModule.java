@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.message.join;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.MessageTag;
@@ -25,12 +27,14 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final IntegrationModule integrationModule;
     private final EventProcessRegistry eventProcessRegistry;
+    private final PacketProvider packetProvider;
 
     @Inject
     public JoinModule(FileResolver fileResolver,
                       PlatformPlayerAdapter platformPlayerAdapter,
                       IntegrationModule integrationModule,
-                      EventProcessRegistry eventProcessRegistry) {
+                      EventProcessRegistry eventProcessRegistry,
+                      PacketProvider packetProvider) {
         super(localization -> localization.getMessage().getJoin());
 
         this.message = fileResolver.getMessage().getJoin();
@@ -38,6 +42,7 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.integrationModule =  integrationModule;
         this.eventProcessRegistry = eventProcessRegistry;
+        this.packetProvider = packetProvider;
     }
 
     @Override
@@ -46,7 +51,15 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
 
         createSound(message.getSound(), permission.getSound());
 
-        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_JOIN, this::send);
+        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_JOIN, fPlayer -> {
+            if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_2)) {
+                // delay for vanish plugins and newer versions
+                sendLater(fPlayer);
+            } else {
+                send(fPlayer);
+            }
+        });
+
         eventProcessRegistry.registerMessageHandler(event -> {
             if (event.getKey() != MinecraftTranslationKeys.MULTIPLAYER_PLAYER_JOINED) return;
 
@@ -59,8 +72,11 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
         return message.isEnable();
     }
 
-    // delay for vanish plugins
     @Async(delay = 5)
+    public void sendLater(FPlayer fPlayer) {
+        send(fPlayer);
+    }
+
     public void send(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
