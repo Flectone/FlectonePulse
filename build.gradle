@@ -43,6 +43,7 @@ subprojects {
         maven { url = "https://repo.diogotc.com/releases" }
         maven { url = "https://repo.codemc.io/repository/maven-snapshots/" }
         maven { url = "https://maven.devs.beer/" }
+        maven { url ="https://maven.nucleoid.xyz/" }
     }
 
     dependencies {

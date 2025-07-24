@@ -7,6 +7,7 @@ import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.module.integration.placeholderapi.PlaceholderAPIModule;
 import net.flectone.pulse.resolver.FileResolver;
 
 @Singleton
@@ -17,6 +18,10 @@ public class FabricIntegrationModule extends IntegrationModule {
                                    PlatformServerAdapter platformServerAdapter,
                                    Injector injector) {
         super(fileManager, platformServerAdapter, injector);
+
+        if (platformServerAdapter.hasProject("placeholder-api")) {
+            addChildren(PlaceholderAPIModule.class);
+        }
     }
 
     @Override

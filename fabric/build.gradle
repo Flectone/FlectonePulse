@@ -36,6 +36,8 @@ dependencies {
 
 	modCompileOnlyApi("com.github.retrooper:packetevents-fabric:$packetevents_spigot_version")
 	compileOnly("net.elytrium:serializer:$elytrium_serializer_version")
+
+	modCompileOnlyApi("eu.pb4:placeholder-api:$text_placeholder_api_version")
 }
 
 shadowJar {
