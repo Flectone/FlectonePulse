@@ -1,20 +1,24 @@
 package net.flectone.pulse.module.integration;
 
 import com.google.inject.Injector;
+import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.deepl.DeeplModule;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
+import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
+import net.flectone.pulse.module.integration.skinsrestorer.SkinsRestorerModule;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.yandex.YandexModule;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.MessageTag;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
@@ -25,10 +29,19 @@ public abstract class IntegrationModule extends AbstractModule {
     private final Injector injector;
 
     protected IntegrationModule(FileResolver fileResolver,
+                                PlatformServerAdapter platformServerAdapter,
                                 Injector injector) {
         this.integration = fileResolver.getIntegration();
         this.permission = fileResolver.getPermission().getIntegration();
         this.injector = injector;
+
+        if (platformServerAdapter.hasProject("SkinsRestorer")) {
+            addChildren(SkinsRestorerModule.class);
+        }
+
+        if (platformServerAdapter.hasProject("LuckPerms")) {
+            addChildren(LuckPermsModule.class);
+        }
     }
 
     @Override
@@ -49,17 +62,72 @@ public abstract class IntegrationModule extends AbstractModule {
 
     public abstract String checkMention(FEntity fPlayer, String message);
 
-    public abstract boolean hasFPlayerPermission(FPlayer fPlayer, String permission);
+    public abstract boolean isVanished(FEntity sender);
 
-    public abstract String getPrefix(FPlayer fPlayer);
+    public abstract boolean hasSeeVanishPermission(FEntity sender);
 
-    public abstract String getSuffix(FPlayer fPlayer);
+    public abstract boolean isMuted(FPlayer fPlayer);
 
-    public abstract Set<String> getGroups();
+    public abstract ExternalModeration getMute(FPlayer fPlayer);
 
-    public abstract int getGroupWeight(FPlayer fPlayer);
+    public abstract String getTritonLocale(FPlayer fPlayer);
 
-    public abstract String getTextureUrl(FEntity sender);
+    public boolean hasFPlayerPermission(FPlayer fPlayer, String permission) {
+        if (!isEnable()) return false;
+
+        boolean value = true;
+
+        if (getChildren().contains(LuckPermsModule.class)) {
+            value = injector.getInstance(LuckPermsModule.class).hasLuckPermission(fPlayer, permission);
+        }
+
+        return value;
+    }
+
+    public String getTextureUrl(FEntity sender) {
+        if (!isEnable()) return null;
+        if (!getChildren().contains(SkinsRestorerModule.class)) return null;
+        if (!(sender instanceof FPlayer fPlayer)) return null;
+
+        return injector.getInstance(SkinsRestorerModule.class).getTextureUrl(fPlayer);
+    }
+
+    public String getPrefix(FPlayer fPlayer) {
+        if (!isEnable()) return null;
+
+        if (getChildren().contains(LuckPermsModule.class)) {
+            return injector.getInstance(LuckPermsModule.class).getPrefix(fPlayer);
+        }
+
+        return null;
+    }
+
+    public String getSuffix(FPlayer fPlayer) {
+        if (!isEnable()) return null;
+
+        if (getChildren().contains(LuckPermsModule.class)) {
+            return injector.getInstance(LuckPermsModule.class).getSuffix(fPlayer);
+        }
+
+        return null;
+    }
+
+    public Set<String> getGroups() {
+        if (!isEnable()) return Collections.emptySet();
+
+        if (getChildren().contains(LuckPermsModule.class)) {
+            return injector.getInstance(LuckPermsModule.class).getGroups();
+        }
+
+        return Collections.emptySet();
+    }
+
+    public int getGroupWeight(FPlayer fPlayer) {
+        if (!isEnable()) return 0;
+        if (!getChildren().contains(LuckPermsModule.class)) return 0;
+
+        return injector.getInstance(LuckPermsModule.class).getGroupWeight(fPlayer);
+    }
 
     public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> discordString) {
         if (getChildren().contains(DiscordModule.class)) {
@@ -75,22 +143,16 @@ public abstract class IntegrationModule extends AbstractModule {
         }
     }
 
-    public abstract boolean hasMessenger();
-
-    public abstract boolean isVanished(FEntity sender);
-
-    public abstract boolean hasSeeVanishPermission(FEntity sender);
+    public boolean hasMessenger() {
+        return injector.getInstance(DiscordModule.class).isEnable()
+                || injector.getInstance(TwitchModule.class).isEnable()
+                || injector.getInstance(TelegramModule.class).isEnable();
+    }
 
     public boolean isVanishedVisible(FEntity sender, FEntity receiver) {
         boolean isVanished = isVanished(sender);
         return !isVanished || hasSeeVanishPermission(receiver);
     }
-
-    public abstract boolean isMuted(FPlayer fPlayer);
-
-    public abstract ExternalModeration getMute(FPlayer fPlayer);
-
-    public abstract String getTritonLocale(FPlayer fPlayer);
 
     public String deeplTranslate(FPlayer sender, String source, String target, String text) {
         if (checkModulePredicates(sender)) return text;

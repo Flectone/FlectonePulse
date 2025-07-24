@@ -8,23 +8,18 @@ import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.advancedban.AdvancedBanModule;
-import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.interactivechat.InteractiveChatModule;
 import net.flectone.pulse.module.integration.itemsadder.ItemsAdderModule;
 import net.flectone.pulse.module.integration.litebans.LiteBansModule;
-import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
 import net.flectone.pulse.module.integration.minimotd.MiniMOTDModule;
 import net.flectone.pulse.module.integration.miniplaceholders.MiniPlaceholdersModule;
 import net.flectone.pulse.module.integration.motd.MOTDModule;
 import net.flectone.pulse.module.integration.placeholderapi.PlaceholderAPIModule;
 import net.flectone.pulse.module.integration.plasmovoice.PlasmoVoiceModule;
 import net.flectone.pulse.module.integration.simplevoice.SimpleVoiceModule;
-import net.flectone.pulse.module.integration.skinsrestorer.SkinsRestorerModule;
 import net.flectone.pulse.module.integration.supervanish.SuperVanishModule;
 import net.flectone.pulse.module.integration.tab.TABModule;
-import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.triton.TritonModule;
-import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.vault.VaultModule;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.logging.FLogger;
@@ -48,7 +43,7 @@ public class BukkitIntegrationModule extends IntegrationModule {
                                    FLogger fLogger,
                                    PlatformServerAdapter platformServerAdapter,
                                    Injector injector) {
-        super(fileResolver, injector);
+        super(fileResolver, platformServerAdapter, injector);
 
         this.fLogger = fLogger;
         this.platformServerAdapter = platformServerAdapter;
@@ -83,10 +78,6 @@ public class BukkitIntegrationModule extends IntegrationModule {
             addChildren(LiteBansModule.class);
         }
 
-        if (platformServerAdapter.hasProject("LuckPerms")) {
-            addChildren(LuckPermsModule.class);
-        }
-
         if (platformServerAdapter.hasProject("MiniMOTD")) {
             addChildren(MiniMOTDModule.class);
         }
@@ -101,10 +92,6 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
         if (platformServerAdapter.hasProject("SuperVanish") || platformServerAdapter.hasProject("PremiumVanish")) {
             addChildren(SuperVanishModule.class);
-        }
-
-        if (platformServerAdapter.hasProject("SkinsRestorer")) {
-            addChildren(SkinsRestorerModule.class);
         }
 
         if (platformServerAdapter.hasProject("VoiceChat")) {
@@ -143,13 +130,7 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
     @Override
     public boolean hasFPlayerPermission(FPlayer fPlayer, String permission) {
-        if (!isEnable()) return false;
-
-        boolean value = true;
-
-        if (getChildren().contains(LuckPermsModule.class)) {
-            value = injector.getInstance(LuckPermsModule.class).hasLuckPermission(fPlayer, permission);
-        }
+        boolean value = super.hasFPlayerPermission(fPlayer, permission);
 
         if (getChildren().contains(VaultModule.class)) {
             value = value && injector.getInstance(VaultModule.class).hasVaultPermission(fPlayer, permission);
@@ -160,11 +141,8 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
     @Override
     public String getPrefix(FPlayer fPlayer) {
-        if (!isEnable()) return null;
-
-        if (getChildren().contains(LuckPermsModule.class)) {
-            return injector.getInstance(LuckPermsModule.class).getPrefix(fPlayer);
-        }
+        String prefix = super.getPrefix(fPlayer);
+        if (prefix != null) return prefix;
 
         if (getChildren().contains(VaultModule.class)) {
             return injector.getInstance(VaultModule.class).getPrefix(fPlayer);
@@ -175,11 +153,8 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
     @Override
     public String getSuffix(FPlayer fPlayer) {
-        if (!isEnable()) return null;
-
-        if (getChildren().contains(LuckPermsModule.class)) {
-            return injector.getInstance(LuckPermsModule.class).getSuffix(fPlayer);
-        }
+        String suffix = super.getSuffix(fPlayer);
+        if (suffix != null) return suffix;
 
         if (getChildren().contains(VaultModule.class)) {
             return injector.getInstance(VaultModule.class).getSuffix(fPlayer);
@@ -190,41 +165,14 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
     @Override
     public Set<String> getGroups() {
-        if (!isEnable()) return Collections.emptySet();
-
-        if (getChildren().contains(LuckPermsModule.class)) {
-            return injector.getInstance(LuckPermsModule.class).getGroups();
-        }
+        Set<String> groups = super.getGroups();
+        if (!groups.isEmpty()) return groups;
 
         if (getChildren().contains(VaultModule.class)) {
             return injector.getInstance(VaultModule.class).getGroups();
         }
 
         return Collections.emptySet();
-    }
-
-    @Override
-    public int getGroupWeight(FPlayer fPlayer) {
-        if (!isEnable()) return 0;
-        if (!getChildren().contains(LuckPermsModule.class)) return 0;
-
-        return injector.getInstance(LuckPermsModule.class).getGroupWeight(fPlayer);
-    }
-
-    @Override
-    public String getTextureUrl(FEntity sender) {
-        if (!isEnable()) return null;
-        if (!getChildren().contains(SkinsRestorerModule.class)) return null;
-        if (!(sender instanceof FPlayer fPlayer)) return null;
-
-        return injector.getInstance(SkinsRestorerModule.class).getTextureUrl(fPlayer);
-    }
-
-    @Override
-    public boolean hasMessenger() {
-        return injector.getInstance(DiscordModule.class).isEnable()
-                || injector.getInstance(TwitchModule.class).isEnable()
-                || injector.getInstance(TelegramModule.class).isEnable();
     }
 
     @Override

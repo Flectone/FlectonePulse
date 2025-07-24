@@ -2,9 +2,10 @@ package net.flectone.pulse.module.integration.skinsrestorer;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.util.logging.FLogger;
 import net.skinsrestorer.api.PropertyUtils;
 import net.skinsrestorer.api.SkinsRestorer;
 import net.skinsrestorer.api.SkinsRestorerProvider;
@@ -37,6 +38,11 @@ public class SkinsRestorerIntegration implements FIntegration {
         }
     }
 
+    @Async(delay = 20)
+    public void hookLater() {
+        hook();
+    }
+
     @Override
     public void unhook() {
         fLogger.info("✖ SkinsRestorer unhooked");
@@ -48,7 +54,7 @@ public class SkinsRestorerIntegration implements FIntegration {
         PlayerStorage storage = skinsRestorer.getPlayerStorage();
         try {
             Optional<SkinProperty> skin = storage.getSkinForPlayer(fPlayer.getUuid(), fPlayer.getName());
-            return skin.map(PropertyUtils::getSkinTextureUrlStripped).orElse(null);
+            return skin.map(PropertyUtils::getSkinTextureHash).orElse(null);
         } catch (DataRequestException e) {
             return null;
         }

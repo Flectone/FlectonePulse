@@ -1,4 +1,6 @@
 dependencies {
     compileOnly "com.alessiodp.libby:libby-bukkit:$libby_version"
     compileOnly "com.github.retrooper:packetevents-api:$packetevents_spigot_version"
+    compileOnly "net.skinsrestorer:skinsrestorer-api:$skinsrestorerapi_version"
+    compileOnly "net.luckperms:api:$luckpermsapi_version"
 }

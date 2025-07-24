@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.luckperms;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.util.logging.FLogger;
@@ -30,6 +31,11 @@ public class LuckPermsIntegration implements FIntegration {
     public void hook() {
         this.luckPerms = LuckPermsProvider.get();
         fLogger.info("✔ LuckPerms hooked");
+    }
+
+    @Async(delay = 20)
+    public void hookLater() {
+        hook();
     }
 
     @Override
@@ -79,6 +85,8 @@ public class LuckPermsIntegration implements FIntegration {
     }
 
     private User getUser(FPlayer fPlayer) {
+        if (luckPerms == null) return null;
+
         return luckPerms.getUserManager().getUser(fPlayer.getUuid());
     }
 }
