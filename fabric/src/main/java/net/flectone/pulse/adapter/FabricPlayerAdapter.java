@@ -21,8 +21,6 @@ import net.flectone.pulse.provider.PacketProvider;
 import net.kyori.adventure.text.Component;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtIo;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
@@ -30,17 +28,11 @@ import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.stat.Stats;
-import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -242,7 +234,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public boolean hasPlayedBefore(@NotNull FPlayer fPlayer) {
-        return getAllTimePlayed(fPlayer) > 0;
+        return true;
     }
 
     @Override
@@ -261,57 +253,19 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         return player != null;
     }
 
-    // not full correctly
     @Override
     public long getFirstPlayed(@NotNull FPlayer fPlayer) {
-        MinecraftServer server = fabricFlectonePulse.getMinecraftServer();
-        if (server == null) return 0;
-
-        try {
-            Path playerDataDir = server.getSavePath(WorldSavePath.PLAYERDATA);
-            Path playerFile = playerDataDir.resolve(fPlayer.getUuid().toString() + ".dat");
-            if (Files.exists(playerFile)) {
-                BasicFileAttributes fileAttributes = Files.readAttributes(playerFile, BasicFileAttributes.class);
-                return fileAttributes.creationTime().toMillis();
-            }
-        } catch (IOException ignored) {}
-
         return 0;
     }
 
     @Override
     public long getLastPlayed(@NotNull FPlayer fPlayer) {
-        MinecraftServer server = fabricFlectonePulse.getMinecraftServer();
-        if (server == null) return 0;
-
-        PlayerManager playerList = server.getPlayerManager();
-        ServerPlayerEntity player = playerList.getPlayer(fPlayer.getUuid());
-        if (player != null) return player.getLastActionTime();
-
-        try {
-            Path playerDataDir = server.getSavePath(WorldSavePath.PLAYERDATA);
-            Path playerFile = playerDataDir.resolve(fPlayer.getUuid().toString() + ".dat");
-            if (Files.exists(playerFile)) {
-                NbtCompound playerData = NbtIo.read(playerFile);
-                if (playerData != null && playerData.contains("FirstPlayed")) {
-                    return playerData.getLong("FirstPlayed").orElse(0L);
-                }
-
-                BasicFileAttributes fileAttributes = Files.readAttributes(playerFile, BasicFileAttributes.class);
-                return fileAttributes.creationTime().toMillis();
-            }
-        } catch (IOException ignored) {}
-
         return 0;
     }
 
-    // not full correctly
     @Override
     public long getAllTimePlayed(@NotNull FPlayer fPlayer) {
-        ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
-        if (player == null) return 0;
-
-        return player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(Stats.PLAY_TIME));
+        return 0;
     }
 
     @Override

@@ -3,9 +3,11 @@ package net.flectone.pulse.module.command.toponline;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.PlatformType;
 import net.flectone.pulse.formatter.TimeFormatter;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -14,6 +16,7 @@ import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.util.DisableAction;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -28,27 +31,33 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
     private final Command.Toponline command;
     private final Permission.Command.Toponline permission;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final PlatformServerAdapter platformServerAdapter;
     private final CommandRegistry commandRegistry;
     private final MessagePipeline messagePipeline;
     private final MessageSender messageSender;
     private final TimeFormatter timeFormatter;
+    private final FLogger fLogger;
 
     @Inject
     public ToponlineModule(FileResolver fileResolver,
                            PlatformPlayerAdapter platformPlayerAdapter,
+                           PlatformServerAdapter platformServerAdapter,
                            CommandRegistry commandRegistry,
                            MessagePipeline messagePipeline,
                            MessageSender messageSender,
-                           TimeFormatter timeFormatter) {
+                           TimeFormatter timeFormatter,
+                           FLogger fLogger) {
         super(localization -> localization.getCommand().getToponline(), null);
 
         this.command = fileResolver.getCommand().getToponline();
         this.permission = fileResolver.getPermission().getCommand().getToponline();
         this.platformPlayerAdapter = platformPlayerAdapter;
+        this.platformServerAdapter = platformServerAdapter;
         this.commandRegistry = commandRegistry;
         this.messagePipeline = messagePipeline;
         this.messageSender = messageSender;
         this.timeFormatter = timeFormatter;
+        this.fLogger = fLogger;
     }
 
     @Override
@@ -58,6 +67,11 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void onEnable() {
+        if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
+            fLogger.warning("/toponline module is disabled! This is not supported on Fabric");
+            return;
+        }
+
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

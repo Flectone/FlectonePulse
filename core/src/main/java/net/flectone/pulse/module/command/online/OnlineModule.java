@@ -4,9 +4,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.PlatformType;
 import net.flectone.pulse.formatter.TimeFormatter;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -15,6 +17,7 @@ import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
+import net.flectone.pulse.util.logging.FLogger;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
@@ -29,26 +32,32 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
     private final Permission.Command.Online permission;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final PlatformServerAdapter platformServerAdapter;
     private final CommandRegistry commandRegistry;
     private final IntegrationModule integrationModule;
     private final TimeFormatter timeFormatter;
+    private final FLogger fLogger;
 
     @Inject
     public OnlineModule(FileResolver fileResolver,
                         FPlayerService fPlayerService,
                         PlatformPlayerAdapter platformPlayerAdapter,
+                        PlatformServerAdapter platformServerAdapter,
                         CommandRegistry commandRegistry,
                         IntegrationModule integrationModule,
-                        TimeFormatter timeFormatter) {
+                        TimeFormatter timeFormatter,
+                        FLogger fLogger) {
         super(localization -> localization.getCommand().getOnline(), null);
 
         this.command = fileResolver.getCommand().getOnline();
         this.permission = fileResolver.getPermission().getCommand().getOnline();
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
+        this.platformServerAdapter = platformServerAdapter;
         this.commandRegistry = commandRegistry;
         this.integrationModule = integrationModule;
         this.timeFormatter = timeFormatter;
+        this.fLogger = fLogger;
     }
 
     @Override
@@ -58,6 +67,11 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
 
     @Override
     public void onEnable() {
+        if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
+            fLogger.warning("/online module is disabled! This is not supported on Fabric");
+            return;
+        }
+
         registerModulePermission(permission);
 
         createCooldown(command.getCooldown(), permission.getCooldownBypass());

@@ -3,14 +3,17 @@ package net.flectone.pulse.module.message.format.moderation.newbie;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.PlatformType;
 import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 public class NewbieModule extends AbstractModuleMessage<Localization.Message.Format.Moderation.Newbie> {
@@ -19,21 +22,33 @@ public class NewbieModule extends AbstractModuleMessage<Localization.Message.For
     private final Permission.Message.Format.Moderation.Newbie permission;
     private final PermissionChecker permissionChecker;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final PlatformServerAdapter platformServerAdapter;
+    private final FLogger fLogger;
 
     @Inject
     public NewbieModule(FileResolver fileResolver,
                         PermissionChecker permissionChecker,
-                        PlatformPlayerAdapter platformPlayerAdapter) {
+                        PlatformPlayerAdapter platformPlayerAdapter,
+                        PlatformServerAdapter platformServerAdapter,
+                        FLogger fLogger) {
         super(localization -> localization.getMessage().getFormat().getModeration().getNewbie());
 
         this.message = fileResolver.getMessage().getFormat().getModeration().getNewbie();
         this.permission = fileResolver.getPermission().getMessage().getFormat().getModeration().getNewbie();
         this.permissionChecker = permissionChecker;
         this.platformPlayerAdapter = platformPlayerAdapter;
+        this.platformServerAdapter = platformServerAdapter;
+        this.fLogger = fLogger;
     }
 
     @Override
     public void onEnable() {
+        if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC
+                && message.getMode() == Message.Format.Moderation.Newbie.Mode.PLAYED_TIME) {
+            fLogger.warning("Newbie module is disabled! Mode PLAYED_TIME is not supported on Fabric");
+            return;
+        }
+
         registerModulePermission(permission);
         registerPermission(permission.getBypass());
     }
