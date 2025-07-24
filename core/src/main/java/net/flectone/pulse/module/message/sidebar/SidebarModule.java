@@ -106,6 +106,7 @@ public class SidebarModule extends AbstractModuleListMessage<Localization.Messag
     }
 
     public void create(FPlayer fPlayer) {
+        remove(fPlayer);
         send(fPlayer, WrapperPlayServerScoreboardObjective.ObjectiveMode.CREATE);
     }
 
