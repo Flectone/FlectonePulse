@@ -1,19 +1,17 @@
 package net.flectone.pulse.module.message.status;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.wrapper.status.server.WrapperStatusServerResponse;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.constant.PlatformType;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -23,10 +21,12 @@ import net.flectone.pulse.module.message.status.motd.MOTDModule;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
 import net.flectone.pulse.module.message.status.version.VersionModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.logging.FLogger;
 
+import java.net.InetAddress;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,10 +41,11 @@ public class StatusModule extends AbstractModule {
     private final VersionModule versionModule;
     private final MessagePipeline messagePipeline;
     private final PlatformServerAdapter platformServerAdapter;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
-    private final FLogger fLogger;
+    private final PacketProvider packetProvider;
 
     @Inject
     public StatusModule(FileResolver fileResolver,
@@ -54,10 +55,11 @@ public class StatusModule extends AbstractModule {
                         VersionModule versionModule,
                         MessagePipeline messagePipeline,
                         PlatformServerAdapter platformServerAdapter,
+                        PlatformPlayerAdapter platformPlayerAdapter,
                         FPlayerService fPlayerService,
                         ListenerRegistry listenerRegistry,
                         IntegrationModule integrationModule,
-                        FLogger fLogger) {
+                        PacketProvider packetProvider) {
         this.message = fileResolver.getMessage().getStatus();
         this.permission = fileResolver.getPermission().getMessage().getStatus();
         this.MOTDModule = MOTDModule;
@@ -66,19 +68,15 @@ public class StatusModule extends AbstractModule {
         this.versionModule = versionModule;
         this.messagePipeline = messagePipeline;
         this.platformServerAdapter = platformServerAdapter;
+        this.platformPlayerAdapter = platformPlayerAdapter;
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
         this.integrationModule = integrationModule;
-        this.fLogger = fLogger;
+        this.packetProvider = packetProvider;
     }
 
     @Override
     public void onEnable() {
-        if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
-            fLogger.warning("Status module disabled! This is not supported on Fabric");
-            return;
-        }
-
         registerModulePermission(permission);
 
         listenerRegistry.register(StatusPacketListener.class);
@@ -94,8 +92,9 @@ public class StatusModule extends AbstractModule {
         return message.isEnable();
     }
 
-    public void send(User user) {
-        FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
+    public void update(PacketSendEvent event) {
+        InetAddress inetAddress = event.getUser().getAddress().getAddress();
+        FPlayer fPlayer = fPlayerService.getFPlayer(inetAddress);
         if (checkModulePredicates(fPlayer)) return;
 
         fPlayerService.loadSettings(fPlayer);
@@ -114,19 +113,22 @@ public class StatusModule extends AbstractModule {
 
         responseJson.addProperty("enforcesSecureChat", false);
 
-        user.sendPacket(new WrapperStatusServerResponse(responseJson));
+        event.markForReEncode(true);
+
+        WrapperStatusServerResponse wrapperStatusServerResponse = new WrapperStatusServerResponse(event);
+        wrapperStatusServerResponse.setComponent(responseJson);
     }
 
     private JsonElement getVersionJson(FPlayer fPlayer) {
         String version = versionModule.get(fPlayer);
         if (version == null) {
-            version = String.valueOf(PacketEvents.getAPI().getServerManager().getVersion().getReleaseName());
+            version = packetProvider.getServerVersion().getReleaseName();
         }
 
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("name", version);
 
-        int protocol = PacketEvents.getAPI().getServerManager().getVersion().getProtocolVersion();
+        int protocol = packetProvider.getServerVersion().getProtocolVersion();
         if (versionModule.isEnable() && versionModule.getMessage().getProtocol() != -1) {
             protocol = versionModule.getMessage().getProtocol();
         }

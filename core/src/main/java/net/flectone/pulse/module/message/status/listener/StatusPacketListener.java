@@ -1,14 +1,14 @@
 package net.flectone.pulse.module.message.status.listener;
 
 import com.github.retrooper.packetevents.event.PacketListener;
-import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.status.StatusModule;
+import net.flectone.pulse.resolver.FileResolver;
 
 @Singleton
 public class StatusPacketListener implements PacketListener {
@@ -24,13 +24,12 @@ public class StatusPacketListener implements PacketListener {
     }
 
     @Override
-    public void onPacketReceive(PacketReceiveEvent event) {
+    public void onPacketSend(PacketSendEvent event) {
         if (event.isCancelled()) return;
-        if (event.getPacketType() != PacketType.Status.Client.REQUEST) return;
+        if (event.getPacketType() != PacketType.Status.Server.RESPONSE) return;
         if (maintenance.isTurnedOn()) return;
         if (statusModule.checkModulePredicates(FPlayer.UNKNOWN)) return;
 
-        event.setCancelled(true);
-        statusModule.send(event.getUser());
+        statusModule.update(event);
     }
 }
