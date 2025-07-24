@@ -16,6 +16,8 @@ import org.incendo.cloud.exception.InvalidSyntaxException;
 import org.incendo.cloud.exception.NoPermissionException;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.fabric.FabricServerCommandManager;
+import org.incendo.cloud.permission.Permission;
+import org.incendo.cloud.permission.PermissionResult;
 import org.incendo.cloud.setting.ManagerSetting;
 
 import java.util.function.Function;
@@ -24,6 +26,7 @@ import java.util.function.Function;
 public class FabricCommandRegistry extends CommandRegistry {
 
     private final FabricFlectonePulse fabricFlectonePulse;
+    private final PermissionChecker permissionChecker;
     private final CommandManager<FPlayer> manager;
 
     @Inject
@@ -35,6 +38,7 @@ public class FabricCommandRegistry extends CommandRegistry {
         super(parsers, permissionChecker);
 
         this.fabricFlectonePulse = fabricFlectonePulse;
+        this.permissionChecker = permissionChecker;
         this.manager = new FabricServerCommandManager<>(ExecutionCoordinator.asyncCoordinator(), fPlayerMapper);
 
         manager.settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true);
@@ -48,7 +52,16 @@ public class FabricCommandRegistry extends CommandRegistry {
 
     @Override
     public final void registerCommand(Function<CommandManager<FPlayer>, Command.Builder<FPlayer>> builder) {
-        Command<FPlayer> command = builder.apply(manager).build();
+        Command.Builder<FPlayer> commandBuilder = builder.apply(manager);
+
+        Permission permission = commandBuilder.commandPermission();
+        String permissionString = permission.permissionString();
+
+        Command<FPlayer> command = commandBuilder.permission(fPlayer -> {
+           boolean value = permissionChecker.check(fPlayer, permissionString);
+
+           return PermissionResult.of(value, permission);
+        }).build();
 
         String commandName = command.rootComponent().name();
 
