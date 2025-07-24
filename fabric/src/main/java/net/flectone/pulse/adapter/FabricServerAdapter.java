@@ -92,9 +92,10 @@ public class FabricServerAdapter implements PlatformServerAdapter {
 
     @Override
     public @NotNull String getServerCore() {
-        return FabricLoader.getInstance().getModContainer("fabric")
-                .map(container -> container.getMetadata().getName())
-                .orElse("Fabric");
+        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return "fabric";
+
+        return minecraftServer.getServerModName();
     }
 
     @Override
