@@ -3,12 +3,13 @@ package net.flectone.pulse.module.message.status.icon;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.util.FileUtil;
+import net.flectone.pulse.util.IconUtil;
 import net.flectone.pulse.util.RandomUtil;
 
 import javax.annotation.Nullable;
@@ -24,8 +25,9 @@ public class IconModule extends AbstractModule {
 
     private final Message.Status.Icon message;
     private final Permission.Message.Status.Icon permission;
+    private final PlatformServerAdapter platformServerAdapter;
     private final RandomUtil randomUtil;
-    private final FileUtil fileUtil;
+    private final IconUtil iconUtil;
     private final Path iconPath;
 
     private int index;
@@ -33,13 +35,15 @@ public class IconModule extends AbstractModule {
     @Inject
     public IconModule(FileResolver fileResolver,
                       @Named("projectPath") Path projectPath,
+                      PlatformServerAdapter platformServerAdapter,
                       RandomUtil randomUtil,
-                      FileUtil fileUtil) {
+                      IconUtil iconUtil) {
         this.message = fileResolver.getMessage().getStatus().getIcon();
         this.permission = fileResolver.getPermission().getMessage().getStatus().getIcon();
-        this.iconPath = projectPath.resolve("images");
-        this.fileUtil = fileUtil;
+        this.platformServerAdapter = platformServerAdapter;
+        this.iconUtil = iconUtil;
         this.randomUtil = randomUtil;
+        this.iconPath = projectPath.resolve("images");
     }
 
     @Override
@@ -66,7 +70,7 @@ public class IconModule extends AbstractModule {
         iconNames.forEach(iconName -> {
             if (new File(iconPath.toString() + File.separator + iconName).exists()) return;
 
-            fileUtil.saveResource("images" + File.separator + iconName);
+            platformServerAdapter.saveResource("images" + File.separator + iconName);
         });
 
         File folder = new File(iconPath.toString());
@@ -80,7 +84,7 @@ public class IconModule extends AbstractModule {
                 if (!icon.isFile()) continue;
                 if (!icon.getName().equals(iconName)) continue;
 
-                String convertedIcon = fileUtil.convertIcon(icon);
+                String convertedIcon = iconUtil.convertIcon(icon);
                 if (convertedIcon == null) continue;
                 iconList.add(convertedIcon);
             }

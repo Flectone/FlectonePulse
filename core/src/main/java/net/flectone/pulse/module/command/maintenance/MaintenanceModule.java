@@ -9,6 +9,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.Getter;
+import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
@@ -24,7 +25,7 @@ import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.FileUtil;
+import net.flectone.pulse.util.IconUtil;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -42,10 +43,11 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
     private final Path iconPath;
-    private final FileUtil fileUtil;
+    private final PlatformServerAdapter platformServerAdapter;
     private final MessagePipeline messagePipeline;
     private final CommandRegistry commandRegistry;
     private final EventProcessRegistry eventProcessRegistry;
+    private final IconUtil iconUtil;
 
     private String icon;
 
@@ -55,10 +57,11 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                              PermissionChecker permissionChecker,
                              ListenerRegistry listenerRegistry,
                              @Named("projectPath") Path projectPath,
-                             FileUtil fileUtil,
+                             PlatformServerAdapter platformServerAdapter,
                              CommandRegistry commandRegistry,
                              MessagePipeline messagePipeline,
-                             EventProcessRegistry eventProcessRegistry) {
+                             EventProcessRegistry eventProcessRegistry,
+                             IconUtil iconUtil) {
         super(module -> module.getCommand().getMaintenance(), null);
 
         this.command = fileResolver.getCommand().getMaintenance();
@@ -69,9 +72,10 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         this.commandRegistry = commandRegistry;
         this.listenerRegistry = listenerRegistry;
         this.iconPath = projectPath.resolve("images");
-        this.fileUtil = fileUtil;
+        this.platformServerAdapter = platformServerAdapter;
         this.messagePipeline = messagePipeline;
         this.eventProcessRegistry = eventProcessRegistry;
+        this.iconUtil = iconUtil;
     }
 
     @Override
@@ -93,10 +97,10 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         File file = new File(iconPath.toString() + File.separator + "maintenance.png");
 
         if (!file.exists()) {
-            fileUtil.saveResource("images" + File.separator + "maintenance.png");
+            platformServerAdapter.saveResource("images" + File.separator + "maintenance.png");
         }
 
-        icon = fileUtil.convertIcon(file);
+        icon = iconUtil.convertIcon(file);
 
         if (command.isTurnedOn()) {
             kickOnlinePlayers(FPlayer.UNKNOWN);

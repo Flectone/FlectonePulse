@@ -1,5 +1,7 @@
 package net.flectone.pulse.util;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import net.flectone.pulse.util.logging.FLogger;
 
 import javax.imageio.ImageIO;
@@ -8,11 +10,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.Base64;
 
-public abstract class FileUtil {
+@Singleton
+public class IconUtil {
 
     private final FLogger fLogger;
 
-    protected FileUtil(FLogger fLogger) {
+    @Inject
+    private IconUtil(FLogger fLogger) {
         this.fLogger = fLogger;
     }
 
@@ -37,7 +41,4 @@ public abstract class FileUtil {
 
         return null;
     }
-
-    public abstract void saveResource(String path);
-
 }

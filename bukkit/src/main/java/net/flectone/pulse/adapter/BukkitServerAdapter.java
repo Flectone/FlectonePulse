@@ -210,6 +210,11 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         return plugin.getResource(path);
     }
 
+    @Override
+    public void saveResource(String path) {
+        plugin.saveResource(path, false);
+    }
+
     private @NotNull String getModernItemName(@NotNull Material material) {
         return (material.isBlock() ? "block" : "item") + ".minecraft." + material.toString().toLowerCase();
     }

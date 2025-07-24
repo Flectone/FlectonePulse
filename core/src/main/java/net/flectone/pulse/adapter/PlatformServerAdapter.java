@@ -85,6 +85,8 @@ public interface PlatformServerAdapter {
      */
     @Nullable InputStream getResource(String path);
 
+    void saveResource(String path);
+
     /**
      * Gets the translated display name of an item in Minecraft's
      *
