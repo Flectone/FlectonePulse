@@ -49,9 +49,10 @@ public class TelegramIntegration implements FIntegration {
         String token = systemVariableResolver.substituteEnvVars(integration.getToken());
         if (token.isEmpty()) return;
 
-        try (TelegramBotsLongPollingApplication botsApplication = new TelegramBotsLongPollingApplication()) {
-            this.telegramClient = new OkHttpTelegramClient(token);
-            this.botsApplication = botsApplication;
+        try {
+            telegramClient = new OkHttpTelegramClient(token);
+
+            botsApplication = new TelegramBotsLongPollingApplication();
             botsApplication.registerBot(token, messageListener);
 
             fLogger.info("✔ Telegram integration enabled");
