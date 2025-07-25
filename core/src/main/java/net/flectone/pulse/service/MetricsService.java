@@ -49,7 +49,7 @@ public class MetricsService {
         metricsDTO.setOsVersion(getOsVersion());
         metricsDTO.setJavaVersion(getJavaVersion());
         metricsDTO.setCpuCores(Runtime.getRuntime().availableProcessors());
-        metricsDTO.setTotalRAM(Runtime.getRuntime().totalMemory());
+        metricsDTO.setTotalRAM(Runtime.getRuntime().maxMemory());
 
         Config config = fileResolver.getConfig();
 
