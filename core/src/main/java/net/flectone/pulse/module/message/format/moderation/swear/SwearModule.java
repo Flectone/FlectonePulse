@@ -95,8 +95,12 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
         StringBuilder result = new StringBuilder();
         Matcher matcher = combinedPattern.matcher(message);
         while (matcher.find()) {
-            matcher.appendReplacement(result, "<swear:'" + matcher.group(0) + "'>");
+            String word = matcher.group(0);
+            if (word != null && this.message.getIgnore().contains(word.trim().toLowerCase())) continue;
+
+            matcher.appendReplacement(result, "<swear:'" + word + "'>");
         }
+
         matcher.appendTail(result);
 
         return result.toString();
