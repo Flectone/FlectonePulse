@@ -12,6 +12,8 @@ public interface TaskScheduler {
 
     void runSync(SchedulerRunnable runnable);
 
+    void runSyncRegion(Object entity, SchedulerRunnable runnable);
+
     void runSyncTimer(SchedulerRunnable runnable, long tick, long period);
 
     void runSyncTimer(SchedulerRunnable runnable, long tick);

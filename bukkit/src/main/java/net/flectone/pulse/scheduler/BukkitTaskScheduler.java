@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Setter;
 import net.flectone.pulse.util.logging.FLogger;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.plugin.Plugin;
 
@@ -88,6 +89,28 @@ public class BukkitTaskScheduler implements TaskScheduler {
         }
 
         taskScheduler.runTask(() -> {
+            try {
+                runnable.run();
+            } catch (IllegalPluginAccessException ignored) {
+                // ignore this
+            } catch (Exception e) {
+                fLogger.warning(e);
+            }
+        });
+    }
+
+    @Override
+    public void runSyncRegion(Object entity, SchedulerRunnable runnable) {
+        if (disabled) {
+            return;
+        }
+
+        if (!(entity instanceof Entity bukkitEntity)) {
+            runSync(runnable);
+            return;
+        }
+
+        taskScheduler.runTask(bukkitEntity.getLocation(), () -> {
             try {
                 runnable.run();
             } catch (IllegalPluginAccessException ignored) {

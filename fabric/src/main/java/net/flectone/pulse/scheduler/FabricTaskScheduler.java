@@ -58,6 +58,11 @@ public class FabricTaskScheduler implements TaskScheduler {
     }
 
     @Override
+    public void runSyncRegion(Object entity, SchedulerRunnable runnable) {
+        runSync(runnable);
+    }
+
+    @Override
     public void runSyncTimer(SchedulerRunnable runnable, long tick, long period) {
         long firstTick = currentTick.get() + tick;
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, period, false);
