@@ -556,6 +556,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         public static final class World implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
             private WorldMode mode = WorldMode.TYPE;
+            private Ticker ticker = new Ticker(false, 100);
             private Map<String, String> values = new LinkedHashMap<>(){
                 {
                     put("normal", "<color:#98FB98>");

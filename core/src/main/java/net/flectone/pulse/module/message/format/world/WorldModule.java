@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.message.format.world;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
@@ -8,16 +9,19 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.registry.EventProcessRegistry;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.Ticker;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.world.listener.WorldPacketListener;
 import net.flectone.pulse.processor.MessageProcessor;
+import net.flectone.pulse.provider.PacketProvider;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -38,6 +42,8 @@ public class WorldModule extends AbstractModule implements MessageProcessor {
     private final PermissionChecker permissionChecker;
     private final MessageProcessRegistry messageProcessRegistry;
     private final EventProcessRegistry eventProcessRegistry;
+    private final TaskScheduler taskScheduler;
+    private final PacketProvider packetProvider;
 
     @Inject
     public WorldModule(FileResolver fileResolver,
@@ -46,7 +52,9 @@ public class WorldModule extends AbstractModule implements MessageProcessor {
                        ListenerRegistry listenerRegistry,
                        PermissionChecker permissionChecker,
                        MessageProcessRegistry messageProcessRegistry,
-                       EventProcessRegistry eventProcessRegistry) {
+                       EventProcessRegistry eventProcessRegistry,
+                       TaskScheduler taskScheduler,
+                       PacketProvider packetProvider) {
         this.message = fileResolver.getMessage().getFormat().getWorld();
         this.permission = fileResolver.getPermission().getMessage().getFormat().getWorld();
         this.formatPermission = fileResolver.getPermission().getMessage().getFormat();
@@ -56,11 +64,18 @@ public class WorldModule extends AbstractModule implements MessageProcessor {
         this.permissionChecker = permissionChecker;
         this.messageProcessRegistry = messageProcessRegistry;
         this.eventProcessRegistry = eventProcessRegistry;
+        this.taskScheduler = taskScheduler;
+        this.packetProvider = packetProvider;
     }
 
     @Override
     public void onEnable() {
         registerModulePermission(permission);
+
+        Ticker ticker = message.getTicker();
+        if (ticker.isEnable() || packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_9)) {
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::update), ticker.getPeriod());
+        }
 
         listenerRegistry.register(WorldPacketListener.class);
         messageProcessRegistry.register(150, this);
