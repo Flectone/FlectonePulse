@@ -88,6 +88,10 @@ public final class LegacyMiniConvertor extends AbstractModule implements Message
     public void process(MessageContext messageContext) {
         FEntity sender = messageContext.getSender();
         if (!messageContext.isColors()) return;
+
+        // parameters &b -> <aqua> (incorrect url)
+        if (!messageContext.isUrl()) return;
+
         if (messageContext.isUserMessage() && !permissionChecker.check(sender, formatPermission.getAll())) return;
 
         String message = toMini(messageContext.getMessage());

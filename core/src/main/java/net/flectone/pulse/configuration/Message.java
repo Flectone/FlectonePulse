@@ -296,7 +296,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
                 put(TagType.STATS, new Tag("%stats%"));
                 put(TagType.SKIN, new Tag("%skin%"));
                 put(TagType.ITEM, new Tag("%item%"));
-                put(TagType.URL, new Tag("(?<!:\")((https?|ftp|gopher|telnet|file):((//)|(\\\\))+[\\w:#@%/;$()~_?+-=\\\\.&]*)"));
+                put(TagType.URL, new Tag("(?<!\\\\)(?<!:\")((https?|ftp|gopher|telnet|file)://[\\w.-]+\\.[a-zA-Z]{2,}(?::\\d+)?(?:/[\\w:#@%/;$()~_?\\+\\-=\\\\.&]*)?(?:#[\\w\\-=/&%]*)?)"));
                 put(TagType.IMAGE, new Tag("(?<!:\")((https?|ftp|gopher|telnet|file):\\/\\/(?:i\\.imgur\\.com|media\\.discordapp\\.net)\\/[\\w:#@%/;$()~_?+-=\\\\.&]*)"));
                 put(TagType.SPOILER, new Tag(Pattern.quote("||")));
                 put(TagType.BOLD, new Tag(Pattern.quote("**")));

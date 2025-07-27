@@ -40,6 +40,9 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -304,13 +307,23 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
             Tag.Argument urlArgument = argumentQueue.peek();
             if (urlArgument == null) return Tag.selfClosingInserting(Component.empty());
 
-            String url = urlArgument.value();
+            String url = toASCII(urlArgument.value());
             Component component = messagePipeline.builder(sender, fReceiver, resolveLocalization(fReceiver).getTags().get(TagType.URL).replace("<message>", url))
                     .url(false)
                     .build();
 
             return Tag.selfClosingInserting(component);
         });
+    }
+
+    private String toASCII(String stringUrl) {
+        if (stringUrl == null || stringUrl.isBlank()) return "";
+
+        try {
+            return new URL(stringUrl).toURI().toASCIIString();
+        } catch (MalformedURLException | URISyntaxException e) {
+            return "";
+        }
     }
 
     private String replaceAll(FEntity sender, FEntity fReceiver, String message) {
