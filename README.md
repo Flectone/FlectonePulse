@@ -17,6 +17,14 @@
     <a href="https://papermc.io/software/velocity"><img src="https://flectone.net/pulse/velocity.svg" alt="velocity" class="hover-brightness"></a>
 </div>
 
+<div align="center">
+
+### 🎥 FlectonePulse Video Review
+
+[![FlectonePulse](https://img.youtube.com/vi/UjIlfjXzdxE/maxresdefault.jpg)](https://youtu.be/UjIlfjXzdxE "View")
+
+</div>
+
 ---
 
 ## 🏆 Key Features
