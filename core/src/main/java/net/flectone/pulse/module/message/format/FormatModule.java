@@ -368,7 +368,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
                     .replace(this.message.getTags().get(TagType.ITEM).getTrigger(), "<item>");
         }
 
-        String regex = "<trigger>(.*?)<trigger>";
+        String regex = "(?<!\\\\)<trigger>(.*?)(?<!\\\\)<trigger>";
 
         if (isCorrectTag(TagType.SPOILER, sender)) {
             message = replaceAll(sender, message,
