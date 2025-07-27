@@ -99,6 +99,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
         if (setting != null) {
             String value = fPlayer.getSettingValue(setting);
             if (setting == FPlayer.Setting.CHAT && value == null) return "default";
+            if (setting == FPlayer.Setting.STREAM_PREFIX && value != null && value.isBlank()) return "";
 
             return value == null ? ""
                     : value.isEmpty() ? "true"

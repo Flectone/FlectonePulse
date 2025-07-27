@@ -84,6 +84,7 @@ public class PlaceholderAPIIntegration implements FIntegration, MessageProcessor
 
                 String value = fPlayer.getSettingValue(setting);
                 if (setting == FPlayer.Setting.CHAT && value == null) return PlaceholderResult.value("default");
+                if (setting == FPlayer.Setting.STREAM_PREFIX && value != null && value.isBlank()) return PlaceholderResult.value("");
                 if (value == null) return PlaceholderResult.value("");
 
                 return value.isEmpty() ? PlaceholderResult.value("true") : PlaceholderResult.value(value);
