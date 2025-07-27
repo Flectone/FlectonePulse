@@ -176,7 +176,6 @@ FlectonePulse построен на плечах этих отличных пр�
 - 🧙 **[PacketEvents](https://github.com/retrooper/packetevents)** — Продвинутая обработка пакетов для Minecraft
 - 🎨 **[Adventure](https://github.com/KyoriPowered/adventure)** — Современное форматирование и стилизация текста
 - ⌨️ **[Cloud](https://github.com/Incendo/cloud)** — Фреймворк команд с надежным автодополнением
-- 📊 **[Scoreboard](https://github.com/MegavexNetwork/scoreboard-library)** — Надежное управление scoreboard
 - ⏱️ **[Universal Scheduler](https://github.com/Anon8281/UniversalScheduler)** — Точное планирование задач
 - 🔣 **[Symbol Chat](https://github.com/replaceitem/symbol-chat)** — Расширенная поддержка символов для чата
 - 🖥️ **[PacketUxUi](https://github.com/OceJlot/PacketUxUi)** — Улучшенные компоненты GUI

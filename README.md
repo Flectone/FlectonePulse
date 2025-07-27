@@ -176,7 +176,6 @@ FlectonePulse is built on the shoulders of these excellent projects:
 - 🧙 **[PacketEvents](https://github.com/retrooper/packetevents)** — Advanced packet handling for Minecraft
 - 🎨 **[Adventure](https://github.com/KyoriPowered/adventure)** — Modern text formatting and styling
 - ⌨️ **[Cloud](https://github.com/Incendo/cloud)** — Command framework with robust autocomplete
-- 📊 **[Scoreboard](https://github.com/MegavexNetwork/scoreboard-library)** — Reliable scoreboard management
 - ⏱️ **[Universal Scheduler](https://github.com/Anon8281/UniversalScheduler)** — Precise task scheduling
 - 🔣 **[Symbol Chat](https://github.com/replaceitem/symbol-chat)** — Extended symbol support for chat
 - 🖥️ **[PacketUxUi](https://github.com/OceJlot/PacketUxUi)** — Enhanced GUI components
