@@ -17,7 +17,7 @@ public class TranslatableMessageEvent extends Event {
     private final PacketSendEvent packetEvent;
 
     public TranslatableMessageEvent(MinecraftTranslationKey key, TranslatableComponent component, PacketSendEvent packetEvent) {
-        super(Type.MESSAGE);
+        super(Type.TRANSLATABLE_MESSAGE_RECEIVE);
 
         this.key = key;
         this.component = component;

@@ -28,7 +28,7 @@ public class EventProcessRegistry implements Registry {
     }
 
     public void registerMessageHandler(Consumer<TranslatableMessageEvent> handler) {
-        registerHandler(Event.Type.MESSAGE, event -> handler.accept((TranslatableMessageEvent) event));
+        registerHandler(Event.Type.TRANSLATABLE_MESSAGE_RECEIVE, event -> handler.accept((TranslatableMessageEvent) event));
     }
 
     public void processEvent(Event event) {
