@@ -125,12 +125,6 @@ public class FLogger extends Logger {
         log(warn);
     }
 
-    public void warning(String format, Object... args) {
-        String formattedMessage = String.format(format, args);
-        LogRecord warn = new LogRecord(Level.WARNING, formattedMessage);
-        log(warn);
-    }
-
     public void warning(Exception exception) {
         LogRecord warn = new LogRecord(Level.WARNING, "An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues");
         warn.setThrown(exception);

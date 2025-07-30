@@ -133,7 +133,7 @@ public class FPlayerDAO extends BaseDAO<FPlayerSQL> {
     }
 
     private void updateAndWarn(FPlayerSQL fPlayerSQL, int id, UUID uuid, String name, String ip) {
-        logger.warning("Found player {} with different UUID or name, will now use UUID: {} and name: {}", name, uuid, name);
+        logger.warning("Found player " + name + " with different UUID or name, will now use UUID: " + uuid + " and name: " + name);
         fPlayerSQL.update(id, true, uuid.toString(), name, ip);
     }
 
