@@ -27,6 +27,8 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
     private final MessagePipeline messagePipeline;
     private final FLogger fLogger;
 
+    private boolean enable;
+
     // only for fabric support
     public SimpleVoiceIntegration() {
         fPlayerService = null;
@@ -68,15 +70,18 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
 
     @Override
     public void hook() {
+        enable = true;
         fLogger.info("✔ SimpleVoice hooked");
     }
 
     @Override
     public void unhook() {
+        enable = false;
         fLogger.info("✖ SimpleVoice unhooked");
     }
 
     public void onEntitySoundPacketEvent(EntitySoundPacketEvent event) {
+        if (!enable) return;
         if (event.getSenderConnection() == null) return;
         if (event.getReceiverConnection() == null) return;
 
@@ -92,6 +97,7 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
     }
 
     public void onMicrophonePacketEvent(MicrophonePacketEvent event) {
+        if (!enable) return;
         if (event.isCancelled()) return;
         if (event.getSenderConnection() == null) return;
 

@@ -34,6 +34,8 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
     private final MessagePipeline messagePipeline;
     private final FLogger fLogger;
 
+    private boolean enable;
+
     @Inject
     public PlasmoVoiceIntegration(FPlayerService fPlayerService,
                                   ModerationMessageFormatter moderationMessageFormatter,
@@ -51,16 +53,20 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
 
     @Override
     public void hook() {
+        enable = true;
         fLogger.info("✔ PlasmoVoice hooked");
     }
 
     @Override
     public void unhook() {
+        enable = false;
         fLogger.info("✖ PlasmoVoice unhooked");
     }
 
     @EventSubscribe
     public void onServerSourceCreatedEvent(ServerSourceCreatedEvent event) {
+        if (!enable) return;
+
         ServerAudioSource<?> source = event.getSource();
         if (!(source.getSourceInfo() instanceof PlayerSourceInfo sourceInfo)) return;
 
@@ -77,6 +83,7 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
 
     @EventSubscribe
     public void onPlayerSpeakEvent(UdpPacketReceivedEvent event) {
+        if (!enable) return;
         if (!(event.getPacket() instanceof PlayerAudioPacket)) return;
 
         UUID senderUUID = event.getConnection().getPlayer().getInstance().getUuid();
