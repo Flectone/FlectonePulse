@@ -7,24 +7,21 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.processor.MessageProcessor;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.registry.MessageProcessRegistry;
-import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.processor.MessageProcessor;
+import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.util.Optional;
 import java.util.UUID;
 import java.util.WeakHashMap;
-
-import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
 public class MentionModule extends AbstractModuleMessage<Localization.Message.Format.Mention> implements MessageProcessor {
@@ -85,39 +82,13 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
 
         String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
         messageContext.setMessage(processedMessage);
-        messageContext.addTagResolvers(mentionTag(messageContext.getProcessId(), messageContext.getSender(), messageContext.getReceiver()));
-    }
 
-    private String replace(FEntity sender, String message) {
-        if (checkModulePredicates(sender)) return message;
+        FEntity sender = messageContext.getSender();
+        if (checkModulePredicates(sender)) return;
 
-        String[] words = message.split(" ");
-
-        for (int i = 0; i < words.length; i++) {
-            String word = words[i];
-
-            if (!word.startsWith(this.message.getTrigger())) continue;
-
-            String wordWithoutPrefix = word.replaceFirst(this.message.getTrigger(), "");
-
-            boolean isMention = !fPlayerService.getFPlayer(wordWithoutPrefix).isUnknown()
-                    || integrationModule.getGroups().contains(wordWithoutPrefix)
-                    && permissionChecker.check(sender, permission.getGroup());
-
-            if (!isMention) continue;
-
-            words[i] = "<mention:" + wordWithoutPrefix + ">";
-            break;
-        }
-
-        return String.join(" ", words);
-    }
-
-    private TagResolver mentionTag(UUID processId, FEntity sender, FEntity receiver) {
-        String tag = "mention";
-        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
+        UUID processId = messageContext.getProcessId();
+        FEntity receiver = messageContext.getReceiver();
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.MENTION, (argumentQueue, context) -> {
             Tag.Argument mentionTag = argumentQueue.peek();
             if (mentionTag == null) return Tag.selfClosingInserting(Component.empty());
 
@@ -149,6 +120,29 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
 
             return Tag.selfClosingInserting(messagePipeline.builder(receiver, format).build());
         });
+    }
+
+    private String replace(FEntity sender, String message) {
+        String[] words = message.split(" ");
+
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+
+            if (!word.startsWith(this.message.getTrigger())) continue;
+
+            String wordWithoutPrefix = word.replaceFirst(this.message.getTrigger(), "");
+
+            boolean isMention = !fPlayerService.getFPlayer(wordWithoutPrefix).isUnknown()
+                    || integrationModule.getGroups().contains(wordWithoutPrefix)
+                    && permissionChecker.check(sender, permission.getGroup());
+
+            if (!isMention) continue;
+
+            words[i] = "<mention:" + wordWithoutPrefix + ">";
+            break;
+        }
+
+        return String.join(" ", words);
     }
 
     private void sendMention(UUID processId, FPlayer fPlayer) {

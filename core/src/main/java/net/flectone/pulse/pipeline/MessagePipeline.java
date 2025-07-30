@@ -10,14 +10,24 @@ import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.TagPattern;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @Singleton
 public class MessagePipeline {
+
+    private final Set<TagResolver> disabledTags = new HashSet<>();
 
     private final FLogger fLogger;
     private final MiniMessage miniMessage;
@@ -30,6 +40,24 @@ public class MessagePipeline {
         this.fLogger = fLogger;
         this.miniMessage = miniMessage;
         this.messageProcessRegistry = messageProcessRegistry;
+    }
+
+    public void reload() {
+        disabledTags.clear();
+
+        Builder builder = builder("Test message for initializing disabled tags");
+        builder.translate("Test message for initializing TranslateModule tags", true);
+        builder.applyProcessors();
+
+        Set<TagResolver> tagResolvers = builder.context.getTagResolvers();
+
+        Arrays.stream(ReplacementTag.values())
+                .filter(tag -> tagResolvers
+                        .stream()
+                        .filter(tagResolver -> !tagResolver.equals(StandardTags.translatable()))
+                        .noneMatch(tagResolver -> tagResolver.has(tag.getTagName()))
+                )
+                .forEach(tag -> disabledTags.add(tag.empty()));
     }
 
     public Builder builder(@NotNull String message) {
@@ -148,10 +176,19 @@ public class MessagePipeline {
             return this;
         }
 
-        public Component build() {
+        public void applyProcessors() {
             messageProcessRegistry.getProcessors().forEach((priority, processors) ->
                     processors.forEach(processor -> processor.process(context))
             );
+        }
+
+        public Component build() {
+            applyProcessors();
+
+            // replace disabled tags
+            disabledTags.forEach(tagResolver -> {
+                context.addTagResolvers(tagResolver);
+            });
 
             try {
                 return miniMessage.deserialize(
@@ -180,5 +217,50 @@ public class MessagePipeline {
         public JsonElement jsonSerializerBuild() {
             return GsonComponentSerializer.gson().serializeToTree(build());
         }
+    }
+
+    public enum ReplacementTag {
+
+        AFK_SUFFIX,
+        STREAM_PREFIX,
+        VAULT_SUFFIX,
+        VAULT_PREFIX,
+        DISPLAY_NAME,
+        PLAYER,
+        CONSTANT,
+        PING,
+        TPS,
+        ONLINE,
+        COORDS,
+        STATS,
+        SKIN,
+        ITEM,
+        URL,
+        FCOLOR,
+        EMOJI,
+        IMAGE,
+        MENTION,
+        SWEAR,
+        QUESTION,
+        SPOILER,
+        TRANSLATE,
+        TRANSLATETO,
+        WORLD_PREFIX;
+
+        @Subst("")
+        public String getTagName() {
+            return name().toLowerCase();
+        }
+
+        public TagResolver empty() {
+            return ReplacementTag.empty(getTagName());
+        }
+
+        public static TagResolver empty(@TagPattern String tag) {
+            return TagResolver.resolver(tag, (argumentQueue, context) ->
+                    Tag.selfClosingInserting(Component.empty())
+            );
+        }
+
     }
 }

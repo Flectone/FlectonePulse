@@ -3,9 +3,15 @@ package net.flectone.pulse.context;
 import lombok.Getter;
 import lombok.Setter;
 import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.pipeline.MessagePipeline;
+import net.kyori.adventure.text.minimessage.Context;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 @Setter
 @Getter
@@ -29,8 +35,28 @@ public class MessageContext {
 
     public void addTagResolvers(TagResolver... resolvers) {
         if (resolvers == null || resolvers.length == 0) return;
+//        if (resolvers.length == 1) {
+//            tagResolvers.add(resolvers[0]);
+//            return;
+//        }
 
         tagResolvers.addAll(Set.of(resolvers));
+    }
+
+    public void addReplacementTag(TagResolver tagResolver) {
+        tagResolvers.add(tagResolver);
+    }
+
+    public void addReplacementTag(MessagePipeline.ReplacementTag replacementTag, BiFunction<ArgumentQueue, Context, Tag> handler) {
+        addReplacementTag(TagResolver.resolver(replacementTag.getTagName(), handler));
+    }
+
+    public void addReplacementTag(Set<MessagePipeline.ReplacementTag> replacementTags, BiFunction<ArgumentQueue, Context, Tag> handler) {
+        Set<String> tags = replacementTags.stream()
+                .map(MessagePipeline.ReplacementTag::getTagName)
+                .collect(Collectors.toSet());
+
+        addReplacementTag(TagResolver.resolver(tags, handler));
     }
 
     public boolean isUserMessage() {

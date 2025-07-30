@@ -15,6 +15,7 @@ import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.world.listener.WorldPacketListener;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.registry.EventProcessRegistry;
@@ -25,10 +26,6 @@ import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.jetbrains.annotations.NotNull;
-
-import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
 public class WorldModule extends AbstractModule implements MessageProcessor {
@@ -91,8 +88,15 @@ public class WorldModule extends AbstractModule implements MessageProcessor {
     public void process(MessageContext messageContext) {
         FEntity sender = messageContext.getSender();
         if (messageContext.isUserMessage() && !permissionChecker.check(sender, formatPermission.getAll())) return;
+        if (checkModulePredicates(sender)) return;
+        if (!(sender instanceof FPlayer fPlayer)) return;
 
-        messageContext.addTagResolvers(worldTag(sender));
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.WORLD_PREFIX, (argumentQueue, context) -> {
+            String worldPrefix = fPlayer.getSettingValue(FPlayer.Setting.WORLD_PREFIX);
+            if (worldPrefix == null) return Tag.selfClosingInserting(Component.empty());
+
+            return Tag.preProcessParsed(worldPrefix);
+        });
     }
 
     @Async
@@ -108,19 +112,6 @@ public class WorldModule extends AbstractModule implements MessageProcessor {
         if (newWorldPrefix != null && newWorldPrefix.equalsIgnoreCase(fPlayerWorldPrefix)) return;
 
         fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.WORLD_PREFIX, newWorldPrefix);
-    }
-
-    private TagResolver worldTag(@NotNull FEntity sender) {
-        String tag = "world_prefix";
-        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
-        if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            String worldPrefix = fPlayer.getSettingValue(FPlayer.Setting.WORLD_PREFIX);
-            if (worldPrefix == null) return Tag.selfClosingInserting(Component.empty());
-
-            return Tag.preProcessParsed(worldPrefix);
-        });
     }
 
     public enum Mode {

@@ -36,7 +36,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.util.UUID;
 
-import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
+import static net.flectone.pulse.pipeline.MessagePipeline.ReplacementTag.empty;
 
 @Singleton
 public class DeathModule extends AbstractModuleMessage<Localization.Message.Death> {
@@ -174,8 +174,8 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
 
     public TagResolver byItemTag(Item item) {
         String tag = "by_item";
-        if (!isEnable()) return emptyTagResolver(tag);
-        if (item == null) return emptyTagResolver(tag);
+        if (!isEnable()) return empty(tag);
+        if (item == null) return empty(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
             Component component = Component.text(item.getName());
@@ -189,10 +189,10 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
 
     public TagResolver killerTag(FPlayer receiver, Death killer) {
         String tag = "killer";
-        if (!isEnable()) return emptyTagResolver(tag);
+        if (!isEnable()) return empty(tag);
 
         FEntity entity = convertDeath(killer);
-        if (entity == null) return emptyTagResolver(tag);
+        if (entity == null) return empty(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
             Localization.Message.Death message = resolveLocalization(receiver);

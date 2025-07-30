@@ -7,23 +7,20 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.processor.MessageProcessor;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
 public class SwearModule extends AbstractModuleMessage<Localization.Message.Format.Moderation.Swear> implements MessageProcessor {
@@ -79,38 +76,11 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
     public void process(MessageContext messageContext) {
         if (!messageContext.isSwear()) return;
 
-        messageContext.addTagResolvers(swearTag(messageContext.getSender(), messageContext.getReceiver()));
+        FEntity sender = messageContext.getSender();
+        if (checkModulePredicates(sender)) return;
 
-        if (!messageContext.isUserMessage()) return;
-
-        String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
-        messageContext.setMessage(processedMessage);
-    }
-
-    private String replace(FEntity sender, String message) {
-        if (checkModulePredicates(sender)) return message;
-        if (permissionChecker.check(sender, permission.getBypass())) return message;
-        if (combinedPattern == null) return message;
-
-        StringBuilder result = new StringBuilder();
-        Matcher matcher = combinedPattern.matcher(message);
-        while (matcher.find()) {
-            String word = matcher.group(0);
-            if (word != null && this.message.getIgnore().contains(word.trim().toLowerCase())) continue;
-
-            matcher.appendReplacement(result, "<swear:'" + word + "'>");
-        }
-
-        matcher.appendTail(result);
-
-        return result.toString();
-    }
-
-    private TagResolver swearTag(FEntity sender, FEntity receiver) {
-        String tag = "swear";
-        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
+        FEntity receiver = messageContext.getReceiver();
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SWEAR, (argumentQueue, context) -> {
             Tag.Argument swearTag = argumentQueue.peek();
             if (swearTag == null) return Tag.selfClosingInserting(Component.empty());
 
@@ -127,5 +97,28 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
 
             return Tag.selfClosingInserting(component);
         });
+
+        if (!messageContext.isUserMessage()) return;
+
+        String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
+        messageContext.setMessage(processedMessage);
+    }
+
+    private String replace(FEntity sender, String message) {
+        if (permissionChecker.check(sender, permission.getBypass())) return message;
+        if (combinedPattern == null) return message;
+
+        StringBuilder result = new StringBuilder();
+        Matcher matcher = combinedPattern.matcher(message);
+        while (matcher.find()) {
+            String word = matcher.group(0);
+            if (word != null && this.message.getIgnore().contains(word.trim().toLowerCase())) continue;
+
+            matcher.appendReplacement(result, "<swear:'" + word + "'>");
+        }
+
+        matcher.appendTail(result);
+
+        return result.toString();
     }
 }

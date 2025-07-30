@@ -46,8 +46,6 @@ import java.net.URL;
 import java.util.EnumMap;
 import java.util.Map;
 
-import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
-
 @Singleton
 public class FormatModule extends AbstractModuleMessage<Localization.Message.Format> implements MessageProcessor {
 
@@ -150,23 +148,129 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         if (!messageContext.isFormatting()) return;
 
         FEntity sender = messageContext.getSender();
+        if (checkModulePredicates(sender)) return;
+
         getTagResolverMap()
                 .entrySet()
                 .stream()
                 .filter(entry -> isCorrectTag(entry.getKey(), sender, messageContext.isUserMessage()))
-                .forEach(entry -> messageContext.addTagResolvers(entry.getValue()));
+                .forEach(entry -> messageContext.addReplacementTag(entry.getValue()));
 
         FEntity receiver = messageContext.getReceiver();
-        messageContext.addTagResolvers(pingTag(sender, receiver));
-        messageContext.addTagResolvers(tpsTag(sender, receiver));
-        messageContext.addTagResolvers(onlineTag(sender, receiver));
-        messageContext.addTagResolvers(coordsTag(sender, receiver));
-        messageContext.addTagResolvers(statsTag(sender, receiver));
-        messageContext.addTagResolvers(skinTag(sender, receiver));
-        messageContext.addTagResolvers(itemTag(sender, receiver, messageContext.isTranslateItem()));
 
-        if (messageContext.isUrl()) {
-            messageContext.addTagResolvers(urlTag(sender, receiver));
+        if (sender instanceof FPlayer fPlayer && isCorrectTag(TagType.PING, sender)) {
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.PING, (argumentQueue, context) -> {
+                int ping = fPlayerService.getPing(fPlayer);
+
+                String string = resolveLocalization(receiver).getTags().get(TagType.PING)
+                        .replace("<ping>", String.valueOf(ping));
+
+                Component component = messagePipeline.builder(sender, receiver, string).build();
+
+                return Tag.selfClosingInserting(component);
+            });
+        }
+
+        if (isCorrectTag(TagType.TPS, sender)) {
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.TPS, (argumentQueue, context) -> {
+                String string = resolveLocalization(receiver).getTags().get(TagType.TPS)
+                        .replace("<tps>", platformServerAdapter.getTPS());
+
+                Component component = messagePipeline.builder(sender, receiver, string).build();
+
+                return Tag.selfClosingInserting(component);
+            });
+        }
+
+        if (isCorrectTag(TagType.ONLINE, sender)) {
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.ONLINE, (argumentQueue, context) -> {
+                String string = resolveLocalization(receiver).getTags().get(TagType.ONLINE)
+                        .replace("<online>", String.valueOf(platformServerAdapter.getOnlinePlayerCount()));
+
+                Component component = messagePipeline.builder(sender, receiver, string).build();
+
+                return Tag.selfClosingInserting(component);
+            });
+        }
+
+        if (isCorrectTag(TagType.COORDS, sender)) {
+            PlatformPlayerAdapter.Coordinates coordinates = platformPlayerAdapter.getCoordinates(sender);
+            if (coordinates != null) {
+                messageContext.addReplacementTag(MessagePipeline.ReplacementTag.COORDS, (argumentQueue, context) -> {
+                    String string = resolveLocalization(receiver).getTags().get(TagType.COORDS)
+                            .replace("<x>", String.valueOf(coordinates.x()))
+                            .replace("<y>", String.valueOf(coordinates.y()))
+                            .replace("<z>", String.valueOf(coordinates.z()));
+
+                    Component component = messagePipeline.builder(sender, receiver, string).build();
+
+                    return Tag.selfClosingInserting(component);
+                });
+            }
+        }
+
+        if (isCorrectTag(TagType.STATS, sender)) {
+            PlatformPlayerAdapter.Statistics statistics = platformPlayerAdapter.getStatistics(sender);
+            if (statistics != null) {
+                messageContext.addReplacementTag(MessagePipeline.ReplacementTag.STATS, (argumentQueue, context) -> {
+                    String string = resolveLocalization(receiver).getTags().get(TagType.STATS)
+                            .replace("<hp>", String.valueOf(statistics.health()))
+                            .replace("<armor>", String.valueOf(statistics.armor()))
+                            .replace("<exp>", String.valueOf(statistics.level()))
+                            .replace("<food>", String.valueOf(statistics.food()))
+                            .replace("<attack>", String.valueOf(statistics.damage()));
+
+                    Component component = messagePipeline.builder(sender, receiver, string).build();
+
+                    return Tag.selfClosingInserting(component);
+                });
+            }
+        }
+
+        if (isCorrectTag(TagType.SKIN, sender)) {
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SKIN, (argumentQueue, context) -> {
+                String url = skinService.getBodyUrl(sender);
+                String string = resolveLocalization(receiver).getTags().get(TagType.SKIN)
+                        .replace("<message>", url);
+
+                Component component = messagePipeline.builder(sender, receiver, string).build();
+
+                return Tag.selfClosingInserting(component);
+            });
+        }
+
+        if (isCorrectTag(TagType.ITEM, sender)) {
+            Object itemStackObject = platformPlayerAdapter.getItem(sender.getUuid());
+
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.ITEM, (argumentQueue, context) -> {
+                String string = resolveLocalization(receiver).getTags().get(TagType.ITEM);
+
+                return Tag.selfClosingInserting(messagePipeline.builder(sender, receiver, string)
+                        .build()
+                        .replaceText(TextReplacementConfig.builder()
+                                .match("<message>")
+                                .replacement(platformServerAdapter.translateItemName(itemStackObject, messageContext.isTranslateItem()))
+                                .build()
+                        )
+                );
+            });
+        }
+
+        if (messageContext.isUrl() && isCorrectTag(TagType.URL, sender)) {
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.URL, (argumentQueue, context) -> {
+                Tag.Argument urlArgument = argumentQueue.peek();
+                if (urlArgument == null) return Tag.selfClosingInserting(Component.empty());
+
+                String url = toASCII(urlArgument.value());
+                String string = resolveLocalization(receiver).getTags().get(TagType.URL)
+                        .replace("<message>", url);
+
+                Component component = messagePipeline.builder(sender, receiver, string)
+                        .url(false)
+                        .build();
+
+                return Tag.selfClosingInserting(component);
+            });
         }
 
         if (messageContext.isUserMessage()) {
@@ -181,139 +285,6 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         if (!tag.isEnable()) return;
 
         tagResolverMap.put(type, tagResolver);
-    }
-
-    private TagResolver tpsTag(FEntity sender, FEntity fReceiver) {
-        String tag = "tps";
-        if (!isCorrectTag(TagType.TPS, sender)) return emptyTagResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            String string = resolveLocalization(fReceiver).getTags().get(TagType.TPS).replace("<tps>", platformServerAdapter.getTPS());
-
-            Component component = messagePipeline.builder(sender, fReceiver, string).build();
-
-            return Tag.selfClosingInserting(component);
-        });
-    }
-
-    private TagResolver onlineTag(FEntity sender, FEntity fReceiver) {
-        String tag = "online";
-        if (!isCorrectTag(TagType.ONLINE, sender)) return emptyTagResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            String string = resolveLocalization(fReceiver).getTags().get(TagType.ONLINE).replace("<online>", String.valueOf(platformServerAdapter.getOnlinePlayerCount()));
-
-            Component component = messagePipeline.builder(sender, fReceiver, string).build();
-
-            return Tag.selfClosingInserting(component);
-        });
-    }
-
-    private TagResolver pingTag(FEntity sender, FEntity fReceiver) {
-        String tag = "ping";
-        if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);
-        if (!isCorrectTag(TagType.PING, sender)) return emptyTagResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            int ping = fPlayerService.getPing(fPlayer);
-            String string = resolveLocalization(fReceiver).getTags().get(TagType.PING).replace("<ping>", String.valueOf(ping));
-
-            Component component = messagePipeline.builder(sender, fReceiver, string).build();
-
-            return Tag.selfClosingInserting(component);
-        });
-    }
-
-    private TagResolver coordsTag(FEntity sender, FEntity fReceiver) {
-        String tag = "coords";
-        if (!isCorrectTag(TagType.COORDS, sender)) return emptyTagResolver(tag);
-
-        PlatformPlayerAdapter.Coordinates coordinates = platformPlayerAdapter.getCoordinates(sender);
-        if (coordinates == null) return emptyTagResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            String string = resolveLocalization(fReceiver).getTags().get(TagType.COORDS)
-                    .replace("<x>", String.valueOf(coordinates.x()))
-                    .replace("<y>", String.valueOf(coordinates.y()))
-                    .replace("<z>", String.valueOf(coordinates.z()));
-
-            Component component = messagePipeline.builder(sender, fReceiver, string).build();
-
-            return Tag.selfClosingInserting(component);
-        });
-    }
-
-    private TagResolver statsTag(FEntity sender, FEntity fReceiver) {
-        String tag = "stats";
-        if (!isCorrectTag(TagType.STATS, sender)) return emptyTagResolver(tag);
-
-        PlatformPlayerAdapter.Statistics statistics = platformPlayerAdapter.getStatistics(sender);
-        if (statistics == null) return emptyTagResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            String string = resolveLocalization(fReceiver).getTags().get(TagType.STATS)
-                    .replace("<hp>", String.valueOf(statistics.health()))
-                    .replace("<armor>", String.valueOf(statistics.armor()))
-                    .replace("<exp>", String.valueOf(statistics.level()))
-                    .replace("<food>", String.valueOf(statistics.food()))
-                    .replace("<attack>", String.valueOf(statistics.damage()));
-
-            Component component = messagePipeline.builder(sender, fReceiver, string).build();
-
-            return Tag.selfClosingInserting(component);
-        });
-    }
-
-    private TagResolver skinTag(FEntity sender, FEntity fReceiver) {
-        String tag = "skin";
-        if (!isCorrectTag(TagType.SKIN, sender)) return emptyTagResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-
-            String url = skinService.getBodyUrl(sender);
-            String string = resolveLocalization(fReceiver).getTags().get(TagType.SKIN).replace("<message>", url);
-            Component component = messagePipeline.builder(sender, fReceiver, string).build();
-
-            return Tag.selfClosingInserting(component);
-        });
-    }
-
-    private TagResolver itemTag(FEntity sender, FEntity fReceiver, boolean translatable) {
-        String tag = "item";
-        if (!isCorrectTag(TagType.ITEM, sender)) return emptyTagResolver(tag);
-
-        Object itemStackObject = platformPlayerAdapter.getItem(sender.getUuid());
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            String string = resolveLocalization(fReceiver).getTags().get(TagType.ITEM);
-
-            return Tag.selfClosingInserting(messagePipeline.builder(sender, fReceiver, string)
-                    .build()
-                    .replaceText(TextReplacementConfig.builder()
-                            .match("<message>")
-                            .replacement(platformServerAdapter.translateItemName(itemStackObject, translatable))
-                            .build()
-                    )
-            );
-        });
-    }
-
-    private TagResolver urlTag(FEntity sender, FEntity fReceiver) {
-        String tag = "url";
-        if (!isCorrectTag(TagType.URL, sender)) return emptyTagResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-
-            Tag.Argument urlArgument = argumentQueue.peek();
-            if (urlArgument == null) return Tag.selfClosingInserting(Component.empty());
-
-            String url = toASCII(urlArgument.value());
-            Component component = messagePipeline.builder(sender, fReceiver, resolveLocalization(fReceiver).getTags().get(TagType.URL).replace("<message>", url))
-                    .url(false)
-                    .build();
-
-            return Tag.selfClosingInserting(component);
-        });
     }
 
     private String toASCII(String stringUrl) {
@@ -442,7 +413,6 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
     }
 
     private boolean isCorrectTag(TagType tagType, FEntity sender, boolean needPermission) {
-        if (checkModulePredicates(sender)) return false;
         if (!message.getTags().get(tagType).isEnable()) return false;
         if (!tagResolverMap.containsKey(tagType)) return false;
 
@@ -450,7 +420,6 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
     }
 
     private boolean isCorrectTag(TagType tagType, FEntity sender) {
-        if (checkModulePredicates(sender)) return false;
         if (!message.getTags().get(tagType).isEnable()) return false;
 
         return permissionChecker.check(sender, permission.getTags().get(tagType));

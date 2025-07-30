@@ -9,14 +9,14 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.model.*;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,8 +25,6 @@ import java.util.WeakHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
 public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Message.Format.QuestionAnswer> implements MessageProcessor {
@@ -97,15 +95,29 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
         if (!messageContext.isQuestion()) return;
         if (!messageContext.isUserMessage()) return;
 
-        String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
+        FEntity sender = messageContext.getSender();
+        if (checkModulePredicates(sender)) return;
 
+        String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
         messageContext.setMessage(processedMessage);
-        messageContext.addTagResolvers(questionAnswerTag(messageContext.getProcessId(), messageContext.getSender(), messageContext.getReceiver()));
+
+        UUID processId = messageContext.getProcessId();
+        FEntity receiver = messageContext.getReceiver();
+
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.QUESTION, (argumentQueue, context) -> {
+            Tag.Argument questionTag = argumentQueue.peek();
+            if (questionTag == null) return Tag.selfClosingInserting(Component.empty());
+
+            String questionKey = questionTag.value();
+            if (questionKey.isEmpty()) return Tag.selfClosingInserting(Component.empty());
+
+            sendAnswer(processId, sender, receiver, questionKey);
+
+            return Tag.selfClosingInserting(Component.empty());
+        });
     }
 
     private String replace(FEntity sender, String message) {
-        if (checkModulePredicates(sender)) return message;
-
         StringBuilder result = new StringBuilder(message);
 
         for (Map.Entry<String, Pattern> entry : patternMap.entrySet()) {
@@ -122,23 +134,6 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
         }
 
         return result.toString();
-    }
-
-    private TagResolver questionAnswerTag(UUID processId, FEntity sender, FEntity receiver) {
-        String tag = "question";
-        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            Tag.Argument questionTag = argumentQueue.peek();
-            if (questionTag == null) return Tag.selfClosingInserting(Component.empty());
-
-            String questionKey = questionTag.value();
-            if (questionKey.isEmpty()) return Tag.selfClosingInserting(Component.empty());
-
-            sendAnswer(processId, sender, receiver, questionKey);
-
-            return Tag.selfClosingInserting(Component.empty());
-        });
     }
 
     private void sendAnswer(UUID processId, FEntity sender, FEntity receiver, String question) {

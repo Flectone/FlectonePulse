@@ -19,10 +19,8 @@ import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.jetbrains.annotations.NotNull;
 
-import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
+import java.util.Set;
 
 @Singleton
 public class NameModule extends AbstractModuleMessage<Localization.Message.Format.Name> implements MessageProcessor {
@@ -71,124 +69,88 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
     public void process(MessageContext messageContext) {
         FEntity sender = messageContext.getSender();
         if (messageContext.isUserMessage() && !permissionChecker.check(sender, formatPermission.getAll())) return;
-
-        messageContext.addTagResolvers(constantTag(sender));
+        if (checkModulePredicates(sender)) return;
 
         FEntity receiver = messageContext.getReceiver();
-        messageContext.addTagResolvers(displayTag(sender, receiver));
-        messageContext.addTagResolvers(vaultSuffixTag(sender, receiver));
-        messageContext.addTagResolvers(vaultPrefixTag(sender, receiver));
 
-        if (messageContext.isPlayer()) {
-            messageContext.addTagResolvers(playerTag(sender, receiver));
+        if (isInvisible(sender)) {
+            messageContext.addReplacementTag(Set.of(MessagePipeline.ReplacementTag.DISPLAY_NAME, MessagePipeline.ReplacementTag.PLAYER), (argumentQueue, context) -> {
+                String formatInvisible = resolveLocalization(receiver).getInvisible();
+                Component name = messagePipeline.builder(sender, receiver, formatInvisible)
+                        .build();
+
+                return Tag.selfClosingInserting(name);
+            });
+
+            return;
         }
-    }
 
-    private TagResolver vaultSuffixTag(FEntity sender, FEntity fReceiver) {
-        String tag = "vault_suffix";
-        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
-        if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);
-        if (isInvisible(sender)) return emptyTagResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            String suffix = integrationModule.getSuffix(fPlayer);
-            if (suffix == null || suffix.isEmpty()) return Tag.selfClosingInserting(Component.empty());
-
-            String text = messagePipeline.builder(fPlayer, fReceiver, suffix)
-                    .defaultSerializerBuild();
-
-
-            return Tag.preProcessParsed(text);
-        });
-    }
-
-    private TagResolver vaultPrefixTag(FEntity sender, FEntity fReceiver) {
-        String tag = "vault_prefix";
-        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
-        if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);
-        if (isInvisible(sender)) return emptyTagResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            String prefix = integrationModule.getPrefix(fPlayer);
-            if (prefix == null || prefix.isEmpty()) return Tag.selfClosingInserting(Component.empty());
-
-            String text = messagePipeline.builder(fPlayer, fReceiver, prefix)
-                    .defaultSerializerBuild();
-
-            return Tag.preProcessParsed(text);
-        });
-    }
-
-    private TagResolver constantTag(FEntity player) {
-        String tag = "constant";
-        if (checkModulePredicates(player)) return emptyTagResolver(tag);
-        if (isInvisible(player)) return emptyTagResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            String constantName = player.getConstantName();
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.CONSTANT, (argumentQueue, context) -> {
+            String constantName = sender.getConstantName();
             if (constantName != null && constantName.isEmpty()) {
                 return Tag.preProcessParsed(constantName);
             }
 
             if (constantName == null) {
-                constantName = resolveLocalization(player).getConstant();
+                constantName = resolveLocalization(sender).getConstant();
             }
 
             if (constantName.isEmpty()) {
                 return Tag.selfClosingInserting(Component.empty());
             }
 
-            return Tag.preProcessParsed(messagePipeline.builder(player, constantName).defaultSerializerBuild());
+            return Tag.preProcessParsed(messagePipeline.builder(sender, constantName).defaultSerializerBuild());
         });
-    }
 
-    private TagResolver playerTag(@NotNull FEntity player, FEntity receiver) {
-        String tag = "player";
-        if (checkModulePredicates(player)) return emptyTagResolver(tag);
-        if (isInvisible(player)) return invisibleTag(tag, player, receiver);
+        if (!(sender instanceof FPlayer fPlayer)) {
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) ->
+                    Tag.preProcessParsed(resolveLocalization(receiver).getEntity()
+                            .replace("<name>", sender.getName())
+                            .replace("<type>", sender.getType())
+                            .replace("<uuid>", sender.getUuid().toString())
+                    ));
+            return;
+        }
 
-        return TagResolver.resolver(tag, (argumentQueue, context) ->
-                Tag.preProcessParsed(player.getName())
-        );
-    }
-
-    private TagResolver displayTag(FEntity sender, FEntity fReceiver) {
-        String tag = "display_name";
-        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
-        if (isInvisible(sender)) return invisibleTag(tag, sender, fReceiver);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            if (sender instanceof FPlayer fPlayer) {
-                if (fPlayer.isUnknown()) {
-                    return Tag.preProcessParsed(resolveLocalization(fReceiver).getUnknown()
-                            .replace("<name>", fPlayer.getName())
-                    );
-                }
-
-                String displayName = resolveLocalization(fReceiver).getDisplay();
-                Component name = messagePipeline.builder(sender, fReceiver, displayName)
-                        .build();
-
-                return Tag.selfClosingInserting(name);
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) -> {
+            if (fPlayer.isUnknown()) {
+                return Tag.preProcessParsed(resolveLocalization(receiver).getUnknown()
+                        .replace("<name>", fPlayer.getName())
+                );
             }
 
-            return Tag.preProcessParsed(resolveLocalization(fReceiver).getEntity()
-                    .replace("<name>", sender.getName())
-                    .replace("<type>", sender.getType())
-                    .replace("<uuid>", sender.getUuid().toString())
-            );
-        });
-    }
-
-    private TagResolver invisibleTag(String tag, FEntity sender, FEntity fReceiver) {
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-
-            String formatInvisible = resolveLocalization(fReceiver).getInvisible();
-            Component name = messagePipeline.builder(sender, fReceiver, formatInvisible)
+            String displayName = resolveLocalization(receiver).getDisplay();
+            Component name = messagePipeline.builder(sender, receiver, displayName)
                     .build();
 
             return Tag.selfClosingInserting(name);
         });
+
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.VAULT_PREFIX, (argumentQueue, context) -> {
+            String prefix = integrationModule.getPrefix(fPlayer);
+            if (prefix == null || prefix.isEmpty()) return Tag.selfClosingInserting(Component.empty());
+
+            String text = messagePipeline.builder(fPlayer, receiver, prefix)
+                    .defaultSerializerBuild();
+
+            return Tag.preProcessParsed(text);
+        });
+
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.VAULT_SUFFIX, (argumentQueue, context) -> {
+            String suffix = integrationModule.getSuffix(fPlayer);
+            if (suffix == null || suffix.isEmpty()) return Tag.selfClosingInserting(Component.empty());
+
+            String text = messagePipeline.builder(fPlayer, receiver, suffix)
+                    .defaultSerializerBuild();
+
+            return Tag.preProcessParsed(text);
+        });
+
+        if (messageContext.isPlayer()) {
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.PLAYER, (argumentQueue, context) ->
+                    Tag.preProcessParsed(fPlayer.getName())
+            );
+        }
     }
 
     private boolean isInvisible(FEntity entity) {

@@ -20,15 +20,12 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.StyleBuilderApplicable;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-
-import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
 public class ImageModule extends AbstractModule implements MessageProcessor {
@@ -74,18 +71,15 @@ public class ImageModule extends AbstractModule implements MessageProcessor {
     public void process(MessageContext messageContext) {
         if (!messageContext.isImage()) return;
 
-        messageContext.addTagResolvers(imageTag(messageContext.getSender(), messageContext.getReceiver()));
-    }
+        FEntity sender = messageContext.getSender();
+        if (checkModulePredicates(sender)) return;
 
-    private TagResolver imageTag(FEntity sender, FEntity receiver) {
-        String tag = "image";
-        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            final Tag.Argument argument = argumentQueue.peek();
+        FEntity receiver = messageContext.getReceiver();
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.IMAGE, (argumentQueue, context) -> {
+            Tag.Argument argument = argumentQueue.peek();
             if (argument == null) return Tag.selfClosingInserting(Component.empty());
 
-            final String link = argument.value();
+            String link = argument.value();
 
             Component component;
             try {

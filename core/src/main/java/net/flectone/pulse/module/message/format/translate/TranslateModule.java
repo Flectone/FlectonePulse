@@ -8,25 +8,21 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
-import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
 public class TranslateModule extends AbstractModuleMessage<Localization.Message.Format.Translate> implements MessageProcessor {
@@ -35,8 +31,6 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
             .maximumSize(5000)
             .expireAfterWrite(1, TimeUnit.HOURS)
             .build();
-
-    private final Set<String> TAG = Set.of("translate", "translateto");
 
     private final Message.Format.Translate message;
     private final Permission.Message.Format.Translate permission;
@@ -75,15 +69,55 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
     @Override
     public void process(MessageContext messageContext) {
         if (!messageContext.isTranslate()) {
-            messageContext.addTagResolvers(emptyTagResolver(TAG));
+            messageContext.addTagResolvers(MessagePipeline.ReplacementTag.TRANSLATE.empty());
             return;
         }
 
         String messageToTranslate = messageContext.getMessageToTranslate();
-
         UUID key = saveMessage(messageToTranslate);
 
-        messageContext.addTagResolvers(translateTag(messageContext.getSender(), messageContext.getReceiver(), key));
+        FEntity sender = messageContext.getSender();
+        if (checkModulePredicates(sender)) return;
+
+        FEntity receiver = messageContext.getReceiver();
+
+        messageContext.addReplacementTag(Set.of(MessagePipeline.ReplacementTag.TRANSLATE, MessagePipeline.ReplacementTag.TRANSLATETO), (argumentQueue, context) -> {
+            String firstLang = "auto";
+            String secondLang = receiver instanceof FPlayer fReceiver
+                    ? fReceiver.getSettingValue(FPlayer.Setting.LOCALE)
+                    : null;
+
+            if (argumentQueue.hasNext()) {
+                Tag.Argument first = argumentQueue.pop();
+
+                if (argumentQueue.hasNext()) {
+                    Tag.Argument second = argumentQueue.pop();
+
+                    if (argumentQueue.hasNext()) {
+                        // translateto language language message
+                        firstLang = first.value();
+                        secondLang = second.value();
+                    } else {
+                        // translateto auto language message
+                        secondLang = first.value();
+                    }
+                }
+            }
+
+            String action = resolveLocalization(receiver).getAction()
+                    .replaceFirst("<language>", firstLang)
+                    .replaceFirst("<language>", secondLang == null ? "ru_ru" : secondLang)
+                    .replace("<message>", key.toString());
+
+            Component component = messagePipeline.builder(sender, receiver, action)
+                    .interactiveChat(false)
+                    .question(false)
+                    .mention(false)
+                    .translate(false)
+                    .build();
+
+            return Tag.selfClosingInserting(component);
+        });
     }
 
     private UUID saveMessage(String message) {
@@ -115,47 +149,5 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
                 .findFirst()
                 .map(Map.Entry::getKey)
                 .orElse(null);
-    }
-
-    private TagResolver translateTag(FEntity fPlayer, FEntity receiver, @NotNull UUID key) {
-        if (checkModulePredicates(fPlayer)) return emptyTagResolver(TAG);
-
-        return TagResolver.resolver(TAG, (argumentQueue, context) -> {
-            if (!(receiver instanceof FPlayer fReceiver) || fReceiver.isUnknown()) return Tag.selfClosingInserting(Component.empty());
-
-            String firstLang = "auto";
-            String secondLang = fReceiver.getSettingValue(FPlayer.Setting.LOCALE);
-
-            if (argumentQueue.hasNext()) {
-                Tag.Argument first = argumentQueue.pop();
-
-                if (argumentQueue.hasNext()) {
-                    Tag.Argument second = argumentQueue.pop();
-
-                    if (argumentQueue.hasNext()) {
-                        // translateto language language message
-                        firstLang = first.value();
-                        secondLang = second.value();
-                    } else {
-                        // translateto auto language message
-                        secondLang = first.value();
-                    }
-                }
-            }
-
-            String action = resolveLocalization(receiver).getAction()
-                    .replaceFirst("<language>", firstLang)
-                    .replaceFirst("<language>", secondLang == null ? "ru_ru" : secondLang)
-                    .replace("<message>", key.toString());
-
-            Component component = messagePipeline.builder(fPlayer, receiver, action)
-                    .interactiveChat(false)
-                    .question(false)
-                    .mention(false)
-                    .translate(false)
-                    .build();
-
-            return Tag.selfClosingInserting(component);
-        });
     }
 }

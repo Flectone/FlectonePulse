@@ -7,21 +7,19 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 
 @Singleton
@@ -55,19 +53,13 @@ public class ColorModule extends AbstractModule implements MessageProcessor {
     public void process(MessageContext messageContext) {
         FEntity sender = messageContext.getSender();
         if (messageContext.isUserMessage() && !permissionChecker.check(sender, formatPermission.getAll())) return;
-
-        messageContext.addTagResolvers(colorTag(message.isUseRecipientColors() ? messageContext.getReceiver() : sender));
-    }
-
-    private TagResolver colorTag(FEntity sender) {
-        String tag = "fcolor";
-        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
+        if (checkModulePredicates(sender)) return;
 
         Map<String, String> playerColors = sender instanceof FPlayer fPlayer
                 ? fPlayer.getColors()
                 : new HashMap<>();
 
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.FCOLOR, (argumentQueue, context) -> {
             Tag.Argument colorArg = argumentQueue.peek();
             if (colorArg == null) return Tag.selfClosingInserting(Component.empty());
 

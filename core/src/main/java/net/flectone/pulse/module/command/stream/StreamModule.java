@@ -13,6 +13,7 @@ import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.registry.EventProcessRegistry;
@@ -23,12 +24,10 @@ import net.flectone.pulse.util.DisableAction;
 import net.flectone.pulse.util.MessageTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
-import org.jetbrains.annotations.NotNull;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -38,8 +37,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
 public class StreamModule extends AbstractModuleCommand<Localization.Command.Stream> implements MessageProcessor {
@@ -105,8 +102,15 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     public void process(MessageContext messageContext) {
         FEntity sender = messageContext.getSender();
         if (messageContext.isUserMessage() && !permissionChecker.check(sender, formatPermission.getAll())) return;
+        if (!(sender instanceof FPlayer fPlayer)) return;
+        if (checkModulePredicates(fPlayer)) return;
 
-        messageContext.addTagResolvers(streamTag(sender));
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.STREAM_PREFIX, (argumentQueue, context) -> {
+            String streamPrefix = fPlayer.getSettingValue(FPlayer.Setting.STREAM_PREFIX);
+            if (streamPrefix == null) return Tag.selfClosingInserting(Component.empty());
+
+            return Tag.preProcessParsed(streamPrefix);
+        });
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
@@ -210,18 +214,5 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         } catch (MalformedURLException | URISyntaxException e) {
             return false;
         }
-    }
-
-    private TagResolver streamTag(@NotNull FEntity sender) {
-        String tag = "stream_prefix";
-        if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);
-        if (checkModulePredicates(fPlayer)) return emptyTagResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            String streamPrefix = fPlayer.getSettingValue(FPlayer.Setting.STREAM_PREFIX);
-            if (streamPrefix == null) return Tag.selfClosingInserting(Component.empty());
-
-            return Tag.preProcessParsed(streamPrefix);
-        });
     }
 }

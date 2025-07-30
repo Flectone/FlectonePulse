@@ -16,6 +16,7 @@ import net.flectone.pulse.model.Range;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.registry.MessageProcessRegistry;
@@ -26,14 +27,11 @@ import net.flectone.pulse.util.MessageTag;
 import net.flectone.pulse.util.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import static net.flectone.pulse.util.TagResolverUtil.emptyTagResolver;
 
 @Singleton
 public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> implements MessageProcessor {
@@ -101,7 +99,14 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> i
         FEntity sender = messageContext.getSender();
         if (messageContext.isUserMessage() && !permissionChecker.check(sender, formatPermission.getAll())) return;
 
-        messageContext.addTagResolvers(afkTag(messageContext.getSender()));
+        if (checkModulePredicates(sender)) return;
+        if (!(sender instanceof FPlayer fPlayer)) return;
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.AFK_SUFFIX, (argumentQueue, context) -> {
+            String afkSuffix = fPlayer.getSettingValue(FPlayer.Setting.AFK_SUFFIX);
+            if (afkSuffix == null) return Tag.selfClosingInserting(Component.empty());
+
+            return Tag.preProcessParsed(afkSuffix);
+        });
     }
 
     @Async
@@ -203,18 +208,5 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> i
                 .proxy(dataOutputStream -> dataOutputStream.writeBoolean(isAfk))
                 .sound(getSound())
                 .sendBuilt();
-    }
-
-    private TagResolver afkTag(@NotNull FEntity sender) {
-        String tag = "afk_suffix";
-        if (checkModulePredicates(sender)) return emptyTagResolver(tag);
-        if (!(sender instanceof FPlayer fPlayer)) return emptyTagResolver(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            String afkSuffix = fPlayer.getSettingValue(FPlayer.Setting.AFK_SUFFIX);
-            if (afkSuffix == null) return Tag.selfClosingInserting(Component.empty());
-
-            return Tag.preProcessParsed(afkSuffix);
-        });
     }
 }
