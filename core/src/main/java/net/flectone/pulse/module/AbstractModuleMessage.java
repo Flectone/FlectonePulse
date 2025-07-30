@@ -7,22 +7,23 @@ import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.constant.MessageFlag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.formatter.TimeFormatter;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.*;
+import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.DataConsumer;
-import net.flectone.pulse.constant.DisableSource;
-import net.flectone.pulse.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -53,9 +54,9 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
     @Inject private TimeFormatter timeFormatter;
     @Inject private ProxySender proxySender;
     @Inject private IntegrationModule integrationModule;
-    @Inject private MessageSender messageSender;
     @Inject private SoundPlayer soundPlayer;
     @Inject private TaskScheduler taskScheduler;
+    @Inject private EventProcessRegistry eventProcessRegistry;
 
     @Getter private Cooldown cooldown;
     @Getter private Sound sound;
@@ -381,7 +382,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
                     subComponent = buildSubcomponent(recipient, messageComponent);
                 }
 
-                messageSender.send(recipient, formatComponent, subComponent, destination);
+                eventProcessRegistry.processEvent(new SenderToReceiverMessageEvent(fPlayer, recipient, formatComponent, subComponent, destination));
 
                 if (sound != null) {
                     if (!permissionChecker.check(fPlayer, sound.getPermission())) return;

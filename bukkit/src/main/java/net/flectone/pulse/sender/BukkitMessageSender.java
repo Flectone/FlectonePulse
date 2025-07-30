@@ -6,6 +6,7 @@ import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.BukkitIntegrationModule;
 import net.flectone.pulse.provider.PacketProvider;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.serializer.PacketSerializer;
 import net.flectone.pulse.util.logging.FLogger;
@@ -23,8 +24,9 @@ public class BukkitMessageSender extends MessageSender {
                                PacketSerializer packetSerializer,
                                PacketSender packetSender,
                                PacketProvider packetProvider,
+                               EventProcessRegistry eventProcessRegistry,
                                FLogger fLogger) {
-        super(taskScheduler, platformPlayerAdapter, packetSerializer, packetSender, packetProvider, fLogger);
+        super(taskScheduler, platformPlayerAdapter, packetSerializer, packetSender, packetProvider, eventProcessRegistry, fLogger);
 
         this.integrationModule = integrationModule;
     }

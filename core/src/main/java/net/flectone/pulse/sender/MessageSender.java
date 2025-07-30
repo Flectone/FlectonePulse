@@ -15,7 +15,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.model.*;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
 import net.flectone.pulse.provider.PacketProvider;
+import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.serializer.PacketSerializer;
 import net.flectone.pulse.util.logging.FLogger;
@@ -32,6 +35,7 @@ public class MessageSender {
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PacketSender packetSender;
     private final PacketProvider packetProvider;
+    private final EventProcessRegistry eventProcessRegistry;
     private final FLogger fLogger;
 
     @Inject
@@ -40,13 +44,22 @@ public class MessageSender {
                          PacketSerializer packetSerializer,
                          PacketSender packetSender,
                          PacketProvider packetProvider,
+                         EventProcessRegistry eventProcessRegistry,
                          FLogger fLogger) {
         this.taskScheduler = taskScheduler;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.packetSerializer = packetSerializer;
         this.packetSender = packetSender;
         this.packetProvider = packetProvider;
+        this.eventProcessRegistry = eventProcessRegistry;
         this.fLogger = fLogger;
+    }
+
+    public void reload() {
+        eventProcessRegistry.registerHandler(Event.Type.SENDER_TO_RECEIVER_MESSAGE, event -> {
+            SenderToReceiverMessageEvent messageEvent = (SenderToReceiverMessageEvent) event;
+            send(messageEvent.getReceiver(), messageEvent.getMessage(), messageEvent.getSubmessage(), messageEvent.getDestination());
+        });
     }
 
     public void send(FPlayer fPlayer, Component component, Component subcomponent, Destination destination) {

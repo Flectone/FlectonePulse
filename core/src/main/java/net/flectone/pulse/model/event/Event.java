@@ -17,6 +17,7 @@ public class Event {
         PLAYER_JOIN,
         PLAYER_QUIT,
         PLAYER_PERSIST_AND_DISPOSE,
-        MESSAGE,
+        RECEIVE_TRANSLATABLE_MESSAGE,
+        SENDER_TO_RECEIVER_MESSAGE,
     }
 }

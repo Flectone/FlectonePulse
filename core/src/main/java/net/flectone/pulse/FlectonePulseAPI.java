@@ -14,6 +14,7 @@ import net.flectone.pulse.module.Module;
 import net.flectone.pulse.registry.*;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MetricsService;
 import net.flectone.pulse.service.ModerationService;
@@ -53,6 +54,9 @@ public class FlectonePulseAPI  {
 
         // initialize packetevents
         PacketEvents.getAPI().init();
+
+        // register event handler
+        injector.getInstance(MessageSender.class).reload();
 
         // reload modules and their children
         injector.getInstance(net.flectone.pulse.module.Module.class).reloadWithChildren();
@@ -157,6 +161,9 @@ public class FlectonePulseAPI  {
         // reload event process registry
         EventProcessRegistry eventProcessRegistry = injector.getInstance(EventProcessRegistry.class);
         eventProcessRegistry.reload();
+
+        // register event handler
+        injector.getInstance(MessageSender.class).reload();
 
         // reload task scheduler
         injector.getInstance(TaskScheduler.class).reload();
