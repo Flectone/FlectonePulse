@@ -27,6 +27,16 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
     private final MessagePipeline messagePipeline;
     private final FLogger fLogger;
 
+    // only for fabric support
+    public SimpleVoiceIntegration() {
+        fPlayerService = null;
+        moderationMessageFormatter = null;
+        muteChecker = null;
+        messageSender = null;
+        messagePipeline = null;
+        fLogger = null;
+    }
+
     @Inject
     public SimpleVoiceIntegration(FPlayerService fPlayerService,
                                   ModerationMessageFormatter moderationMessageFormatter,
@@ -49,8 +59,11 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
 
     @Override
     public void registerEvents(EventRegistration registration) {
-        registration.registerEvent(MicrophonePacketEvent.class, this::onMicrophonePacketEvent);
-        registration.registerEvent(EntitySoundPacketEvent.class, this::onEntitySoundPacketEvent);
+        SimpleVoiceIntegration simpleVoiceIntegration = SimpleVoiceModule.getSimpleVoiceIntegration();
+        if (simpleVoiceIntegration == null) return;
+
+        registration.registerEvent(MicrophonePacketEvent.class, simpleVoiceIntegration::onMicrophonePacketEvent);
+        registration.registerEvent(EntitySoundPacketEvent.class, simpleVoiceIntegration::onEntitySoundPacketEvent);
     }
 
     @Override
@@ -63,7 +76,7 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
         fLogger.info("✖ SimpleVoice unhooked");
     }
 
-    private void onEntitySoundPacketEvent(EntitySoundPacketEvent event) {
+    public void onEntitySoundPacketEvent(EntitySoundPacketEvent event) {
         if (event.getSenderConnection() == null) return;
         if (event.getReceiverConnection() == null) return;
 
@@ -78,7 +91,7 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
         event.cancel();
     }
 
-    private void onMicrophonePacketEvent(MicrophonePacketEvent event) {
+    public void onMicrophonePacketEvent(MicrophonePacketEvent event) {
         if (event.isCancelled()) return;
         if (event.getSenderConnection() == null) return;
 

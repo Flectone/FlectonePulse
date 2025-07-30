@@ -15,8 +15,6 @@ import net.flectone.pulse.module.integration.minimotd.MiniMOTDModule;
 import net.flectone.pulse.module.integration.miniplaceholders.MiniPlaceholdersModule;
 import net.flectone.pulse.module.integration.motd.MOTDModule;
 import net.flectone.pulse.module.integration.placeholderapi.PlaceholderAPIModule;
-import net.flectone.pulse.module.integration.plasmovoice.PlasmoVoiceModule;
-import net.flectone.pulse.module.integration.simplevoice.SimpleVoiceModule;
 import net.flectone.pulse.module.integration.supervanish.SuperVanishModule;
 import net.flectone.pulse.module.integration.tab.TABModule;
 import net.flectone.pulse.module.integration.triton.TritonModule;
@@ -35,7 +33,6 @@ import java.util.Set;
 public class BukkitIntegrationModule extends IntegrationModule {
 
     private final Injector injector;
-    private final FLogger fLogger;
     private final PlatformServerAdapter platformServerAdapter;
 
     @Inject
@@ -43,9 +40,8 @@ public class BukkitIntegrationModule extends IntegrationModule {
                                    FLogger fLogger,
                                    PlatformServerAdapter platformServerAdapter,
                                    Injector injector) {
-        super(fileResolver, platformServerAdapter, injector);
+        super(fileResolver, fLogger, platformServerAdapter, injector);
 
-        this.fLogger = fLogger;
         this.platformServerAdapter = platformServerAdapter;
         this.injector = injector;
     }
@@ -92,20 +88,6 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
         if (platformServerAdapter.hasProject("SuperVanish") || platformServerAdapter.hasProject("PremiumVanish")) {
             addChildren(SuperVanishModule.class);
-        }
-
-        if (platformServerAdapter.hasProject("VoiceChat")) {
-            addChildren(SimpleVoiceModule.class);
-        }
-
-        if (platformServerAdapter.hasProject("PlasmoVoice")) {
-            try {
-                Class.forName("su.plo.voice.api.server.event.audio.source.ServerSourceCreatedEvent");
-
-                addChildren(PlasmoVoiceModule.class);
-            } catch (ClassNotFoundException e) {
-                fLogger.warning("Update PlasmoVoice to the latest version");
-            }
         }
 
         if (platformServerAdapter.hasProject("TAB")) {

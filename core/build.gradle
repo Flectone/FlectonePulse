@@ -20,4 +20,6 @@ dependencies {
     compileOnly "com.h2database:h2:$h2_version"
     compileOnly "org.postgresql:postgresql:$postgresql_version"
     compileOnly "io.lettuce:lettuce-core:$lettuce_version"
+    compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
+    compileOnly "su.plo.voice.api:server:$plasmovoiceapi_version"
 }

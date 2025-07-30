@@ -17,6 +17,9 @@
 	"entrypoints": {
 		"main": [
 			"net.flectone.pulse.FabricFlectonePulse"
+		],
+		"voicechat": [
+			"net.flectone.pulse.module.integration.simplevoice.SimpleVoiceIntegration"
 		]
 	},
 	"depends": {

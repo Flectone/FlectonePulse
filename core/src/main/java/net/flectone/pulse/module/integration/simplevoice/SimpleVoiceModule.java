@@ -2,40 +2,33 @@ package net.flectone.pulse.module.integration.simplevoice;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import de.maxhenkel.voicechat.api.BukkitVoicechatService;
+import lombok.Getter;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.AbstractModule;
-import org.bukkit.plugin.Plugin;
+import net.flectone.pulse.resolver.FileResolver;
 
 @Singleton
 public class SimpleVoiceModule extends AbstractModule {
 
     private final Integration.Simplevoice config;
     private final Permission.Integration.Simplevoice permission;
-    private final Plugin plugin;
-    private final SimpleVoiceIntegration simpleVoiceIntegration;
+
+    @Getter private static SimpleVoiceIntegration simpleVoiceIntegration;
 
     @Inject
     public SimpleVoiceModule(FileResolver fileResolver,
-                             Plugin plugin,
                              SimpleVoiceIntegration simpleVoiceIntegration) {
 
         this.config = fileResolver.getIntegration().getSimplevoice();
         this.permission = fileResolver.getPermission().getIntegration().getSimplevoice();
-        this.plugin = plugin;
-        this.simpleVoiceIntegration = simpleVoiceIntegration;
+
+        SimpleVoiceModule.simpleVoiceIntegration = simpleVoiceIntegration;
     }
 
     @Override
     public void onEnable() {
         registerModulePermission(permission);
-
-        BukkitVoicechatService service = plugin.getServer().getServicesManager().load(BukkitVoicechatService.class);
-        if (service == null) return;
-
-        service.registerPlugin(simpleVoiceIntegration);
         simpleVoiceIntegration.hook();
     }
 
@@ -48,5 +41,4 @@ public class SimpleVoiceModule extends AbstractModule {
     protected boolean isConfigEnable() {
         return config.isEnable();
     }
-
 }

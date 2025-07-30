@@ -7,14 +7,13 @@ dependencies {
     compileOnly "com.github.retrooper:packetevents-spigot:$packetevents_spigot_version"
     compileOnly "me.clip:placeholderapi:$placeholderapi_version"
     compileOnly "com.github.MilkBowl:VaultAPI:$vaultapi_version"
-    compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
-    compileOnly "su.plo.voice.api:server:$plasmovoiceapi_version"
     compileOnly "com.github.LeonMangler:SuperVanish:$supervanishapi_version"
     compileOnly "com.loohp:InteractiveChat:$interactivechatapi_version"
     compileOnly "com.rexcantor64.triton:triton-api:$tritonapi_version"
     compileOnly "com.gitlab.ruany:LiteBansAPI:$litebans_version"
     compileOnly "com.github.DevLeoko:AdvancedBan:$advancedban_version"
     compileOnly "dev.lone:api-itemsadder:$itemsadder_version"
+    compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
 
     compileOnly project(":core")
     compileOnly project(":paper")

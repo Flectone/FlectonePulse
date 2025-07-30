@@ -11,12 +11,15 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.deepl.DeeplModule;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
 import net.flectone.pulse.module.integration.luckperms.LuckPermsModule;
+import net.flectone.pulse.module.integration.plasmovoice.PlasmoVoiceModule;
+import net.flectone.pulse.module.integration.simplevoice.SimpleVoiceModule;
 import net.flectone.pulse.module.integration.skinsrestorer.SkinsRestorerModule;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.yandex.YandexModule;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.Collections;
 import java.util.Set;
@@ -29,6 +32,7 @@ public abstract class IntegrationModule extends AbstractModule {
     private final Injector injector;
 
     protected IntegrationModule(FileResolver fileResolver,
+                                FLogger fLogger,
                                 PlatformServerAdapter platformServerAdapter,
                                 Injector injector) {
         this.integration = fileResolver.getIntegration();
@@ -41,6 +45,20 @@ public abstract class IntegrationModule extends AbstractModule {
 
         if (platformServerAdapter.hasProject("LuckPerms")) {
             addChildren(LuckPermsModule.class);
+        }
+
+        if (platformServerAdapter.hasProject("VoiceChat")) {
+            addChildren(SimpleVoiceModule.class);
+        }
+
+        if (platformServerAdapter.hasProject("PlasmoVoice")) {
+            try {
+                Class.forName("su.plo.voice.api.server.event.audio.source.ServerSourceCreatedEvent");
+
+                addChildren(PlasmoVoiceModule.class);
+            } catch (ClassNotFoundException e) {
+                fLogger.warning("Update PlasmoVoice to the latest version");
+            }
         }
     }
 

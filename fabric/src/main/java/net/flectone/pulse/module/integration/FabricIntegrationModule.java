@@ -11,6 +11,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.placeholderapi.PlaceholderAPIModule;
 import net.flectone.pulse.module.integration.supervanish.VanishModule;
 import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 public class FabricIntegrationModule extends IntegrationModule {
@@ -20,10 +21,11 @@ public class FabricIntegrationModule extends IntegrationModule {
 
     @Inject
     public FabricIntegrationModule(FileResolver fileManager,
+                                   FLogger fLogger,
                                    PlatformServerAdapter platformServerAdapter,
                                    PermissionChecker permissionChecker,
                                    Injector injector) {
-        super(fileManager, platformServerAdapter, injector);
+        super(fileManager, fLogger, platformServerAdapter, injector);
 
         this.permissionChecker = permissionChecker;
         this.injector = injector;
