@@ -53,7 +53,7 @@ public class FPlayerDAO extends BaseDAO<FPlayerSQL> {
 
                 String existingName = playerInfo.name();
                 if (!name.equalsIgnoreCase(existingName)) {
-                    updateAndWarn(sql, playerInfo.id(), uuid, existingName, playerInfo.ip());
+                    updateAndWarn(sql, playerInfo.id(), uuid, name, playerInfo.ip());
                 }
 
                 return false;
