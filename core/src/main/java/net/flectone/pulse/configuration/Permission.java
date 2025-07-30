@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.util.TagType;
+import net.flectone.pulse.constant.AdventureTag;
 
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
@@ -903,42 +903,42 @@ public final class Permission extends FileSerializable implements ModuleConfig {
 
             private PermissionEntry all = new PermissionEntry("flectonepulse.module.message.format.all", Type.OP);
 
-            private Map<TagType, PermissionEntry> tags = new LinkedHashMap<>(){
+            private Map<AdventureTag, PermissionEntry> tags = new LinkedHashMap<>(){
                 {
-                    put(TagType.PING, new PermissionEntry("flectonepulse.module.message.format.ping", Type.TRUE));
-                    put(TagType.TPS, new PermissionEntry("flectonepulse.module.message.format.tps", Type.TRUE));
-                    put(TagType.ONLINE, new PermissionEntry("flectonepulse.module.message.format.online", Type.TRUE));
-                    put(TagType.COORDS, new PermissionEntry("flectonepulse.module.message.format.coords", Type.TRUE));
-                    put(TagType.STATS, new PermissionEntry("flectonepulse.module.message.format.stats", Type.TRUE));
-                    put(TagType.SKIN, new PermissionEntry("flectonepulse.module.message.format.skin", Type.TRUE));
-                    put(TagType.ITEM, new PermissionEntry("flectonepulse.module.message.format.item", Type.TRUE));
-                    put(TagType.URL, new PermissionEntry("flectonepulse.module.message.format.url", Type.TRUE));
-                    put(TagType.IMAGE, new PermissionEntry("flectonepulse.module.message.format.image", Type.TRUE));
-                    put(TagType.SPOILER, new PermissionEntry("flectonepulse.module.message.format.spoiler", Type.TRUE));
-                    put(TagType.BOLD, new PermissionEntry("flectonepulse.module.message.format.bold", Type.TRUE));
-                    put(TagType.ITALIC, new PermissionEntry("flectonepulse.module.message.format.italic", Type.TRUE));
-                    put(TagType.UNDERLINE, new PermissionEntry("flectonepulse.module.message.format.underline", Type.TRUE));
-                    put(TagType.OBFUSCATED, new PermissionEntry("flectonepulse.module.message.format.obfuscated", Type.TRUE));
-                    put(TagType.STRIKETHROUGH, new PermissionEntry("flectonepulse.module.message.format.strikethrough", Type.TRUE));
-                    put(TagType.HOVER, new PermissionEntry("flectonepulse.module.message.format.hover", Type.OP));
-                    put(TagType.CLICK, new PermissionEntry("flectonepulse.module.message.format.click", Type.OP));
-                    put(TagType.COLOR, new PermissionEntry("flectonepulse.module.message.format.color", Type.OP));
-                    put(TagType.KEYBIND, new PermissionEntry("flectonepulse.module.message.format.keybind", Type.OP));
-                    put(TagType.TRANSLATABLE, new PermissionEntry("flectonepulse.module.message.format.translatable", Type.OP));
-                    put(TagType.TRANSLATABLE_FALLBACK, new PermissionEntry("flectonepulse.module.message.format.translatable_fallback", Type.OP));
-                    put(TagType.INSERTION, new PermissionEntry("flectonepulse.module.message.format.insertion", Type.OP));
-                    put(TagType.FONT, new PermissionEntry("flectonepulse.module.message.format.font", Type.OP));
-                    put(TagType.DECORATION, new PermissionEntry("flectonepulse.module.message.format.decoration", Type.TRUE));
-                    put(TagType.GRADIENT, new PermissionEntry("flectonepulse.module.message.format.gradient", Type.OP));
-                    put(TagType.RAINBOW, new PermissionEntry("flectonepulse.module.message.format.rainbow", Type.OP));
-                    put(TagType.RESET, new PermissionEntry("flectonepulse.module.message.format.reset", Type.OP));
-                    put(TagType.NEWLINE, new PermissionEntry("flectonepulse.module.message.format.newline", Type.OP));
-                    put(TagType.TRANSITION, new PermissionEntry("flectonepulse.module.message.format.transition", Type.OP));
-                    put(TagType.SELECTOR, new PermissionEntry("flectonepulse.module.message.format.selector", Type.OP));
-                    put(TagType.SCORE, new PermissionEntry("flectonepulse.module.message.format.score", Type.OP));
-                    put(TagType.NBT, new PermissionEntry("flectonepulse.module.message.format.nbt", Type.OP));
-                    put(TagType.PRIDE, new PermissionEntry("flectonepulse.module.message.format.pride", Type.OP));
-                    put(TagType.SHADOW_COLOR, new PermissionEntry("flectonepulse.module.message.format.shadow_color", Type.OP));
+                    put(AdventureTag.PING, new PermissionEntry("flectonepulse.module.message.format.ping", Type.TRUE));
+                    put(AdventureTag.TPS, new PermissionEntry("flectonepulse.module.message.format.tps", Type.TRUE));
+                    put(AdventureTag.ONLINE, new PermissionEntry("flectonepulse.module.message.format.online", Type.TRUE));
+                    put(AdventureTag.COORDS, new PermissionEntry("flectonepulse.module.message.format.coords", Type.TRUE));
+                    put(AdventureTag.STATS, new PermissionEntry("flectonepulse.module.message.format.stats", Type.TRUE));
+                    put(AdventureTag.SKIN, new PermissionEntry("flectonepulse.module.message.format.skin", Type.TRUE));
+                    put(AdventureTag.ITEM, new PermissionEntry("flectonepulse.module.message.format.item", Type.TRUE));
+                    put(AdventureTag.URL, new PermissionEntry("flectonepulse.module.message.format.url", Type.TRUE));
+                    put(AdventureTag.IMAGE, new PermissionEntry("flectonepulse.module.message.format.image", Type.TRUE));
+                    put(AdventureTag.SPOILER, new PermissionEntry("flectonepulse.module.message.format.spoiler", Type.TRUE));
+                    put(AdventureTag.BOLD, new PermissionEntry("flectonepulse.module.message.format.bold", Type.TRUE));
+                    put(AdventureTag.ITALIC, new PermissionEntry("flectonepulse.module.message.format.italic", Type.TRUE));
+                    put(AdventureTag.UNDERLINE, new PermissionEntry("flectonepulse.module.message.format.underline", Type.TRUE));
+                    put(AdventureTag.OBFUSCATED, new PermissionEntry("flectonepulse.module.message.format.obfuscated", Type.TRUE));
+                    put(AdventureTag.STRIKETHROUGH, new PermissionEntry("flectonepulse.module.message.format.strikethrough", Type.TRUE));
+                    put(AdventureTag.HOVER, new PermissionEntry("flectonepulse.module.message.format.hover", Type.OP));
+                    put(AdventureTag.CLICK, new PermissionEntry("flectonepulse.module.message.format.click", Type.OP));
+                    put(AdventureTag.COLOR, new PermissionEntry("flectonepulse.module.message.format.color", Type.OP));
+                    put(AdventureTag.KEYBIND, new PermissionEntry("flectonepulse.module.message.format.keybind", Type.OP));
+                    put(AdventureTag.TRANSLATABLE, new PermissionEntry("flectonepulse.module.message.format.translatable", Type.OP));
+                    put(AdventureTag.TRANSLATABLE_FALLBACK, new PermissionEntry("flectonepulse.module.message.format.translatable_fallback", Type.OP));
+                    put(AdventureTag.INSERTION, new PermissionEntry("flectonepulse.module.message.format.insertion", Type.OP));
+                    put(AdventureTag.FONT, new PermissionEntry("flectonepulse.module.message.format.font", Type.OP));
+                    put(AdventureTag.DECORATION, new PermissionEntry("flectonepulse.module.message.format.decoration", Type.TRUE));
+                    put(AdventureTag.GRADIENT, new PermissionEntry("flectonepulse.module.message.format.gradient", Type.OP));
+                    put(AdventureTag.RAINBOW, new PermissionEntry("flectonepulse.module.message.format.rainbow", Type.OP));
+                    put(AdventureTag.RESET, new PermissionEntry("flectonepulse.module.message.format.reset", Type.OP));
+                    put(AdventureTag.NEWLINE, new PermissionEntry("flectonepulse.module.message.format.newline", Type.OP));
+                    put(AdventureTag.TRANSITION, new PermissionEntry("flectonepulse.module.message.format.transition", Type.OP));
+                    put(AdventureTag.SELECTOR, new PermissionEntry("flectonepulse.module.message.format.selector", Type.OP));
+                    put(AdventureTag.SCORE, new PermissionEntry("flectonepulse.module.message.format.score", Type.OP));
+                    put(AdventureTag.NBT, new PermissionEntry("flectonepulse.module.message.format.nbt", Type.OP));
+                    put(AdventureTag.PRIDE, new PermissionEntry("flectonepulse.module.message.format.pride", Type.OP));
+                    put(AdventureTag.SHADOW_COLOR, new PermissionEntry("flectonepulse.module.message.format.shadow_color", Type.OP));
                 }
             };
 

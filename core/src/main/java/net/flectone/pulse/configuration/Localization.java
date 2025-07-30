@@ -7,7 +7,7 @@ import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.TagType;
+import net.flectone.pulse.constant.AdventureTag;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -552,9 +552,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.format.moderation.newbie.reason = "Ты ещё слишком новичок";
 
-        message.format.tags.put(TagType.URL, "<click:open_url:\"<message>\"><hover:show_text:\"<fcolor:2>Открыть ссылку <br><u><message>\"><fcolor:2><u>🗗 Ссылка</u></fcolor:2></hover></click>");
-        message.format.tags.put(TagType.IMAGE, "<image:\"<message>\"><u>🖃 Картинка</u></image>");
-        message.format.tags.put(TagType.SKIN, "<image:\"<message>\"><u>👨 Скин</u></image>");
+        message.format.tags.put(AdventureTag.URL, "<click:open_url:\"<message>\"><hover:show_text:\"<fcolor:2>Открыть ссылку <br><u><message>\"><fcolor:2><u>🗗 Ссылка</u></fcolor:2></hover></click>");
+        message.format.tags.put(AdventureTag.IMAGE, "<image:\"<message>\"><u>🖃 Картинка</u></image>");
+        message.format.tags.put(AdventureTag.SKIN, "<image:\"<message>\"><u>👨 Скин</u></image>");
 
         message.format.name_.display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <player>\"><vault_prefix><stream_prefix><fcolor:2><player></fcolor><afk_suffix><vault_suffix></hover></click>";
         message.format.name_.entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<name>'> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><lang:'<name>'></hover></fcolor:2>";
@@ -1888,17 +1888,17 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Format implements FormatMessageConfig, Localizable {
 
-            private Map<TagType, String> tags = new LinkedHashMap<>(){
+            private Map<AdventureTag, String> tags = new LinkedHashMap<>(){
                 {
-                    put(TagType.PING, "<fcolor:2><ping></fcolor>");
-                    put(TagType.TPS, "<fcolor:2><tps></fcolor>");
-                    put(TagType.ONLINE, "<fcolor:2><online></fcolor>");
-                    put(TagType.COORDS, "<fcolor:2><x> <y> <z></fcolor>");
-                    put(TagType.STATS, "<color:#ff7171><hp>♥</color> <color:#3de0d8><armor>🛡 <color:#e33059><attack>🗡 <color:#4eff52><exp>⏺ <color:#f0a01f><food>🍖");
-                    put(TagType.SKIN, "<image:\"<message>\"><u>👨 Skin</u></image>");
-                    put(TagType.ITEM, "<fcolor:2>[<message>]</fcolor>");
-                    put(TagType.URL, "<click:open_url:\"<message>\"><hover:show_text:\"<fcolor:2>Open url <br><u><message>\"><fcolor:2><u>🗗 Url</u></fcolor:2></hover></click>");
-                    put(TagType.IMAGE, "<image:\"<message>\"><u>🖃 Image</u></image>");
+                    put(AdventureTag.PING, "<fcolor:2><ping></fcolor>");
+                    put(AdventureTag.TPS, "<fcolor:2><tps></fcolor>");
+                    put(AdventureTag.ONLINE, "<fcolor:2><online></fcolor>");
+                    put(AdventureTag.COORDS, "<fcolor:2><x> <y> <z></fcolor>");
+                    put(AdventureTag.STATS, "<color:#ff7171><hp>♥</color> <color:#3de0d8><armor>🛡 <color:#e33059><attack>🗡 <color:#4eff52><exp>⏺ <color:#f0a01f><food>🍖");
+                    put(AdventureTag.SKIN, "<image:\"<message>\"><u>👨 Skin</u></image>");
+                    put(AdventureTag.ITEM, "<fcolor:2>[<message>]</fcolor>");
+                    put(AdventureTag.URL, "<click:open_url:\"<message>\"><hover:show_text:\"<fcolor:2>Open url <br><u><message>\"><fcolor:2><u>🗗 Url</u></fcolor:2></hover></click>");
+                    put(AdventureTag.IMAGE, "<image:\"<message>\"><u>🖃 Image</u></image>");
                 }
             };
 

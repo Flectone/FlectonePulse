@@ -1,6 +1,6 @@
-package net.flectone.pulse.util;
+package net.flectone.pulse.constant;
 
-public enum TagType {
+public enum AdventureTag {
     PING,
     TPS,
     ONLINE,

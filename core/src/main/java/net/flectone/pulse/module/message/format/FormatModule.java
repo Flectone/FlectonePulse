@@ -33,7 +33,7 @@ import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SkinService;
-import net.flectone.pulse.util.TagType;
+import net.flectone.pulse.constant.AdventureTag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -49,7 +49,7 @@ import java.util.Map;
 @Singleton
 public class FormatModule extends AbstractModuleMessage<Localization.Message.Format> implements MessageProcessor {
 
-    @Getter private final Map<TagType, TagResolver> tagResolverMap = new EnumMap<>(TagType.class);
+    @Getter private final Map<AdventureTag, TagResolver> tagResolverMap = new EnumMap<>(AdventureTag.class);
 
     private final Message.Format message;
     @Getter private final Permission.Message.Format permission;
@@ -95,25 +95,25 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
 
         registerPermission(permission.getAll());
 
-        putKyoriTag(TagType.HOVER, StandardTags.hoverEvent());
-        putKyoriTag(TagType.CLICK, StandardTags.clickEvent());
-        putKyoriTag(TagType.COLOR, StandardTags.color());
-        putKyoriTag(TagType.KEYBIND, StandardTags.keybind());
-        putKyoriTag(TagType.TRANSLATABLE, StandardTags.translatable());
-        putKyoriTag(TagType.TRANSLATABLE_FALLBACK, StandardTags.translatableFallback());
-        putKyoriTag(TagType.INSERTION, StandardTags.insertion());
-        putKyoriTag(TagType.FONT, StandardTags.font());
-        putKyoriTag(TagType.DECORATION, StandardTags.decorations());
-        putKyoriTag(TagType.GRADIENT, StandardTags.gradient());
-        putKyoriTag(TagType.RAINBOW, StandardTags.rainbow());
-        putKyoriTag(TagType.RESET, StandardTags.reset());
-        putKyoriTag(TagType.NEWLINE, StandardTags.newline());
-        putKyoriTag(TagType.TRANSITION, StandardTags.transition());
-        putKyoriTag(TagType.SELECTOR, StandardTags.selector());
-        putKyoriTag(TagType.SCORE, StandardTags.score());
-        putKyoriTag(TagType.NBT, StandardTags.nbt());
-        putKyoriTag(TagType.PRIDE, StandardTags.pride());
-        putKyoriTag(TagType.SHADOW_COLOR, StandardTags.shadowColor());
+        putKyoriTag(AdventureTag.HOVER, StandardTags.hoverEvent());
+        putKyoriTag(AdventureTag.CLICK, StandardTags.clickEvent());
+        putKyoriTag(AdventureTag.COLOR, StandardTags.color());
+        putKyoriTag(AdventureTag.KEYBIND, StandardTags.keybind());
+        putKyoriTag(AdventureTag.TRANSLATABLE, StandardTags.translatable());
+        putKyoriTag(AdventureTag.TRANSLATABLE_FALLBACK, StandardTags.translatableFallback());
+        putKyoriTag(AdventureTag.INSERTION, StandardTags.insertion());
+        putKyoriTag(AdventureTag.FONT, StandardTags.font());
+        putKyoriTag(AdventureTag.DECORATION, StandardTags.decorations());
+        putKyoriTag(AdventureTag.GRADIENT, StandardTags.gradient());
+        putKyoriTag(AdventureTag.RAINBOW, StandardTags.rainbow());
+        putKyoriTag(AdventureTag.RESET, StandardTags.reset());
+        putKyoriTag(AdventureTag.NEWLINE, StandardTags.newline());
+        putKyoriTag(AdventureTag.TRANSITION, StandardTags.transition());
+        putKyoriTag(AdventureTag.SELECTOR, StandardTags.selector());
+        putKyoriTag(AdventureTag.SCORE, StandardTags.score());
+        putKyoriTag(AdventureTag.NBT, StandardTags.nbt());
+        putKyoriTag(AdventureTag.PRIDE, StandardTags.pride());
+        putKyoriTag(AdventureTag.SHADOW_COLOR, StandardTags.shadowColor());
 
         addChildren(ColorModule.class);
         addChildren(EmojiModule.class);
@@ -158,11 +158,11 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
 
         FEntity receiver = messageContext.getReceiver();
 
-        if (sender instanceof FPlayer fPlayer && isCorrectTag(TagType.PING, sender)) {
+        if (sender instanceof FPlayer fPlayer && isCorrectTag(AdventureTag.PING, sender)) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.PING, (argumentQueue, context) -> {
                 int ping = fPlayerService.getPing(fPlayer);
 
-                String string = resolveLocalization(receiver).getTags().get(TagType.PING)
+                String string = resolveLocalization(receiver).getTags().get(AdventureTag.PING)
                         .replace("<ping>", String.valueOf(ping));
 
                 Component component = messagePipeline.builder(sender, receiver, string).build();
@@ -171,9 +171,9 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
             });
         }
 
-        if (isCorrectTag(TagType.TPS, sender)) {
+        if (isCorrectTag(AdventureTag.TPS, sender)) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.TPS, (argumentQueue, context) -> {
-                String string = resolveLocalization(receiver).getTags().get(TagType.TPS)
+                String string = resolveLocalization(receiver).getTags().get(AdventureTag.TPS)
                         .replace("<tps>", platformServerAdapter.getTPS());
 
                 Component component = messagePipeline.builder(sender, receiver, string).build();
@@ -182,9 +182,9 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
             });
         }
 
-        if (isCorrectTag(TagType.ONLINE, sender)) {
+        if (isCorrectTag(AdventureTag.ONLINE, sender)) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.ONLINE, (argumentQueue, context) -> {
-                String string = resolveLocalization(receiver).getTags().get(TagType.ONLINE)
+                String string = resolveLocalization(receiver).getTags().get(AdventureTag.ONLINE)
                         .replace("<online>", String.valueOf(platformServerAdapter.getOnlinePlayerCount()));
 
                 Component component = messagePipeline.builder(sender, receiver, string).build();
@@ -193,11 +193,11 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
             });
         }
 
-        if (isCorrectTag(TagType.COORDS, sender)) {
+        if (isCorrectTag(AdventureTag.COORDS, sender)) {
             PlatformPlayerAdapter.Coordinates coordinates = platformPlayerAdapter.getCoordinates(sender);
             if (coordinates != null) {
                 messageContext.addReplacementTag(MessagePipeline.ReplacementTag.COORDS, (argumentQueue, context) -> {
-                    String string = resolveLocalization(receiver).getTags().get(TagType.COORDS)
+                    String string = resolveLocalization(receiver).getTags().get(AdventureTag.COORDS)
                             .replace("<x>", String.valueOf(coordinates.x()))
                             .replace("<y>", String.valueOf(coordinates.y()))
                             .replace("<z>", String.valueOf(coordinates.z()));
@@ -209,11 +209,11 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
             }
         }
 
-        if (isCorrectTag(TagType.STATS, sender)) {
+        if (isCorrectTag(AdventureTag.STATS, sender)) {
             PlatformPlayerAdapter.Statistics statistics = platformPlayerAdapter.getStatistics(sender);
             if (statistics != null) {
                 messageContext.addReplacementTag(MessagePipeline.ReplacementTag.STATS, (argumentQueue, context) -> {
-                    String string = resolveLocalization(receiver).getTags().get(TagType.STATS)
+                    String string = resolveLocalization(receiver).getTags().get(AdventureTag.STATS)
                             .replace("<hp>", String.valueOf(statistics.health()))
                             .replace("<armor>", String.valueOf(statistics.armor()))
                             .replace("<exp>", String.valueOf(statistics.level()))
@@ -227,10 +227,10 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
             }
         }
 
-        if (isCorrectTag(TagType.SKIN, sender)) {
+        if (isCorrectTag(AdventureTag.SKIN, sender)) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SKIN, (argumentQueue, context) -> {
                 String url = skinService.getBodyUrl(sender);
-                String string = resolveLocalization(receiver).getTags().get(TagType.SKIN)
+                String string = resolveLocalization(receiver).getTags().get(AdventureTag.SKIN)
                         .replace("<message>", url);
 
                 Component component = messagePipeline.builder(sender, receiver, string).build();
@@ -239,11 +239,11 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
             });
         }
 
-        if (isCorrectTag(TagType.ITEM, sender)) {
+        if (isCorrectTag(AdventureTag.ITEM, sender)) {
             Object itemStackObject = platformPlayerAdapter.getItem(sender.getUuid());
 
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.ITEM, (argumentQueue, context) -> {
-                String string = resolveLocalization(receiver).getTags().get(TagType.ITEM);
+                String string = resolveLocalization(receiver).getTags().get(AdventureTag.ITEM);
 
                 return Tag.selfClosingInserting(messagePipeline.builder(sender, receiver, string)
                         .build()
@@ -256,13 +256,13 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
             });
         }
 
-        if (messageContext.isUrl() && isCorrectTag(TagType.URL, sender)) {
+        if (messageContext.isUrl() && isCorrectTag(AdventureTag.URL, sender)) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.URL, (argumentQueue, context) -> {
                 Tag.Argument urlArgument = argumentQueue.peek();
                 if (urlArgument == null) return Tag.selfClosingInserting(Component.empty());
 
                 String url = toASCII(urlArgument.value());
-                String string = resolveLocalization(receiver).getTags().get(TagType.URL)
+                String string = resolveLocalization(receiver).getTags().get(AdventureTag.URL)
                         .replace("<message>", url);
 
                 Component component = messagePipeline.builder(sender, receiver, string)
@@ -279,7 +279,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         }
     }
 
-    private void putKyoriTag(TagType type, TagResolver tagResolver) {
+    private void putKyoriTag(AdventureTag type, TagResolver tagResolver) {
         Message.Format.Tag tag = message.getTags().get(type);
         if (tag == null) return;
         if (!tag.isEnable()) return;
@@ -300,104 +300,104 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
     private String replaceAll(FEntity sender, FEntity fReceiver, String message) {
         if (checkModulePredicates(sender)) return message;
 
-        if (isCorrectTag(TagType.IMAGE, sender)) {
+        if (isCorrectTag(AdventureTag.IMAGE, sender)) {
             Localization.Message.Format localization = resolveLocalization(fReceiver);
             message = replaceAll(sender, message,
-                    permission.getTags().get(TagType.IMAGE),
-                    this.message.getTags().get(TagType.IMAGE).getTrigger(),
-                    localization.getTags().get(TagType.IMAGE).replace("<message>", "$1")
+                    permission.getTags().get(AdventureTag.IMAGE),
+                    this.message.getTags().get(AdventureTag.IMAGE).getTrigger(),
+                    localization.getTags().get(AdventureTag.IMAGE).replace("<message>", "$1")
             );
         }
 
-        if (isCorrectTag(TagType.URL, sender)) {
+        if (isCorrectTag(AdventureTag.URL, sender)) {
             message = replaceAll(sender, message,
-                    permission.getTags().get(TagType.URL),
-                    this.message.getTags().get(TagType.URL).getTrigger(),
+                    permission.getTags().get(AdventureTag.URL),
+                    this.message.getTags().get(AdventureTag.URL).getTrigger(),
                     "<url:'$1'>"
             );
         }
 
-        if (isCorrectTag(TagType.PING, sender)) {
+        if (isCorrectTag(AdventureTag.PING, sender)) {
             message = message
-                    .replace(this.message.getTags().get(TagType.PING).getTrigger(), "<ping>");
+                    .replace(this.message.getTags().get(AdventureTag.PING).getTrigger(), "<ping>");
         }
 
-        if (isCorrectTag(TagType.TPS, sender)) {
+        if (isCorrectTag(AdventureTag.TPS, sender)) {
             message = message
-                    .replace(this.message.getTags().get(TagType.TPS).getTrigger(), "<tps>");
+                    .replace(this.message.getTags().get(AdventureTag.TPS).getTrigger(), "<tps>");
         }
 
-        if (isCorrectTag(TagType.ONLINE, sender)) {
+        if (isCorrectTag(AdventureTag.ONLINE, sender)) {
             message = message
-                    .replace(this.message.getTags().get(TagType.ONLINE).getTrigger(), "<online>");
+                    .replace(this.message.getTags().get(AdventureTag.ONLINE).getTrigger(), "<online>");
         }
 
-        if (isCorrectTag(TagType.COORDS, sender)) {
+        if (isCorrectTag(AdventureTag.COORDS, sender)) {
             message = message
-                    .replace(this.message.getTags().get(TagType.COORDS).getTrigger(), "<coords>");
+                    .replace(this.message.getTags().get(AdventureTag.COORDS).getTrigger(), "<coords>");
         }
 
-        if (isCorrectTag(TagType.STATS, sender)) {
+        if (isCorrectTag(AdventureTag.STATS, sender)) {
             message = message
-                    .replace(this.message.getTags().get(TagType.STATS).getTrigger(), "<stats>");
+                    .replace(this.message.getTags().get(AdventureTag.STATS).getTrigger(), "<stats>");
         }
 
-        if (isCorrectTag(TagType.SKIN, sender)) {
+        if (isCorrectTag(AdventureTag.SKIN, sender)) {
             message = message
-                    .replace(this.message.getTags().get(TagType.SKIN).getTrigger(), "<skin>");
+                    .replace(this.message.getTags().get(AdventureTag.SKIN).getTrigger(), "<skin>");
         }
 
-        if (isCorrectTag(TagType.ITEM, sender)) {
+        if (isCorrectTag(AdventureTag.ITEM, sender)) {
             message = message
-                    .replace(this.message.getTags().get(TagType.ITEM).getTrigger(), "<item>");
+                    .replace(this.message.getTags().get(AdventureTag.ITEM).getTrigger(), "<item>");
         }
 
         String regex = "(?<!\\\\)<trigger>(.*?)(?<!\\\\)<trigger>";
 
-        if (isCorrectTag(TagType.SPOILER, sender)) {
+        if (isCorrectTag(AdventureTag.SPOILER, sender)) {
             message = replaceAll(sender, message,
-                    permission.getTags().get(TagType.SPOILER),
-                    regex.replace("<trigger>", this.message.getTags().get(TagType.SPOILER).getTrigger()),
+                    permission.getTags().get(AdventureTag.SPOILER),
+                    regex.replace("<trigger>", this.message.getTags().get(AdventureTag.SPOILER).getTrigger()),
                     "<spoiler:'$1'>"
             );
         }
 
-        if (isCorrectTag(TagType.BOLD, sender)) {
+        if (isCorrectTag(AdventureTag.BOLD, sender)) {
             message = replaceAll(sender, message,
-                    permission.getTags().get(TagType.BOLD),
-                    regex.replace("<trigger>", this.message.getTags().get(TagType.BOLD).getTrigger()),
+                    permission.getTags().get(AdventureTag.BOLD),
+                    regex.replace("<trigger>", this.message.getTags().get(AdventureTag.BOLD).getTrigger()),
                     "<bold>$1</bold>"
             );
         }
 
-        if (isCorrectTag(TagType.ITALIC, sender)) {
+        if (isCorrectTag(AdventureTag.ITALIC, sender)) {
             message = replaceAll(sender, message,
-                    permission.getTags().get(TagType.ITALIC),
-                    regex.replace("<trigger>", this.message.getTags().get(TagType.ITALIC).getTrigger()),
+                    permission.getTags().get(AdventureTag.ITALIC),
+                    regex.replace("<trigger>", this.message.getTags().get(AdventureTag.ITALIC).getTrigger()),
                     "<italic>$1</italic>"
             );
         }
 
-        if (isCorrectTag(TagType.UNDERLINE, sender)) {
+        if (isCorrectTag(AdventureTag.UNDERLINE, sender)) {
             message = replaceAll(sender, message,
-                    permission.getTags().get(TagType.UNDERLINE),
-                    regex.replace("<trigger>", this.message.getTags().get(TagType.UNDERLINE).getTrigger()),
+                    permission.getTags().get(AdventureTag.UNDERLINE),
+                    regex.replace("<trigger>", this.message.getTags().get(AdventureTag.UNDERLINE).getTrigger()),
                     "<underlined>$1</underlined>"
             );
         }
 
-        if (isCorrectTag(TagType.OBFUSCATED, sender)) {
+        if (isCorrectTag(AdventureTag.OBFUSCATED, sender)) {
             message = replaceAll(sender, message,
-                    permission.getTags().get(TagType.OBFUSCATED),
-                    regex.replace("<trigger>", this.message.getTags().get(TagType.OBFUSCATED).getTrigger()),
+                    permission.getTags().get(AdventureTag.OBFUSCATED),
+                    regex.replace("<trigger>", this.message.getTags().get(AdventureTag.OBFUSCATED).getTrigger()),
                     "<obfuscated>$1</obfuscated>"
             );
         }
 
-        if (isCorrectTag(TagType.STRIKETHROUGH, sender)) {
+        if (isCorrectTag(AdventureTag.STRIKETHROUGH, sender)) {
             message = replaceAll(sender, message,
-                    permission.getTags().get(TagType.STRIKETHROUGH),
-                    regex.replace("<trigger>", this.message.getTags().get(TagType.STRIKETHROUGH).getTrigger()),
+                    permission.getTags().get(AdventureTag.STRIKETHROUGH),
+                    regex.replace("<trigger>", this.message.getTags().get(AdventureTag.STRIKETHROUGH).getTrigger()),
                     "<strikethrough>$1</strikethrough>"
             );
         }
@@ -412,16 +412,16 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         return message.replaceAll(trigger, format);
     }
 
-    private boolean isCorrectTag(TagType tagType, FEntity sender, boolean needPermission) {
-        if (!message.getTags().get(tagType).isEnable()) return false;
-        if (!tagResolverMap.containsKey(tagType)) return false;
+    private boolean isCorrectTag(AdventureTag adventureTag, FEntity sender, boolean needPermission) {
+        if (!message.getTags().get(adventureTag).isEnable()) return false;
+        if (!tagResolverMap.containsKey(adventureTag)) return false;
 
-        return !needPermission || permissionChecker.check(sender, permission.getTags().get(tagType));
+        return !needPermission || permissionChecker.check(sender, permission.getTags().get(adventureTag));
     }
 
-    private boolean isCorrectTag(TagType tagType, FEntity sender) {
-        if (!message.getTags().get(tagType).isEnable()) return false;
+    private boolean isCorrectTag(AdventureTag adventureTag, FEntity sender) {
+        if (!message.getTags().get(adventureTag).isEnable()) return false;
 
-        return permissionChecker.check(sender, permission.getTags().get(tagType));
+        return permissionChecker.check(sender, permission.getTags().get(adventureTag));
     }
 }

@@ -11,7 +11,7 @@ import net.flectone.pulse.model.event.EventPriority;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
-import net.flectone.pulse.util.TagType;
+import net.flectone.pulse.constant.AdventureTag;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -282,42 +282,42 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
         private boolean enable = true;
 
-        private Map<TagType, Tag> tags = new LinkedHashMap<>(){
+        private Map<AdventureTag, Tag> tags = new LinkedHashMap<>(){
             {
-                put(TagType.PING, new Tag("%ping%"));
-                put(TagType.TPS, new Tag("%tps%"));
-                put(TagType.ONLINE, new Tag("%online%"));
-                put(TagType.COORDS, new Tag("%coords%"));
-                put(TagType.STATS, new Tag("%stats%"));
-                put(TagType.SKIN, new Tag("%skin%"));
-                put(TagType.ITEM, new Tag("%item%"));
-                put(TagType.URL, new Tag("(?<!\\\\)(?<!:\")((https?|ftp|gopher|telnet|file)://[\\w.-]+\\.[a-zA-Z]{2,}(?::\\d+)?(?:/[\\w:#@%/;$()~_?+\\-=.&]*)?(?:#[\\w\\-=/&%]*)?)"));
-                put(TagType.IMAGE, new Tag("(?<!:\")((https?|ftp|gopher|telnet|file)://(?:i\\.imgur\\.com|media\\.discordapp\\.net)/[\\w:#@%/;$()~_?+\\-=.&]*[^\\\\\\s])"));
-                put(TagType.SPOILER, new Tag(Pattern.quote("||")));
-                put(TagType.BOLD, new Tag(Pattern.quote("**")));
-                put(TagType.ITALIC, new Tag(Pattern.quote("*")));
-                put(TagType.UNDERLINE, new Tag(Pattern.quote("__")));
-                put(TagType.OBFUSCATED, new Tag(Pattern.quote("??")));
-                put(TagType.STRIKETHROUGH, new Tag(Pattern.quote("~~")));
-                put(TagType.HOVER, new KyoriTag());
-                put(TagType.CLICK, new KyoriTag());
-                put(TagType.COLOR, new KyoriTag());
-                put(TagType.KEYBIND, new KyoriTag());
-                put(TagType.TRANSLATABLE, new KyoriTag());
-                put(TagType.TRANSLATABLE_FALLBACK, new KyoriTag());
-                put(TagType.INSERTION, new KyoriTag());
-                put(TagType.FONT, new KyoriTag());
-                put(TagType.DECORATION, new KyoriTag());
-                put(TagType.GRADIENT, new KyoriTag());
-                put(TagType.RAINBOW, new KyoriTag());
-                put(TagType.RESET, new KyoriTag());
-                put(TagType.NEWLINE, new KyoriTag());
-                put(TagType.TRANSITION, new KyoriTag());
-                put(TagType.SELECTOR, new KyoriTag());
-                put(TagType.SCORE, new KyoriTag());
-                put(TagType.NBT, new KyoriTag());
-                put(TagType.PRIDE, new KyoriTag());
-                put(TagType.SHADOW_COLOR, new KyoriTag());
+                put(AdventureTag.PING, new Tag("%ping%"));
+                put(AdventureTag.TPS, new Tag("%tps%"));
+                put(AdventureTag.ONLINE, new Tag("%online%"));
+                put(AdventureTag.COORDS, new Tag("%coords%"));
+                put(AdventureTag.STATS, new Tag("%stats%"));
+                put(AdventureTag.SKIN, new Tag("%skin%"));
+                put(AdventureTag.ITEM, new Tag("%item%"));
+                put(AdventureTag.URL, new Tag("(?<!\\\\)(?<!:\")((https?|ftp|gopher|telnet|file)://[\\w.-]+\\.[a-zA-Z]{2,}(?::\\d+)?(?:/[\\w:#@%/;$()~_?+\\-=.&]*)?(?:#[\\w\\-=/&%]*)?)"));
+                put(AdventureTag.IMAGE, new Tag("(?<!:\")((https?|ftp|gopher|telnet|file)://(?:i\\.imgur\\.com|media\\.discordapp\\.net)/[\\w:#@%/;$()~_?+\\-=.&]*[^\\\\\\s])"));
+                put(AdventureTag.SPOILER, new Tag(Pattern.quote("||")));
+                put(AdventureTag.BOLD, new Tag(Pattern.quote("**")));
+                put(AdventureTag.ITALIC, new Tag(Pattern.quote("*")));
+                put(AdventureTag.UNDERLINE, new Tag(Pattern.quote("__")));
+                put(AdventureTag.OBFUSCATED, new Tag(Pattern.quote("??")));
+                put(AdventureTag.STRIKETHROUGH, new Tag(Pattern.quote("~~")));
+                put(AdventureTag.HOVER, new KyoriTag());
+                put(AdventureTag.CLICK, new KyoriTag());
+                put(AdventureTag.COLOR, new KyoriTag());
+                put(AdventureTag.KEYBIND, new KyoriTag());
+                put(AdventureTag.TRANSLATABLE, new KyoriTag());
+                put(AdventureTag.TRANSLATABLE_FALLBACK, new KyoriTag());
+                put(AdventureTag.INSERTION, new KyoriTag());
+                put(AdventureTag.FONT, new KyoriTag());
+                put(AdventureTag.DECORATION, new KyoriTag());
+                put(AdventureTag.GRADIENT, new KyoriTag());
+                put(AdventureTag.RAINBOW, new KyoriTag());
+                put(AdventureTag.RESET, new KyoriTag());
+                put(AdventureTag.NEWLINE, new KyoriTag());
+                put(AdventureTag.TRANSITION, new KyoriTag());
+                put(AdventureTag.SELECTOR, new KyoriTag());
+                put(AdventureTag.SCORE, new KyoriTag());
+                put(AdventureTag.NBT, new KyoriTag());
+                put(AdventureTag.PRIDE, new KyoriTag());
+                put(AdventureTag.SHADOW_COLOR, new KyoriTag());
             }
         };
 
