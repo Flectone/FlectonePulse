@@ -68,10 +68,7 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
 
     @Override
     public void process(MessageContext messageContext) {
-        if (!messageContext.isTranslate()) {
-            messageContext.addTagResolvers(MessagePipeline.ReplacementTag.TRANSLATE.empty());
-            return;
-        }
+        if (!messageContext.isTranslate()) return;
 
         String messageToTranslate = messageContext.getMessageToTranslate();
         UUID key = saveMessage(messageToTranslate);

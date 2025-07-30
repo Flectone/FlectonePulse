@@ -11,7 +11,6 @@ import net.flectone.pulse.database.Database;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.exception.ReloadException;
 import net.flectone.pulse.module.Module;
-import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.registry.*;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
@@ -71,9 +70,6 @@ public class FlectonePulseAPI  {
 
         // register default listeners
         injector.getInstance(ListenerRegistry.class).registerDefaultListeners();
-
-        // reload disabled tags
-        injector.getInstance(MessagePipeline.class).reload();
 
         // log plugin enabled
         fLogger.logEnabled();
@@ -208,9 +204,6 @@ public class FlectonePulseAPI  {
         if (fileResolver.getConfig().isMetrics()) {
             injector.getInstance(MetricsService.class).reload();
         }
-
-        // reload disabled tags
-        injector.getInstance(MessagePipeline.class).reload();
 
         // log plugin reloaded
         fLogger.logReloaded();

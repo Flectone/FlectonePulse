@@ -21,13 +21,9 @@ import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 @Singleton
 public class MessagePipeline {
-
-    private final Set<TagResolver> disabledTags = new HashSet<>();
 
     private final FLogger fLogger;
     private final MiniMessage miniMessage;
@@ -40,24 +36,6 @@ public class MessagePipeline {
         this.fLogger = fLogger;
         this.miniMessage = miniMessage;
         this.messageProcessRegistry = messageProcessRegistry;
-    }
-
-    public void reload() {
-        disabledTags.clear();
-
-        Builder builder = builder("Test message for initializing disabled tags");
-        builder.translate("Test message for initializing TranslateModule tags", true);
-        builder.applyProcessors();
-
-        Set<TagResolver> tagResolvers = builder.context.getTagResolvers();
-
-        Arrays.stream(ReplacementTag.values())
-                .filter(tag -> tagResolvers
-                        .stream()
-                        .filter(tagResolver -> !tagResolver.equals(StandardTags.translatable()))
-                        .noneMatch(tagResolver -> tagResolver.has(tag.getTagName()))
-                )
-                .forEach(tag -> disabledTags.add(tag.empty()));
     }
 
     public Builder builder(@NotNull String message) {
@@ -186,9 +164,13 @@ public class MessagePipeline {
             applyProcessors();
 
             // replace disabled tags
-            disabledTags.forEach(tagResolver -> {
-                context.addTagResolvers(tagResolver);
-            });
+            Arrays.stream(ReplacementTag.values())
+                    .filter(tag -> context.getTagResolvers()
+                            .stream()
+                            .filter(tagResolver -> !tagResolver.equals(StandardTags.translatable()))
+                            .noneMatch(tagResolver -> tagResolver.has(tag.getTagName()))
+                    )
+                    .forEach(tag -> context.addReplacementTag(tag.empty()));
 
             try {
                 return miniMessage.deserialize(
