@@ -9,7 +9,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 
-public final class FlectonePulseBungeecord extends Plugin implements Listener, FlectonePulse {
+public final class FlectonePulseBungeecord extends Plugin implements Listener {
 
     private static final String CHANNEL = "BungeeCord";
 
@@ -66,7 +66,6 @@ public final class FlectonePulseBungeecord extends Plugin implements Listener, F
                 .forEach(serverInfo -> serverInfo.sendData(CHANNEL, data));
     }
 
-    @Override
     public void reload() {
         fLogger.logReloading();
 

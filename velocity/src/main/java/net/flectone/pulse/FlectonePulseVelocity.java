@@ -23,7 +23,7 @@ import org.slf4j.Logger;
         description = BuildConfig.PROJECT_DESCRIPTION,
         url = BuildConfig.PROJECT_WEBSITE
 )
-public class FlectonePulseVelocity implements FlectonePulse {
+public class FlectonePulseVelocity {
 
     private static final MinecraftChannelIdentifier IDENTIFIER = MinecraftChannelIdentifier.from("flectonepulse:main");
 
@@ -86,7 +86,6 @@ public class FlectonePulseVelocity implements FlectonePulse {
                 .forEach(serverInfo -> serverInfo.sendPluginMessage(IDENTIFIER, data));
     }
 
-    @Override
     public void reload() {
         fLogger.logReloading();
 

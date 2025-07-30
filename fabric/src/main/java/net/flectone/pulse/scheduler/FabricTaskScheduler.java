@@ -27,6 +27,13 @@ public class FabricTaskScheduler implements TaskScheduler {
     }
 
     @Override
+    public void setDisabled(boolean value) {
+        if (value) {
+            shutdown();
+        }
+    }
+
+    @Override
     public void runAsync(SchedulerRunnable runnable) {
         asyncExecutor.execute(wrapExceptionRunnable(runnable));
     }

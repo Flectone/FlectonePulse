@@ -2,6 +2,8 @@ package net.flectone.pulse.scheduler;
 
 public interface TaskScheduler {
 
+    void setDisabled(boolean value);
+
     void runAsync(SchedulerRunnable runnable);
 
     void runAsyncTimer(SchedulerRunnable runnable, long tick, long period);

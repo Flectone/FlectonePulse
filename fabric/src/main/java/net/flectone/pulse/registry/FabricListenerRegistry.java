@@ -58,9 +58,9 @@ public class FabricListenerRegistry extends ListenerRegistry {
         // skip double register
         if (fabricFlectonePulse.getMinecraftServer() != null) return;
 
-        ServerLifecycleEvents.SERVER_STARTING.register(fabricFlectonePulse::setMinecraftServer);
         ServerTickEvents.START_SERVER_TICK.register(server -> fabricTaskScheduler.onTick());
         ServerTickEvents.END_SERVER_TICK.register(server -> tpsTracker.onTick());
+        ServerLifecycleEvents.SERVER_STARTING.register(fabricFlectonePulse::setMinecraftServer);
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> fabricFlectonePulse.onDisable());
 
         ServerPlayConnectionEvents.JOIN.register((handler, packetSender, minecraftServer) -> {
