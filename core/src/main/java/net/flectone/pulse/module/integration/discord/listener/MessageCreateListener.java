@@ -12,7 +12,7 @@ import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.model.Range;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import reactor.core.publisher.Mono;
 
 @Getter
@@ -35,7 +35,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
     public Mono<MessageCreateEvent> execute(MessageCreateEvent event) {
         Message discordMessage = event.getMessage();
 
-        String channel = integration.getMessageChannel().get(MessageTag.FROM_DISCORD_TO_MINECRAFT);
+        String channel = integration.getMessageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT);
         if (channel == null) return Mono.empty();
         if (!channel.equals(discordMessage.getChannelId().asString())) return Mono.empty();
 
@@ -67,7 +67,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
                 .range(Range.get(Range.Type.PROXY))
                 .destination(integration.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DISCORD))
-                .tag(MessageTag.FROM_DISCORD_TO_MINECRAFT)
+                .tag(MessageType.FROM_DISCORD_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft().replace("<name>", nickname))
                 .message(message)
                 .proxy(output -> {

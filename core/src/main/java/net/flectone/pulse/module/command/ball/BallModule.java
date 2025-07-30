@@ -11,7 +11,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.RandomUtil;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -77,7 +77,7 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
         builder(fPlayer)
                 .range(command.getRange())
                 .destination(command.getDestination())
-                .tag(MessageTag.COMMAND_BALL)
+                .tag(MessageType.COMMAND_BALL)
                 .format(replaceAnswer(answer))
                 .message(message)
                 .proxy(output -> {

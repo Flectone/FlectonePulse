@@ -15,7 +15,7 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.parser.standard.UUIDParser;
@@ -126,7 +126,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         RockPaperScissors rockPaperScissors = new RockPaperScissors(fPlayer.getUuid(), fReceiver.getUuid());
 
-        proxySender.send(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_CREATE, dataOutputStream -> {
+        proxySender.send(fPlayer, MessageType.COMMAND_ROCKPAPERSCISSORS_CREATE, dataOutputStream -> {
             dataOutputStream.writeUTF(rockPaperScissors.getId().toString());
             dataOutputStream.writeUTF(rockPaperScissors.getReceiver().toString());
         });
@@ -169,7 +169,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                 return;
             }
 
-            boolean isSent = proxySender.send(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_FINAL, dataOutputStream -> {
+            boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_ROCKPAPERSCISSORS_FINAL, dataOutputStream -> {
                 dataOutputStream.writeUTF(rockPaperScissors.getId().toString());
                 dataOutputStream.writeUTF(move);
             });
@@ -186,7 +186,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                 .format((fResolver, s) -> s.getSender())
                 .sendBuilt();
 
-        boolean isSent = proxySender.send(fPlayer, MessageTag.COMMAND_ROCKPAPERSCISSORS_MOVE, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_ROCKPAPERSCISSORS_MOVE, dataOutputStream -> {
             dataOutputStream.writeUTF(rockPaperScissors.getId().toString());
             dataOutputStream.writeUTF(move);
         });

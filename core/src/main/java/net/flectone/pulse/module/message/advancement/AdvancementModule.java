@@ -18,7 +18,7 @@ import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -107,7 +107,7 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
                 .destination(message.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.ADVANCEMENT))
                 .filter(fPlayer -> integrationModule.isVanishedVisible(fTarget, fPlayer))
-                .tag(MessageTag.ADVANCEMENT)
+                .tag(MessageType.ADVANCEMENT)
                 .format(s -> convert(s, advancement))
                 .tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fResolver, advancement)})
                 .proxy(output -> output.writeUTF(gson.toJson(advancement)))

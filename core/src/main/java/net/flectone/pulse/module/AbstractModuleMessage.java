@@ -21,7 +21,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.DataConsumer;
 import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -227,7 +227,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
 
         private final FEntity fPlayer;
         private FPlayer fReceiver = FPlayer.UNKNOWN;
-        private MessageTag tag = null;
+        private MessageType tag = null;
         private Range range;
         private Destination destination = new Destination();
         private Sound sound = null;
@@ -255,7 +255,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             return this;
         }
 
-        public Builder tag(MessageTag tag) {
+        public Builder tag(MessageType tag) {
             this.tag = tag;
             return this;
         }

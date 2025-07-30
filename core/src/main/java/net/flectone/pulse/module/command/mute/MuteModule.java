@@ -17,7 +17,7 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.Pair;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -126,12 +126,12 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         Moderation mute = moderationService.mute(fTarget, databaseTime, reason, fPlayer.getId());
         if (mute == null) return;
 
-        proxySender.send(fTarget, MessageTag.SYSTEM_MUTE, dataOutputStream -> {});
+        proxySender.send(fTarget, MessageType.SYSTEM_MUTE, dataOutputStream -> {});
 
         builder(fTarget)
                 .range(command.getRange())
                 .destination(command.getDestination())
-                .tag(MessageTag.COMMAND_MUTE)
+                .tag(MessageType.COMMAND_MUTE)
                 .format(buildFormat(mute))
                 .proxy(output -> {
                     output.writeUTF(gson.toJson(fPlayer));

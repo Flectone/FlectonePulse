@@ -19,7 +19,7 @@ import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.Pair;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -133,12 +133,12 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         Moderation warn = moderationService.warn(fTarget, databaseTime, reason, fPlayer.getId());
         if (warn == null) return;
 
-        proxySender.send(fTarget, MessageTag.SYSTEM_WARN, dataOutputStream -> {});
+        proxySender.send(fTarget, MessageType.SYSTEM_WARN, dataOutputStream -> {});
 
         builder(fTarget)
                 .range(command.getRange())
                 .destination(command.getDestination())
-                .tag(MessageTag.COMMAND_WARN)
+                .tag(MessageType.COMMAND_WARN)
                 .format(buildFormat(warn))
                 .proxy(output -> {
                     output.writeUTF(gson.toJson(fPlayer));

@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.constant.AdventureTag;
 
 import java.nio.file.Path;
@@ -1456,9 +1456,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
                     put("id", "TPS <tps>");
                 }
             };
-            private Map<MessageTag, ChannelEmbed> messageChannel = new LinkedHashMap<>(){
+            private Map<MessageType, ChannelEmbed> messageChannel = new LinkedHashMap<>(){
                 {
-                    put(MessageTag.CHAT, new ChannelEmbed());
+                    put(MessageType.CHAT, new ChannelEmbed());
                 }
             };
 
@@ -1539,9 +1539,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Telegram implements SubIntegrationConfig, Localizable {
             private String forMinecraft = "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>";
-            private Map<MessageTag, String> messageChannel = new LinkedHashMap<>(){
+            private Map<MessageType, String> messageChannel = new LinkedHashMap<>(){
                 {
-                    put(MessageTag.CHAT, "<final_message>");
+                    put(MessageType.CHAT, "<final_message>");
                 }
             };
         }
@@ -1554,9 +1554,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Twitch implements SubIntegrationConfig, Localizable {
             private String forMinecraft = "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>";
-            private Map<MessageTag, String> messageChannel = new LinkedHashMap<>(){
+            private Map<MessageType, String> messageChannel = new LinkedHashMap<>(){
                 {
-                    put(MessageTag.CHAT, "<final_message>");
+                    put(MessageType.CHAT, "<final_message>");
                 }
             };
         }

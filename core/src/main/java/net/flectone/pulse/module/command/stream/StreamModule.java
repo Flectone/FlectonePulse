@@ -21,7 +21,7 @@ import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.incendo.cloud.context.CommandContext;
@@ -167,7 +167,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
             builder(fPlayer)
                     .range(command.getRange())
                     .destination(command.getDestination())
-                    .tag(MessageTag.COMMAND_STREAM)
+                    .tag(MessageType.COMMAND_STREAM)
                     .format(replaceUrls(urls))
                     .proxy(output -> output.writeUTF(urls))
                     .integration(s -> s.replace("<urls>", urls))

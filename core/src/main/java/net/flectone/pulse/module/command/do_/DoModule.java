@@ -11,7 +11,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
@@ -68,7 +68,7 @@ public class DoModule extends AbstractModuleCommand<Localization.Command.Do> {
         builder(fPlayer)
                 .range(command.getRange())
                 .destination(command.getDestination())
-                .tag(MessageTag.COMMAND_DO)
+                .tag(MessageType.COMMAND_DO)
                 .format(Localization.Command.Do::getFormat)
                 .message(message)
                 .proxy(output -> output.writeUTF(message))

@@ -17,7 +17,7 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
@@ -132,7 +132,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
         String receiverUUID = fReceiver.getUuid().toString();
 
-        boolean isSent = proxySender.send(fPlayer, MessageTag.COMMAND_TELL, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TELL, dataOutputStream -> {
             dataOutputStream.writeUTF(receiverUUID);
             dataOutputStream.writeUTF(message);
         });

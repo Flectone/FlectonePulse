@@ -11,7 +11,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.RandomUtil;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -79,7 +79,7 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
         builder(fPlayer)
                 .range(command.getRange())
                 .destination(command.getDestination())
-                .tag(MessageTag.COMMAND_TRY)
+                .tag(MessageType.COMMAND_TRY)
                 .format(replacePercent(random))
                 .message((fResolver, s)  -> message)
                 .proxy(output -> {

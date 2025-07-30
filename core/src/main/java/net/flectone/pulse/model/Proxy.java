@@ -1,6 +1,6 @@
 package net.flectone.pulse.model;
 
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 
 public interface Proxy {
 
@@ -10,6 +10,6 @@ public interface Proxy {
 
     void onDisable();
 
-    boolean sendMessage(FEntity sender, MessageTag tag, byte[] message);
+    boolean sendMessage(FEntity sender, MessageType tag, byte[] message);
 
 }

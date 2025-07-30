@@ -23,7 +23,7 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.Pair;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
@@ -151,14 +151,14 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         Moderation ban = moderationService.ban(fTarget, databaseTime, reason, fPlayer.getId());
         if (ban == null) return;
 
-        proxySender.send(fTarget, MessageTag.SYSTEM_BAN, dataOutputStream -> {});
+        proxySender.send(fTarget, MessageType.SYSTEM_BAN, dataOutputStream -> {});
 
         kick(fPlayer, fTarget, ban);
 
         builder(fTarget)
                 .range(command.getRange())
                 .destination(command.getDestination())
-                .tag(MessageTag.COMMAND_BAN)
+                .tag(MessageType.COMMAND_BAN)
                 .format(buildFormat(ban))
                 .proxy(output -> {
                     output.writeUTF(gson.toJson(fPlayer));

@@ -10,7 +10,7 @@ import net.flectone.pulse.model.Range;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.telegram.TelegramIntegration;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
@@ -65,7 +65,7 @@ public class MessageListener extends EventListener {
             return;
         }
 
-        List<String> chats = integration.getMessageChannel().get(MessageTag.FROM_TELEGRAM_TO_MINECRAFT);
+        List<String> chats = integration.getMessageChannel().get(MessageType.FROM_TELEGRAM_TO_MINECRAFT);
         if (chats == null || !chats.contains(chatID)) return;
 
         sendMessage(author, chat, text);
@@ -77,7 +77,7 @@ public class MessageListener extends EventListener {
                 .range(Range.get(Range.Type.PROXY))
                 .destination(integration.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELEGRAM))
-                .tag(MessageTag.FROM_TELEGRAM_TO_MINECRAFT)
+                .tag(MessageType.FROM_TELEGRAM_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft()
                         .replace("<name>", author)
                         .replace("<chat>", chat)

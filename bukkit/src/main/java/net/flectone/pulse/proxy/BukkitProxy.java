@@ -9,7 +9,7 @@ import net.flectone.pulse.listener.BukkitProxyListener;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.Proxy;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -60,7 +60,7 @@ public class BukkitProxy implements Proxy {
     }
 
     @Override
-    public boolean sendMessage(FEntity sender, MessageTag tag, byte[] message) {
+    public boolean sendMessage(FEntity sender, MessageType tag, byte[] message) {
         if (!isEnable()) return false;
         if (tag == null) return false;
 

@@ -15,7 +15,7 @@ import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.Proxy;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.SystemVariableResolver;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.nio.charset.StandardCharsets;
@@ -76,7 +76,7 @@ public class RedisProxy implements Proxy {
             fLogger.info("Redis (Lettuce) connected");
 
             RedisPubSubAsyncCommands<byte[], byte[]> async = pubSubConnection.async();
-            for (MessageTag tag : MessageTag.values()) {
+            for (MessageType tag : MessageType.values()) {
                 async.subscribe(tag.name().getBytes(StandardCharsets.UTF_8));
             }
 
@@ -99,7 +99,7 @@ public class RedisProxy implements Proxy {
     }
 
     @Override
-    public boolean sendMessage(FEntity sender, MessageTag tag, byte[] message) {
+    public boolean sendMessage(FEntity sender, MessageType tag, byte[] message) {
         if (!isEnable()) return false;
         if (tag == null) return false;
 

@@ -23,7 +23,7 @@ import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -197,7 +197,7 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> i
         builder(fPlayer)
                 .range(range)
                 .destination(message.getDestination())
-                .tag(MessageTag.AFK)
+                .tag(MessageType.AFK)
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.AFK))
                 .filter(fReceiver -> integrationModule.isVanishedVisible(fPlayer, fReceiver))
                 .format(s -> isAfk

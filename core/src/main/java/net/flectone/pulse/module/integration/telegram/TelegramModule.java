@@ -12,7 +12,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.LibraryResolver;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 
 import java.util.function.UnaryOperator;
 
@@ -87,9 +87,9 @@ public class TelegramModule extends AbstractModule {
         return integration.isEnable();
     }
 
-    public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> telegramString) {
+    public void sendMessage(FEntity sender, MessageType messageType, UnaryOperator<String> telegramString) {
         if (checkModulePredicates(sender)) return;
 
-        injector.getInstance(TelegramIntegration.class).sendMessage(sender, messageTag, telegramString);
+        injector.getInstance(TelegramIntegration.class).sendMessage(sender, messageType, telegramString);
     }
 }

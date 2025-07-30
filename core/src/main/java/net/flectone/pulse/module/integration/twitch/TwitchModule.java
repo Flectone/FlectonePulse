@@ -12,7 +12,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.LibraryResolver;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 
 import java.util.function.UnaryOperator;
 
@@ -344,9 +344,9 @@ public class TwitchModule extends AbstractModule {
         return integration.isEnable();
     }
 
-    public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> twitchString) {
+    public void sendMessage(FEntity sender, MessageType messageType, UnaryOperator<String> twitchString) {
         if (checkModulePredicates(sender)) return;
 
-        injector.getInstance(TwitchIntegration.class).sendMessage(sender, messageTag, twitchString);
+        injector.getInstance(TwitchIntegration.class).sendMessage(sender, messageType, twitchString);
     }
 }

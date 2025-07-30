@@ -52,7 +52,7 @@ import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
@@ -94,7 +94,7 @@ public class ProxyMessageHandler {
         try (ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
              DataInputStream input = new DataInputStream(byteStream)) {
 
-            MessageTag tag = MessageTag.fromProxyString(input.readUTF());
+            MessageType tag = MessageType.fromProxyString(input.readUTF());
             if (tag == null) return;
 
             switch (tag) {
@@ -115,7 +115,7 @@ public class ProxyMessageHandler {
         fPlayerService.invalidateOnline(UUID.fromString(input.readUTF()));
     }
 
-    private void handleTaggedMessage(DataInputStream input, MessageTag tag) throws IOException {
+    private void handleTaggedMessage(DataInputStream input, MessageType tag) throws IOException {
         int clustersCount = input.readInt();
         Set<String> proxyClusters = readClusters(input, clustersCount);
 
@@ -174,7 +174,7 @@ public class ProxyMessageHandler {
         }
     }
 
-    private boolean handleModerationInvalidation(MessageTag tag, FEntity fEntity) {
+    private boolean handleModerationInvalidation(MessageType tag, FEntity fEntity) {
         return switch (tag) {
             case SYSTEM_BAN -> {
                 moderationService.invalidateBans(fEntity.getUuid());
@@ -500,7 +500,7 @@ public class ProxyMessageHandler {
         tryModule.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(tryModule.getCommand().getDestination())
-                .tag(MessageTag.COMMAND_TRY)
+                .tag(MessageType.COMMAND_TRY)
                 .format(tryModule.replacePercent(value))
                 .message(message)
                 .sound(tryModule.getSound())
@@ -608,7 +608,7 @@ public class ProxyMessageHandler {
         messageCreateListener.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(messageCreateListener.getIntegration().getDestination())
-                .tag(MessageTag.FROM_DISCORD_TO_MINECRAFT)
+                .tag(MessageType.FROM_DISCORD_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft().replace("<name>", nickname))
                 .message(string)
                 .sound(messageCreateListener.getSound())
@@ -624,7 +624,7 @@ public class ProxyMessageHandler {
         channelMessageListener.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(channelMessageListener.getIntegration().getDestination())
-                .tag(MessageTag.FROM_TWITCH_TO_MINECRAFT)
+                .tag(MessageType.FROM_TWITCH_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft()
                         .replace("<name>", nickname)
                         .replace("<channel>", channelName)
@@ -643,7 +643,7 @@ public class ProxyMessageHandler {
         messageListener.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(messageListener.getIntegration().getDestination())
-                .tag(MessageTag.FROM_TELEGRAM_TO_MINECRAFT)
+                .tag(MessageType.FROM_TELEGRAM_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft()
                         .replace("<name>", author)
                         .replace("<chat>", chat)
@@ -662,7 +662,7 @@ public class ProxyMessageHandler {
         advancementModule.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(advancementModule.getMessage().getDestination())
-                .tag(MessageTag.ADVANCEMENT)
+                .tag(MessageType.ADVANCEMENT)
                 .format((fResolver, s) -> advancementModule.convert(s, advancement))
                 .tagResolvers(fResolver -> new TagResolver[]{advancementModule.advancementTag(fEntity, fResolver, advancement)})
                 .sound(advancementModule.getSound())
@@ -678,7 +678,7 @@ public class ProxyMessageHandler {
         deathModule.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(deathModule.getMessage().getDestination())
-                .tag(MessageTag.DEATH)
+                .tag(MessageType.DEATH)
                 .format((fResolver, s) -> s.getTypes().get(death.getKey()))
                 .tagResolvers(fResolver -> new TagResolver[]{deathModule.killerTag(fResolver, death.getKiller()), deathModule.byItemTag(death.getItem())})
                 .sound(deathModule.getSound())
@@ -692,7 +692,7 @@ public class ProxyMessageHandler {
         boolean hasPlayedBefore = input.readBoolean();
 
         joinModule.builder(fEntity)
-                .tag(MessageTag.JOIN)
+                .tag(MessageType.JOIN)
                 .destination(joinModule.getMessage().getDestination())
                 .range(Range.get(Range.Type.SERVER))
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.JOIN))
@@ -706,7 +706,7 @@ public class ProxyMessageHandler {
         if (quitModule.checkModulePredicates(fEntity)) return;
 
         quitModule.builder(fEntity)
-                .tag(MessageTag.QUIT)
+                .tag(MessageType.QUIT)
                 .destination(quitModule.getMessage().getDestination())
                 .range(Range.get(Range.Type.SERVER))
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.QUIT))
@@ -722,7 +722,7 @@ public class ProxyMessageHandler {
         boolean isAfk = input.readBoolean();
 
         afkModule.builder(fEntity)
-                .tag(MessageTag.AFK)
+                .tag(MessageType.AFK)
                 .destination(afkModule.getMessage().getDestination())
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.AFK))
                 .format(s -> isAfk

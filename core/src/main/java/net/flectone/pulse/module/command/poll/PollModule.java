@@ -19,7 +19,7 @@ import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.incendo.cloud.context.CommandContext;
@@ -129,7 +129,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
                 builder(fPlayer)
                         .range(range)
-                        .tag(MessageTag.COMMAND_POLL_CREATE_MESSAGE)
+                        .tag(MessageType.COMMAND_POLL_CREATE_MESSAGE)
                         .format(resolvePollFormat(fPlayer, poll, status))
                         .message((fResolver, s) -> poll.getTitle())
                         .sendBuilt();
@@ -166,7 +166,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         String promptNumber = getPrompt().getNumber();
         int numberVote = commandContext.get(promptNumber);
 
-        boolean isSent = proxySender.send(fPlayer, MessageTag.COMMAND_POLL_VOTE, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_POLL_VOTE, dataOutputStream -> {
             dataOutputStream.writeInt(id);
             dataOutputStream.writeInt(numberVote);
         });
@@ -222,7 +222,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
         builder(fPlayer)
                 .range(range)
-                .tag(MessageTag.COMMAND_POLL_CREATE_MESSAGE)
+                .tag(MessageType.COMMAND_POLL_CREATE_MESSAGE)
                 .format(resolvePollFormat(fPlayer, poll, Status.START))
                 .message((fResolver, s) -> poll.getTitle())
                 .proxy(output -> output.writeUTF(gson.toJson(poll)))

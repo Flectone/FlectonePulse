@@ -11,7 +11,7 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import net.flectone.pulse.processor.ProxyMessageProcessor;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import org.slf4j.Logger;
 
@@ -70,7 +70,7 @@ public class FlectonePulseVelocity {
 
     @Subscribe
     public void onServerConnectedEvent(ServerConnectedEvent event) {
-        byte[] data = ProxyMessageProcessor.create(MessageTag.SYSTEM_ONLINE, event.getPlayer().getUniqueId());
+        byte[] data = ProxyMessageProcessor.create(MessageType.SYSTEM_ONLINE, event.getPlayer().getUniqueId());
 
         proxyServer.getAllServers().stream()
                 .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())
@@ -79,7 +79,7 @@ public class FlectonePulseVelocity {
 
     @Subscribe
     public void onDisconnectEvent(DisconnectEvent event) {
-        byte[] data = ProxyMessageProcessor.create(MessageTag.SYSTEM_OFFLINE, event.getPlayer().getUniqueId());
+        byte[] data = ProxyMessageProcessor.create(MessageType.SYSTEM_OFFLINE, event.getPlayer().getUniqueId());
 
         proxyServer.getAllServers().stream()
                 .filter(registeredServer -> !registeredServer.getPlayersConnected().isEmpty())

@@ -12,7 +12,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.LibraryResolver;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.function.UnaryOperator;
@@ -93,9 +93,9 @@ public class DiscordModule extends AbstractModule {
         return integration.isEnable();
     }
 
-    public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> discordString) {
+    public void sendMessage(FEntity sender, MessageType messageType, UnaryOperator<String> discordString) {
         if (checkModulePredicates(sender)) return;
 
-        injector.getInstance(DiscordIntegration.class).sendMessage(sender, messageTag, discordString);
+        injector.getInstance(DiscordIntegration.class).sendMessage(sender, messageType, discordString);
     }
 }

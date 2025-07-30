@@ -18,7 +18,7 @@ import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.yandex.YandexModule;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.Collections;
@@ -147,17 +147,17 @@ public abstract class IntegrationModule extends AbstractModule {
         return injector.getInstance(LuckPermsModule.class).getGroupWeight(fPlayer);
     }
 
-    public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> discordString) {
+    public void sendMessage(FEntity sender, MessageType messageType, UnaryOperator<String> discordString) {
         if (getChildren().contains(DiscordModule.class)) {
-            injector.getInstance(DiscordModule.class).sendMessage(sender, messageTag, discordString);
+            injector.getInstance(DiscordModule.class).sendMessage(sender, messageType, discordString);
         }
 
         if (getChildren().contains(TwitchModule.class)) {
-            injector.getInstance(TwitchModule.class).sendMessage(sender, messageTag, discordString);
+            injector.getInstance(TwitchModule.class).sendMessage(sender, messageType, discordString);
         }
 
         if (getChildren().contains(TelegramModule.class)) {
-            injector.getInstance(TelegramModule.class).sendMessage(sender, messageTag, discordString);
+            injector.getInstance(TelegramModule.class).sendMessage(sender, messageType, discordString);
         }
     }
 

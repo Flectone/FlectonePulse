@@ -15,7 +15,7 @@ import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.twitch.listener.ChannelMessageListener;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.SystemVariableResolver;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.List;
@@ -92,12 +92,12 @@ public class TwitchIntegration implements FIntegration {
         fLogger.info("✔ Twitch integration enabled");
     }
 
-    public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> twitchString) {
-        List<String> channels = integration.getMessageChannel().get(messageTag);
+    public void sendMessage(FEntity sender, MessageType messageType, UnaryOperator<String> twitchString) {
+        List<String> channels = integration.getMessageChannel().get(messageType);
         if (channels == null) return;
         if (channels.isEmpty()) return;
 
-        String message = localization.getMessageChannel().get(messageTag);
+        String message = localization.getMessageChannel().get(messageType);
         if (message == null) return;
         if (message.isEmpty()) return;
 

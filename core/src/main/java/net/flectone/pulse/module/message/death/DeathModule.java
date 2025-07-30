@@ -24,7 +24,7 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.PacketSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.EntityUtil;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -136,7 +136,7 @@ public class DeathModule extends AbstractModuleMessage<Localization.Message.Deat
                 .destination(message.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DEATH))
                 .filter(fPlayer -> integrationModule.isVanishedVisible(fTarget, fPlayer))
-                .tag(MessageTag.DEATH)
+                .tag(MessageType.DEATH)
                 .format(s -> s.getTypes().get(death.getKey()))
                 .tagResolvers(fResolver -> new TagResolver[]{killerTag(fResolver, death.getKiller()), byItemTag(death.getItem())})
                 .proxy(output -> output.writeUTF(gson.toJson(death)))

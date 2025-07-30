@@ -12,7 +12,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.RandomUtil;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -92,7 +92,7 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
         builder(fPlayer)
                 .range(command.getRange())
                 .destination(command.getDestination())
-                .tag(MessageTag.COMMAND_DICE)
+                .tag(MessageType.COMMAND_DICE)
                 .format(replaceResult(cubes))
                 .proxy(output -> output.writeUTF(gson.toJson(cubes)))
                 .integration(s -> {

@@ -15,7 +15,7 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
@@ -126,10 +126,10 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
 
         moderationService.remove(fTarget, warns);
 
-        proxySender.send(fTarget, MessageTag.SYSTEM_WARN, dataOutputStream -> {});
+        proxySender.send(fTarget, MessageType.SYSTEM_WARN, dataOutputStream -> {});
 
         builder(fTarget)
-                .tag(MessageTag.COMMAND_UNWARN)
+                .tag(MessageType.COMMAND_UNWARN)
                 .destination(command.getDestination())
                 .range(command.getRange())
                 .filter(filter -> filter.isSetting(FPlayer.Setting.WARN))

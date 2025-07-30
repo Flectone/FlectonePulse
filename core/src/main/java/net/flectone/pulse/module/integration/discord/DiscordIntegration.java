@@ -27,7 +27,7 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.SystemVariableResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.SkinService;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
@@ -74,15 +74,15 @@ public class DiscordIntegration implements FIntegration {
         this.fLogger = fLogger;
     }
 
-    public void sendMessage(FEntity sender, MessageTag messageTag, UnaryOperator<String> discordString) {
+    public void sendMessage(FEntity sender, MessageType messageType, UnaryOperator<String> discordString) {
         if (gateway == null) return;
 
-        String integrationChannel = integration.getMessageChannel().get(messageTag);
+        String integrationChannel = integration.getMessageChannel().get(messageType);
         if (integrationChannel == null) return;
         if (integrationChannel.isEmpty()) return;
 
         Localization.Integration.Discord localization = fileResolver.getLocalization().getIntegration().getDiscord();
-        Localization.Integration.Discord.ChannelEmbed messageChannelEmbed = localization.getMessageChannel().get(messageTag);
+        Localization.Integration.Discord.ChannelEmbed messageChannelEmbed = localization.getMessageChannel().get(messageType);
         if (messageChannelEmbed == null) return;
 
         String skin = skinService.getSkin(sender);

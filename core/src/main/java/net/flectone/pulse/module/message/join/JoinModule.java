@@ -16,7 +16,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.constant.MinecraftTranslationKey;
 
 @Singleton
@@ -83,7 +83,7 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
         boolean hasPlayedBefore = platformPlayerAdapter.hasPlayedBefore(fPlayer);
 
         builder(fPlayer)
-                .tag(MessageTag.JOIN)
+                .tag(MessageType.JOIN)
                 .destination(message.getDestination())
                 .range(message.getRange())
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.JOIN))

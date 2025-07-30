@@ -15,7 +15,7 @@ import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
@@ -116,7 +116,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
         builder(fPlayer)
                 .range(command.getRange())
                 .destination(command.getDestination())
-                .tag(MessageTag.COMMAND_TRANSLATETO)
+                .tag(MessageType.COMMAND_TRANSLATETO)
                 .format(replaceLanguage(targetLang))
                 .message(translatedMessage)
                 .proxy(output -> {

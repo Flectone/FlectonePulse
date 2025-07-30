@@ -15,7 +15,7 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
@@ -126,10 +126,10 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
 
         moderationService.remove(fTarget, mutes);
 
-        proxySender.send(fTarget, MessageTag.SYSTEM_MUTE, dataOutputStream -> {});
+        proxySender.send(fTarget, MessageType.SYSTEM_MUTE, dataOutputStream -> {});
 
         builder(fTarget)
-                .tag(MessageTag.COMMAND_UNMUTE)
+                .tag(MessageType.COMMAND_UNMUTE)
                 .destination(command.getDestination())
                 .range(command.getRange())
                 .filter(filter -> filter.isSetting(FPlayer.Setting.MUTE))

@@ -5,7 +5,7 @@ import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.Destination;
 import net.flectone.pulse.model.Ticker;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -103,10 +103,10 @@ public final class Integration extends FileSerializable implements ModuleConfig.
         private String token = "";
         private Presence presence = new Presence();
         private ChannelInfo channelInfo = new ChannelInfo();
-        private Map<MessageTag, String> messageChannel = new LinkedHashMap<>(){
+        private Map<MessageType, String> messageChannel = new LinkedHashMap<>(){
             {
-                put(MessageTag.FROM_DISCORD_TO_MINECRAFT, "");
-                put(MessageTag.CHAT, "");
+                put(MessageType.FROM_DISCORD_TO_MINECRAFT, "");
+                put(MessageType.CHAT, "");
             }
         };
         private Destination destination = new Destination();
@@ -214,10 +214,10 @@ public final class Integration extends FileSerializable implements ModuleConfig.
     public static final class Telegram implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = false;
         private String token = "";
-        private Map<MessageTag, List<String>> messageChannel = new LinkedHashMap<>(){
+        private Map<MessageType, List<String>> messageChannel = new LinkedHashMap<>(){
             {
-                put(MessageTag.FROM_TELEGRAM_TO_MINECRAFT, new ArrayList<>());
-                put(MessageTag.CHAT, new ArrayList<>());
+                put(MessageType.FROM_TELEGRAM_TO_MINECRAFT, new ArrayList<>());
+                put(MessageType.CHAT, new ArrayList<>());
             }
         };
         private Destination destination = new Destination();
@@ -233,10 +233,10 @@ public final class Integration extends FileSerializable implements ModuleConfig.
         private boolean enable = false;
         private String clientID = "";
         private String token = "";
-        private Map<MessageTag, List<String>> messageChannel = new LinkedHashMap<>(){
+        private Map<MessageType, List<String>> messageChannel = new LinkedHashMap<>(){
             {
-                put(MessageTag.FROM_TWITCH_TO_MINECRAFT, new ArrayList<>());
-                put(MessageTag.CHAT, new ArrayList<>());
+                put(MessageType.FROM_TWITCH_TO_MINECRAFT, new ArrayList<>());
+                put(MessageType.CHAT, new ArrayList<>());
             }
         };
         private Map<String, List<String>> followChannel = new LinkedHashMap<>(Map.of(

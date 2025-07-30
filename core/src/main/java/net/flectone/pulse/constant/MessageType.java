@@ -1,8 +1,8 @@
-package net.flectone.pulse.util;
+package net.flectone.pulse.constant;
 
 import java.util.Arrays;
 
-public enum MessageTag {
+public enum MessageType {
     CHAT,
     COMMAND_ANON,
     COMMAND_ME,
@@ -53,10 +53,10 @@ public enum MessageTag {
         return "FlectonePulse:" + this.name();
     }
 
-    public static MessageTag fromProxyString(String string) {
+    public static MessageType fromProxyString(String string) {
         if (string == null) return null;
 
-        return Arrays.stream(MessageTag.values())
+        return Arrays.stream(MessageType.values())
                 .filter(tag -> string.equals("FlectonePulse:" + tag.name()))
                 .findAny()
                 .orElse(null);

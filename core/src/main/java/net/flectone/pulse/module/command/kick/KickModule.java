@@ -7,6 +7,7 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.resolver.FileResolver;
@@ -114,7 +115,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         builder(fTarget)
                 .destination(command.getDestination())
                 .range(command.getRange())
-                .tag(MessageTag.COMMAND_KICK)
+                .tag(MessageType.COMMAND_KICK)
                 .format(buildFormat(kick))
                 .proxy(output -> {
                     output.writeUTF(gson.toJson(fTarget));

@@ -16,7 +16,7 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
@@ -137,7 +137,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 .sound(getSound())
                 .sendBuilt();
 
-        boolean isSent = proxySender.send(fPlayer, MessageTag.COMMAND_TICTACTOE_CREATE, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TICTACTOE_CREATE, dataOutputStream -> {
             dataOutputStream.writeUTF(gson.toJson(fReceiver));
             dataOutputStream.writeInt(ticTacToe.getId());
             dataOutputStream.writeBoolean(isHard);
@@ -224,7 +224,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 .format(getMoveMessage(ticTacToe, fReceiver, fPlayer, finalTypeTitle, move))
                 .sendBuilt();
 
-        boolean isSent = proxySender.send(fPlayer, MessageTag.COMMAND_TICTACTOE_MOVE, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TICTACTOE_MOVE, dataOutputStream -> {
             dataOutputStream.writeUTF(gson.toJson(fReceiver));
             dataOutputStream.writeUTF(ticTacToe.toString());
             dataOutputStream.writeInt(finalTypeTitle);

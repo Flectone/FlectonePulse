@@ -12,7 +12,7 @@ import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.constant.MinecraftTranslationKey;
 
 @Singleton
@@ -58,7 +58,7 @@ public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit>
         if (checkModulePredicates(fPlayer)) return;
 
         builder(fPlayer)
-                .tag(MessageTag.QUIT)
+                .tag(MessageType.QUIT)
                 .destination(message.getDestination())
                 .range(message.getRange())
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.QUIT))

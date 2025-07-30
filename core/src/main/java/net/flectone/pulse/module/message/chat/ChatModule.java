@@ -21,7 +21,7 @@ import net.flectone.pulse.module.message.chat.listener.ChatListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -162,7 +162,7 @@ public class ChatModule extends AbstractModuleMessage<Localization.Message.Chat>
                 : eventMessage;
 
         Builder builder = builder(fPlayer)
-                .tag(MessageTag.CHAT)
+                .tag(MessageType.CHAT)
                 .destination(playerChat.getDestination())
                 .range(chatRange)
                 .filter(chatPermissionFilter)

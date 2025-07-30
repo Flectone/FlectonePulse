@@ -12,7 +12,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
@@ -101,7 +101,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
                 .filter(fReceiver -> permissionChecker.check(fReceiver, getModulePermission()))
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.SPY))
                 .filter(FPlayer::isOnline)
-                .tag(MessageTag.COMMAND_SPY)
+                .tag(MessageType.COMMAND_SPY)
                 .format(replaceAction(action))
                 .message((fResolver, s) -> string)
                 .proxy(output -> {

@@ -1,7 +1,7 @@
 package net.flectone.pulse.processor;
 
 import lombok.experimental.UtilityClass;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 
 import java.io.*;
 import java.util.UUID;
@@ -9,7 +9,7 @@ import java.util.UUID;
 @UtilityClass
 public class ProxyMessageProcessor {
 
-    public byte[] create(MessageTag tag, UUID uuid) {
+    public byte[] create(MessageType tag, UUID uuid) {
         try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
              DataOutputStream output = new DataOutputStream(byteStream)) {
 
@@ -29,8 +29,8 @@ public class ProxyMessageProcessor {
             String tag = input.readUTF();
             if (!tag.startsWith("FlectonePulse")) return null;
 
-            MessageTag proxyMessageTag = MessageTag.fromProxyString(tag);
-            if (proxyMessageTag == null) return null;
+            MessageType proxyMessageType = MessageType.fromProxyString(tag);
+            if (proxyMessageType == null) return null;
 
             return data;
         } catch (IOException e) {

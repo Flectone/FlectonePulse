@@ -11,7 +11,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.DisableAction;
-import net.flectone.pulse.util.MessageTag;
+import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
@@ -66,7 +66,7 @@ public class AnonModule extends AbstractModuleCommand<Localization.Command.Anon>
         String string = commandContext.get(promptMessage);
 
         builder(fPlayer)
-                .tag(MessageTag.COMMAND_ANON)
+                .tag(MessageType.COMMAND_ANON)
                 .destination(command.getDestination())
                 .range(command.getRange())
                 .format(Localization.Command.Anon::getFormat)
