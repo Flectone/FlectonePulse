@@ -13,7 +13,7 @@ import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.flectone.pulse.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 
@@ -47,8 +47,8 @@ public class GamemodeModule extends AbstractModuleMessage<Localization.Message.G
         createSound(message.getSound(), permission.getSound());
 
         eventProcessRegistry.registerMessageHandler(event -> {
-            MinecraftTranslationKeys key = event.getKey();
-            if (!key.startsWith("commands.gamemode.success") && key != MinecraftTranslationKeys.GAMEMODE_CHANGED) return;
+            MinecraftTranslationKey key = event.getKey();
+            if (!key.startsWith("commands.gamemode.success") && key != MinecraftTranslationKey.GAMEMODE_CHANGED) return;
 
             String target = event.getUserName();
             String gamemodeKey = "";

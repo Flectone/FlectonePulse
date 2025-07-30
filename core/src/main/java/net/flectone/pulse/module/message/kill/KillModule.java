@@ -14,7 +14,7 @@ import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.EntityUtil;
-import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.flectone.pulse.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -66,14 +66,14 @@ public class KillModule extends AbstractModuleMessage<Localization.Message.Kill>
     }
 
     @Async
-    public void send(UUID receiver, MinecraftTranslationKeys key, String value, FEntity fEntity) {
+    public void send(UUID receiver, MinecraftTranslationKey key, String value, FEntity fEntity) {
         FPlayer fPlayer = fPlayerService.getFPlayer(receiver);
         if (checkModulePredicates(fPlayer)) return;
 
         FEntity fTarget = fPlayer;
 
-        boolean isSingle = key == MinecraftTranslationKeys.COMMANDS_KILL_SUCCESS_SINGLE
-                || key == MinecraftTranslationKeys.COMMANDS_KILL_SUCCESS;
+        boolean isSingle = key == MinecraftTranslationKey.COMMANDS_KILL_SUCCESS_SINGLE
+                || key == MinecraftTranslationKey.COMMANDS_KILL_SUCCESS;
 
         if (isSingle && fEntity != null && fEntity.getUuid() != null) {
             fTarget = fPlayerService.getFPlayer(fEntity.getUuid());
@@ -86,7 +86,7 @@ public class KillModule extends AbstractModuleMessage<Localization.Message.Kill>
         builder(fTarget)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> key == MinecraftTranslationKeys.COMMANDS_KILL_SUCCESS_MULTIPLE
+                .format(s -> key == MinecraftTranslationKey.COMMANDS_KILL_SUCCESS_MULTIPLE
                         ? s.getMultiple().replace("<count>", value)
                         : s.getSingle()
                 )
@@ -101,7 +101,7 @@ public class KillModule extends AbstractModuleMessage<Localization.Message.Kill>
         String value = firstArgument.content();
 
         event.cancel();
-        send(event.getUserUUID(), MinecraftTranslationKeys.COMMANDS_KILL_SUCCESS_MULTIPLE, value, null);
+        send(event.getUserUUID(), MinecraftTranslationKey.COMMANDS_KILL_SUCCESS_MULTIPLE, value, null);
     }
 
     private void handleKillSingle(TranslatableMessageEvent event) {

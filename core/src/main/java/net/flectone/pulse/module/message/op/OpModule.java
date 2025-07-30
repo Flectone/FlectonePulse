@@ -11,7 +11,7 @@ import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.flectone.pulse.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +45,7 @@ public class OpModule extends AbstractModuleMessage<Localization.Message.Op> {
         createSound(message.getSound(), permission.getSound());
 
         eventProcessRegistry.registerMessageHandler(event -> {
-            if (event.getKey() != MinecraftTranslationKeys.COMMANDS_OP_SUCCESS) return;
+            if (event.getKey() != MinecraftTranslationKey.COMMANDS_OP_SUCCESS) return;
 
             TranslatableComponent translatableComponent = event.getComponent();
             if (translatableComponent.args().isEmpty()) return;

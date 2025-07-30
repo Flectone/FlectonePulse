@@ -1,10 +1,10 @@
-package net.flectone.pulse.util;
+package net.flectone.pulse.constant;
 
 import net.kyori.adventure.text.TranslatableComponent;
 
 import java.util.Arrays;
 
-public enum MinecraftTranslationKeys {
+public enum MinecraftTranslationKey {
 
     BLOCK_MINECRAFT_BED_NO_SLEEP("block.minecraft.bed.no_sleep"),
     BLOCK_MINECRAFT_BED_NOT_SAFE("block.minecraft.bed.not_safe"),
@@ -172,16 +172,16 @@ public enum MinecraftTranslationKeys {
 
     private final String key;
 
-    MinecraftTranslationKeys(String key) {
+    MinecraftTranslationKey(String key) {
         this.key = key;
     }
 
-    public static MinecraftTranslationKeys fromString(TranslatableComponent component) {
+    public static MinecraftTranslationKey fromString(TranslatableComponent component) {
         return fromString(component.key());
     }
 
-    public static MinecraftTranslationKeys fromString(String string) {
-        return Arrays.stream(MinecraftTranslationKeys.values())
+    public static MinecraftTranslationKey fromString(String string) {
+        return Arrays.stream(MinecraftTranslationKey.values())
                 .filter(type -> type.key.equalsIgnoreCase(string))
                 .findAny()
                 .orElse(UNKNOWN);

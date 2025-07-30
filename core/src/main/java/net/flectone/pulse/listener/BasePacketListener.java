@@ -21,7 +21,7 @@ import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.sender.PacketSender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.flectone.pulse.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 
@@ -99,10 +99,10 @@ public class BasePacketListener implements PacketListener {
         TranslatableComponent translatableComponent = parseTranslatableComponent(event);
         if (translatableComponent == null) return;
 
-        MinecraftTranslationKeys key = MinecraftTranslationKeys.fromString(translatableComponent.key());
+        MinecraftTranslationKey key = MinecraftTranslationKey.fromString(translatableComponent.key());
 
         // skip minecraft warning
-        if (key == MinecraftTranslationKeys.MULTIPLAYER_MESSAGE_NOT_DELIVERED) {
+        if (key == MinecraftTranslationKey.MULTIPLAYER_MESSAGE_NOT_DELIVERED) {
             event.setCancelled(true);
             return;
         }

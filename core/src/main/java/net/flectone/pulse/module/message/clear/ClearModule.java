@@ -12,7 +12,7 @@ import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.flectone.pulse.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 
@@ -52,7 +52,7 @@ public class ClearModule extends AbstractModuleMessage<Localization.Message.Clea
 
             event.cancel();
 
-            if (event.getKey() == MinecraftTranslationKeys.COMMANDS_CLEAR_SUCCESS) {
+            if (event.getKey() == MinecraftTranslationKey.COMMANDS_CLEAR_SUCCESS) {
                 send(event, secondArg.content(), firstArg.content());
             } else {
                 send(event, firstArg.content(), secondArg.content());
@@ -72,8 +72,8 @@ public class ClearModule extends AbstractModuleMessage<Localization.Message.Clea
         if (checkModulePredicates(fPlayer)) return;
 
         FPlayer fTarget = fPlayer;
-        boolean isSingle = event.getKey() == MinecraftTranslationKeys.COMMANDS_CLEAR_SUCCESS_SINGLE
-                || event.getKey() == MinecraftTranslationKeys.COMMANDS_CLEAR_SUCCESS;
+        boolean isSingle = event.getKey() == MinecraftTranslationKey.COMMANDS_CLEAR_SUCCESS_SINGLE
+                || event.getKey() == MinecraftTranslationKey.COMMANDS_CLEAR_SUCCESS;
 
         if (isSingle) {
             fTarget = fPlayerService.getFPlayer(value);

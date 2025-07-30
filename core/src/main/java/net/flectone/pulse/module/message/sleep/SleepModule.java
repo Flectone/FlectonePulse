@@ -12,7 +12,7 @@ import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.flectone.pulse.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 
@@ -49,7 +49,7 @@ public class SleepModule extends AbstractModuleMessage<Localization.Message.Slee
             String allCount = "";
 
             TranslatableComponent translatableComponent = event.getComponent();
-            if (event.getKey() == MinecraftTranslationKeys.SLEEP_PLAYERS_SLEEPING && translatableComponent.args().size() == 2) {
+            if (event.getKey() == MinecraftTranslationKey.SLEEP_PLAYERS_SLEEPING && translatableComponent.args().size() == 2) {
                 if ((translatableComponent.args().get(0) instanceof TextComponent sleepComponent)) {
                     sleepCount = sleepComponent.content();
                 }

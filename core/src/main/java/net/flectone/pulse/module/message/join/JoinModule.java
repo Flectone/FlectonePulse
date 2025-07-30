@@ -17,7 +17,7 @@ import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.flectone.pulse.constant.MinecraftTranslationKey;
 
 @Singleton
 public class JoinModule extends AbstractModuleMessage<Localization.Message.Join> {
@@ -61,7 +61,7 @@ public class JoinModule extends AbstractModuleMessage<Localization.Message.Join>
         });
 
         eventProcessRegistry.registerMessageHandler(event -> {
-            if (event.getKey() != MinecraftTranslationKeys.MULTIPLAYER_PLAYER_JOINED) return;
+            if (event.getKey() != MinecraftTranslationKey.MULTIPLAYER_PLAYER_JOINED) return;
 
             event.cancel();
         });

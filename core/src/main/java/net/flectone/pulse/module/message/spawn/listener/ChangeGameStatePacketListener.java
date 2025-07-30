@@ -7,7 +7,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCh
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.module.message.spawn.SpawnModule;
-import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.flectone.pulse.constant.MinecraftTranslationKey;
 
 @Singleton
 public class ChangeGameStatePacketListener implements PacketListener {
@@ -29,7 +29,7 @@ public class ChangeGameStatePacketListener implements PacketListener {
         if (wrapper.getReason() != WrapperPlayServerChangeGameState.Reason.NO_RESPAWN_BLOCK_AVAILABLE) return;
 
         event.setCancelled(true);
-        spawnModule.send(event.getUser().getUUID(), MinecraftTranslationKeys.BLOCK_MINECRAFT_SPAWN_NOT_VALID);
+        spawnModule.send(event.getUser().getUUID(), MinecraftTranslationKey.BLOCK_MINECRAFT_SPAWN_NOT_VALID);
     }
 }
 

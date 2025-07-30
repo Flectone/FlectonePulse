@@ -11,7 +11,7 @@ import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.flectone.pulse.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -47,7 +47,7 @@ public class SetblockModule extends AbstractModuleMessage<Localization.Message.S
         createSound(message.getSound(), permission.getSound());
 
         eventProcessRegistry.registerMessageHandler(event -> {
-            if (event.getKey() != MinecraftTranslationKeys.COMMANDS_SETBLOCK_SUCCESS) return;
+            if (event.getKey() != MinecraftTranslationKey.COMMANDS_SETBLOCK_SUCCESS) return;
 
             TranslatableComponent translatableComponent = event.getComponent();
             List<Component> translationArguments = translatableComponent.args();

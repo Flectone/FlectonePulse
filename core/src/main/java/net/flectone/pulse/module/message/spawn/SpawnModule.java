@@ -14,7 +14,7 @@ import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.flectone.pulse.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -53,7 +53,7 @@ public class SpawnModule extends AbstractModuleMessage<Localization.Message.Spaw
 
         listenerRegistry.register(ChangeGameStatePacketListener.class);
         eventProcessRegistry.registerMessageHandler(event -> {
-            if (event.getKey() == MinecraftTranslationKeys.BLOCK_MINECRAFT_SET_SPAWN) {
+            if (event.getKey() == MinecraftTranslationKey.BLOCK_MINECRAFT_SET_SPAWN) {
                 event.cancel();
                 send(event.getUserUUID(), event.getKey());
                 return;
@@ -72,7 +72,7 @@ public class SpawnModule extends AbstractModuleMessage<Localization.Message.Spaw
                 String angle = "";
                 String world = "";
 
-                if (event.getKey() == MinecraftTranslationKeys.COMMANDS_SPAWNPOINT_SUCCESS) {
+                if (event.getKey() == MinecraftTranslationKey.COMMANDS_SPAWNPOINT_SUCCESS) {
                     // legacy format, player first
                     targetComponent = translationArguments.get(0);
                     xComponent = translationArguments.get(1);
@@ -117,14 +117,14 @@ public class SpawnModule extends AbstractModuleMessage<Localization.Message.Spaw
     }
 
     @Async
-    public void send(UUID receiver, MinecraftTranslationKeys key) {
+    public void send(UUID receiver, MinecraftTranslationKey key) {
         FPlayer fPlayer = fPlayerService.getFPlayer(receiver);
         if (checkModulePredicates(fPlayer)) return;
 
         builder(fPlayer)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(spawn -> key == MinecraftTranslationKeys.BLOCK_MINECRAFT_SET_SPAWN
+                .format(spawn -> key == MinecraftTranslationKey.BLOCK_MINECRAFT_SET_SPAWN
                         ? spawn.getSet() : spawn.getNotValid())
                 .sound(getSound())
                 .sendBuilt();
@@ -137,8 +137,8 @@ public class SpawnModule extends AbstractModuleMessage<Localization.Message.Spaw
 
         FPlayer fTarget = fPlayer;
 
-        boolean isSingle = event.getKey() == MinecraftTranslationKeys.COMMANDS_SPAWNPOINT_SUCCESS_SINGLE
-                || event.getKey() == MinecraftTranslationKeys.COMMANDS_SPAWNPOINT_SUCCESS;
+        boolean isSingle = event.getKey() == MinecraftTranslationKey.COMMANDS_SPAWNPOINT_SUCCESS_SINGLE
+                || event.getKey() == MinecraftTranslationKey.COMMANDS_SPAWNPOINT_SUCCESS;
 
         if (isSingle) {
             fTarget = fPlayerService.getFPlayer(value);

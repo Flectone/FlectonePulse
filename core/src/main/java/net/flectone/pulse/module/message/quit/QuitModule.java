@@ -13,7 +13,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.flectone.pulse.constant.MinecraftTranslationKey;
 
 @Singleton
 public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit> {
@@ -43,7 +43,7 @@ public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit>
 
         eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_QUIT, this::send);
         eventProcessRegistry.registerMessageHandler(event -> {
-            if (event.getKey() != MinecraftTranslationKeys.MULTIPLAYER_PLAYER_LEFT) return;
+            if (event.getKey() != MinecraftTranslationKey.MULTIPLAYER_PLAYER_LEFT) return;
 
             event.cancel();
         });

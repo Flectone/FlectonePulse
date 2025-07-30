@@ -12,7 +12,7 @@ import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.flectone.pulse.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 
@@ -44,7 +44,7 @@ public class EnchantModule extends AbstractModuleMessage<Localization.Message.En
 
         eventProcessRegistry.registerMessageHandler(event -> {
             if (!event.getKey().startsWith("commands.enchant.success")) return;
-            if (event.getKey() == MinecraftTranslationKeys.COMMANDS_ENCHANT_SUCCESS) {
+            if (event.getKey() == MinecraftTranslationKey.COMMANDS_ENCHANT_SUCCESS) {
                 event.cancel();
                 send(event, "", "", "");
                 return;
@@ -81,8 +81,8 @@ public class EnchantModule extends AbstractModuleMessage<Localization.Message.En
 
         FPlayer fTarget = fPlayer;
 
-        boolean isSingle = event.getKey() == MinecraftTranslationKeys.COMMANDS_ENCHANT_SUCCESS_SINGLE
-                || event.getKey() == MinecraftTranslationKeys.COMMANDS_ENCHANT_SUCCESS;
+        boolean isSingle = event.getKey() == MinecraftTranslationKey.COMMANDS_ENCHANT_SUCCESS_SINGLE
+                || event.getKey() == MinecraftTranslationKey.COMMANDS_ENCHANT_SUCCESS;
 
         if (isSingle && !value.isEmpty()) {
             fTarget = fPlayerService.getFPlayer(value);

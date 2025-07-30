@@ -19,7 +19,7 @@ import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.MessageTag;
-import net.flectone.pulse.util.MinecraftTranslationKeys;
+import net.flectone.pulse.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -219,14 +219,14 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
     }
 
     private void processCommand(TranslatableMessageEvent event) {
-        MinecraftTranslationKeys type = event.getKey();
+        MinecraftTranslationKey type = event.getKey();
 
-        boolean revoke = type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS
-                || type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS
-                || type == MinecraftTranslationKeys.COMMANDS_ACHIEVEMENT_TAKE_MANY
-                || type == MinecraftTranslationKeys.COMMANDS_ACHIEVEMENT_TAKE_ONE
-                || type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_REVOKE_EVERYTHING_SUCCESS
-                || type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_REVOKE_ONLY_SUCCESS;
+        boolean revoke = type == MinecraftTranslationKey.COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS
+                || type == MinecraftTranslationKey.COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS
+                || type == MinecraftTranslationKey.COMMANDS_ACHIEVEMENT_TAKE_MANY
+                || type == MinecraftTranslationKey.COMMANDS_ACHIEVEMENT_TAKE_ONE
+                || type == MinecraftTranslationKey.COMMANDS_ADVANCEMENT_REVOKE_EVERYTHING_SUCCESS
+                || type == MinecraftTranslationKey.COMMANDS_ADVANCEMENT_REVOKE_ONLY_SUCCESS;
         if (revoke && !message.isRevoke()) return;
         if (!revoke && !message.isGrant()) return;
 
@@ -236,9 +236,9 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
         Component argument;
         Component playerArgument;
 
-        if (type == MinecraftTranslationKeys.COMMANDS_ACHIEVEMENT_GIVE_ONE
-                || type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_GRANT_EVERYTHING_SUCCESS
-                || type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_REVOKE_EVERYTHING_SUCCESS) {
+        if (type == MinecraftTranslationKey.COMMANDS_ACHIEVEMENT_GIVE_ONE
+                || type == MinecraftTranslationKey.COMMANDS_ADVANCEMENT_GRANT_EVERYTHING_SUCCESS
+                || type == MinecraftTranslationKey.COMMANDS_ADVANCEMENT_REVOKE_EVERYTHING_SUCCESS) {
             playerArgument = translatableComponent.args().get(0);
             argument = translatableComponent.args().get(1);
         } else {
@@ -259,17 +259,17 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
                  COMMANDS_ACHIEVEMENT_TAKE_ONE, COMMANDS_ACHIEVEMENT_GIVE_ONE -> {
                 String title;
                 String description;
-                MinecraftTranslationKeys advancementType;
+                MinecraftTranslationKey advancementType;
 
                 switch (argument) {
                     case TranslatableComponent argumentIn when argumentIn.key().equals("chat.square_brackets") && !argumentIn.args().isEmpty() -> {
-                        Triplet<String, String, MinecraftTranslationKeys> triplet = processAdvancementCommandComponent(argumentIn.args().get(0));
+                        Triplet<String, String, MinecraftTranslationKey> triplet = processAdvancementCommandComponent(argumentIn.args().get(0));
                         title = triplet.first();
                         description = triplet.second();
                         advancementType = triplet.third();
                     }
                     case TextComponent textComponent when textComponent.content().equals("[") && !textComponent.children().isEmpty() -> {
-                        Triplet<String, String, MinecraftTranslationKeys> triplet = processAdvancementCommandComponent(textComponent.children().get(0));
+                        Triplet<String, String, MinecraftTranslationKey> triplet = processAdvancementCommandComponent(textComponent.children().get(0));
                         title = triplet.first();
                         description = triplet.second();
                         advancementType = triplet.third();
@@ -296,8 +296,8 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
                 if (!(argument instanceof TextComponent textComponent)) return;
 
                 content = textComponent.content();
-                relation = type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_REVOKE_ONLY_SUCCESS
-                        || type == MinecraftTranslationKeys.COMMANDS_ADVANCEMENT_GRANT_ONLY_SUCCESS
+                relation = type == MinecraftTranslationKey.COMMANDS_ADVANCEMENT_REVOKE_ONLY_SUCCESS
+                        || type == MinecraftTranslationKey.COMMANDS_ADVANCEMENT_GRANT_ONLY_SUCCESS
                         ? Relation.ONE_TO_ONE_TEXT
                         : Relation.MANY_TO_ONE;
             }
@@ -310,10 +310,10 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
         send(relation, revoke, event.getUserUUID(), target, advancement, content);
     }
 
-    private Triplet<String, String, MinecraftTranslationKeys> processAdvancementCommandComponent(Component component) {
+    private Triplet<String, String, MinecraftTranslationKey> processAdvancementCommandComponent(Component component) {
         String title = "";
         String description = "";
-        MinecraftTranslationKeys advancementType = MinecraftTranslationKeys.CHAT_TYPE_ADVANCEMENT_TASK;
+        MinecraftTranslationKey advancementType = MinecraftTranslationKey.CHAT_TYPE_ADVANCEMENT_TASK;
 
         if (component instanceof TextComponent textComponent) {
             title = textComponent.content();
@@ -332,8 +332,8 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
                             : "";
 
                     advancementType = NamedTextColor.DARK_PURPLE.equals(hoverValue.color())
-                            ? MinecraftTranslationKeys.CHAT_TYPE_ADVANCEMENT_CHALLENGE
-                            : MinecraftTranslationKeys.CHAT_TYPE_ADVANCEMENT_TASK;
+                            ? MinecraftTranslationKey.CHAT_TYPE_ADVANCEMENT_CHALLENGE
+                            : MinecraftTranslationKey.CHAT_TYPE_ADVANCEMENT_TASK;
                 }
             } else {
                 title = titleComponent.key();
