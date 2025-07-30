@@ -18,7 +18,7 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.DisableAction;
+import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -178,7 +178,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
     public void executeCreate(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (!isEnable()) return;
-        if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
+        if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
         if (checkCooldown(fPlayer)) return;
         if (checkMute(fPlayer)) return;
 

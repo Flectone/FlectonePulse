@@ -11,7 +11,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.model.Ignore;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.DisableAction;
+import net.flectone.pulse.constant.DisableSource;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
@@ -59,13 +59,13 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
         );
 
         addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
+        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableSource.YOU));
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkCooldown(fPlayer)) return;
-        if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
+        if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
         if (checkModulePredicates(fPlayer)) return;
 
         String prompt = getPrompt().getPlayer();

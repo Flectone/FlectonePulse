@@ -7,6 +7,7 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
@@ -18,7 +19,6 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.*;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
@@ -88,7 +88,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkCooldown(fPlayer)) return;
-        if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
+        if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
         if (checkMute(fPlayer)) return;
         if (checkModulePredicates(fPlayer)) return;
 

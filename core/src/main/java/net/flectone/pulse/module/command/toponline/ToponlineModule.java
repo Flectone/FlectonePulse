@@ -15,7 +15,7 @@ import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.MessageSender;
-import net.flectone.pulse.util.DisableAction;
+import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
@@ -87,7 +87,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
         );
 
         addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
+        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableSource.YOU));
     }
 
     @Override

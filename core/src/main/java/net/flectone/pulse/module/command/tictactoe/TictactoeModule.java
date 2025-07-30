@@ -15,7 +15,7 @@ import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.DisableAction;
+import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -99,7 +99,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
-        if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
+        if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
         if (checkMute(fPlayer)) return;
 
         String promptPlayer = getPrompt().getPlayer();
@@ -127,7 +127,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         fPlayerService.loadIgnores(fPlayer);
 
         if (checkIgnore(fPlayer, fReceiver)) return;
-        if (checkDisable(fPlayer, fReceiver, DisableAction.HE)) return;
+        if (checkDisable(fPlayer, fReceiver, DisableSource.HE)) return;
 
         TicTacToe ticTacToe = tictactoeManager.create(fPlayer, fReceiver, isHard);
 

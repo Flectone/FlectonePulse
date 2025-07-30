@@ -13,7 +13,7 @@ import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.registry.ProxyRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.DisableAction;
+import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
@@ -71,7 +71,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
         );
 
         addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
+        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableSource.YOU));
         addPredicate(this::checkMute);
     }
 

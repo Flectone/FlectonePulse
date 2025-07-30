@@ -15,7 +15,7 @@ import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.DisableAction;
+import net.flectone.pulse.constant.DisableSource;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
@@ -79,7 +79,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkCooldown(fPlayer)) return;
-        if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
+        if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
         if (checkMute(fPlayer)) return;
         if (checkModulePredicates(fPlayer)) return;
 
@@ -109,7 +109,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         fPlayerService.loadIgnores(fReceiver);
 
         if (checkIgnore(fPlayer, fReceiver)) return;
-        if (checkDisable(fPlayer, fReceiver, DisableAction.HE)) return;
+        if (checkDisable(fPlayer, fReceiver, DisableSource.HE)) return;
 
         String promptMessage = getPrompt().getMessage();
         String message = commandContext.get(promptMessage);

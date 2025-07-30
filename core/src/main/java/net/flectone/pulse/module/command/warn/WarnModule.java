@@ -18,7 +18,7 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.DisableAction;
+import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.Pair;
 import org.incendo.cloud.context.CommandContext;
@@ -97,7 +97,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
-        if (checkDisable(fPlayer, fPlayer, DisableAction.YOU)) return;
+        if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
         if (checkMute(fPlayer)) return;
 
         String promptReason = getPrompt().getReason();

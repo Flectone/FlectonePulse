@@ -20,7 +20,7 @@ import net.flectone.pulse.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.DataConsumer;
-import net.flectone.pulse.util.DisableAction;
+import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -136,11 +136,11 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         return true;
     }
 
-    public boolean sendDisableMessage(FEntity fPlayer, DisableAction whoDisableCommand) {
+    public boolean sendDisableMessage(FEntity fPlayer, DisableSource whoDisableCommand) {
         return sendDisableMessage(fPlayer, fPlayer, whoDisableCommand);
     }
 
-    public boolean sendDisableMessage(FEntity fPlayer, @NotNull FEntity fReceiver, DisableAction action) {
+    public boolean sendDisableMessage(FEntity fPlayer, @NotNull FEntity fReceiver, DisableSource action) {
         Localization.Command.Chatsetting.Disable localization = fileResolver.getLocalization(fReceiver).getCommand().getChatsetting().getDisable();
 
         String string = switch (action) {

@@ -11,7 +11,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.util.DisableAction;
+import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.RandomUtil;
 import org.incendo.cloud.context.CommandContext;
@@ -68,7 +68,7 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
         );
 
         addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableAction.YOU));
+        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableSource.YOU));
         addPredicate(this::checkMute);
     }
 

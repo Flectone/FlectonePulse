@@ -7,7 +7,7 @@ import net.flectone.pulse.model.Range;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.util.DisableAction;
+import net.flectone.pulse.constant.DisableSource;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.execution.CommandExecutionHandler;
@@ -47,7 +47,7 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
 
     public abstract void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext);
 
-    public boolean checkDisable(FEntity entity, @NotNull FEntity receiver, DisableAction action) {
+    public boolean checkDisable(FEntity entity, @NotNull FEntity receiver, DisableSource action) {
         if (!(receiver instanceof FPlayer fReceiver)) return false;
         if (commandPredicate == null || commandPredicate.test(fReceiver)) return false;
 
