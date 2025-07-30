@@ -6,7 +6,7 @@ import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.ScoreboardPosition;
+import net.flectone.pulse.module.message.objective.ScoreboardPosition;
 import net.flectone.pulse.model.Ticker;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModule;
