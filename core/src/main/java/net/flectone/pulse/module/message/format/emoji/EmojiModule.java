@@ -7,6 +7,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.processor.MessageProcessor;
@@ -57,7 +58,7 @@ public class EmojiModule extends AbstractModule implements MessageProcessor {
         String processedMessage = replace(messageContext.getMessage());
         messageContext.setMessage(processedMessage);
 
-        FEntity receiver = messageContext.getReceiver();
+        FPlayer receiver = messageContext.getReceiver();
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.EMOJI, (argumentQueue, context) -> {
             Tag.Argument emojiTag = argumentQueue.peek();
             if (emojiTag == null) return Tag.selfClosingInserting(Component.empty());

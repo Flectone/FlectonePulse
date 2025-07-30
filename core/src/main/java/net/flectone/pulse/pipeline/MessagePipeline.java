@@ -43,11 +43,11 @@ public class MessagePipeline {
         return builder(FPlayer.UNKNOWN, message);
     }
 
-    public Builder builder(@NotNull FEntity sender, @NotNull String message) {
+    public Builder builder(@NotNull FPlayer sender, @NotNull String message) {
         return new Builder(sender, sender, message);
     }
 
-    public Builder builder(@NotNull FEntity sender, @NotNull FEntity receiver, @NotNull String message) {
+    public Builder builder(@NotNull FEntity sender, @NotNull FPlayer receiver, @NotNull String message) {
         return new Builder(sender, receiver, message);
     }
 
@@ -55,7 +55,7 @@ public class MessagePipeline {
 
         private final MessageContext context;
 
-        public Builder(FEntity sender, FEntity receiver, String message) {
+        public Builder(FEntity sender, FPlayer receiver, String message) {
             this.context = new MessageContext(sender, receiver, message);
         }
 
@@ -128,6 +128,7 @@ public class MessagePipeline {
         STREAM_PREFIX,
         VAULT_SUFFIX,
         VAULT_PREFIX,
+        DELETE,
         DISPLAY_NAME,
         PLAYER,
         CONSTANT,

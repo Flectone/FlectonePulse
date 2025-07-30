@@ -3,14 +3,14 @@ package net.flectone.pulse.sender;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.proxy.Proxy;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.proxy.Proxy;
 import net.flectone.pulse.registry.ProxyRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.DataConsumer;
-import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.io.ByteArrayOutputStream;
@@ -41,8 +41,13 @@ public class ProxySender {
     }
 
     public boolean send(FEntity sender, MessageType tag, DataConsumer<DataOutputStream> outputConsumer) {
-        String constantName = getConstantName(sender);
-        sender.setConstantName(constantName);
+        boolean isPlayer = sender instanceof FPlayer;
+
+        if (isPlayer) {
+            FPlayer fPlayer = (FPlayer) sender;
+            String constantName = getConstantName(fPlayer);
+            fPlayer.setConstantName(constantName);
+        }
 
         byte[] message;
         try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
@@ -56,7 +61,7 @@ public class ProxySender {
                 output.writeUTF(cluster);
             }
 
-            output.writeBoolean(sender instanceof FPlayer);
+            output.writeBoolean(isPlayer);
             output.writeUTF(gson.toJson(sender));
 
             outputConsumer.accept(output);
@@ -78,7 +83,7 @@ public class ProxySender {
     }
 
 
-    private String getConstantName(FEntity sender) {
+    private String getConstantName(FPlayer sender) {
         String message = fileResolver.getLocalization(sender).getMessage().getFormat().getName_().getConstant();
         if (message.isEmpty()) return "";
 

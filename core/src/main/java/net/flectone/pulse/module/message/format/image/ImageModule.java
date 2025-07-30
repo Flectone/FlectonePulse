@@ -9,6 +9,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.image.model.FImage;
 import net.flectone.pulse.pipeline.MessagePipeline;
@@ -75,7 +76,7 @@ public class ImageModule extends AbstractModule implements MessageProcessor {
         FEntity sender = messageContext.getSender();
         if (checkModulePredicates(sender)) return;
 
-        FEntity receiver = messageContext.getReceiver();
+        FPlayer receiver = messageContext.getReceiver();
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.IMAGE, (argumentQueue, context) -> {
             Tag.Argument argument = argumentQueue.peek();
             if (argument == null) return Tag.selfClosingInserting(Component.empty());

@@ -1,7 +1,6 @@
 package net.flectone.pulse.model;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.UUID;
 
@@ -14,8 +13,6 @@ public class FEntity {
     private final String name;
     private final UUID uuid;
     private final String type;
-
-    @Setter private String constantName;
 
     public FEntity(String name, UUID uuid, String type) {
         this.name = name == null ? unknownName : name;

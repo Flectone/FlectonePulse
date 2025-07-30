@@ -72,7 +72,7 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission.getAll())) return;
         if (checkModulePredicates(sender)) return;
 
-        FEntity receiver = messageContext.getReceiver();
+        FPlayer receiver = messageContext.getReceiver();
 
         if (isInvisible(sender)) {
             messageContext.addReplacementTag(Set.of(MessagePipeline.ReplacementTag.DISPLAY_NAME, MessagePipeline.ReplacementTag.PLAYER), (argumentQueue, context) -> {
@@ -86,23 +86,6 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
             return;
         }
 
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.CONSTANT, (argumentQueue, context) -> {
-            String constantName = sender.getConstantName();
-            if (constantName != null && constantName.isEmpty()) {
-                return Tag.preProcessParsed(constantName);
-            }
-
-            if (constantName == null) {
-                constantName = resolveLocalization(sender).getConstant();
-            }
-
-            if (constantName.isEmpty()) {
-                return Tag.selfClosingInserting(Component.empty());
-            }
-
-            return Tag.preProcessParsed(messagePipeline.builder(sender, constantName).defaultSerializerBuild());
-        });
-
         if (!(sender instanceof FPlayer fPlayer)) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) ->
                     Tag.preProcessParsed(resolveLocalization(receiver).getEntity()
@@ -112,6 +95,23 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
                     ));
             return;
         }
+
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.CONSTANT, (argumentQueue, context) -> {
+            String constantName = fPlayer.getConstantName();
+            if (constantName != null && constantName.isEmpty()) {
+                return Tag.preProcessParsed(constantName);
+            }
+
+            if (constantName == null) {
+                constantName = resolveLocalization(fPlayer).getConstant();
+            }
+
+            if (constantName.isEmpty()) {
+                return Tag.selfClosingInserting(Component.empty());
+            }
+
+            return Tag.preProcessParsed(messagePipeline.builder(fPlayer, constantName).defaultSerializerBuild());
+        });
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) -> {
             if (fPlayer.isUnknown()) {

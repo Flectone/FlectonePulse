@@ -88,7 +88,7 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
         if (checkModulePredicates(sender)) return;
 
         UUID processId = messageContext.getProcessId();
-        FEntity receiver = messageContext.getReceiver();
+        FPlayer receiver = messageContext.getReceiver();
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.MENTION, (argumentQueue, context) -> {
             Tag.Argument mentionTag = argumentQueue.peek();
             if (mentionTag == null) return Tag.selfClosingInserting(Component.empty());

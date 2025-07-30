@@ -157,7 +157,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
                 .filter(entry -> isCorrectTag(entry.getKey(), sender, messageContext.isFlag(MessageFlag.USER_MESSAGE)))
                 .forEach(entry -> messageContext.addReplacementTag(entry.getValue()));
 
-        FEntity receiver = messageContext.getReceiver();
+        FPlayer receiver = messageContext.getReceiver();
 
         if (sender instanceof FPlayer fPlayer && isCorrectTag(AdventureTag.PING, sender)) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.PING, (argumentQueue, context) -> {

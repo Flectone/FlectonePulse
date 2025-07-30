@@ -8,6 +8,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.processor.MessageProcessor;
@@ -58,7 +59,7 @@ public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Fo
         if (checkModulePredicates(sender)) return;
 
         boolean userMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
-        FEntity receiver = messageContext.getReceiver();
+        FPlayer receiver = messageContext.getReceiver();
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SPOILER, (argumentQueue, context) -> {
             Tag.Argument spoilerTag = argumentQueue.peek();

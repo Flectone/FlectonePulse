@@ -9,6 +9,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.processor.MessageProcessor;
@@ -80,7 +81,7 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
         FEntity sender = messageContext.getSender();
         if (checkModulePredicates(sender)) return;
 
-        FEntity receiver = messageContext.getReceiver();
+        FPlayer receiver = messageContext.getReceiver();
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SWEAR, (argumentQueue, context) -> {
             Tag.Argument swearTag = argumentQueue.peek();
             if (swearTag == null) return Tag.selfClosingInserting(Component.empty());

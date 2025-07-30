@@ -77,13 +77,11 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
         FEntity sender = messageContext.getSender();
         if (checkModulePredicates(sender)) return;
 
-        FEntity receiver = messageContext.getReceiver();
+        FPlayer receiver = messageContext.getReceiver();
 
         messageContext.addReplacementTag(Set.of(MessagePipeline.ReplacementTag.TRANSLATE, MessagePipeline.ReplacementTag.TRANSLATETO), (argumentQueue, context) -> {
             String firstLang = "auto";
-            String secondLang = receiver instanceof FPlayer fReceiver
-                    ? fReceiver.getSettingValue(FPlayer.Setting.LOCALE)
-                    : null;
+            String secondLang = receiver.getSettingValue(FPlayer.Setting.LOCALE);
 
             if (argumentQueue.hasNext()) {
                 Tag.Argument first = argumentQueue.pop();

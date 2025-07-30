@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.kyori.adventure.text.minimessage.Context;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -22,12 +23,12 @@ public class MessageContext {
     private final Set<TagResolver> tagResolvers = new HashSet<>();
 
     private final FEntity sender;
-    private final FEntity receiver;
+    private final FPlayer receiver;
     private final UUID processId;
     private String message;
     private String messageToTranslate;
 
-    public MessageContext(FEntity sender, FEntity receiver, String message) {
+    public MessageContext(FEntity sender, FPlayer receiver, String message) {
         this.processId = UUID.randomUUID();
         this.sender = sender;
         this.receiver = receiver;

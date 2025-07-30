@@ -18,6 +18,7 @@ public class FPlayer extends FEntity {
 
     private boolean online;
     private String ip;
+    private String constantName;
 
     public FPlayer(int id, String name, UUID uuid, String type) {
         super(name, uuid, type);
@@ -35,16 +36,22 @@ public class FPlayer extends FEntity {
         setDefaultSettings();
     }
 
+    public void setOnline(boolean online) {
+        if (isUnknown()) return;
+
+        this.online = online;
+    }
+
     public void setIp(String ip) {
         if (isUnknown()) return;
 
         this.ip = ip;
     }
 
-    public void setOnline(boolean online) {
+    public void setConstantName(String constantName) {
         if (isUnknown()) return;
 
-        this.online = online;
+        this.constantName = constantName;
     }
 
     public boolean isIgnored(@NotNull FPlayer fPlayer) {
