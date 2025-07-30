@@ -35,12 +35,8 @@ public class MessageContext {
 
     public void addTagResolvers(TagResolver... resolvers) {
         if (resolvers == null || resolvers.length == 0) return;
-//        if (resolvers.length == 1) {
-//            tagResolvers.add(resolvers[0]);
-//            return;
-//        }
 
-        tagResolvers.addAll(Set.of(resolvers));
+        tagResolvers.addAll(Arrays.asList(resolvers));
     }
 
     public void addReplacementTag(TagResolver tagResolver) {
