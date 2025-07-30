@@ -13,7 +13,7 @@ import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.afk.AfkModule;
-import net.flectone.pulse.module.message.objective.ObjectiveMode;
+import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
@@ -167,13 +167,13 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public int getObjectiveScore(@NotNull UUID uuid, @Nullable ObjectiveMode objectiveMode) {
-        if (objectiveMode == null) return 0;
+    public int getObjectiveScore(@NotNull UUID uuid, @Nullable ObjectiveModule.Mode mode) {
+        if (mode == null) return 0;
 
         ServerPlayerEntity player = getPlayer(uuid);
         if (player == null) return 0;
 
-        return switch (objectiveMode) {
+        return switch (mode) {
             case HEALTH -> (int) Math.round(player.getHealth() * 10.0) / 10;
             case LEVEL -> player.experienceLevel;
             case FOOD -> player.getHungerManager().getFoodLevel();

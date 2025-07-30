@@ -63,4 +63,11 @@ public class BubbleModule extends AbstractModule {
 
         bubbleService.addMessage(fPlayer, inputString);
     }
+
+    public enum Billboard {
+        FIXED,
+        VERTICAL,
+        HORIZONTAL,
+        CENTER
+    }
 }

@@ -10,6 +10,11 @@ import net.elytrium.serializer.custom.ClassSerializer;
 import net.elytrium.serializer.language.object.YamlSerializable;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.model.*;
+import net.flectone.pulse.model.event.EventPriority;
+import net.flectone.pulse.module.message.bubble.BubbleModule;
+import net.flectone.pulse.module.message.format.world.WorldModule;
+import net.flectone.pulse.module.message.objective.ObjectiveModule;
+import net.flectone.pulse.serializer.EnumSerializer;
 import net.kyori.adventure.bossbar.BossBar;
 
 import java.nio.file.Path;
@@ -22,20 +27,17 @@ public abstract class FileSerializable extends YamlSerializable {
     private static final SerializerConfig CONFIG = new SerializerConfig
             .Builder()
             .setBackupOnErrors(true)
-            .registerSerializer(new ClassSerializer<Database.Type, Object>() {
-
-                @Override
-                public Object serialize(Database.Type type) {
-                    return type.name();
-                }
-
-                @Override
-                public Database.Type deserialize(Object object) {
-                    String string = String.valueOf(object);
-
-                    return Database.Type.fromString(string);
-                }
-            })
+            .registerSerializer(new EnumSerializer<>(Database.Type.class))
+            .registerSerializer(new EnumSerializer<>(Permission.Type.class))
+            .registerSerializer(new EnumSerializer<>(Destination.Type.class))
+            .registerSerializer(new EnumSerializer<>(Toast.Type.class))
+            .registerSerializer(new EnumSerializer<>(BossBar.Flag.class))
+            .registerSerializer(new EnumSerializer<>(BossBar.Overlay.class))
+            .registerSerializer(new EnumSerializer<>(BossBar.Color.class))
+            .registerSerializer(new EnumSerializer<>(BubbleModule.Billboard.class))
+            .registerSerializer(new EnumSerializer<>(WorldModule.Mode.class))
+            .registerSerializer(new EnumSerializer<>(ObjectiveModule.Mode.class))
+            .registerSerializer(new EnumSerializer<>(EventPriority.class))
             .registerSerializer(new ClassSerializer<Range, Object>() {
 
                 @Override

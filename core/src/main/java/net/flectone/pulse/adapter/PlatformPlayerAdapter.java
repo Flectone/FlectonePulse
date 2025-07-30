@@ -5,7 +5,7 @@ import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.message.objective.ObjectiveMode;
+import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -64,7 +64,7 @@ public interface PlatformPlayerAdapter {
     @NotNull Component getPlayerListFooter(@NotNull FPlayer fPlayer);
 
     // Objective and statistic methods
-    int getObjectiveScore(@NotNull UUID uuid, @Nullable ObjectiveMode objectiveMode);
+    int getObjectiveScore(@NotNull UUID uuid, @Nullable ObjectiveModule.Mode mode);
     @Nullable Statistics getStatistics(@NotNull FEntity fEntity);
 
     // Position and measurement methods

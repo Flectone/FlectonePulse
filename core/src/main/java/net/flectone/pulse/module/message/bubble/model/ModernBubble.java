@@ -1,7 +1,7 @@
 package net.flectone.pulse.module.message.bubble.model;
 
 import lombok.Getter;
-import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.module.message.bubble.BubbleModule;
 
 @Getter
 public class ModernBubble extends Bubble {
@@ -10,7 +10,7 @@ public class ModernBubble extends Bubble {
     private final int background;
     private final float scale;
     private final int animationTime;
-    private final Message.Bubble.Billboard billboard;
+    private final BubbleModule.Billboard billboard;
 
     private ModernBubble(ModernBuilder builder) {
         super(builder);
@@ -26,7 +26,7 @@ public class ModernBubble extends Bubble {
         private int background;
         private float scale;
         private int animationTime;
-        private Message.Bubble.Billboard billboard;
+        private BubbleModule.Billboard billboard;
 
         public ModernBuilder hasShadow(boolean hasShadow) {
             this.hasShadow = hasShadow;
@@ -48,7 +48,7 @@ public class ModernBubble extends Bubble {
             return this;
         }
 
-        public ModernBuilder billboard(Message.Bubble.Billboard billboard) {
+        public ModernBuilder billboard(BubbleModule.Billboard billboard) {
             this.billboard = billboard;
             return this;
         }

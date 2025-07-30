@@ -35,7 +35,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 
 @Singleton
@@ -301,13 +300,6 @@ public class Database {
         POSTGRESQL,
         H2,
         SQLITE,
-        MYSQL;
-
-        public static Database.Type fromString(String string) {
-            return Arrays.stream(Type.values())
-                    .filter(type -> type.name().equalsIgnoreCase(string))
-                    .findAny()
-                    .orElseThrow(() -> new IllegalArgumentException("Unknown database type: " + string));
-        }
+        MYSQL
     }
 }

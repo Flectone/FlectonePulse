@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.converter.ColorConverter;
+import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
@@ -93,7 +94,7 @@ public class BubbleService {
         int background = colorConverter.parseHexToArgb(configModern.getBackground());
         int animationTime = configModern.getAnimationTime();
         float scale = configModern.getScale();
-        Message.Bubble.Billboard billboard = configModern.getBillboard();
+        BubbleModule.Billboard billboard = configModern.getBillboard();
 
         int maxLength = fileResolver.getMessage().getBubble().getMaxLength();
 
@@ -130,7 +131,7 @@ public class BubbleService {
 
     private Bubble buildBubble(int id, FPlayer sender, String message, long duration, int elevation, float interactionHeight,
                                boolean interactionRiding, boolean useModern, boolean hasShadow, int background,
-                               int animationTime, float scale, Message.Bubble.Billboard billboard) {
+                               int animationTime, float scale, BubbleModule.Billboard billboard) {
         Bubble.Builder builder = useModern
                 ? new ModernBubble.ModernBuilder()
                 .hasShadow(hasShadow)

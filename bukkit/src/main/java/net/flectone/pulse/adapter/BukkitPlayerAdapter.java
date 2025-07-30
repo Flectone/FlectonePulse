@@ -10,7 +10,7 @@ import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.afk.AfkModule;
-import net.flectone.pulse.module.message.objective.ObjectiveMode;
+import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
@@ -200,7 +200,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public int getObjectiveScore(@NotNull UUID uuid, @Nullable ObjectiveMode objectiveValueType) {
+    public int getObjectiveScore(@NotNull UUID uuid, @Nullable ObjectiveModule.Mode objectiveValueType) {
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) return 0;
         if (objectiveValueType == null) return 0;

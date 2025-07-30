@@ -88,4 +88,13 @@ public class ObjectiveModule extends AbstractModule {
                 null
         ));
     }
+
+    public enum Mode {
+        HEALTH,
+        LEVEL,
+        FOOD,
+        PING,
+        ARMOR,
+        ATTACK
+    }
 }

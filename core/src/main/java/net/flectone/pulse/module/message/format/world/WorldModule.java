@@ -99,7 +99,7 @@ public class WorldModule extends AbstractModule implements MessageProcessor {
     public void update(FPlayer fPlayer) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String newWorldPrefix = message.getMode() == WorldMode.TYPE
+        String newWorldPrefix = message.getMode() == Mode.TYPE
                 ? message.getValues().get(platformPlayerAdapter.getWorldEnvironment(fPlayer))
                 : message.getValues().get(platformPlayerAdapter.getWorldName(fPlayer));
 
@@ -121,5 +121,10 @@ public class WorldModule extends AbstractModule implements MessageProcessor {
 
             return Tag.preProcessParsed(worldPrefix);
         });
+    }
+
+    public enum Mode {
+        TYPE,
+        NAME
     }
 }

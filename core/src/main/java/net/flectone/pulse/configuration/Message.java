@@ -8,8 +8,9 @@ import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.model.event.EventPriority;
-import net.flectone.pulse.module.message.format.world.WorldMode;
-import net.flectone.pulse.module.message.objective.ObjectiveMode;
+import net.flectone.pulse.module.message.bubble.BubbleModule;
+import net.flectone.pulse.module.message.format.world.WorldModule;
+import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.util.TagType;
 
 import java.nio.file.Path;
@@ -196,15 +197,9 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             private int animationTime = 5;
             private float scale = 1.0f;
             private String background = "#00000040";
-            private Billboard billboard = Billboard.CENTER;
+            private BubbleModule.Billboard billboard = BubbleModule.Billboard.CENTER;
         }
 
-        public enum Billboard {
-            FIXED,
-            VERTICAL,
-            HORIZONTAL,
-            CENTER
-        }
     }
 
     @Getter
@@ -556,7 +551,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         @Getter
         public static final class World implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
-            private WorldMode mode = WorldMode.TYPE;
+            private WorldModule.Mode mode = WorldModule.Mode.TYPE;
             private Ticker ticker = new Ticker(false, 100);
             private Map<String, String> values = new LinkedHashMap<>(){
                 {
@@ -617,14 +612,14 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         @Getter
         public static final class Belowname implements SubObjectiveMessageConfig {
             private boolean enable = false;
-            private ObjectiveMode mode = ObjectiveMode.PING;
+            private ObjectiveModule.Mode mode = ObjectiveModule.Mode.PING;
             private Ticker ticker = new Ticker(true, 100);
         }
 
         @Getter
         public static final class Tabname implements SubObjectiveMessageConfig {
             private boolean enable = false;
-            private ObjectiveMode mode = ObjectiveMode.PING;
+            private ObjectiveModule.Mode mode = ObjectiveModule.Mode.PING;
             private Ticker ticker = new Ticker(true, 100);
         }
 
