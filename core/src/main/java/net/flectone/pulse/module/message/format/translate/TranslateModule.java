@@ -7,6 +7,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -68,7 +69,7 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
 
     @Override
     public void process(MessageContext messageContext) {
-        if (!messageContext.isTranslate()) return;
+        if (!messageContext.isFlag(MessageFlag.TRANSLATE)) return;
 
         String messageToTranslate = messageContext.getMessageToTranslate();
         UUID key = saveMessage(messageToTranslate);
@@ -107,10 +108,10 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
                     .replace("<message>", key.toString());
 
             Component component = messagePipeline.builder(sender, receiver, action)
-                    .interactiveChat(false)
-                    .question(false)
-                    .mention(false)
-                    .translate(false)
+                    .flag(MessageFlag.MENTION, false)
+                    .flag(MessageFlag.INTERACTIVE_CHAT, false)
+                    .flag(MessageFlag.QUESTION, false)
+                    .flag(MessageFlag.TRANSLATE, false)
                     .build();
 
             return Tag.selfClosingInserting(component);

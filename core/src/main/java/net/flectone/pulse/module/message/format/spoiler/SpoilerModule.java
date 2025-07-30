@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -51,12 +52,12 @@ public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Fo
 
     @Override
     public void process(MessageContext messageContext) {
-        if (!messageContext.isSpoiler()) return;
+        if (!messageContext.isFlag(MessageFlag.SPOILER)) return;
 
         FEntity sender = messageContext.getSender();
         if (checkModulePredicates(sender)) return;
 
-        boolean userMessage = messageContext.isUserMessage();
+        boolean userMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
         FEntity receiver = messageContext.getReceiver();
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SPOILER, (argumentQueue, context) -> {
@@ -66,7 +67,7 @@ public class SpoilerModule extends AbstractModuleMessage<Localization.Message.Fo
             String spoilerText = spoilerTag.value();
 
             Component spoilerComponent = messagePipeline.builder(sender, receiver, spoilerText)
-                    .userMessage(userMessage)
+                    .flag(MessageFlag.USER_MESSAGE, userMessage)
                     .build();
 
             int length = PlainTextComponentSerializer.plainText().serialize(spoilerComponent).length();

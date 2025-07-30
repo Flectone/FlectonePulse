@@ -7,6 +7,7 @@ import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.formatter.TimeFormatter;
 import net.flectone.pulse.resolver.FileResolver;
@@ -407,8 +408,8 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             if (messageContent == null || messageContent.isBlank()) return Component.empty();
 
             MessagePipeline.Builder messageBuilder = messagePipeline.builder(fPlayer, fReceiver, messageContent)
-                    .userMessage(true)
-                    .mention(!fReceiver.isUnknown());
+                    .flag(MessageFlag.USER_MESSAGE, true)
+                    .flag(MessageFlag.MENTION, !fReceiver.isUnknown());
 
             if (messageComponentBuilder != null) {
                 messageBuilder = messageComponentBuilder.apply(messageBuilder);
@@ -451,7 +452,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             }
 
             Component componentFormat = messagePipeline.builder(fPlayer, FPlayer.UNKNOWN, formatContent)
-                    .translate(false)
+                    .flag(MessageFlag.TRANSLATE, false)
                     .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(FPlayer.UNKNOWN))
                     .build();
 
@@ -460,11 +461,11 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
                     ? Component.empty()
                     : messagePipeline
                     .builder(fPlayer, FPlayer.UNKNOWN, messageContent)
-                    .translate(false)
-                    .userMessage(true)
-                    .mention(false)
-                    .interactiveChat(false)
-                    .question(false)
+                    .flag(MessageFlag.TRANSLATE, false)
+                    .flag(MessageFlag.USER_MESSAGE, true)
+                    .flag(MessageFlag.MENTION, false)
+                    .flag(MessageFlag.INTERACTIVE_CHAT, false)
+                    .flag(MessageFlag.QUESTION, false)
                     .build();
 
             PlainTextComponentSerializer serializer = PlainTextComponentSerializer.plainText();

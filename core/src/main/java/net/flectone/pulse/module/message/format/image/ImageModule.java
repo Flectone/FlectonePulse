@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
@@ -69,7 +70,7 @@ public class ImageModule extends AbstractModule implements MessageProcessor {
 
     @Override
     public void process(MessageContext messageContext) {
-        if (!messageContext.isImage()) return;
+        if (!messageContext.isFlag(MessageFlag.IMAGE)) return;
 
         FEntity sender = messageContext.getSender();
         if (checkModulePredicates(sender)) return;

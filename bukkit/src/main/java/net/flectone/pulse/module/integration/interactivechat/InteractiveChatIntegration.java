@@ -7,6 +7,7 @@ import com.loohp.interactivechat.api.InteractiveChatAPI;
 import com.loohp.interactivechat.data.PlayerDataManager;
 import com.loohp.interactivechat.listeners.ChatEvents;
 import com.loohp.interactivechat.registry.Registry;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.util.logging.FLogger;
@@ -114,7 +115,7 @@ public class InteractiveChatIntegration implements FIntegration, MessageProcesso
 
     @Override
     public void process(MessageContext messageContext) {
-        if (!messageContext.isInteractiveChat()) return;
+        if (!messageContext.isFlag(MessageFlag.INTERACTIVE_CHAT)) return;
 
         FEntity sender = messageContext.getSender();
         String message = messageContext.getMessage();

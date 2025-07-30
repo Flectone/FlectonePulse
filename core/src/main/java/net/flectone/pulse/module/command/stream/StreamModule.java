@@ -8,6 +8,9 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.DisableSource;
+import net.flectone.pulse.constant.MessageFlag;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -20,8 +23,6 @@ import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.registry.MessageProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.constant.DisableSource;
-import net.flectone.pulse.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.incendo.cloud.context.CommandContext;
@@ -101,7 +102,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     @Override
     public void process(MessageContext messageContext) {
         FEntity sender = messageContext.getSender();
-        if (messageContext.isUserMessage() && !permissionChecker.check(sender, formatPermission.getAll())) return;
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission.getAll())) return;
         if (!(sender instanceof FPlayer fPlayer)) return;
         if (checkModulePredicates(fPlayer)) return;
 

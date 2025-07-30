@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
@@ -41,8 +42,8 @@ public class FixationModule extends AbstractModule implements MessageProcessor {
 
     @Override
     public void process(MessageContext messageContext) {
-        if (!messageContext.isFixation()) return;
-        if (!messageContext.isUserMessage()) return;
+        if (!messageContext.isFlag(MessageFlag.FIXATION)) return;
+        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
 
         String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
         messageContext.setMessage(processedMessage);

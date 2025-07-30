@@ -28,6 +28,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.resolver.FileResolver;
@@ -87,12 +88,10 @@ public final class LegacyMiniConvertor extends AbstractModule implements Message
     @Override
     public void process(MessageContext messageContext) {
         FEntity sender = messageContext.getSender();
-        if (!messageContext.isColors()) return;
-
+        if (!messageContext.isFlag(MessageFlag.COLORS)) return;
         // parameters &b -> <aqua> (incorrect url)
-        if (!messageContext.isUrl()) return;
-
-        if (messageContext.isUserMessage() && !permissionChecker.check(sender, formatPermission.getAll())) return;
+        if (!messageContext.isFlag(MessageFlag.URL)) return;
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission.getAll())) return;
 
         String message = toMini(messageContext.getMessage());
         messageContext.setMessage(message);

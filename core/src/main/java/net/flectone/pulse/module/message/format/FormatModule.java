@@ -9,6 +9,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.converter.LegacyMiniConvertor;
 import net.flectone.pulse.model.FEntity;
@@ -145,7 +146,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
 
     @Override
     public void process(MessageContext messageContext) {
-        if (!messageContext.isFormatting()) return;
+        if (!messageContext.isFlag(MessageFlag.FORMATTING)) return;
 
         FEntity sender = messageContext.getSender();
         if (checkModulePredicates(sender)) return;
@@ -153,7 +154,7 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
         getTagResolverMap()
                 .entrySet()
                 .stream()
-                .filter(entry -> isCorrectTag(entry.getKey(), sender, messageContext.isUserMessage()))
+                .filter(entry -> isCorrectTag(entry.getKey(), sender, messageContext.isFlag(MessageFlag.USER_MESSAGE)))
                 .forEach(entry -> messageContext.addReplacementTag(entry.getValue()));
 
         FEntity receiver = messageContext.getReceiver();
@@ -249,14 +250,14 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
                         .build()
                         .replaceText(TextReplacementConfig.builder()
                                 .match("<message>")
-                                .replacement(platformServerAdapter.translateItemName(itemStackObject, messageContext.isTranslateItem()))
+                                .replacement(platformServerAdapter.translateItemName(itemStackObject, messageContext.isFlag(MessageFlag.TRANSLATE_ITEM)))
                                 .build()
                         )
                 );
             });
         }
 
-        if (messageContext.isUrl() && isCorrectTag(AdventureTag.URL, sender)) {
+        if (messageContext.isFlag(MessageFlag.URL) && isCorrectTag(AdventureTag.URL, sender)) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.URL, (argumentQueue, context) -> {
                 Tag.Argument urlArgument = argumentQueue.peek();
                 if (urlArgument == null) return Tag.selfClosingInserting(Component.empty());
@@ -266,14 +267,14 @@ public class FormatModule extends AbstractModuleMessage<Localization.Message.For
                         .replace("<message>", url);
 
                 Component component = messagePipeline.builder(sender, receiver, string)
-                        .url(false)
+                        .flag(MessageFlag.URL, false)
                         .build();
 
                 return Tag.selfClosingInserting(component);
             });
         }
 
-        if (messageContext.isUserMessage()) {
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
             String messageContent = replaceAll(sender, receiver, messageContext.getMessage());
             messageContext.setMessage(messageContent);
         }

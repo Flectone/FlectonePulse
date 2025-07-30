@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
@@ -44,7 +45,7 @@ public class BookModule extends AbstractModule {
             Component deserialized = LegacyComponentSerializer.legacySection().deserialize(string);
 
             Component component = messagePipeline.builder(fPlayer, string.replace("§", "&"))
-                    .userMessage(true)
+                    .flag(MessageFlag.USER_MESSAGE, true)
                     .build()
                     .mergeStyle(deserialized);
 

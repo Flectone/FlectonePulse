@@ -12,14 +12,14 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.registry.EventProcessRegistry;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.provider.PacketProvider;
+import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.PacketSender;
 import net.flectone.pulse.service.FPlayerService;
@@ -99,7 +99,6 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
         if (user == null) return;
 
         Component name = messagePipeline.builder(fPlayer, fReceiver, resolveLocalization(fReceiver).getFormat())
-                .userMessage(false)
                 .build();
 
         if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)) {

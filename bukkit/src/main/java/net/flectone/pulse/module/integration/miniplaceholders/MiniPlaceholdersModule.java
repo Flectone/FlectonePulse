@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.registry.MessageProcessRegistry;
@@ -46,7 +47,7 @@ public class MiniPlaceholdersModule extends AbstractModule {
             if (checkModulePredicates(sender)) return;
 
             FEntity receiver = messageContext.getReceiver();
-            boolean isUserMessage = messageContext.isUserMessage();
+            boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
             if (!permissionChecker.check(sender, permission.getUse()) && isUserMessage) return;
             if (!permissionChecker.check(receiver, permission.getUse()) && isUserMessage) return;
 

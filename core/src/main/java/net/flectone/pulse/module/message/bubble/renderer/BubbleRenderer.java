@@ -19,6 +19,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
@@ -175,16 +176,17 @@ public class BubbleRenderer {
         Localization.Message.Bubble localization = fileResolver.getLocalization(viewer).getMessage().getBubble();
 
         Component message = messagePipeline.builder(bubble.getSender(), viewer, bubble.getRawMessage())
-                .userMessage(true)
-                .mention(false)
-                .question(false)
-                .interactiveChat(false)
+                .flag(MessageFlag.USER_MESSAGE, true)
+                .flag(MessageFlag.MENTION, false)
+                .flag(MessageFlag.INTERACTIVE_CHAT, false)
+                .flag(MessageFlag.QUESTION, false)
                 .build();
+
         
         return messagePipeline.builder(bubble.getSender(), viewer, localization.getFormat())
-                .mention(false)
-                .question(false)
-                .interactiveChat(false)
+                .flag(MessageFlag.MENTION, false)
+                .flag(MessageFlag.INTERACTIVE_CHAT, false)
+                .flag(MessageFlag.QUESTION, false)
                 .tagResolvers(TagResolver.resolver("message", (argumentQueue, context) -> Tag.inserting(message)))
                 .build();
     }

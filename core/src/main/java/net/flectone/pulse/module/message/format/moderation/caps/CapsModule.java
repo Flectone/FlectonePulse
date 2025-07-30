@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
@@ -44,8 +45,8 @@ public class CapsModule extends AbstractModule implements MessageProcessor {
 
     @Override
     public void process(MessageContext messageContext) {
-        if (!messageContext.isCaps()) return;
-        if (!messageContext.isUserMessage()) return;
+        if (!messageContext.isFlag(MessageFlag.CAPS)) return;
+        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
 
         String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
         messageContext.setMessage(processedMessage);

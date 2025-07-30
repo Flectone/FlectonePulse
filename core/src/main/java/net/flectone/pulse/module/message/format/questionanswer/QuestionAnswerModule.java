@@ -7,6 +7,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -92,8 +93,8 @@ public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Mes
 
     @Override
     public void process(MessageContext messageContext) {
-        if (!messageContext.isQuestion()) return;
-        if (!messageContext.isUserMessage()) return;
+        if (!messageContext.isFlag(MessageFlag.QUESTION)) return;
+        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
 
         FEntity sender = messageContext.getSender();
         if (checkModulePredicates(sender)) return;

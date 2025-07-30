@@ -4,12 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 
 @Singleton
 public class StyleModule extends AbstractModule implements MessageProcessor {
@@ -40,7 +41,7 @@ public class StyleModule extends AbstractModule implements MessageProcessor {
 
     @Override
     public void process(MessageContext messageContext) {
-        if (messageContext.isUserMessage()) return;
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
         if (!(messageContext.getSender() instanceof FPlayer sender)) return;
 
         String style = sender.getSettingValue(FPlayer.Setting.STYLE);

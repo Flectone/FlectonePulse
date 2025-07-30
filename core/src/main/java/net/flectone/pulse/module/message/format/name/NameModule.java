@@ -8,6 +8,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -68,7 +69,7 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
     @Override
     public void process(MessageContext messageContext) {
         FEntity sender = messageContext.getSender();
-        if (messageContext.isUserMessage() && !permissionChecker.check(sender, formatPermission.getAll())) return;
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission.getAll())) return;
         if (checkModulePredicates(sender)) return;
 
         FEntity receiver = messageContext.getReceiver();
@@ -146,11 +147,9 @@ public class NameModule extends AbstractModuleMessage<Localization.Message.Forma
             return Tag.preProcessParsed(text);
         });
 
-        if (messageContext.isPlayer()) {
-            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.PLAYER, (argumentQueue, context) ->
-                    Tag.preProcessParsed(fPlayer.getName())
-            );
-        }
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.PLAYER, (argumentQueue, context) ->
+                Tag.preProcessParsed(fPlayer.getName())
+        );
     }
 
     private boolean isInvisible(FEntity entity) {

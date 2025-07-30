@@ -6,6 +6,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModuleMessage;
@@ -74,7 +75,7 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
 
     @Override
     public void process(MessageContext messageContext) {
-        if (!messageContext.isSwear()) return;
+        if (!messageContext.isFlag(MessageFlag.SWEAR)) return;
 
         FEntity sender = messageContext.getSender();
         if (checkModulePredicates(sender)) return;
@@ -98,7 +99,7 @@ public class SwearModule extends AbstractModuleMessage<Localization.Message.Form
             return Tag.selfClosingInserting(component);
         });
 
-        if (!messageContext.isUserMessage()) return;
+        if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
 
         String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
         messageContext.setMessage(processedMessage);

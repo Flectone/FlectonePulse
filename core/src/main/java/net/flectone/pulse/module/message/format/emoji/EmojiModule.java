@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
@@ -48,7 +49,7 @@ public class EmojiModule extends AbstractModule implements MessageProcessor {
 
     @Override
     public void process(MessageContext messageContext) {
-        if (!messageContext.isEmoji()) return;
+        if (!messageContext.isFlag(MessageFlag.EMOJI)) return;
 
         FEntity sender = messageContext.getSender();
         if (checkModulePredicates(sender)) return;
@@ -73,7 +74,7 @@ public class EmojiModule extends AbstractModule implements MessageProcessor {
             if (emojis == null) return Tag.selfClosingInserting(Component.empty());
 
             Component component = messagePipeline.builder(sender, receiver, emojis.getValue())
-                    .emoji(false)
+                    .flag(MessageFlag.EMOJI, false)
                     .build();
 
             return Tag.selfClosingInserting(component);

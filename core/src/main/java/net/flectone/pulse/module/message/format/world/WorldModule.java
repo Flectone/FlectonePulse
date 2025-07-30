@@ -8,6 +8,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -87,7 +88,7 @@ public class WorldModule extends AbstractModule implements MessageProcessor {
     @Override
     public void process(MessageContext messageContext) {
         FEntity sender = messageContext.getSender();
-        if (messageContext.isUserMessage() && !permissionChecker.check(sender, formatPermission.getAll())) return;
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission.getAll())) return;
         if (checkModulePredicates(sender)) return;
         if (!(sender instanceof FPlayer fPlayer)) return;
 

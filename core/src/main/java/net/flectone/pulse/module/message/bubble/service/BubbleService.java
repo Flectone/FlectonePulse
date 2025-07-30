@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.converter.ColorConverter;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.resolver.FileResolver;
@@ -60,11 +61,11 @@ public class BubbleService {
         );
 
         message = messagePipeline.builder(sender, message)
-                .userMessage(true)
-                .mention(false)
-                .question(false)
-                .interactiveChat(false)
-                .translateItem(false)
+                .flag(MessageFlag.USER_MESSAGE, true)
+                .flag(MessageFlag.MENTION, false)
+                .flag(MessageFlag.INTERACTIVE_CHAT, false)
+                .flag(MessageFlag.QUESTION, false)
+                .flag(MessageFlag.TRANSLATE_ITEM, false)
                 .plainSerializerBuild();
 
         List<Bubble> bubbles = splitMessageToBubbles(sender, message);

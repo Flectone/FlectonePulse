@@ -3,6 +3,7 @@ package net.flectone.pulse.pipeline;
 import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -58,94 +59,14 @@ public class MessagePipeline {
             this.context = new MessageContext(sender, receiver, message);
         }
 
-        public Builder caps(boolean caps) {
-            context.setCaps(caps);
-            return this;
-        }
-
-        public Builder flood(boolean flood) {
-            context.setFlood(flood);
-            return this;
-        }
-
-        public Builder colors(boolean colors) {
-            context.setColors(colors);
-            return this;
-        }
-
-        public Builder image(boolean image) {
-            context.setImage(image);
-            return this;
-        }
-
-        public Builder url(boolean url) {
-            context.setUrl(url);
-            return this;
-        }
-
-        public Builder formatting(boolean formating) {
-            context.setFormatting(formating);
-            return this;
-        }
-
-        public Builder swear(boolean swear) {
-            context.setSwear(swear);
-            return this;
-        }
-
-        public Builder emoji(boolean emoji) {
-            context.setEmoji(emoji);
-            return this;
-        }
-
-        public Builder fixation(boolean fixation) {
-            context.setFixation(fixation);
-            return this;
-        }
-
-        public Builder question(boolean question) {
-            context.setQuestion(question);
-            return this;
-        }
-
-        public Builder spoiler(boolean spoiler) {
-            context.setSpoiler(spoiler);
-            return this;
-        }
-
-        public Builder translate(boolean translate) {
-            context.setTranslate(translate);
+        public Builder flag(MessageFlag flag, boolean value) {
+            context.setFlag(flag, value);
             return this;
         }
 
         public Builder translate(String messageToTranslate, boolean translate) {
             context.setMessageToTranslate(messageToTranslate);
-            context.setTranslate(translate);
-            return this;
-        }
-
-        public Builder translateItem(boolean translateItem) {
-            context.setTranslateItem(translateItem);
-            return this;
-        }
-
-        public Builder userMessage(boolean userMessage) {
-            context.setUserMessage(userMessage);
-            return this;
-        }
-
-        public Builder mention(boolean mention) {
-            context.setMention(mention);
-            return this;
-        }
-
-        public Builder player(boolean player) {
-            context.setPlayer(player);
-            return this;
-        }
-
-        public Builder interactiveChat(boolean interactiveChat) {
-            context.setInteractiveChat(interactiveChat);
+            context.setFlag(MessageFlag.TRANSLATE, translate);
             return this;
         }
 

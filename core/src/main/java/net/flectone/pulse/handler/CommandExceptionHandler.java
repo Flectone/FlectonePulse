@@ -3,9 +3,9 @@ package net.flectone.pulse.handler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -59,7 +59,6 @@ public class CommandExceptionHandler {
         };
 
         Component componentMessage = messagePipeline.builder(fPlayer, message)
-                .player(false)
                 .build();
 
         messageSender.sendMessage(fPlayer, componentMessage);
@@ -75,7 +74,6 @@ public class CommandExceptionHandler {
                 .replace("<command>", correctSyntax.split(" ")[0]);
 
         Component componentMessage = messagePipeline.builder(fPlayer, message)
-                .player(false)
                 .build();
 
         messageSender.sendMessage(fPlayer, componentMessage);
@@ -88,7 +86,6 @@ public class CommandExceptionHandler {
                 .getCommand().getException().getPermission();
 
         Component componentMessage = messagePipeline.builder(fPlayer, message)
-                .player(false)
                 .build();
 
         messageSender.sendMessage(fPlayer, componentMessage);
@@ -105,7 +102,6 @@ public class CommandExceptionHandler {
                 .replace("<exception>", context.exception().getMessage());
 
         Component componentMessage = messagePipeline.builder(fPlayer, message)
-                .player(false)
                 .build();
 
         messageSender.sendMessage(fPlayer, componentMessage);

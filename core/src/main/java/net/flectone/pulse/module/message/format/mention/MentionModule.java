@@ -6,6 +6,7 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
@@ -78,7 +79,7 @@ public class MentionModule extends AbstractModuleMessage<Localization.Message.Fo
 
     @Override
     public void process(MessageContext messageContext) {
-        if (!messageContext.isMention()) return;
+        if (!messageContext.isFlag(MessageFlag.MENTION)) return;
 
         String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
         messageContext.setMessage(processedMessage);

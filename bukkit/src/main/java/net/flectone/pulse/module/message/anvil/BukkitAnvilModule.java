@@ -2,11 +2,12 @@ package net.flectone.pulse.module.message.anvil;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.anvil.listener.AnvilListener;
-import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.registry.BukkitListenerRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -48,8 +49,8 @@ public class BukkitAnvilModule extends AnvilModule {
             Component deserialized = LegacyComponentSerializer.legacySection().deserialize(displayName);
 
             Component component = messagePipeline.builder(fPlayer, displayName.replace("§", "&"))
-                    .userMessage(true)
-                    .colors(false)
+                    .flag(MessageFlag.USER_MESSAGE, true)
+                    .flag(MessageFlag.COLORS, false)
                     .build()
                     .applyFallbackStyle(deserialized.style())
                     .mergeStyle(deserialized);
