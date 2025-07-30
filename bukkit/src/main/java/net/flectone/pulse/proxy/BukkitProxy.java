@@ -7,7 +7,6 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.listener.BukkitProxyListener;
 import net.flectone.pulse.model.FEntity;
-import net.flectone.pulse.model.Proxy;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.constant.MessageType;
 import org.bukkit.Bukkit;

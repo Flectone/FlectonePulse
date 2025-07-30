@@ -8,7 +8,7 @@ import lombok.Getter;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.database.Database;
-import net.flectone.pulse.model.Proxy;
+import net.flectone.pulse.proxy.Proxy;
 import net.flectone.pulse.proxy.RedisProxy;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.LibraryResolver;

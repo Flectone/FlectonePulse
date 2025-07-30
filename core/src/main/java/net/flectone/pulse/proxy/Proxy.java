@@ -1,6 +1,7 @@
-package net.flectone.pulse.model;
+package net.flectone.pulse.proxy;
 
 import net.flectone.pulse.constant.MessageType;
+import net.flectone.pulse.model.FEntity;
 
 public interface Proxy {
 

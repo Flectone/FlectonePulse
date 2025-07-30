@@ -12,7 +12,6 @@ import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.listener.RedisListener;
 import net.flectone.pulse.model.FEntity;
-import net.flectone.pulse.model.Proxy;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.SystemVariableResolver;
 import net.flectone.pulse.constant.MessageType;
