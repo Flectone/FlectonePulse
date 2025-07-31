@@ -18,7 +18,7 @@ import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.Pair;
+import org.incendo.cloud.type.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -89,7 +89,7 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> {
         if (checkModulePredicates(fPlayer)) return;
         if (message.getIgnore().contains(action)) return;
 
-        playersCoordinates.put(fPlayer.getUuid(), new Pair<>(0, new PlatformPlayerAdapter.Coordinates(0, -1000, 0)));
+        playersCoordinates.put(fPlayer.getUuid(), Pair.of(0, new PlatformPlayerAdapter.Coordinates(0, -1000, 0)));
         check(fPlayer);
     }
 
@@ -115,7 +115,7 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> {
         int time = (int) (System.currentTimeMillis()/1000);
 
         Pair<Integer, PlatformPlayerAdapter.Coordinates> timeVector = playersCoordinates.get(fPlayer.getUuid());
-        if (timeVector == null || !timeVector.getValue().equals(coordinates)) {
+        if (timeVector == null || !timeVector.second().equals(coordinates)) {
 
             if (fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX)) {
                 fPlayer.removeSetting(FPlayer.Setting.AFK_SUFFIX);
@@ -124,12 +124,12 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> {
                 send(fPlayer);
             }
 
-            playersCoordinates.put(fPlayer.getUuid(), new Pair<>(time, coordinates));
+            playersCoordinates.put(fPlayer.getUuid(), Pair.of(time, coordinates));
             return;
         }
 
         if (fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX)) return;
-        if (time - timeVector.getKey() < message.getDelay()) return;
+        if (time - timeVector.first() < message.getDelay()) return;
 
         setAfk(fPlayer);
     }

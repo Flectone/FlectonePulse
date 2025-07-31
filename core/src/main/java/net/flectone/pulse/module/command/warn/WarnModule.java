@@ -20,9 +20,9 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.constant.MessageType;
-import net.flectone.pulse.util.Pair;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
+import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
 import java.util.List;
@@ -104,9 +104,9 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         String promptTime = getPrompt().getTime();
 
         Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptReason);
-        Pair<Long, String> timeReasonPair = optionalTime.orElse(new Pair<>(Duration.ofHours(1).toMillis(), null));
+        Pair<Long, String> timeReasonPair = optionalTime.orElse(Pair.of(Duration.ofHours(1).toMillis(), null));
 
-        long time = timeReasonPair.left() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.left();
+        long time = timeReasonPair.first() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.first();
 
         if (time < 1) {
             builder(fPlayer)
@@ -115,7 +115,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
             return;
         }
 
-        String reason = timeReasonPair.right();
+        String reason = timeReasonPair.second();
 
         String promptPlayer = getPrompt().getPlayer();
         String target = commandContext.get(promptPlayer);

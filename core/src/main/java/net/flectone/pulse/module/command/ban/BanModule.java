@@ -21,9 +21,9 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.Pair;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
+import org.incendo.cloud.type.tuple.Pair;
 
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -108,10 +108,10 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         String promptTime = getPrompt().getTime();
 
         Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptReason);
-        Pair<Long, String> timeReasonPair = optionalTime.orElse(new Pair<>(-1L, null));
+        Pair<Long, String> timeReasonPair = optionalTime.orElse(Pair.of(-1L, null));
 
-        long time = timeReasonPair.left();
-        String reason = timeReasonPair.right();
+        long time = timeReasonPair.first();
+        String reason = timeReasonPair.second();
 
         if (time != -1 && time < 1) {
             builder(fPlayer)

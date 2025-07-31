@@ -3,13 +3,13 @@ package net.flectone.pulse.parser.integer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.util.Pair;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.context.CommandInput;
 import org.incendo.cloud.parser.ArgumentParseResult;
 import org.incendo.cloud.parser.ArgumentParser;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
+import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -48,7 +48,7 @@ public class DurationReasonParser implements ArgumentParser<FPlayer, Pair<Long, 
         }
 
         if (rawDuration.isEmpty()) {
-            return ArgumentParseResult.success(new Pair<>(-1L, null));
+            return ArgumentParseResult.success(Pair.of(-1L, null));
         }
 
         String otherInput = stringJoiner.toString();
@@ -73,10 +73,10 @@ public class DurationReasonParser implements ArgumentParser<FPlayer, Pair<Long, 
         }
 
         if (!duration.isZero() && length == rawDuration.length()) {
-            return ArgumentParseResult.success(new Pair<>(duration.toMillis(), otherInput));
+            return ArgumentParseResult.success(Pair.of(duration.toMillis(), otherInput));
         }
 
-        return ArgumentParseResult.success(new Pair<>(-1L, rawDuration + " " + otherInput));
+        return ArgumentParseResult.success(Pair.of(-1L, rawDuration + " " + otherInput));
     }
 
     @Override

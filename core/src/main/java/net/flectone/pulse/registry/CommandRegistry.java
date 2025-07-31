@@ -3,12 +3,12 @@ package net.flectone.pulse.registry;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.util.Pair;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.parser.ParserDescriptor;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
+import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
 import java.util.Collections;

@@ -13,13 +13,13 @@ import net.flectone.pulse.parser.player.OfflinePlayerParser;
 import net.flectone.pulse.parser.player.PlayerParser;
 import net.flectone.pulse.parser.string.MessageParser;
 import net.flectone.pulse.parser.string.SingleMessageParser;
-import net.flectone.pulse.util.Pair;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.parser.ParserDescriptor;
 import org.incendo.cloud.parser.standard.BooleanParser;
 import org.incendo.cloud.parser.standard.DurationParser;
 import org.incendo.cloud.parser.standard.IntegerParser;
 import org.incendo.cloud.parser.standard.StringParser;
+import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
 
