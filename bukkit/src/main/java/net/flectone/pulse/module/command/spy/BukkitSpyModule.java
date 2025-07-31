@@ -4,13 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.checker.PermissionChecker;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -46,7 +46,7 @@ public class BukkitSpyModule extends SpyModule {
     public void onEnable() {
         super.onEnable();
 
-        bukkitListenerManager.register(SpyListener.class, EventPriority.NORMAL);
+        bukkitListenerManager.register(SpyListener.class, Event.Priority.NORMAL);
     }
 
     @Async

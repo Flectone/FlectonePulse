@@ -15,7 +15,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.checker.FabricPermissionChecker;
 import net.flectone.pulse.checker.PermissionChecker;
-import net.flectone.pulse.converter.LegacyMiniConvertor;
+import net.flectone.pulse.listener.LegacyMiniConvertorPulseListener;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.module.integration.FabricIntegrationModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -87,7 +87,7 @@ public class FabricInjector extends AbstractModule {
         // Libraries and serialization
         bind(LibraryResolver.class).toInstance(libraryResolver);
         bind(Gson.class).toInstance(GsonComponentSerializer.gson().serializer());
-        bind(LegacyMiniConvertor.class).asEagerSingleton();
+        bind(LegacyMiniConvertorPulseListener.class).asEagerSingleton();
 
         // Core bindings
         bind(FlectonePulse.class).toInstance(flectonePulse);

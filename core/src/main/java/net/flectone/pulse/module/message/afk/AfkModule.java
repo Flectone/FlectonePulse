@@ -5,29 +5,20 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.constant.MessageType;
-import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Range;
-import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.processor.MessageProcessor;
-import net.flectone.pulse.registry.EventProcessRegistry;
-import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.module.message.afk.listener.AfkPulseListener;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.Pair;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -35,42 +26,34 @@ import java.util.Map;
 import java.util.UUID;
 
 @Singleton
-public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> implements MessageProcessor {
+public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> {
 
     private final Map<UUID, Pair<Integer, PlatformPlayerAdapter.Coordinates>> playersCoordinates = new HashMap<>();
 
     @Getter private final Message.Afk message;
     private final Permission.Message.Afk permission;
-    private final Permission.Message.Format formatPermission;
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final IntegrationModule integrationModule;
-    private final PermissionChecker permissionChecker;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-    private final MessageProcessRegistry messageProcessRegistry;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public AfkModule(FileResolver fileResolver,
                      FPlayerService fPlayerService,
                      TaskScheduler taskScheduler,
                      IntegrationModule integrationModule,
-                     PermissionChecker permissionChecker,
                      PlatformPlayerAdapter platformPlayerAdapter,
-                     MessageProcessRegistry messageProcessRegistry,
-                     EventProcessRegistry eventProcessRegistry) {
+                     ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getAfk());
 
         this.message = fileResolver.getMessage().getAfk();
         this.permission = fileResolver.getPermission().getMessage().getAfk();
-        this.formatPermission = fileResolver.getPermission().getMessage().getFormat();
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.integrationModule = integrationModule;
-        this.permissionChecker = permissionChecker;
         this.platformPlayerAdapter = platformPlayerAdapter;
-        this.messageProcessRegistry = messageProcessRegistry;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -81,8 +64,7 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> i
             taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::check), message.getTicker().getPeriod());
         }
 
-        messageProcessRegistry.register(150, this);
-        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, fPlayer -> remove("", fPlayer));
+        listenerRegistry.register(AfkPulseListener.class);
     }
 
     @Override
@@ -93,21 +75,6 @@ public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> i
     @Override
     protected boolean isConfigEnable() {
         return message.isEnable();
-    }
-
-    @Override
-    public void process(MessageContext messageContext) {
-        FEntity sender = messageContext.getSender();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission.getAll())) return;
-
-        if (checkModulePredicates(sender)) return;
-        if (!(sender instanceof FPlayer fPlayer)) return;
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.AFK_SUFFIX, (argumentQueue, context) -> {
-            String afkSuffix = fPlayer.getSettingValue(FPlayer.Setting.AFK_SUFFIX);
-            if (afkSuffix == null) return Tag.selfClosingInserting(Component.empty());
-
-            return Tag.preProcessParsed(afkSuffix);
-        });
     }
 
     @Async

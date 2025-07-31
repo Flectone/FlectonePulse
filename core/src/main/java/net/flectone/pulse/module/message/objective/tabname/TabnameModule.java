@@ -6,12 +6,12 @@ import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.message.objective.ScoreboardPosition;
 import net.flectone.pulse.model.Ticker;
-import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
-import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.module.message.objective.ScoreboardPosition;
+import net.flectone.pulse.module.message.objective.tabname.listener.TabnamePulseListener;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
@@ -25,7 +25,7 @@ public class TabnameModule extends AbstractModule {
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
     private final ObjectiveModule objectiveModule;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public TabnameModule(FileResolver fileResolver,
@@ -33,14 +33,14 @@ public class TabnameModule extends AbstractModule {
                          PlatformPlayerAdapter platformPlayerAdapter,
                          TaskScheduler taskScheduler,
                          ObjectiveModule objectiveModule,
-                         EventProcessRegistry eventProcessRegistry) {
+                         ListenerRegistry listenerRegistry) {
         this.config = fileResolver.getMessage().getObjective().getTabname();
         this.permission = fileResolver.getPermission().getMessage().getObjective().getTabname();
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.taskScheduler = taskScheduler;
         this.objectiveModule = objectiveModule;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -54,8 +54,7 @@ public class TabnameModule extends AbstractModule {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::update), ticker.getPeriod());
         }
 
-        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, this::create);
-        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_QUIT, this::remove);
+        listenerRegistry.register(TabnamePulseListener.class);
     }
 
     @Override

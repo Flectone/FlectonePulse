@@ -4,30 +4,27 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.quit.listener.QuitListener;
-import net.flectone.pulse.registry.BukkitListenerRegistry;
-import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
-import org.bukkit.event.EventPriority;
 
 @Singleton
 public class BukkitQuitModule extends QuitModule {
 
-    private final BukkitListenerRegistry bukkitListenerRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public BukkitQuitModule(FileResolver fileResolver,
                             IntegrationModule integrationModule,
-                            BukkitListenerRegistry bukkitListenerRegistry,
-                            EventProcessRegistry eventProcessRegistry) {
-        super(fileResolver, integrationModule, eventProcessRegistry);
+                            ListenerRegistry listenerRegistry) {
+        super(fileResolver, integrationModule, listenerRegistry);
 
-        this.bukkitListenerRegistry = bukkitListenerRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
         super.onEnable();
 
-        bukkitListenerRegistry.register(QuitListener.class, EventPriority.NORMAL);
+        listenerRegistry.register(QuitListener.class);
     }
 }

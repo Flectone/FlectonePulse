@@ -14,11 +14,11 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
-import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleListMessage;
+import net.flectone.pulse.module.message.sidebar.listener.SidebarPulseListener;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.provider.PacketProvider;
-import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.PacketSender;
@@ -38,7 +38,7 @@ public class SidebarModule extends AbstractModuleListMessage<Localization.Messag
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
     private final PacketSender packetSender;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
     private final PacketProvider packetProvider;
 
     @Inject
@@ -47,7 +47,7 @@ public class SidebarModule extends AbstractModuleListMessage<Localization.Messag
                          TaskScheduler taskScheduler,
                          MessagePipeline messagePipeline,
                          PacketSender packetSender,
-                         EventProcessRegistry eventProcessRegistry,
+                         ListenerRegistry listenerRegistry,
                          PacketProvider packetProvider) {
         super(localization -> localization.getMessage().getSidebar());
 
@@ -57,7 +57,7 @@ public class SidebarModule extends AbstractModuleListMessage<Localization.Messag
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
         this.packetProvider = packetProvider;
     }
 
@@ -72,8 +72,7 @@ public class SidebarModule extends AbstractModuleListMessage<Localization.Messag
             taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::update), ticker.getPeriod());
         }
 
-        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, this::create);
-        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_QUIT, this::remove);
+        listenerRegistry.register(SidebarPulseListener.class);
     }
 
     @Override

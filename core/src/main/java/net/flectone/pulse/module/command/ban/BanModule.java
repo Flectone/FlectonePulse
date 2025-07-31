@@ -4,28 +4,24 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
-import net.flectone.pulse.model.Range;
-import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.ban.listener.BanPulseListener;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.registry.CommandRegistry;
-import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.Pair;
-import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
@@ -41,11 +37,10 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     private final ModerationService moderationService;
     private final CommandRegistry commandRegistry;
     private final ModerationMessageFormatter moderationMessageFormatter;
-    private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
     private final ProxySender proxySender;
     private final Gson gson;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public BanModule(FileResolver fileResolver,
@@ -53,11 +48,10 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
                      ModerationService moderationService,
                      CommandRegistry commandRegistry,
                      ModerationMessageFormatter moderationMessageFormatter,
-                     PermissionChecker permissionChecker,
                      MessagePipeline messagePipeline,
                      ProxySender proxySender,
                      Gson gson,
-                     EventProcessRegistry eventProcessRegistry) {
+                     ListenerRegistry listenerRegistry) {
         super(localization -> localization.getCommand().getBan(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.BAN));
 
         this.command = fileResolver.getCommand().getBan();
@@ -66,11 +60,10 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         this.moderationService = moderationService;
         this.commandRegistry = commandRegistry;
         this.moderationMessageFormatter = moderationMessageFormatter;
-        this.permissionChecker = permissionChecker;
         this.messagePipeline = messagePipeline;
         this.proxySender = proxySender;
         this.gson = gson;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -102,9 +95,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
                         .handler(this)
         );
 
-        eventProcessRegistry.registerHandler(Event.Type.PLAYER_PRE_LOGIN, event ->
-                isAllowed((PlayerPreLoginEvent) event)
-        );
+        listenerRegistry.register(BanPulseListener.class);
     }
 
     @Override
@@ -187,36 +178,5 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         formatPlayer = moderationMessageFormatter.replacePlaceholders(formatPlayer, fTarget, ban);
 
         fPlayerService.kick(fTarget, messagePipeline.builder(fModerator, fTarget, formatPlayer).build());
-    }
-
-    public void isAllowed(PlayerPreLoginEvent event) {
-        if (!isEnable()) return;
-
-        FPlayer fPlayer = event.getPlayer();
-        for (Moderation ban : moderationService.getValidBans(fPlayer)) {
-            event.setAllowed(false);
-
-            FPlayer fModerator = fPlayerService.getFPlayer(ban.getModerator());
-
-            fPlayerService.loadSettings(fPlayer);
-            fPlayerService.loadColors(fPlayer);
-
-            Localization.Command.Ban localization = resolveLocalization(fPlayer);
-            String formatPlayer = moderationMessageFormatter.replacePlaceholders(localization.getPerson(), fPlayer, ban);
-
-            Component reason = messagePipeline.builder(fModerator, fPlayer, formatPlayer).build();
-            event.setKickReason(reason);
-
-            if (command.isShowConnectionAttempts()) {
-                builder(fPlayer)
-                        .range(Range.get(Range.Type.SERVER))
-                        .filter(filter -> permissionChecker.check(filter, getModulePermission()))
-                        .format((fReceiver, message) -> {
-                            String format = message.getConnectionAttempt();
-                            return moderationMessageFormatter.replacePlaceholders(format, fReceiver, ban);
-                        })
-                        .sendBuilt();
-            }
-        }
     }
 }

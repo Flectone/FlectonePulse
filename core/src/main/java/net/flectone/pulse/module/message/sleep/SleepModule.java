@@ -6,15 +6,13 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.event.message.TranslatableMessageEvent;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.module.message.sleep.listener.SleepPulseListener;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.constant.MinecraftTranslationKey;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.TranslatableComponent;
 
 @Singleton
 public class SleepModule extends AbstractModuleMessage<Localization.Message.Sleep> {
@@ -22,18 +20,18 @@ public class SleepModule extends AbstractModuleMessage<Localization.Message.Slee
     private final Message.Sleep message;
     private final Permission.Message.Sleep permission;
     private final FPlayerService fPlayerService;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public SleepModule(FileResolver fileResolver,
                        FPlayerService fPlayerService,
-                       EventProcessRegistry eventProcessRegistry) {
+                       ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getSleep());
 
         this.message = fileResolver.getMessage().getSleep();
         this.permission = fileResolver.getPermission().getMessage().getSleep();
         this.fPlayerService = fPlayerService;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -42,25 +40,7 @@ public class SleepModule extends AbstractModuleMessage<Localization.Message.Slee
 
         createSound(message.getSound(), permission.getSound());
 
-        eventProcessRegistry.registerMessageHandler(event -> {
-            if (!event.getKey().startsWith("sleep.")) return;
-
-            String sleepCount = "";
-            String allCount = "";
-
-            TranslatableComponent translatableComponent = event.getComponent();
-            if (event.getKey() == MinecraftTranslationKey.SLEEP_PLAYERS_SLEEPING && translatableComponent.args().size() == 2) {
-                if ((translatableComponent.args().get(0) instanceof TextComponent sleepComponent)) {
-                    sleepCount = sleepComponent.content();
-                }
-                if ((translatableComponent.args().get(1) instanceof TextComponent allComponent)) {
-                    allCount = allComponent.content();
-                }
-            }
-
-            event.cancel();
-            send(event, sleepCount, allCount);
-        });
+        listenerRegistry.register(SleepPulseListener.class);
     }
 
     @Override
@@ -69,14 +49,13 @@ public class SleepModule extends AbstractModuleMessage<Localization.Message.Slee
     }
 
     @Async
-    public void send(TranslatableMessageEvent event, String sleepCount, String allCount) {
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getUserUUID());
+    public void send(FPlayer fPlayer, MinecraftTranslationKey key, String sleepCount, String allCount) {
         if (checkModulePredicates(fPlayer)) return;
 
         builder(fPlayer)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(bed -> switch (event.getKey()) {
+                .format(bed -> switch (key) {
                     case SLEEP_NOT_POSSIBLE -> bed.getNotPossible();
                     case SLEEP_PLAYERS_SLEEPING -> bed.getPlayersSleeping()
                             .replace("<sleep_count>", sleepCount)

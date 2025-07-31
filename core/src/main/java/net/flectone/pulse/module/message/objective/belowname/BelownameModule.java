@@ -7,13 +7,13 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.message.objective.ScoreboardPosition;
 import net.flectone.pulse.model.Ticker;
-import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
+import net.flectone.pulse.module.message.objective.ScoreboardPosition;
+import net.flectone.pulse.module.message.objective.belowname.listener.BelownamePulseListener;
 import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
@@ -28,7 +28,7 @@ public class BelownameModule extends AbstractModuleMessage<Localization.Message.
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
     private final ObjectiveModule objectiveModule;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
 
     @Inject
@@ -37,7 +37,7 @@ public class BelownameModule extends AbstractModuleMessage<Localization.Message.
                            PlatformPlayerAdapter platformPlayerAdapter,
                            TaskScheduler taskScheduler,
                            ObjectiveModule objectiveModule,
-                           EventProcessRegistry eventProcessRegistry,
+                           ListenerRegistry listenerRegistry,
                            MessagePipeline messagePipeline) {
         super(localization -> localization.getMessage().getObjective().getBelowname());
 
@@ -47,7 +47,7 @@ public class BelownameModule extends AbstractModuleMessage<Localization.Message.
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.taskScheduler = taskScheduler;
         this.objectiveModule = objectiveModule;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
         this.messagePipeline = messagePipeline;
     }
 
@@ -62,8 +62,7 @@ public class BelownameModule extends AbstractModuleMessage<Localization.Message.
             taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::update), ticker.getPeriod());
         }
 
-        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, this::create);
-        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_QUIT, this::remove);
+        listenerRegistry.register(BelownamePulseListener.class);
     }
 
     @Override

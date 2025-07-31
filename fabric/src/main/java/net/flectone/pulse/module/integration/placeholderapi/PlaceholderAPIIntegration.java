@@ -1,6 +1,7 @@
 package net.flectone.pulse.module.integration.placeholderapi;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
@@ -8,13 +9,19 @@ import eu.pb4.placeholders.api.Placeholders;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.mapper.FPlayerMapper;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.logging.FLogger;
@@ -25,25 +32,33 @@ import net.minecraft.util.Identifier;
 import java.util.Arrays;
 
 @Singleton
-public class PlaceholderAPIIntegration implements FIntegration, MessageProcessor {
+public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
     private final Message.Format.Color color;
+    private final Permission.Integration.Placeholderapi permission;
     private final FPlayerService fPlayerService;
     private final FPlayerMapper fPlayerMapper;
     private final PlatformServerAdapter platformServerAdapter;
+    private final Provider<PlaceholderAPIModule> placeholderAPIModuleProvider;
     private final FLogger fLogger;
+    private final PermissionChecker permissionChecker;
 
     @Inject
     public PlaceholderAPIIntegration(FileResolver fileResolver,
                                      FPlayerService fPlayerService,
                                      FPlayerMapper fPlayerMapper,
                                      PlatformServerAdapter platformServerAdapter,
-                                     FLogger fLogger) {
+                                     Provider<PlaceholderAPIModule> placeholderAPIModuleProvider,
+                                     FLogger fLogger,
+                                     PermissionChecker permissionChecker) {
         this.color = fileResolver.getMessage().getFormat().getColor();
+        this.permission = fileResolver.getPermission().getIntegration().getPlaceholderapi();
         this.fPlayerService = fPlayerService;
         this.fPlayerMapper = fPlayerMapper;
         this.platformServerAdapter = platformServerAdapter;
+        this.placeholderAPIModuleProvider = placeholderAPIModuleProvider;
         this.fLogger = fLogger;
+        this.permissionChecker = permissionChecker;
     }
 
     @Override
@@ -117,9 +132,16 @@ public class PlaceholderAPIIntegration implements FIntegration, MessageProcessor
         fLogger.info("✔ Text Placeholder API hooked");
     }
 
-    @Override
-    public void process(MessageContext messageContext) {
+    @Pulse(priority = Event.Priority.LOW)
+    public void onMessageProcessingEvent(MessageFormattingEvent event) {
+        MessageContext messageContext = event.getContext();
         FEntity sender = messageContext.getSender();
+        if (placeholderAPIModuleProvider.get().checkModulePredicates(sender)) return;
+
+        FEntity receiver = messageContext.getReceiver();
+        boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
+        if (!permissionChecker.check(sender, permission.getUse()) && isUserMessage) return;
+        if (!permissionChecker.check(receiver, permission.getUse()) && isUserMessage) return;
         if (!(sender instanceof FPlayer fPlayer)) return;
 
         Object player = fPlayerService.toPlatformFPlayer(fPlayer);

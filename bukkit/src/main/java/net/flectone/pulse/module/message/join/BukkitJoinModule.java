@@ -5,27 +5,22 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.join.listener.JoinListener;
-import net.flectone.pulse.provider.PacketProvider;
-import net.flectone.pulse.registry.BukkitListenerRegistry;
-import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
-import org.bukkit.event.EventPriority;
 
 @Singleton
 public class BukkitJoinModule extends JoinModule {
 
-    private final BukkitListenerRegistry bukkitListenerRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public BukkitJoinModule(FileResolver fileResolver,
                             PlatformPlayerAdapter platformPlayerAdapter,
                             IntegrationModule integrationModule,
-                            BukkitListenerRegistry bukkitListenerRegistry,
-                            EventProcessRegistry eventProcessRegistry,
-                            PacketProvider packetProvider) {
-        super(fileResolver, platformPlayerAdapter, integrationModule, eventProcessRegistry, packetProvider);
+                            ListenerRegistry listenerRegistry) {
+        super(fileResolver, platformPlayerAdapter, integrationModule, listenerRegistry);
 
-        this.bukkitListenerRegistry = bukkitListenerRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
 
@@ -33,6 +28,6 @@ public class BukkitJoinModule extends JoinModule {
     public void onEnable() {
         super.onEnable();
 
-        bukkitListenerRegistry.register(JoinListener.class, EventPriority.NORMAL);
+        listenerRegistry.register(JoinListener.class);
     }
 }

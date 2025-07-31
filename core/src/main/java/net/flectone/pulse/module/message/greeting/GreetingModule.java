@@ -5,12 +5,12 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.registry.EventProcessRegistry;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.message.format.image.model.FImage;
+import net.flectone.pulse.module.message.greeting.listener.GreetingPulseListener;
+import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -24,20 +24,20 @@ public class GreetingModule extends AbstractModuleMessage<Localization.Message.G
     private final Permission.Message.Greeting permission;
     private final SkinService skinService;
     private final FLogger fLogger;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public GreetingModule(FileResolver fileResolver,
                           SkinService skinService,
                           FLogger fLogger,
-                          EventProcessRegistry eventProcessRegistry) {
+                          ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getGreeting());
 
         this.message = fileResolver.getMessage().getGreeting();
         this.permission = fileResolver.getPermission().getMessage().getGreeting();
         this.skinService = skinService;
         this.fLogger = fLogger;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class GreetingModule extends AbstractModuleMessage<Localization.Message.G
         registerModulePermission(permission);
 
         createSound(message.getSound(), permission.getSound());
-        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_JOIN, this::send);
+        listenerRegistry.register(GreetingPulseListener.class);
     }
 
     @Override

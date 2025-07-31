@@ -5,12 +5,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Config;
+import net.flectone.pulse.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.provider.PacketProvider;
-import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
@@ -29,19 +29,19 @@ public class BukkitBaseListener implements Listener {
 
     private final Config config;
     private final FPlayerService fPlayerService;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final EventDispatcher eventDispatcher;
     private final PacketProvider packetProvider;
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
 
     @Inject
     public BukkitBaseListener(FileResolver fileResolver,
                               FPlayerService fPlayerService,
-                              EventProcessRegistry eventProcessRegistry,
+                              EventDispatcher eventDispatcher,
                               PacketProvider packetProvider,
                               PlayerPreLoginProcessor playerPreLoginProcessor) {
         this.config = fileResolver.getConfig();
         this.fPlayerService = fPlayerService;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.eventDispatcher = eventDispatcher;
         this.packetProvider = packetProvider;
         this.playerPreLoginProcessor = playerPreLoginProcessor;
     }
@@ -84,8 +84,8 @@ public class BukkitBaseListener implements Listener {
             fPlayerService.updateLocale(fPlayer, locale);
         }
 
-        eventProcessRegistry.processEvent(new PlayerLoadEvent(fPlayer));
-        eventProcessRegistry.processEvent(new net.flectone.pulse.model.event.player.PlayerJoinEvent(fPlayer));
+        eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));
+        eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerJoinEvent(fPlayer));
     }
 
     @Async
@@ -93,8 +93,8 @@ public class BukkitBaseListener implements Listener {
         UUID uuid = event.getPlayer().getUniqueId();
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
-        eventProcessRegistry.processEvent(new net.flectone.pulse.model.event.player.PlayerQuitEvent(fPlayer));
-        eventProcessRegistry.processEvent(new PlayerPersistAndDisposeEvent(fPlayer));
+        eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerQuitEvent(fPlayer));
+        eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));
     }
 
     private String getPlayerLocale(Player player) {

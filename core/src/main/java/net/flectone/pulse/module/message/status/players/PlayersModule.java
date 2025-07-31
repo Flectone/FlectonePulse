@@ -9,14 +9,10 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.module.message.status.players.listener.PlayersPulseListener;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.service.FPlayerService;
-import net.kyori.adventure.text.Component;
 
 import java.util.List;
 
@@ -25,28 +21,22 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
 
     @Getter private final Message.Status.Players message;
     private final Permission.Message.Status.Players permission;
-    private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final PlatformServerAdapter platformServerAdapter;
-    private final MessagePipeline messagePipeline;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public PlayersModule(FileResolver fileResolver,
-                         FPlayerService fPlayerService,
                          PermissionChecker permissionChecker,
                          PlatformServerAdapter platformServerAdapter,
-                         MessagePipeline messagePipeline,
-                         EventProcessRegistry eventProcessRegistry) {
+                         ListenerRegistry listenerRegistry) {
         super(module -> module.getMessage().getStatus().getPlayers());
 
         this.message = fileResolver.getMessage().getStatus().getPlayers();
         this.permission = fileResolver.getPermission().getMessage().getStatus().getPlayers();
-        this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
         this.platformServerAdapter = platformServerAdapter;
-        this.messagePipeline = messagePipeline;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -54,22 +44,7 @@ public class PlayersModule extends AbstractModuleMessage<Localization.Message.St
         registerModulePermission(permission);
         registerPermission(permission.getBypass());
 
-        eventProcessRegistry.registerHandler(Event.Type.PLAYER_PRE_LOGIN, event -> {
-            PlayerPreLoginEvent playerPreLoginEvent = (PlayerPreLoginEvent) event;
-            FPlayer fPlayer = playerPreLoginEvent.getPlayer();
-
-            if (isAllowed(fPlayer)) return;
-
-            playerPreLoginEvent.setAllowed(false);
-
-            fPlayerService.loadSettings(fPlayer);
-            fPlayerService.loadColors(fPlayer);
-
-            String reasonMessage = resolveLocalization(fPlayer).getFull();
-            Component reason = messagePipeline.builder(fPlayer, reasonMessage).build();
-
-            playerPreLoginEvent.setKickReason(reason);
-        });
+        listenerRegistry.register(PlayersPulseListener.class);
     }
 
     public boolean isAllowed(FPlayer fPlayer) {

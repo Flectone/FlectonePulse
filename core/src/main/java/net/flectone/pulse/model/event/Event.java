@@ -1,23 +1,23 @@
 package net.flectone.pulse.model.event;
 
 import lombok.Getter;
+import lombok.Setter;
 
+@Setter
 @Getter
-public class Event {
+public abstract class Event {
 
-    private final Type type;
+    private boolean cancelled;
 
-    public Event(Type type) {
-        this.type = type;
+    protected Event() {
     }
 
-    public enum Type {
-        PLAYER_PRE_LOGIN,
-        PLAYER_LOAD,
-        PLAYER_JOIN,
-        PLAYER_QUIT,
-        PLAYER_PERSIST_AND_DISPOSE,
-        TRANSLATABLE_MESSAGE_RECEIVE,
-        SENDER_TO_RECEIVER_MESSAGE,
+    public enum Priority {
+        LOWEST,
+        LOW,
+        NORMAL,
+        HIGH,
+        HIGHEST,
+        MONITOR
     }
 }

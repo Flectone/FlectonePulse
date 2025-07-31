@@ -10,7 +10,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unmute.UnmuteModule;
-import net.flectone.pulse.sender.MessageSender;
+import net.flectone.pulse.listener.MessagePulseListener;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
@@ -34,7 +34,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
     private final UnmuteModule unmuteModule;
     private final MessagePipeline messagePipeline;
     private final CommandRegistry commandRegistry;
-    private final MessageSender messageSender;
+    private final MessagePulseListener messagePulseListener;
 
     @Inject
     public MutelistModule(FileResolver fileResolver,
@@ -44,7 +44,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
                           UnmuteModule unmuteModule,
                           MessagePipeline messagePipeline,
                           CommandRegistry commandRegistry,
-                          MessageSender messageSender) {
+                          MessagePulseListener messagePulseListener) {
         super(localization -> localization.getCommand().getMutelist(), null);
 
         this.command = fileResolver.getCommand().getMutelist();
@@ -55,7 +55,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
         this.unmuteModule = unmuteModule;
         this.messagePipeline = messagePipeline;
         this.commandRegistry = commandRegistry;
-        this.messageSender = messageSender;
+        this.messagePulseListener = messagePulseListener;
     }
 
     @Override
@@ -178,7 +178,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
-        messageSender.sendMessage(fPlayer, component);
+        messagePulseListener.sendMessage(fPlayer, component);
 
         playSound(fPlayer);
     }

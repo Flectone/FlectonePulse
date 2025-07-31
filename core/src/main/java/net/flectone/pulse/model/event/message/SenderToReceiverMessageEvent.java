@@ -7,18 +7,25 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.kyori.adventure.text.Component;
 
+import java.util.UUID;
+
 @Getter
 public class SenderToReceiverMessageEvent extends Event {
 
+    private final UUID uuid;
     private final FEntity sender;
     private final FPlayer receiver;
     private final Component message;
     private final Component submessage;
     private final Destination destination;
 
-    public SenderToReceiverMessageEvent(FEntity sender, FPlayer receiver, Component message, Component submessage, Destination destination) {
-        super(Type.SENDER_TO_RECEIVER_MESSAGE);
-
+    public SenderToReceiverMessageEvent(UUID uuid,
+                                        FEntity sender,
+                                        FPlayer receiver,
+                                        Component message,
+                                        Component submessage,
+                                        Destination destination) {
+        this.uuid = uuid;
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;

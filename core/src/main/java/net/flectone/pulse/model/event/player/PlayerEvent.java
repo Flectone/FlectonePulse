@@ -5,13 +5,11 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.event.Event;
 
 @Getter
-public class PlayerEvent extends Event {
+public abstract class PlayerEvent extends Event {
 
     private final FPlayer player;
 
-    public PlayerEvent(Type type, FPlayer player) {
-        super(type);
-
+    protected PlayerEvent(FPlayer player) {
         this.player = player;
     }
 

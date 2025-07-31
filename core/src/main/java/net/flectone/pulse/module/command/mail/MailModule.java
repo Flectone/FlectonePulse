@@ -5,24 +5,23 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.registry.EventProcessRegistry;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.constant.DisableSource;
+import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Mail;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.mail.listener.MailPulseListener;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.constant.DisableSource;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 
-import java.util.List;
-
 @Singleton
-public class MailModule extends AbstractModuleCommand<Localization.Command.Mail> {
+public class MailModule extends AbstractModuleCommand<Localization.Command.Mail> implements PulseListener {
 
     private final Command.Mail command;
     private final Permission.Command.Mail permission;
@@ -30,7 +29,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
     private final IntegrationModule integrationModule;
     private final FPlayerService fPlayerService;
     private final CommandRegistry commandRegistry;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public MailModule(FileResolver fileResolver,
@@ -38,7 +37,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
                       IntegrationModule integrationModule,
                       FPlayerService fPlayerService,
                       CommandRegistry commandRegistry,
-                      EventProcessRegistry eventProcessRegistry) {
+                      ListenerRegistry listenerRegistry) {
         super(localization -> localization.getCommand().getMail(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.MAIL));
 
         this.command = fileResolver.getCommand().getMail();
@@ -47,7 +46,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         this.integrationModule = integrationModule;
         this.fPlayerService = fPlayerService;
         this.commandRegistry = commandRegistry;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -73,7 +72,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
                         .handler(this)
         );
 
-        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, this::send);
+        listenerRegistry.register(MailPulseListener.class);
     }
 
     @Override
@@ -124,25 +123,4 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
                 .message(message)
                 .sendBuilt();
     }
-
-    public void send(FPlayer fReceiver) {
-        if (checkModulePredicates(fReceiver)) return;
-
-        List<Mail> mails = fPlayerService.getReceiverMails(fReceiver);
-        if (mails.isEmpty()) return;
-
-        for (Mail mail : mails) {
-            FPlayer fPlayer = fPlayerService.getFPlayer(mail.sender());
-
-            builder(fPlayer)
-                    .receiver(fReceiver)
-                    .format((fResolver, s) -> s.getReceiver())
-                    .message((fResolver, s) -> mail.message())
-                    .sendBuilt();
-
-            fPlayerService.deleteMail(mail);
-        }
-    }
-
-
 }

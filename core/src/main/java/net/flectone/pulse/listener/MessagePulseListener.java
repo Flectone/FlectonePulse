@@ -1,4 +1,4 @@
-package net.flectone.pulse.sender;
+package net.flectone.pulse.listener;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.advancements.*;
@@ -14,12 +14,13 @@ import com.github.retrooper.packetevents.wrapper.play.server.*;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
 import net.flectone.pulse.provider.PacketProvider;
-import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.sender.PacketSender;
 import net.flectone.pulse.serializer.PacketSerializer;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -28,53 +29,48 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import java.util.*;
 
 @Singleton
-public class MessageSender {
+public class MessagePulseListener implements PulseListener {
 
     private final PacketSerializer packetSerializer;
     private final TaskScheduler taskScheduler;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PacketSender packetSender;
     private final PacketProvider packetProvider;
-    private final EventProcessRegistry eventProcessRegistry;
     private final FLogger fLogger;
 
     @Inject
-    public MessageSender(TaskScheduler taskScheduler,
-                         PlatformPlayerAdapter platformPlayerAdapter,
-                         PacketSerializer packetSerializer,
-                         PacketSender packetSender,
-                         PacketProvider packetProvider,
-                         EventProcessRegistry eventProcessRegistry,
-                         FLogger fLogger) {
+    public MessagePulseListener(TaskScheduler taskScheduler,
+                                PlatformPlayerAdapter platformPlayerAdapter,
+                                PacketSerializer packetSerializer,
+                                PacketSender packetSender,
+                                PacketProvider packetProvider,
+                                FLogger fLogger) {
         this.taskScheduler = taskScheduler;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.packetSerializer = packetSerializer;
         this.packetSender = packetSender;
         this.packetProvider = packetProvider;
-        this.eventProcessRegistry = eventProcessRegistry;
         this.fLogger = fLogger;
     }
 
-    public void reload() {
-        eventProcessRegistry.registerHandler(Event.Type.SENDER_TO_RECEIVER_MESSAGE, event -> {
-            SenderToReceiverMessageEvent messageEvent = (SenderToReceiverMessageEvent) event;
-            send(messageEvent.getReceiver(), messageEvent.getMessage(), messageEvent.getSubmessage(), messageEvent.getDestination());
-        });
-    }
+    @Pulse(priority = Event.Priority.HIGHEST)
+    public void onSenderToReceiverMessageEvent(SenderToReceiverMessageEvent event) {
+        Component message = event.getMessage();
+        if (!Component.IS_NOT_EMPTY.test(message)) return;
 
-    public void send(FPlayer fPlayer, Component component, Component subcomponent, Destination destination) {
-        if (!Component.IS_NOT_EMPTY.test(component)) return;
-
+        FPlayer fReceiver = event.getReceiver();
+        Component submessage = event.getSubmessage();
+        Destination destination = event.getDestination();
         switch (destination.getType()) {
-            case TITLE -> sendTitle(fPlayer, component, subcomponent, destination.getTimes());
-            case SUBTITLE -> sendTitle(fPlayer, subcomponent, component, destination.getTimes());
-            case ACTION_BAR -> sendActionBar(fPlayer, component, destination.getTimes().stayTicks());
-            case BOSS_BAR -> sendBoosBar(fPlayer, component, destination.getBossBar());
-            case TAB_HEADER -> sendPlayerListHeaderAndFooter(fPlayer, component, platformPlayerAdapter.getPlayerListFooter(fPlayer));
-            case TAB_FOOTER -> sendPlayerListHeaderAndFooter(fPlayer, platformPlayerAdapter.getPlayerListHeader(fPlayer), component);
-            case TOAST -> sendToast(fPlayer, component, destination.getToast());
-            case BRAND -> sendBrand(fPlayer, component);
-            default -> sendMessage(fPlayer, component);
+            case TITLE -> sendTitle(fReceiver, message, submessage, destination.getTimes());
+            case SUBTITLE -> sendTitle(fReceiver, submessage, message, destination.getTimes());
+            case ACTION_BAR -> sendActionBar(fReceiver, message, destination.getTimes().stayTicks());
+            case BOSS_BAR -> sendBoosBar(fReceiver, message, destination.getBossBar());
+            case TAB_HEADER -> sendPlayerListHeaderAndFooter(fReceiver, message, platformPlayerAdapter.getPlayerListFooter(fReceiver));
+            case TAB_FOOTER -> sendPlayerListHeaderAndFooter(fReceiver, platformPlayerAdapter.getPlayerListHeader(fReceiver), message);
+            case TOAST -> sendToast(fReceiver, message, destination.getToast());
+            case BRAND -> sendBrand(fReceiver, message);
+            default -> sendMessage(fReceiver, message);
         }
     }
 

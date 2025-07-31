@@ -11,7 +11,7 @@ import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.sender.MessageSender;
+import net.flectone.pulse.listener.MessagePulseListener;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
@@ -23,7 +23,7 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
     private final FPlayerService fPlayerService;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final MuteChecker muteChecker;
-    private final MessageSender messageSender;
+    private final MessagePulseListener messagePulseListener;
     private final MessagePipeline messagePipeline;
     private final FLogger fLogger;
 
@@ -34,7 +34,7 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
         fPlayerService = null;
         moderationMessageFormatter = null;
         muteChecker = null;
-        messageSender = null;
+        messagePulseListener = null;
         messagePipeline = null;
         fLogger = null;
     }
@@ -43,13 +43,13 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
     public SimpleVoiceIntegration(FPlayerService fPlayerService,
                                   ModerationMessageFormatter moderationMessageFormatter,
                                   MuteChecker muteChecker,
-                                  MessageSender messageSender,
+                                  MessagePulseListener messagePulseListener,
                                   MessagePipeline messagePipeline,
                                   FLogger fLogger) {
         this.fPlayerService = fPlayerService;
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.muteChecker = muteChecker;
-        this.messageSender = messageSender;
+        this.messagePulseListener = messagePulseListener;
         this.messagePipeline = messagePipeline;
         this.fLogger = fLogger;
     }
@@ -110,6 +110,6 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
         event.cancel();
 
         String message = moderationMessageFormatter.buildMuteMessage(fPlayer, status);
-        messageSender.sendActionBar(fPlayer, messagePipeline.builder(fPlayer, message).build());
+        messagePulseListener.sendActionBar(fPlayer, messagePipeline.builder(fPlayer, message).build());
     }
 }

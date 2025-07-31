@@ -4,9 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 
 @Singleton
 public class ItemsAdderModule extends AbstractModule {
@@ -14,16 +14,16 @@ public class ItemsAdderModule extends AbstractModule {
     private final Integration.Itemsadder integration;
     private final Permission.Integration.Itemsadder permission;
     private final ItemsAdderIntegration itemsAdderIntegration;
-    private final MessageProcessRegistry messageProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public ItemsAdderModule(FileResolver fileResolver,
                             ItemsAdderIntegration itemsAdderIntegration,
-                            MessageProcessRegistry messageProcessRegistry) {
+                            ListenerRegistry listenerRegistry) {
         this.integration = fileResolver.getIntegration().getItemsadder();
         this.permission = fileResolver.getPermission().getIntegration().getItemsadder();
         this.itemsAdderIntegration = itemsAdderIntegration;
-        this.messageProcessRegistry = messageProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class ItemsAdderModule extends AbstractModule {
 
         itemsAdderIntegration.hook();
 
-        messageProcessRegistry.register(30, itemsAdderIntegration);
+        listenerRegistry.register(ItemsAdderIntegration.class);
     }
 
     @Override

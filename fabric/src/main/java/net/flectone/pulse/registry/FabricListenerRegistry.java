@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Config;
+import net.flectone.pulse.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
@@ -18,6 +19,7 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.FabricTaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.TpsTracker;
+import net.flectone.pulse.util.logging.FLogger;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -29,7 +31,7 @@ public class FabricListenerRegistry extends ListenerRegistry {
     private final Config config;
     private final FabricFlectonePulse fabricFlectonePulse;
     private final FPlayerService fPlayerService;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final EventDispatcher eventDispatcher;
     private final FabricTaskScheduler fabricTaskScheduler;
     private final TpsTracker tpsTracker;
 
@@ -37,16 +39,17 @@ public class FabricListenerRegistry extends ListenerRegistry {
     public FabricListenerRegistry(FileResolver fileResolver,
                                   FabricFlectonePulse fabricFlectonePulse,
                                   FPlayerService fPlayerService,
-                                  EventProcessRegistry eventProcessRegistry,
+                                  EventDispatcher eventDispatcher,
                                   FabricTaskScheduler fabricTaskScheduler,
                                   TpsTracker tpsTracker,
+                                  FLogger fLogger,
                                   Injector injector) {
-        super(injector);
+        super(fLogger, injector);
 
         this.config = fileResolver.getConfig();
         this.fabricFlectonePulse = fabricFlectonePulse;
         this.fPlayerService = fPlayerService;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.eventDispatcher = eventDispatcher;
         this.fabricTaskScheduler = fabricTaskScheduler;
         this.tpsTracker = tpsTracker;
     }
@@ -86,15 +89,15 @@ public class FabricListenerRegistry extends ListenerRegistry {
     public void asyncProcessJoinEvent(UUID uuid) {
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
-        eventProcessRegistry.processEvent(new PlayerLoadEvent(fPlayer));
-        eventProcessRegistry.processEvent(new net.flectone.pulse.model.event.player.PlayerJoinEvent(fPlayer));
+        eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer));
+        eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerJoinEvent(fPlayer));
     }
 
     @Async
     public void asyncProcessQuitEvent(UUID uuid) {
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
 
-        eventProcessRegistry.processEvent(new net.flectone.pulse.model.event.player.PlayerQuitEvent(fPlayer));
-        eventProcessRegistry.processEvent(new PlayerPersistAndDisposeEvent(fPlayer));
+        eventDispatcher.dispatch(new net.flectone.pulse.model.event.player.PlayerQuitEvent(fPlayer));
+        eventDispatcher.dispatch(new PlayerPersistAndDisposeEvent(fPlayer));
     }
 }

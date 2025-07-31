@@ -5,9 +5,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -28,15 +29,15 @@ public class MessagePipeline {
 
     private final FLogger fLogger;
     private final MiniMessage miniMessage;
-    private final MessageProcessRegistry messageProcessRegistry;
+    private final EventDispatcher eventDispatcher;
 
     @Inject
     public MessagePipeline(FLogger fLogger,
                            MiniMessage miniMessage,
-                           MessageProcessRegistry messageProcessRegistry) {
+                           EventDispatcher eventDispatcher) {
         this.fLogger = fLogger;
         this.miniMessage = miniMessage;
-        this.messageProcessRegistry = messageProcessRegistry;
+        this.eventDispatcher = eventDispatcher;
     }
 
     public Builder builder(@NotNull String message) {
@@ -75,14 +76,8 @@ public class MessagePipeline {
             return this;
         }
 
-        public void applyProcessors() {
-            messageProcessRegistry.getProcessors().forEach((priority, processors) ->
-                    processors.forEach(processor -> processor.process(context))
-            );
-        }
-
         public Component build() {
-            applyProcessors();
+            eventDispatcher.dispatch(new MessageFormattingEvent(context));
 
             // replace disabled tags
             Arrays.stream(ReplacementTag.values())

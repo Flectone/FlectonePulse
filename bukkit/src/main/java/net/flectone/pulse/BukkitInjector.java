@@ -14,8 +14,8 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.checker.BukkitPermissionChecker;
 import net.flectone.pulse.checker.PermissionChecker;
-import net.flectone.pulse.converter.LegacyMiniConvertor;
 import net.flectone.pulse.database.Database;
+import net.flectone.pulse.listener.LegacyMiniConvertorPulseListener;
 import net.flectone.pulse.module.command.spy.BukkitSpyModule;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.BukkitIntegrationModule;
@@ -42,8 +42,6 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.resolver.LibraryResolver;
 import net.flectone.pulse.scheduler.BukkitTaskScheduler;
 import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.sender.BukkitMessageSender;
-import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.util.interceptor.AsyncInterceptor;
 import net.flectone.pulse.util.interceptor.SyncInterceptor;
 import net.flectone.pulse.util.logging.FLogger;
@@ -124,7 +122,6 @@ public class BukkitInjector extends AbstractModule {
         // Checkers and utilities
         bind(PermissionChecker.class).to(BukkitPermissionChecker.class);
         bind(TaskScheduler.class).to(BukkitTaskScheduler.class);
-        bind(MessageSender.class).to(BukkitMessageSender.class);
 
         // Modules
         bind(IntegrationModule.class).to(BukkitIntegrationModule.class);
@@ -141,7 +138,7 @@ public class BukkitInjector extends AbstractModule {
         // Libraries and serialization
         bind(LibraryResolver.class).toInstance(libraryResolver);
         bind(Gson.class).toInstance(GsonComponentSerializer.gson().serializer());
-        bind(LegacyMiniConvertor.class).asEagerSingleton();
+        bind(LegacyMiniConvertorPulseListener.class).asEagerSingleton();
 
         // Core bindings
         bind(FlectonePulse.class).toInstance(instance);

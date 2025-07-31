@@ -7,12 +7,15 @@ import com.loohp.interactivechat.api.InteractiveChatAPI;
 import com.loohp.interactivechat.data.PlayerDataManager;
 import com.loohp.interactivechat.listeners.ChatEvents;
 import com.loohp.interactivechat.registry.Registry;
+import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.processor.MessageProcessor;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -24,7 +27,7 @@ import java.util.UUID;
 // but users really like it, so...
 
 @Singleton
-public class InteractiveChatIntegration implements FIntegration, MessageProcessor {
+public class InteractiveChatIntegration implements FIntegration, PulseListener {
 
     private final FLogger fLogger;
 
@@ -113,8 +116,9 @@ public class InteractiveChatIntegration implements FIntegration, MessageProcesso
         return true;
     }
 
-    @Override
-    public void process(MessageContext messageContext) {
+    @Pulse(priority = Event.Priority.LOWEST)
+    public void onMessageProcessingEvent(MessageFormattingEvent event) {
+        MessageContext messageContext = event.getContext();
         if (!messageContext.isFlag(MessageFlag.INTERACTIVE_CHAT)) return;
 
         FEntity sender = messageContext.getSender();

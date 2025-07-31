@@ -3,9 +3,9 @@ package net.flectone.pulse.processor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
-import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.registry.ProxyRegistry;
 import net.flectone.pulse.service.FPlayerService;
 
@@ -17,15 +17,15 @@ public class PlayerPreLoginProcessor {
 
     private final FPlayerService fPlayerService;
     private final ProxyRegistry proxyRegistry;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final EventDispatcher eventDispatcher;
 
     @Inject
     public PlayerPreLoginProcessor(FPlayerService fPlayerService,
                                    ProxyRegistry proxyRegistry,
-                                   EventProcessRegistry eventProcessRegistry) {
+                                   EventDispatcher eventDispatcher) {
         this.fPlayerService = fPlayerService;
         this.proxyRegistry = proxyRegistry;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.eventDispatcher = eventDispatcher;
     }
 
     @Async
@@ -43,7 +43,7 @@ public class PlayerPreLoginProcessor {
 
         FPlayer fPlayer = fPlayerService.addFPlayer(uuid, name);
         PlayerPreLoginEvent event = new PlayerPreLoginEvent(fPlayer);
-        eventProcessRegistry.processEvent(event);
+        eventDispatcher.dispatch(event);
 
         if (event.isAllowed()) {
             fPlayerService.loadData(uuid);

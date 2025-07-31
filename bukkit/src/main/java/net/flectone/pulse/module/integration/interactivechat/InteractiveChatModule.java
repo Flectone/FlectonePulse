@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.kyori.adventure.text.Component;
 
 @Singleton
@@ -16,16 +16,16 @@ public class InteractiveChatModule extends AbstractModule {
     private final Integration.Interactivechat integration;
     private final Permission.Integration.Interactivechat permission;
     private final InteractiveChatIntegration interactiveChatIntegration;
-    private final MessageProcessRegistry messageProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public InteractiveChatModule(FileResolver fileResolver,
                                  InteractiveChatIntegration interactiveChatIntegration,
-                                 MessageProcessRegistry messageProcessRegistry) {
+                                 ListenerRegistry listenerRegistry) {
         this.integration = fileResolver.getIntegration().getInteractivechat();
         this.permission = fileResolver.getPermission().getIntegration().getInteractivechat();
         this.interactiveChatIntegration = interactiveChatIntegration;
-        this.messageProcessRegistry = messageProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class InteractiveChatModule extends AbstractModule {
 
         interactiveChatIntegration.hook();
 
-        messageProcessRegistry.register(0, interactiveChatIntegration);
+        listenerRegistry.register(InteractiveChatIntegration.class);
     }
 
     @Override

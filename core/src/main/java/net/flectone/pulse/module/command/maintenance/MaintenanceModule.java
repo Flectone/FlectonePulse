@@ -15,13 +15,11 @@ import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.maintenance.listener.MaintenancePacketListener;
+import net.flectone.pulse.module.command.maintenance.listener.MaintenancePulseListener;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.registry.CommandRegistry;
-import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
@@ -46,7 +44,6 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     private final PlatformServerAdapter platformServerAdapter;
     private final MessagePipeline messagePipeline;
     private final CommandRegistry commandRegistry;
-    private final EventProcessRegistry eventProcessRegistry;
     private final IconUtil iconUtil;
 
     private String icon;
@@ -60,7 +57,6 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                              PlatformServerAdapter platformServerAdapter,
                              CommandRegistry commandRegistry,
                              MessagePipeline messagePipeline,
-                             EventProcessRegistry eventProcessRegistry,
                              IconUtil iconUtil) {
         super(module -> module.getCommand().getMaintenance(), null);
 
@@ -74,7 +70,6 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         this.iconPath = projectPath.resolve("images");
         this.platformServerAdapter = platformServerAdapter;
         this.messagePipeline = messagePipeline;
-        this.eventProcessRegistry = eventProcessRegistry;
         this.iconUtil = iconUtil;
     }
 
@@ -93,6 +88,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         registerPermission(permission.getJoin());
 
         listenerRegistry.register(MaintenancePacketListener.class);
+        listenerRegistry.register(MaintenancePulseListener.class);
 
         File file = new File(iconPath.toString() + File.separator + "maintenance.png");
 
@@ -114,23 +110,6 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         );
 
         addPredicate(this::checkCooldown);
-
-        eventProcessRegistry.registerHandler(Event.Type.PLAYER_PRE_LOGIN, event -> {
-            PlayerPreLoginEvent playerPreLoginEvent = (PlayerPreLoginEvent) event;
-            FPlayer fPlayer = playerPreLoginEvent.getPlayer();
-
-            if (isAllowed(fPlayer)) return;
-
-            playerPreLoginEvent.setAllowed(false);
-
-            fPlayerService.loadSettings(fPlayer);
-            fPlayerService.loadColors(fPlayer);
-
-            String reasonMessage = resolveLocalization(fPlayer).getKick();
-            Component reason = messagePipeline.builder(fPlayer, reasonMessage).build();
-
-            playerPreLoginEvent.setKickReason(reason);
-        });
     }
 
     @Override

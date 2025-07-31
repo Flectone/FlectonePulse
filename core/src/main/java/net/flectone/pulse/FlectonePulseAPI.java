@@ -8,13 +8,13 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.controller.InventoryController;
 import net.flectone.pulse.database.Database;
+import net.flectone.pulse.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.exception.ReloadException;
 import net.flectone.pulse.module.Module;
 import net.flectone.pulse.registry.*;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.sender.MessageSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MetricsService;
 import net.flectone.pulse.service.ModerationService;
@@ -54,9 +54,6 @@ public class FlectonePulseAPI  {
 
         // initialize packetevents
         PacketEvents.getAPI().init();
-
-        // register event handler
-        injector.getInstance(MessageSender.class).reload();
 
         // reload modules and their children
         injector.getInstance(net.flectone.pulse.module.Module.class).reloadWithChildren();
@@ -154,16 +151,8 @@ public class FlectonePulseAPI  {
         injector.getInstance(CommandParserRegistry.class).reload();
         injector.getInstance(CommandRegistry.class).reload();
         injector.getInstance(ListenerRegistry.class).reload();
-        injector.getInstance(MessageProcessRegistry.class).reload();
         injector.getInstance(PermissionRegistry.class).reload();
         injector.getInstance(ProxyRegistry.class).reload();
-
-        // reload event process registry
-        EventProcessRegistry eventProcessRegistry = injector.getInstance(EventProcessRegistry.class);
-        eventProcessRegistry.reload();
-
-        // register event handler
-        injector.getInstance(MessageSender.class).reload();
 
         // reload task scheduler
         injector.getInstance(TaskScheduler.class).reload();
@@ -203,8 +192,9 @@ public class FlectonePulseAPI  {
         injector.getInstance(Module.class).reloadWithChildren();
 
         // process player load event for all platform fplayers
+        EventDispatcher eventDispatcher = injector.getInstance(EventDispatcher.class);
         fPlayerService.getPlatformFPlayers().forEach(fPlayer ->
-                eventProcessRegistry.processEvent(new PlayerLoadEvent(fPlayer))
+                eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer))
         );
 
         // reload metrics service if enabled

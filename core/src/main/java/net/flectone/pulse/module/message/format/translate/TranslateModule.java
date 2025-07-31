@@ -7,26 +7,18 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.constant.MessageFlag;
-import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.model.FEntity;
-import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.processor.MessageProcessor;
-import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.module.message.format.translate.listener.TranslatePulseListener;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Singleton
-public class TranslateModule extends AbstractModuleMessage<Localization.Message.Format.Translate> implements MessageProcessor {
+public class TranslateModule extends AbstractModuleMessage<Localization.Message.Format.Translate> {
 
     private final Cache<String, UUID> messageCache = CacheBuilder.newBuilder()
             .maximumSize(5000)
@@ -35,26 +27,23 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
 
     private final Message.Format.Translate message;
     private final Permission.Message.Format.Translate permission;
-    private final MessagePipeline messagePipeline;
-    private final MessageProcessRegistry messageProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public TranslateModule(FileResolver fileResolver,
-                           MessagePipeline messagePipeline,
-                           MessageProcessRegistry messageProcessRegistry) {
+                           ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getFormat().getTranslate());
 
         this.message = fileResolver.getMessage().getFormat().getTranslate();
         this.permission = fileResolver.getPermission().getMessage().getFormat().getTranslate();
-        this.messagePipeline = messagePipeline;
-        this.messageProcessRegistry = messageProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
         registerModulePermission(permission);
 
-        messageProcessRegistry.register(100, this);
+        listenerRegistry.register(TranslatePulseListener.class);
     }
 
     @Override
@@ -67,56 +56,7 @@ public class TranslateModule extends AbstractModuleMessage<Localization.Message.
         return message.isEnable();
     }
 
-    @Override
-    public void process(MessageContext messageContext) {
-        if (!messageContext.isFlag(MessageFlag.TRANSLATE)) return;
-
-        String messageToTranslate = messageContext.getMessageToTranslate();
-        UUID key = saveMessage(messageToTranslate);
-
-        FEntity sender = messageContext.getSender();
-        if (checkModulePredicates(sender)) return;
-
-        FPlayer receiver = messageContext.getReceiver();
-
-        messageContext.addReplacementTag(Set.of(MessagePipeline.ReplacementTag.TRANSLATE, MessagePipeline.ReplacementTag.TRANSLATETO), (argumentQueue, context) -> {
-            String firstLang = "auto";
-            String secondLang = receiver.getSettingValue(FPlayer.Setting.LOCALE);
-
-            if (argumentQueue.hasNext()) {
-                Tag.Argument first = argumentQueue.pop();
-
-                if (argumentQueue.hasNext()) {
-                    Tag.Argument second = argumentQueue.pop();
-
-                    if (argumentQueue.hasNext()) {
-                        // translateto language language message
-                        firstLang = first.value();
-                        secondLang = second.value();
-                    } else {
-                        // translateto auto language message
-                        secondLang = first.value();
-                    }
-                }
-            }
-
-            String action = resolveLocalization(receiver).getAction()
-                    .replaceFirst("<language>", firstLang)
-                    .replaceFirst("<language>", secondLang == null ? "ru_ru" : secondLang)
-                    .replace("<message>", key.toString());
-
-            Component component = messagePipeline.builder(sender, receiver, action)
-                    .flag(MessageFlag.MENTION, false)
-                    .flag(MessageFlag.INTERACTIVE_CHAT, false)
-                    .flag(MessageFlag.QUESTION, false)
-                    .flag(MessageFlag.TRANSLATE, false)
-                    .build();
-
-            return Tag.selfClosingInserting(component);
-        });
-    }
-
-    private UUID saveMessage(String message) {
+    public UUID saveMessage(String message) {
         UUID uuid = messageCache.getIfPresent(message);
         if (uuid == null) {
             uuid = UUID.randomUUID();

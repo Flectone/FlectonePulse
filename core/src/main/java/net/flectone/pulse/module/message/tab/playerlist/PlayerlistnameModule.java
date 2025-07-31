@@ -14,11 +14,11 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
-import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.message.tab.playerlist.listener.PlayerlistnamePulseListener;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.provider.PacketProvider;
-import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.PacketSender;
@@ -36,7 +36,7 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
     private final PacketSender packetSender;
     private final PacketProvider packetProvider;
     private final TaskScheduler taskScheduler;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public PlayerlistnameModule(FPlayerService fPlayerService,
@@ -46,7 +46,7 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
                                 PacketSender packetSender,
                                 PacketProvider packetProvider,
                                 TaskScheduler taskScheduler,
-                                EventProcessRegistry eventProcessRegistry) {
+                                ListenerRegistry listenerRegistry) {
         super(module -> module.getMessage().getTab().getPlayerlistname());
 
         this.message = fileResolver.getMessage().getTab().getPlayerlistname();
@@ -57,7 +57,7 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
         this.packetSender = packetSender;
         this.packetProvider = packetProvider;
         this.taskScheduler = taskScheduler;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -71,7 +71,7 @@ public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Mes
             taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::send), ticker.getPeriod());
         }
 
-        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, fPlayer -> update());
+        listenerRegistry.register(PlayerlistnamePulseListener.class);
     }
 
     @Async(delay = 10)

@@ -8,17 +8,11 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.module.message.setblock.listener.SetblockPulseListener;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.constant.MinecraftTranslationKey;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.TranslatableComponent;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.UUID;
 
 @Singleton
 public class SetblockModule extends AbstractModuleMessage<Localization.Message.Setblock> {
@@ -26,18 +20,18 @@ public class SetblockModule extends AbstractModuleMessage<Localization.Message.S
     private final Message.Setblock message;
     private final Permission.Message.Setblock permission;
     private final FPlayerService fPlayerService;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public SetblockModule(FileResolver fileResolver,
                           FPlayerService fPlayerService,
-                          EventProcessRegistry eventProcessRegistry) {
+                          ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getSetblock());
 
         this.message = fileResolver.getMessage().getSetblock();
         this.permission = fileResolver.getPermission().getMessage().getSetblock();
         this.fPlayerService = fPlayerService;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -46,29 +40,7 @@ public class SetblockModule extends AbstractModuleMessage<Localization.Message.S
 
         createSound(message.getSound(), permission.getSound());
 
-        eventProcessRegistry.registerMessageHandler(event -> {
-            if (event.getKey() != MinecraftTranslationKey.COMMANDS_SETBLOCK_SUCCESS) return;
-
-            TranslatableComponent translatableComponent = event.getComponent();
-            List<Component> translationArguments = translatableComponent.args();
-
-            String x = "";
-            String y = "";
-            String z = "";
-            if (translationArguments.size() > 2) {
-                if (!(translationArguments.get(0) instanceof TextComponent xComponent)) return;
-                if (!(translationArguments.get(1) instanceof TextComponent yComponent)) return;
-                if (!(translationArguments.get(2) instanceof TextComponent zComponent)) return;
-
-                x = xComponent.content();
-                y = yComponent.content();
-                z = zComponent.content();
-            }
-
-            event.cancel();
-
-            send(event.getUserUUID(), x, y, z);
-        });
+        listenerRegistry.register(SetblockPulseListener.class);
     }
 
     @Override
@@ -77,8 +49,7 @@ public class SetblockModule extends AbstractModuleMessage<Localization.Message.S
     }
 
     @Async
-    public void send(UUID receiver, @NotNull String x, @NotNull String y, @NotNull String z) {
-        FPlayer fPlayer = fPlayerService.getFPlayer(receiver);
+    public void send(FPlayer fPlayer, @NotNull String x, @NotNull String y, @NotNull String z) {
         if (checkModulePredicates(fPlayer)) return;
 
         builder(fPlayer)

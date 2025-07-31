@@ -14,7 +14,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.sender.MessageSender;
+import net.flectone.pulse.listener.MessagePulseListener;
 import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -34,7 +34,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
     private final PlatformServerAdapter platformServerAdapter;
     private final CommandRegistry commandRegistry;
     private final MessagePipeline messagePipeline;
-    private final MessageSender messageSender;
+    private final MessagePulseListener messagePulseListener;
     private final TimeFormatter timeFormatter;
     private final FLogger fLogger;
 
@@ -44,7 +44,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
                            PlatformServerAdapter platformServerAdapter,
                            CommandRegistry commandRegistry,
                            MessagePipeline messagePipeline,
-                           MessageSender messageSender,
+                           MessagePulseListener messagePulseListener,
                            TimeFormatter timeFormatter,
                            FLogger fLogger) {
         super(localization -> localization.getCommand().getToponline(), null);
@@ -55,7 +55,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
         this.platformServerAdapter = platformServerAdapter;
         this.commandRegistry = commandRegistry;
         this.messagePipeline = messagePipeline;
-        this.messageSender = messageSender;
+        this.messagePulseListener = messagePulseListener;
         this.timeFormatter = timeFormatter;
         this.fLogger = fLogger;
     }
@@ -147,7 +147,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
-        messageSender.sendMessage(fPlayer, component);
+        messagePulseListener.sendMessage(fPlayer, component);
 
         playSound(fPlayer);
     }

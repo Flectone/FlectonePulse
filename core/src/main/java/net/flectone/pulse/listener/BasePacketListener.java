@@ -14,14 +14,14 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCh
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.constant.MinecraftTranslationKey;
+import net.flectone.pulse.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.event.message.TranslatableMessageEvent;
+import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
 import net.flectone.pulse.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.provider.PacketProvider;
-import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.sender.PacketSender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 
@@ -31,19 +31,19 @@ import java.util.UUID;
 public class BasePacketListener implements PacketListener {
 
     private final FPlayerService fPlayerService;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final EventDispatcher eventDispatcher;
     private final PacketProvider packetProvider;
     private final PacketSender packetSender;
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
 
     @Inject
     public BasePacketListener(FPlayerService fPlayerService,
-                              EventProcessRegistry eventProcessRegistry,
+                              EventDispatcher eventDispatcher,
                               PacketProvider packetProvider,
                               PacketSender packetSender,
                               PlayerPreLoginProcessor playerPreLoginProcessor) {
         this.fPlayerService = fPlayerService;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.eventDispatcher = eventDispatcher;
         this.packetProvider = packetProvider;
         this.packetSender = packetSender;
         this.playerPreLoginProcessor = playerPreLoginProcessor;
@@ -107,7 +107,8 @@ public class BasePacketListener implements PacketListener {
             return;
         }
 
-        eventProcessRegistry.processEvent(new TranslatableMessageEvent(key, translatableComponent, event));
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getUser().getUUID());
+        eventDispatcher.dispatch(new TranslatableMessageReceiveEvent(fPlayer, key, translatableComponent, event));
     }
 
     private TranslatableComponent parseTranslatableComponent(PacketSendEvent event) {

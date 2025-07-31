@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.BukkitBaseListener;
+import net.flectone.pulse.sender.BukkitMessageListener;
+import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.event.*;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
@@ -22,17 +24,29 @@ public class BukkitListenerRegistry extends ListenerRegistry {
     private final Injector injector;
 
     @Inject
-    public BukkitListenerRegistry(Plugin plugin, Injector injector) {
-        super(injector);
+    public BukkitListenerRegistry(Plugin plugin,
+                                  FLogger fLogger,
+                                  Injector injector) {
+        super(fLogger, injector);
 
         this.plugin = plugin;
         this.injector = injector;
     }
 
-    public void register(Class<? extends Listener> clazzListener, EventPriority eventPriority) {
-        Listener abstractListener = injector.getInstance(clazzListener);
-        listeners.add(abstractListener);
-        registerEvents(abstractListener, eventPriority);
+    @Override
+    public void register(Class<?> clazzListener, net.flectone.pulse.model.event.Event.Priority eventPriority) {
+        if (Listener.class.isAssignableFrom(clazzListener)) {
+            Listener bukkitListener = (Listener) injector.getInstance(clazzListener);
+            register(bukkitListener, EventPriority.valueOf(eventPriority.name()));
+            return;
+        }
+
+        super.register(clazzListener, eventPriority);
+    }
+
+    public void register(Listener bukkitListener, EventPriority eventPriority) {
+        listeners.add(bukkitListener);
+        registerEvents(bukkitListener, eventPriority);
     }
 
     private void registerEvents(Listener abstractListener, EventPriority eventPriority) {
@@ -78,6 +92,7 @@ public class BukkitListenerRegistry extends ListenerRegistry {
     public void registerDefaultListeners() {
         super.registerDefaultListeners();
 
-        register(BukkitBaseListener.class, EventPriority.LOWEST);
+        register(BukkitBaseListener.class, net.flectone.pulse.model.event.Event.Priority.LOWEST);
+        register(BukkitMessageListener.class);
     }
 }

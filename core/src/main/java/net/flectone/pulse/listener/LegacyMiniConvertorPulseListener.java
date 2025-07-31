@@ -1,4 +1,4 @@
-package net.flectone.pulse.converter;
+package net.flectone.pulse.listener;
 
 /*
     MIT License
@@ -26,15 +26,15 @@ package net.flectone.pulse.converter;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
-import net.flectone.pulse.processor.MessageProcessor;
-import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.message.MessageFormattingEvent;
+import net.flectone.pulse.resolver.FileResolver;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +47,7 @@ import java.util.regex.Pattern;
  */
 
 @Singleton
-public final class LegacyMiniConvertor extends AbstractModule implements MessageProcessor {
+public final class LegacyMiniConvertorPulseListener implements PulseListener {
 
     private final Set<Option> DEF_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
             Option.COLOR,
@@ -63,30 +63,18 @@ public final class LegacyMiniConvertor extends AbstractModule implements Message
     private final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
 
     private final Permission.Message.Format formatPermission;
-    private final MessageProcessRegistry messageProcessRegistry;
     private final PermissionChecker permissionChecker;
 
     @Inject
-    public LegacyMiniConvertor(FileResolver fileResolver,
-                               MessageProcessRegistry messageProcessRegistry,
-                               PermissionChecker permissionChecker) {
+    public LegacyMiniConvertorPulseListener(FileResolver fileResolver,
+                                            PermissionChecker permissionChecker) {
         this.formatPermission = fileResolver.getPermission().getMessage().getFormat();
-        this.messageProcessRegistry = messageProcessRegistry;
         this.permissionChecker = permissionChecker;
     }
 
-    @Override
-    public void onEnable() {
-        messageProcessRegistry.register(1000, this);
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return true;
-    }
-
-    @Override
-    public void process(MessageContext messageContext) {
+    @Pulse(priority = Event.Priority.HIGHEST)
+    public void onMessageProcessingEvent(MessageFormattingEvent event) {
+        MessageContext messageContext = event.getContext();
         FEntity sender = messageContext.getSender();
         if (!messageContext.isFlag(MessageFlag.COLORS)) return;
         // parameters &b -> <aqua> (incorrect url)

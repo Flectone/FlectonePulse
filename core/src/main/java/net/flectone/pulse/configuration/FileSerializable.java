@@ -10,7 +10,7 @@ import net.elytrium.serializer.custom.ClassSerializer;
 import net.elytrium.serializer.language.object.YamlSerializable;
 import net.flectone.pulse.database.Database;
 import net.flectone.pulse.model.*;
-import net.flectone.pulse.model.event.EventPriority;
+import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
@@ -37,7 +37,7 @@ public abstract class FileSerializable extends YamlSerializable {
             .registerSerializer(new EnumSerializer<>(BubbleModule.Billboard.class))
             .registerSerializer(new EnumSerializer<>(WorldModule.Mode.class))
             .registerSerializer(new EnumSerializer<>(ObjectiveModule.Mode.class))
-            .registerSerializer(new EnumSerializer<>(EventPriority.class))
+            .registerSerializer(new EnumSerializer<>(Event.Priority.class))
             .registerSerializer(new ClassSerializer<Range, Object>() {
 
                 @Override

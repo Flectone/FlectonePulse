@@ -13,7 +13,7 @@ public class PlayerPreLoginEvent extends PlayerEvent {
     private boolean allowed = true;
 
     public PlayerPreLoginEvent(FPlayer fPlayer) {
-        super(Type.PLAYER_PRE_LOGIN, fPlayer);
+        super(fPlayer);
     }
 
 }

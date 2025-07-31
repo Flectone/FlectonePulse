@@ -6,14 +6,20 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.adapter.PlatformServerAdapter;
+import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.annotation.Sync;
+import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.processor.MessageProcessor;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.Bukkit;
@@ -23,24 +29,30 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Singleton
-public class PlaceholderAPIIntegration extends PlaceholderExpansion implements FIntegration, MessageProcessor {
+public class PlaceholderAPIIntegration extends PlaceholderExpansion implements FIntegration, PulseListener {
 
     private final Message.Format.Color color;
-
+    private final Permission.Integration.Placeholderapi permission;
     private final FPlayerService fPlayerService;
     private final PlatformServerAdapter platformServerAdapter;
+    private final PermissionChecker permissionChecker;
+    private final PlaceholderAPIModule placeholderAPIModule;
     private final FLogger fLogger;
 
     @Inject
     public PlaceholderAPIIntegration(FPlayerService fPlayerService,
                                      FileResolver fileResolver,
                                      PlatformServerAdapter platformServerAdapter,
+                                     PermissionChecker permissionChecker,
+                                     PlaceholderAPIModule placeholderAPIModule,
                                      FLogger fLogger) {
+        this.color = fileResolver.getMessage().getFormat().getColor();
+        this.permission = fileResolver.getPermission().getIntegration().getPlaceholderapi();
         this.fPlayerService = fPlayerService;
         this.platformServerAdapter = platformServerAdapter;
+        this.permissionChecker = permissionChecker;
+        this.placeholderAPIModule = placeholderAPIModule;
         this.fLogger = fLogger;
-
-        color = fileResolver.getMessage().getFormat().getColor();
     }
 
     @Override
@@ -118,9 +130,16 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
         return placeholder == null ? "" : placeholder;
     }
 
-    @Override
-    public void process(MessageContext messageContext) {
+    @Pulse(priority = Event.Priority.LOW)
+    public void onMessageProcessingEvent(MessageFormattingEvent event) {
+        MessageContext messageContext = event.getContext();
         FEntity sender = messageContext.getSender();
+        if (placeholderAPIModule.checkModulePredicates(sender)) return;
+
+        FEntity fReceiver = messageContext.getReceiver();
+        boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
+        if (!permissionChecker.check(sender, permission.getUse()) && isUserMessage) return;
+        if (!permissionChecker.check(fReceiver, permission.getUse()) && isUserMessage) return;
         if (!(sender instanceof FPlayer fPlayer)) return;
 
         String message = messageContext.getMessage();
@@ -131,7 +150,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
 
             if (!fPlayer.isOnline()) return;
 
-            Player receiver = Bukkit.getPlayer(messageContext.getReceiver().getUuid());
+            Player receiver = Bukkit.getPlayer(fReceiver.getUuid());
             if (receiver == null) {
                 receiver = offlinePlayer.getPlayer();
             }

@@ -7,11 +7,11 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
-import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.message.format.scoreboard.listener.ScoreboardPulseListener;
 import net.flectone.pulse.module.message.format.scoreboard.model.Team;
 import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.PacketSender;
@@ -35,7 +35,7 @@ public class ScoreboardModule extends AbstractModule {
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
     private final PacketSender packetSender;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public ScoreboardModule(FileResolver fileResolver,
@@ -43,14 +43,14 @@ public class ScoreboardModule extends AbstractModule {
                             TaskScheduler taskScheduler,
                             MessagePipeline messagePipeline,
                             PacketSender packetSender,
-                            EventProcessRegistry eventProcessRegistry) {
+                            ListenerRegistry listenerRegistry) {
         this.message = fileResolver.getMessage().getFormat().getScoreboard();
         this.permission = fileResolver.getPermission().getMessage().getFormat().getScoreboard();
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -79,8 +79,7 @@ public class ScoreboardModule extends AbstractModule {
             }), ticker.getPeriod());
         }
 
-        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, this::create);
-        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_QUIT, this::remove);
+        listenerRegistry.register(ScoreboardPulseListener.class);
     }
 
     @Override

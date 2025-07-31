@@ -6,7 +6,7 @@ import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.checker.MuteChecker;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.sender.MessageSender;
+import net.flectone.pulse.listener.MessagePulseListener;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
@@ -30,7 +30,7 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
     private final FPlayerService fPlayerService;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final MuteChecker muteChecker;
-    private final MessageSender messageSender;
+    private final MessagePulseListener messagePulseListener;
     private final MessagePipeline messagePipeline;
     private final FLogger fLogger;
 
@@ -40,13 +40,13 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
     public PlasmoVoiceIntegration(FPlayerService fPlayerService,
                                   ModerationMessageFormatter moderationMessageFormatter,
                                   MuteChecker muteChecker,
-                                  MessageSender messageSender,
+                                  MessagePulseListener messagePulseListener,
                                   MessagePipeline messagePipeline,
                                   FLogger fLogger) {
         this.fPlayerService = fPlayerService;
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.muteChecker = muteChecker;
-        this.messageSender = messageSender;
+        this.messagePulseListener = messagePulseListener;
         this.messagePipeline = messagePipeline;
         this.fLogger = fLogger;
     }
@@ -95,7 +95,7 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
         event.setCancelled(true);
 
         String message = moderationMessageFormatter.buildMuteMessage(fPlayer, status);
-        messageSender.sendActionBar(fPlayer, messagePipeline.builder(fPlayer, message).build());
+        messagePulseListener.sendActionBar(fPlayer, messagePipeline.builder(fPlayer, message).build());
     }
 
     @Override

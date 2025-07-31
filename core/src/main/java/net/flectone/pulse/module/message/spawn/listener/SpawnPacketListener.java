@@ -6,17 +6,22 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChangeGameState;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.spawn.SpawnModule;
 import net.flectone.pulse.constant.MinecraftTranslationKey;
+import net.flectone.pulse.service.FPlayerService;
 
 @Singleton
-public class ChangeGameStatePacketListener implements PacketListener {
+public class SpawnPacketListener implements PacketListener {
 
     private final SpawnModule spawnModule;
+    private final FPlayerService fPlayerService;
 
     @Inject
-    public ChangeGameStatePacketListener(SpawnModule spawnModule) {
+    public SpawnPacketListener(SpawnModule spawnModule,
+                               FPlayerService fPlayerService) {
         this.spawnModule = spawnModule;
+        this.fPlayerService = fPlayerService;
     }
 
     @Override
@@ -29,7 +34,9 @@ public class ChangeGameStatePacketListener implements PacketListener {
         if (wrapper.getReason() != WrapperPlayServerChangeGameState.Reason.NO_RESPAWN_BLOCK_AVAILABLE) return;
 
         event.setCancelled(true);
-        spawnModule.send(event.getUser().getUUID(), MinecraftTranslationKey.BLOCK_MINECRAFT_SPAWN_NOT_VALID);
+
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getUser().getUUID());
+        spawnModule.send(fPlayer, MinecraftTranslationKey.BLOCK_MINECRAFT_SPAWN_NOT_VALID);
     }
 }
 

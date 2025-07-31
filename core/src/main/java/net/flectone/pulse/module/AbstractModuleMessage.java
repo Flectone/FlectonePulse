@@ -10,13 +10,13 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.constant.MessageType;
+import net.flectone.pulse.dispatcher.EventDispatcher;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.formatter.TimeFormatter;
 import net.flectone.pulse.model.*;
 import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.registry.EventProcessRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.ProxySender;
@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -56,7 +57,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
     @Inject private IntegrationModule integrationModule;
     @Inject private SoundPlayer soundPlayer;
     @Inject private TaskScheduler taskScheduler;
-    @Inject private EventProcessRegistry eventProcessRegistry;
+    @Inject private EventDispatcher eventDispatcher;
 
     @Getter private Cooldown cooldown;
     @Getter private Sound sound;
@@ -366,6 +367,8 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         }
 
         public void send(List<FPlayer> recipients) {
+            UUID messageUUID = UUID.randomUUID();
+
             recipients.forEach(recipient -> {
 
                 // example
@@ -382,7 +385,13 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
                     subComponent = buildSubcomponent(recipient, messageComponent);
                 }
 
-                eventProcessRegistry.processEvent(new SenderToReceiverMessageEvent(fPlayer, recipient, formatComponent, subComponent, destination));
+                eventDispatcher.dispatch(new SenderToReceiverMessageEvent(messageUUID,
+                        fPlayer,
+                        recipient,
+                        formatComponent,
+                        subComponent,
+                        destination
+                ));
 
                 if (sound != null) {
                     if (!permissionChecker.check(fPlayer, sound.getPermission())) return;

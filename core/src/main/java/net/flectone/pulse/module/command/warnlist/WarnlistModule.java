@@ -10,7 +10,7 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
-import net.flectone.pulse.sender.MessageSender;
+import net.flectone.pulse.listener.MessagePulseListener;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
@@ -35,7 +35,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
     private final UnwarnModule unwarnModule;
     private final MessagePipeline messagePipeline;
     private final CommandRegistry commandRegistry;
-    private final MessageSender messageSender;
+    private final MessagePulseListener messagePulseListener;
 
     @Inject
     public WarnlistModule(FileResolver fileResolver,
@@ -45,7 +45,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
                           UnwarnModule unwarnModule,
                           MessagePipeline messagePipeline,
                           CommandRegistry commandRegistry,
-                          MessageSender messageSender) {
+                          MessagePulseListener messagePulseListener) {
         super(localization -> localization.getCommand().getWarnlist(), null);
 
         this.command = fileResolver.getCommand().getWarnlist();
@@ -55,7 +55,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.unwarnModule = unwarnModule;
         this.messagePipeline = messagePipeline;
-        this.messageSender = messageSender;
+        this.messagePulseListener = messagePulseListener;
         this.commandRegistry = commandRegistry;
     }
 
@@ -179,7 +179,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
-        messageSender.sendMessage(fPlayer, component);
+        messagePulseListener.sendMessage(fPlayer, component);
 
         playSound(fPlayer);
     }

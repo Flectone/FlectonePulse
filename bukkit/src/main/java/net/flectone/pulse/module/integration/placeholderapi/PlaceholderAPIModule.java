@@ -1,14 +1,12 @@
 package net.flectone.pulse.module.integration.placeholderapi;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Integration;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.constant.MessageFlag;
-import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 
 @Singleton
@@ -16,20 +14,17 @@ public class PlaceholderAPIModule extends AbstractModule {
 
     private final Integration.Placeholderapi integration;
     private final Permission.Integration.Placeholderapi permission;
-    private final PlaceholderAPIIntegration placeholderAPIIntegration;
-    private final PermissionChecker permissionChecker;
-    private final MessageProcessRegistry messageProcessRegistry;
+    private final Provider<PlaceholderAPIIntegration> placeholderAPIIntegrationProvider;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public PlaceholderAPIModule(FileResolver fileResolver,
-                                PermissionChecker permissionChecker,
-                                PlaceholderAPIIntegration placeholderAPIIntegration,
-                                MessageProcessRegistry messageProcessRegistry) {
+                                Provider<PlaceholderAPIIntegration> placeholderAPIIntegrationProvider,
+                                ListenerRegistry listenerRegistry) {
         this.integration = fileResolver.getIntegration().getPlaceholderapi();
         this.permission = fileResolver.getPermission().getIntegration().getPlaceholderapi();
-        this.placeholderAPIIntegration = placeholderAPIIntegration;
-        this.permissionChecker = permissionChecker;
-        this.messageProcessRegistry = messageProcessRegistry;
+        this.placeholderAPIIntegrationProvider = placeholderAPIIntegrationProvider;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -37,24 +32,13 @@ public class PlaceholderAPIModule extends AbstractModule {
         registerModulePermission(permission);
         registerPermission(permission.getUse());
 
-        placeholderAPIIntegration.hook();
-
-        messageProcessRegistry.register(10, messageContext -> {
-            FEntity sender = messageContext.getSender();
-            if (checkModulePredicates(sender)) return;
-
-            FEntity receiver = messageContext.getReceiver();
-            boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
-            if (!permissionChecker.check(sender, permission.getUse()) && isUserMessage) return;
-            if (!permissionChecker.check(receiver, permission.getUse()) && isUserMessage) return;
-
-            placeholderAPIIntegration.process(messageContext);
-        });
+        placeholderAPIIntegrationProvider.get().hook();
+        listenerRegistry.register(PlaceholderAPIIntegration.class);
     }
 
     @Override
     public void onDisable() {
-        placeholderAPIIntegration.unhook();
+        placeholderAPIIntegrationProvider.get().unhook();
     }
 
     @Override

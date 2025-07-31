@@ -9,9 +9,9 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.Destination;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
-import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleListMessage;
-import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.module.message.tab.footer.listener.FooterPulseListener;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.PacketSender;
@@ -27,14 +27,14 @@ public class FooterModule extends AbstractModuleListMessage<Localization.Message
     private final Permission.Message.Tab.Footer permission;
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
     private final PacketSender packetSender;
 
     @Inject
     public FooterModule(FileResolver fileResolver,
                         FPlayerService fPlayerService,
                         TaskScheduler taskScheduler,
-                        EventProcessRegistry eventProcessRegistry,
+                        ListenerRegistry listenerRegistry,
                         PacketSender packetSender) {
         super(module -> module.getMessage().getTab().getFooter());
 
@@ -42,7 +42,7 @@ public class FooterModule extends AbstractModuleListMessage<Localization.Message
         this.permission = fileResolver.getPermission().getMessage().getTab().getFooter();
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
         this.packetSender = packetSender;
     }
 
@@ -55,11 +55,12 @@ public class FooterModule extends AbstractModuleListMessage<Localization.Message
             taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::send), ticker.getPeriod());
         }
 
-        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, this::send);
+        listenerRegistry.register(FooterPulseListener.class);
     }
 
     @Override
     public void onDisable() {
+        // clear tab
         Destination.Type destinationType = message.getDestination().getType();
         if (destinationType == Destination.Type.TAB_HEADER || destinationType == Destination.Type.TAB_FOOTER) {
             packetSender.send(new WrapperPlayServerPlayerListHeaderAndFooter(Component.empty(), Component.empty()));

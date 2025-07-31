@@ -7,26 +7,26 @@ import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.message.anvil.listener.AnvilListener;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.bukkit.event.EventPriority;
 import org.bukkit.inventory.meta.ItemMeta;
 
 @Singleton
 public class BukkitAnvilModule extends AnvilModule {
 
-    private final BukkitListenerRegistry bukkitListenerManager;
+    private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
 
     @Inject
     public BukkitAnvilModule(FileResolver fileResolver,
-                             BukkitListenerRegistry bukkitListenerManager,
+                             BukkitListenerRegistry listenerRegistry,
                              MessagePipeline messagePipeline) {
         super(fileResolver);
 
-        this.bukkitListenerManager = bukkitListenerManager;
+        this.listenerRegistry = listenerRegistry;
         this.messagePipeline = messagePipeline;
     }
 
@@ -34,7 +34,7 @@ public class BukkitAnvilModule extends AnvilModule {
     public void onEnable() {
         super.onEnable();
 
-        bukkitListenerManager.register(AnvilListener.class, EventPriority.NORMAL);
+        listenerRegistry.register(AnvilListener.class);
     }
 
     @Override

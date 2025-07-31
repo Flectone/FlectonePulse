@@ -8,15 +8,11 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleMessage;
-import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.module.message.deop.listener.DeopPulseListener;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.constant.MinecraftTranslationKey;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.TranslatableComponent;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.UUID;
 
 @Singleton
 public class DeopModule extends AbstractModuleMessage<Localization.Message.Deop> {
@@ -24,18 +20,18 @@ public class DeopModule extends AbstractModuleMessage<Localization.Message.Deop>
     private final Message.Deop message;
     private final Permission.Message.Deop permission;
     private final FPlayerService fPlayerService;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public DeopModule(FileResolver fileResolver,
                       FPlayerService fPlayerService,
-                      EventProcessRegistry eventProcessRegistry) {
+                      ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getDeop());
 
         this.message = fileResolver.getMessage().getDeop();
         this.permission = fileResolver.getPermission().getMessage().getDeop();
         this.fPlayerService = fPlayerService;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -44,16 +40,7 @@ public class DeopModule extends AbstractModuleMessage<Localization.Message.Deop>
 
         createSound(message.getSound(), permission.getSound());
 
-        eventProcessRegistry.registerMessageHandler(event -> {
-            if (event.getKey() != MinecraftTranslationKey.COMMANDS_DEOP_SUCCESS) return;
-
-            TranslatableComponent translatableComponent = event.getComponent();
-            if (translatableComponent.args().isEmpty()) return;
-            if (!(translatableComponent.args().get(0) instanceof TextComponent targetComponent)) return;
-
-            event.cancel();
-            send(event.getUserUUID(), targetComponent.content());
-        });
+        listenerRegistry.register(DeopPulseListener.class);
     }
 
     @Override
@@ -62,8 +49,7 @@ public class DeopModule extends AbstractModuleMessage<Localization.Message.Deop>
     }
 
     @Async
-    public void send(UUID receiver, @NotNull String target) {
-        FPlayer fPlayer = fPlayerService.getFPlayer(receiver);
+    public void send(FPlayer fPlayer, @NotNull String target) {
         if (checkModulePredicates(fPlayer)) return;
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);

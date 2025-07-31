@@ -9,7 +9,7 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.model.Ignore;
-import net.flectone.pulse.sender.MessageSender;
+import net.flectone.pulse.listener.MessagePulseListener;
 import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.pipeline.MessagePipeline;
@@ -28,7 +28,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
     private final Permission.Command.Ignorelist permission;
 
     private final FPlayerService fPlayerService;
-    private final MessageSender messageSender;
+    private final MessagePulseListener messagePulseListener;
     private final MessagePipeline messagePipeline;
     private final CommandRegistry commandRegistry;
     private final TimeFormatter timeFormatter;
@@ -36,7 +36,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
     @Inject
     public IgnorelistModule(FileResolver fileResolver,
                             FPlayerService fPlayerService,
-                            MessageSender messageSender,
+                            MessagePulseListener messagePulseListener,
                             MessagePipeline messagePipeline,
                             CommandRegistry commandRegistry,
                             TimeFormatter timeFormatter) {
@@ -45,7 +45,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         this.command = fileResolver.getCommand().getIgnorelist();
         this.permission = fileResolver.getPermission().getCommand().getIgnorelist();
         this.fPlayerService = fPlayerService;
-        this.messageSender = messageSender;
+        this.messagePulseListener = messagePulseListener;
         this.messagePipeline = messagePipeline;
         this.commandRegistry = commandRegistry;
         this.timeFormatter = timeFormatter;
@@ -136,7 +136,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
-        messageSender.sendMessage(fPlayer, component);
+        messagePulseListener.sendMessage(fPlayer, component);
 
         playSound(fPlayer);
     }

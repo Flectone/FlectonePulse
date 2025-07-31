@@ -4,16 +4,19 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
 import lombok.Getter;
+import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 @Singleton
-public class ItemsAdderIntegration implements FIntegration, MessageProcessor {
+public class ItemsAdderIntegration implements FIntegration, PulseListener {
 
     private final FLogger fLogger;
 
@@ -37,8 +40,9 @@ public class ItemsAdderIntegration implements FIntegration, MessageProcessor {
         fLogger.info("✖ ItemsAdder unhooked");
     }
 
-    @Override
-    public void process(MessageContext messageContext) {
+    @Pulse(priority = Event.Priority.LOW)
+    public void onMessageProcessingEvent(MessageFormattingEvent event) {
+        MessageContext messageContext = event.getContext();
         if (!isHooked()) return;
 
         FEntity fPlayer = messageContext.getSender();

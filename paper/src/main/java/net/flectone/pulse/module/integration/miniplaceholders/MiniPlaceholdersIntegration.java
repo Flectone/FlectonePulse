@@ -1,9 +1,12 @@
 package net.flectone.pulse.module.integration.miniplaceholders;
 
 import io.github.miniplaceholders.api.MiniPlaceholders;
+import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.processor.MessageProcessor;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -17,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // only for modern paper based servers
-public class MiniPlaceholdersIntegration implements FIntegration, MessageProcessor {
+public class MiniPlaceholdersIntegration implements FIntegration, PulseListener {
 
     private final Pattern bracesPattern = Pattern.compile("\\{([^}]*)}");
 
@@ -38,8 +41,10 @@ public class MiniPlaceholdersIntegration implements FIntegration, MessageProcess
         fLogger.info("✖ MiniPlaceholders unhooked");
     }
 
-    @Override
-    public void process(MessageContext messageContext) {
+    @Pulse(priority = Event.Priority.HIGH)
+    public void onMessageProcessingEvent(MessageFormattingEvent event) {
+        MessageContext messageContext = event.getContext();
+
         Set<TagResolver> resolvers = new HashSet<>();
         resolvers.add(MiniPlaceholders.getGlobalPlaceholders());
 
@@ -66,7 +71,7 @@ public class MiniPlaceholdersIntegration implements FIntegration, MessageProcess
         messageContext.setMessage(message);
     }
 
-    public String replaceMiniPlaceholders(String text, TagResolver[] resolvers) {
+    private String replaceMiniPlaceholders(String text, TagResolver[] resolvers) {
         Matcher matcher = bracesPattern.matcher(text);
         StringBuilder result = new StringBuilder();
         while (matcher.find()) {

@@ -12,16 +12,15 @@ import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.chat.listener.ChatListener;
-import net.flectone.pulse.registry.BukkitListenerRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import org.bukkit.event.EventPriority;
 
 @Singleton
 public class BukkitChatModule extends ChatModule {
 
     private final Message.Chat message;
-    private final BukkitListenerRegistry bukkitListenerRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     protected BukkitChatModule(FileResolver fileResolver,
@@ -33,12 +32,12 @@ public class BukkitChatModule extends ChatModule {
                                TimeFormatter timeFormatter,
                                Provider<BubbleModule> bubbleModuleProvider,
                                Provider<SpyModule> spyModuleProvider,
-                               BukkitListenerRegistry bukkitListenerRegistry) {
+                               ListenerRegistry listenerRegistry) {
         super(fileResolver, fPlayerService, platformPlayerAdapter, platformServerAdapter, permissionChecker,
-                integrationModule, timeFormatter, bubbleModuleProvider, spyModuleProvider, bukkitListenerRegistry);
+                integrationModule, timeFormatter, bubbleModuleProvider, spyModuleProvider, listenerRegistry);
 
         this.message = fileResolver.getMessage().getChat();
-        this.bukkitListenerRegistry = bukkitListenerRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -46,7 +45,7 @@ public class BukkitChatModule extends ChatModule {
         super.onEnable();
 
         if (!message.isPacketBased()) {
-            bukkitListenerRegistry.register(ChatListener.class, EventPriority.valueOf(message.getEventPriority().name()));
+            listenerRegistry.register(ChatListener.class, message.getPriority());
         }
     }
 }

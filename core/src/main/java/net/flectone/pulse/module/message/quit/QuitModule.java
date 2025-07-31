@@ -6,14 +6,13 @@ import lombok.Getter;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleMessage;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.registry.EventProcessRegistry;
+import net.flectone.pulse.module.message.quit.listener.QuitPulseListener;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.constant.MessageType;
-import net.flectone.pulse.constant.MinecraftTranslationKey;
 
 @Singleton
 public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit> {
@@ -21,18 +20,18 @@ public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit>
     @Getter private final Message.Quit message;
     private final Permission.Message.Quit permission;
     private final IntegrationModule integrationModule;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public QuitModule(FileResolver fileResolver,
                       IntegrationModule integrationModule,
-                      EventProcessRegistry eventProcessRegistry) {
+                      ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getQuit());
 
         this.message = fileResolver.getMessage().getQuit();
         this.permission = fileResolver.getPermission().getMessage().getQuit();
         this.integrationModule = integrationModule;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -41,12 +40,7 @@ public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit>
 
         createSound(message.getSound(), permission.getSound());
 
-        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_QUIT, this::send);
-        eventProcessRegistry.registerMessageHandler(event -> {
-            if (event.getKey() != MinecraftTranslationKey.MULTIPLAYER_PLAYER_LEFT) return;
-
-            event.cancel();
-        });
+        listenerRegistry.register(QuitPulseListener.class);
     }
 
     @Override

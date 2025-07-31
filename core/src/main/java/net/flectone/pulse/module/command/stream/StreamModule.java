@@ -4,27 +4,19 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.NonNull;
-import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.DisableSource;
-import net.flectone.pulse.constant.MessageFlag;
 import net.flectone.pulse.constant.MessageType;
-import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.processor.MessageProcessor;
+import net.flectone.pulse.module.command.stream.listener.StreamPulseListener;
 import net.flectone.pulse.registry.CommandRegistry;
-import net.flectone.pulse.registry.EventProcessRegistry;
-import net.flectone.pulse.registry.MessageProcessRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
@@ -40,34 +32,26 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Singleton
-public class StreamModule extends AbstractModuleCommand<Localization.Command.Stream> implements MessageProcessor {
+public class StreamModule extends AbstractModuleCommand<Localization.Command.Stream> implements PulseListener {
 
     @Getter private final Command.Stream command;
     private final Permission.Command.Stream permission;
-    private final Permission.Message.Format formatPermission;
     private final FPlayerService fPlayerService;
     private final CommandRegistry commandRegistry;
-    private final PermissionChecker permissionChecker;
-    private final MessageProcessRegistry messageProcessRegistry;
-    private final EventProcessRegistry eventProcessRegistry;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public StreamModule(FileResolver fileResolver,
                         FPlayerService fPlayerService,
                         CommandRegistry commandRegistry,
-                        PermissionChecker permissionChecker,
-                        MessageProcessRegistry messageProcessRegistry,
-                        EventProcessRegistry eventProcessRegistry) {
+                        ListenerRegistry listenerRegistry) {
         super(localization -> localization.getCommand().getStream(), null);
 
         this.command = fileResolver.getCommand().getStream();
         this.permission = fileResolver.getPermission().getCommand().getStream();
-        this.formatPermission = fileResolver.getPermission().getMessage().getFormat();
         this.fPlayerService = fPlayerService;
         this.commandRegistry = commandRegistry;
-        this.permissionChecker = permissionChecker;
-        this.messageProcessRegistry = messageProcessRegistry;
-        this.eventProcessRegistry = eventProcessRegistry;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -93,25 +77,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                         .handler(this)
         );
 
-        messageProcessRegistry.register(150, this);
-        eventProcessRegistry.registerPlayerHandler(Event.Type.PLAYER_LOAD, fPlayer ->
-                setStreamPrefix(fPlayer, fPlayer.isSetting(FPlayer.Setting.STREAM))
-        );
-    }
-
-    @Override
-    public void process(MessageContext messageContext) {
-        FEntity sender = messageContext.getSender();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission.getAll())) return;
-        if (!(sender instanceof FPlayer fPlayer)) return;
-        if (checkModulePredicates(fPlayer)) return;
-
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.STREAM_PREFIX, (argumentQueue, context) -> {
-            String streamPrefix = fPlayer.getSettingValue(FPlayer.Setting.STREAM_PREFIX);
-            if (streamPrefix == null) return Tag.selfClosingInserting(Component.empty());
-
-            return Tag.preProcessParsed(streamPrefix);
-        });
+        listenerRegistry.register(StreamPulseListener.class);
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {

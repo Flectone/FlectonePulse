@@ -12,16 +12,16 @@ import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton
-public class BubbleListener implements PacketListener {
+public class BubblePacketListener implements PacketListener {
 
     private final FPlayerService fPlayerService;
     private final BubbleModule bubbleModule;
     private final ChatModule chatModule;
 
     @Inject
-    public BubbleListener(FPlayerService fPlayerService,
-                          BubbleModule bubbleModule,
-                          ChatModule chatModule) {
+    public BubblePacketListener(FPlayerService fPlayerService,
+                                BubbleModule bubbleModule,
+                                ChatModule chatModule) {
         this.fPlayerService = fPlayerService;
         this.bubbleModule = bubbleModule;
         this.chatModule = chatModule;
