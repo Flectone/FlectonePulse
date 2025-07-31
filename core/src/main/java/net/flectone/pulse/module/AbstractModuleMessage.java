@@ -23,7 +23,7 @@ import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.DataConsumer;
+import net.flectone.pulse.util.ProxyDataConsumer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -235,7 +235,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
         private Destination destination = new Destination();
         private Sound sound = null;
         private Predicate<FPlayer> builderFilter = player -> true;
-        private DataConsumer<DataOutputStream> proxyOutput = null;
+        private ProxyDataConsumer<DataOutputStream> proxyOutput = null;
         private UnaryOperator<String> integrationString = null;
         private BiFunction<FPlayer, M, String> format = null;
         private UnaryOperator<MessagePipeline.Builder> formatComponentBuilder = null;
@@ -283,7 +283,7 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
             return this;
         }
 
-        public Builder proxy(DataConsumer<DataOutputStream> output) {
+        public Builder proxy(ProxyDataConsumer<DataOutputStream> output) {
             this.proxyOutput = output;
             return this;
         }

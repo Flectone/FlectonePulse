@@ -10,7 +10,7 @@ import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.proxy.Proxy;
 import net.flectone.pulse.registry.ProxyRegistry;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.util.DataConsumer;
+import net.flectone.pulse.util.ProxyDataConsumer;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.io.ByteArrayOutputStream;
@@ -40,7 +40,7 @@ public class ProxySender {
         this.fLogger = fLogger;
     }
 
-    public boolean send(FEntity sender, MessageType tag, DataConsumer<DataOutputStream> outputConsumer) {
+    public boolean send(FEntity sender, MessageType tag, ProxyDataConsumer<DataOutputStream> outputConsumer) {
         boolean isPlayer = sender instanceof FPlayer;
 
         if (isPlayer) {
