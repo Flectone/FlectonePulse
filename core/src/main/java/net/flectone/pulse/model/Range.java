@@ -42,7 +42,7 @@ public class Range {
 
     public static Range get(Type type) {
         if (type == Type.BLOCKS) {
-            throw new IllegalArgumentException("");
+            throw new IllegalArgumentException("You can't get default BLOCKS range");
         }
 
         return DEFAULT_RANGES.get(type);
