@@ -6,13 +6,12 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.provider.CommandParserProvider;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.Optional;
 
@@ -22,26 +21,21 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
     private final Command.Clearchat command;
     private final Permission.Command.Clearchat permission;
     private final FPlayerService fPlayerService;
-    private final CommandRegistry commandRegistry;
     private final PermissionChecker permissionChecker;
+    private final CommandParserProvider commandParserProvider;
 
     @Inject
     public ClearchatModule(FPlayerService fPlayerService,
                            FileResolver fileResolver,
-                           CommandRegistry commandRegistry,
-                           PermissionChecker permissionChecker) {
-        super(localization -> localization.getCommand().getClearchat(), null);
+                           PermissionChecker permissionChecker,
+                           CommandParserProvider commandParserProvider) {
+        super(localization -> localization.getCommand().getClearchat(), Command::getClearchat);
 
         this.command = fileResolver.getCommand().getClearchat();
         this.permission = fileResolver.getPermission().getCommand().getClearchat();
         this.fPlayerService = fPlayerService;
-        this.commandRegistry = commandRegistry;
         this.permissionChecker = permissionChecker;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
+        this.commandParserProvider = commandParserProvider;
     }
 
     @Override
@@ -53,13 +47,10 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
 
         registerPermission(permission.getOther());
 
-        String commandName = getName(command);
-        String promptPlayer = getPrompt().getPlayer();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
+        registerCommand(commandBuilder -> commandBuilder
                         .permission(permission.getName())
-                        .optional(promptPlayer, commandRegistry.playerParser(), commandRegistry.playerSuggestionPermission(permission.getOther()))
-                        .handler(this)
+                        .optional(promptPlayer, commandParserProvider.playerParser(), commandParserProvider.playerSuggestionPermission(permission.getOther()))
         );
 
         addPredicate(this::checkCooldown);
@@ -69,7 +60,7 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String promptPlayer = getPrompt().getPlayer();
+        String promptPlayer = getPrompt(0);
         Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
 
         FPlayer fTarget = fPlayer;

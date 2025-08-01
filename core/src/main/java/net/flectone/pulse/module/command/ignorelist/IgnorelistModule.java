@@ -5,18 +5,17 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.model.Ignore;
-import net.flectone.pulse.listener.MessagePulseListener;
-import net.flectone.pulse.registry.CommandRegistry;
-import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.formatter.TimeFormatter;
+import net.flectone.pulse.listener.MessagePulseListener;
+import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.Ignore;
+import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.provider.CommandParserProvider;
+import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,11 +25,10 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
 
     private final Command.Ignorelist command;
     private final Permission.Command.Ignorelist permission;
-
     private final FPlayerService fPlayerService;
     private final MessagePulseListener messagePulseListener;
     private final MessagePipeline messagePipeline;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
     private final TimeFormatter timeFormatter;
 
     @Inject
@@ -38,22 +36,17 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
                             FPlayerService fPlayerService,
                             MessagePulseListener messagePulseListener,
                             MessagePipeline messagePipeline,
-                            CommandRegistry commandRegistry,
+                            CommandParserProvider commandParserProvider,
                             TimeFormatter timeFormatter) {
-        super(localization -> localization.getCommand().getIgnorelist(), null);
+        super(localization -> localization.getCommand().getIgnorelist(), Command::getIgnorelist);
 
         this.command = fileResolver.getCommand().getIgnorelist();
         this.permission = fileResolver.getPermission().getCommand().getIgnorelist();
         this.fPlayerService = fPlayerService;
         this.messagePulseListener = messagePulseListener;
         this.messagePipeline = messagePipeline;
-        this.commandRegistry = commandRegistry;
+        this.commandParserProvider = commandParserProvider;
         this.timeFormatter = timeFormatter;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
     }
 
     @Override
@@ -63,13 +56,10 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptNumber = getPrompt().getNumber();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .optional(promptNumber, commandRegistry.integerParser())
-                        .handler(this)
+        String promptNumber = addPrompt(0, Localization.Command.Prompt::getNumber);
+        registerCommand(commandBuilder -> commandBuilder
+                .permission(permission.getName())
+                .optional(promptNumber, commandParserProvider.integerParser())
         );
 
         addPredicate(this::checkCooldown);
@@ -93,7 +83,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         int perPage = command.getPerPage();
         int countPage = (int) Math.ceil((double) size / perPage);
 
-        String prompt = getPrompt().getNumber();
+        String prompt = getPrompt(0);
         Optional<Integer> optionalPage = commandContext.optional(prompt);
         Integer page = optionalPage.orElse(1);
 
@@ -104,7 +94,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
             return;
         }
 
-        String commandLine = "/" + command.getAliases().get(0);
+        String commandLine = "/" + getCommandName();
 
         List<Ignore> finalIgnoreList = ignoreList.stream()
                  .skip((long) (page - 1) * perPage)

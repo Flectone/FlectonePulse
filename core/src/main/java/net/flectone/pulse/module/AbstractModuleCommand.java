@@ -3,41 +3,107 @@ package net.flectone.pulse.module;
 import com.google.inject.Inject;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.model.Range;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.constant.DisableSource;
+import net.flectone.pulse.model.Range;
+import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.execution.CommandExecutionHandler;
+import org.incendo.cloud.meta.CommandMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 public abstract class AbstractModuleCommand<M extends Localization.Localizable> extends AbstractModuleMessage<M> implements CommandExecutionHandler<FPlayer> {
 
+    private final List<String> prompts = new ArrayList<>();
     private final Predicate<FPlayer> commandPredicate;
+    private final Function<Command, Command.ICommandFile> commandFunction;
 
     @Inject private FileResolver fileResolver;
+    @Inject private CommandRegistry commandParserProvider;
 
-    protected AbstractModuleCommand(Function<Localization, M> messageFunction, Predicate<FPlayer> commandPredicate) {
+    protected AbstractModuleCommand(Function<Localization, M> messageFunction,
+                                    Function<Command, Command.ICommandFile> commandFunction) {
+        this(messageFunction, commandFunction, null);
+    }
+
+    protected AbstractModuleCommand(Function<Localization, M> messageFunction,
+                                    Function<Command, Command.ICommandFile> commandFunction,
+                                    Predicate<FPlayer> commandPredicate) {
         super(messageFunction);
 
+        this.commandFunction = commandFunction;
         this.commandPredicate = commandPredicate;
     }
 
-    public Localization.Command.Prompt getPrompt() {
-        return fileResolver.getLocalization().getCommand().getPrompt();
+    protected void registerCommand(UnaryOperator<org.incendo.cloud.Command.Builder<FPlayer>> commandBuilderOperator) {
+        List<String> aliases = resolveCommand().getAliases();
+        String commandName = getCommandName();
+
+        commandParserProvider.registerCommand(manager ->
+                commandBuilderOperator
+                        .apply(manager.commandBuilder(commandName, aliases, CommandMeta.empty()))
+                        .handler(this)
+        );
     }
 
-    public String getName(Command.ICommandFile command) {
-        List<String> aliases = command.getAliases();
+    protected void registerCustomCommand(Function<CommandManager<FPlayer>, org.incendo.cloud.Command.Builder<FPlayer>> builder) {
+        commandParserProvider.registerCommand(builder);
+    }
+
+    // all prompt methods for solving the problems of a non-existent argument
+    // when changing the plugin language at runtime
+    protected void clearPrompts() {
+        if (fileResolver.getConfig().isUnregisterOwnCommands()) {
+            prompts.clear();
+        }
+    }
+
+    protected String addPrompt(int index, Function<Localization.Command.Prompt, String> promptLocalization) {
+        // this command already registered and ignored
+        if (!prompts.isEmpty() && prompts.size() - 1 != index) return "unknown";
+
+        String prompt = promptLocalization.apply(fileResolver.getLocalization().getCommand().getPrompt());
+        prompts.add(prompt);
+
+        return prompt;
+    }
+
+    protected String getPrompt(int index) {
+        if (prompts.size() - 1 < index) throw new IllegalArgumentException("Argument at index " + index + " is not registered in the " + getCommandName() + "  command");
+
+        return prompts.get(index);
+    }
+
+    protected <V extends @NonNull Object> V getArgument(CommandContext<FPlayer> commandContext, int promptIndex) {
+        String prompt = getPrompt(promptIndex);
+        return commandContext.get(prompt);
+    }
+
+    public String getCommandName() {
+        List<String> aliases = resolveCommand().getAliases();
         if (aliases.isEmpty()) return "flectonepulsenull";
 
-        return aliases.get(0);
+        return aliases.getFirst();
+    }
+
+    @Override
+    protected boolean isConfigEnable() {
+        return resolveCommand().isEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        clearPrompts();
     }
 
     @Override
@@ -63,5 +129,9 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
         }
 
         return this.commandPredicate == null ? filter : filter.and(commandPredicate);
+    }
+
+    private Command.ICommandFile resolveCommand() {
+        return commandFunction.apply(fileResolver.getCommand());
     }
 }

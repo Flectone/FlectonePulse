@@ -7,19 +7,19 @@ import lombok.NonNull;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.DisableSource;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.poll.model.Poll;
 import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.provider.CommandParserProvider;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.constant.DisableSource;
-import net.flectone.pulse.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.incendo.cloud.context.CommandContext;
@@ -42,7 +42,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     private final FPlayerService fPlayerService;
     private final ProxySender proxySender;
     private final TaskScheduler taskScheduler;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
     private final Gson gson;
 
@@ -51,10 +51,10 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                       FPlayerService fPlayerService,
                       ProxySender proxySender,
                       TaskScheduler taskScheduler,
-                      CommandRegistry commandRegistry,
+                      CommandParserProvider commandParserProvider,
                       MessagePipeline messagePipeline,
                       Gson gson) {
-        super(localization -> localization.getCommand().getPoll(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.POLL));
+        super(localization -> localization.getCommand().getPoll(), Command::getPoll, fPlayer -> fPlayer.isSetting(FPlayer.Setting.POLL));
 
         this.command = fileResolver.getCommand().getPoll();
         this.permission = fileResolver.getPermission().getCommand().getPoll();
@@ -62,14 +62,9 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         this.fPlayerService = fPlayerService;
         this.proxySender = proxySender;
         this.taskScheduler = taskScheduler;
-        this.commandRegistry = commandRegistry;
+        this.commandParserProvider = commandParserProvider;
         this.messagePipeline = messagePipeline;
         this.gson = gson;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
     }
 
     @Override
@@ -81,32 +76,26 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
         registerPermission(permission.getCreate());
 
-        String commandName = getName(command);
-
-        String promptTime = getPrompt().getTime();
-        String promptRepeatTime = getPrompt().getRepeatTime();
-        String promptMultipleVote = getPrompt().getMultipleVote();
-        String promptMessage = getPrompt().getMessage();
-
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getCreate().getName())
-                        .required(promptTime, commandRegistry.durationParser())
-                        .required(promptRepeatTime, commandRegistry.durationParser())
-                        .required(promptMultipleVote, commandRegistry.booleanParser())
-                        .required(promptMessage, commandRegistry.messageParser(), mapSuggestion())
-                        .handler(commandContext -> executeCreate(commandContext.sender(), commandContext))
+        String promptTime = addPrompt(0, Localization.Command.Prompt::getTime);
+        String promptRepeatTime = addPrompt(1, Localization.Command.Prompt::getRepeatTime);
+        String promptMultipleVote = addPrompt(2, Localization.Command.Prompt::getMultipleVote);
+        String promptMessage = addPrompt(3, Localization.Command.Prompt::getMessage);
+        registerCommand(manager -> manager
+                .permission(permission.getCreate().getName())
+                .required(promptTime, commandParserProvider.durationParser())
+                .required(promptRepeatTime, commandParserProvider.durationParser())
+                .required(promptMultipleVote, commandParserProvider.booleanParser())
+                .required(promptMessage, commandParserProvider.messageParser(), mapSuggestion())
         );
 
-        String promptId = getPrompt().getId();
-        String promptNumber = getPrompt().getNumber();
-
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName + "vote", CommandMeta.empty())
+        String promptId = addPrompt(4, Localization.Command.Prompt::getId);
+        String promptNumber = addPrompt(5, Localization.Command.Prompt::getNumber);
+        registerCustomCommand(manager ->
+                manager.commandBuilder(getCommandName() + "vote", CommandMeta.empty())
                         .permission(permission.getName())
-                        .required(promptId, commandRegistry.integerParser())
-                        .required(promptNumber, commandRegistry.integerParser())
-                        .handler(this)
+                        .required(promptId, commandParserProvider.integerParser())
+                        .required(promptNumber, commandParserProvider.integerParser())
+                        .handler(commandContext -> executeVote(commandContext.sender(), commandContext))
         );
 
         taskScheduler.runAsyncTimer(() -> {
@@ -141,6 +130,8 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         pollMap.clear();
     }
 
@@ -156,16 +147,11 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         };
     }
 
-    @Override
-    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+    public void executeVote(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String promptId = getPrompt().getId();
-        int id = commandContext.get(promptId);
-
-        String promptNumber = getPrompt().getNumber();
-        int numberVote = commandContext.get(promptNumber);
-
+        int id = getArgument(commandContext, 4);
+        int numberVote = getArgument(commandContext, 5);
         boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_POLL_VOTE, dataOutputStream -> {
             dataOutputStream.writeInt(id);
             dataOutputStream.writeInt(numberVote);
@@ -176,22 +162,23 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         vote(fPlayer, id, numberVote);
     }
 
-    public void executeCreate(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
+    @Override
+    public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (!isEnable()) return;
         if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
         if (checkCooldown(fPlayer)) return;
         if (checkMute(fPlayer)) return;
 
-        String promptTime = getPrompt().getTime();
+        String promptTime = getPrompt(0);
         long time = ((Duration) commandContext.get(promptTime)).toMillis();
 
-        String promptRepeatTime = getPrompt().getRepeatTime();
+        String promptRepeatTime = getPrompt(1);
         long repeatTime = ((Duration) commandContext.get(promptRepeatTime)).toMillis();
 
-        String promptMultipleVote = getPrompt().getMultipleVote();
+        String promptMultipleVote = getPrompt(2);
         boolean multipleVote = commandContext.get(promptMultipleVote);
 
-        String promptMessage = getPrompt().getMessage();
+        String promptMessage = getPrompt(3);
         String rawPoll = commandContext.get(promptMessage);
 
         boolean hasTitle = rawPoll.startsWith("title=");

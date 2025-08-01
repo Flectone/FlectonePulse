@@ -3,24 +3,22 @@ package net.flectone.pulse.module.command.kick;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.constant.MessageType;
-import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.provider.CommandParserProvider;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -28,12 +26,12 @@ import java.util.function.BiFunction;
 @Singleton
 public class KickModule extends AbstractModuleCommand<Localization.Command.Kick> {
 
-    @Getter private final Command.Kick command;
+    private final Command.Kick command;
     private final Permission.Command.Kick permission;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
     private final Gson gson;
 
@@ -42,24 +40,19 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
                       FPlayerService fPlayerService,
                       ModerationService moderationService,
                       ModerationMessageFormatter moderationMessageFormatter,
-                      CommandRegistry commandRegistry,
+                      CommandParserProvider commandParserProvider,
                       MessagePipeline messagePipeline,
                       Gson gson) {
-        super(localization -> localization.getCommand().getKick(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.KICK));
+        super(localization -> localization.getCommand().getKick(), Command::getKick, fPlayer -> fPlayer.isSetting(FPlayer.Setting.KICK));
 
         this.command = fileResolver.getCommand().getKick();
         this.permission = fileResolver.getPermission().getCommand().getKick();
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.moderationMessageFormatter = moderationMessageFormatter;
-        this.commandRegistry = commandRegistry;
+        this.commandParserProvider = commandParserProvider;
         this.messagePipeline = messagePipeline;
         this.gson = gson;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
     }
 
     @Override
@@ -73,15 +66,12 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptPlayer = getPrompt().getPlayer();
-        String promptMessage = getPrompt().getMessage();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .required(promptPlayer, commandRegistry.playerParser())
-                        .optional(promptMessage, commandRegistry.nativeMessageParser())
-                        .handler(this)
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
+        String promptMessage = addPrompt(1, Localization.Command.Prompt::getMessage);
+        registerCommand(commandBuilder -> commandBuilder
+                .permission(permission.getName())
+                .required(promptPlayer, commandParserProvider.playerParser())
+                .optional(promptMessage, commandParserProvider.nativeMessageParser())
         );
     }
 
@@ -92,9 +82,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         if (checkMute(fPlayer)) return;
         if (checkModulePredicates(fPlayer)) return;
 
-        String promptPlayer = getPrompt().getPlayer();
-        String playerName = commandContext.get(promptPlayer);
-
+        String playerName = getArgument(commandContext, 0);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
         if (!fTarget.isOnline()) {
             builder(fPlayer)
@@ -103,7 +91,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
             return;
         }
 
-        String promptMessage = getPrompt().getMessage();
+        String promptMessage = getPrompt(1);
         Optional<String> optionalReason = commandContext.optional(promptMessage);
         String reason = optionalReason.orElse(null);
 

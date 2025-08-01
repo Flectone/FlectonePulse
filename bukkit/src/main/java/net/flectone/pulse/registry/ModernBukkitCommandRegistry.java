@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import io.leangen.geantyref.TypeToken;
 import net.flectone.pulse.adapter.BukkitServerAdapter;
-import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.handler.CommandExceptionHandler;
 import net.flectone.pulse.mapper.FPlayerMapper;
@@ -28,12 +27,10 @@ public class ModernBukkitCommandRegistry extends LegacyBukkitCommandRegistry {
 
     @Inject
     public ModernBukkitCommandRegistry(FileResolver fileResolver,
-                                       CommandParserRegistry parsers,
                                        CommandExceptionHandler commandExceptionHandler,
-                                       PermissionChecker permissionChecker,
                                        Plugin plugin,
                                        FPlayerMapper fPlayerMapper) {
-        super(fileResolver, parsers, commandExceptionHandler, permissionChecker, plugin, fPlayerMapper);
+        super(fileResolver, commandExceptionHandler, plugin, fPlayerMapper);
 
         this.config = fileResolver.getConfig();
 
@@ -74,9 +71,9 @@ public class ModernBukkitCommandRegistry extends LegacyBukkitCommandRegistry {
         if (!config.isUnregisterOwnCommands()) return;
 
         if (BukkitServerAdapter.IS_PAPER) {
-            manager.commands().forEach(command -> unregisterCommand(command.rootComponent().name()));
+            removeCommands();
         } else {
-            super.syncReload();
+            syncRemoveCommands();
         }
     }
 }

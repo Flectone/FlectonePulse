@@ -6,16 +6,15 @@ import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.converter.ColorConverter;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.provider.CommandParserProvider;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.Optional;
 
@@ -27,29 +26,24 @@ public class ChatstyleModule extends AbstractModuleCommand<Localization.Command.
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final ProxySender proxySender;
-    private final CommandRegistry commandRegistry;
     private final ColorConverter colorConverter;
+    private final CommandParserProvider commandParserProvider;
 
     @Inject
     public ChatstyleModule(FileResolver fileResolver,
                            FPlayerService fPlayerService,
                            PermissionChecker permissionChecker,
                            ProxySender proxySender,
-                           CommandRegistry commandRegistry,
-                           ColorConverter colorConverter) {
-        super(localization -> localization.getCommand().getChatstyle(), null);
+                           ColorConverter colorConverter,
+                           CommandParserProvider commandParserProvider) {
+        super(localization -> localization.getCommand().getChatstyle(), Command::getChatstyle);
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
         this.proxySender = proxySender;
-        this.commandRegistry = commandRegistry;
         this.colorConverter = colorConverter;
         this.command = fileResolver.getCommand().getChatstyle();
         this.permission = fileResolver.getPermission().getCommand().getChatstyle();
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
+        this.commandParserProvider = commandParserProvider;
     }
 
     @Override
@@ -61,14 +55,12 @@ public class ChatstyleModule extends AbstractModuleCommand<Localization.Command.
 
         registerPermission(permission.getOther());
 
-        String commandName = getName(command);
-        String promptPlayer = getPrompt().getPlayer();
-        String promptColor = getPrompt().getColor();
-        commandRegistry.registerCommand(manager ->  manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
+        String promptColor = addPrompt(1, Localization.Command.Prompt::getColor);
+        registerCommand(commandBuilder -> commandBuilder
                 .permission(permission.getName())
-                .required(promptColor, commandRegistry.colorParser())
-                .optional(promptPlayer, commandRegistry.offlinePlayerParser(), commandRegistry.playerSuggestionPermission(permission.getOther()))
-                .handler(this)
+                .required(promptColor, commandParserProvider.colorParser())
+                .optional(promptPlayer, commandParserProvider.offlinePlayerParser(), commandParserProvider.playerSuggestionPermission(permission.getOther()))
         );
 
         addPredicate(this::checkCooldown);
@@ -78,10 +70,10 @@ public class ChatstyleModule extends AbstractModuleCommand<Localization.Command.
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String promptPlayer = getPrompt().getPlayer();
+        String promptPlayer = getPrompt(0);
         Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
 
-        String promptColor = getPrompt().getColor();
+        String promptColor = getPrompt(1);
         Optional<String> optionalStyle = commandContext.optional(promptColor);
         String style = optionalStyle.orElse(null);
 

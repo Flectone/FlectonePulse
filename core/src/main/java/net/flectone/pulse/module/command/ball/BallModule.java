@@ -2,19 +2,17 @@ package net.flectone.pulse.module.command.ball;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.registry.CommandRegistry;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.constant.MessageType;
+import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.provider.CommandParserProvider;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.RandomUtil;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.List;
 import java.util.function.Function;
@@ -22,26 +20,21 @@ import java.util.function.Function;
 @Singleton
 public class BallModule extends AbstractModuleCommand<Localization.Command.Ball> {
 
-    @Getter private final Command.Ball command;
+    private final Command.Ball command;
     private final Permission.Command.Ball permission;
     private final RandomUtil randomUtil;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
 
     @Inject
     public BallModule(FileResolver fileResolver,
                       RandomUtil randomUtil,
-                      CommandRegistry commandRegistry) {
-        super(localization -> localization.getCommand().getBall(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.BALL));
+                      CommandParserProvider commandParserProvider) {
+        super(localization -> localization.getCommand().getBall(), Command::getBall, fPlayer -> fPlayer.isSetting(FPlayer.Setting.BALL));
 
         this.command = fileResolver.getCommand().getBall();
         this.permission = fileResolver.getPermission().getCommand().getBall();
         this.randomUtil = randomUtil;
-        this.commandRegistry = commandRegistry;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
+        this.commandParserProvider = commandParserProvider;
     }
 
     @Override
@@ -51,13 +44,10 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptMessage = getPrompt().getMessage();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .required(promptMessage, commandRegistry.nativeMessageParser())
-                        .handler(this)
+        String promptMessage = addPrompt(0, Localization.Command.Prompt::getMessage);
+        registerCommand(commandBuilder -> commandBuilder
+                .permission(permission.getName())
+                .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
 
         addPredicate(this::checkCooldown);
@@ -69,8 +59,7 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String promptMessage = getPrompt().getMessage();
-        String message = commandContext.get(promptMessage);
+        String message = getArgument(commandContext, 0);
 
         int answer = randomUtil.nextInt(0, resolveLocalization().getAnswers().size());
 

@@ -7,19 +7,18 @@ import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.constant.PlatformType;
 import net.flectone.pulse.formatter.TimeFormatter;
+import net.flectone.pulse.listener.MessagePulseListener;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.provider.CommandParserProvider;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.listener.MessagePulseListener;
-import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.Comparator;
 import java.util.List;
@@ -32,7 +31,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
     private final Permission.Command.Toponline permission;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
     private final MessagePulseListener messagePulseListener;
     private final TimeFormatter timeFormatter;
@@ -42,27 +41,22 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
     public ToponlineModule(FileResolver fileResolver,
                            PlatformPlayerAdapter platformPlayerAdapter,
                            PlatformServerAdapter platformServerAdapter,
-                           CommandRegistry commandRegistry,
+                           CommandParserProvider commandParserProvider,
                            MessagePipeline messagePipeline,
                            MessagePulseListener messagePulseListener,
                            TimeFormatter timeFormatter,
                            FLogger fLogger) {
-        super(localization -> localization.getCommand().getToponline(), null);
+        super(localization -> localization.getCommand().getToponline(), Command::getToponline);
 
         this.command = fileResolver.getCommand().getToponline();
         this.permission = fileResolver.getPermission().getCommand().getToponline();
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.platformServerAdapter = platformServerAdapter;
-        this.commandRegistry = commandRegistry;
+        this.commandParserProvider = commandParserProvider;
         this.messagePipeline = messagePipeline;
         this.messagePulseListener = messagePulseListener;
         this.timeFormatter = timeFormatter;
         this.fLogger = fLogger;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
     }
 
     @Override
@@ -77,13 +71,10 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptNumber = getPrompt().getNumber();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .optional(promptNumber, commandRegistry.integerParser())
-                        .handler(commandContext -> execute(commandContext.sender(), commandContext))
+        String promptNumber = addPrompt(0, Localization.Command.Prompt::getNumber);
+        registerCommand(manager -> manager
+               .permission(permission.getName())
+               .optional(promptNumber, commandParserProvider.integerParser())
         );
 
         addPredicate(this::checkCooldown);
@@ -94,7 +85,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String promptNumber = getPrompt().getNumber();
+        String promptNumber = getPrompt(0);
         Optional<Integer> optionalNumber = commandContext.optional(promptNumber);
         int page = optionalNumber.orElse(1);
 
@@ -139,7 +130,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
         }
 
         String footer = localization.getFooter()
-                .replace("<command>", "/" + getName(command))
+                .replace("<command>", "/" + getCommandName())
                 .replace("<prev_page>", String.valueOf(page-1))
                 .replace("<next_page>", String.valueOf(page+1))
                 .replace("<current_page>", String.valueOf(page))

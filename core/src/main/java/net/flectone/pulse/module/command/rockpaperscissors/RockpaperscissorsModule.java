@@ -5,19 +5,18 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.DisableSource;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissors;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.provider.CommandParserProvider;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.constant.DisableSource;
-import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.parser.standard.UUIDParser;
 
 import java.util.*;
@@ -32,28 +31,23 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     private final Permission.Command.Rockpaperscissors permission;
     private final ProxySender proxySender;
     private final FPlayerService fPlayerService;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
     private final IntegrationModule integrationModule;
 
     @Inject
     public RockpaperscissorsModule(FileResolver fileResolver,
                                    ProxySender proxySender,
                                    FPlayerService fPlayerService,
-                                   CommandRegistry commandRegistry,
+                                   CommandParserProvider commandParserProvider,
                                    IntegrationModule integrationModule) {
-        super(localization -> localization.getCommand().getRockpaperscissors(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.ROCKPAPERSCISSORS));
+        super(localization -> localization.getCommand().getRockpaperscissors(), Command::getRockpaperscissors, fPlayer -> fPlayer.isSetting(FPlayer.Setting.ROCKPAPERSCISSORS));
 
         this.command = fileResolver.getCommand().getRockpaperscissors();
         this.permission = fileResolver.getPermission().getCommand().getRockpaperscissors();
         this.proxySender = proxySender;
         this.fPlayerService = fPlayerService;
-        this.commandRegistry = commandRegistry;
+        this.commandParserProvider = commandParserProvider;
         this.integrationModule = integrationModule;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
     }
 
     @Override
@@ -63,22 +57,21 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptPlayer = getPrompt().getPlayer();
-        String promptMove = getPrompt().getMove();
-        String promptUUID = getPrompt().getId();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .required(promptPlayer, commandRegistry.playerParser())
-                        .optional(promptMove, commandRegistry.nativeSingleMessageParser())
-                        .optional(promptUUID, UUIDParser.uuidParser())
-                        .handler(this)
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
+        String promptMove = addPrompt(1, Localization.Command.Prompt::getMove);
+        String promptUUID = addPrompt(2, Localization.Command.Prompt::getId);
+        registerCommand(manager -> manager
+                .permission(permission.getName())
+                .required(promptPlayer, commandParserProvider.playerParser())
+                .optional(promptMove, commandParserProvider.nativeSingleMessageParser())
+                .optional(promptUUID, UUIDParser.uuidParser())
         );
     }
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         gameMap.clear();
     }
 
@@ -89,8 +82,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
         if (checkMute(fPlayer)) return;
 
-        String promptPlayer = getPrompt().getPlayer();
-        String player = commandContext.get(promptPlayer);
+        String player = getArgument(commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(player);
         if (!fReceiver.isOnline() || !integrationModule.isVanishedVisible(fReceiver, fPlayer)) {
             builder(fPlayer)
@@ -111,11 +103,11 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         if (checkIgnore(fPlayer, fReceiver)) return;
         if (checkDisable(fPlayer, fReceiver, DisableSource.HE)) return;
 
-        String promptMove = getPrompt().getMove();
+        String promptMove = getPrompt(1);
         Optional<String> optionalMove = commandContext.optional(promptMove);
         String move = optionalMove.orElse(null);
 
-        String promptUUID = getPrompt().getId();
+        String promptUUID = getPrompt(2);
         Optional<UUID> optionalUUID = commandContext.optional(promptUUID);
         UUID uuid = optionalUUID.orElse(null);
 

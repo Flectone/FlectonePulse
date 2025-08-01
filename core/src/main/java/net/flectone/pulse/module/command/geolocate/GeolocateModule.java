@@ -6,14 +6,13 @@ import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.provider.CommandParserProvider;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.constant.DisableSource;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,25 +30,20 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
     private final Permission.Command.Geolocate permission;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
 
     @Inject
     public GeolocateModule(FileResolver fileResolver,
                            FPlayerService fPlayerService,
                            PlatformPlayerAdapter platformPlayerAdapter,
-                           CommandRegistry commandRegistry) {
-        super(localization -> localization.getCommand().getGeolocate(), null);
+                           CommandParserProvider commandParserProvider) {
+        super(localization -> localization.getCommand().getGeolocate(), Command::getGeolocate);
 
         this.command = fileResolver.getCommand().getGeolocate();
         this.permission = fileResolver.getPermission().getCommand().getGeolocate();
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
-        this.commandRegistry = commandRegistry;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
+        this.commandParserProvider = commandParserProvider;
     }
 
     @Override
@@ -59,13 +53,10 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptPlayer = getPrompt().getPlayer();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .required(promptPlayer, commandRegistry.playerParser(command.isSuggestOfflinePlayers()))
-                        .handler(this)
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
+        registerCommand(manager -> manager
+                .permission(permission.getName())
+                .required(promptPlayer, commandParserProvider.playerParser(command.isSuggestOfflinePlayers()))
         );
 
         addPredicate(this::checkCooldown);
@@ -76,9 +67,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String promptPlayer = getPrompt().getPlayer();
-        String playerName = commandContext.get(promptPlayer);
-
+        String playerName = getArgument(commandContext, 0);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
 
         if (fTarget.isUnknown()) {

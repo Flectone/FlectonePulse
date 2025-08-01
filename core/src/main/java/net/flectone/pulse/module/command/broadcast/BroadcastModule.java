@@ -2,39 +2,32 @@ package net.flectone.pulse.module.command.broadcast;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.registry.CommandRegistry;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.constant.MessageType;
+import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.provider.CommandParserProvider;
+import net.flectone.pulse.resolver.FileResolver;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 @Singleton
 public class BroadcastModule extends AbstractModuleCommand<Localization.Command.Broadcast> {
 
-    @Getter private final Command.Broadcast command;
+    private final Command.Broadcast command;
     private final Permission.Command.Broadcast permission;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
 
     @Inject
     public BroadcastModule(FileResolver fileResolver,
-                           CommandRegistry commandRegistry) {
-        super(localization -> localization.getCommand().getBroadcast(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.BROADCAST));
+                           CommandParserProvider commandParserProvider) {
+        super(localization -> localization.getCommand().getBroadcast(), Command::getBroadcast, fPlayer -> fPlayer.isSetting(FPlayer.Setting.BROADCAST));
 
         this.command = fileResolver.getCommand().getBroadcast();
         this.permission = fileResolver.getPermission().getCommand().getBroadcast();
-        this.commandRegistry = commandRegistry;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
+        this.commandParserProvider = commandParserProvider;
     }
 
     @Override
@@ -44,13 +37,10 @@ public class BroadcastModule extends AbstractModuleCommand<Localization.Command.
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptMessage = getPrompt().getMessage();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+        String promptMessage = addPrompt(0, Localization.Command.Prompt::getMessage);
+        registerCommand(manager -> manager
                         .permission(permission.getName())
-                        .required(promptMessage, commandRegistry.nativeMessageParser())
-                        .handler(this)
+                        .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
 
         addPredicate(this::checkCooldown);
@@ -62,8 +52,7 @@ public class BroadcastModule extends AbstractModuleCommand<Localization.Command.
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String promptMessage = getPrompt().getMessage();
-        String message = commandContext.get(promptMessage);
+        String message = getArgument(commandContext, 0);
 
         builder(fPlayer)
                 .range(command.getRange())

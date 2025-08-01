@@ -2,17 +2,15 @@ package net.flectone.pulse.module.command.symbol;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import lombok.NonNull;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.provider.CommandParserProvider;
+import net.flectone.pulse.resolver.FileResolver;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 
@@ -22,23 +20,18 @@ import java.util.Collections;
 @Singleton
 public class SymbolModule extends AbstractModuleCommand<Localization.Command.Symbol> {
 
-    @Getter private final Command.Symbol command;
-    @Getter private final Permission.Command.Symbol permission;
-    private final CommandRegistry commandRegistry;
+    private final Command.Symbol command;
+    private final Permission.Command.Symbol permission;
+    private final CommandParserProvider commandParserProvider;
 
     @Inject
     public SymbolModule(FileResolver fileResolver,
-                        CommandRegistry commandRegistry) {
-        super(localization -> localization.getCommand().getSymbol(), null);
+                        CommandParserProvider commandParserProvider) {
+        super(localization -> localization.getCommand().getSymbol(), Command::getSymbol);
 
         this.command = fileResolver.getCommand().getSymbol();
         this.permission = fileResolver.getPermission().getCommand().getSymbol();
-        this.commandRegistry = commandRegistry;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
+        this.commandParserProvider = commandParserProvider;
     }
 
     @Override
@@ -48,15 +41,12 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptCategory = getPrompt().getCategory();
-        String promptMessage = getPrompt().getMessage();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .required(promptCategory, commandRegistry.singleMessageParser(), categorySuggestion())
-                        .required(promptMessage, commandRegistry.messageParser(), symbolSuggestion())
-                        .permission(permission.getName())
-                        .handler(this)
+        String promptCategory = addPrompt(0, Localization.Command.Prompt::getCategory);
+        String promptMessage = addPrompt(1, Localization.Command.Prompt::getMessage);
+        registerCommand(manager -> manager
+                .required(promptCategory, commandParserProvider.singleMessageParser(), categorySuggestion())
+                .required(promptMessage, commandParserProvider.messageParser(), symbolSuggestion())
+                .permission(permission.getName())
         );
 
         addPredicate(this::checkCooldown);
@@ -92,8 +82,7 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String promptMessage = getPrompt().getMessage();
-        String message = commandContext.get(promptMessage);
+        String message = getArgument(commandContext, 1);
 
         builder(fPlayer)
                 .destination(command.getDestination())

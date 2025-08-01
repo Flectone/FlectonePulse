@@ -8,18 +8,17 @@ import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.constant.PlatformType;
 import net.flectone.pulse.formatter.TimeFormatter;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.provider.CommandParserProvider;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.util.logging.FLogger;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 
@@ -33,7 +32,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
     private final IntegrationModule integrationModule;
     private final TimeFormatter timeFormatter;
     private final FLogger fLogger;
@@ -43,26 +42,21 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
                         FPlayerService fPlayerService,
                         PlatformPlayerAdapter platformPlayerAdapter,
                         PlatformServerAdapter platformServerAdapter,
-                        CommandRegistry commandRegistry,
+                        CommandParserProvider commandParserProvider,
                         IntegrationModule integrationModule,
                         TimeFormatter timeFormatter,
                         FLogger fLogger) {
-        super(localization -> localization.getCommand().getOnline(), null);
+        super(localization -> localization.getCommand().getOnline(), Command::getOnline);
 
         this.command = fileResolver.getCommand().getOnline();
         this.permission = fileResolver.getPermission().getCommand().getOnline();
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.platformServerAdapter = platformServerAdapter;
-        this.commandRegistry = commandRegistry;
+        this.commandParserProvider = commandParserProvider;
         this.integrationModule = integrationModule;
         this.timeFormatter = timeFormatter;
         this.fLogger = fLogger;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
     }
 
     @Override
@@ -77,15 +71,12 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptType = getPrompt().getType();
-        String promptPlayer = getPrompt().getPlayer();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .required(promptType, commandRegistry.singleMessageParser(), typeSuggestion())
-                        .required(promptPlayer, commandRegistry.playerParser(command.isSuggestOfflinePlayers()))
-                        .handler(commandContext -> execute(commandContext.sender(), commandContext))
+        String promptType = addPrompt(0, Localization.Command.Prompt::getType);
+        String promptPlayer = addPrompt(1, Localization.Command.Prompt::getPlayer);
+        registerCommand(manager -> manager
+                .permission(permission.getName())
+                .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
+                .required(promptPlayer, commandParserProvider.playerParser(command.isSuggestOfflinePlayers()))
         );
 
         addPredicate(this::checkCooldown);
@@ -104,8 +95,8 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String promptPlayer = getPrompt().getPlayer();
-        String target = commandContext.get(promptPlayer);
+        String type = getArgument(commandContext, 0);
+        String target = getArgument(commandContext, 1);
 
         FPlayer targetFPlayer = fPlayerService.getFPlayer(target);
         if (targetFPlayer.isUnknown()) {
@@ -114,9 +105,6 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
                     .sendBuilt();
             return;
         }
-
-        String promptType = getPrompt().getType();
-        String type = commandContext.get(promptType);
 
         builder(targetFPlayer)
                 .destination(command.getDestination())

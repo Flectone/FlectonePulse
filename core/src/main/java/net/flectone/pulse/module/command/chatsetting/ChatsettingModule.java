@@ -15,12 +15,10 @@ import net.flectone.pulse.model.inventory.Inventory;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.provider.PacketProvider;
-import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -33,7 +31,6 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     private final Permission.Command.Chatsetting permission;
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
-    private final CommandRegistry commandRegistry;
     private final PermissionChecker permissionChecker;
     private final InventoryController inventoryController;
     private final PlatformServerAdapter platformServerAdapter;
@@ -43,28 +40,21 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     public ChatsettingModule(FileResolver fileResolver,
                              FPlayerService fPlayerService,
                              MessagePipeline messagePipeline,
-                             CommandRegistry commandRegistry,
                              PermissionChecker permissionChecker,
                              InventoryController inventoryController,
                              PlatformServerAdapter platformServerAdapter,
                              PacketProvider packetProvider) {
-        super(localization -> localization.getCommand().getChatsetting(), null);
+        super(localization -> localization.getCommand().getChatsetting(), Command::getChatsetting);
 
         this.chatPermission = fileResolver.getPermission().getMessage().getChat();
         this.command = fileResolver.getCommand().getChatsetting();
         this.permission = fileResolver.getPermission().getCommand().getChatsetting();
         this.fPlayerService = fPlayerService;
         this.messagePipeline = messagePipeline;
-        this.commandRegistry = commandRegistry;
         this.permissionChecker = permissionChecker;
         this.inventoryController = inventoryController;
         this.platformServerAdapter = platformServerAdapter;
         this.modernVersion = packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_14);
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
     }
 
     @Override
@@ -76,11 +66,8 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
 
         permission.getSettings().values().forEach(this::registerPermission);
 
-        String commandName = getName(command);
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .handler(this)
+        registerCommand(commandBuilder -> commandBuilder
+                .permission(permission.getName())
         );
 
         addPredicate(this::checkCooldown);

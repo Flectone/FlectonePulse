@@ -3,7 +3,6 @@ package net.flectone.pulse.registry;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Config;
 import net.flectone.pulse.handler.CommandExceptionHandler;
 import net.flectone.pulse.mapper.FPlayerMapper;
@@ -31,13 +30,9 @@ public class LegacyBukkitCommandRegistry extends CommandRegistry {
 
     @Inject
     public LegacyBukkitCommandRegistry(FileResolver fileResolver,
-                                       CommandParserRegistry parsers,
                                        CommandExceptionHandler commandExceptionHandler,
-                                       PermissionChecker permissionChecker,
                                        Plugin plugin,
                                        FPlayerMapper fPlayerMapper) {
-        super(parsers, permissionChecker);
-
         this.config = fileResolver.getConfig();
         this.plugin = plugin;
         this.manager = new LegacyPaperCommandManager<>(plugin, ExecutionCoordinator.asyncCoordinator(), fPlayerMapper);
@@ -82,12 +77,19 @@ public class LegacyBukkitCommandRegistry extends CommandRegistry {
     public void reload() {
         if (!config.isUnregisterOwnCommands()) return;
 
-        syncReload();
+        syncRemoveCommands();
+    }
+
+    public void removeCommands() {
+        manager.commands().stream()
+                .map(command -> command.rootComponent().name())
+                .toList() // fix concurrent modification
+                .forEach(this::unregisterCommand);
     }
 
     @Sync
-    public void syncReload() {
-        manager.commands().forEach(command -> unregisterCommand(command.rootComponent().name()));
+    public void syncRemoveCommands() {
+        removeCommands();
     }
 
 }

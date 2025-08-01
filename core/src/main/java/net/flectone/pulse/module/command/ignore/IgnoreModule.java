@@ -5,15 +5,14 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.model.Ignore;
-import net.flectone.pulse.registry.CommandRegistry;
-import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.constant.DisableSource;
+import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.Ignore;
+import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.provider.CommandParserProvider;
+import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.service.FPlayerService;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.Optional;
 
@@ -23,23 +22,18 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
     private final Command.Ignore command;
     private final Permission.Command.Ignore permission;
     private final FPlayerService fPlayerService;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
 
     @Inject
     public IgnoreModule(FileResolver fileResolver,
                         FPlayerService fPlayerService,
-                        CommandRegistry commandRegistry) {
-        super(localization -> localization.getCommand().getIgnore(), null);
+                        CommandParserProvider commandParserProvider) {
+        super(localization -> localization.getCommand().getIgnore(), Command::getIgnore);
 
         this.command = fileResolver.getCommand().getIgnore();
         this.permission = fileResolver.getPermission().getCommand().getIgnore();
         this.fPlayerService = fPlayerService;
-        this.commandRegistry = commandRegistry;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
+        this.commandParserProvider = commandParserProvider;
     }
 
     @Override
@@ -49,13 +43,10 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptPlayer = getPrompt().getPlayer();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .required(promptPlayer, commandRegistry.playerParser(command.isSuggestOfflinePlayers()))
-                        .handler(this)
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
+        registerCommand(manager -> manager
+                .permission(permission.getName())
+                .required(promptPlayer, commandParserProvider.playerParser(command.isSuggestOfflinePlayers()))
         );
 
         addPredicate(this::checkCooldown);
@@ -68,8 +59,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
         if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
         if (checkModulePredicates(fPlayer)) return;
 
-        String prompt = getPrompt().getPlayer();
-        String targetName = commandContext.get(prompt);
+        String targetName = getArgument(commandContext, 0);
 
         if (fPlayer.getName().equalsIgnoreCase(targetName)) {
             builder(fPlayer)

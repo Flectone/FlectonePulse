@@ -5,20 +5,19 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.formatter.ModerationMessageFormatter;
+import net.flectone.pulse.listener.MessagePulseListener;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
-import net.flectone.pulse.listener.MessagePulseListener;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.provider.CommandParserProvider;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,13 +27,12 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
 
     private final Command.Warnlist command;
     private final Permission.Command.Warnlist permission;
-
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final UnwarnModule unwarnModule;
     private final MessagePipeline messagePipeline;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
     private final MessagePulseListener messagePulseListener;
 
     @Inject
@@ -44,9 +42,9 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
                           ModerationMessageFormatter moderationMessageFormatter,
                           UnwarnModule unwarnModule,
                           MessagePipeline messagePipeline,
-                          CommandRegistry commandRegistry,
+                          CommandParserProvider commandParserProvider,
                           MessagePulseListener messagePulseListener) {
-        super(localization -> localization.getCommand().getWarnlist(), null);
+        super(localization -> localization.getCommand().getWarnlist(), Command::getWarnlist);
 
         this.command = fileResolver.getCommand().getWarnlist();
         this.permission = fileResolver.getPermission().getCommand().getWarnlist();
@@ -56,12 +54,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
         this.unwarnModule = unwarnModule;
         this.messagePipeline = messagePipeline;
         this.messagePulseListener = messagePulseListener;
-        this.commandRegistry = commandRegistry;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
+        this.commandParserProvider = commandParserProvider;
     }
 
     @Override
@@ -75,16 +68,12 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptPlayer = getPrompt().getPlayer();
-        String promptNumber = getPrompt().getNumber();
-
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .optional(promptPlayer, commandRegistry.warnedParser())
-                        .optional(promptNumber, commandRegistry.integerParser())
-                        .handler(this)
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
+        String promptNumber = addPrompt(1, Localization.Command.Prompt::getNumber);
+        registerCommand(manager -> manager
+                .permission(permission.getName())
+                .optional(promptPlayer, commandParserProvider.warnedParser())
+                .optional(promptNumber, commandParserProvider.integerParser())
         );
     }
 
@@ -96,12 +85,12 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
         Localization.Command.Warnlist localization = resolveLocalization(fPlayer);
         Localization.ListTypeMessage localizationType = localization.getGlobal();
 
-        String commandLine = "/" + getName(command);
+        String commandLine = "/" + getCommandName();
 
         FPlayer targetFPlayer = null;
         int page = 1;
 
-        String promptPlayer = getPrompt().getPlayer();
+        String promptPlayer = getPrompt(0);
         Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
         if (optionalPlayer.isPresent()) {
             String playerName = optionalPlayer.get();
@@ -109,7 +98,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
             try {
                 page = Integer.parseInt(playerName);
             } catch (NumberFormatException e) {
-                String promptNumber = getPrompt().getNumber();
+                String promptNumber = getPrompt(1);
                 Optional<Integer> optionalNumber = commandContext.optional(promptNumber);
                 page = optionalNumber.orElse(page);
 
@@ -162,7 +151,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
 
             FPlayer fTarget = fPlayerService.getFPlayer(moderation.getPlayer());
 
-            String line = localizationType.getLine().replace("<command>", "/" + unwarnModule.getName(unwarnModule.getCommand()) + " <player> <id>");
+            String line = localizationType.getLine().replace("<command>", "/" + unwarnModule.getCommandName() + " <player> <id>");
             line = moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation);
 
             component = component

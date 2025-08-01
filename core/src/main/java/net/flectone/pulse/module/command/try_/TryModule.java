@@ -2,40 +2,38 @@ package net.flectone.pulse.module.command.try_;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.registry.CommandRegistry;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.constant.MessageType;
+import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.provider.CommandParserProvider;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.RandomUtil;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.function.Function;
 
 @Singleton
 public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
 
-    @Getter private final Command.Try command;
+    private final Command.Try command;
     private final Permission.Command.Try permission;
     private final RandomUtil randomUtil;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
 
     @Inject
     public TryModule(FileResolver fileResolver,
                      RandomUtil randomUtil,
-                     CommandRegistry commandRegistry) {
-        super(localization -> localization.getCommand().getTry(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TRY));
+                     CommandParserProvider commandParserProvider) {
+        super(localization -> localization.getCommand().getTry(), Command::getTry, fPlayer -> fPlayer.isSetting(FPlayer.Setting.TRY));
 
         this.command = fileResolver.getCommand().getTry();
         this.permission = fileResolver.getPermission().getCommand().getTry();
         this.randomUtil = randomUtil;
-        this.commandRegistry = commandRegistry;
+        this.commandParserProvider = commandParserProvider;
     }
 
     @Override
@@ -50,13 +48,11 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptMessage = getPrompt().getMessage();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .required(promptMessage, commandRegistry.nativeMessageParser())
-                        .handler(this)
+        String promptMessage = addPrompt(0, Localization.Command.Prompt::getMessage);
+        registerCommand(commandBuilder -> commandBuilder
+                .permission(permission.getName())
+                .required(promptMessage, commandParserProvider.nativeMessageParser())
+                .handler(this)
         );
 
         addPredicate(this::checkCooldown);
@@ -70,11 +66,9 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
 
         int min = command.getMin();
         int max = command.getMax();
-
         int random = randomUtil.nextInt(min, max);
 
-        String promptMessage = getPrompt().getMessage();
-        String message = commandContext.get(promptMessage);
+        String message = getArgument(commandContext, 0);
 
         builder(fPlayer)
                 .range(command.getRange())

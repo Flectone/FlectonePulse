@@ -7,16 +7,15 @@ import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.converter.ColorConverter;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.provider.CommandParserProvider;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.*;
 
@@ -29,17 +28,17 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final ProxySender proxySender;
-    private final CommandRegistry commandRegistry;
     private final ColorConverter colorConverter;
+    private final CommandParserProvider commandParserProvider;
 
     @Inject
     public ChatcolorModule(FileResolver fileResolver,
                            FPlayerService fPlayerService,
                            PermissionChecker permissionChecker,
                            ProxySender proxySender,
-                           CommandRegistry commandRegistry,
-                           ColorConverter colorConverter) {
-        super(localization -> localization.getCommand().getChatcolor(), null);
+                           ColorConverter colorConverter,
+                           CommandParserProvider commandParserProvider) {
+        super(localization -> localization.getCommand().getChatcolor(), Command::getChatcolor);
 
         this.color = fileResolver.getMessage().getFormat().getColor();
         this.command = fileResolver.getCommand().getChatcolor();
@@ -47,13 +46,8 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
         this.proxySender = proxySender;
-        this.commandRegistry = commandRegistry;
         this.colorConverter = colorConverter;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
+        this.commandParserProvider = commandParserProvider;
     }
 
     @Override
@@ -65,17 +59,16 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
 
         registerPermission(permission.getOther());
 
-        String commandName = getName(command);
-        String promptColor = getPrompt().getColor();
-        commandRegistry.registerCommand(manager -> {
-            var builder = manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
+        String promptColor = addPrompt(0, Localization.Command.Prompt::getColor);
+        registerCommand(commandBuilder -> {
+            commandBuilder = commandBuilder
                     .permission(permission.getName());
 
             for (int i = 0; i < color.getValues().size(); i++) {
-                builder = builder.optional(promptColor + " " + (i + 1), commandRegistry.colorParser());
+                commandBuilder = commandBuilder.optional(promptColor + " " + (i + 1), commandParserProvider.colorParser());
             }
 
-            return builder.handler(this);
+            return commandBuilder;
         });
 
         addPredicate(this::checkCooldown);
@@ -88,7 +81,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         String[] inputColors = null;
 
         if (commandContext.rawInput().input().split(" ").length != 1) {
-            String promptColor = getPrompt().getColor();
+            String promptColor = getArgument(commandContext, 0);
 
             List<String> inputList = new ArrayList<>();
             for (int i = 0; i < color.getValues().size(); i++) {

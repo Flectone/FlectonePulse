@@ -3,19 +3,17 @@ package net.flectone.pulse.module.command.dice;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.registry.CommandRegistry;
-import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.constant.DisableSource;
 import net.flectone.pulse.constant.MessageType;
+import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.provider.CommandParserProvider;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.RandomUtil;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,29 +24,24 @@ import java.util.function.Function;
 @Singleton
 public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice> {
 
-    @Getter private final Command.Dice command;
+    private final Command.Dice command;
     private final Permission.Command.Dice permission;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
     private final RandomUtil randomUtil;
     private final Gson gson;
 
     @Inject
     public DiceModule(FileResolver fileResolver,
-                      CommandRegistry commandRegistry,
+                      CommandParserProvider commandParserProvider,
                       RandomUtil randomUtil,
                       Gson gson) {
-        super(localization -> localization.getCommand().getDice(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.DICE));
+        super(localization -> localization.getCommand().getDice(), Command::getDice, fPlayer -> fPlayer.isSetting(FPlayer.Setting.DICE));
 
         this.command = fileResolver.getCommand().getDice();
         this.permission = fileResolver.getPermission().getCommand().getDice();
-        this.commandRegistry = commandRegistry;
+        this.commandParserProvider = commandParserProvider;
         this.randomUtil = randomUtil;
         this.gson = gson;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
     }
 
     @Override
@@ -58,13 +51,10 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptMessage = getPrompt().getMessage();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .optional(promptMessage, commandRegistry.integerParser(command.getMin(), command.getMax()))
-                        .handler(this)
+        String promptMessage = addPrompt(0, Localization.Command.Prompt::getMessage);
+        registerCommand(commandBuilder -> commandBuilder
+                .permission(permission.getName())
+                .optional(promptMessage, commandParserProvider.integerParser(command.getMin(), command.getMax()))
         );
 
         addPredicate(this::checkCooldown);
@@ -79,7 +69,7 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
         int min = command.getMin();
         int max = command.getMax();
 
-        String promptMessage = getPrompt().getMessage();
+        String promptMessage = getPrompt(0);
         Optional<Integer> optionalNumber = commandContext.optional(promptMessage);
 
         int number = optionalNumber.orElse(min);

@@ -3,23 +3,21 @@ package net.flectone.pulse.module.command.mute;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.provider.CommandParserProvider;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
@@ -29,12 +27,12 @@ import java.util.function.BiFunction;
 @Singleton
 public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute> {
 
-    @Getter private final Command.Mute command;
+    private final Command.Mute command;
     private final Permission.Command.Mute permission;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
     private final Gson gson;
 
@@ -43,24 +41,19 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
                       FPlayerService fPlayerService,
                       ModerationService moderationService,
                       ModerationMessageFormatter moderationMessageFormatter,
-                      CommandRegistry commandRegistry,
+                      CommandParserProvider commandParserProvider,
                       ProxySender proxySender,
                       Gson gson) {
-        super(localization -> localization.getCommand().getMute(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.MUTE));
+        super(localization -> localization.getCommand().getMute(), Command::getMute, fPlayer -> fPlayer.isSetting(FPlayer.Setting.MUTE));
 
         this.command = fileResolver.getCommand().getMute();
         this.permission = fileResolver.getPermission().getCommand().getMute();
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.moderationMessageFormatter = moderationMessageFormatter;
-        this.commandRegistry = commandRegistry;
+        this.commandParserProvider = commandParserProvider;
         this.proxySender = proxySender;
         this.gson = gson;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
     }
 
     @Override
@@ -74,17 +67,14 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptPlayer = getPrompt().getPlayer();
-        String promptReason = getPrompt().getReason();
-        String promptTime = getPrompt().getTime();
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
+        String promptReason = addPrompt(1, Localization.Command.Prompt::getReason);
+        String promptTime = addPrompt(2, Localization.Command.Prompt::getTime);
 
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .required(promptPlayer, commandRegistry.playerParser(command.isSuggestOfflinePlayers()))
-                        .optional(promptTime + " " + promptReason, commandRegistry.durationReasonParser())
-                        .handler(this)
+        registerCommand(commandBuilder -> commandBuilder
+                .permission(permission.getName())
+                .required(promptPlayer, commandParserProvider.playerParser(command.isSuggestOfflinePlayers()))
+                .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
         );
     }
 
@@ -94,14 +84,14 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         if (checkCooldown(fPlayer)) return;
         if (checkMute(fPlayer)) return;
 
-        String promptReason = getPrompt().getReason();
-        String promptTime = getPrompt().getTime();
+        String target = getArgument(commandContext, 0);
+        String promptReason = getPrompt(1);
+        String promptTime = getPrompt(2);
 
         Optional<Pair<Long, String>> optionalTime = commandContext.optional(promptTime + " " + promptReason);
         Pair<Long, String> timeReasonPair = optionalTime.orElse(Pair.of(Duration.ofHours(1).toMillis(), null));
 
         long time = timeReasonPair.first() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.first();
-
         if (time < 1) {
             builder(fPlayer)
                     .format(Localization.Command.Mute::getNullTime)
@@ -109,10 +99,6 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
             return;
         }
 
-        String reason = timeReasonPair.second();
-
-        String promptPlayer = getPrompt().getPlayer();
-        String target = commandContext.get(promptPlayer);
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
             builder(fPlayer)
@@ -122,6 +108,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         }
 
         long databaseTime = time + System.currentTimeMillis();
+        String reason = timeReasonPair.second();
 
         Moderation mute = moderationService.mute(fTarget, databaseTime, reason, fPlayer.getId());
         if (mute == null) return;

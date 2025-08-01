@@ -1,8 +1,10 @@
-package net.flectone.pulse.registry;
+package net.flectone.pulse.provider;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.leangen.geantyref.TypeToken;
+import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.parser.integer.ColorParser;
 import net.flectone.pulse.parser.integer.DurationReasonParser;
@@ -19,13 +21,16 @@ import org.incendo.cloud.parser.standard.BooleanParser;
 import org.incendo.cloud.parser.standard.DurationParser;
 import org.incendo.cloud.parser.standard.IntegerParser;
 import org.incendo.cloud.parser.standard.StringParser;
+import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
+import java.util.Collections;
 
 @Singleton
-public class CommandParserRegistry implements Registry {
+public class CommandParserProvider {
 
+    private final PermissionChecker permissionChecker;
     private final PlayerParser playerParser;
     private final OfflinePlayerParser offlinePlayerParser;
     private final DurationReasonParser durationReasonParser;
@@ -42,7 +47,8 @@ public class CommandParserRegistry implements Registry {
     private final DurationParser<FPlayer> durationParser = new DurationParser<>();
 
     @Inject
-    public CommandParserRegistry(PlayerParser playerParser,
+    public CommandParserProvider(PermissionChecker permissionChecker,
+                                 PlayerParser playerParser,
                                  OfflinePlayerParser offlinePlayerParser,
                                  DurationReasonParser durationReasonParser,
                                  BanModerationParser banModerationParser,
@@ -51,6 +57,7 @@ public class CommandParserRegistry implements Registry {
                                  ColorParser colorParser,
                                  MessageParser messageParser,
                                  SingleMessageParser singleMessageParser) {
+        this.permissionChecker = permissionChecker;
         this.banModerationParser = banModerationParser;
         this.muteModerationParser = muteModerationParser;
         this.warnModerationParser = warnModerationParser;
@@ -61,9 +68,6 @@ public class CommandParserRegistry implements Registry {
         this.messageParser = messageParser;
         this.singleMessageParser = singleMessageParser;
     }
-
-    @Override
-    public void reload() {}
 
     public @NonNull ParserDescriptor<FPlayer, String> playerParser(boolean offlinePlayers) {
         return offlinePlayers ? offlinePlayerParser() : playerParser();
@@ -89,11 +93,11 @@ public class CommandParserRegistry implements Registry {
         return ParserDescriptor.of(new IntegerParser<>(min, max), Integer.class);
     }
 
-    public @NonNull ParserDescriptor<FPlayer, String> singleStringParser() {
+    public @NonNull ParserDescriptor<FPlayer, String> nativeSingleMessageParser() {
         return ParserDescriptor.of(singleStringParser, String.class);
     }
 
-    public @NonNull ParserDescriptor<FPlayer, String> greedyStringParser() {
+    public @NonNull ParserDescriptor<FPlayer, String> nativeMessageParser() {
         return ParserDescriptor.of(greedyStringParser, String.class);
     }
 
@@ -127,5 +131,13 @@ public class CommandParserRegistry implements Registry {
 
     public @NonNull ParserDescriptor<FPlayer, String> colorParser() {
         return ParserDescriptor.of(colorParser, String.class);
+    }
+
+    public @NonNull BlockingSuggestionProvider<FPlayer> playerSuggestionPermission(Permission.IPermission permission) {
+        return (context, input) -> {
+            if (!permissionChecker.check(context.sender(), permission)) return Collections.emptyList();
+
+            return playerParser().parser().suggestionProvider().suggestionsFuture(context, input).join();
+        };
     }
 }

@@ -3,21 +3,19 @@ package net.flectone.pulse.module.command.unban;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.provider.CommandParserProvider;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +24,11 @@ import java.util.Optional;
 @Singleton
 public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unban> {
 
-    @Getter private final Command.Unban command;
+    private final Command.Unban command;
     private final Permission.Command.Unban permission;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
     private final Gson gson;
 
@@ -38,16 +36,16 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
     public UnbanModule(FileResolver fileResolver,
                        FPlayerService fPlayerService,
                        ModerationService moderationService,
-                       CommandRegistry commandRegistry,
+                       CommandParserProvider commandParserProvider,
                        ProxySender proxySender,
                        Gson gson) {
-        super(localization -> localization.getCommand().getUnban(), null);
+        super(localization -> localization.getCommand().getUnban(), Command::getUnban);
 
         this.command = fileResolver.getCommand().getUnban();
         this.permission = fileResolver.getPermission().getCommand().getUnban();
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
-        this.commandRegistry = commandRegistry;
+        this.commandParserProvider = commandParserProvider;
         this.proxySender = proxySender;
         this.gson = gson;
     }
@@ -68,15 +66,12 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptPlayer = getPrompt().getPlayer();
-        String promptId = getPrompt().getId();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .required(promptPlayer, commandRegistry.bannedParser())
-                        .optional(promptId, commandRegistry.integerParser())
-                        .handler(this)
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
+        String promptId = addPrompt(1, Localization.Command.Prompt::getId);
+        registerCommand(manager -> manager
+                .permission(permission.getName())
+                .required(promptPlayer, commandParserProvider.warnedParser())
+                .optional(promptId, commandParserProvider.integerParser())
         );
     }
 
@@ -85,10 +80,9 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         if (checkModulePredicates(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
 
-        String promptPlayer = getPrompt().getPlayer();
-        String target = commandContext.get(promptPlayer);
+        String target = getArgument(commandContext, 0);
 
-        String promptId = getPrompt().getId();
+        String promptId = getPrompt(1);
         Optional<Integer> optionalId = commandContext.optional(promptId);
         int id = optionalId.orElse(-1);
 

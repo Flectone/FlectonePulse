@@ -5,20 +5,19 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.formatter.ModerationMessageFormatter;
+import net.flectone.pulse.listener.MessagePulseListener;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unban.UnbanModule;
-import net.flectone.pulse.listener.MessagePulseListener;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.provider.CommandParserProvider;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.formatter.ModerationMessageFormatter;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,37 +29,32 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
     private final Permission.Command.Banlist permission;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
-    private final CommandRegistry commandRegistry;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final UnbanModule unbanModule;
     private final MessagePipeline messagePipeline;
     private final MessagePulseListener messagePulseListener;
+    private final CommandParserProvider commandParserProvider;
 
     @Inject
     public BanlistModule(FileResolver fileResolver,
                          FPlayerService fPlayerService,
                          ModerationService moderationService,
-                         CommandRegistry commandRegistry,
                          ModerationMessageFormatter moderationMessageFormatter,
                          UnbanModule unbanModule,
                          MessagePipeline messagePipeline,
-                         MessagePulseListener messagePulseListener) {
-        super(localization -> localization.getCommand().getBanlist(), null);
+                         MessagePulseListener messagePulseListener,
+                         CommandParserProvider commandParserProvider) {
+        super(localization -> localization.getCommand().getBanlist(), Command::getBanlist);
 
         this.command = fileResolver.getCommand().getBanlist();
         this.permission = fileResolver.getPermission().getCommand().getBanlist();
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
-        this.commandRegistry = commandRegistry;
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.unbanModule = unbanModule;
         this.messagePipeline = messagePipeline;
         this.messagePulseListener = messagePulseListener;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
+        this.commandParserProvider = commandParserProvider;
     }
 
     @Override
@@ -74,16 +68,12 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptPlayer = getPrompt().getPlayer();
-        String promptNumber = getPrompt().getNumber();
-
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .optional(promptPlayer, commandRegistry.bannedParser())
-                        .optional(promptNumber, commandRegistry.integerParser())
-                        .handler(this)
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
+        String promptNumber = addPrompt(1, Localization.Command.Prompt::getNumber);
+        registerCommand(commandBuilder -> commandBuilder
+                .permission(permission.getName())
+                .optional(promptPlayer, commandParserProvider.bannedParser())
+                .optional(promptNumber, commandParserProvider.integerParser())
         );
 
         addPredicate(this::checkCooldown);
@@ -96,12 +86,12 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         Localization.Command.Banlist localization = resolveLocalization(fPlayer);
         Localization.ListTypeMessage localizationType = localization.getGlobal();
 
-        String commandLine = "/" + getName(command);
+        String commandLine = "/" + getCommandName();
 
         int page = 1;
         FPlayer targetFPlayer = null;
 
-        String promptPlayer = getPrompt().getPlayer();
+        String promptPlayer = getPrompt(0);
         Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
         if (optionalPlayer.isPresent()) {
             String playerName = optionalPlayer.get();
@@ -109,7 +99,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
             try {
                 page = Integer.parseInt(playerName);
             } catch (NumberFormatException e) {
-                String promptNumber = getPrompt().getNumber();
+                String promptNumber = getPrompt(1);
                 Optional<Integer> optionalNumber = commandContext.optional(promptNumber);
                 page = optionalNumber.orElse(page);
 
@@ -161,7 +151,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         for (Moderation moderation : finalModerationList) {
             FPlayer fTarget = fPlayerService.getFPlayer(moderation.getPlayer());
 
-            String line = localizationType.getLine().replace("<command>", "/" + unbanModule.getName(unbanModule.getCommand()) + " <player> <id>");
+            String line = localizationType.getLine().replace("<command>", "/" + unbanModule.getCommandName() + " <player> <id>");
             line = moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation);
 
             component = component

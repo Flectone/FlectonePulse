@@ -2,21 +2,19 @@ package net.flectone.pulse.module.command.helper;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.DisableSource;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.provider.CommandParserProvider;
 import net.flectone.pulse.registry.ProxyRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.constant.DisableSource;
-import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -24,32 +22,27 @@ import java.util.function.Predicate;
 @Singleton
 public class HelperModule extends AbstractModuleCommand<Localization.Command.Helper> {
 
-    @Getter private final Command.Helper command;
+    private final Command.Helper command;
     private final Permission.Command.Helper permission;
     private final FPlayerService fPlayerService;
     private final ProxyRegistry proxyRegistry;
     private final PermissionChecker permissionChecker;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
 
     @Inject
     public HelperModule(FileResolver fileResolver,
                         FPlayerService fPlayerService,
                         ProxyRegistry proxyRegistry,
                         PermissionChecker permissionChecker,
-                        CommandRegistry commandRegistry) {
-        super(localization -> localization.getCommand().getHelper(), null);
+                        CommandParserProvider commandParserProvider) {
+        super(localization -> localization.getCommand().getHelper(), Command::getHelper);
 
         this.command = fileResolver.getCommand().getHelper();
         this.permission = fileResolver.getPermission().getCommand().getHelper();
         this.fPlayerService = fPlayerService;
         this.proxyRegistry = proxyRegistry;
         this.permissionChecker = permissionChecker;
-        this.commandRegistry = commandRegistry;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
+        this.commandParserProvider = commandParserProvider;
     }
 
     @Override
@@ -61,13 +54,10 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
 
         registerPermission(permission.getSee());
 
-        String commandName = getName(command);
-        String promptMessage = getPrompt().getMessage();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .required(promptMessage, commandRegistry.nativeMessageParser())
-                        .handler(this)
+        String promptMessage = addPrompt(0, Localization.Command.Prompt::getMessage);
+        registerCommand(commandBuilder -> commandBuilder
+                .permission(permission.getName())
+                .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
 
         addPredicate(this::checkCooldown);
@@ -94,8 +84,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
             }
         }
 
-        String promptMessage = getPrompt().getMessage();
-        String message = commandContext.get(promptMessage);
+        String message = getArgument(commandContext, 0);
 
         builder(fPlayer)
                 .destination(command.getDestination())

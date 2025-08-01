@@ -2,19 +2,16 @@ package net.flectone.pulse.module.command.spy;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.List;
 import java.util.Map;
@@ -23,29 +20,21 @@ import java.util.function.Function;
 @Singleton
 public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
-    @Getter private final Command.Spy command;
+    private final Command.Spy command;
     private final Permission.Command.Spy permission;
-    private final CommandRegistry commandRegistry;
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
 
     @Inject
     public SpyModule(FileResolver fileResolver,
-                     CommandRegistry commandRegistry,
                      FPlayerService fPlayerService,
                      PermissionChecker permissionChecker) {
-        super(localization -> localization.getCommand().getSpy(), null);
+        super(localization -> localization.getCommand().getSpy(), Command::getSpy);
 
         this.command = fileResolver.getCommand().getSpy();
         this.permission = fileResolver.getPermission().getCommand().getSpy();
-        this.commandRegistry = commandRegistry;
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
     }
 
     @Override
@@ -55,11 +44,8 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .handler(this)
+        registerCommand(manager -> manager
+                .permission(permission.getName())
         );
     }
 
@@ -84,7 +70,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
     public void checkChat(FPlayer fPlayer, String chat, String message) {
         if (!isEnable()) return;
 
-        Map<String, List<String>> categories = getCommand().getCategories();
+        Map<String, List<String>> categories = command.getCategories();
         if (categories.get("action") == null) return;
         if (!categories.get("action").contains(chat)) return;
 

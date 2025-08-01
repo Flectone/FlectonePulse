@@ -3,21 +3,19 @@ package net.flectone.pulse.module.command.translateto;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import lombok.NonNull;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.DisableSource;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.provider.CommandParserProvider;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.constant.DisableSource;
-import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 
@@ -33,29 +31,24 @@ import java.util.function.Function;
 @Singleton
 public class TranslatetoModule extends AbstractModuleCommand<Localization.Command.Translateto> {
 
-    @Getter private final Command.Translateto command;
+    private final Command.Translateto command;
     private final Permission.Command.Translateto permission;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
     private final IntegrationModule integrationModule;
     private final Provider<TranslateModule> translateModuleProvider;
 
     @Inject
     public TranslatetoModule(FileResolver fileResolver,
-                             CommandRegistry commandRegistry,
+                             CommandParserProvider commandParserProvider,
                              IntegrationModule integrationModule,
                              Provider<TranslateModule> translateModuleProvider) {
-        super(localization -> localization.getCommand().getTranslateto(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TRANSLATETO));
+        super(localization -> localization.getCommand().getTranslateto(), Command::getTranslateto, fPlayer -> fPlayer.isSetting(FPlayer.Setting.TRANSLATETO));
 
         this.command = fileResolver.getCommand().getTranslateto();
         this.permission = fileResolver.getPermission().getCommand().getTranslateto();
-        this.commandRegistry = commandRegistry;
+        this.commandParserProvider = commandParserProvider;
         this.integrationModule = integrationModule;
         this.translateModuleProvider = translateModuleProvider;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
     }
 
     @Override
@@ -65,16 +58,13 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptLanguage = getPrompt().getLanguage();
-        String promptMessage = getPrompt().getMessage();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .required(promptLanguage + " main", commandRegistry.singleMessageParser(), languageSuggestion())
-                        .required(promptLanguage + " target", commandRegistry.singleMessageParser(), languageSuggestion())
-                        .required(promptMessage, commandRegistry.nativeMessageParser())
-                        .permission(permission.getName())
-                        .handler(this)
+        String promptLanguage = addPrompt(0, Localization.Command.Prompt::getLanguage);
+        String promptMessage = addPrompt(1, Localization.Command.Prompt::getMessage);
+        registerCommand(manager -> manager
+                .required(promptLanguage + " main", commandParserProvider.singleMessageParser(), languageSuggestion())
+                .required(promptLanguage + " target", commandParserProvider.singleMessageParser(), languageSuggestion())
+                .required(promptMessage, commandParserProvider.nativeMessageParser())
+                .permission(permission.getName())
         );
 
         addPredicate(this::checkCooldown);
@@ -93,12 +83,11 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkModulePredicates(fPlayer)) return;
 
-        String promptLanguage = getPrompt().getLanguage();
+        String promptLanguage = getPrompt(0);
         String mainLang = commandContext.get(promptLanguage + " main");
         String targetLang = commandContext.get(promptLanguage + " target");
 
-        String promptMessage = getPrompt().getMessage();
-        String message = commandContext.get(promptMessage);
+        String message = getArgument(commandContext, 1);
 
         String messageToTranslate = translateModuleProvider.get().getMessage(message);
         if (messageToTranslate == null) {

@@ -8,7 +8,6 @@ import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import lombok.Getter;
 import net.flectone.pulse.adapter.PlatformServerAdapter;
 import net.flectone.pulse.checker.PermissionChecker;
 import net.flectone.pulse.configuration.Command;
@@ -19,14 +18,12 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.maintenance.listener.MaintenancePacketListener;
 import net.flectone.pulse.module.command.maintenance.listener.MaintenancePulseListener;
 import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.IconUtil;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -34,7 +31,7 @@ import java.nio.file.Path;
 @Singleton
 public class MaintenanceModule extends AbstractModuleCommand<Localization.Command.Maintenance> {
 
-    @Getter private final Command.Maintenance command;
+    private final Command.Maintenance command;
     private final Permission.Command.Maintenance permission;
     private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
@@ -43,7 +40,6 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     private final Path iconPath;
     private final PlatformServerAdapter platformServerAdapter;
     private final MessagePipeline messagePipeline;
-    private final CommandRegistry commandRegistry;
     private final IconUtil iconUtil;
 
     private String icon;
@@ -55,27 +51,20 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                              ListenerRegistry listenerRegistry,
                              @Named("projectPath") Path projectPath,
                              PlatformServerAdapter platformServerAdapter,
-                             CommandRegistry commandRegistry,
                              MessagePipeline messagePipeline,
                              IconUtil iconUtil) {
-        super(module -> module.getCommand().getMaintenance(), null);
+        super(module -> module.getCommand().getMaintenance(), Command::getMaintenance);
 
         this.command = fileResolver.getCommand().getMaintenance();
         this.permission = fileResolver.getPermission().getCommand().getMaintenance();
         this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
-        this.commandRegistry = commandRegistry;
         this.listenerRegistry = listenerRegistry;
         this.iconPath = projectPath.resolve("images");
         this.platformServerAdapter = platformServerAdapter;
         this.messagePipeline = messagePipeline;
         this.iconUtil = iconUtil;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
     }
 
     @Override
@@ -102,11 +91,8 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
             kickOnlinePlayers(FPlayer.UNKNOWN);
         }
 
-        String commandName = getName(command);
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .handler(this)
+        registerCommand(commandBuilder -> commandBuilder
+                .permission(permission.getName())
         );
 
         addPredicate(this::checkCooldown);

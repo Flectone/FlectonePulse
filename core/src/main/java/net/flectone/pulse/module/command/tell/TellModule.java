@@ -7,19 +7,18 @@ import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.constant.DisableSource;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.provider.CommandParserProvider;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.constant.DisableSource;
-import net.flectone.pulse.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -35,7 +34,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
     private final FPlayerService fPlayerService;
     private final ProxySender proxySender;
     private final IntegrationModule integrationModule;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Inject
@@ -43,22 +42,17 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                       FPlayerService fPlayerService,
                       ProxySender proxySender,
                       IntegrationModule integrationModule,
-                      CommandRegistry commandRegistry,
+                      CommandParserProvider commandParserProvider,
                       PlatformPlayerAdapter platformPlayerAdapter) {
-        super(localization -> localization.getCommand().getTell(), fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELL));
+        super(localization -> localization.getCommand().getTell(), Command::getTell, fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELL));
 
         this.command = fileResolver.getCommand().getTell();
         this.permission = fileResolver.getPermission().getCommand().getTell();
         this.fPlayerService = fPlayerService;
         this.proxySender = proxySender;
         this.integrationModule = integrationModule;
-        this.commandRegistry = commandRegistry;
+        this.commandParserProvider = commandParserProvider;
         this.platformPlayerAdapter = platformPlayerAdapter;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
     }
 
     @Override
@@ -68,20 +62,19 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptPlayer = getPrompt().getPlayer();
-        String promptMessage = getPrompt().getMessage();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .required(promptPlayer, commandRegistry.playerParser(command.isSuggestOfflinePlayers()))
-                        .required(promptMessage, commandRegistry.nativeMessageParser())
-                        .permission(permission.getName())
-                        .handler(this)
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
+        String promptMessage = addPrompt(1, Localization.Command.Prompt::getMessage);
+        registerCommand(manager -> manager
+                .required(promptPlayer, commandParserProvider.playerParser(command.isSuggestOfflinePlayers()))
+                .required(promptMessage, commandParserProvider.nativeMessageParser())
+                .permission(permission.getName())
         );
     }
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         senderReceiverMap.clear();
     }
 
@@ -92,11 +85,8 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
         if (checkMute(fPlayer)) return;
 
-        String promptPlayer = getPrompt().getPlayer();
-        String playerName = commandContext.get(promptPlayer);
-
-        String promptMessage = getPrompt().getMessage();
-        String message = commandContext.get(promptMessage);
+        String playerName = getArgument(commandContext, 0);
+        String message = getArgument(commandContext, 1);
 
         send(fPlayer, playerName, message);
     }

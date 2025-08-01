@@ -2,7 +2,6 @@ package net.flectone.pulse.module.command.stream;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import lombok.NonNull;
 import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.configuration.Localization;
@@ -13,12 +12,11 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.stream.listener.StreamPulseListener;
-import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.provider.CommandParserProvider;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import org.incendo.cloud.context.CommandContext;
-import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 
@@ -34,29 +32,24 @@ import java.util.stream.Collectors;
 @Singleton
 public class StreamModule extends AbstractModuleCommand<Localization.Command.Stream> implements PulseListener {
 
-    @Getter private final Command.Stream command;
+    private final Command.Stream command;
     private final Permission.Command.Stream permission;
     private final FPlayerService fPlayerService;
-    private final CommandRegistry commandRegistry;
+    private final CommandParserProvider commandParserProvider;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public StreamModule(FileResolver fileResolver,
                         FPlayerService fPlayerService,
-                        CommandRegistry commandRegistry,
+                        CommandParserProvider commandParserProvider,
                         ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getCommand().getStream(), null);
+        super(localization -> localization.getCommand().getStream(), Command::getStream);
 
         this.command = fileResolver.getCommand().getStream();
         this.permission = fileResolver.getPermission().getCommand().getStream();
         this.fPlayerService = fPlayerService;
-        this.commandRegistry = commandRegistry;
+        this.commandParserProvider = commandParserProvider;
         this.listenerRegistry = listenerRegistry;
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
     }
 
     @Override
@@ -66,15 +59,12 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         createCooldown(command.getCooldown(), permission.getCooldownBypass());
         createSound(command.getSound(), permission.getSound());
 
-        String commandName = getName(command);
-        String promptType = getPrompt().getType();
-        String promptUrl = getPrompt().getUrl();
-        commandRegistry.registerCommand(manager ->
-                manager.commandBuilder(commandName, command.getAliases(), CommandMeta.empty())
-                        .permission(permission.getName())
-                        .required(promptType, commandRegistry.singleMessageParser(), typeSuggestion())
-                        .optional(promptUrl, commandRegistry.nativeMessageParser())
-                        .handler(this)
+        String promptType = addPrompt(0, Localization.Command.Prompt::getType);
+        String promptUrl = addPrompt(1, Localization.Command.Prompt::getUrl);
+        registerCommand(manager -> manager
+                .permission(permission.getName())
+                .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
+                .optional(promptUrl, commandParserProvider.nativeMessageParser())
         );
 
         listenerRegistry.register(StreamPulseListener.class);
@@ -94,8 +84,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
         if (checkMute(fPlayer)) return;
 
-        String promptType = getPrompt().getType();
-        String type = commandContext.get(promptType);
+        String type = getArgument(commandContext, 0);
         Boolean needStart = switch (type) {
             case "start" -> true;
             case "end" -> false;
@@ -123,7 +112,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         setStreamPrefix(fPlayer, needStart);
 
         if (needStart) {
-            String promptUrl = getPrompt().getUrl();
+            String promptUrl = getPrompt(1);
             Optional<String> optionalUrl = commandContext.optional(promptUrl);
             String rawString = optionalUrl.orElse("");
 
