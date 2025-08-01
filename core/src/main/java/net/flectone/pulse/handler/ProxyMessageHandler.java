@@ -7,11 +7,12 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.model.Range;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Moderation;
+import net.flectone.pulse.model.Range;
 import net.flectone.pulse.module.command.anon.AnonModule;
 import net.flectone.pulse.module.command.ball.BallModule;
 import net.flectone.pulse.module.command.ban.BanModule;
@@ -43,16 +44,16 @@ import net.flectone.pulse.module.integration.discord.listener.MessageCreateListe
 import net.flectone.pulse.module.integration.telegram.listener.MessageListener;
 import net.flectone.pulse.module.integration.twitch.listener.ChannelMessageListener;
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
-import net.flectone.pulse.module.message.advancement.model.Advancement;
+import net.flectone.pulse.module.message.advancement.model.ChatAdvancement;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.death.DeathModule;
 import net.flectone.pulse.module.message.death.model.Death;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
+import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
@@ -209,7 +210,7 @@ public class ProxyMessageHandler {
 
         module.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(module.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getAnon().getDestination())
                 .format(Localization.Command.Anon::getFormat)
                 .message(message)
                 .sound(module.getSound())
@@ -224,7 +225,7 @@ public class ProxyMessageHandler {
 
         module.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(module.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getMe().getDestination())
                 .format(Localization.Command.Me::getFormat)
                 .message(message)
                 .sound(module.getSound())
@@ -240,7 +241,7 @@ public class ProxyMessageHandler {
 
         module.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(module.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getBall().getDestination())
                 .format(module.replaceAnswer(answer))
                 .message(message)
                 .sound(module.getSound())
@@ -257,7 +258,7 @@ public class ProxyMessageHandler {
 
         module.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(module.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getBan().getDestination())
                 .format(module.buildFormat(ban))
                 .sound(module.getSound())
                 .sendBuilt();
@@ -271,7 +272,7 @@ public class ProxyMessageHandler {
 
         broadcastModule.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(broadcastModule.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getBroadcast().getDestination())
                 .format(Localization.Command.Broadcast::getFormat)
                 .message(message)
                 .sound(broadcastModule.getSound())
@@ -294,7 +295,7 @@ public class ProxyMessageHandler {
 
         coinModule.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(coinModule.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getCoin().getDestination())
                 .format(coinModule.replaceResult(percent))
                 .sound(coinModule.getSound())
                 .sendBuilt();
@@ -308,7 +309,7 @@ public class ProxyMessageHandler {
 
         diceModule.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(diceModule.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getDice().getDestination())
                 .format(diceModule.replaceResult(cubes))
                 .sound(diceModule.getSound())
                 .sendBuilt();
@@ -322,7 +323,7 @@ public class ProxyMessageHandler {
 
         doModule.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(doModule.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getDo().getDestination())
                 .format(Localization.Command.Do::getFormat)
                 .message(message)
                 .sound(doModule.getSound())
@@ -336,7 +337,7 @@ public class ProxyMessageHandler {
         String message = input.readUTF();
 
         helperModule.builder(fEntity)
-                .destination(helperModule.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getHelper().getDestination())
                 .filter(helperModule.getFilterSee())
                 .format(Localization.Command.Helper::getGlobal)
                 .message(message)
@@ -354,7 +355,7 @@ public class ProxyMessageHandler {
 
         muteModule.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(muteModule.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getMute().getDestination())
                 .format(muteModule.buildFormat(mute))
                 .sound(muteModule.getSound())
                 .sendBuilt();
@@ -369,11 +370,11 @@ public class ProxyMessageHandler {
         if (unbanModule.checkModulePredicates(fPlayer)) return;
 
         unbanModule.builder(fEntity)
-                .destination(unbanModule.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getUnban().getDestination())
                 .range(Range.get(Range.Type.SERVER))
                 .filter(filter -> filter.isSetting(FPlayer.Setting.BAN))
                 .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
-                .sound(unbanModule.getCommand().getSound())
+                .sound(unbanModule.getSound())
                 .sendBuilt();
     }
 
@@ -384,11 +385,11 @@ public class ProxyMessageHandler {
         if (unmuteModule.checkModulePredicates(fPlayer)) return;
 
         unmuteModule.builder(fEntity)
-                .destination(unmuteModule.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getUnmute().getDestination())
                 .range(Range.get(Range.Type.SERVER))
                 .filter(filter -> filter.isSetting(FPlayer.Setting.MUTE))
                 .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
-                .sound(unmuteModule.getCommand().getSound())
+                .sound(unmuteModule.getSound())
                 .sendBuilt();
     }
 
@@ -399,11 +400,11 @@ public class ProxyMessageHandler {
         if (unwarnModule.checkModulePredicates(fPlayer)) return;
 
         unwarnModule.builder(fEntity)
-                .destination(unwarnModule.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getUnwarn().getDestination())
                 .range(Range.get(Range.Type.SERVER))
                 .filter(filter -> filter.isSetting(FPlayer.Setting.WARN))
                 .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
-                .sound(unwarnModule.getCommand().getSound())
+                .sound(unwarnModule.getSound())
                 .sendBuilt();
     }
 
@@ -435,7 +436,7 @@ public class ProxyMessageHandler {
 
         spyModule.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(spyModule.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getSpy().getDestination())
                 .filter(fReceiver -> !fEntity.equals(fReceiver)
                         && !spyModule.checkModulePredicates(fReceiver)
                         && fReceiver.isSetting(FPlayer.Setting.SPY)
@@ -453,7 +454,7 @@ public class ProxyMessageHandler {
         String message = input.readUTF();
         streamModule.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(streamModule.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getStream().getDestination())
                 .format(streamModule.replaceUrls(message))
                 .sendBuilt();
     }
@@ -483,7 +484,7 @@ public class ProxyMessageHandler {
 
         translatetoModule.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(translatetoModule.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getTranslateto().getDestination())
                 .format(translatetoModule.replaceLanguage(targetLang))
                 .message(message)
                 .sound(translatetoModule.getSound())
@@ -499,7 +500,7 @@ public class ProxyMessageHandler {
 
         tryModule.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(tryModule.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getTry().getDestination())
                 .tag(MessageType.COMMAND_TRY)
                 .format(tryModule.replacePercent(value))
                 .message(message)
@@ -517,7 +518,7 @@ public class ProxyMessageHandler {
 
         warnModule.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(warnModule.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getWarn().getDestination())
                 .format(warnModule.buildFormat(warn))
                 .sound(warnModule.getSound())
                 .sendBuilt();
@@ -535,7 +536,7 @@ public class ProxyMessageHandler {
 
         kickModule.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(kickModule.getCommand().getDestination())
+                .destination(fileResolver.getCommand().getKick().getDestination())
                 .format(kickModule.buildFormat(kick))
                 .sound(kickModule.getSound())
                 .sendBuilt();
@@ -607,7 +608,7 @@ public class ProxyMessageHandler {
         MessageCreateListener messageCreateListener = injector.getInstance(MessageCreateListener.class);
         messageCreateListener.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(messageCreateListener.getIntegration().getDestination())
+                .destination(fileResolver.getIntegration().getDiscord().getDestination())
                 .tag(MessageType.FROM_DISCORD_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft().replace("<name>", nickname))
                 .message(string)
@@ -623,7 +624,7 @@ public class ProxyMessageHandler {
         ChannelMessageListener channelMessageListener = injector.getInstance(ChannelMessageListener.class);
         channelMessageListener.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(channelMessageListener.getIntegration().getDestination())
+                .destination(fileResolver.getIntegration().getTwitch().getDestination())
                 .tag(MessageType.FROM_TWITCH_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft()
                         .replace("<name>", nickname)
@@ -642,7 +643,7 @@ public class ProxyMessageHandler {
         MessageListener messageListener = injector.getInstance(MessageListener.class);
         messageListener.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(messageListener.getIntegration().getDestination())
+                .destination(fileResolver.getIntegration().getTelegram().getDestination())
                 .tag(MessageType.FROM_TELEGRAM_TO_MINECRAFT)
                 .format(s -> s.getForMinecraft()
                         .replace("<name>", author)
@@ -657,14 +658,14 @@ public class ProxyMessageHandler {
         AdvancementModule advancementModule = injector.getInstance(AdvancementModule.class);
         if (advancementModule.checkModulePredicates(fEntity)) return;
 
-        Advancement advancement = gson.fromJson(input.readUTF(), Advancement.class);
+        ChatAdvancement chatAdvancement = gson.fromJson(input.readUTF(), ChatAdvancement.class);
 
         advancementModule.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(advancementModule.getMessage().getDestination())
+                .destination(fileResolver.getMessage().getAdvancement().getDestination())
                 .tag(MessageType.ADVANCEMENT)
-                .format((fResolver, s) -> advancementModule.convert(s, advancement))
-                .tagResolvers(fResolver -> new TagResolver[]{advancementModule.advancementTag(fEntity, fResolver, advancement)})
+                .format((fResolver, s) -> advancementModule.convert(s, chatAdvancement))
+                .tagResolvers(fResolver -> new TagResolver[]{advancementModule.advancementTag(fEntity, fResolver, chatAdvancement)})
                 .sound(advancementModule.getSound())
                 .sendBuilt();
     }
@@ -677,7 +678,7 @@ public class ProxyMessageHandler {
 
         deathModule.builder(fEntity)
                 .range(Range.get(Range.Type.SERVER))
-                .destination(deathModule.getMessage().getDestination())
+                .destination(fileResolver.getMessage().getDeath().getDestination())
                 .tag(MessageType.DEATH)
                 .format((fResolver, s) -> s.getTypes().get(death.getKey()))
                 .tagResolvers(fResolver -> new TagResolver[]{deathModule.killerTag(fResolver, death.getKiller()), deathModule.byItemTag(death.getItem())})
@@ -691,12 +692,14 @@ public class ProxyMessageHandler {
 
         boolean hasPlayedBefore = input.readBoolean();
 
+        Message.Join message = fileResolver.getMessage().getJoin();
+
         joinModule.builder(fEntity)
                 .tag(MessageType.JOIN)
-                .destination(joinModule.getMessage().getDestination())
+                .destination(message.getDestination())
                 .range(Range.get(Range.Type.SERVER))
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.JOIN))
-                .format(s -> hasPlayedBefore || !joinModule.getMessage().isFirst() ? s.getFormat() : s.getFormatFirstTime())
+                .format(s -> hasPlayedBefore || !message.isFirst() ? s.getFormat() : s.getFormatFirstTime())
                 .sound(joinModule.getSound())
                 .sendBuilt();
     }
@@ -707,7 +710,7 @@ public class ProxyMessageHandler {
 
         quitModule.builder(fEntity)
                 .tag(MessageType.QUIT)
-                .destination(quitModule.getMessage().getDestination())
+                .destination(fileResolver.getMessage().getQuit().getDestination())
                 .range(Range.get(Range.Type.SERVER))
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.QUIT))
                 .format(Localization.Message.Quit::getFormat)
@@ -723,7 +726,7 @@ public class ProxyMessageHandler {
 
         afkModule.builder(fEntity)
                 .tag(MessageType.AFK)
-                .destination(afkModule.getMessage().getDestination())
+                .destination(fileResolver.getMessage().getAfk().getDestination())
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.AFK))
                 .format(s -> isAfk
                         ? s.getFormatFalse().getGlobal()
