@@ -38,6 +38,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * Responsible for rendering bubbles above players' heads
@@ -99,7 +100,7 @@ public class BubbleRenderer {
                     Component formattedMessage = createFormattedMessage(bubble, fViewer);
 
                     String key = sender.getUuid().toString() + fViewer.getUuid();
-                    Deque<BubbleEntity> bubbleEntities = activeBubbleEntities.getOrDefault(key, new ArrayDeque<>());
+                    Deque<BubbleEntity> bubbleEntities = activeBubbleEntities.getOrDefault(key, new ConcurrentLinkedDeque<>());
 
                     // create bubble entity
                     BubbleEntity bubbleEntity = createBubbleEntity(bubble, formattedMessage, fViewer);

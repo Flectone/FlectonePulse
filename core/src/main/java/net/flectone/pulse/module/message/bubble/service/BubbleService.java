@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Singleton
 public class BubbleService {
@@ -57,7 +58,7 @@ public class BubbleService {
 
         Queue<Bubble> bubbleQueue = playerBubbleQueues.computeIfAbsent(
                 sender.getUuid(), 
-                uuid -> new LinkedList<>()
+                uuid -> new ConcurrentLinkedQueue<>()
         );
 
         message = messagePipeline.builder(sender, message)
