@@ -3,7 +3,6 @@ package net.flectone.pulse.module.message.advancement;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
@@ -11,10 +10,11 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.advancement.listener.AdvancementPulseListener;
-import net.flectone.pulse.module.message.advancement.model.Advancement;
+import net.flectone.pulse.module.message.advancement.model.ChatAdvancement;
+import net.flectone.pulse.module.message.advancement.model.CommandAdvancement;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
@@ -23,14 +23,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import static net.flectone.pulse.pipeline.MessagePipeline.ReplacementTag.empty;
 
 @Singleton
-public class AdvancementModule extends AbstractModuleMessage<Localization.Message.Advancement> {
+public class AdvancementModule extends AbstractModuleLocalization<Localization.Message.Advancement> {
 
-    @Getter private final Message.Advancement message;
+    private final Message.Advancement message;
     private final Permission.Message.Advancement permission;
     private final FPlayerService fPlayerService;
     private final IntegrationModule integrationModule;
@@ -71,9 +70,10 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
     }
 
     @Async
-    public void send(FPlayer fReceiver, String target, Advancement advancement) {
-        FPlayer fTarget = fPlayerService.getFPlayer(target);
+    public void send(FPlayer fReceiver, ChatAdvancement chatAdvancement) {
+        FPlayer fTarget = fPlayerService.getFPlayer(chatAdvancement.owner());
         if (fTarget.isUnknown()) return;
+
         if (checkModulePredicates(fTarget)) return;
         if (!fTarget.equals(fReceiver)) return;
 
@@ -83,25 +83,20 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.ADVANCEMENT))
                 .filter(fPlayer -> integrationModule.isVanishedVisible(fTarget, fPlayer))
                 .tag(MessageType.ADVANCEMENT)
-                .format(s -> convert(s, advancement))
-                .tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fResolver, advancement)})
-                .proxy(output -> output.writeUTF(gson.toJson(advancement)))
+                .format(s -> convert(s, chatAdvancement))
+                .tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fResolver, chatAdvancement)})
+                .proxy(output -> output.writeUTF(gson.toJson(chatAdvancement)))
                 .integration()
                 .sound(getSound())
                 .sendBuilt();
     }
 
     @Async
-    public void send(Relation relation,
-                     boolean revoke,
-                     FPlayer fPlayer,
-                     String target,
-                     @Nullable Advancement advancement,
-                     @Nullable String content) {
-        if (advancement == null && content == null) return;
+    public void send(boolean revoke, FPlayer fPlayer, CommandAdvancement commandAdvancement) {
+        if (commandAdvancement.isIncorrect()) return;
         if (checkModulePredicates(fPlayer)) return;
 
-        FPlayer fTarget = fPlayerService.getFPlayer(target);
+        FPlayer fTarget = fPlayerService.getFPlayer(commandAdvancement.owner());
         if (fTarget.isUnknown()) return;
 
         Builder builder = builder(fTarget)
@@ -109,23 +104,23 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
                 .format(s -> {
                     Localization.Message.Advancement.Command subcommand = revoke ? s.getRevoke() : s.getGrant();
 
-                    return switch (relation) {
-                        case MANY_TO_ONE -> subcommand.getManyToOne().replace("<number>", content);
-                        case ONE_TO_ONE_TEXT -> subcommand.getOneToOne().replace("<advancement>", content);
+                    return switch (commandAdvancement.relation()) {
+                        case MANY_TO_ONE -> subcommand.getManyToOne().replace("<number>", commandAdvancement.content());
+                        case ONE_TO_ONE_TEXT -> subcommand.getOneToOne().replace("<advancement>", commandAdvancement.content());
                         case ONE_TO_ONE_ADVANCEMENT -> subcommand.getOneToOne();
                     };
                 })
                 .sound(getSound());
 
-        if (relation == Relation.ONE_TO_ONE_ADVANCEMENT && advancement != null) {
-            builder.tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fPlayer, advancement)});
+        if (commandAdvancement.relation() == Relation.ONE_TO_ONE_ADVANCEMENT && commandAdvancement.chatAdvancement() != null) {
+            builder.tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fPlayer, commandAdvancement.chatAdvancement())});
         }
 
         builder.sendBuilt();
     }
 
-    public String convert(Localization.Message.Advancement message, Advancement advancement) {
-        String string = switch (advancement.type()) {
+    public String convert(Localization.Message.Advancement message, ChatAdvancement chatAdvancement) {
+        String string = switch (chatAdvancement.type()) {
             case CHAT_TYPE_ACHIEVEMENT_TAKEN -> message.getTaken().getFormat();
             case CHAT_TYPE_ADVANCEMENT_GOAL -> message.getGoal().getFormat();
             case CHAT_TYPE_ADVANCEMENT_CHALLENGE -> message.getChallenge().getFormat();
@@ -133,18 +128,18 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
         };
 
         return string
-                .replace("<title>", advancement.title())
-                .replace("<description>", advancement.description());
+                .replace("<title>", chatAdvancement.title())
+                .replace("<description>", chatAdvancement.description());
     }
 
-    public TagResolver advancementTag(FEntity sender, FPlayer receiver, @NotNull Advancement advancement) {
+    public TagResolver advancementTag(FEntity sender, FPlayer receiver, @NotNull ChatAdvancement chatAdvancement) {
         String tag = "advancement";
         if (!isEnable()) return empty(tag);
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
             Localization.Message.Advancement localization = resolveLocalization(receiver);
 
-            String title = switch (advancement.type()) {
+            String title = switch (chatAdvancement.type()) {
                 case CHAT_TYPE_ACHIEVEMENT_TAKEN -> localization.getTaken().getTag();
                 case CHAT_TYPE_ADVANCEMENT_GOAL -> localization.getGoal().getTag();
                 case CHAT_TYPE_ADVANCEMENT_CHALLENGE -> localization.getChallenge().getTag();
@@ -152,8 +147,8 @@ public class AdvancementModule extends AbstractModuleMessage<Localization.Messag
             };
 
             Component component = messagePipeline.builder(sender, receiver, title
-                            .replace("<title>", advancement.title())
-                            .replace("<description>", advancement.description())
+                            .replace("<title>", chatAdvancement.title())
+                            .replace("<description>", chatAdvancement.description())
                     )
                     .build();
 
