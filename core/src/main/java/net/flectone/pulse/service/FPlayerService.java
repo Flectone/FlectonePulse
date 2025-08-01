@@ -8,13 +8,11 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Config;
-import net.flectone.pulse.listener.FPlayerPulseListener;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ignore;
 import net.flectone.pulse.model.Mail;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.provider.PacketProvider;
-import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.repository.FPlayerRepository;
 import net.flectone.pulse.repository.SocialRepository;
 import net.flectone.pulse.resolver.FileResolver;
@@ -37,7 +35,6 @@ public class FPlayerService {
     private final IntegrationModule integrationModule;
     private final PacketSender packetSender;
     private final PacketProvider packetProvider;
-    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public FPlayerService(FileResolver fileResolver,
@@ -47,8 +44,7 @@ public class FPlayerService {
                           ModerationService moderationService,
                           IntegrationModule integrationModule,
                           PacketSender packetSender,
-                          PacketProvider packetProvider,
-                          ListenerRegistry listenerRegistry) {
+                          PacketProvider packetProvider) {
         this.config = fileResolver.getConfig();
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.fPlayerRepository = fPlayerRepository;
@@ -57,7 +53,6 @@ public class FPlayerService {
         this.integrationModule = integrationModule;
         this.packetSender = packetSender;
         this.packetProvider = packetProvider;
-        this.listenerRegistry = listenerRegistry;
     }
 
     public void clear() {
@@ -76,8 +71,6 @@ public class FPlayerService {
             FPlayer fPlayer = addFPlayer(uuid, name);
             loadData(fPlayer);
         });
-
-        listenerRegistry.register(FPlayerPulseListener.class);
     }
 
     public FPlayer addFPlayer(UUID uuid, String name) {

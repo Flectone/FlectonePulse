@@ -31,12 +31,9 @@ public class FabricCommandRegistry extends CommandRegistry {
 
     @Inject
     public FabricCommandRegistry(FabricFlectonePulse fabricFlectonePulse,
-                                 CommandParserRegistry parsers,
                                  PermissionChecker permissionChecker,
                                  CommandExceptionHandler commandExceptionHandler,
                                  FPlayerMapper fPlayerMapper) {
-        super(parsers, permissionChecker);
-
         this.fabricFlectonePulse = fabricFlectonePulse;
         this.permissionChecker = permissionChecker;
         this.manager = new FabricServerCommandManager<>(ExecutionCoordinator.asyncCoordinator(), fPlayerMapper);

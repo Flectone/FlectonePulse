@@ -12,7 +12,10 @@ import net.flectone.pulse.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.exception.ReloadException;
 import net.flectone.pulse.module.Module;
-import net.flectone.pulse.registry.*;
+import net.flectone.pulse.registry.CommandRegistry;
+import net.flectone.pulse.registry.ListenerRegistry;
+import net.flectone.pulse.registry.PermissionRegistry;
+import net.flectone.pulse.registry.ProxyRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
@@ -38,6 +41,9 @@ public class FlectonePulseAPI  {
 
         // log plugin information
         fLogger.logPluginInfo();
+
+        // register default listeners
+        injector.getInstance(ListenerRegistry.class).registerDefaultListeners();
 
         try {
             // connect to database
@@ -68,9 +74,6 @@ public class FlectonePulseAPI  {
         if (fileResolver.getConfig().isMetrics()) {
             injector.getInstance(MetricsService.class).reload();
         }
-
-        // register default listeners
-        injector.getInstance(ListenerRegistry.class).registerDefaultListeners();
 
         // log plugin enabled
         fLogger.logEnabled();
@@ -144,19 +147,6 @@ public class FlectonePulseAPI  {
         // log plugin reloading
         fLogger.logReloading();
 
-        // close all open inventories
-        injector.getInstance(InventoryController.class).closeAll();
-
-        // reload registries
-        injector.getInstance(CommandParserRegistry.class).reload();
-        injector.getInstance(CommandRegistry.class).reload();
-        injector.getInstance(ListenerRegistry.class).reload();
-        injector.getInstance(PermissionRegistry.class).reload();
-        injector.getInstance(ProxyRegistry.class).reload();
-
-        // reload task scheduler
-        injector.getInstance(TaskScheduler.class).reload();
-
         // get file resolver for configuration
         FileResolver fileResolver = injector.getInstance(FileResolver.class);
 
@@ -166,6 +156,18 @@ public class FlectonePulseAPI  {
         } catch (Exception e) {
             reloadException = new ReloadException(e.getMessage(), e);
         }
+
+        // close all open inventories
+        injector.getInstance(InventoryController.class).closeAll();
+
+        // reload registries
+        injector.getInstance(CommandRegistry.class).reload();
+        injector.getInstance(ListenerRegistry.class).reload();
+        injector.getInstance(PermissionRegistry.class).reload();
+        injector.getInstance(ProxyRegistry.class).reload();
+
+        // reload task scheduler
+        injector.getInstance(TaskScheduler.class).reload();
 
         // reload logger with new configuration
         fLogger.reload(fileResolver.getConfig().getLogFilter());
