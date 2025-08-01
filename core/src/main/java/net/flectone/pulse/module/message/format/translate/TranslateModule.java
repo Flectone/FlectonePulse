@@ -7,7 +7,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.translate.listener.TranslatePulseListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
@@ -18,7 +18,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Singleton
-public class TranslateModule extends AbstractModuleMessage<Localization.Message.Format.Translate> {
+public class TranslateModule extends AbstractModuleLocalization<Localization.Message.Format.Translate> {
 
     private final Cache<String, UUID> messageCache = CacheBuilder.newBuilder()
             .maximumSize(5000)

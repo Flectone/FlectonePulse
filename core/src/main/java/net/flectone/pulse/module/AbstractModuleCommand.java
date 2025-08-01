@@ -22,7 +22,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-public abstract class AbstractModuleCommand<M extends Localization.Localizable> extends AbstractModuleMessage<M> implements CommandExecutionHandler<FPlayer> {
+public abstract class AbstractModuleCommand<M extends Localization.Localizable> extends AbstractModuleLocalization<M> implements CommandExecutionHandler<FPlayer> {
 
     private final List<String> prompts = new ArrayList<>();
     private final Predicate<FPlayer> commandPredicate;

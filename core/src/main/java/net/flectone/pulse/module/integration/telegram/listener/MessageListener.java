@@ -3,14 +3,13 @@ package net.flectone.pulse.module.integration.telegram.listener;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
-import net.flectone.pulse.model.Range;
-import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.integration.telegram.TelegramIntegration;
 import net.flectone.pulse.constant.MessageType;
+import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.Range;
+import net.flectone.pulse.module.integration.telegram.TelegramIntegration;
+import net.flectone.pulse.resolver.FileResolver;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
@@ -20,8 +19,7 @@ import java.util.List;
 @Singleton
 public class MessageListener extends EventListener {
 
-    @Getter private final Integration.Telegram integration;
-
+    private final Integration.Telegram integration;
     private final Provider<TelegramIntegration> telegramIntegration;
 
     @Inject

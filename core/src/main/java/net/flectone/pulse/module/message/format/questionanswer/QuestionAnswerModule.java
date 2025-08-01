@@ -8,7 +8,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.*;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.questionanswer.listener.QuestionAnswerPulseListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 @Singleton
-public class QuestionAnswerModule extends AbstractModuleMessage<Localization.Message.Format.QuestionAnswer> {
+public class QuestionAnswerModule extends AbstractModuleLocalization<Localization.Message.Format.QuestionAnswer> {
 
     private final Map<UUID, Boolean> processedQuestions = new WeakHashMap<>();
     private final Map<String, Sound> soundMap = new HashMap<>();

@@ -6,7 +6,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.mention.listener.MentionPulseListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
@@ -15,7 +15,7 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 
 @Singleton
-public class MentionModule extends AbstractModuleMessage<Localization.Message.Format.Mention> {
+public class MentionModule extends AbstractModuleLocalization<Localization.Message.Format.Mention> {
 
     private final WeakHashMap<UUID, Boolean> processedMentions = new WeakHashMap<>();
 

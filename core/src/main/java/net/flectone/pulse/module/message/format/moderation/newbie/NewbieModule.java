@@ -11,12 +11,12 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.PlatformType;
 import net.flectone.pulse.model.ExternalModeration;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
-public class NewbieModule extends AbstractModuleMessage<Localization.Message.Format.Moderation.Newbie> {
+public class NewbieModule extends AbstractModuleLocalization<Localization.Message.Format.Moderation.Newbie> {
 
     private final Message.Format.Moderation.Newbie message;
     private final Permission.Message.Format.Moderation.Newbie permission;

@@ -2,7 +2,6 @@ package net.flectone.pulse.module.message.join;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
@@ -10,16 +9,16 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.join.listener.JoinPulseListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 
 @Singleton
-public class JoinModule extends AbstractModuleMessage<Localization.Message.Join> {
+public class JoinModule extends AbstractModuleLocalization<Localization.Message.Join> {
 
-    @Getter private final Message.Join message;
+    private final Message.Join message;
     private final Permission.Message.Join permission;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final IntegrationModule integrationModule;

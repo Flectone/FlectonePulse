@@ -7,7 +7,7 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
-import net.flectone.pulse.module.AbstractModuleListMessage;
+import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.module.message.brand.listener.BrandPulseListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
@@ -17,7 +17,7 @@ import net.flectone.pulse.service.FPlayerService;
 import java.util.List;
 
 @Singleton
-public class BrandModule extends AbstractModuleListMessage<Localization.Message.Brand> {
+public class BrandModule extends AbstractModuleListLocalization<Localization.Message.Brand> {
 
     private final Message.Brand message;
     private final Permission.Message.Brand permission;

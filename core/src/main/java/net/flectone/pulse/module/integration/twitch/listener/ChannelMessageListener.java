@@ -3,17 +3,15 @@ package net.flectone.pulse.module.integration.twitch.listener;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
+import net.flectone.pulse.constant.MessageType;
+import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Range;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.constant.MessageType;
 
 import java.util.List;
 
-@Getter
 @Singleton
 public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
 

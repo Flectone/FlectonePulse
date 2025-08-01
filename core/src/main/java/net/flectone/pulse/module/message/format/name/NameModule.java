@@ -5,13 +5,13 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.name.listener.NamePulseListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 
 @Singleton
-public class NameModule extends AbstractModuleMessage<Localization.Message.Format.Name> {
+public class NameModule extends AbstractModuleLocalization<Localization.Message.Format.Name> {
 
     private final Message.Format.Name message;
     private final Permission.Message.Format.Name permission;

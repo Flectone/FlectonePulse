@@ -6,16 +6,14 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Attachment;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
-import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Integration;
+import net.flectone.pulse.constant.MessageType;
+import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Range;
 import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.constant.MessageType;
 import reactor.core.publisher.Mono;
 
-@Getter
 @Singleton
 public class MessageCreateListener extends EventListener<MessageCreateEvent> {
 

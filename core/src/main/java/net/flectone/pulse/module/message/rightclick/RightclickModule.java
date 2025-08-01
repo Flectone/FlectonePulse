@@ -9,7 +9,7 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.rightclick.listener.RightclickPacketListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.service.FPlayerService;
@@ -18,7 +18,7 @@ import java.util.UUID;
 
 
 @Singleton
-public class RightclickModule extends AbstractModuleMessage<Localization.Message.Rightclick> {
+public class RightclickModule extends AbstractModuleLocalization<Localization.Message.Rightclick> {
 
     private final Message.Rightclick message;
     private final Permission.Message.Rightclick permission;

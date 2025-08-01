@@ -8,14 +8,14 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.sleep.listener.SleepPulseListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton
-public class SleepModule extends AbstractModuleMessage<Localization.Message.Sleep> {
+public class SleepModule extends AbstractModuleLocalization<Localization.Message.Sleep> {
 
     private final Message.Sleep message;
     private final Permission.Message.Sleep permission;

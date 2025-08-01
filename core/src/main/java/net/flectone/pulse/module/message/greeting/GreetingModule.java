@@ -6,7 +6,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.image.model.FImage;
 import net.flectone.pulse.module.message.greeting.listener.GreetingPulseListener;
 import net.flectone.pulse.registry.ListenerRegistry;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Singleton
-public class GreetingModule extends AbstractModuleMessage<Localization.Message.Greeting> {
+public class GreetingModule extends AbstractModuleLocalization<Localization.Message.Greeting> {
 
     private final Message.Greeting message;
     private final Permission.Message.Greeting permission;

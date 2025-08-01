@@ -14,7 +14,7 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.tab.playerlist.listener.PlayerlistnamePulseListener;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.provider.PacketProvider;
@@ -26,7 +26,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 
 @Singleton
-public class PlayerlistnameModule extends AbstractModuleMessage<Localization.Message.Tab.Playerlistname> {
+public class PlayerlistnameModule extends AbstractModuleLocalization<Localization.Message.Tab.Playerlistname> {
 
     private final Message.Tab.Playerlistname message;
     private final Permission.Message.Tab.Playerlistname permission;

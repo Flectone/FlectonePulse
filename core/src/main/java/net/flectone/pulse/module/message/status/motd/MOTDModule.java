@@ -11,13 +11,13 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.provider.PacketProvider;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleListMessage;
+import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.pipeline.MessagePipeline;
 
 import java.util.List;
 
 @Singleton
-public class MOTDModule extends AbstractModuleListMessage<Localization.Message.Status.MOTD> {
+public class MOTDModule extends AbstractModuleListLocalization<Localization.Message.Status.MOTD> {
 
     private final Message.Status.MOTD message;
     private final Permission.Message.Status.MOTD permission;

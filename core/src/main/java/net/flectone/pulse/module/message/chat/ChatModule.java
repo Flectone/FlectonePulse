@@ -13,7 +13,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.PlatformType;
 import net.flectone.pulse.formatter.TimeFormatter;
 import net.flectone.pulse.model.*;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
@@ -29,7 +29,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Singleton
-public class ChatModule extends AbstractModuleMessage<Localization.Message.Chat> {
+public class ChatModule extends AbstractModuleLocalization<Localization.Message.Chat> {
 
     private final Map<String, Cooldown> cooldownMap = new HashMap<>();
     private final Map<String, Sound> soundMap = new HashMap<>();

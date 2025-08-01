@@ -9,14 +9,14 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.kill.listener.KillPulseListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton
-public class KillModule extends AbstractModuleMessage<Localization.Message.Kill> {
+public class KillModule extends AbstractModuleLocalization<Localization.Message.Kill> {
 
     private final Message.Kill message;
     private final Permission.Message.Kill permission;

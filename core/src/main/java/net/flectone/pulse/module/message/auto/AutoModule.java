@@ -9,14 +9,14 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Sound;
 import net.flectone.pulse.model.Ticker;
-import net.flectone.pulse.module.AbstractModuleListMessage;
+import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 
 import java.util.List;
 
 @Singleton
-public class AutoModule extends AbstractModuleListMessage<Localization.Message.Auto> {
+public class AutoModule extends AbstractModuleListLocalization<Localization.Message.Auto> {
 
     private final Message.Auto message;
     private final Permission.Message.Auto permission;

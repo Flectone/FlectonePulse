@@ -2,22 +2,21 @@ package net.flectone.pulse.module.message.quit;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.quit.listener.QuitPulseListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 
 @Singleton
-public class QuitModule extends AbstractModuleMessage<Localization.Message.Quit> {
+public class QuitModule extends AbstractModuleLocalization<Localization.Message.Quit> {
 
-    @Getter private final Message.Quit message;
+    private final Message.Quit message;
     private final Permission.Message.Quit permission;
     private final IntegrationModule integrationModule;
     private final ListenerRegistry listenerRegistry;

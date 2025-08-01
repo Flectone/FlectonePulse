@@ -8,14 +8,14 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.enchant.listener.EnchantPulseListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton
-public class EnchantModule extends AbstractModuleMessage<Localization.Message.Enchant> {
+public class EnchantModule extends AbstractModuleLocalization<Localization.Message.Enchant> {
 
     private final Message.Enchant message;
     private final Permission.Message.Enchant permission;

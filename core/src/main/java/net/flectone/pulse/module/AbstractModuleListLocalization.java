@@ -10,13 +10,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 
-public abstract class AbstractModuleListMessage<M extends Localization.Localizable> extends AbstractModuleMessage<M> {
+public abstract class AbstractModuleListLocalization<M extends Localization.Localizable> extends AbstractModuleLocalization<M> {
 
     private final HashMap<Integer, Integer> messageIndexMap = new HashMap<>();
 
     @Inject private RandomUtil randomUtil;
 
-    protected AbstractModuleListMessage(Function<Localization, M> messageFunction) {
+    protected AbstractModuleListLocalization(Function<Localization, M> messageFunction) {
         super(messageFunction);
     }
 

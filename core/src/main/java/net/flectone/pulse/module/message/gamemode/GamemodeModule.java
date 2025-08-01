@@ -8,14 +8,14 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.gamemode.listener.GamemodePulseListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton
-public class GamemodeModule extends AbstractModuleMessage<Localization.Message.Gamemode> {
+public class GamemodeModule extends AbstractModuleLocalization<Localization.Message.Gamemode> {
 
     private final Message.Gamemode message;
     private final Permission.Message.Gamemode permission;

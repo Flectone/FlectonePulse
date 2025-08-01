@@ -9,7 +9,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.Destination;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
-import net.flectone.pulse.module.AbstractModuleListMessage;
+import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.module.message.tab.footer.listener.FooterPulseListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
@@ -21,7 +21,7 @@ import net.kyori.adventure.text.Component;
 import java.util.List;
 
 @Singleton
-public class FooterModule extends AbstractModuleListMessage<Localization.Message.Tab.Footer> {
+public class FooterModule extends AbstractModuleListLocalization<Localization.Message.Tab.Footer> {
 
     private final Message.Tab.Footer message;
     private final Permission.Message.Tab.Footer permission;

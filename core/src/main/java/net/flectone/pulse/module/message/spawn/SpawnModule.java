@@ -8,7 +8,7 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.spawn.listener.SpawnPacketListener;
 import net.flectone.pulse.module.message.spawn.listener.SpawnPulseListener;
 import net.flectone.pulse.registry.ListenerRegistry;
@@ -16,7 +16,7 @@ import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton
-public class SpawnModule extends AbstractModuleMessage<Localization.Message.Spawn> {
+public class SpawnModule extends AbstractModuleLocalization<Localization.Message.Spawn> {
 
     private final Message.Spawn message;
     private final Permission.Message.Spawn permission;

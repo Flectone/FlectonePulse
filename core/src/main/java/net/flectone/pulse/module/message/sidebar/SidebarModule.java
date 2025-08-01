@@ -14,7 +14,7 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
-import net.flectone.pulse.module.AbstractModuleListMessage;
+import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.module.message.sidebar.listener.SidebarPulseListener;
 import net.flectone.pulse.pipeline.MessagePipeline;
 import net.flectone.pulse.provider.PacketProvider;
@@ -28,7 +28,7 @@ import net.kyori.adventure.text.Component;
 import java.util.*;
 
 @Singleton
-public class SidebarModule extends AbstractModuleListMessage<Localization.Message.Sidebar> {
+public class SidebarModule extends AbstractModuleListLocalization<Localization.Message.Sidebar> {
 
     private final Map<UUID, List<String>> playerSidebar = new HashMap<>();
 

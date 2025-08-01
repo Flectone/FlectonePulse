@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.checker.PermissionChecker;
+import net.flectone.pulse.configuration.Command;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.registry.BukkitListenerRegistry;
-import net.flectone.pulse.registry.CommandRegistry;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import org.bukkit.entity.Player;
@@ -27,17 +27,18 @@ import java.util.Map;
 @Singleton
 public class BukkitSpyModule extends SpyModule {
 
+    private final Command.Spy command;
     private final FPlayerService fPlayerService;
     private final BukkitListenerRegistry bukkitListenerManager;
 
     @Inject
     public BukkitSpyModule(FileResolver fileResolver,
                            FPlayerService fPlayerService,
-                           CommandRegistry commandRegistry,
                            PermissionChecker permissionChecker,
                            BukkitListenerRegistry bukkitListenerManager) {
-        super(fileResolver, commandRegistry, fPlayerService, permissionChecker);
+        super(fileResolver, fPlayerService, permissionChecker);
 
+        this.command = fileResolver.getCommand().getSpy();
         this.fPlayerService = fPlayerService;
         this.bukkitListenerManager = bukkitListenerManager;
     }
@@ -53,7 +54,7 @@ public class BukkitSpyModule extends SpyModule {
     public void check(PlayerCommandPreprocessEvent event) {
         if (!isEnable()) return;
 
-        Map<String, List<String>> categories = getCommand().getCategories();
+        Map<String, List<String>> categories = command.getCategories();
         if (categories.get("command") == null) return;
 
         String action = event.getMessage();
@@ -71,7 +72,7 @@ public class BukkitSpyModule extends SpyModule {
     public void check(InventoryClickEvent event) {
         if (!isEnable()) return;
 
-        Map<String, List<String>> categories = getCommand().getCategories();
+        Map<String, List<String>> categories = command.getCategories();
         if (categories.get("action") == null) return;
         if (!categories.get("action").contains("anvil")) return;
         if (event.isCancelled()) return;
@@ -97,7 +98,7 @@ public class BukkitSpyModule extends SpyModule {
     public void check(PlayerEditBookEvent event) {
         if (!isEnable()) return;
 
-        Map<String, List<String>> categories = getCommand().getCategories();
+        Map<String, List<String>> categories = command.getCategories();
         if (categories.get("action") == null) return;
         if (!categories.get("action").contains("book")) return;
 
@@ -115,7 +116,7 @@ public class BukkitSpyModule extends SpyModule {
     public void check(SignChangeEvent event) {
         if (!isEnable()) return;
 
-        Map<String, List<String>> categories = getCommand().getCategories();
+        Map<String, List<String>> categories = command.getCategories();
         if (categories.get("action") == null) return;
         if (!categories.get("action").contains("sign")) return;
 

@@ -4,7 +4,6 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDe
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.configuration.Localization;
@@ -14,7 +13,7 @@ import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.FEntity;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.death.listener.DeathPacketListener;
 import net.flectone.pulse.module.message.death.listener.DeathPulseListener;
@@ -32,9 +31,9 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import static net.flectone.pulse.pipeline.MessagePipeline.ReplacementTag.empty;
 
 @Singleton
-public class DeathModule extends AbstractModuleMessage<Localization.Message.Death> implements PulseListener {
+public class DeathModule extends AbstractModuleLocalization<Localization.Message.Death> implements PulseListener {
 
-    @Getter private final Message.Death message;
+    private final Message.Death message;
     private final Permission.Message.Death permission;
     private final MessagePipeline messagePipeline;
     private final PacketSender packetSender;

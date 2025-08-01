@@ -40,9 +40,9 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
-public abstract class AbstractModuleMessage<M extends Localization.Localizable> extends AbstractModule {
+public abstract class AbstractModuleLocalization<M extends Localization.Localizable> extends AbstractModule {
 
-    private final Function<Localization, M> messageResolver;
+    private final Function<Localization, M> localizationFunction;
 
     @Inject private FPlayerService fPlayerService;
     @Inject private ModerationService moderationService;
@@ -62,8 +62,8 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
     @Getter private Cooldown cooldown;
     @Getter private Sound sound;
 
-    protected AbstractModuleMessage(Function<Localization, M> messageFunction) {
-        this.messageResolver = messageFunction;
+    protected AbstractModuleLocalization(Function<Localization, M> localizationMFunction) {
+        this.localizationFunction = localizationMFunction;
     }
 
     public Sound createSound(Sound sound, Permission.IPermission permission) {
@@ -99,11 +99,11 @@ public abstract class AbstractModuleMessage<M extends Localization.Localizable> 
     }
 
     public M resolveLocalization() {
-        return messageResolver.apply(fileResolver.getLocalization());
+        return localizationFunction.apply(fileResolver.getLocalization());
     }
 
     public M resolveLocalization(FEntity sender) {
-        return messageResolver.apply(fileResolver.getLocalization(sender));
+        return localizationFunction.apply(fileResolver.getLocalization(sender));
     }
 
     public Builder builder(FEntity fPlayer) {

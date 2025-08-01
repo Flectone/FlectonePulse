@@ -2,7 +2,6 @@ package net.flectone.pulse.module.message.afk;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.configuration.Localization;
@@ -11,7 +10,7 @@ import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.MessageType;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Range;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.afk.listener.AfkPulseListener;
 import net.flectone.pulse.registry.ListenerRegistry;
@@ -26,11 +25,11 @@ import java.util.Map;
 import java.util.UUID;
 
 @Singleton
-public class AfkModule extends AbstractModuleMessage<Localization.Message.Afk> {
+public class AfkModule extends AbstractModuleLocalization<Localization.Message.Afk> {
 
     private final Map<UUID, Pair<Integer, PlatformPlayerAdapter.Coordinates>> playersCoordinates = new HashMap<>();
 
-    @Getter private final Message.Afk message;
+    private final Message.Afk message;
     private final Permission.Message.Afk permission;
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;

@@ -8,7 +8,7 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
 import net.flectone.pulse.model.Ticker;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.objective.ScoreboardPosition;
 import net.flectone.pulse.module.message.objective.belowname.listener.BelownamePulseListener;
@@ -20,7 +20,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 
 @Singleton
-public class BelownameModule extends AbstractModuleMessage<Localization.Message.Objective.Belowname> {
+public class BelownameModule extends AbstractModuleLocalization<Localization.Message.Objective.Belowname> {
 
     private final Message.Objective.Belowname config;
     private final Permission.Message.Objective.Belowname permission;

@@ -7,7 +7,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.seed.listener.SeedPulseListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
@@ -15,7 +15,7 @@ import net.flectone.pulse.service.FPlayerService;
 import org.jetbrains.annotations.NotNull;
 
 @Singleton
-public class SeedModule extends AbstractModuleMessage<Localization.Message.Seed> {
+public class SeedModule extends AbstractModuleLocalization<Localization.Message.Seed> {
 
     private final Message.Seed message;
     private final Permission.Message.Seed permission;

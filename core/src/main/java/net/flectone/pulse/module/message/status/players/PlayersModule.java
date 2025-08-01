@@ -9,7 +9,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.status.players.listener.PlayersPulseListener;
 import net.flectone.pulse.registry.ListenerRegistry;
 import net.flectone.pulse.resolver.FileResolver;
@@ -17,7 +17,7 @@ import net.flectone.pulse.resolver.FileResolver;
 import java.util.List;
 
 @Singleton
-public class PlayersModule extends AbstractModuleMessage<Localization.Message.Status.Players> {
+public class PlayersModule extends AbstractModuleLocalization<Localization.Message.Status.Players> {
 
     @Getter private final Message.Status.Players message;
     private final Permission.Message.Status.Players permission;

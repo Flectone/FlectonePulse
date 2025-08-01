@@ -8,10 +8,10 @@ import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.resolver.FileResolver;
 import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 
 @Singleton
-public class VersionModule extends AbstractModuleMessage<Localization.Message.Status.Version> {
+public class VersionModule extends AbstractModuleLocalization<Localization.Message.Status.Version> {
 
     @Getter private final Message.Status.Version message;
     private final Permission.Message.Status.Version permission;

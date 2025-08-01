@@ -7,7 +7,7 @@ import net.flectone.pulse.configuration.Localization;
 import net.flectone.pulse.configuration.Message;
 import net.flectone.pulse.configuration.Permission;
 import net.flectone.pulse.constant.AdventureTag;
-import net.flectone.pulse.module.AbstractModuleMessage;
+import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.color.ColorModule;
 import net.flectone.pulse.module.message.format.emoji.EmojiModule;
 import net.flectone.pulse.module.message.format.fixation.FixationModule;
@@ -31,7 +31,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 @Singleton
-public class FormatModule extends AbstractModuleMessage<Localization.Message.Format> {
+public class FormatModule extends AbstractModuleLocalization<Localization.Message.Format> {
 
     @Getter private final Map<AdventureTag, TagResolver> tagResolverMap = new EnumMap<>(AdventureTag.class);
 
