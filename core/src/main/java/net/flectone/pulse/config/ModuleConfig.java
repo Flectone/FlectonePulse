@@ -134,7 +134,6 @@ public interface ModuleConfig {
             interface ModerationFormatMessageConfig extends SubFormatMessageConfig {
 
                 SubModerationFormatMessageConfig getCaps();
-                SubModerationFormatMessageConfig getDelete();
                 SubModerationFormatMessageConfig getNewbie();
                 SubModerationFormatMessageConfig getFlood();
                 SubModerationFormatMessageConfig getSwear();
