@@ -2,7 +2,7 @@ package net.flectone.pulse.module.message.advancement.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.constant.MinecraftTranslationKey;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
 import net.flectone.pulse.module.message.advancement.model.ChatAdvancement;

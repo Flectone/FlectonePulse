@@ -2,12 +2,12 @@ package net.flectone.pulse.module.message.format.color;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.configuration.Message;
-import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.config.Message;
+import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.color.listener.ColorPulseListener;
-import net.flectone.pulse.registry.ListenerRegistry;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.resolver.FileResolver;
 
 
 @Singleton

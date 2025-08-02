@@ -3,10 +3,10 @@ package net.flectone.pulse.module.message.book;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.module.message.book.listener.BookListener;
-import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.registry.BukkitListenerRegistry;
-import net.flectone.pulse.registry.ListenerRegistry;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.resolver.FileResolver;
 
 @Singleton
 public class BukkitBookModule extends BookModule {

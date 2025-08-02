@@ -2,9 +2,9 @@ package net.flectone.pulse.service;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.Moderation;
-import net.flectone.pulse.repository.ModerationRepository;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.data.repository.ModerationRepository;
 
 import java.util.List;
 import java.util.UUID;

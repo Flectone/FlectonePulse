@@ -3,8 +3,8 @@ package net.flectone.pulse.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.lettuce.core.pubsub.RedisPubSubListener;
-import net.flectone.pulse.handler.ProxyMessageHandler;
-import net.flectone.pulse.proxy.RedisProxy;
+import net.flectone.pulse.platform.handler.ProxyMessageHandler;
+import net.flectone.pulse.platform.proxy.RedisProxy;
 
 @Singleton
 public class RedisListener implements RedisPubSubListener<byte[], byte[]> {

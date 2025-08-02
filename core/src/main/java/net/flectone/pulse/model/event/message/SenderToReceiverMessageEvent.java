@@ -1,9 +1,9 @@
 package net.flectone.pulse.model.event.message;
 
 import lombok.Getter;
-import net.flectone.pulse.model.Destination;
-import net.flectone.pulse.model.FEntity;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.util.Destination;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.kyori.adventure.text.Component;
 

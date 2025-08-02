@@ -2,15 +2,15 @@ package net.flectone.pulse.module.message.auto;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.configuration.Message;
-import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.Sound;
-import net.flectone.pulse.model.Ticker;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Message;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.util.Sound;
+import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
-import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 
 import java.util.List;

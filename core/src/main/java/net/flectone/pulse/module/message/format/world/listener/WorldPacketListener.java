@@ -5,7 +5,7 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.service.FPlayerService;
 

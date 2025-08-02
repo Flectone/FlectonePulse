@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.Setter;
-import net.flectone.pulse.checker.PermissionChecker;
-import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.model.FEntity;
-import net.flectone.pulse.registry.PermissionRegistry;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.platform.registry.PermissionRegistry;
 
 import java.util.*;
 import java.util.function.Predicate;

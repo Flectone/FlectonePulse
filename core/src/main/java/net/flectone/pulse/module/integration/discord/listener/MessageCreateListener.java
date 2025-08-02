@@ -7,11 +7,11 @@ import discord4j.core.object.entity.Attachment;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.configuration.Integration;
-import net.flectone.pulse.constant.MessageType;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.Range;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.util.Range;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import reactor.core.publisher.Mono;
 
 @Singleton

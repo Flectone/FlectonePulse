@@ -3,14 +3,14 @@ package net.flectone.pulse.module.integration;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import net.flectone.pulse.adapter.PlatformServerAdapter;
-import net.flectone.pulse.checker.PermissionChecker;
-import net.flectone.pulse.model.ExternalModeration;
-import net.flectone.pulse.model.FEntity;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.model.util.ExternalModeration;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.placeholderapi.PlaceholderAPIModule;
 import net.flectone.pulse.module.integration.supervanish.VanishModule;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton

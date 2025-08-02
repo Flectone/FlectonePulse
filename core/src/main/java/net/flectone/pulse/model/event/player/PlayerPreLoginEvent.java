@@ -2,7 +2,7 @@ package net.flectone.pulse.model.event.player;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.kyori.adventure.text.Component;
 
 @Setter

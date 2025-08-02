@@ -4,27 +4,27 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.configuration.Message;
-import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.constant.MessageType;
-import net.flectone.pulse.model.FEntity;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Message;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.advancement.listener.AdvancementPulseListener;
 import net.flectone.pulse.module.message.advancement.model.ChatAdvancement;
 import net.flectone.pulse.module.message.advancement.model.CommandAdvancement;
-import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.registry.ListenerRegistry;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 
-import static net.flectone.pulse.pipeline.MessagePipeline.ReplacementTag.empty;
+import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.empty;
 
 @Singleton
 public class AdvancementModule extends AbstractModuleLocalization<Localization.Message.Advancement> {

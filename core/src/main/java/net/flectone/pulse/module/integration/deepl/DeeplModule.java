@@ -5,12 +5,12 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.configuration.Integration;
-import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.resolver.LibraryResolver;
+import net.flectone.pulse.processing.resolver.LibraryResolver;
 
 @Singleton
 public class DeeplModule extends AbstractModule {

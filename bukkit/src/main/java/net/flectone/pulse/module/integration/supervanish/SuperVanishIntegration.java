@@ -7,7 +7,7 @@ import de.myzelyam.api.vanish.PlayerShowEvent;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.quit.QuitModule;

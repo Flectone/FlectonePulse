@@ -3,9 +3,9 @@ package net.flectone.pulse.module.message.sign;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.module.message.sign.listener.SignListener;
-import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.registry.ListenerRegistry;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.resolver.FileResolver;
 
 @Singleton
 public class BukkitSignModule extends SignModule {

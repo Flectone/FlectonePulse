@@ -2,8 +2,8 @@ package net.flectone.pulse.module.message.bubble.model;
 
 import com.github.retrooper.packetevents.protocol.entity.type.EntityType;
 import lombok.Getter;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.PacketEntity;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.entity.PacketEntity;
 import net.kyori.adventure.text.Component;
 
 @Getter

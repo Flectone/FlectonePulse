@@ -2,7 +2,7 @@ package net.flectone.pulse.module.integration.miniplaceholders;
 
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;

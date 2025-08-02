@@ -2,9 +2,9 @@ package net.flectone.pulse.module.command.flectonepulse.web;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.configuration.Config;
+import net.flectone.pulse.config.Config;
 import net.flectone.pulse.module.command.flectonepulse.web.controller.EditorController;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import spark.Service;
 
 @Singleton

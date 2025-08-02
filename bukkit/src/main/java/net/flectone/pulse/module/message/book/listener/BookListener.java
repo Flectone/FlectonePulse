@@ -2,7 +2,7 @@ package net.flectone.pulse.module.message.book.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.book.BukkitBookModule;
 import net.flectone.pulse.service.FPlayerService;
 import org.bukkit.event.EventHandler;

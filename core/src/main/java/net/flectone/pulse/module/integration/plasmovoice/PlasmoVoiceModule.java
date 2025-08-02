@@ -2,9 +2,9 @@ package net.flectone.pulse.module.integration.plasmovoice;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.configuration.Integration;
-import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.module.AbstractModule;
 import su.plo.voice.api.server.PlasmoVoiceServer;
 

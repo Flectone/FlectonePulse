@@ -3,15 +3,15 @@ package net.flectone.pulse.module.message.bubble;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.configuration.Message;
-import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.config.Message;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.bubble.listener.BubblePacketListener;
 import net.flectone.pulse.module.message.bubble.listener.BubblePulseListener;
 import net.flectone.pulse.module.message.bubble.service.BubbleService;
-import net.flectone.pulse.registry.ListenerRegistry;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import org.jetbrains.annotations.NotNull;
 
 @Singleton

@@ -5,9 +5,9 @@ import com.deepl.api.DeepLClientOptions;
 import com.deepl.api.DeepLException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.configuration.Integration;
+import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.module.integration.FIntegration;
 
 @Singleton

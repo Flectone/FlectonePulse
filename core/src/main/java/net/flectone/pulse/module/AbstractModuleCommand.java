@@ -1,14 +1,14 @@
 package net.flectone.pulse.module;
 
 import com.google.inject.Inject;
-import net.flectone.pulse.configuration.Command;
-import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.constant.DisableSource;
-import net.flectone.pulse.model.FEntity;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.Range;
-import net.flectone.pulse.registry.CommandRegistry;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.config.Command;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.util.Range;
+import net.flectone.pulse.platform.registry.CommandRegistry;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;

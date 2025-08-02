@@ -1,6 +1,6 @@
 package net.flectone.pulse.module.message.advancement.model;
 
-import net.flectone.pulse.constant.MinecraftTranslationKey;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 
 public record ChatAdvancement(String owner,
                               String title,

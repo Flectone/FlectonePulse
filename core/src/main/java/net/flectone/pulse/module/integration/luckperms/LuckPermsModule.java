@@ -2,13 +2,13 @@ package net.flectone.pulse.module.integration.luckperms;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.adapter.PlatformServerAdapter;
-import net.flectone.pulse.configuration.Integration;
-import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.constant.PlatformType;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.util.constant.PlatformType;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.processing.resolver.FileResolver;
 
 import java.util.Collections;
 import java.util.Set;

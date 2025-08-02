@@ -3,17 +3,17 @@ package net.flectone.pulse.module.message.chat;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import net.flectone.pulse.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.adapter.PlatformServerAdapter;
-import net.flectone.pulse.checker.PermissionChecker;
-import net.flectone.pulse.configuration.Message;
-import net.flectone.pulse.formatter.TimeFormatter;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.config.Message;
+import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.chat.listener.ChatListener;
-import net.flectone.pulse.registry.ListenerRegistry;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton

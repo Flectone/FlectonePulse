@@ -1,8 +1,8 @@
 package net.flectone.pulse.module;
 
 import com.google.inject.Inject;
-import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.RandomUtil;
 import org.jetbrains.annotations.Nullable;
 

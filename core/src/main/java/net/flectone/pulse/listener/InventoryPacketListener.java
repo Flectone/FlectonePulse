@@ -8,7 +8,7 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.controller.InventoryController;
+import net.flectone.pulse.platform.controller.InventoryController;
 import net.flectone.pulse.model.inventory.Inventory;
 
 @Singleton

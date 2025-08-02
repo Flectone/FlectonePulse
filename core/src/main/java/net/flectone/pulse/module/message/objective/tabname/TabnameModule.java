@@ -2,18 +2,18 @@ package net.flectone.pulse.module.message.objective.tabname;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.configuration.Message;
-import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.model.FPlayer;
-import net.flectone.pulse.model.Ticker;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.config.Message;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.objective.ScoreboardPosition;
 import net.flectone.pulse.module.message.objective.tabname.listener.TabnamePulseListener;
-import net.flectone.pulse.registry.ListenerRegistry;
-import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.scheduler.TaskScheduler;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton

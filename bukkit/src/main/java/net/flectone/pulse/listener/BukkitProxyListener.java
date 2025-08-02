@@ -2,8 +2,8 @@ package net.flectone.pulse.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.handler.ProxyMessageHandler;
-import net.flectone.pulse.proxy.BukkitProxy;
+import net.flectone.pulse.platform.handler.ProxyMessageHandler;
+import net.flectone.pulse.platform.proxy.BukkitProxy;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.jetbrains.annotations.NotNull;

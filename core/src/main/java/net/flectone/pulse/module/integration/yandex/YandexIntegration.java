@@ -2,9 +2,9 @@ package net.flectone.pulse.module.integration.yandex;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.configuration.Integration;
+import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.module.integration.FIntegration;
 import yandex.cloud.api.ai.translate.v2.TranslationServiceGrpc;
 import yandex.cloud.api.ai.translate.v2.TranslationServiceOuterClass;

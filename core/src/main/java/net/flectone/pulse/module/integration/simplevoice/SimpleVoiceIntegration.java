@@ -8,13 +8,13 @@ import de.maxhenkel.voicechat.api.events.EntitySoundPacketEvent;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.checker.MuteChecker;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.util.checker.MuteChecker;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.listener.MessagePulseListener;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.pipeline.MessagePipeline;
-import net.flectone.pulse.formatter.ModerationMessageFormatter;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton

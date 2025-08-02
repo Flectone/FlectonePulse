@@ -2,12 +2,12 @@ package net.flectone.pulse.module;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.configuration.Config;
-import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.config.Config;
+import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.command.CommandModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.MessageModule;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.processing.resolver.FileResolver;
 
 @Singleton
 public class Module extends AbstractModule {

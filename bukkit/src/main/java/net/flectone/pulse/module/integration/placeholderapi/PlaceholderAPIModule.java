@@ -3,11 +3,11 @@ package net.flectone.pulse.module.integration.placeholderapi;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import net.flectone.pulse.configuration.Integration;
-import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.registry.ListenerRegistry;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.resolver.FileResolver;
 
 @Singleton
 public class PlaceholderAPIModule extends AbstractModule {

@@ -3,7 +3,7 @@ package net.flectone.pulse.module.integration.luckperms;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.util.logging.FLogger;
 import net.luckperms.api.LuckPerms;

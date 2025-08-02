@@ -1,12 +1,12 @@
 package net.flectone.pulse.module.integration;
 
 import com.google.inject.Injector;
-import net.flectone.pulse.adapter.PlatformServerAdapter;
-import net.flectone.pulse.configuration.Integration;
-import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.model.ExternalModeration;
-import net.flectone.pulse.model.FEntity;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.util.ExternalModeration;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.deepl.DeeplModule;
 import net.flectone.pulse.module.integration.discord.DiscordModule;
@@ -17,8 +17,8 @@ import net.flectone.pulse.module.integration.skinsrestorer.SkinsRestorerModule;
 import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.yandex.YandexModule;
-import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.constant.MessageType;
+import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.Collections;

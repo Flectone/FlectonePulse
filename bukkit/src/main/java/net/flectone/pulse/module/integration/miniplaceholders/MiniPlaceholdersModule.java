@@ -2,17 +2,17 @@ package net.flectone.pulse.module.integration.miniplaceholders;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.checker.PermissionChecker;
-import net.flectone.pulse.configuration.Integration;
-import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.constant.MessageFlag;
-import net.flectone.pulse.context.MessageContext;
-import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.registry.ListenerRegistry;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton

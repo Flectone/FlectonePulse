@@ -2,7 +2,7 @@ package net.flectone.pulse.module.message.bubble.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.entity.FPlayer;
 
 import java.util.UUID;
 

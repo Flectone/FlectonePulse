@@ -3,14 +3,14 @@ package net.flectone.pulse.module.message.format.fixation.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.configuration.Message;
-import net.flectone.pulse.constant.MessageFlag;
-import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.config.Message;
+import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.message.format.fixation.FixationModule;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import org.jetbrains.annotations.Nullable;
 
 @Singleton

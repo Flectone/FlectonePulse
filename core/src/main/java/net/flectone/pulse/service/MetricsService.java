@@ -3,13 +3,13 @@ package net.flectone.pulse.service;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.adapter.PlatformServerAdapter;
-import net.flectone.pulse.configuration.Config;
-import net.flectone.pulse.database.dto.MetricsDTO;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.config.Config;
+import net.flectone.pulse.model.dto.MetricsDTO;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.module.Module;
-import net.flectone.pulse.scheduler.TaskScheduler;
-import net.flectone.pulse.sender.MetricsSender;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.platform.sender.MetricsSender;
 
 import java.time.Instant;
 

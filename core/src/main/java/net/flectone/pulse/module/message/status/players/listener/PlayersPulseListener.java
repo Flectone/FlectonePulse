@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerPreLoginEvent;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
-import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 

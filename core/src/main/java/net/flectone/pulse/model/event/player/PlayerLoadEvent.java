@@ -1,6 +1,6 @@
 package net.flectone.pulse.model.event.player;
 
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.entity.FPlayer;
 
 public class PlayerLoadEvent extends PlayerEvent {
 

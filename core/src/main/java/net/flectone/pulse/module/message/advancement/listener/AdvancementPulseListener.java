@@ -3,14 +3,14 @@ package net.flectone.pulse.module.message.advancement.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.configuration.Message;
+import net.flectone.pulse.config.Message;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
 import net.flectone.pulse.module.message.advancement.extractor.AdvancementExtractor;
 import net.flectone.pulse.module.message.advancement.model.ChatAdvancement;
 import net.flectone.pulse.module.message.advancement.model.CommandAdvancement;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.processing.resolver.FileResolver;
 
 import java.util.Optional;
 

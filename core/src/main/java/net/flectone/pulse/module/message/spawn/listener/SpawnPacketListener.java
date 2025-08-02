@@ -6,9 +6,9 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChangeGameState;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.spawn.SpawnModule;
-import net.flectone.pulse.constant.MinecraftTranslationKey;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton

@@ -2,15 +2,15 @@ package net.flectone.pulse.module.command.anon;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.configuration.Command;
-import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.constant.DisableSource;
-import net.flectone.pulse.constant.MessageType;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.config.Command;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.provider.CommandParserProvider;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton

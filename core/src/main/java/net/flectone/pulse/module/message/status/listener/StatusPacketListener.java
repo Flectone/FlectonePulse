@@ -5,10 +5,10 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.configuration.Command;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.config.Command;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.status.StatusModule;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.processing.resolver.FileResolver;
 
 @Singleton
 public class StatusPacketListener implements PacketListener {

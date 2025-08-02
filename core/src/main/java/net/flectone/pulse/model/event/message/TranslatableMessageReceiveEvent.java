@@ -2,8 +2,8 @@ package net.flectone.pulse.model.event.message;
 
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import lombok.Getter;
-import net.flectone.pulse.constant.MinecraftTranslationKey;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.kyori.adventure.text.TranslatableComponent;
 

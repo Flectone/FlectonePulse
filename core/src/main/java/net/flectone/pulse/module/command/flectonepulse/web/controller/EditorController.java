@@ -2,10 +2,10 @@ package net.flectone.pulse.module.command.flectonepulse.web.controller;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.configuration.FileSerializable;
-import net.flectone.pulse.configuration.Localization;
+import net.flectone.pulse.config.FileSerializable;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import spark.Request;
 import spark.Response;
 import spark.Service;

@@ -3,16 +3,16 @@ package net.flectone.pulse.module.message.format.moderation.caps.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.checker.PermissionChecker;
-import net.flectone.pulse.configuration.Message;
-import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.constant.MessageFlag;
-import net.flectone.pulse.context.MessageContext;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.config.Message;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.message.format.moderation.caps.CapsModule;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.processing.resolver.FileResolver;
 
 @Singleton
 public class CapsPulseListener implements PulseListener {

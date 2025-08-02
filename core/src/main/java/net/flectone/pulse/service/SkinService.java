@@ -2,7 +2,7 @@ package net.flectone.pulse.service;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.model.FEntity;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.integration.IntegrationModule;
 
 @Singleton

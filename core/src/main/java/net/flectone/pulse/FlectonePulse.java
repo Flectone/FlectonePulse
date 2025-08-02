@@ -1,7 +1,7 @@
 package net.flectone.pulse;
 
 import com.google.inject.Injector;
-import net.flectone.pulse.model.exception.ReloadException;
+import net.flectone.pulse.exception.ReloadException;
 
 public interface FlectonePulse {
 

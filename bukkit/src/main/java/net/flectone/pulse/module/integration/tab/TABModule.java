@@ -2,8 +2,8 @@ package net.flectone.pulse.module.integration.tab;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.configuration.Integration;
-import net.flectone.pulse.configuration.Permission;
+import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.objective.belowname.BelownameModule;
@@ -11,7 +11,7 @@ import net.flectone.pulse.module.message.objective.tabname.TabnameModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
-import net.flectone.pulse.resolver.FileResolver;
+import net.flectone.pulse.processing.resolver.FileResolver;
 
 @Singleton
 public class TABModule extends AbstractModule {

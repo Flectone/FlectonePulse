@@ -5,14 +5,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.configuration.Localization;
-import net.flectone.pulse.configuration.Message;
-import net.flectone.pulse.configuration.Permission;
-import net.flectone.pulse.provider.PacketProvider;
-import net.flectone.pulse.resolver.FileResolver;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Message;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
-import net.flectone.pulse.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 
 import java.util.List;
 

@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import com.rexcantor64.triton.api.TritonAPI;
 import com.rexcantor64.triton.api.events.PlayerChangeLanguageSpigotEvent;
 import com.rexcantor64.triton.api.players.LanguagePlayer;
-import net.flectone.pulse.model.FPlayer;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.logging.FLogger;
