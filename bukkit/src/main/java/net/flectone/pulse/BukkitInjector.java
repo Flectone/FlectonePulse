@@ -40,7 +40,6 @@ import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.execution.scheduler.BukkitTaskScheduler;
-import net.flectone.pulse.registry.*;
 import net.flectone.pulse.util.checker.BukkitPermissionChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.interceptor.AsyncInterceptor;

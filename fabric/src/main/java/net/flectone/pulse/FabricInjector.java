@@ -23,7 +23,6 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.anvil.AnvilModule;
 import net.flectone.pulse.module.message.anvil.FabricAnvilModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.registry.*;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.execution.scheduler.FabricTaskScheduler;
