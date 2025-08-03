@@ -12,7 +12,6 @@ import net.flectone.pulse.module.message.deop.listener.DeopPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import org.jetbrains.annotations.NotNull;
 
 @Singleton
 public class DeopModule extends AbstractModuleLocalization<Localization.Message.Deop> {
@@ -49,7 +48,7 @@ public class DeopModule extends AbstractModuleLocalization<Localization.Message.
     }
 
     @Async
-    public void send(FPlayer fPlayer, @NotNull String target) {
+    public void send(FPlayer fPlayer, String target) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
