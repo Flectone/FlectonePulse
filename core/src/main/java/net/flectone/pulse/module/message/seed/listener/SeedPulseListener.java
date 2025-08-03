@@ -45,7 +45,7 @@ public class SeedPulseListener implements PulseListener {
 
         if (seed == null) return;
 
-        event.cancelPacket();
+        event.setCancelled(true);
         seedModule.send(event.getFPlayer(), seed);
     }
 

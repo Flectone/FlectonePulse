@@ -28,7 +28,7 @@ public class DeopPulseListener implements PulseListener {
         if (translatableComponent.args().isEmpty()) return;
         if (!(translatableComponent.args().get(0) instanceof TextComponent targetComponent)) return;
 
-        event.cancelPacket();
+        event.setCancelled(true);
         deopModule.send(event.getFPlayer(), targetComponent.content());
     }
 

@@ -29,7 +29,7 @@ public class ClearPulseListener implements PulseListener {
         if (!(translatableComponent.args().get(0) instanceof TextComponent firstArg)) return;
         if (!(translatableComponent.args().get(1) instanceof TextComponent secondArg)) return;
 
-        event.cancelPacket();
+        event.setCancelled(true);
 
         if (event.getKey() == MinecraftTranslationKey.COMMANDS_CLEAR_SUCCESS) {
             clearModule.send(event.getFPlayer(), event.getKey(), secondArg.content(), firstArg.content());

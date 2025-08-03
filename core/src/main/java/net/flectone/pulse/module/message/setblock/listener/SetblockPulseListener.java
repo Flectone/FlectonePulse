@@ -43,7 +43,7 @@ public class SetblockPulseListener implements PulseListener {
             z = zComponent.content();
         }
 
-        event.cancelPacket();
+        event.setCancelled(true);
 
         setblockModule.send(event.getFPlayer(), x, y, z);
     }

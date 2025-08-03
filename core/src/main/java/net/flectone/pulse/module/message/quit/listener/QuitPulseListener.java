@@ -30,7 +30,7 @@ public class QuitPulseListener implements PulseListener {
     public void onTranslatableMessageReceive(TranslatableMessageReceiveEvent event) {
         if (event.getKey() != MinecraftTranslationKey.MULTIPLAYER_PLAYER_LEFT) return;
 
-        event.cancelPacket();
+        event.setCancelled(true);
     }
 
 }

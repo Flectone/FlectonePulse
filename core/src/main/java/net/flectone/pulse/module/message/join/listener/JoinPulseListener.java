@@ -40,6 +40,6 @@ public class JoinPulseListener implements PulseListener {
     public void onTranslatableMessageReceiveEvent(TranslatableMessageReceiveEvent event) {
         if (event.getKey() != MinecraftTranslationKey.MULTIPLAYER_PLAYER_JOINED) return;
 
-        event.cancelPacket();
+        event.setCancelled(true);
     }
 }

@@ -108,7 +108,10 @@ public class BasePacketListener implements PacketListener {
         }
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getUser().getUUID());
-        eventDispatcher.dispatch(new TranslatableMessageReceiveEvent(fPlayer, key, translatableComponent, event));
+        TranslatableMessageReceiveEvent translatableMessageReceiveEvent = new TranslatableMessageReceiveEvent(fPlayer, key, translatableComponent);
+        eventDispatcher.dispatch(translatableMessageReceiveEvent);
+
+        event.setCancelled(translatableMessageReceiveEvent.isCancelled());
     }
 
     private TranslatableComponent parseTranslatableComponent(PacketSendEvent event) {

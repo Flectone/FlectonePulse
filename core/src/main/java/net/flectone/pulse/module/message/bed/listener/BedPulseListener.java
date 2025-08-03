@@ -21,7 +21,7 @@ public class BedPulseListener implements PulseListener {
     public void onTranslatableMessageReceiveEvent(TranslatableMessageReceiveEvent event) {
         if (!event.getKey().startsWith("block.minecraft.bed.") && !event.getKey().startsWith("tile.bed")) return;
 
-        event.cancelPacket();
+        event.setCancelled(true);
         bedModule.send(event.getFPlayer(), event.getKey());
     }
 

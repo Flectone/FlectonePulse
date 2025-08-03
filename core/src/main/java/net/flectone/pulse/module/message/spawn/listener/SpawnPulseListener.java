@@ -27,7 +27,7 @@ public class SpawnPulseListener implements PulseListener {
     @Pulse
     public void onTranslatableMessageReceiveEvent(TranslatableMessageReceiveEvent event) {
         if (event.getKey() == MinecraftTranslationKey.BLOCK_MINECRAFT_SET_SPAWN) {
-            event.cancelPacket();
+            event.setCancelled(true);
             spawnModule.send(event.getFPlayer(), event.getKey());
             return;
         }
@@ -78,7 +78,7 @@ public class SpawnPulseListener implements PulseListener {
         String z = zComp.content();
         String value = tgtComp.content();
 
-        event.cancelPacket();
+        event.setCancelled(true);
         spawnModule.send(event.getFPlayer(), event.getKey(), x, y, z, angle, world, value);
     }
 

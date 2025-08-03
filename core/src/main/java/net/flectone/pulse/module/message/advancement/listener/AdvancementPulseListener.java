@@ -38,7 +38,7 @@ public class AdvancementPulseListener implements PulseListener {
                 Optional<ChatAdvancement> advancement = advancementExtractor.extractFromChat(event);
                 if (advancement.isEmpty()) return;
 
-                event.cancelPacket();
+                event.setCancelled(true);
                 advancementModule.send(event.getFPlayer(), advancement.get());
             }
             case COMMANDS_ADVANCEMENT_GRANT_ONE_TO_ONE_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_MANY_TO_ONE_SUCCESS,
@@ -49,7 +49,7 @@ public class AdvancementPulseListener implements PulseListener {
                 Optional<CommandAdvancement> commandAdvancement = advancementExtractor.extractFromCommand(event);
                 if (commandAdvancement.isEmpty()) return;
 
-                event.cancelPacket();
+                event.setCancelled(true);
                 advancementModule.send(false, event.getFPlayer(), commandAdvancement.get());
             }
             case COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS, COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS,
@@ -60,7 +60,7 @@ public class AdvancementPulseListener implements PulseListener {
                 Optional<CommandAdvancement> commandAdvancement = advancementExtractor.extractFromCommand(event);
                 if (commandAdvancement.isEmpty()) return;
 
-                event.cancelPacket();
+                event.setCancelled(true);
                 advancementModule.send(true, event.getFPlayer(), commandAdvancement.get());
             }
         }

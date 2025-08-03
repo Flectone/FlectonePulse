@@ -30,7 +30,7 @@ public class GamemodePulseListener implements PulseListener {
 
         TranslatableComponent translatableComponent = event.getComponent();
         if (translatableComponent.args().isEmpty()) {
-            event.cancelPacket();
+            event.setCancelled(true);
             gamemodeModule.send(event.getFPlayer(), gamemodeKey, target);
             return;
         }
@@ -44,7 +44,7 @@ public class GamemodePulseListener implements PulseListener {
             gamemodeKey = gamemodeComponent.key();
         }
 
-        event.cancelPacket();
+        event.setCancelled(true);
         gamemodeModule.send(event.getFPlayer(), gamemodeKey, target);
     }
 

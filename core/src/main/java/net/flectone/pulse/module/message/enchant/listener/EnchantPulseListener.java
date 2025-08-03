@@ -24,7 +24,7 @@ public class EnchantPulseListener implements PulseListener {
     public void onTranslatableMessageReceiveEvent(TranslatableMessageReceiveEvent event) {
         if (!event.getKey().startsWith("commands.enchant.success")) return;
         if (event.getKey() == MinecraftTranslationKey.COMMANDS_ENCHANT_SUCCESS) {
-            event.cancelPacket();
+            event.setCancelled(true);
             enchantModule.send(event.getFPlayer(), event.getKey(), "", "", "");
             return;
         }
@@ -43,7 +43,7 @@ public class EnchantPulseListener implements PulseListener {
         if (!(translatableComponent.args().get(1) instanceof TextComponent targetComponent)) return;
         String value = targetComponent.content();
 
-        event.cancelPacket();
+        event.setCancelled(true);
         enchantModule.send(event.getFPlayer(), event.getKey(), enchantKey, levelKey, value);
     }
 

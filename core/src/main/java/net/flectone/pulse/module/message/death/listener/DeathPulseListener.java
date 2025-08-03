@@ -44,7 +44,7 @@ public class DeathPulseListener implements PulseListener {
         Item item = getItem(translatableComponent);
         death.setItem(item);
 
-        event.cancelPacket();
+        event.setCancelled(true);
         deathModule.send(event.getFPlayer(), death);
     }
 

@@ -48,7 +48,7 @@ public class KillPulseListener implements PulseListener {
 
         String value = firstArgument.content();
 
-        event.cancelPacket();
+        event.setCancelled(true);
         killModule.send(event.getFPlayer(), MinecraftTranslationKey.COMMANDS_KILL_SUCCESS_MULTIPLE, value, null);
     }
 
@@ -85,7 +85,7 @@ public class KillPulseListener implements PulseListener {
         String type = triplet.second();
         uuid = triplet.third();
 
-        event.cancelPacket();
+        event.setCancelled(true);
         killModule.send(event.getFPlayer(), event.getKey(), "", new FEntity(name, uuid, type));
     }
 

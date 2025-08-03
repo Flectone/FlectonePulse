@@ -28,7 +28,7 @@ public class OpPulseListener implements PulseListener {
         if (translatableComponent.args().isEmpty()) return;
         if (!(translatableComponent.args().get(0) instanceof TextComponent targetComponent)) return;
 
-        event.cancelPacket();
+        event.setCancelled(true);
         opModule.send(event.getFPlayer(), targetComponent.content());
     }
 

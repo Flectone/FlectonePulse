@@ -37,7 +37,7 @@ public class SleepPulseListener implements PulseListener {
             }
         }
 
-        event.cancelPacket();
+        event.setCancelled(true);
         sleepModule.send(event.getFPlayer(), event.getKey(), sleepCount, allCount);
     }
 
