@@ -443,9 +443,9 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
                     .tagResolvers(messageTag(message));
 
             if (!fReceiver.isUnknown()) {
-                String messageToTranslate = resolveString(fReceiver, this.message);
-                // support new <translate> and old <translateto>
-                formatBuilder = formatBuilder.translate(messageToTranslate, formatContent.contains("<translate"));
+                formatBuilder = formatBuilder
+                        .setUserMessage(resolveString(fReceiver, this.message))
+                        .translate(formatContent.contains("<translate")); // support new <translate> and old <translateto>
             }
 
             if (formatComponentBuilder != null) {

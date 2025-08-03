@@ -26,7 +26,7 @@ public class MessageContext {
     private final FPlayer receiver;
     private final UUID processId;
     private String message;
-    private String messageToTranslate;
+    private String userMessage;
 
     public MessageContext(FEntity sender, FPlayer receiver, String message) {
         this.processId = UUID.randomUUID();
