@@ -12,7 +12,6 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.moderation.delete.listener.DeletePulseListener;
 import net.flectone.pulse.module.message.format.moderation.delete.model.HistoryMessage;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
@@ -35,15 +34,13 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
     private final MessagePulseListener messagePulseListener;
-    private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Inject
     public DeleteModule(FileResolver fileResolver,
                         ListenerRegistry listenerRegistry,
                         MessagePipeline messagePipeline,
                         FPlayerService fPlayerService,
-                        MessagePulseListener messagePulseListener,
-                        PlatformPlayerAdapter platformPlayerAdapter) {
+                        MessagePulseListener messagePulseListener) {
         super(localization -> localization.getMessage().getFormat().getModeration().getDelete());
 
         this.message = fileResolver.getMessage().getFormat().getModeration().getDelete();
@@ -52,7 +49,6 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
         this.messagePipeline = messagePipeline;
         this.fPlayerService = fPlayerService;
         this.messagePulseListener = messagePulseListener;
-        this.platformPlayerAdapter = platformPlayerAdapter;
     }
 
     @Override
