@@ -2023,8 +2023,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
             public static final class QuestionAnswer implements SubFormatMessageConfig, Localizable {
                 private Map<String, String> questions = new LinkedHashMap<>(){
                     {
-                        put("server", "<fcolor:2>[Q&A] @<player><fcolor:1>, this is a vanilla server in minecraft!");
-                        put("flectone", "<fcolor:2>[Q&A] @<player><fcolor:1>, this is a brand and projects created by TheFaser");
+                        put("server", "<fcolor:2>[Answer] @<player><fcolor:1>, this is a vanilla server in minecraft!");
+                        put("flectone", "<fcolor:2>[Answer] @<player><fcolor:1>, this is a brand and projects created by TheFaser");
                     }
                 };
             }
