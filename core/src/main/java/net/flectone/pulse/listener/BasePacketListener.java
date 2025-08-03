@@ -96,7 +96,7 @@ public class BasePacketListener implements PacketListener {
             );
         }
 
-        TranslatableComponent translatableComponent = parseTranslatableComponent(event);
+        TranslatableComponent translatableComponent = extractTranslatableComponent(event);
         if (translatableComponent == null) return;
 
         MinecraftTranslationKey key = MinecraftTranslationKey.fromString(translatableComponent.key());
@@ -114,7 +114,7 @@ public class BasePacketListener implements PacketListener {
         event.setCancelled(translatableMessageReceiveEvent.isCancelled());
     }
 
-    private TranslatableComponent parseTranslatableComponent(PacketSendEvent event) {
+    private TranslatableComponent extractTranslatableComponent(PacketSendEvent event) {
         Component component = null;
 
         if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
