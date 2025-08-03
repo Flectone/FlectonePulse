@@ -1,10 +1,10 @@
 package net.flectone.pulse.model.event.message;
 
 import lombok.Getter;
-import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.util.Destination;
 import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
@@ -33,4 +33,26 @@ public class SenderToReceiverMessageEvent extends Event {
         this.destination = destination;
     }
 
+    public SenderToReceiverMessageEvent(FEntity sender,
+                                        FPlayer receiver,
+                                        Component message,
+                                        Component submessage,
+                                        Destination destination) {
+        this(UUID.randomUUID(), sender, receiver, message, submessage, destination);
+    }
+
+    public SenderToReceiverMessageEvent(FPlayer sender,
+                                        Component message,
+                                        Component submessage,
+                                        Destination destination) {
+        this(UUID.randomUUID(), sender, sender, message, submessage, destination);
+    }
+
+    public SenderToReceiverMessageEvent(FPlayer sender, Component message, Destination destination) {
+        this(UUID.randomUUID(), sender, sender, message, Component.empty(), destination);
+    }
+
+    public SenderToReceiverMessageEvent(FPlayer sender, Component message) {
+        this(UUID.randomUUID(), sender, sender, message, Component.empty(), new Destination());
+    }
 }
