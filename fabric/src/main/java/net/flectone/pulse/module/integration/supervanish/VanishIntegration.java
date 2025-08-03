@@ -29,14 +29,6 @@ public class VanishIntegration implements FIntegration {
         this.fabricFlectonePulse = fabricFlectonePulse;
         this.fLogger = fLogger;
 
-//        VanishEvents.VANISH_MESSAGE_EVENT.register((player) -> {
-//            return Text.empty();
-//        });
-//
-//        VanishEvents.UN_VANISH_MESSAGE_EVENT.register((player) -> {
-//            return Text.empty();
-//        });
-
         VanishEvents.VANISH_EVENT.register((player, vanish) -> {
             FPlayer fPlayer = fPlayerService.getFPlayer(player.getUuid());
 

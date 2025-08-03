@@ -196,7 +196,7 @@ public class ProxyMessageHandler {
     }
 
     private Set<String> readClusters(DataInputStream input, int clustersCount) throws IOException {
-        Set<String> clusters = new HashSet<>(clustersCount);
+        Set<String> clusters = HashSet.newHashSet(clustersCount);
         for (int i = 0; i < clustersCount; i++) {
             clusters.add(input.readUTF());
         }

@@ -4,7 +4,6 @@ import com.alessiodp.libby.FabricLibraryManager;
 import com.alessiodp.libby.Library;
 import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.processing.resolver.LibraryResolver;
 import org.slf4j.Logger;
 
 @Singleton

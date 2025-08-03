@@ -11,25 +11,21 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.seed.listener.SeedPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.service.FPlayerService;
 
 @Singleton
 public class SeedModule extends AbstractModuleLocalization<Localization.Message.Seed> {
 
     private final Message.Seed message;
     private final Permission.Message.Seed permission;
-    private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public SeedModule(FileResolver fileResolver,
-                      FPlayerService fPlayerService,
                       ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getSeed());
 
         this.message = fileResolver.getMessage().getSeed();
         this.permission = fileResolver.getPermission().getMessage().getSeed();
-        this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
     }
 

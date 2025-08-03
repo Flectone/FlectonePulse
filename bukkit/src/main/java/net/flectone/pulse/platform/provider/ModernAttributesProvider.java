@@ -11,7 +11,6 @@ public class ModernAttributesProvider implements AttributesProvider {
 
     @Inject
     public ModernAttributesProvider() {
-
     }
 
     @Override

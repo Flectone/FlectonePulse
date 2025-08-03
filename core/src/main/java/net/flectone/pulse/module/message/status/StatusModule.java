@@ -7,11 +7,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -20,7 +19,7 @@ import net.flectone.pulse.module.message.status.listener.StatusPacketListener;
 import net.flectone.pulse.module.message.status.motd.MOTDModule;
 import net.flectone.pulse.module.message.status.players.PlayersModule;
 import net.flectone.pulse.module.message.status.version.VersionModule;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
@@ -41,7 +40,6 @@ public class StatusModule extends AbstractModule {
     private final VersionModule versionModule;
     private final MessagePipeline messagePipeline;
     private final PlatformServerAdapter platformServerAdapter;
-    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
@@ -55,7 +53,6 @@ public class StatusModule extends AbstractModule {
                         VersionModule versionModule,
                         MessagePipeline messagePipeline,
                         PlatformServerAdapter platformServerAdapter,
-                        PlatformPlayerAdapter platformPlayerAdapter,
                         FPlayerService fPlayerService,
                         ListenerRegistry listenerRegistry,
                         IntegrationModule integrationModule,
@@ -68,7 +65,6 @@ public class StatusModule extends AbstractModule {
         this.versionModule = versionModule;
         this.messagePipeline = messagePipeline;
         this.platformServerAdapter = platformServerAdapter;
-        this.platformPlayerAdapter = platformPlayerAdapter;
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
         this.integrationModule = integrationModule;

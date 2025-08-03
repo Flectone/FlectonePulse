@@ -2,8 +2,6 @@ package net.flectone.pulse.execution.scheduler;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.execution.scheduler.SchedulerRunnable;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.List;

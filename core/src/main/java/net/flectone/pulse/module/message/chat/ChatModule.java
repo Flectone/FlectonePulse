@@ -170,7 +170,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                 .destination(playerChat.getDestination())
                 .range(chatRange)
                 .filter(chatPermissionFilter)
-                .format(message -> message.getTypes().get(chatName))
+                .format(localization -> localization.getTypes().get(chatName))
                 .message(finalMessage)
                 .proxy(output -> {
                     output.writeUTF(chatName);

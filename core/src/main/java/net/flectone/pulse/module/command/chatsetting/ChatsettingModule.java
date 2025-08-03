@@ -159,8 +159,8 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                         inventoryChatsBuilder = inventoryChatsBuilder
                                 .addItem(i, platformServerAdapter.buildItemStack(fPlayer, chatMaterial, chatTitle, chatLore))
                                 .addClickHandler(i, (chatItemStack, chatInventory) -> {
-                                    Permission.IPermission permission = chatPermission.getTypes().get(chatName);
-                                    if (!permissionChecker.check(fPlayer, permission)) {
+                                    Permission.IPermission chatTypePermission = chatPermission.getTypes().get(chatName);
+                                    if (!permissionChecker.check(fPlayer, chatTypePermission)) {
                                         builder(fPlayer)
                                                 .format(Localization.Command.Chatsetting::getNoPermission)
                                                 .sendBuilt();
