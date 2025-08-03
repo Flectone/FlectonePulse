@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.listener.FabricBaseListener;
+import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.execution.scheduler.FabricTaskScheduler;
 import net.flectone.pulse.util.TpsTracker;
@@ -34,8 +35,9 @@ public class FabricListenerRegistry extends ListenerRegistry {
                                   FabricTaskScheduler fabricTaskScheduler,
                                   TpsTracker tpsTracker,
                                   FLogger fLogger,
-                                  Injector injector) {
-        super(fLogger, injector);
+                                  Injector injector,
+                                  PacketProvider packetProvider) {
+        super(fLogger, injector, packetProvider);
 
         this.config = fileResolver.getConfig();
         this.fabricFlectonePulse = fabricFlectonePulse;

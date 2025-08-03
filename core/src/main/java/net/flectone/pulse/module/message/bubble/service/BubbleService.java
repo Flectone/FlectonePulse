@@ -1,21 +1,21 @@
 package net.flectone.pulse.module.message.bubble.service;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Message;
-import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.processing.converter.ColorConverter;
-import net.flectone.pulse.module.message.bubble.BubbleModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
 import net.flectone.pulse.module.message.bubble.renderer.BubbleRenderer;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.processing.converter.ColorConverter;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.constant.MessageFlag;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -31,20 +31,23 @@ public class BubbleService {
     private final BubbleRenderer bubbleRenderer;
     private final ColorConverter colorConverter;
     private final TaskScheduler taskScheduler;
+    private final PacketProvider packetProvider;
     private final RandomUtil randomUtil;
     private final MessagePipeline messagePipeline;
     
     @Inject
-    public BubbleService(TaskScheduler taskScheduler,
-                         FileResolver fileResolver,
+    public BubbleService(FileResolver fileResolver,
                          BubbleRenderer bubbleRenderer,
                          ColorConverter colorConverter,
+                         TaskScheduler taskScheduler,
+                         PacketProvider packetProvider,
                          RandomUtil randomUtil,
                          MessagePipeline messagePipeline) {
         this.fileResolver = fileResolver;
         this.bubbleRenderer = bubbleRenderer;
         this.colorConverter = colorConverter;
         this.taskScheduler = taskScheduler;
+        this.packetProvider = packetProvider;
         this.randomUtil = randomUtil;
         this.messagePipeline = messagePipeline;
     }
@@ -198,12 +201,12 @@ public class BubbleService {
     }
 
     private boolean isModern() {
-        return PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)
+        return packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)
                 && fileResolver.getMessage().getBubble().getModern().isEnable();
     }
 
     private boolean isInteractionRiding() {
-        return PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_21_3)
+        return packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_3)
                 && fileResolver.getMessage().getBubble().getInteraction().isEnable();
     }
 }

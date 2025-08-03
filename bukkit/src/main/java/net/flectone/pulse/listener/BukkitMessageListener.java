@@ -1,9 +1,8 @@
-package net.flectone.pulse.platform.sender;
+package net.flectone.pulse.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;

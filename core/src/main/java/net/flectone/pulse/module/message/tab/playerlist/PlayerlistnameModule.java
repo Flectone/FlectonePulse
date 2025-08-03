@@ -1,27 +1,26 @@
 package net.flectone.pulse.module.message.tab.playerlist;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfo;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.tab.playerlist.listener.PlayerlistnamePulseListener;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 
@@ -101,7 +100,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
         Component name = messagePipeline.builder(fPlayer, fReceiver, resolveLocalization(fReceiver).getFormat())
                 .build();
 
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)) {
+        if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)) {
             WrapperPlayServerPlayerInfoUpdate.PlayerInfo playerInfo = new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
                     user.getProfile(),
                     true,

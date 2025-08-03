@@ -4,7 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.BukkitBaseListener;
-import net.flectone.pulse.platform.sender.BukkitMessageListener;
+import net.flectone.pulse.listener.BukkitMessageListener;
+import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.event.*;
 import org.bukkit.plugin.EventExecutor;
@@ -26,8 +27,9 @@ public class BukkitListenerRegistry extends ListenerRegistry {
     @Inject
     public BukkitListenerRegistry(Plugin plugin,
                                   FLogger fLogger,
-                                  Injector injector) {
-        super(fLogger, injector);
+                                  Injector injector,
+                                  PacketProvider packetProvider) {
+        super(fLogger, injector, packetProvider);
 
         this.plugin = plugin;
         this.injector = injector;

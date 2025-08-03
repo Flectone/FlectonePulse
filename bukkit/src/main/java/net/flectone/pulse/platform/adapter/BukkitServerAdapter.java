@@ -1,6 +1,5 @@
 package net.flectone.pulse.platform.adapter;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore;
@@ -13,12 +12,13 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.util.constant.PlatformType;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.PaperItemStackUtil;
+import net.flectone.pulse.util.constant.PlatformType;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -53,16 +53,19 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private final Provider<IntegrationModule> integrationModuleProvider;
     private final Provider<FPlayerService> fPlayerServiceProvider;
     private final Provider<MessagePipeline> messagePipelineProvider;
+    private final PacketProvider packetProvider;
 
     @Inject
     public BukkitServerAdapter(Plugin plugin,
                                Provider<IntegrationModule> integrationModuleProvider,
                                Provider<FPlayerService> fPlayerServiceProvider,
-                               Provider<MessagePipeline> messagePipelineProvider) {
+                               Provider<MessagePipeline> messagePipelineProvider,
+                               PacketProvider packetProvider) {
         this.plugin = plugin;
         this.integrationModuleProvider = integrationModuleProvider;
         this.fPlayerServiceProvider = fPlayerServiceProvider;
         this.messagePipelineProvider = messagePipelineProvider;
+        this.packetProvider = packetProvider;
     }
 
     @Sync
@@ -160,7 +163,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
                 .map(message -> messagePipelineProvider.get().builder(fPlayer, message).build().decoration(TextDecoration.ITALIC, false))
                 .toList();
 
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
+        if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_20_5)) {
             return buildModernItemStack(itemMaterial, componentName, componentLore);
         }
 
@@ -204,7 +207,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
             return "";
         }
 
-        if (PacketEvents.getAPI().getServerManager().getVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
+        if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
             return getModernItemName(bukkitItem.getType());
         }
 

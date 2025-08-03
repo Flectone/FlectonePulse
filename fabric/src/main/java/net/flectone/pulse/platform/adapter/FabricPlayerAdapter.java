@@ -1,6 +1,5 @@
 package net.flectone.pulse.platform.adapter;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.GameMode;
 import com.github.retrooper.packetevents.protocol.player.User;
@@ -10,13 +9,13 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.FabricFlectonePulse;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.kyori.adventure.text.Component;
 import net.minecraft.entity.Entity;
@@ -177,7 +176,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
             case HEALTH -> (int) Math.round(player.getHealth() * 10.0) / 10;
             case LEVEL -> player.experienceLevel;
             case FOOD -> player.getHungerManager().getFoodLevel();
-            case PING -> PacketEvents.getAPI().getPlayerManager().getPing(player);
+            case PING -> packetProvider.getPlayerManager().getPing(player);
             case ARMOR -> player.getArmor();
             case ATTACK -> player.getMainHandStack().getDamage();
         };

@@ -1,6 +1,5 @@
 package net.flectone.pulse.platform.registry;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketListenerCommon;
@@ -12,6 +11,7 @@ import lombok.Getter;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.*;
 import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.lang.reflect.InvocationTargetException;
@@ -33,14 +33,15 @@ public class ListenerRegistry implements Registry {
 
     private final FLogger fLogger;
     private final Injector injector;
-    private final EventManager eventManager;
+    private final PacketProvider packetProvider;
 
     @Inject
     public ListenerRegistry(FLogger fLogger,
-                            Injector injector) {
+                            Injector injector,
+                            PacketProvider packetProvider) {
         this.fLogger = fLogger;
         this.injector = injector;
-        this.eventManager = PacketEvents.getAPI().getEventManager();
+        this.packetProvider = packetProvider;
     }
 
     public void register(Class<?> clazzListener) {
@@ -61,7 +62,7 @@ public class ListenerRegistry implements Registry {
     }
 
     public void register(PacketListener packetListener, PacketListenerPriority priority) {
-        PacketListenerCommon packetListenerCommon = eventManager.registerListener(packetListener, priority);
+        PacketListenerCommon packetListenerCommon = packetProvider.getEventManager().registerListener(packetListener, priority);
         packetListeners.add(packetListenerCommon);
     }
 
@@ -104,6 +105,7 @@ public class ListenerRegistry implements Registry {
     }
 
     public void unregisterAll() {
+        EventManager eventManager = packetProvider.getEventManager();
         packetListeners.forEach(eventManager::unregisterListeners);
         packetListeners.clear();
         pulseListeners.clear();

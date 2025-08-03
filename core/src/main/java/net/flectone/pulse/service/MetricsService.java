@@ -1,15 +1,15 @@
 package net.flectone.pulse.service;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.config.Config;
-import net.flectone.pulse.model.dto.MetricsDTO;
-import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.module.Module;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.dto.MetricsDTO;
+import net.flectone.pulse.module.Module;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.MetricsSender;
+import net.flectone.pulse.processing.resolver.FileResolver;
 
 import java.time.Instant;
 
@@ -19,6 +19,7 @@ public class MetricsService {
     private final TaskScheduler taskScheduler;
     private final MetricsSender metricsSender;
     private final PlatformServerAdapter platformServerAdapter;
+    private final PacketProvider packetProvider;
     private final FileResolver fileResolver;
     private final Module module;
 
@@ -26,11 +27,13 @@ public class MetricsService {
     public MetricsService(TaskScheduler taskScheduler,
                           MetricsSender metricsSender,
                           PlatformServerAdapter platformServerAdapter,
+                          PacketProvider packetProvider,
                           FileResolver fileResolver,
                           Module module) {
         this.taskScheduler = taskScheduler;
         this.metricsSender = metricsSender;
         this.platformServerAdapter = platformServerAdapter;
+        this.packetProvider = packetProvider;
         this.fileResolver = fileResolver;
         this.module = module;
     }
@@ -43,7 +46,7 @@ public class MetricsService {
         MetricsDTO metricsDTO = new MetricsDTO();
         metricsDTO.setServerCore(platformServerAdapter.getServerCore());
 
-        metricsDTO.setServerVersion(PacketEvents.getAPI().getServerManager().getVersion().getReleaseName());
+        metricsDTO.setServerVersion(packetProvider.getServerVersion().getReleaseName());
         metricsDTO.setOsName(getOsName());
         metricsDTO.setOsArchitecture(getOsArch());
         metricsDTO.setOsVersion(getOsVersion());

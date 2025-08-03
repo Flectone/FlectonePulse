@@ -1,7 +1,5 @@
 package net.flectone.pulse.platform.sender;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.PacketEventsAPI;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -13,7 +11,6 @@ import java.util.UUID;
 @Singleton
 public class PacketSender {
 
-    private final PacketEventsAPI<?> packetEvents = PacketEvents.getAPI();
     private final PacketProvider packetProvider;
 
     @Inject
@@ -25,7 +22,7 @@ public class PacketSender {
         Object channel = packetProvider.getChannel(uuid);
         if (channel == null) return;
 
-        packetEvents.getProtocolManager().sendPacket(channel, packetWrapper);
+        packetProvider.getProtocolManager().sendPacket(channel, packetWrapper);
     }
 
     public void send(FPlayer fPlayer, PacketWrapper<?> packetWrapper) {
@@ -33,11 +30,11 @@ public class PacketSender {
     }
 
     public void send(Object channel, PacketWrapper<?> packetWrapper) {
-        packetEvents.getProtocolManager().sendPacket(channel, packetWrapper);
+        packetProvider.getProtocolManager().sendPacket(channel, packetWrapper);
     }
 
     public void send(PacketWrapper<?> packetWrapper) {
-        packetEvents.getProtocolManager()
+        packetProvider.getProtocolManager()
                 .getUsers()
                 .forEach(user -> user.sendPacket(packetWrapper));
     }

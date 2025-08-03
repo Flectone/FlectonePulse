@@ -1,6 +1,5 @@
 package net.flectone.pulse.module.message.bubble.renderer;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
@@ -16,21 +15,22 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSe
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
-import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.model.Bubble;
 import net.flectone.pulse.module.message.bubble.model.BubbleEntity;
 import net.flectone.pulse.module.message.bubble.model.ModernBubble;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -52,6 +52,7 @@ public class BubbleRenderer {
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PacketSender packetSender;
+    private final PacketProvider packetProvider;
     private final MessagePipeline messagePipeline;
     private final IntegrationModule integrationModule;
     private final TaskScheduler taskScheduler;
@@ -62,6 +63,7 @@ public class BubbleRenderer {
                           FPlayerService fPlayerService,
                           PlatformPlayerAdapter platformPlayerAdapter,
                           PacketSender packetSender,
+                          PacketProvider packetProvider,
                           MessagePipeline messagePipeline,
                           IntegrationModule integrationModule,
                           TaskScheduler taskScheduler,
@@ -70,6 +72,7 @@ public class BubbleRenderer {
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.packetSender = packetSender;
+        this.packetProvider = packetProvider;
         this.messagePipeline = messagePipeline;
         this.integrationModule = integrationModule;
         this.taskScheduler = taskScheduler;
@@ -316,7 +319,7 @@ public class BubbleRenderer {
             // radius
             int radiusIndex = 8;
 
-            if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
+            if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
                 radiusIndex = 7;
             }
 

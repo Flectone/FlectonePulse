@@ -1,22 +1,21 @@
 package net.flectone.pulse.service;
 
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Config;
+import net.flectone.pulse.data.repository.FPlayerRepository;
+import net.flectone.pulse.data.repository.SocialRepository;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ignore;
 import net.flectone.pulse.model.util.Mail;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.data.repository.FPlayerRepository;
-import net.flectone.pulse.data.repository.SocialRepository;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -124,7 +123,7 @@ public class FPlayerService {
     }
 
     public String getSortedName(FPlayer fPlayer) {
-        if (PacketEvents.getAPI().getServerManager().getVersion().isOlderThan(ServerVersion.V_1_17)) {
+        if (packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_17)) {
             return fPlayer.getName();
         }
 
