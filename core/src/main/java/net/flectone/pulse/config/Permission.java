@@ -780,6 +780,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Status status = new Status();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/")})
         private Tab tab = new Tab();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/update/")})
+        private Update update = new Update();
 
         @Getter
         public static final class Advancement implements SubMessageConfig, IPermission {
@@ -1299,6 +1301,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                 private String name = "flectonepulse.module.message.tab.footer";
                 private Type type = Type.TRUE;
             }
+        }
+
+        @Getter
+        public static final class Update implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.op";
+            private Type type = Type.OP;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.op.sound", Type.TRUE);
         }
     }
 

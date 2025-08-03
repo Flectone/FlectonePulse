@@ -647,6 +647,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 });
             }
         });
+
+        message.update.formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse)</fcolor:2> Твоя версия <fcolor:2><current_version></fcolor:2> устарела! Обновись до <fcolor:2><latest_version></fcolor:2> с помощью <url:https://modrinth.com/plugin/flectonepulse>, чтобы получить новые возможности!";
+        message.update.formatConsole = "<fcolor:1>Твоя версия <fcolor:2><current_version></fcolor:2> устарела! Обновись до <fcolor:2><latest_version></fcolor:2> с помощью <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse";
     }
 
 
@@ -1637,6 +1640,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Status status = new Status();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/")})
         private Tab tab = new Tab();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/update/")})
+        private Update update = new Update();
 
         @Getter
         public static final class Advancement implements SubMessageConfig, Localizable {
@@ -2229,6 +2234,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
             public static final class Playerlistname implements SubTabMessageConfig, Localizable {
                 private String format = "<world_prefix>▋ <reset><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix>";
             }
+        }
+
+        @Getter
+        public static final class Update implements SubMessageConfig, Localizable {
+            private String formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse)</fcolor:2> Your version <fcolor:2><current_version></fcolor:2> is outdated! Update to <fcolor:2><latest_version></fcolor:2> at <url:https://github.com/Flectone/FlectonePulse/releases> for the latest features!";
+            private String formatConsole = "<fcolor:1>Your version <fcolor:2><current_version></fcolor:2> is outdated! Update to <fcolor:2><latest_version></fcolor:2> at <click:open_url:https://github.com/Flectone/FlectonePulse/releases>https://github.com/Flectone/FlectonePulse/releases";
         }
 
     }

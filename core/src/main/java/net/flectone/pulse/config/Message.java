@@ -103,6 +103,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Status status = new Status();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/")})
     private Tab tab = new Tab();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/update/")})
+    private Update update = new Update();
 
     @Getter
     public static final class Advancement implements SubMessageConfig, Config.IEnable {
@@ -769,5 +771,12 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             private boolean enable = true;
             private Ticker ticker = new Ticker(true, 100);
         }
+    }
+
+    @Getter
+    public static final class Update implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Destination destination = new Destination();
+        private Sound sound = new Sound();
     }
 }

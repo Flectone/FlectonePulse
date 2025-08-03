@@ -111,6 +111,7 @@ public interface ModuleConfig {
         SubMessageConfig getSign();
         StatusMessageConfig getStatus();
         TabMessageConfig getTab();
+        SubMessageConfig getUpdate();
 
         interface SubMessageConfig {}
 
