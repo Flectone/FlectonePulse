@@ -12,7 +12,6 @@ import net.flectone.pulse.module.message.op.listener.OpPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import org.jetbrains.annotations.NotNull;
 
 @Singleton
 public class OpModule extends AbstractModuleLocalization<Localization.Message.Op> {
@@ -49,7 +48,7 @@ public class OpModule extends AbstractModuleLocalization<Localization.Message.Op
     }
 
     @Async
-    public void send(FPlayer fPlayer, @NotNull String target) {
+    public void send(FPlayer fPlayer, String target) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
