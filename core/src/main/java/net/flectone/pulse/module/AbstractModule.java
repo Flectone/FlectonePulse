@@ -78,7 +78,7 @@ public abstract class AbstractModule {
         reloadWithChildren(this.getClass(), AbstractModule::isConfigEnable);
     }
 
-    public void disable() {
+    public void terminate() {
         reloadWithChildren(this.getClass(), module -> false);
     }
 

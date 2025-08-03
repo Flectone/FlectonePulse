@@ -115,7 +115,7 @@ public class FlectonePulseAPI  {
         taskScheduler.setDisabled(true);
 
         // disable all modules
-        injector.getInstance(net.flectone.pulse.module.Module.class).disable();
+        injector.getInstance(net.flectone.pulse.module.Module.class).terminate();
 
         // unregister all listeners
         injector.getInstance(ListenerRegistry.class).unregisterAll();
