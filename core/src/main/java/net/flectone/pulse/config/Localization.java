@@ -90,7 +90,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.coin.formatDraw = "<fcolor:1>✎ <display_name> неудачно подбросил монетку ребром :)";
 
         command.deletemessage.nullMessage = "<color:#ff7171><b>⁉</b> Сообщение не существует";
-        command.deletemessage.format = "<color:#98FB98>\uD83D\uDDD9 Сообщение успешно удалено";
+        command.deletemessage.format = "<color:#98FB98>☒ Сообщение успешно удалено";
 
         command.translateto.nullOrError = "<color:#ff7171><b>⁉</b> Ошибка, возможно указан неправильный язык";
         command.translateto.format = "<fcolor:1>📖 Перевод на [<language>] → <fcolor:2><style><message>";
@@ -1048,7 +1048,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Deletemessage implements SubCommandConfig, Localizable {
             private String nullMessage = "<color:#ff7171><b>⁉</b> This message does not exist";
-            private String format = "<color:#98FB98>\uD83D\uDDD9 Successfully deleted message";
+            private String format = "<color:#98FB98>☒ Successfully deleted message";
         }
 
         @Getter
