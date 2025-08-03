@@ -53,7 +53,7 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         String receiverName = tellModule.getSenderReceiverMap().get(fPlayer.getUuid());
         if (receiverName == null) {

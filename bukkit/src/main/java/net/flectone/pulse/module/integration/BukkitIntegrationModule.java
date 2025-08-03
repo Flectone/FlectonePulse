@@ -101,7 +101,7 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
     @Override
     public String checkMention(FEntity fSender, String message) {
-        if (checkModulePredicates(fSender)) return message;
+        if (isModuleDisabledFor(fSender)) return message;
 
         if (getChildren().contains(InteractiveChatModule.class)) {
             return injector.getInstance(InteractiveChatModule.class).checkMention(fSender, message);
@@ -214,7 +214,7 @@ public class BukkitIntegrationModule extends IntegrationModule {
     }
 
     public boolean sendMessageWithInteractiveChat(FEntity fReceiver, Component message) {
-        if (checkModulePredicates(fReceiver)) return false;
+        if (isModuleDisabledFor(fReceiver)) return false;
 
         if (getChildren().contains(InteractiveChatModule.class)) {
             return injector.getInstance(InteractiveChatModule.class).sendMessage(fReceiver, message);

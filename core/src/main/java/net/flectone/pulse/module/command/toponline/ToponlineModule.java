@@ -84,7 +84,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         String promptNumber = getPrompt(0);
         Optional<Integer> optionalNumber = commandContext.optional(promptNumber);

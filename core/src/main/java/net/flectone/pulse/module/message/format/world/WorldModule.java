@@ -65,7 +65,7 @@ public class WorldModule extends AbstractModule {
 
     @Async
     public void update(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         String newWorldPrefix = message.getMode() == Mode.TYPE
                 ? message.getValues().get(platformPlayerAdapter.getWorldEnvironment(fPlayer))

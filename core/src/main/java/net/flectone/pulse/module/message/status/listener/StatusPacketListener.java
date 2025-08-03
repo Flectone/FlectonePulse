@@ -28,7 +28,7 @@ public class StatusPacketListener implements PacketListener {
         if (event.isCancelled()) return;
         if (event.getPacketType() != PacketType.Status.Server.RESPONSE) return;
         if (maintenance.isTurnedOn()) return;
-        if (statusModule.checkModulePredicates(FPlayer.UNKNOWN)) return;
+        if (statusModule.isModuleDisabledFor(FPlayer.UNKNOWN)) return;
 
         statusModule.update(event);
     }

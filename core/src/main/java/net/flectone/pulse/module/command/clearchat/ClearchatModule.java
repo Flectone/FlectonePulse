@@ -58,7 +58,7 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         String promptPlayer = getPrompt(0);
         Optional<String> optionalPlayer = commandContext.optional(promptPlayer);

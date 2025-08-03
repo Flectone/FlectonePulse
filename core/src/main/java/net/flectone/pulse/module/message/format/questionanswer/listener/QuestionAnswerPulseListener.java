@@ -45,7 +45,7 @@ public class QuestionAnswerPulseListener implements PulseListener {
         if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
 
         FEntity sender = messageContext.getSender();
-        if (questionAnswerModule.checkModulePredicates(sender)) return;
+        if (questionAnswerModule.isModuleDisabledFor(sender)) return;
 
         String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
         messageContext.setMessage(processedMessage);

@@ -50,7 +50,7 @@ public class ClearModule extends AbstractModuleLocalization<Localization.Message
 
     @Async
     public void send(FPlayer fPlayer, MinecraftTranslationKey key, String count, String value) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         FPlayer fTarget = fPlayer;
         boolean isSingle = key == MinecraftTranslationKey.COMMANDS_CLEAR_SUCCESS_SINGLE

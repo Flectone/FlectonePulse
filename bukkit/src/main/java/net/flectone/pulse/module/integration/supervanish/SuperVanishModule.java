@@ -50,7 +50,7 @@ public class SuperVanishModule extends AbstractModule {
     }
 
     public boolean isVanished(FEntity sender) {
-        if (checkModulePredicates(sender)) return false;
+        if (isModuleDisabledFor(sender)) return false;
 
         Player player = Bukkit.getPlayer(sender.getUuid());
         if (player == null) return false;

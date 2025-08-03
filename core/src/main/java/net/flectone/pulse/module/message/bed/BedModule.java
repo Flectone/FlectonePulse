@@ -50,7 +50,7 @@ public class BedModule extends AbstractModuleLocalization<Localization.Message.B
 
     @Async
     public void send(FPlayer fPlayer, MinecraftTranslationKey minecraftTranslationKey) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         builder(fPlayer)
                 .destination(message.getDestination())

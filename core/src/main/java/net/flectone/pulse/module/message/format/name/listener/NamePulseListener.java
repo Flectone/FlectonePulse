@@ -56,7 +56,7 @@ public class NamePulseListener implements PulseListener {
         MessageContext messageContext = event.getContext();
         FEntity sender = messageContext.getSender();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission.getAll())) return;
-        if (nameModule.checkModulePredicates(sender)) return;
+        if (nameModule.isModuleDisabledFor(sender)) return;
 
         FPlayer receiver = messageContext.getReceiver();
 

@@ -54,7 +54,7 @@ public class BubbleModule extends AbstractModule {
 
     @Async
     public void add(@NotNull FPlayer fPlayer, @NotNull String inputString) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         bubbleService.addMessage(fPlayer, inputString);
     }

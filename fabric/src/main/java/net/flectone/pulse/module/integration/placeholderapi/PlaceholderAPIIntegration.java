@@ -136,7 +136,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.getContext();
         FEntity sender = messageContext.getSender();
-        if (placeholderAPIModuleProvider.get().checkModulePredicates(sender)) return;
+        if (placeholderAPIModuleProvider.get().isModuleDisabledFor(sender)) return;
 
         FEntity receiver = messageContext.getReceiver();
         boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);

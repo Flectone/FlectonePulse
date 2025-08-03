@@ -93,7 +93,7 @@ public class IconModule extends AbstractModule {
 
     @Nullable
     public String next(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return null;
+        if (isModuleDisabledFor(fPlayer)) return null;
         if (iconList.isEmpty()) return null;
 
         if (message.isRandom()) {

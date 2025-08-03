@@ -60,7 +60,7 @@ public abstract class AbstractModule {
         predicates.add(predicate);
     }
 
-    public boolean checkModulePredicates(FEntity entity) {
+    public boolean isModuleDisabledFor(FEntity entity) {
         for (Predicate<FEntity> predicate : predicates) {
             if (predicate.test(entity)) {
                 return true;

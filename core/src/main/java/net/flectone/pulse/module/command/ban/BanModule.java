@@ -68,7 +68,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     public void onEnable() {
         // if FPlayer.UNKNOWN (all-permissions) fails check (method will return true),
         // a moderation plugin is intercepting this command
-        if (checkModulePredicates(FPlayer.UNKNOWN)) return;
+        if (isModuleDisabledFor(FPlayer.UNKNOWN)) return;
 
         registerModulePermission(permission);
 
@@ -91,7 +91,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkCooldown(fPlayer)) return;
         if (checkMute(fPlayer)) return;
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         String target = getArgument(commandContext, 0);
         String promptReason = getPrompt(1);
@@ -114,7 +114,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     }
 
     public void ban(FPlayer fPlayer, String target, long time, String reason) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
@@ -156,7 +156,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     }
 
     public void kick(FEntity fModerator, FPlayer fTarget, Moderation ban) {
-        if (checkModulePredicates(fModerator)) return;
+        if (isModuleDisabledFor(fModerator)) return;
         if (fModerator == null) return;
 
         Localization.Command.Ban localization = resolveLocalization(fTarget);

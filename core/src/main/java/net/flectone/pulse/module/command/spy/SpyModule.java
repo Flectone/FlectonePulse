@@ -52,7 +52,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkCooldown(fPlayer)) return;
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         if (fPlayer.isSetting(FPlayer.Setting.SPY)) {
             fPlayerService.deleteSetting(fPlayer, FPlayer.Setting.SPY);

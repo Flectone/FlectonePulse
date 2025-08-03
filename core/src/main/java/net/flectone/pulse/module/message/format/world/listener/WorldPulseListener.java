@@ -48,7 +48,7 @@ public class WorldPulseListener implements PulseListener {
         FEntity sender = messageContext.getSender();
 
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission.getAll())) return;
-        if (worldModule.checkModulePredicates(sender)) return;
+        if (worldModule.isModuleDisabledFor(sender)) return;
         if (!(sender instanceof FPlayer fPlayer)) return;
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.WORLD_PREFIX, (argumentQueue, context) -> {

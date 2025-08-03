@@ -67,7 +67,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         Predicate<FPlayer> filter = getFilterSee();
 

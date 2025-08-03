@@ -70,7 +70,7 @@ public class HeaderModule extends AbstractModuleListLocalization<Localization.Me
     }
 
     public void send(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         String format = getNextMessage(fPlayer, message.isRandom());
         if (format == null) return;

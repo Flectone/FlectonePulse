@@ -60,7 +60,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
     public void onEnable() {
         // if FPlayer.UNKNOWN (all-permissions) fails check (method will return true),
         // a moderation plugin is intercepting this command
-        if (checkModulePredicates(FPlayer.UNKNOWN)) return;
+        if (isModuleDisabledFor(FPlayer.UNKNOWN)) return;
 
         registerModulePermission(permission);
 
@@ -80,7 +80,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
         if (checkMute(fPlayer)) return;
 
@@ -136,7 +136,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
     }
 
     public void sendForTarget(FEntity fModerator, FPlayer fReceiver, Moderation mute) {
-        if (checkModulePredicates(fModerator)) return;
+        if (isModuleDisabledFor(fModerator)) return;
 
         builder(fReceiver)
                 .format(s -> moderationMessageFormatter.replacePlaceholders(s.getPerson(), fReceiver, mute))

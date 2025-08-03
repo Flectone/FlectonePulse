@@ -80,7 +80,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
         if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
         if (checkMute(fPlayer)) return;
@@ -92,7 +92,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
     }
 
     public void send(FPlayer fPlayer, String playerName, String message) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         if (fPlayer.getName().equalsIgnoreCase(playerName)) {
             builder(fPlayer)

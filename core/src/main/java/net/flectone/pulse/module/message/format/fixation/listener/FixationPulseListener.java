@@ -37,7 +37,7 @@ public class FixationPulseListener implements PulseListener {
     }
 
     private String replace(@Nullable FEntity sender, String string) {
-        if (fixationModule.checkModulePredicates(sender)) return string;
+        if (fixationModule.isModuleDisabledFor(sender)) return string;
         if (string.isBlank()) return string;
 
         if (message.isEndDot() && message.getNonDotSymbols().stream().noneMatch(string::endsWith)) {

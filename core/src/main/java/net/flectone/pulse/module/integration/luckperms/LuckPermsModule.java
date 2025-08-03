@@ -67,13 +67,13 @@ public class LuckPermsModule extends AbstractModule {
     }
 
     public String getPrefix(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return null;
+        if (isModuleDisabledFor(fPlayer)) return null;
 
         return luckPermsIntegration.getPrefix(fPlayer);
     }
 
     public String getSuffix(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return null;
+        if (isModuleDisabledFor(fPlayer)) return null;
 
         return luckPermsIntegration.getSuffix(fPlayer);
     }

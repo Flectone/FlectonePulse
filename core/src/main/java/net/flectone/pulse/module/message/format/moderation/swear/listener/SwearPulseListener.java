@@ -48,7 +48,7 @@ public class SwearPulseListener implements PulseListener {
         if (!messageContext.isFlag(MessageFlag.SWEAR)) return;
 
         FEntity sender = messageContext.getSender();
-        if (swearModule.checkModulePredicates(sender)) return;
+        if (swearModule.isModuleDisabledFor(sender)) return;
         if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
 
         String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());

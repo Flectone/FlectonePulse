@@ -59,7 +59,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
     public void onEnable() {
         // if FPlayer.UNKNOWN (all-permissions) fails check (method will return true),
         // a moderation plugin is intercepting this command
-        if (checkModulePredicates(FPlayer.UNKNOWN)) return;
+        if (isModuleDisabledFor(FPlayer.UNKNOWN)) return;
 
         registerModulePermission(permission);
 
@@ -80,7 +80,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         if (checkCooldown(fPlayer)) return;
         if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
         if (checkMute(fPlayer)) return;
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         String playerName = getArgument(commandContext, 0);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
@@ -119,7 +119,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
     }
 
     public void kick(FEntity fModerator, FPlayer fReceiver, Moderation kick) {
-        if (checkModulePredicates(fModerator)) return;
+        if (isModuleDisabledFor(fModerator)) return;
 
         String format = moderationMessageFormatter.replacePlaceholders(resolveLocalization(fReceiver).getPerson(), fReceiver, kick);
 

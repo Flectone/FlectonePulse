@@ -43,7 +43,7 @@ public class MOTDModule extends AbstractModuleListLocalization<Localization.Mess
 
 
     public JsonElement next(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return null;
+        if (isModuleDisabledFor(fPlayer)) return null;
 
         String nextMessage = getNextMessage(fPlayer, this.message.isRandom());
         if (nextMessage == null) return null;

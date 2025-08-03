@@ -94,7 +94,7 @@ public class DiscordModule extends AbstractModule {
     }
 
     public void sendMessage(FEntity sender, MessageType messageType, UnaryOperator<String> discordString) {
-        if (checkModulePredicates(sender)) return;
+        if (isModuleDisabledFor(sender)) return;
 
         injector.getInstance(DiscordIntegration.class).sendMessage(sender, messageType, discordString);
     }

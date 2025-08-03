@@ -54,7 +54,7 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
     }
 
     public void send(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         FImage fImage = new FImage(skinService.getAvatarUrl(fPlayer));
 

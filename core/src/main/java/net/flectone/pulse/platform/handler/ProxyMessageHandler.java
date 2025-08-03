@@ -206,7 +206,7 @@ public class ProxyMessageHandler {
 
     private void handleAnonCommand(DataInputStream input, FEntity fEntity) throws IOException {
         AnonModule module = injector.getInstance(AnonModule.class);
-        if (module.checkModulePredicates(fEntity)) return;
+        if (module.isModuleDisabledFor(fEntity)) return;
 
         String message = input.readUTF();
 
@@ -221,7 +221,7 @@ public class ProxyMessageHandler {
 
     private void handleMeCommand(DataInputStream input, FEntity fEntity) throws IOException {
         MeModule module = injector.getInstance(MeModule.class);
-        if (module.checkModulePredicates(fEntity)) return;
+        if (module.isModuleDisabledFor(fEntity)) return;
 
         String message = input.readUTF();
 
@@ -236,7 +236,7 @@ public class ProxyMessageHandler {
 
     private void handleBallCommand(DataInputStream input, FEntity fEntity) throws IOException {
         BallModule module = injector.getInstance(BallModule.class);
-        if (module.checkModulePredicates(fEntity)) return;
+        if (module.isModuleDisabledFor(fEntity)) return;
 
         int answer = input.readInt();
         String message = input.readUTF();
@@ -253,7 +253,7 @@ public class ProxyMessageHandler {
     private void handleBanCommand(DataInputStream input, FEntity fEntity) throws IOException {
         BanModule module = injector.getInstance(BanModule.class);
         FPlayer moderator = gson.fromJson(input.readUTF(), FPlayer.class);
-        if (module.checkModulePredicates(moderator)) return;
+        if (module.isModuleDisabledFor(moderator)) return;
 
         Moderation ban = gson.fromJson(input.readUTF(), Moderation.class);
         module.kick(moderator, (FPlayer) fEntity, ban);
@@ -268,7 +268,7 @@ public class ProxyMessageHandler {
 
     private void handleBroadcastCommand(DataInputStream input, FEntity fEntity) throws IOException {
         BroadcastModule broadcastModule = injector.getInstance(BroadcastModule.class);
-        if (broadcastModule.checkModulePredicates(fEntity)) return;
+        if (broadcastModule.isModuleDisabledFor(fEntity)) return;
 
         String message = input.readUTF();
 
@@ -291,7 +291,7 @@ public class ProxyMessageHandler {
 
     private void handleCoinCommand(DataInputStream input, FEntity fEntity) throws IOException {
         CoinModule coinModule = injector.getInstance(CoinModule.class);
-        if (coinModule.checkModulePredicates(fEntity)) return;
+        if (coinModule.isModuleDisabledFor(fEntity)) return;
 
         int percent = input.readInt();
 
@@ -313,7 +313,7 @@ public class ProxyMessageHandler {
 
     private void handleDiceCommand(DataInputStream input, FEntity fEntity) throws IOException {
         DiceModule diceModule = injector.getInstance(DiceModule.class);
-        if (diceModule.checkModulePredicates(fEntity)) return;
+        if (diceModule.isModuleDisabledFor(fEntity)) return;
 
         List<Integer> cubes = gson.fromJson(input.readUTF(), new TypeToken<List<Integer>>() {}.getType());
 
@@ -327,7 +327,7 @@ public class ProxyMessageHandler {
 
     private void handleDoCommand(DataInputStream input, FEntity fEntity) throws IOException {
         DoModule doModule = injector.getInstance(DoModule.class);
-        if (doModule.checkModulePredicates(fEntity)) return;
+        if (doModule.isModuleDisabledFor(fEntity)) return;
 
         String message = input.readUTF();
 
@@ -342,7 +342,7 @@ public class ProxyMessageHandler {
 
     private void handleHelperCommand(DataInputStream input, FEntity fEntity) throws IOException {
         HelperModule helperModule = injector.getInstance(HelperModule.class);
-        if (helperModule.checkModulePredicates(fEntity)) return;
+        if (helperModule.isModuleDisabledFor(fEntity)) return;
 
         String message = input.readUTF();
 
@@ -359,7 +359,7 @@ public class ProxyMessageHandler {
         MuteModule muteModule = injector.getInstance(MuteModule.class);
 
         FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
-        if (muteModule.checkModulePredicates(fModerator)) return;
+        if (muteModule.isModuleDisabledFor(fModerator)) return;
 
         Moderation mute = gson.fromJson(input.readUTF(), Moderation.class);
 
@@ -377,7 +377,7 @@ public class ProxyMessageHandler {
         UnbanModule unbanModule = injector.getInstance(UnbanModule.class);
 
         FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
-        if (unbanModule.checkModulePredicates(fPlayer)) return;
+        if (unbanModule.isModuleDisabledFor(fPlayer)) return;
 
         unbanModule.builder(fEntity)
                 .destination(fileResolver.getCommand().getUnban().getDestination())
@@ -392,7 +392,7 @@ public class ProxyMessageHandler {
         UnmuteModule unmuteModule = injector.getInstance(UnmuteModule.class);
 
         FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
-        if (unmuteModule.checkModulePredicates(fPlayer)) return;
+        if (unmuteModule.isModuleDisabledFor(fPlayer)) return;
 
         unmuteModule.builder(fEntity)
                 .destination(fileResolver.getCommand().getUnmute().getDestination())
@@ -407,7 +407,7 @@ public class ProxyMessageHandler {
         UnwarnModule unwarnModule = injector.getInstance(UnwarnModule.class);
 
         FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
-        if (unwarnModule.checkModulePredicates(fPlayer)) return;
+        if (unwarnModule.isModuleDisabledFor(fPlayer)) return;
 
         unwarnModule.builder(fEntity)
                 .destination(fileResolver.getCommand().getUnwarn().getDestination())
@@ -424,7 +424,7 @@ public class ProxyMessageHandler {
 
     private void handlePollCreate(DataInputStream input, FEntity fEntity) throws IOException {
         PollModule pollModule = injector.getInstance(PollModule.class);
-        if (pollModule.checkModulePredicates(fEntity)) return;
+        if (pollModule.isModuleDisabledFor(fEntity)) return;
 
         Poll poll = gson.fromJson(input.readUTF(), Poll.class);
         pollModule.saveAndUpdateLast(poll);
@@ -448,7 +448,7 @@ public class ProxyMessageHandler {
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getCommand().getSpy().getDestination())
                 .filter(fReceiver -> !fEntity.equals(fReceiver)
-                        && !spyModule.checkModulePredicates(fReceiver)
+                        && !spyModule.isModuleDisabledFor(fReceiver)
                         && fReceiver.isSetting(FPlayer.Setting.SPY)
                         && fReceiver.isOnline()
                 )
@@ -459,7 +459,7 @@ public class ProxyMessageHandler {
 
     private void handleStreamCommand(DataInputStream input, FEntity fEntity) throws IOException {
         StreamModule streamModule = injector.getInstance(StreamModule.class);
-        if (streamModule.checkModulePredicates(fEntity)) return;
+        if (streamModule.isModuleDisabledFor(fEntity)) return;
 
         String message = input.readUTF();
         streamModule.builder(fEntity)
@@ -471,7 +471,7 @@ public class ProxyMessageHandler {
 
     private void handleTellCommand(DataInputStream input, FEntity fEntity) throws IOException {
         TellModule tellModule = injector.getInstance(TellModule.class);
-        if (tellModule.checkModulePredicates(fEntity)) return;
+        if (tellModule.isModuleDisabledFor(fEntity)) return;
 
         UUID receiverUUID = UUID.fromString(input.readUTF());
         String message = input.readUTF();
@@ -487,7 +487,7 @@ public class ProxyMessageHandler {
 
     private void handleTranslateToCommand(DataInputStream input, FEntity fEntity) throws IOException {
         TranslatetoModule translatetoModule = injector.getInstance(TranslatetoModule.class);
-        if (translatetoModule.checkModulePredicates(fEntity)) return;
+        if (translatetoModule.isModuleDisabledFor(fEntity)) return;
 
         String targetLang = input.readUTF();
         String message = input.readUTF();
@@ -503,7 +503,7 @@ public class ProxyMessageHandler {
 
     private void handleTryCommand(DataInputStream input, FEntity fEntity) throws IOException {
         TryModule tryModule = injector.getInstance(TryModule.class);
-        if (tryModule.checkModulePredicates(fEntity)) return;
+        if (tryModule.isModuleDisabledFor(fEntity)) return;
 
         int value = input.readInt();
         String message = input.readUTF();
@@ -522,7 +522,7 @@ public class ProxyMessageHandler {
         WarnModule warnModule = injector.getInstance(WarnModule.class);
 
         FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
-        if (warnModule.checkModulePredicates(fModerator)) return;
+        if (warnModule.isModuleDisabledFor(fModerator)) return;
 
         Moderation warn = gson.fromJson(input.readUTF(), Moderation.class);
 
@@ -540,7 +540,7 @@ public class ProxyMessageHandler {
         KickModule kickModule = injector.getInstance(KickModule.class);
 
         FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
-        if (kickModule.checkModulePredicates(fModerator)) return;
+        if (kickModule.isModuleDisabledFor(fModerator)) return;
 
         Moderation kick = gson.fromJson(input.readUTF(), Moderation.class);
 
@@ -666,7 +666,7 @@ public class ProxyMessageHandler {
 
     private void handleAdvancement(DataInputStream input, FEntity fEntity) throws IOException {
         AdvancementModule advancementModule = injector.getInstance(AdvancementModule.class);
-        if (advancementModule.checkModulePredicates(fEntity)) return;
+        if (advancementModule.isModuleDisabledFor(fEntity)) return;
 
         ChatAdvancement chatAdvancement = gson.fromJson(input.readUTF(), ChatAdvancement.class);
 
@@ -682,7 +682,7 @@ public class ProxyMessageHandler {
 
     private void handleDeath(DataInputStream input, FEntity fEntity) throws IOException {
         DeathModule deathModule = injector.getInstance(DeathModule.class);
-        if (deathModule.checkModulePredicates(fEntity)) return;
+        if (deathModule.isModuleDisabledFor(fEntity)) return;
 
         Death death = gson.fromJson(input.readUTF(), Death.class);
 
@@ -698,7 +698,7 @@ public class ProxyMessageHandler {
 
     private void handleJoin(DataInputStream input, FEntity fEntity) throws IOException {
         JoinModule joinModule = injector.getInstance(JoinModule.class);
-        if (joinModule.checkModulePredicates(fEntity)) return;
+        if (joinModule.isModuleDisabledFor(fEntity)) return;
 
         boolean hasPlayedBefore = input.readBoolean();
 
@@ -716,7 +716,7 @@ public class ProxyMessageHandler {
 
     private void handleQuit(DataInputStream input, FEntity fEntity) throws IOException {
         QuitModule quitModule = injector.getInstance(QuitModule.class);
-        if (quitModule.checkModulePredicates(fEntity)) return;
+        if (quitModule.isModuleDisabledFor(fEntity)) return;
 
         quitModule.builder(fEntity)
                 .tag(MessageType.QUIT)
@@ -730,7 +730,7 @@ public class ProxyMessageHandler {
 
     private void handleAfk(DataInputStream input, FEntity fEntity) throws IOException {
         AfkModule afkModule = injector.getInstance(AfkModule.class);
-        if (afkModule.checkModulePredicates(fEntity)) return;
+        if (afkModule.isModuleDisabledFor(fEntity)) return;
 
         boolean isAfk = input.readBoolean();
 

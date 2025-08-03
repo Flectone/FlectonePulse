@@ -50,7 +50,7 @@ public class EnchantModule extends AbstractModuleLocalization<Localization.Messa
 
     @Async
     public void send(FPlayer fPlayer, MinecraftTranslationKey key, String enchant, String level, String value) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         FPlayer fTarget = fPlayer;
 

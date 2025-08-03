@@ -95,7 +95,7 @@ public class StatusModule extends AbstractModule {
     public void update(PacketSendEvent event) {
         InetAddress inetAddress = event.getUser().getAddress().getAddress();
         FPlayer fPlayer = fPlayerService.getFPlayer(inetAddress);
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         fPlayerService.loadSettings(fPlayer);
         fPlayerService.loadColors(fPlayer);

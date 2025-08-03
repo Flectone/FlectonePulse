@@ -79,7 +79,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
         if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
         if (checkMute(fPlayer)) return;
@@ -150,7 +150,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     }
 
     public void setStreamPrefix(FPlayer fPlayer, boolean isStart) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
         if (fPlayer.isUnknown()) return;
 
         if (isStart) {

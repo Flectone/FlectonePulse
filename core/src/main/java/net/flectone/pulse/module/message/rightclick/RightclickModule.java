@@ -60,7 +60,7 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
     @Async
     public void send(UUID uuid, int targetId) {
         FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         UUID targetUUID = platformPlayerAdapter.getPlayerByEntityId(targetId);
         if (targetUUID == null) return;

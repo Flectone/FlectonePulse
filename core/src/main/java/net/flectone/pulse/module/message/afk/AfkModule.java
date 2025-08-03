@@ -85,7 +85,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
             return;
         }
 
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
         if (message.getIgnore().contains(action)) return;
 
         playersCoordinates.put(fPlayer.getUuid(), Pair.of(0, new PlatformPlayerAdapter.Coordinates(0, -1000, 0)));
@@ -106,7 +106,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
             return;
         }
 
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         PlatformPlayerAdapter.Coordinates coordinates = platformPlayerAdapter.getCoordinates(fPlayer);
         if (coordinates == null) return;
@@ -134,14 +134,14 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
     }
 
     public void setAfk(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.AFK_SUFFIX, resolveLocalization().getSuffix());
         send(fPlayer);
     }
 
     private void send(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         Range range = message.getRange();
         boolean isAfk = !fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX);

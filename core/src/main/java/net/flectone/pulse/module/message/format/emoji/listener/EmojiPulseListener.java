@@ -40,7 +40,7 @@ public class EmojiPulseListener implements PulseListener {
         if (!messageContext.isFlag(MessageFlag.EMOJI)) return;
 
         FEntity sender = messageContext.getSender();
-        if (emojiModule.checkModulePredicates(sender)) return;
+        if (emojiModule.isModuleDisabledFor(sender)) return;
 
         String processedMessage = replace(messageContext.getMessage());
         messageContext.setMessage(processedMessage);

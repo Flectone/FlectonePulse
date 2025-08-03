@@ -173,7 +173,7 @@ public abstract class IntegrationModule extends AbstractModule {
     }
 
     public String deeplTranslate(FPlayer sender, String source, String target, String text) {
-        if (checkModulePredicates(sender)) return text;
+        if (isModuleDisabledFor(sender)) return text;
         if (getChildren().contains(DeeplModule.class)) {
             return injector.getInstance(DeeplModule.class).translate(sender, source, target, text);
         }
@@ -182,7 +182,7 @@ public abstract class IntegrationModule extends AbstractModule {
     }
 
     public String yandexTranslate(FPlayer sender, String source, String target, String text) {
-        if (checkModulePredicates(sender)) return text;
+        if (isModuleDisabledFor(sender)) return text;
         if (getChildren().contains(YandexModule.class)) {
             return injector.getInstance(YandexModule.class).translate(sender, source, target, text);
         }

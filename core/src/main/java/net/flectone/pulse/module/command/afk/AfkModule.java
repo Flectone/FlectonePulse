@@ -44,7 +44,7 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         if (fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX)) {
             afkMessageModule.remove("afk", fPlayer);

@@ -81,7 +81,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
     }
 
     public void send(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         fPlayerService.getFPlayers().stream()
                 .filter(FPlayer::isOnline)

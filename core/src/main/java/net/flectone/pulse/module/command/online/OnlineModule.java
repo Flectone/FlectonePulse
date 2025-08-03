@@ -93,7 +93,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         String type = getArgument(commandContext, 0);
         String target = getArgument(commandContext, 1);

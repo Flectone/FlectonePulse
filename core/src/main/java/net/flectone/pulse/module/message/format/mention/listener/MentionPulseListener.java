@@ -59,7 +59,7 @@ public class MentionPulseListener implements PulseListener {
         messageContext.setMessage(processedMessage);
 
         FEntity sender = messageContext.getSender();
-        if (mentionModule.checkModulePredicates(sender)) return;
+        if (mentionModule.isModuleDisabledFor(sender)) return;
 
         UUID processId = messageContext.getMessageUUID();
         FPlayer receiver = messageContext.getReceiver();

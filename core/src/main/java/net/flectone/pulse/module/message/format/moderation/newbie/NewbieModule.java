@@ -59,7 +59,7 @@ public class NewbieModule extends AbstractModuleLocalization<Localization.Messag
     }
 
     public boolean isNewBie(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return false;
+        if (isModuleDisabledFor(fPlayer)) return false;
         if (permissionChecker.check(fPlayer, permission.getBypass())) return false;
 
         long timeToCheck = switch (message.getMode()) {

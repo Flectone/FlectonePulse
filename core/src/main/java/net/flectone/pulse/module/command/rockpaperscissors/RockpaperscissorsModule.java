@@ -77,7 +77,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
         if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
         if (checkMute(fPlayer)) return;
@@ -189,7 +189,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     }
 
     public void sendFinalMessage(UUID id, FPlayer fPlayer, String move) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         RockPaperScissors rockPaperScissors = gameMap.get(id);
         if (rockPaperScissors == null) return;
@@ -235,7 +235,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     }
 
     public void move(UUID id, FEntity fPlayer, String move) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         RockPaperScissors rockPaperScissors = gameMap.get(id);
         if (rockPaperScissors == null) return;
@@ -258,7 +258,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     }
 
     public void create(UUID id, FEntity fPlayer, UUID receiver) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         RockPaperScissors rockPaperScissors = new RockPaperScissors(id, fPlayer.getUuid(), receiver);
         gameMap.put(id, rockPaperScissors);

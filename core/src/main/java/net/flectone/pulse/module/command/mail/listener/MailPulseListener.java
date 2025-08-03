@@ -28,7 +28,7 @@ public class MailPulseListener implements PulseListener {
     @Pulse
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
         FPlayer fReceiver = event.getPlayer();
-        if (mailModule.checkModulePredicates(fReceiver)) return;
+        if (mailModule.isModuleDisabledFor(fReceiver)) return;
 
         List<Mail> mails = fPlayerService.getReceiverMails(fReceiver);
         if (mails.isEmpty()) return;

@@ -74,7 +74,7 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
         FPlayer fTarget = fPlayerService.getFPlayer(chatAdvancement.owner());
         if (fTarget.isUnknown()) return;
 
-        if (checkModulePredicates(fTarget)) return;
+        if (isModuleDisabledFor(fTarget)) return;
         if (!fTarget.equals(fReceiver)) return;
 
         builder(fTarget)
@@ -94,7 +94,7 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
     @Async
     public void send(boolean revoke, FPlayer fPlayer, CommandAdvancement commandAdvancement) {
         if (commandAdvancement.isIncorrect()) return;
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         FPlayer fTarget = fPlayerService.getFPlayer(commandAdvancement.owner());
         if (fTarget.isUnknown()) return;

@@ -55,7 +55,7 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
     }
 
     public void send(FPlayer fPlayer, String name, Message.Auto.Type type, Sound sound) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
         if (!fPlayer.isSetting(FPlayer.Setting.AUTO)) return;
 
         List<String> messages = resolveLocalization(fPlayer).getTypes().get(name);

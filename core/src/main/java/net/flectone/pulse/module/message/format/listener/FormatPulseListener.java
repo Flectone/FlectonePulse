@@ -69,7 +69,7 @@ public class FormatPulseListener implements PulseListener {
         if (!messageContext.isFlag(MessageFlag.FORMATTING)) return;
 
         FEntity sender = messageContext.getSender();
-        if (formatModule.checkModulePredicates(sender)) return;
+        if (formatModule.isModuleDisabledFor(sender)) return;
 
         formatModule.getTagResolverMap()
                 .entrySet()
@@ -211,7 +211,7 @@ public class FormatPulseListener implements PulseListener {
     }
 
     private String replaceAll(FEntity sender, FEntity fReceiver, String message) {
-        if (formatModule.checkModulePredicates(sender)) return message;
+        if (formatModule.isModuleDisabledFor(sender)) return message;
 
         if (isCorrectTag(AdventureTag.IMAGE, sender)) {
             Localization.Message.Format localization = formatModule.resolveLocalization(fReceiver);
@@ -319,7 +319,7 @@ public class FormatPulseListener implements PulseListener {
     }
 
     private String replaceAll(FEntity sender, String message, Permission.PermissionEntry permission, String trigger, String format) {
-        if (formatModule.checkModulePredicates(sender)) return message;
+        if (formatModule.isModuleDisabledFor(sender)) return message;
         if (!permissionChecker.check(sender, permission)) return message;
 
         return message.replaceAll(trigger, format);

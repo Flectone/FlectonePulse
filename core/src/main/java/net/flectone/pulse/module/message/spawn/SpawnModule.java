@@ -52,7 +52,7 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
 
     @Async
     public void send(FPlayer fPlayer, MinecraftTranslationKey key) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         builder(fPlayer)
                 .destination(message.getDestination())
@@ -65,7 +65,7 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
 
     @Async
     public void send(FPlayer fPlayer, MinecraftTranslationKey key, String x, String y, String z, String angle, String world, String value) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         FPlayer fTarget = fPlayer;
 

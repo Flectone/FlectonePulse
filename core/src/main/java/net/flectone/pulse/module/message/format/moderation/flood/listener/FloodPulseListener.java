@@ -43,7 +43,7 @@ public class FloodPulseListener implements PulseListener {
     }
 
     private String replace(FEntity sender, String string) {
-        if (floodModule.checkModulePredicates(sender)) return string;
+        if (floodModule.isModuleDisabledFor(sender)) return string;
         if (permissionChecker.check(sender, permission.getBypass())) return string;
         if (string == null || string.isEmpty()) return string;
 

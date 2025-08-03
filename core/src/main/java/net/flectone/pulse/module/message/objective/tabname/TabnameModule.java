@@ -68,14 +68,14 @@ public class TabnameModule extends AbstractModule {
     }
 
     public void create(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         objectiveModule.createObjective(fPlayer, null, ScoreboardPosition.TABLIST);
         update(fPlayer);
     }
 
     public void update(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         fPlayerService.getPlatformFPlayers().forEach(fObjective -> {
             int score = platformPlayerAdapter.getObjectiveScore(fObjective.getUuid(), config.getMode());
@@ -84,7 +84,7 @@ public class TabnameModule extends AbstractModule {
     }
 
     public void remove(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         objectiveModule.removeObjective(fPlayer, ScoreboardPosition.TABLIST);
     }

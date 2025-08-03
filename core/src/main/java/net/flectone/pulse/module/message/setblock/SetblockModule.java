@@ -50,7 +50,7 @@ public class SetblockModule extends AbstractModuleLocalization<Localization.Mess
 
     @Async
     public void send(FPlayer fPlayer, @NotNull String x, @NotNull String y, @NotNull String z) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         builder(fPlayer)
                 .destination(message.getDestination())

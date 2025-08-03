@@ -41,7 +41,7 @@ public class SpoilerPulseListener implements PulseListener {
         if (!messageContext.isFlag(MessageFlag.SPOILER)) return;
 
         FEntity sender = messageContext.getSender();
-        if (spoilerModule.checkModulePredicates(sender)) return;
+        if (spoilerModule.isModuleDisabledFor(sender)) return;
 
         boolean userMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
         FPlayer receiver = messageContext.getReceiver();

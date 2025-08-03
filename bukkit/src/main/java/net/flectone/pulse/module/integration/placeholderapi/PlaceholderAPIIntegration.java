@@ -134,7 +134,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.getContext();
         FEntity sender = messageContext.getSender();
-        if (placeholderAPIModule.checkModulePredicates(sender)) return;
+        if (placeholderAPIModule.isModuleDisabledFor(sender)) return;
 
         FEntity fReceiver = messageContext.getReceiver();
         boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);

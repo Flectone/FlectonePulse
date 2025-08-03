@@ -46,7 +46,7 @@ public class ColorPulseListener implements PulseListener {
         MessageContext messageContext = event.getContext();
         FEntity sender = messageContext.getSender();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission.getAll())) return;
-        if (colorModule.checkModulePredicates(sender)) return;
+        if (colorModule.isModuleDisabledFor(sender)) return;
 
         Map<String, String> playerColors = sender instanceof FPlayer fPlayer
                 ? fPlayer.getColors()

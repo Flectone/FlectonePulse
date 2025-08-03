@@ -45,7 +45,7 @@ public class ImagePulseListener implements PulseListener {
         if (!messageContext.isFlag(MessageFlag.IMAGE)) return;
 
         FEntity sender = messageContext.getSender();
-        if (imageModule.checkModulePredicates(sender)) return;
+        if (imageModule.isModuleDisabledFor(sender)) return;
 
         FPlayer receiver = messageContext.getReceiver();
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.IMAGE, (argumentQueue, context) -> {

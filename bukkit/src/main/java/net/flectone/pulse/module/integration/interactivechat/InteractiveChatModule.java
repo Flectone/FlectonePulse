@@ -48,13 +48,13 @@ public class InteractiveChatModule extends AbstractModule {
     }
 
     public String checkMention(FEntity fSender, String message) {
-        if (checkModulePredicates(fSender)) return message;
+        if (isModuleDisabledFor(fSender)) return message;
 
         return interactiveChatIntegration.checkMention(fSender, message);
     }
 
     public boolean sendMessage(FEntity fReceiver, Component message) {
-        if (checkModulePredicates(fReceiver)) return false;
+        if (isModuleDisabledFor(fReceiver)) return false;
 
         return interactiveChatIntegration.sendMessage(fReceiver, message);
     }

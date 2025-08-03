@@ -41,7 +41,7 @@ public class VanishModule extends AbstractModule {
     }
 
     public boolean isVanished(FEntity sender) {
-        if (checkModulePredicates(sender)) return false;
+        if (isModuleDisabledFor(sender)) return false;
 
         return vanishIntegration.isVanished(sender);
     }

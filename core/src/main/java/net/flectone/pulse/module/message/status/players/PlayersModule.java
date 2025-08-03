@@ -51,7 +51,7 @@ public class PlayersModule extends AbstractModuleLocalization<Localization.Messa
         if (!isEnable()) return true;
         if (!message.isControl()) return true;
 
-        if (checkModulePredicates(fPlayer)) return true;
+        if (isModuleDisabledFor(fPlayer)) return true;
         if (permissionChecker.check(fPlayer, permission.getBypass())) return true;
 
         int online = platformServerAdapter.getOnlinePlayerCount();
@@ -64,7 +64,7 @@ public class PlayersModule extends AbstractModuleLocalization<Localization.Messa
     }
 
     public List<Localization.Message.Status.Players.Sample> getSamples(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return null;
+        if (isModuleDisabledFor(fPlayer)) return null;
 
         return resolveLocalization(fPlayer).getSamples();
     }

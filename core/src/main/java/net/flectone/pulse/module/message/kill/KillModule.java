@@ -51,7 +51,7 @@ public class KillModule extends AbstractModuleLocalization<Localization.Message.
 
     @Async
     public void send(FPlayer fPlayer, MinecraftTranslationKey key, String value, FEntity fEntity) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         FEntity fTarget = fPlayer;
 

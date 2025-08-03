@@ -133,7 +133,7 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
 
         FPlayer fTarget = fPlayerService.getFPlayer(death.getTargetName());
         if (fTarget.isUnknown()) return null;
-        if (checkModulePredicates(fTarget)) return null;
+        if (isModuleDisabledFor(fTarget)) return null;
 
         return fTarget;
     }

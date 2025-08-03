@@ -57,7 +57,7 @@ public class BrandModule extends AbstractModuleListLocalization<Localization.Mes
     }
 
     public void send(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         String format = getNextMessage(fPlayer, this.message.isRandom());
         if (format == null) return;

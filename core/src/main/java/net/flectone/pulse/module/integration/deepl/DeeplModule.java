@@ -64,7 +64,7 @@ public class DeeplModule extends AbstractModule {
     }
 
     public String translate(FPlayer sender, String source, String target, String text) {
-        if (checkModulePredicates(sender)) return text;
+        if (isModuleDisabledFor(sender)) return text;
 
         return injector.getInstance(DeeplIntegration.class).translate(source, target, text);
     }

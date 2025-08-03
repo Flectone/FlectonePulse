@@ -89,7 +89,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
         if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
         if (checkMute(fPlayer)) return;
@@ -141,7 +141,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
     // /tictactoe %d create
     public void sendCreateMessage(FPlayer fPlayer, FPlayer fReceiver, TicTacToe ticTacToe) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
         if (!integrationModule.isVanishedVisible(fPlayer, fReceiver)
                 || !integrationModule.isVanishedVisible(fReceiver, fPlayer)) return;
 
@@ -154,7 +154,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
     // /tictactoe %d <move>
     public void sendMoveMessage(FPlayer fPlayer, FPlayer fReceiver, TicTacToe ticTacToe, int typeTitle, String move) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
         if (!integrationModule.isVanishedVisible(fPlayer, fReceiver)
                 || !integrationModule.isVanishedVisible(fReceiver, fPlayer)) return;
         if (ticTacToe == null) return;

@@ -89,7 +89,7 @@ public class ScoreboardModule extends AbstractModule {
     }
 
     public void create(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         Team team = createTeam(fPlayer);
         sendPacket(team, WrapperPlayServerTeams.TeamMode.CREATE);
@@ -101,7 +101,7 @@ public class ScoreboardModule extends AbstractModule {
     }
 
     public void remove(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         Team team = uuidTeamMap.get(fPlayer.getUuid());
         if (team == null) return;

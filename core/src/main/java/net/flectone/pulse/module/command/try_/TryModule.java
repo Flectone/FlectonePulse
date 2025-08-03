@@ -62,7 +62,7 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         int min = command.getMin();
         int max = command.getMax();

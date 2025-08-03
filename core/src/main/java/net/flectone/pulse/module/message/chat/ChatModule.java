@@ -106,7 +106,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
     }
 
     public void send(FPlayer fPlayer, String eventMessage, Runnable cancelEvent, BiConsumer<String, Boolean> successEvent) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         if (checkMute(fPlayer)) {
             cancelEvent.run();
@@ -224,7 +224,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
     }
 
     public void send(FEntity fPlayer, String chatName, String string) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         var optionalChat = message.getTypes().entrySet().stream()
                 .filter(chat -> chat.getKey().equals(chatName))

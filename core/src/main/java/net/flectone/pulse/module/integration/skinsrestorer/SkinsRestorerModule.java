@@ -52,7 +52,7 @@ public class SkinsRestorerModule extends AbstractModule {
     }
 
     public String getTextureUrl(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return null;
+        if (isModuleDisabledFor(fPlayer)) return null;
 
         return skinsRestorerIntegration.getTextureUrl(fPlayer);
     }

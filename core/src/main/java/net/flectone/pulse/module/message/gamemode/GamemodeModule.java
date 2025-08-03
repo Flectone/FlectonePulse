@@ -53,7 +53,7 @@ public class GamemodeModule extends AbstractModuleLocalization<Localization.Mess
 
     @Async
     public void send(FPlayer fPlayer, String gamemodeKey, String target) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) return;

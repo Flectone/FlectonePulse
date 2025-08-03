@@ -50,7 +50,7 @@ public class SleepModule extends AbstractModuleLocalization<Localization.Message
 
     @Async
     public void send(FPlayer fPlayer, MinecraftTranslationKey key, String sleepCount, String allCount) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         builder(fPlayer)
                 .destination(message.getDestination())

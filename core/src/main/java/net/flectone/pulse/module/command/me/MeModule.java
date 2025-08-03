@@ -50,7 +50,7 @@ public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         String message = getArgument(commandContext, 0);
 

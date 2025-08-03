@@ -48,7 +48,7 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
     }
 
     public void send(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         builder(fPlayer)
                 .tag(MessageType.QUIT)

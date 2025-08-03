@@ -59,7 +59,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
     public void onEnable() {
         // if FPlayer.UNKNOWN (all-permissions) fails check (method will return true),
         // a moderation plugin is intercepting this command
-        if (checkModulePredicates(FPlayer.UNKNOWN)) return;
+        if (isModuleDisabledFor(FPlayer.UNKNOWN)) return;
 
         registerModulePermission(permission);
 
@@ -77,7 +77,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
         if (checkCooldown(fPlayer)) return;
 
         String target = getArgument(commandContext, 0);
@@ -90,7 +90,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
     }
 
     public void unban(FPlayer fPlayer, String target, int id) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {

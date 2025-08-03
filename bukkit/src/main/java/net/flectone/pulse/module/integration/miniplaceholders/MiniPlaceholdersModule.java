@@ -50,7 +50,7 @@ public class MiniPlaceholdersModule extends AbstractModule {
 
             MessageContext messageContext = messageFormattingEvent.getContext();
             FEntity sender = messageContext.getSender();
-            if (checkModulePredicates(sender)) return;
+            if (isModuleDisabledFor(sender)) return;
 
             FEntity receiver = messageContext.getReceiver();
             boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);

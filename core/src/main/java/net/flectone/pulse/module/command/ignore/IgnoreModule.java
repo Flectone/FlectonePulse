@@ -57,7 +57,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (checkCooldown(fPlayer)) return;
         if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         String targetName = getArgument(commandContext, 0);
 

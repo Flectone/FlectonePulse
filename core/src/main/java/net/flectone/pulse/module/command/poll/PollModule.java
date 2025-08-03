@@ -148,7 +148,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     }
 
     public void executeVote(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         int id = getArgument(commandContext, 4);
         int numberVote = getArgument(commandContext, 5);
@@ -224,7 +224,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     }
 
     public void vote(FEntity fPlayer, int id, int numberVote) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         Poll poll = pollMap.get(id);
         if (poll == null) {

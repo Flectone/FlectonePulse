@@ -35,7 +35,7 @@ public class VersionModule extends AbstractModuleLocalization<Localization.Messa
     }
 
     public String get(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return null;
+        if (isModuleDisabledFor(fPlayer)) return null;
 
         return resolveLocalization(fPlayer).getName();
     }

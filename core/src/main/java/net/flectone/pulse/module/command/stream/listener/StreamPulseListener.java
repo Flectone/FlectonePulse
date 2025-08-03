@@ -48,7 +48,7 @@ public class StreamPulseListener implements PulseListener {
 
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission.getAll())) return;
         if (!(sender instanceof FPlayer fPlayer)) return;
-        if (streamModule.checkModulePredicates(fPlayer)) return;
+        if (streamModule.isModuleDisabledFor(fPlayer)) return;
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.STREAM_PREFIX, (argumentQueue, context) -> {
             String streamPrefix = fPlayer.getSettingValue(FPlayer.Setting.STREAM_PREFIX);

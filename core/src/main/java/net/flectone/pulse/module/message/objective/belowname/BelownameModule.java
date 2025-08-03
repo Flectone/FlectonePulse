@@ -76,7 +76,7 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
     }
 
     public void create(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         Component displayName = messagePipeline.builder(fPlayer, resolveLocalization(fPlayer).getFormat())
                 .build();
@@ -86,7 +86,7 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
     }
 
     public void update(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         fPlayerService.getPlatformFPlayers().forEach(fObjective -> {
             int score = platformPlayerAdapter.getObjectiveScore(fObjective.getUuid(), config.getMode());
@@ -95,7 +95,7 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
     }
 
     public void remove(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         objectiveModule.removeObjective(fPlayer, ScoreboardPosition.BELOWNAME);
     }

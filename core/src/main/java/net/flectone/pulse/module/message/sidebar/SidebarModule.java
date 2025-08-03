@@ -111,7 +111,7 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
 
     @Async
     public void send(FPlayer fPlayer, WrapperPlayServerScoreboardObjective.ObjectiveMode objectiveMode) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         String format = getNextMessage(fPlayer, getMessage().isRandom());
         if (format == null) return;

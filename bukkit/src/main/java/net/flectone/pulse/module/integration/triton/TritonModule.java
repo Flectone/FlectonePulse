@@ -49,7 +49,7 @@ public class TritonModule extends AbstractModule {
 
     @Nullable
     public String getLocale(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return null;
+        if (isModuleDisabledFor(fPlayer)) return null;
 
         return tritonIntegration.getLocale(fPlayer);
     }

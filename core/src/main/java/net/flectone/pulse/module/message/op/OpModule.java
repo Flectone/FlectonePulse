@@ -50,7 +50,7 @@ public class OpModule extends AbstractModuleLocalization<Localization.Message.Op
 
     @Async
     public void send(FPlayer fPlayer, @NotNull String target) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) return;

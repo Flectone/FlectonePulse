@@ -39,7 +39,7 @@ public class TranslatePulseListener implements PulseListener {
         UUID key = translateModule.saveMessage(messageToTranslate);
 
         FEntity sender = messageContext.getSender();
-        if (translateModule.checkModulePredicates(sender)) return;
+        if (translateModule.isModuleDisabledFor(sender)) return;
 
         FPlayer receiver = messageContext.getReceiver();
 

@@ -43,7 +43,7 @@ public class DeletePulseListener implements PulseListener {
 
         FEntity sender = messageContext.getSender();
         FPlayer receiver = messageContext.getReceiver();
-        if (deleteModule.checkModulePredicates(receiver)) return;
+        if (deleteModule.isModuleDisabledFor(receiver)) return;
 
         String message = messageContext.getMessage();
         if (message == null || !message.contains("<delete>")) return;

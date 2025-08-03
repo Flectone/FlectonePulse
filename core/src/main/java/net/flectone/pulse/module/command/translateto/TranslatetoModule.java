@@ -81,7 +81,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         String promptLanguage = getPrompt(0);
         String mainLang = commandContext.get(promptLanguage + " main");

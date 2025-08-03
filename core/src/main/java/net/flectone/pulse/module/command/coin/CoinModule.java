@@ -50,7 +50,7 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
 
         int percent = randomUtil.nextInt(command.isDraw() ? 0 : 1, 101);
 

@@ -39,7 +39,7 @@ public class BookModule extends AbstractModule {
     }
 
     public String format(FPlayer fPlayer, String string) {
-        if (checkModulePredicates(fPlayer)) return null;
+        if (isModuleDisabledFor(fPlayer)) return null;
 
         try {
             Component deserialized = LegacyComponentSerializer.legacySection().deserialize(string);

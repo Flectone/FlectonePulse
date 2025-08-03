@@ -60,7 +60,7 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
 
     @Async
     public void send(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
         if (latestVersion == null) return;
 
         String currentVersion = fileResolver.getConfig().getVersion();

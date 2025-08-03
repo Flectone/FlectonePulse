@@ -86,7 +86,7 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
     }
 
     public boolean remove(FEntity sender, UUID messageUUID) {
-        if (checkModulePredicates(sender)) return false;
+        if (isModuleDisabledFor(sender)) return false;
         if (messageUUID == null) return false;
 
         List<Map.Entry<UUID, List<HistoryMessage>>> entryToDelete = playersHistory.entrySet().stream()

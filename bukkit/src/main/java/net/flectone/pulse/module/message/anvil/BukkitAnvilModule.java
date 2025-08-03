@@ -39,7 +39,7 @@ public class BukkitAnvilModule extends AnvilModule {
 
     @Override
     public boolean format(FPlayer fPlayer, Object itemMeta) {
-        if (checkModulePredicates(fPlayer)) return false;
+        if (isModuleDisabledFor(fPlayer)) return false;
         if (!(itemMeta instanceof ItemMeta bukkitItemMeta)) return false;
 
         String displayName = bukkitItemMeta.getDisplayName();

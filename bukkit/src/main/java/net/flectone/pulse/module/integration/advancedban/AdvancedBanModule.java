@@ -101,13 +101,13 @@ public class AdvancedBanModule extends AbstractModule {
     }
 
     public boolean isMuted(FEntity fEntity) {
-        if (checkModulePredicates(fEntity)) return false;
+        if (isModuleDisabledFor(fEntity)) return false;
 
         return advancedBanIntegration.isMuted(fEntity);
     }
 
     public ExternalModeration getMute(FEntity fEntity) {
-        if (checkModulePredicates(fEntity)) return null;
+        if (isModuleDisabledFor(fEntity)) return null;
 
         return advancedBanIntegration.getMute(fEntity);
     }

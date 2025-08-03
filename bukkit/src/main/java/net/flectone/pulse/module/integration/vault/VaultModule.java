@@ -50,13 +50,13 @@ public class VaultModule extends AbstractModule {
     }
 
     public String getPrefix(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return null;
+        if (isModuleDisabledFor(fPlayer)) return null;
 
         return vaultIntegration.getPrefix(fPlayer);
     }
 
     public String getSuffix(FPlayer fPlayer) {
-        if (checkModulePredicates(fPlayer)) return null;
+        if (isModuleDisabledFor(fPlayer)) return null;
 
         return vaultIntegration.getSuffix(fPlayer);
     }

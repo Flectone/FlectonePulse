@@ -48,7 +48,7 @@ public class AfkPulseListener implements PulseListener {
         FEntity sender = messageContext.getSender();
 
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission.getAll())) return;
-        if (afkModule.checkModulePredicates(sender)) return;
+        if (afkModule.isModuleDisabledFor(sender)) return;
         if (!(sender instanceof FPlayer fPlayer)) return;
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.AFK_SUFFIX, (argumentQueue, context) -> {
