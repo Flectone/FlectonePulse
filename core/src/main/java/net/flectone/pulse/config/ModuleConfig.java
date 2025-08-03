@@ -19,7 +19,7 @@ public interface ModuleConfig {
         SubCommandConfig getClearchat();
         SubCommandConfig getClearmail();
         SubCommandConfig getCoin();
-        SubCommandConfig getDelete();
+        SubCommandConfig getDeletemessage();
         SubCommandConfig getDice();
         SubCommandConfig getDo();
         SubCommandConfig getFlectonepulse();

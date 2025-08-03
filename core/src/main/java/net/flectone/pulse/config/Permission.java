@@ -75,8 +75,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Clearmail clearmail = new Clearmail();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/coin/")})
         private Coin coin = new Coin();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/delete/")})
-        private Delete delete = new Delete();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/deletemessage/")})
+        private Deletemessage deletemessage = new Deletemessage();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/dice/")})
         private Dice dice = new Dice();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/do/")})
@@ -286,11 +286,11 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         }
 
         @Getter
-        public static final class Delete implements SubCommandConfig, IPermission {
-            private String name = "flectonepulse.module.command.delete";
+        public static final class Deletemessage implements SubCommandConfig, IPermission {
+            private String name = "flectonepulse.module.command.deletemessage";
             private Type type = Type.OP;
-            private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.delete.cooldown.bypass", Type.OP);
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.delete.sound", Type.TRUE);
+            private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.deletemessage.cooldown.bypass", Type.OP);
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.deletemessage.sound", Type.TRUE);
         }
 
         @Getter

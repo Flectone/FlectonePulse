@@ -89,8 +89,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.coin.format = "<fcolor:1>✎ <display_name> подбросил монетку - <style><result>";
         command.coin.formatDraw = "<fcolor:1>✎ <display_name> неудачно подбросил монетку ребром :)";
 
-        command.delete.nullMessage = "<color:#ff7171><b>⁉</b> Сообщение не существует";
-        command.delete.format = "<color:#98FB98>\uD83D\uDDD9 Сообщение успешно удалено";
+        command.deletemessage.nullMessage = "<color:#ff7171><b>⁉</b> Сообщение не существует";
+        command.deletemessage.format = "<color:#98FB98>\uD83D\uDDD9 Сообщение успешно удалено";
 
         command.translateto.nullOrError = "<color:#ff7171><b>⁉</b> Ошибка, возможно указан неправильный язык";
         command.translateto.format = "<fcolor:1>📖 Перевод на [<language>] → <fcolor:2><style><message>";
@@ -746,8 +746,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Clearmail clearmail = new Clearmail();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/coin/")})
         private Coin coin = new Coin();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/delete/")})
-        private Delete delete = new Delete();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/deletemessage/")})
+        private Deletemessage deletemessage = new Deletemessage();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/dice/")})
         private Dice dice = new Dice();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/do/")})
@@ -1046,7 +1046,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         }
 
         @Getter
-        public static final class Delete implements SubCommandConfig, Localizable {
+        public static final class Deletemessage implements SubCommandConfig, Localizable {
             private String nullMessage = "<color:#ff7171><b>⁉</b> This message does not exist";
             private String format = "<color:#98FB98>\uD83D\uDDD9 Successfully deleted message";
         }
@@ -1994,7 +1994,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
                 @Getter
                 public static final class Delete implements SubModerationFormatMessageConfig, Localizable {
-                    private String placeholder = "<color:#ff7171><hover:show_text:\"<color:#ff7171>Click to delete message\"><click:run_command:\"/delete <uuid>\">[x] ";
+                    private String placeholder = "<color:#ff7171><hover:show_text:\"<color:#ff7171>Click to delete message\"><click:run_command:\"/deletemessage <uuid>\">[x] ";
                     private String format = "<fcolor:3><i>Message deleted</i>";
                 }
 

@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.command.delete;
+package net.flectone.pulse.module.command.deletemessage;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.DisableSource;
@@ -17,21 +18,21 @@ import org.incendo.cloud.parser.standard.UUIDParser;
 import java.util.UUID;
 
 @Singleton
-public class DeleteModule extends AbstractModuleCommand<Localization.Command.Delete> {
+public class DeletemessageModule extends AbstractModuleCommand<Localization.Command.Deletemessage> {
 
-    private final Command.Delete command;
-    private final Permission.Command.Delete permission;
-    private final net.flectone.pulse.module.message.format.moderation.delete.DeleteModule deleteModule;
+    private final Command.Deletemessage command;
+    private final Permission.Command.Deletemessage permission;
+    private final DeleteModule deleteModule;
     private final ProxySender proxySender;
 
     @Inject
-    public DeleteModule(FileResolver fileResolver,
-                        net.flectone.pulse.module.message.format.moderation.delete.DeleteModule deleteModule,
-                        ProxySender proxySender) {
-        super(localization -> localization.getCommand().getDelete(), Command::getDelete);
+    public DeletemessageModule(FileResolver fileResolver,
+                               DeleteModule deleteModule,
+                               ProxySender proxySender) {
+        super(localization -> localization.getCommand().getDeletemessage(), Command::getDeletemessage);
 
-        this.command = fileResolver.getCommand().getDelete();
-        this.permission = fileResolver.getPermission().getCommand().getDelete();
+        this.command = fileResolver.getCommand().getDeletemessage();
+        this.permission = fileResolver.getPermission().getCommand().getDeletemessage();
         this.deleteModule = deleteModule;
         this.proxySender = proxySender;
     }
@@ -61,7 +62,7 @@ public class DeleteModule extends AbstractModuleCommand<Localization.Command.Del
         UUID uuid = getArgument(commandContext, 0);
         if (!deleteModule.remove(fPlayer, uuid)) {
             builder(fPlayer)
-                    .format(Localization.Command.Delete::getNullMessage)
+                    .format(Localization.Command.Deletemessage::getNullMessage)
                     .sendBuilt();
             return;
         }
@@ -73,7 +74,7 @@ public class DeleteModule extends AbstractModuleCommand<Localization.Command.Del
         builder(fPlayer)
                 .destination(command.getDestination())
                 .tag(MessageType.COMMAND_BALL)
-                .format(Localization.Command.Delete::getFormat)
+                .format(Localization.Command.Deletemessage::getFormat)
                 .proxy(output -> output.writeUTF(uuid.toString()))
                 .sound(getSound())
                 .sendBuilt();
