@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.module.message.enchant.model.Enchant;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
@@ -49,7 +50,7 @@ public class EnchantModule extends AbstractModuleLocalization<Localization.Messa
     }
 
     @Async
-    public void send(FPlayer fPlayer, MinecraftTranslationKey key, String enchant, String level, String value) {
+    public void send(FPlayer fPlayer, MinecraftTranslationKey key, Enchant enchant) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         FPlayer fTarget = fPlayer;
@@ -57,17 +58,17 @@ public class EnchantModule extends AbstractModuleLocalization<Localization.Messa
         boolean isSingle = key == MinecraftTranslationKey.COMMANDS_ENCHANT_SUCCESS_SINGLE
                 || key == MinecraftTranslationKey.COMMANDS_ENCHANT_SUCCESS;
 
-        if (isSingle && !value.isEmpty()) {
-            fTarget = fPlayerService.getFPlayer(value);
+        if (isSingle && !enchant.value().isEmpty()) {
+            fTarget = fPlayerService.getFPlayer(enchant.value());
             if (fTarget.isUnknown()) return;
         }
 
         builder(fTarget)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> (isSingle ? s.getSingle() : s.getMultiple().replace("<count>", value))
-                        .replace("<enchant>", enchant)
-                        .replace("<level>", level)
+                .format(s -> (isSingle ? s.getSingle() : s.getMultiple().replace("<count>", enchant.value()))
+                        .replace("<enchant>", enchant.name())
+                        .replace("<level>", enchant.level())
                 )
                 .sound(getSound())
                 .sendBuilt();
