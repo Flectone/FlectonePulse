@@ -6,13 +6,13 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.listener.MessagePulseListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.moderation.delete.listener.DeletePulseListener;
 import net.flectone.pulse.module.message.format.moderation.delete.model.HistoryMessage;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.sender.MessageSender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
@@ -33,14 +33,14 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
-    private final MessagePulseListener messagePulseListener;
+    private final MessageSender messageSender;
 
     @Inject
     public DeleteModule(FileResolver fileResolver,
                         ListenerRegistry listenerRegistry,
                         MessagePipeline messagePipeline,
                         FPlayerService fPlayerService,
-                        MessagePulseListener messagePulseListener) {
+                        MessageSender messageSender) {
         super(localization -> localization.getMessage().getFormat().getModeration().getDelete());
 
         this.message = fileResolver.getMessage().getFormat().getModeration().getDelete();
@@ -48,7 +48,7 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
         this.listenerRegistry = listenerRegistry;
         this.messagePipeline = messagePipeline;
         this.fPlayerService = fPlayerService;
-        this.messagePulseListener = messagePulseListener;
+        this.messageSender = messageSender;
     }
 
     @Override
@@ -131,12 +131,12 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
         // empty messages
         for (int i = 0; i < message.getHistoryLength(); i++) {
             if (i >= history.size()) {
-                messagePulseListener.sendMessage(fPlayer, Component.newline());
+                messageSender.sendMessage(fPlayer, Component.newline());
             }
         }
 
         history.forEach(historyMessage ->
-                messagePulseListener.sendMessage(fPlayer, historyMessage.component())
+                messageSender.sendMessage(fPlayer, historyMessage.component())
         );
     }
 

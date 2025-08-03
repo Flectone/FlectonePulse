@@ -5,12 +5,13 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.platform.formatter.TimeFormatter;
-import net.flectone.pulse.listener.MessagePulseListener;
+import net.flectone.pulse.execution.dispatcher.EventDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
 import net.flectone.pulse.model.util.Ignore;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
@@ -26,7 +27,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
     private final Command.Ignorelist command;
     private final Permission.Command.Ignorelist permission;
     private final FPlayerService fPlayerService;
-    private final MessagePulseListener messagePulseListener;
+    private final EventDispatcher eventDispatcher;
     private final MessagePipeline messagePipeline;
     private final CommandParserProvider commandParserProvider;
     private final TimeFormatter timeFormatter;
@@ -34,7 +35,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
     @Inject
     public IgnorelistModule(FileResolver fileResolver,
                             FPlayerService fPlayerService,
-                            MessagePulseListener messagePulseListener,
+                            EventDispatcher eventDispatcher,
                             MessagePipeline messagePipeline,
                             CommandParserProvider commandParserProvider,
                             TimeFormatter timeFormatter) {
@@ -43,7 +44,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         this.command = fileResolver.getCommand().getIgnorelist();
         this.permission = fileResolver.getPermission().getCommand().getIgnorelist();
         this.fPlayerService = fPlayerService;
-        this.messagePulseListener = messagePulseListener;
+        this.eventDispatcher = eventDispatcher;
         this.messagePipeline = messagePipeline;
         this.commandParserProvider = commandParserProvider;
         this.timeFormatter = timeFormatter;
@@ -126,7 +127,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
-        messagePulseListener.sendMessage(fPlayer, component);
+        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(fPlayer, component));
 
         playSound(fPlayer);
     }

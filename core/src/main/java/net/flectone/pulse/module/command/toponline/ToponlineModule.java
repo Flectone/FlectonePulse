@@ -2,20 +2,21 @@ package net.flectone.pulse.module.command.toponline;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
-import net.flectone.pulse.util.constant.PlatformType;
-import net.flectone.pulse.platform.formatter.TimeFormatter;
-import net.flectone.pulse.listener.MessagePulseListener;
-import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
+import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
@@ -33,7 +34,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
     private final PlatformServerAdapter platformServerAdapter;
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
-    private final MessagePulseListener messagePulseListener;
+    private final EventDispatcher eventDispatcher;
     private final TimeFormatter timeFormatter;
     private final FLogger fLogger;
 
@@ -43,7 +44,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
                            PlatformServerAdapter platformServerAdapter,
                            CommandParserProvider commandParserProvider,
                            MessagePipeline messagePipeline,
-                           MessagePulseListener messagePulseListener,
+                           EventDispatcher eventDispatcher,
                            TimeFormatter timeFormatter,
                            FLogger fLogger) {
         super(localization -> localization.getCommand().getToponline(), Command::getToponline);
@@ -54,7 +55,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
         this.platformServerAdapter = platformServerAdapter;
         this.commandParserProvider = commandParserProvider;
         this.messagePipeline = messagePipeline;
-        this.messagePulseListener = messagePulseListener;
+        this.eventDispatcher = eventDispatcher;
         this.timeFormatter = timeFormatter;
         this.fLogger = fLogger;
     }
@@ -138,7 +139,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
-        messagePulseListener.sendMessage(fPlayer, component);
+        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(fPlayer, component));
 
         playSound(fPlayer);
     }

@@ -3,13 +3,13 @@ package net.flectone.pulse.module.integration.plasmovoice;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.util.checker.MuteChecker;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
-import net.flectone.pulse.listener.MessagePulseListener;
-import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
+import net.flectone.pulse.platform.sender.MessageSender;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.logging.FLogger;
 import su.plo.voice.api.addon.AddonInitializer;
 import su.plo.voice.api.addon.AddonLoaderScope;
@@ -30,7 +30,7 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
     private final FPlayerService fPlayerService;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final MuteChecker muteChecker;
-    private final MessagePulseListener messagePulseListener;
+    private final MessageSender messageSender;
     private final MessagePipeline messagePipeline;
     private final FLogger fLogger;
 
@@ -40,13 +40,13 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
     public PlasmoVoiceIntegration(FPlayerService fPlayerService,
                                   ModerationMessageFormatter moderationMessageFormatter,
                                   MuteChecker muteChecker,
-                                  MessagePulseListener messagePulseListener,
+                                  MessageSender messageSender,
                                   MessagePipeline messagePipeline,
                                   FLogger fLogger) {
         this.fPlayerService = fPlayerService;
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.muteChecker = muteChecker;
-        this.messagePulseListener = messagePulseListener;
+        this.messageSender = messageSender;
         this.messagePipeline = messagePipeline;
         this.fLogger = fLogger;
     }
@@ -95,7 +95,7 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
         event.setCancelled(true);
 
         String message = moderationMessageFormatter.buildMuteMessage(fPlayer, status);
-        messagePulseListener.sendActionBar(fPlayer, messagePipeline.builder(fPlayer, message).build());
+        messageSender.sendActionBar(fPlayer, messagePipeline.builder(fPlayer, message).build());
     }
 
     @Override

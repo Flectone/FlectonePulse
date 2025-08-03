@@ -5,13 +5,14 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
-import net.flectone.pulse.listener.MessagePulseListener;
+import net.flectone.pulse.execution.dispatcher.EventDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unmute.UnmuteModule;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
@@ -33,7 +34,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
     private final UnmuteModule unmuteModule;
     private final MessagePipeline messagePipeline;
     private final CommandParserProvider commandParserProvider;
-    private final MessagePulseListener messagePulseListener;
+    private final EventDispatcher eventDispatcher;
 
     @Inject
     public MutelistModule(FileResolver fileResolver,
@@ -43,7 +44,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
                           UnmuteModule unmuteModule,
                           MessagePipeline messagePipeline,
                           CommandParserProvider commandParserProvider,
-                          MessagePulseListener messagePulseListener) {
+                          EventDispatcher eventDispatcher) {
         super(localization -> localization.getCommand().getMutelist(), Command::getMutelist);
 
         this.command = fileResolver.getCommand().getMutelist();
@@ -54,7 +55,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
         this.unmuteModule = unmuteModule;
         this.messagePipeline = messagePipeline;
         this.commandParserProvider = commandParserProvider;
-        this.messagePulseListener = messagePulseListener;
+        this.eventDispatcher = eventDispatcher;
     }
 
     @Override
@@ -169,7 +170,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
-        messagePulseListener.sendMessage(fPlayer, component);
+        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(fPlayer, component));
 
         playSound(fPlayer);
     }

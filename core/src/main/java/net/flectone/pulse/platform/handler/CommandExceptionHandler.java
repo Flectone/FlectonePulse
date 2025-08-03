@@ -3,10 +3,11 @@ package net.flectone.pulse.platform.handler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.listener.MessagePulseListener;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.exception.ArgumentParseException;
@@ -23,17 +24,17 @@ import org.incendo.cloud.parser.standard.StringParser;
 public class CommandExceptionHandler {
 
     private final FileResolver fileResolver;
-    private final MessagePulseListener messagePulseListener;
+    private final EventDispatcher eventDispatcher;
     private final MessagePipeline messagePipeline;
     private final FLogger fLogger;
 
     @Inject
     public CommandExceptionHandler(FileResolver fileResolver,
-                                   MessagePulseListener messagePulseListener,
+                                   EventDispatcher eventDispatcher,
                                    MessagePipeline messagePipeline,
                                    FLogger fLogger) {
         this.fileResolver = fileResolver;
-        this.messagePulseListener = messagePulseListener;
+        this.eventDispatcher = eventDispatcher;
         this.messagePipeline = messagePipeline;
         this.fLogger = fLogger;
     }
@@ -58,10 +59,7 @@ public class CommandExceptionHandler {
                     .replace("<input>", throwable.getMessage());
         };
 
-        Component componentMessage = messagePipeline.builder(fPlayer, message)
-                .build();
-
-        messagePulseListener.sendMessage(fPlayer, componentMessage);
+        send(fPlayer, messagePipeline.builder(fPlayer, message).build());
     }
 
     public void handleInvalidSyntaxException(ExceptionContext<FPlayer, InvalidSyntaxException> context) {
@@ -73,10 +71,7 @@ public class CommandExceptionHandler {
                 .replace("<correct_syntax>", correctSyntax)
                 .replace("<command>", correctSyntax.split(" ")[0]);
 
-        Component componentMessage = messagePipeline.builder(fPlayer, message)
-                .build();
-
-        messagePulseListener.sendMessage(fPlayer, componentMessage);
+        send(fPlayer, messagePipeline.builder(fPlayer, message).build());
     }
 
     public void handleNoPermissionException(ExceptionContext<FPlayer, NoPermissionException> context) {
@@ -85,10 +80,7 @@ public class CommandExceptionHandler {
         String message = fileResolver.getLocalization(fPlayer)
                 .getCommand().getException().getPermission();
 
-        Component componentMessage = messagePipeline.builder(fPlayer, message)
-                .build();
-
-        messagePulseListener.sendMessage(fPlayer, componentMessage);
+        send(fPlayer, messagePipeline.builder(fPlayer, message).build());
     }
 
     public void handleCommandExecutionException(ExceptionContext<FPlayer, CommandExecutionException> context) {
@@ -101,9 +93,10 @@ public class CommandExceptionHandler {
                 .getCommand().getException().getExecution()
                 .replace("<exception>", context.exception().getMessage());
 
-        Component componentMessage = messagePipeline.builder(fPlayer, message)
-                .build();
+        send(fPlayer, messagePipeline.builder(fPlayer, message).build());
+    }
 
-        messagePulseListener.sendMessage(fPlayer, componentMessage);
+    private void send(FPlayer fPlayer, Component component) {
+        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(fPlayer, component));
     }
 }

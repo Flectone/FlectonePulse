@@ -5,13 +5,14 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
-import net.flectone.pulse.listener.MessagePulseListener;
+import net.flectone.pulse.execution.dispatcher.EventDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unban.UnbanModule;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
@@ -32,7 +33,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final UnbanModule unbanModule;
     private final MessagePipeline messagePipeline;
-    private final MessagePulseListener messagePulseListener;
+    private final EventDispatcher eventDispatcher;
     private final CommandParserProvider commandParserProvider;
 
     @Inject
@@ -42,7 +43,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
                          ModerationMessageFormatter moderationMessageFormatter,
                          UnbanModule unbanModule,
                          MessagePipeline messagePipeline,
-                         MessagePulseListener messagePulseListener,
+                         EventDispatcher eventDispatcher,
                          CommandParserProvider commandParserProvider) {
         super(localization -> localization.getCommand().getBanlist(), Command::getBanlist);
 
@@ -53,7 +54,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.unbanModule = unbanModule;
         this.messagePipeline = messagePipeline;
-        this.messagePulseListener = messagePulseListener;
+        this.eventDispatcher = eventDispatcher;
         this.commandParserProvider = commandParserProvider;
     }
 
@@ -168,7 +169,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
-        messagePulseListener.sendMessage(fPlayer, component);
+        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(fPlayer, component));
 
         playSound(fPlayer);
     }
