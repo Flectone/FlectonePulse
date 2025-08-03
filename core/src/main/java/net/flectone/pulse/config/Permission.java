@@ -75,6 +75,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Clearmail clearmail = new Clearmail();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/coin/")})
         private Coin coin = new Coin();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/delete/")})
+        private Delete delete = new Delete();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/dice/")})
         private Dice dice = new Dice();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/do/")})
@@ -281,6 +283,14 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.coin.cooldown.bypass", Type.OP);
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.coin.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Delete implements SubCommandConfig, IPermission {
+            private String name = "flectonepulse.module.command.delete";
+            private Type type = Type.OP;
+            private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.delete.cooldown.bypass", Type.OP);
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.delete.sound", Type.TRUE);
         }
 
         @Getter
@@ -1012,6 +1022,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
 
                 @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/caps/")})
                 private Caps caps = new Caps();
+                @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/delete/")})
+                private Delete delete = new Delete();
                 @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/newbie/")})
                 private Newbie newbie = new Newbie();
                 @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/flood/")})
@@ -1024,6 +1036,12 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                     private String name = "flectonepulse.module.message.format.moderation.caps";
                     private Type type = Type.TRUE;
                     private PermissionEntry bypass = new PermissionEntry("flectonepulse.module.message.format.moderation.caps.bypass", Type.OP);
+                }
+
+                @Getter
+                public static final class Delete implements SubModerationFormatMessageConfig, IPermission {
+                    private String name = "flectonepulse.module.message.format.moderation.delete";
+                    private Type type = Type.OP;
                 }
 
                 @Getter

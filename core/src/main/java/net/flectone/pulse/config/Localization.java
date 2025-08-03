@@ -89,6 +89,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.coin.format = "<fcolor:1>✎ <display_name> подбросил монетку - <style><result>";
         command.coin.formatDraw = "<fcolor:1>✎ <display_name> неудачно подбросил монетку ребром :)";
 
+        command.delete.nullMessage = "<color:#ff7171><b>⁉</b> Сообщение не существует";
+        command.delete.format = "<color:#98FB98>\uD83D\uDDD9 Сообщение успешно удалено";
+
         command.translateto.nullOrError = "<color:#ff7171><b>⁉</b> Ошибка, возможно указан неправильный язык";
         command.translateto.format = "<fcolor:1>📖 Перевод на [<language>] → <fcolor:2><style><message>";
 
@@ -428,8 +431,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.chat.types.clear();
         message.chat.types.putAll(Map.of(
-                "local", "<display_name><fcolor:3>: <style><message> <translate>",
-                "global", "<display_name> <world_prefix>»<fcolor:4> <style><message> <translate>"
+                "local", "<delete><display_name><fcolor:3>: <style><message> <translate>",
+                "global", "<delete><display_name> <world_prefix>»<fcolor:4> <style><message> <translate>"
         ));
         message.chat.nullChat = "<color:#ff7171><b>⁉</b> На сервер выключен чат";
         message.chat.nullReceiver = "<color:#ff7171><b>⁉</b> Тебя никто не услышал";
@@ -549,6 +552,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.enchant.multiple = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'></fcolor:2>» на предмет <fcolor:2><count></fcolor:2> сущностей";
 
         message.format.mention.person = "<fcolor:2>Тебя упомянули!";
+
+        message.format.moderation.delete.placeholder = "<color:#ff7171><hover:show_text:\"<color:#ff7171>Нажми, чтобы удалить\"><click:run_command:\"/delete <uuid>\">[x] ";
+        message.format.moderation.delete.format = "<fcolor:3><i>Сообщение удалено</i>";
 
         message.format.moderation.newbie.reason = "Ты ещё слишком новичок";
 
@@ -740,6 +746,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Clearmail clearmail = new Clearmail();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/coin/")})
         private Coin coin = new Coin();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/delete/")})
+        private Delete delete = new Delete();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/dice/")})
         private Dice dice = new Dice();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/do/")})
@@ -1035,6 +1043,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String tail = "tails";
             private String format = "<fcolor:1>✎ <display_name> player got <style><result>";
             private String formatDraw = "<fcolor:1>✎ <display_name> player got edge :)";
+        }
+
+        @Getter
+        public static final class Delete implements SubCommandConfig, Localizable {
+            private String nullMessage = "<color:#ff7171><b>⁉</b> This message does not exist";
+            private String format = "<color:#98FB98>\uD83D\uDDD9 Successfully deleted message";
         }
 
         @Getter
@@ -1757,8 +1771,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String nullReceiver = "<color:#ff7171><b>⁉</b> Nobody heard you";
             private Map<String, String> types = new LinkedHashMap<>(){
                 {
-                    put("global", "<display_name> <world_prefix>»<fcolor:4> <style><message> <translate>");
-                    put("local", "<display_name><fcolor:3>: <style><message> <translate>");
+                    put("global", "<delete><display_name> <world_prefix>»<fcolor:4> <style><message> <translate>");
+                    put("local", "<delete><display_name><fcolor:3>: <style><message> <translate>");
                 }
             };
         }
@@ -1959,6 +1973,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
             @Getter
             public static final class Moderation implements ModerationFormatMessageConfig, Localizable {
 
+                @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/delete/")})
+                private Delete delete = new Delete();
+
                 @Override
                 public SubModerationFormatMessageConfig getCaps() {
                     return null;
@@ -1974,6 +1991,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
                 @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/swear/")})
                 private Swear swear = new Swear();
+
+                @Getter
+                public static final class Delete implements SubModerationFormatMessageConfig, Localizable {
+                    private String placeholder = "<color:#ff7171><hover:show_text:\"<color:#ff7171>Click to delete message\"><click:run_command:\"/delete <uuid>\">[x] ";
+                    private String format = "<fcolor:3><i>Message deleted</i>";
+                }
 
                 @Getter
                 public static final class Newbie implements SubModerationFormatMessageConfig, Localizable {

@@ -8,6 +8,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
+import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -142,6 +143,7 @@ public class ProxyMessageHandler {
             case COMMAND_CHATCOLOR -> handleChatColorCommand(fEntity);
             case COMMAND_CHATSTYLE -> handleChatStyleCommand(fEntity);
             case COMMAND_COIN -> handleCoinCommand(input, fEntity);
+            case COMMAND_DELETE -> handleDeleteCommand(input, fEntity);
             case COMMAND_DICE -> handleDiceCommand(input, fEntity);
             case COMMAND_DO -> handleDoCommand(input, fEntity);
             case COMMAND_HELPER -> handleHelperCommand(input, fEntity);
@@ -299,6 +301,14 @@ public class ProxyMessageHandler {
                 .format(coinModule.replaceResult(percent))
                 .sound(coinModule.getSound())
                 .sendBuilt();
+    }
+
+    private void handleDeleteCommand(DataInputStream input, FEntity fEntity) throws IOException {
+        // skip delete command checking, only format.moderation.delete module
+        DeleteModule deleteModule = injector.getInstance(DeleteModule.class);
+
+        UUID messageUUID = UUID.fromString(input.readUTF());
+        deleteModule.remove(fEntity, messageUUID);
     }
 
     private void handleDiceCommand(DataInputStream input, FEntity fEntity) throws IOException {

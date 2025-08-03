@@ -17,6 +17,7 @@ import net.flectone.pulse.module.command.chatstyle.ChatstyleModule;
 import net.flectone.pulse.module.command.clearchat.ClearchatModule;
 import net.flectone.pulse.module.command.clearmail.ClearmailModule;
 import net.flectone.pulse.module.command.coin.CoinModule;
+import net.flectone.pulse.module.command.delete.DeleteModule;
 import net.flectone.pulse.module.command.dice.DiceModule;
 import net.flectone.pulse.module.command.do_.DoModule;
 import net.flectone.pulse.module.command.flectonepulse.FlectonepulseModule;
@@ -78,6 +79,7 @@ public class CommandModule extends AbstractModule {
         addChildren(ClearchatModule.class);
         addChildren(ClearmailModule.class);
         addChildren(CoinModule.class);
+        addChildren(DeleteModule.class);
         addChildren(DiceModule.class);
         addChildren(DoModule.class);
         addChildren(FlectonepulseModule.class);

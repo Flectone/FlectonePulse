@@ -67,6 +67,8 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     private Clearmail clearmail = new Clearmail();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/coin/")})
     private Coin coin = new Coin();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/delete/")})
+    private Delete delete = new Delete();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/dice/")})
     private Dice dice = new Dice();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/do/")})
@@ -406,6 +408,15 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
         private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("coin"));
         private Destination destination = new Destination();
+        private Cooldown cooldown = new Cooldown();
+        private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Delete implements SubCommandConfig, ICommandFile {
+        private boolean enable = true;
+        private List<String> aliases = new ArrayList<>(List.of("delete"));
+        private Destination destination = new Destination(Destination.Type.ACTION_BAR);
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }

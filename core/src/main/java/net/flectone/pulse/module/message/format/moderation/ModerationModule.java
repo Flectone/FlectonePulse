@@ -6,6 +6,7 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.moderation.caps.CapsModule;
+import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
 import net.flectone.pulse.module.message.format.moderation.swear.SwearModule;
@@ -28,6 +29,7 @@ public class ModerationModule extends AbstractModule {
         registerModulePermission(permission);
 
         addChildren(CapsModule.class);
+        addChildren(DeleteModule.class);
         addChildren(NewbieModule.class);
         addChildren(FloodModule.class);
         addChildren(SwearModule.class);

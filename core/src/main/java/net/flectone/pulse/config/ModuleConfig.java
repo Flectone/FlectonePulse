@@ -19,6 +19,7 @@ public interface ModuleConfig {
         SubCommandConfig getClearchat();
         SubCommandConfig getClearmail();
         SubCommandConfig getCoin();
+        SubCommandConfig getDelete();
         SubCommandConfig getDice();
         SubCommandConfig getDo();
         SubCommandConfig getFlectonepulse();
@@ -135,6 +136,7 @@ public interface ModuleConfig {
             interface ModerationFormatMessageConfig extends SubFormatMessageConfig {
 
                 SubModerationFormatMessageConfig getCaps();
+                SubModerationFormatMessageConfig getDelete();
                 SubModerationFormatMessageConfig getNewbie();
                 SubModerationFormatMessageConfig getFlood();
                 SubModerationFormatMessageConfig getSwear();
