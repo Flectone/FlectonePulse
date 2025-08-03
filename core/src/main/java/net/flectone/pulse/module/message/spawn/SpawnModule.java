@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.module.message.spawn.model.Spawn;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
@@ -64,7 +65,7 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
     }
 
     @Async
-    public void send(FPlayer fPlayer, MinecraftTranslationKey key, String x, String y, String z, String angle, String world, String value) {
+    public void send(FPlayer fPlayer, MinecraftTranslationKey key, Spawn spawn) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         FPlayer fTarget = fPlayer;
@@ -73,19 +74,19 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
                 || key == MinecraftTranslationKey.COMMANDS_SPAWNPOINT_SUCCESS;
 
         if (isSingle) {
-            fTarget = fPlayerService.getFPlayer(value);
+            fTarget = fPlayerService.getFPlayer(spawn.value());
             if (fTarget.isUnknown()) return;
         }
 
         builder(fTarget)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> (isSingle ? s.getSingle() : s.getMultiple().replace("<count>", value))
-                        .replace("<x>", x)
-                        .replace("<y>", y)
-                        .replace("<z>", z)
-                        .replace("<angle>", angle)
-                        .replace("<world>", world)
+                .format(s -> (isSingle ? s.getSingle() : s.getMultiple().replace("<count>", spawn.value()))
+                        .replace("<x>", spawn.x())
+                        .replace("<y>", spawn.y())
+                        .replace("<z>", spawn.z())
+                        .replace("<angle>", spawn.angle())
+                        .replace("<world>", spawn.world())
                 )
                 .sound(getSound())
                 .sendBuilt();
