@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.gamemode;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.module.message.gamemode.model.Gamemode;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
@@ -52,23 +53,23 @@ public class GamemodeModule extends AbstractModuleLocalization<Localization.Mess
     }
 
     @Async
-    public void send(FPlayer fPlayer, String gamemodeKey, String target) {
+    public void send(FPlayer fPlayer, Gamemode gamemode) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        FPlayer fTarget = fPlayerService.getFPlayer(target);
+        FPlayer fTarget = fPlayerService.getFPlayer(gamemode.target());
         if (fTarget.isUnknown()) return;
 
         boolean isSelf = fPlayer.equals(fTarget);
 
-        String gamemode = gamemodeKey.isEmpty()
+        String gamemodeType = gamemode.type().isEmpty()
                 ? platformPlayerAdapter.getGamemode(fTarget).name().toLowerCase()
-                : gamemodeKey.split("\\.")[1];
+                : gamemode.type().split("\\.")[1];
 
         // for sender
         builder(fTarget)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> (isSelf ? s.getFormatSelf() : s.getFormatOther()).replace("<gamemode>", gamemode))
+                .format(s -> (isSelf ? s.getFormatSelf() : s.getFormatOther()).replace("<gamemode>", gamemodeType))
                 .sound(getSound())
                 .sendBuilt();
     }
