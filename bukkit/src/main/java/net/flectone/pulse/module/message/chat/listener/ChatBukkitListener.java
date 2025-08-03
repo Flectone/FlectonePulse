@@ -12,14 +12,14 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import java.util.function.BiConsumer;
 
 @Singleton
-public class ChatListener implements Listener {
+public class ChatBukkitListener implements Listener {
 
     private final FPlayerService fPlayerService;
     private final BukkitChatModule chatModule;
 
     @Inject
-    public ChatListener(FPlayerService fPlayerService,
-                        BukkitChatModule chatModule) {
+    public ChatBukkitListener(FPlayerService fPlayerService,
+                              BukkitChatModule chatModule) {
         this.fPlayerService = fPlayerService;
         this.chatModule = chatModule;
     }
