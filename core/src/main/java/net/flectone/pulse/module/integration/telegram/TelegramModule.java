@@ -10,6 +10,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.util.constant.MessageType;
@@ -21,15 +22,14 @@ public class TelegramModule extends AbstractModule {
 
     private final Integration.Telegram integration;
     private final Permission.Integration.Telegram permission;
-
-    private final LibraryResolver libraryResolver;
+    private final ReflectionResolver reflectionResolver;
     private final Injector injector;
 
     @Inject
     public TelegramModule(FileResolver fileResolver,
-                          LibraryResolver libraryResolver,
+                          ReflectionResolver reflectionResolver,
                           Injector injector) {
-        this.libraryResolver = libraryResolver;
+        this.reflectionResolver = reflectionResolver;
         this.injector = injector;
 
         integration = fileResolver.getIntegration().getTelegram();
@@ -40,11 +40,7 @@ public class TelegramModule extends AbstractModule {
     public void onEnable() {
         registerModulePermission(permission);
 
-        try {
-            Class.forName("org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient");
-        } catch (ClassNotFoundException e) {
-            loadLibraries();
-        }
+        reflectionResolver.hasClassOrElse("org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient", this::loadLibraries);
 
         injector.getInstance(TelegramIntegration.class).hook();
 
@@ -56,7 +52,7 @@ public class TelegramModule extends AbstractModule {
         injector.getInstance(TelegramIntegration.class).unhook();
     }
 
-    private void loadLibraries() {
+    private void loadLibraries(LibraryResolver libraryResolver) {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("org{}telegram")
                 .artifactId("telegrambots-longpolling")

@@ -6,7 +6,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.platform.proxy.BukkitProxy;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.processing.resolver.LibraryResolver;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
@@ -17,10 +17,10 @@ public class BukkitProxyRegistry extends ProxyRegistry {
 
     @Inject
     public BukkitProxyRegistry(FileResolver fileResolver,
-                               LibraryResolver libraryResolver,
+                               ReflectionResolver reflectionResolver,
                                FLogger fLogger,
                                Injector injector) {
-        super(fileResolver, libraryResolver, fLogger, injector);
+        super(fileResolver, reflectionResolver, fLogger, injector);
 
         this.fileResolver = fileResolver;
         this.injector = injector;

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.model.entity.FEntity;
@@ -24,8 +25,9 @@ public class FabricIntegrationModule extends IntegrationModule {
                                    FLogger fLogger,
                                    PlatformServerAdapter platformServerAdapter,
                                    PermissionChecker permissionChecker,
+                                   ReflectionResolver reflectionResolver,
                                    Injector injector) {
-        super(fileManager, fLogger, platformServerAdapter, injector);
+        super(fileManager, fLogger, platformServerAdapter, reflectionResolver, injector);
 
         this.permissionChecker = permissionChecker;
         this.injector = injector;

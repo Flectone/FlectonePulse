@@ -10,6 +10,7 @@ import net.flectone.pulse.config.Config;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.platform.proxy.Proxy;
 import net.flectone.pulse.platform.proxy.RedisProxy;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.util.logging.FLogger;
@@ -23,17 +24,17 @@ public class ProxyRegistry implements Registry {
     @Getter private final List<Proxy> proxies = new ArrayList<>();
 
     private final FileResolver fileResolver;
-    private final LibraryResolver libraryResolver;
+    private final ReflectionResolver reflectionResolver;
     private final FLogger fLogger;
     private final Injector injector;
 
     @Inject
     public ProxyRegistry(FileResolver fileResolver,
-                         LibraryResolver libraryResolver,
+                         ReflectionResolver reflectionResolver,
                          FLogger fLogger,
                          Injector injector) {
         this.fileResolver = fileResolver;
-        this.libraryResolver = libraryResolver;
+        this.reflectionResolver = reflectionResolver;
         this.fLogger = fLogger;
         this.injector = injector;
     }
@@ -51,11 +52,7 @@ public class ProxyRegistry implements Registry {
         if (redis.isEnable()) {
             warnIfLocalDatabase();
 
-            try {
-                Class.forName("io.lettuce.core.RedisClient");
-            } catch (ClassNotFoundException e) {
-                loadLibraries();
-            }
+            reflectionResolver.hasClassOrElse("io.lettuce.core.RedisClient", this::loadLibraries);
 
             RedisProxy redisProxy = injector.getInstance(RedisProxy.class);
             redisProxy.onEnable();
@@ -82,7 +79,7 @@ public class ProxyRegistry implements Registry {
         onEnable();
     }
 
-    private void loadLibraries() {
+    private void loadLibraries(LibraryResolver libraryResolver) {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("io{}lettuce")
                 .artifactId("lettuce-core")

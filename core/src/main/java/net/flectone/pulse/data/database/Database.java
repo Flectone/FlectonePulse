@@ -11,7 +11,6 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.data.database.dao.ColorsDAO;
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
@@ -20,9 +19,10 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ignore;
 import net.flectone.pulse.model.util.Mail;
 import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.processing.resolver.LibraryResolver;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import org.jdbi.v3.core.Jdbi;
@@ -49,7 +49,7 @@ public class Database {
     private final PlatformServerAdapter platformServerAdapter;
     private final FLogger fLogger;
     private final PacketProvider packetProvider;
-    private final LibraryResolver libraryResolver;
+    private final ReflectionResolver reflectionResolver;
 
     private HikariDataSource dataSource;
     private Jdbi jdbi;
@@ -62,7 +62,7 @@ public class Database {
                     PlatformServerAdapter platformServerAdapter,
                     FLogger fLogger,
                     PacketProvider packetProvider,
-                    LibraryResolver libraryResolver) {
+                    ReflectionResolver reflectionResolver) {
         this.config = fileResolver.getConfig().getDatabase();
         this.injector = injector;
         this.fileResolver = fileResolver;
@@ -71,7 +71,7 @@ public class Database {
         this.platformServerAdapter = platformServerAdapter;
         this.fLogger = fLogger;
         this.packetProvider = packetProvider;
-        this.libraryResolver = libraryResolver;
+        this.reflectionResolver = reflectionResolver;
     }
 
     public void connect() throws IOException {
@@ -144,7 +144,14 @@ public class Database {
         String connectionURL = "jdbc:" + config.getType().name().toLowerCase() + ":";
         switch (config.getType()) {
             case POSTGRESQL -> {
-                setupPostgreSQLLibrary();
+                reflectionResolver.hasClassOrElse("org.postgresql.Driver", libraryResolver ->
+                        libraryResolver.loadLibrary(Library.builder()
+                                .groupId("org{}postgresql")
+                                .artifactId("postgresql")
+                                .version(BuildConfig.POSTGRESQL_VERSION)
+                                .build()
+                        )
+                );
 
                 connectionURL = connectionURL +
                         "//" +
@@ -164,7 +171,14 @@ public class Database {
                 hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "4096");
             }
             case H2 -> {
-                setupH2Library();
+                reflectionResolver.hasClassOrElse("org.h2.Driver", libraryResolver ->
+                        libraryResolver.loadLibrary(Library.builder()
+                                .groupId("com{}h2database")
+                                .artifactId("h2")
+                                .version(BuildConfig.H2_VERSION)
+                                .build()
+                        )
+                );
 
                 connectionURL = connectionURL +
                         "file:./" + projectPath.toString() +
@@ -267,32 +281,6 @@ public class Database {
             } catch (IOException e) {
                 fLogger.warning(e);
             }
-        }
-    }
-
-    private void setupH2Library() {
-        try {
-            Class.forName("org.h2.Driver");
-        } catch (ClassNotFoundException ignored) {
-            libraryResolver.loadLibrary(Library.builder()
-                    .groupId("com{}h2database")
-                    .artifactId("h2")
-                    .version(BuildConfig.H2_VERSION)
-                    .build()
-            );
-        }
-    }
-
-    private void setupPostgreSQLLibrary() {
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException ignored) {
-            libraryResolver.loadLibrary(Library.builder()
-                    .groupId("org{}postgresql")
-                    .artifactId("postgresql")
-                    .version(BuildConfig.POSTGRESQL_VERSION)
-                    .build()
-            );
         }
     }
 

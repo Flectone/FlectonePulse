@@ -16,6 +16,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.PaperItemStackUtil;
 import net.flectone.pulse.util.constant.PlatformType;
@@ -41,31 +42,26 @@ import java.util.List;
 @Singleton
 public class BukkitServerAdapter implements PlatformServerAdapter {
 
-    public static final boolean IS_FOLIA;
-    public static final boolean IS_PAPER;
-
-    static {
-        IS_FOLIA = detectFolia();
-        IS_PAPER = detectPaper();
-    }
-
     private final Plugin plugin;
     private final Provider<IntegrationModule> integrationModuleProvider;
     private final Provider<FPlayerService> fPlayerServiceProvider;
     private final Provider<MessagePipeline> messagePipelineProvider;
     private final PacketProvider packetProvider;
+    private final ReflectionResolver reflectionResolver;
 
     @Inject
     public BukkitServerAdapter(Plugin plugin,
                                Provider<IntegrationModule> integrationModuleProvider,
                                Provider<FPlayerService> fPlayerServiceProvider,
                                Provider<MessagePipeline> messagePipelineProvider,
-                               PacketProvider packetProvider) {
+                               PacketProvider packetProvider,
+                               ReflectionResolver reflectionResolver) {
         this.plugin = plugin;
         this.integrationModuleProvider = integrationModuleProvider;
         this.fPlayerServiceProvider = fPlayerServiceProvider;
         this.messagePipelineProvider = messagePipelineProvider;
         this.packetProvider = packetProvider;
+        this.reflectionResolver = reflectionResolver;
     }
 
     @Sync
@@ -257,7 +253,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
             // it's not really working full
             // for some reason nbt components are not showing up
             // waiting for new NBTSerializer by Kyori
-            if (BukkitServerAdapter.IS_PAPER) {
+            if (reflectionResolver.isPaper()) {
                 JsonElement element = PaperItemStackUtil.serialize(itemStack);
                 return component.hoverEvent(AdventureSerializer.serializer().fromJsonTree(element).hoverEvent());
             }
@@ -279,27 +275,5 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         String itemName = itemStack.getType().name().toLowerCase().replace("_", " ");
 
         return Component.text(itemName);
-    }
-
-    private static boolean detectFolia() {
-        try {
-            Class.forName("io.papermc.paper.threadedregions.ThreadedRegionizer");
-            return true;
-        } catch (ClassNotFoundException ignored) {
-            // ignore not folia server
-        }
-
-        return false;
-    }
-
-    private static boolean detectPaper() {
-        try {
-            Class.forName("com.destroystokyo.paper.ParticleBuilder");
-            return true;
-        } catch (ClassNotFoundException ignored) {
-            // ignore not paper server
-        }
-
-        return false;
     }
 }

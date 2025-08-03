@@ -20,6 +20,7 @@ import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
@@ -32,6 +33,8 @@ import java.util.List;
 @Singleton
 public class FlectonepulseModule extends AbstractModuleCommand<Localization.Command.Flectonepulse> {
 
+    private final String sparkClass = "net.flectone.pulse.library.spark.Service";
+
     private final Config.Editor config;
     private final Command.Flectonepulse command;
     private final Permission.Command.Flectonepulse permission;
@@ -39,7 +42,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     private final CommandParserProvider commandParserProvider;
     private final TimeFormatter timeFormatter;
     private final FLogger fLogger;
-    private final LibraryResolver libraryResolver;
+    private final ReflectionResolver reflectionResolver;
     private final Injector injector;
 
     @Inject
@@ -48,7 +51,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                                TimeFormatter timeFormatter,
                                FlectonePulse flectonePulse,
                                FLogger fLogger,
-                               LibraryResolver libraryResolver,
+                               ReflectionResolver reflectionResolver,
                                Injector injector) {
         super(localization -> localization.getCommand().getFlectonepulse(), Command::getFlectonepulse);
 
@@ -59,7 +62,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
         this.commandParserProvider = commandParserProvider;
         this.timeFormatter = timeFormatter;
         this.fLogger = fLogger;
-        this.libraryResolver = libraryResolver;
+        this.reflectionResolver = reflectionResolver;
         this.injector = injector;
     }
 
@@ -78,7 +81,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
         addPredicate(this::checkCooldown);
 
-        if (hasSparkClass()) {
+        if (reflectionResolver.hasClass(sparkClass)) {
             enableSpark();
         }
     }
@@ -87,7 +90,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     public void onDisable() {
         super.onDisable();
 
-        if (hasSparkClass()) {
+        if (reflectionResolver.hasClass(sparkClass)) {
             injector.getInstance(SparkServer.class).onDisable();
         }
     }
@@ -113,9 +116,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
             UrlService urlService = injector.getInstance(UrlService.class);
             String url = urlService.generateUrl();
 
-            if (!hasSparkClass()) {
-                loadSparkLibrary();
-            }
+            reflectionResolver.hasClassOrElse(sparkClass, this::loadSparkLibrary);
 
             enableSpark();
 
@@ -167,7 +168,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
         );
     }
 
-    private void loadSparkLibrary() {
+    private void loadSparkLibrary(LibraryResolver libraryResolver) {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("com{}sparkjava")
                 .artifactId("spark-core")
@@ -180,14 +181,5 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                 )
                 .build()
         );
-    }
-
-    private boolean hasSparkClass() {
-        try {
-            Class.forName("net.flectone.pulse.library.spark.Service");
-            return true;
-        } catch (ClassNotFoundException ignored) {
-            return false;
-        }
     }
 }

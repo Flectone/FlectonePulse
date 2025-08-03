@@ -18,6 +18,7 @@ import net.flectone.pulse.module.integration.telegram.TelegramModule;
 import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.yandex.YandexModule;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -34,6 +35,7 @@ public abstract class IntegrationModule extends AbstractModule {
     protected IntegrationModule(FileResolver fileResolver,
                                 FLogger fLogger,
                                 PlatformServerAdapter platformServerAdapter,
+                                ReflectionResolver reflectionResolver,
                                 Injector injector) {
         this.integration = fileResolver.getIntegration();
         this.permission = fileResolver.getPermission().getIntegration();
@@ -52,11 +54,9 @@ public abstract class IntegrationModule extends AbstractModule {
         }
 
         if (platformServerAdapter.hasProject("PlasmoVoice")) {
-            try {
-                Class.forName("su.plo.voice.api.server.event.audio.source.ServerSourceCreatedEvent");
-
+            if (reflectionResolver.hasClass("su.plo.voice.api.server.event.audio.source.ServerSourceCreatedEvent")) {
                 addChildren(PlasmoVoiceModule.class);
-            } catch (ClassNotFoundException e) {
+            } else {
                 fLogger.warning("Update PlasmoVoice to the latest version");
             }
         }

@@ -11,22 +11,23 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 
 @Singleton
 public class DeeplModule extends AbstractModule {
 
     private final Integration.Deepl integration;
     private final Permission.Integration.Deepl permission;
-    private final LibraryResolver libraryResolver;
+    private final ReflectionResolver reflectionResolver;
     private final Injector injector;
 
     @Inject
     public DeeplModule(FileResolver fileResolver,
-                       LibraryResolver libraryResolver,
+                       ReflectionResolver reflectionResolver,
                        Injector injector) {
         this.integration = fileResolver.getIntegration().getDeepl();
         this.permission = fileResolver.getPermission().getIntegration().getDeepl();
-        this.libraryResolver = libraryResolver;
+        this.reflectionResolver = reflectionResolver;
         this.injector = injector;
     }
 
@@ -34,11 +35,7 @@ public class DeeplModule extends AbstractModule {
     public void onEnable() {
         registerModulePermission(permission);
 
-        try {
-            Class.forName("com.deepl.api.DeepLClient");
-        } catch (ClassNotFoundException e) {
-            loadLibraries();
-        }
+        reflectionResolver.hasClassOrElse("com.deepl.api.DeepLClient", this::loadLibraries);
 
         injector.getInstance(DeeplIntegration.class).hook();
     }
@@ -48,7 +45,7 @@ public class DeeplModule extends AbstractModule {
         injector.getInstance(DeeplIntegration.class).unhook();
     }
 
-    private void loadLibraries() {
+    private void loadLibraries(LibraryResolver libraryResolver) {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("com{}deepl{}api")
                 .artifactId("deepl-java")

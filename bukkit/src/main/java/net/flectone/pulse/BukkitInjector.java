@@ -37,6 +37,7 @@ import net.flectone.pulse.module.message.quit.BukkitQuitModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.sign.BukkitSignModule;
 import net.flectone.pulse.module.message.sign.SignModule;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.execution.scheduler.BukkitTaskScheduler;
@@ -77,6 +78,9 @@ public class BukkitInjector extends AbstractModule {
     protected void configure() {
         bind(PacketProvider.class).toInstance(packetProvider);
 
+        ReflectionResolver reflectionResolver = new ReflectionResolver(libraryResolver);
+        bind(ReflectionResolver.class).toInstance(reflectionResolver);
+
         // Bind project path
         Path projectPath = plugin.getDataFolder().toPath();
         bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
@@ -93,17 +97,15 @@ public class BukkitInjector extends AbstractModule {
         bind(PlatformServerAdapter.class).to(BukkitServerAdapter.class);
 
         // Providers
-        try {
-            Class.forName("org.bukkit.attribute.Attribute");
+        if (reflectionResolver.hasClass("org.bukkit.attribute.Attribute")) {
             bind(AttributesProvider.class).to(ModernAttributesProvider.class);
-        } catch (ClassNotFoundException e) {
+        } else {
             bind(AttributesProvider.class).to(LegacyAttributesProvider.class);
         }
 
-        try {
-            Player.class.getMethod("getPassengers");
+        if (reflectionResolver.hasMethod(Player.class, "getPassengers")) {
             bind(PassengersProvider.class).to(ModernPassengersProvider.class);
-        } catch (NoSuchMethodException e) {
+        } else {
             bind(PassengersProvider.class).to(LegacyPassengersProvider.class);
         }
 
@@ -112,10 +114,9 @@ public class BukkitInjector extends AbstractModule {
         bind(ListenerRegistry.class).to(BukkitListenerRegistry.class);
         bind(ProxyRegistry.class).to(BukkitProxyRegistry.class);
 
-        try {
-            Class.forName("com.mojang.brigadier.arguments.ArgumentType");
+        if (reflectionResolver.hasClass("com.mojang.brigadier.arguments.ArgumentType")) {
             bind(CommandRegistry.class).to(ModernBukkitCommandRegistry.class);
-        } catch (ClassNotFoundException e) {
+        } else {
             bind(CommandRegistry.class).to(LegacyBukkitCommandRegistry.class);
         }
 

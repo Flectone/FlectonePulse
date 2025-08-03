@@ -10,6 +10,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.util.constant.MessageType;
@@ -21,17 +22,16 @@ public class TwitchModule extends AbstractModule {
 
     private final Integration.Twitch integration;
     private final Permission.Integration.Twitch permission;
-
-    private final LibraryResolver libraryResolver;
+    private final ReflectionResolver reflectionResolver;
     private final Injector injector;
 
     @Inject
     public TwitchModule(FileResolver fileResolver,
-                        LibraryResolver libraryResolver,
+                        ReflectionResolver reflectionResolver,
                         Injector injector) {
         this.integration = fileResolver.getIntegration().getTwitch();
         this.permission = fileResolver.getPermission().getIntegration().getTwitch();
-        this.libraryResolver = libraryResolver;
+        this.reflectionResolver = reflectionResolver;
         this.injector = injector;
     }
 
@@ -39,11 +39,7 @@ public class TwitchModule extends AbstractModule {
     public void onEnable() {
         registerModulePermission(permission);
 
-        try {
-            Class.forName("com.github.twitch4j.TwitchClient");
-        } catch (ClassNotFoundException e) {
-            loadLibraries();
-        }
+        reflectionResolver.hasClassOrElse("com.github.twitch4j.TwitchClient", this::loadLibraries);
 
         injector.getInstance(TwitchIntegration.class).hook();
 
@@ -55,7 +51,7 @@ public class TwitchModule extends AbstractModule {
         injector.getInstance(TwitchIntegration.class).unhook();
     }
 
-    private void loadLibraries() {
+    private void loadLibraries(LibraryResolver libraryResolver) {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("com{}github{}philippheuer{}credentialmanager")
                 .artifactId("credentialmanager")

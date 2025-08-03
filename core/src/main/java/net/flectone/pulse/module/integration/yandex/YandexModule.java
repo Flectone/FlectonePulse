@@ -7,9 +7,10 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 
 @Singleton
@@ -17,16 +18,16 @@ public class YandexModule extends AbstractModule {
 
     private final Integration.Yandex integration;
     private final Permission.Integration.Yandex permission;
-    private final LibraryResolver libraryResolver;
+    private final ReflectionResolver reflectionResolver;
     private final Injector injector;
 
     @Inject
     public YandexModule(FileResolver fileResolver,
-                        LibraryResolver libraryResolver,
+                        ReflectionResolver reflectionResolver,
                         Injector injector) {
         this.integration = fileResolver.getIntegration().getYandex();
         this.permission = fileResolver.getPermission().getIntegration().getYandex();
-        this.libraryResolver = libraryResolver;
+        this.reflectionResolver = reflectionResolver;
         this.injector = injector;
     }
 
@@ -34,11 +35,7 @@ public class YandexModule extends AbstractModule {
     public void onEnable() {
         registerModulePermission(permission);
 
-        try {
-            Class.forName("yandex.cloud.sdk.auth.Auth");
-        } catch (ClassNotFoundException e) {
-            loadLibraries();
-        }
+        reflectionResolver.hasClassOrElse("yandex.cloud.sdk.auth.Auth", this::loadLibraries);
 
         injector.getInstance(YandexIntegration.class).hook();
     }
@@ -48,7 +45,7 @@ public class YandexModule extends AbstractModule {
         injector.getInstance(YandexIntegration.class).unhook();
     }
 
-    private void loadLibraries() {
+    private void loadLibraries(LibraryResolver libraryResolver) {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("com{}yandex{}cloud")
                 .artifactId("java-sdk-services")

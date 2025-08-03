@@ -20,6 +20,7 @@ import net.flectone.pulse.module.integration.tab.TABModule;
 import net.flectone.pulse.module.integration.triton.TritonModule;
 import net.flectone.pulse.module.integration.vault.VaultModule;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -39,8 +40,9 @@ public class BukkitIntegrationModule extends IntegrationModule {
     public BukkitIntegrationModule(FileResolver fileResolver,
                                    FLogger fLogger,
                                    PlatformServerAdapter platformServerAdapter,
+                                   ReflectionResolver reflectionResolver,
                                    Injector injector) {
-        super(fileResolver, fLogger, platformServerAdapter, injector);
+        super(fileResolver, fLogger, platformServerAdapter, reflectionResolver, injector);
 
         this.platformServerAdapter = platformServerAdapter;
         this.injector = injector;
