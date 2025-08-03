@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.module.message.sleep.model.Sleep;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
@@ -49,7 +50,7 @@ public class SleepModule extends AbstractModuleLocalization<Localization.Message
     }
 
     @Async
-    public void send(FPlayer fPlayer, MinecraftTranslationKey key, String sleepCount, String allCount) {
+    public void send(FPlayer fPlayer, MinecraftTranslationKey key, Sleep sleep) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         builder(fPlayer)
@@ -58,8 +59,8 @@ public class SleepModule extends AbstractModuleLocalization<Localization.Message
                 .format(bed -> switch (key) {
                     case SLEEP_NOT_POSSIBLE -> bed.getNotPossible();
                     case SLEEP_PLAYERS_SLEEPING -> bed.getPlayersSleeping()
-                            .replace("<sleep_count>", sleepCount)
-                            .replace("<all_count>", allCount);
+                            .replace("<sleep_count>", sleep.sleepCount())
+                            .replace("<all_count>", sleep.allCount());
                     case SLEEP_SKIPPING_NIGHT -> bed.getSkippingNight();
                     default -> "";
                 })
