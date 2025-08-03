@@ -24,12 +24,12 @@ public class MessageContext {
 
     private final FEntity sender;
     private final FPlayer receiver;
-    private final UUID processId;
+    private final UUID messageUUID;
     private String message;
     private String userMessage;
 
-    public MessageContext(FEntity sender, FPlayer receiver, String message) {
-        this.processId = UUID.randomUUID();
+    public MessageContext(UUID messageUUID, FEntity sender, FPlayer receiver, String message) {
+        this.messageUUID = messageUUID;
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;

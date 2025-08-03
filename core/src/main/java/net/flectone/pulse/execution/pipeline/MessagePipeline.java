@@ -3,6 +3,7 @@ package net.flectone.pulse.execution.pipeline;
 import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.Getter;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
@@ -23,6 +24,7 @@ import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 @Singleton
 public class MessagePipeline {
@@ -52,12 +54,20 @@ public class MessagePipeline {
         return new Builder(sender, receiver, message);
     }
 
+    public Builder builder(UUID messageUUID, @NotNull FEntity sender, @NotNull FPlayer receiver, @NotNull String message) {
+        return new Builder(messageUUID, sender, receiver, message);
+    }
+
     public class Builder {
 
-        private final MessageContext context;
+        @Getter private final MessageContext context;
+
+        public Builder(UUID messageUUID, FEntity sender, FPlayer receiver, String message) {
+            this.context = new MessageContext(messageUUID, sender, receiver, message);
+        }
 
         public Builder(FEntity sender, FPlayer receiver, String message) {
-            this.context = new MessageContext(sender, receiver, message);
+            this(UUID.randomUUID(), sender, receiver, message);
         }
 
         public Builder flag(MessageFlag flag, boolean value) {
@@ -65,8 +75,12 @@ public class MessagePipeline {
             return this;
         }
 
-        public Builder translate(String messageToTranslate, boolean translate) {
-            context.setMessageToTranslate(messageToTranslate);
+        public Builder setUserMessage(String userMessage) {
+            context.setUserMessage(userMessage);
+            return this;
+        }
+
+        public Builder translate(boolean translate) {
             context.setFlag(MessageFlag.TRANSLATE, translate);
             return this;
         }

@@ -2,33 +2,33 @@ package net.flectone.pulse.module;
 
 import com.google.inject.Inject;
 import lombok.Getter;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.dispatcher.EventDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.model.util.Sound;
-import net.flectone.pulse.util.checker.MuteChecker;
-import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
-import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MessageType;
-import net.flectone.pulse.execution.dispatcher.EventDispatcher;
+import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
-import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
-import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.ProxyDataConsumer;
+import net.flectone.pulse.util.checker.MuteChecker;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -381,7 +381,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
                 // message: hello world!
                 // final formatted message: TheFaser > hello world!
                 Component messageComponent = buildMessageComponent(recipient);
-                Component formatComponent = buildFormatComponent(recipient, messageComponent);
+                Component formatComponent = buildFormatComponent(messageUUID, recipient, messageComponent);
 
                 // destination subtext
                 Component subComponent = Component.empty();
@@ -433,12 +433,12 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
             return messageBuilder.build();
         }
 
-        private Component buildFormatComponent(FPlayer fReceiver, Component message) {
+        private Component buildFormatComponent(UUID messageUUID, FPlayer fReceiver, Component message) {
             String formatContent = resolveString(fReceiver, this.format);
             if (formatContent == null) return Component.empty();
 
             MessagePipeline.Builder formatBuilder = messagePipeline
-                    .builder(fPlayer, fReceiver, formatContent)
+                    .builder(messageUUID, fPlayer, fReceiver, formatContent)
                     .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(fReceiver))
                     .tagResolvers(messageTag(message));
 

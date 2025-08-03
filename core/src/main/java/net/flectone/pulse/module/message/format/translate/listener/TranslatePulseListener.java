@@ -35,7 +35,7 @@ public class TranslatePulseListener implements PulseListener {
         MessageContext messageContext = event.getContext();
         if (!messageContext.isFlag(MessageFlag.TRANSLATE)) return;
 
-        String messageToTranslate = messageContext.getMessageToTranslate();
+        String messageToTranslate = messageContext.getUserMessage();
         UUID key = translateModule.saveMessage(messageToTranslate);
 
         FEntity sender = messageContext.getSender();

@@ -50,7 +50,7 @@ public class QuestionAnswerPulseListener implements PulseListener {
         String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
         messageContext.setMessage(processedMessage);
 
-        UUID processId = messageContext.getProcessId();
+        UUID processId = messageContext.getMessageUUID();
         FEntity receiver = messageContext.getReceiver();
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.QUESTION, (argumentQueue, context) -> {

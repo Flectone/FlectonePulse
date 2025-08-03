@@ -61,7 +61,7 @@ public class MentionPulseListener implements PulseListener {
         FEntity sender = messageContext.getSender();
         if (mentionModule.checkModulePredicates(sender)) return;
 
-        UUID processId = messageContext.getProcessId();
+        UUID processId = messageContext.getMessageUUID();
         FPlayer receiver = messageContext.getReceiver();
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.MENTION, (argumentQueue, context) -> {
             Tag.Argument mentionTag = argumentQueue.peek();

@@ -12,20 +12,20 @@ import java.util.UUID;
 @Getter
 public class SenderToReceiverMessageEvent extends Event {
 
-    private final UUID uuid;
+    private final UUID messageUUID;
     private final FEntity sender;
     private final FPlayer receiver;
     private final Component message;
     private final Component submessage;
     private final Destination destination;
 
-    public SenderToReceiverMessageEvent(UUID uuid,
+    public SenderToReceiverMessageEvent(UUID messageUUID,
                                         FEntity sender,
                                         FPlayer receiver,
                                         Component message,
                                         Component submessage,
                                         Destination destination) {
-        this.uuid = uuid;
+        this.messageUUID = messageUUID;
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
