@@ -11,14 +11,14 @@ import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton
-public class ChatListener implements PacketListener {
+public class ChatPacketListener implements PacketListener {
 
     private final FPlayerService fPlayerService;
     private final ChatModule chatModule;
 
     @Inject
-    public ChatListener(FPlayerService fPlayerService,
-                        ChatModule chatModule) {
+    public ChatPacketListener(FPlayerService fPlayerService,
+                              ChatModule chatModule) {
         this.fPlayerService = fPlayerService;
         this.chatModule = chatModule;
     }

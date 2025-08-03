@@ -21,7 +21,7 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
-import net.flectone.pulse.module.message.chat.listener.ChatListener;
+import net.flectone.pulse.module.message.chat.listener.ChatPacketListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
@@ -90,7 +90,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         });
 
         if (message.isPacketBased() || platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
-            listenerRegistry.register(ChatListener.class);
+            listenerRegistry.register(ChatPacketListener.class);
         }
     }
 
