@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.module.message.clear.model.Clear;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
@@ -49,7 +50,7 @@ public class ClearModule extends AbstractModuleLocalization<Localization.Message
     }
 
     @Async
-    public void send(FPlayer fPlayer, MinecraftTranslationKey key, String count, String value) {
+    public void send(FPlayer fPlayer, MinecraftTranslationKey key, Clear clear) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         FPlayer fTarget = fPlayer;
@@ -57,7 +58,7 @@ public class ClearModule extends AbstractModuleLocalization<Localization.Message
                 || key == MinecraftTranslationKey.COMMANDS_CLEAR_SUCCESS;
 
         if (isSingle) {
-            fTarget = fPlayerService.getFPlayer(value);
+            fTarget = fPlayerService.getFPlayer(clear.value());
             if (fTarget.isUnknown()) return;
         }
 
@@ -67,9 +68,9 @@ public class ClearModule extends AbstractModuleLocalization<Localization.Message
                 .format(s -> {
                     String format = isSingle
                             ? s.getSingle()
-                            : s.getMultiple().replace("<count>", value);
+                            : s.getMultiple().replace("<count>", clear.value());
 
-                    return format.replace("<number>", count);
+                    return format.replace("<number>", clear.count());
                 })
                 .sound(getSound())
                 .sendBuilt();

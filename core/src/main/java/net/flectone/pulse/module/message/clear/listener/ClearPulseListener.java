@@ -3,6 +3,8 @@ package net.flectone.pulse.module.message.clear.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.module.message.clear.extractor.ClearExtractor;
+import net.flectone.pulse.module.message.clear.model.Clear;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
@@ -10,32 +12,30 @@ import net.flectone.pulse.module.message.clear.ClearModule;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 
+import java.util.Optional;
+
 @Singleton
 public class ClearPulseListener implements PulseListener {
 
     private final ClearModule clearModule;
+    private final ClearExtractor clearExtractor;
 
     @Inject
-    public ClearPulseListener(ClearModule clearModule) {
+    public ClearPulseListener(ClearModule clearModule,
+                              ClearExtractor clearExtractor) {
         this.clearModule = clearModule;
+        this.clearExtractor = clearExtractor;
     }
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(TranslatableMessageReceiveEvent event) {
         if (!event.getKey().startsWith("commands.clear.success")) return;
 
-        TranslatableComponent translatableComponent = event.getComponent();
-        if (translatableComponent.args().size() < 2) return;
-        if (!(translatableComponent.args().get(0) instanceof TextComponent firstArg)) return;
-        if (!(translatableComponent.args().get(1) instanceof TextComponent secondArg)) return;
+        Optional<Clear> clear = clearExtractor.extract(event);
+        if (clear.isEmpty()) return;
 
         event.setCancelled(true);
-
-        if (event.getKey() == MinecraftTranslationKey.COMMANDS_CLEAR_SUCCESS) {
-            clearModule.send(event.getFPlayer(), event.getKey(), secondArg.content(), firstArg.content());
-        } else {
-            clearModule.send(event.getFPlayer(), event.getKey(), firstArg.content(), secondArg.content());
-        }
+        clearModule.send(event.getFPlayer(), event.getKey(), clear.get());
     }
 
 }
