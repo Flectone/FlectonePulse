@@ -12,7 +12,6 @@ import net.flectone.pulse.module.message.seed.listener.SeedPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import org.jetbrains.annotations.NotNull;
 
 @Singleton
 public class SeedModule extends AbstractModuleLocalization<Localization.Message.Seed> {
@@ -49,7 +48,7 @@ public class SeedModule extends AbstractModuleLocalization<Localization.Message.
     }
 
     @Async
-    public void send(FPlayer fPlayer, @NotNull String seed) {
+    public void send(FPlayer fPlayer, String seed) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         builder(fPlayer)
