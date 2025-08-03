@@ -1,0 +1,97 @@
+package net.flectone.pulse.module.message.kill.extractor;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.module.message.kill.model.Kill;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.EntityUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.event.HoverEvent;
+import org.incendo.cloud.type.tuple.Triplet;
+
+import java.util.Optional;
+import java.util.UUID;
+
+@Singleton
+public class KillExtractor {
+
+    private final EntityUtil entityUtil;
+    private final FPlayerService fPlayerService;
+
+    @Inject
+    public KillExtractor(EntityUtil entityUtil,
+                         FPlayerService fPlayerService) {
+        this.entityUtil = entityUtil;
+        this.fPlayerService = fPlayerService;
+    }
+
+    public Optional<Kill> extractMultipleKill(TranslatableMessageReceiveEvent event) {
+        TranslatableComponent translatableComponent = event.getComponent();
+        if (!(translatableComponent.args().get(0) instanceof TextComponent firstArgument)) return Optional.empty();
+
+        String value = firstArgument.content();
+        Kill kill = new Kill(value, null);
+        return Optional.of(kill);
+    }
+
+    public Optional<Kill> extractSingleKill(TranslatableMessageReceiveEvent event) {
+        TranslatableComponent translatableComponent = event.getComponent();
+        if (translatableComponent.args().isEmpty()) return Optional.empty();
+
+        Component firstArgument = translatableComponent.args().get(0);
+        UUID uuid = null;
+
+        String content = switch (firstArgument) {
+            case TranslatableComponent translatableArg -> {
+                String insertion = translatableArg.insertion();
+                if (insertion != null && !insertion.isEmpty()) {
+                    try {
+                        uuid = UUID.fromString(insertion);
+                    } catch (IllegalArgumentException e) {
+                        // invalid UUID
+                    }
+                }
+
+                yield translatableArg.key();
+            }
+            case TextComponent textArg -> textArg.content();
+            default -> null;
+        };
+
+        if (content == null) return Optional.empty();
+
+        Triplet<String, String, UUID> triplet = extractHoverComponent(content, content, uuid, firstArgument.hoverEvent());
+        String name = triplet.first();
+        if (name.isEmpty()) return Optional.empty();
+
+        String type = triplet.second();
+        uuid = triplet.third();
+
+        event.setCancelled(true);
+        FEntity fEntity = new FEntity(name, uuid, type);
+        Kill kill = new Kill("", fEntity);
+        return Optional.of(kill);
+    }
+
+    private Triplet<String, String, UUID> extractHoverComponent(String name, String type, UUID uuid, HoverEvent<?> hoverEvent) {
+        if (hoverEvent != null && hoverEvent.action() == HoverEvent.Action.SHOW_ENTITY) {
+            HoverEvent.ShowEntity showEntity = (HoverEvent.ShowEntity) hoverEvent.value();
+            uuid = showEntity.id();
+            type = entityUtil.resolveEntityTranslationKey(showEntity.type().key().value());
+            if (showEntity.name() instanceof TextComponent hoverText) {
+                name = hoverText.content();
+            } else if (showEntity.name() instanceof TranslatableComponent hoverTranslatable) {
+                name = hoverTranslatable.key();
+            }
+        } else if (uuid == null) {
+            uuid = fPlayerService.getFPlayer(name).getUuid();
+        }
+
+        return Triplet.of(name, type, uuid);
+    }
+
+}

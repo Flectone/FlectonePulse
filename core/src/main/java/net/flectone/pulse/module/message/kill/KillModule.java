@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.module.message.kill.model.Kill;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -50,7 +51,7 @@ public class KillModule extends AbstractModuleLocalization<Localization.Message.
     }
 
     @Async
-    public void send(FPlayer fPlayer, MinecraftTranslationKey key, String value, FEntity fEntity) {
+    public void send(FPlayer fPlayer, MinecraftTranslationKey key, Kill kill) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         FEntity fTarget = fPlayer;
@@ -58,11 +59,11 @@ public class KillModule extends AbstractModuleLocalization<Localization.Message.
         boolean isSingle = key == MinecraftTranslationKey.COMMANDS_KILL_SUCCESS_SINGLE
                 || key == MinecraftTranslationKey.COMMANDS_KILL_SUCCESS;
 
-        if (isSingle && fEntity != null && fEntity.getUuid() != null) {
-            fTarget = fPlayerService.getFPlayer(fEntity.getUuid());
+        if (isSingle && kill.getEntityUUID() != null) {
+            fTarget = fPlayerService.getFPlayer(kill.getEntityUUID());
 
             if (fTarget.isUnknown()) {
-                fTarget = fEntity;
+                fTarget = kill.fEntity();
             }
         }
 
@@ -70,7 +71,7 @@ public class KillModule extends AbstractModuleLocalization<Localization.Message.
                 .destination(message.getDestination())
                 .receiver(fPlayer)
                 .format(s -> key == MinecraftTranslationKey.COMMANDS_KILL_SUCCESS_MULTIPLE
-                        ? s.getMultiple().replace("<count>", value)
+                        ? s.getMultiple().replace("<count>", kill.value())
                         : s.getSingle()
                 )
                 .sound(getSound())
