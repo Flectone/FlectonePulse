@@ -3,18 +3,18 @@ package net.flectone.pulse.module.message.chat;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Message;
-import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
-import net.flectone.pulse.module.message.chat.listener.ChatListener;
+import net.flectone.pulse.module.message.chat.listener.ChatBukkitListener;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.checker.PermissionChecker;
 
 @Singleton
 public class BukkitChatModule extends ChatModule {
@@ -45,7 +45,7 @@ public class BukkitChatModule extends ChatModule {
         super.onEnable();
 
         if (!message.isPacketBased()) {
-            listenerRegistry.register(ChatListener.class, message.getPriority());
+            listenerRegistry.register(ChatBukkitListener.class, message.getPriority());
         }
     }
 }
