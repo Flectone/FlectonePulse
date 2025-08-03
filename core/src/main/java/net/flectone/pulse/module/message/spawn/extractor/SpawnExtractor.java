@@ -17,10 +17,9 @@ public class SpawnExtractor {
 
     @Inject
     public SpawnExtractor() {
-
     }
 
-    public Optional<Spawn> extractSpawn(TranslatableMessageReceiveEvent event) {
+    public Optional<Spawn> extract(TranslatableMessageReceiveEvent event) {
         TranslatableComponent translatableComponent = event.getComponent();
         List<Component> translationArguments = translatableComponent.args();
         if (translationArguments.size() < 4) return Optional.empty();

@@ -39,7 +39,7 @@ public class SpawnPulseListener implements PulseListener {
 
         if (!key.startsWith("commands.spawnpoint.success")) return;
 
-        Optional<Spawn> spawn = spawnExtractor.extractSpawn(event);
+        Optional<Spawn> spawn = spawnExtractor.extract(event);
         if (spawn.isEmpty()) return;
 
         event.setCancelled(true);

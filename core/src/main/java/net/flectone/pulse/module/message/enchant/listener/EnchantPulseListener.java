@@ -26,7 +26,7 @@ public class EnchantPulseListener implements PulseListener {
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(TranslatableMessageReceiveEvent event) {
-        Optional<Enchant> enchant = enchantExtractor.extractEnchant(event);
+        Optional<Enchant> enchant = enchantExtractor.extract(event);
         if (enchant.isEmpty()) return;
 
         event.setCancelled(true);
