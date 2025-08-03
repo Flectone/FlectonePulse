@@ -57,7 +57,7 @@ public class MiniPlaceholdersModule extends AbstractModule {
             if (!permissionChecker.check(sender, permission.getUse()) && isUserMessage) return;
             if (!permissionChecker.check(receiver, permission.getUse()) && isUserMessage) return;
 
-            miniPlaceholdersIntegration.onMessageProcessingEvent(messageFormattingEvent);
+            miniPlaceholdersIntegration.onMessageFormattingEvent(messageFormattingEvent);
         });
     }
 

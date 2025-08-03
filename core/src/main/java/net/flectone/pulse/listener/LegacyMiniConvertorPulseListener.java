@@ -73,7 +73,7 @@ public final class LegacyMiniConvertorPulseListener implements PulseListener {
     }
 
     @Pulse(priority = Event.Priority.HIGHEST)
-    public void onMessageProcessingEvent(MessageFormattingEvent event) {
+    public void onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.getContext();
         FEntity sender = messageContext.getSender();
         if (!messageContext.isFlag(MessageFlag.COLORS)) return;

@@ -18,7 +18,7 @@ public class StylePulseListener implements PulseListener {
     }
 
     @Pulse(priority = Event.Priority.HIGH)
-    public void onMessageProcessingEvent(MessageFormattingEvent event) {
+    public void onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.getContext();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
         if (!(messageContext.getSender() instanceof FPlayer sender)) return;

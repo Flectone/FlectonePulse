@@ -27,7 +27,7 @@ public class FixationPulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onMessageProcessingEvent(MessageFormattingEvent event) {
+    public void onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.getContext();
         if (!messageContext.isFlag(MessageFlag.FIXATION)) return;
         if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;

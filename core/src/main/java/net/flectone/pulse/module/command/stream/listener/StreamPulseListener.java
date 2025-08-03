@@ -42,7 +42,7 @@ public class StreamPulseListener implements PulseListener {
     }
 
     @Pulse(priority = Event.Priority.HIGH)
-    public void onMessageProcessingEvent(MessageFormattingEvent event) {
+    public void onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.getContext();
         FEntity sender = messageContext.getSender();
 

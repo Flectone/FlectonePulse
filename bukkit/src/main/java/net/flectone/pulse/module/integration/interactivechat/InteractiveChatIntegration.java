@@ -117,7 +117,7 @@ public class InteractiveChatIntegration implements FIntegration, PulseListener {
     }
 
     @Pulse(priority = Event.Priority.LOWEST)
-    public void onMessageProcessingEvent(MessageFormattingEvent event) {
+    public void onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.getContext();
         if (!messageContext.isFlag(MessageFlag.INTERACTIVE_CHAT)) return;
 

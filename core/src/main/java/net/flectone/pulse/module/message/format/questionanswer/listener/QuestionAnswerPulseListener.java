@@ -39,7 +39,7 @@ public class QuestionAnswerPulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onMessageProcessingEvent(MessageFormattingEvent event) {
+    public void onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.getContext();
         if (!messageContext.isFlag(MessageFlag.QUESTION)) return;
         if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;

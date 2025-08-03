@@ -40,7 +40,7 @@ public class ImagePulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onMessageProcessingEvent(MessageFormattingEvent event) {
+    public void onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.getContext();
         if (!messageContext.isFlag(MessageFlag.IMAGE)) return;
 
