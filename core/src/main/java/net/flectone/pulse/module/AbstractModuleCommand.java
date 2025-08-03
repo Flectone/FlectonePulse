@@ -70,7 +70,7 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
 
     protected String addPrompt(int index, Function<Localization.Command.Prompt, String> promptLocalization) {
         // this command already registered and ignored
-        if (!prompts.isEmpty() && prompts.size() - 1 != index) return "unknown";
+        if (prompts.size() != index) return "unknown";
 
         String prompt = promptLocalization.apply(fileResolver.getLocalization().getCommand().getPrompt());
         prompts.add(prompt);
@@ -79,7 +79,7 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
     }
 
     protected String getPrompt(int index) {
-        if (prompts.size() - 1 < index) throw new IllegalArgumentException("Argument at index " + index + " is not registered in the " + getCommandName() + "  command");
+        if (prompts.size() - 1 < index) throw new IllegalArgumentException("Argument at index " + index + " is not registered in the " + getCommandName() + " command");
 
         return prompts.get(index);
     }
