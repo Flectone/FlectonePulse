@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.config.Message;
+import net.flectone.pulse.platform.formatter.UrlFormatter;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.listener.PulseListener;
@@ -29,14 +30,17 @@ public class ImagePulseListener implements PulseListener {
     private final Message.Format.Image message;
     private final ImageModule imageModule;
     private final MessagePipeline messagePipeline;
+    private final UrlFormatter urlFormatter;
 
     @Inject
     public ImagePulseListener(FileResolver fileResolver,
                               ImageModule imageModule,
-                              MessagePipeline messagePipeline) {
+                              MessagePipeline messagePipeline,
+                              UrlFormatter urlFormatter) {
         this.message = fileResolver.getMessage().getFormat().getImage();
         this.imageModule = imageModule;
         this.messagePipeline = messagePipeline;
+        this.urlFormatter = urlFormatter;
     }
 
     @Pulse
@@ -52,7 +56,8 @@ public class ImagePulseListener implements PulseListener {
             Tag.Argument argument = argumentQueue.peek();
             if (argument == null) return Tag.selfClosingInserting(Component.empty());
 
-            String link = argument.value();
+            String link = urlFormatter.toASCII(argument.value());
+            if (link.isEmpty()) return Tag.selfClosingInserting(Component.empty());
 
             Component component;
             try {

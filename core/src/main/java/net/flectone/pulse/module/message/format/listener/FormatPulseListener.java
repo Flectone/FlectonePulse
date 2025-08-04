@@ -2,32 +2,29 @@ package net.flectone.pulse.module.message.format.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.AdventureTag;
-import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.message.format.FormatModule;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.formatter.UrlFormatter;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SkinService;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.AdventureTag;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 @Singleton
 public class FormatPulseListener implements PulseListener {
@@ -41,6 +38,7 @@ public class FormatPulseListener implements PulseListener {
     private final SkinService skinService;
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
+    private final UrlFormatter urlFormatter;
 
     @Inject
     public FormatPulseListener(FileResolver fileResolver,
@@ -50,7 +48,8 @@ public class FormatPulseListener implements PulseListener {
                                PlatformPlayerAdapter platformPlayerAdapter,
                                SkinService skinService,
                                PermissionChecker permissionChecker,
-                               MessagePipeline messagePipeline) {
+                               MessagePipeline messagePipeline,
+                               UrlFormatter urlFormatter) {
         this.message = fileResolver.getMessage().getFormat();
         this.permission = fileResolver.getPermission().getMessage().getFormat();
         this.formatModule = formatModule;
@@ -60,6 +59,7 @@ public class FormatPulseListener implements PulseListener {
         this.skinService = skinService;
         this.permissionChecker = permissionChecker;
         this.messagePipeline = messagePipeline;
+        this.urlFormatter = urlFormatter;
     }
 
     @Pulse
@@ -182,7 +182,9 @@ public class FormatPulseListener implements PulseListener {
                 Tag.Argument urlArgument = argumentQueue.peek();
                 if (urlArgument == null) return Tag.selfClosingInserting(Component.empty());
 
-                String url = toASCII(urlArgument.value());
+                String url = urlFormatter.toASCII(urlArgument.value());
+                if (url.isEmpty()) return Tag.selfClosingInserting(Component.empty());
+
                 String string = formatModule.resolveLocalization(receiver).getTags().get(AdventureTag.URL)
                         .replace("<message>", url);
 
@@ -197,16 +199,6 @@ public class FormatPulseListener implements PulseListener {
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
             String messageContent = replaceAll(sender, receiver, messageContext.getMessage());
             messageContext.setMessage(messageContent);
-        }
-    }
-
-    private String toASCII(String stringUrl) {
-        if (stringUrl == null || stringUrl.isBlank()) return "";
-
-        try {
-            return new URL(stringUrl).toURI().toASCIIString();
-        } catch (MalformedURLException | URISyntaxException e) {
-            return "";
         }
     }
 
