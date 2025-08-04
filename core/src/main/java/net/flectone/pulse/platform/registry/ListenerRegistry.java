@@ -67,7 +67,7 @@ public class ListenerRegistry implements Registry {
     }
 
     public void register(PulseListener pulseListener) {
-        for (Method method : pulseListener.getClass().getDeclaredMethods()) {
+        for (Method method : pulseListener.getClass().getMethods()) {
             if (method.isAnnotationPresent(Pulse.class)) {
                 if (method.isBridge() || method.isSynthetic()) continue;
 
