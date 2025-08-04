@@ -2,14 +2,18 @@ package net.flectone.pulse.platform.sender;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.advancements.*;
+import com.github.retrooper.packetevents.protocol.chat.ChatType;
 import com.github.retrooper.packetevents.protocol.chat.ChatTypes;
+import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessageLegacy;
 import com.github.retrooper.packetevents.protocol.chat.message.ChatMessage_v1_16;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemType;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -49,7 +53,7 @@ public class MessageSender {
     }
 
 
-    public void sendMessage(FPlayer fPlayer, Component component) {
+    public void sendMessage(FPlayer fPlayer, Component component, boolean silent) {
         if (fPlayer.isUnknown()) {
             fLogger.info(component);
             return;
@@ -58,7 +62,21 @@ public class MessageSender {
         User user = packetProvider.getUser(fPlayer);
         if (user == null) return;
 
-        user.sendMessage(component);
+        // PacketEvents realization
+        ClientVersion version = user.getClientVersion();
+        PacketWrapper<?> chatPacket;
+        if (version.isNewerThanOrEquals(ClientVersion.V_1_19)) {
+            chatPacket = new WrapperPlayServerSystemChatMessage(false, component);
+        } else {
+            ChatType type = ChatTypes.CHAT;
+            ChatMessage message = version.isNewerThanOrEquals(ClientVersion.V_1_16)
+                    ? new ChatMessage_v1_16(component, type, new UUID(0L, 0L))
+                    : new ChatMessageLegacy(component, type);
+
+            chatPacket = new WrapperPlayServerChatMessage(message);
+        }
+
+        packetSender.send(fPlayer.getUuid(), chatPacket, silent);
     }
 
     public void sendTitle(FPlayer fPlayer, Component title, Component subTitle, Times times) {

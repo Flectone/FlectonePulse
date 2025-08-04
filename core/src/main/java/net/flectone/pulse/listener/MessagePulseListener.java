@@ -41,7 +41,7 @@ public class MessagePulseListener implements PulseListener {
             case TAB_FOOTER -> messageSender.sendPlayerListHeaderAndFooter(fReceiver, platformPlayerAdapter.getPlayerListHeader(fReceiver), message);
             case TOAST -> messageSender.sendToast(fReceiver, message, destination.getToast());
             case BRAND -> messageSender.sendBrand(fReceiver, message);
-            default -> messageSender.sendMessage(fReceiver, message);
+            default -> messageSender.sendMessage(fReceiver, message, false);
         }
     }
 }

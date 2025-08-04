@@ -1,5 +1,6 @@
 package net.flectone.pulse.platform.sender;
 
+import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -18,19 +19,32 @@ public class PacketSender {
         this.packetProvider = packetProvider;
     }
 
-    public void send(UUID uuid, PacketWrapper<?> packetWrapper) {
+    public void send(Object channel, PacketWrapper<?> packetWrapper, boolean silent) {
+        ProtocolManager protocolManager = packetProvider.getProtocolManager();
+        if (silent) {
+            protocolManager.sendPacketSilently(channel, packetWrapper);
+        } else {
+            protocolManager.sendPacket(channel, packetWrapper);
+        }
+    }
+
+    public void send(UUID uuid, PacketWrapper<?> packetWrapper, boolean silent) {
         Object channel = packetProvider.getChannel(uuid);
         if (channel == null) return;
 
-        packetProvider.getProtocolManager().sendPacket(channel, packetWrapper);
+        send(channel, packetWrapper, silent);
+    }
+
+    public void send(FPlayer fPlayer, PacketWrapper<?> packetWrapper, boolean silent) {
+        send(fPlayer.getUuid(), packetWrapper, silent);
+    }
+
+    public void send(UUID uuid, PacketWrapper<?> packetWrapper) {
+        send(uuid, packetWrapper, false);
     }
 
     public void send(FPlayer fPlayer, PacketWrapper<?> packetWrapper) {
-        send(fPlayer.getUuid(), packetWrapper);
-    }
-
-    public void send(Object channel, PacketWrapper<?> packetWrapper) {
-        packetProvider.getProtocolManager().sendPacket(channel, packetWrapper);
+        send(fPlayer.getUuid(), packetWrapper, false);
     }
 
     public void send(PacketWrapper<?> packetWrapper) {
