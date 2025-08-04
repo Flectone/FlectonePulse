@@ -78,8 +78,6 @@ public abstract class IntegrationModule extends AbstractModule {
         return integration.isEnable();
     }
 
-    public abstract String checkMention(FEntity fPlayer, String message);
-
     public abstract boolean isVanished(FEntity sender);
 
     public abstract boolean hasSeeVanishPermission(FEntity sender);

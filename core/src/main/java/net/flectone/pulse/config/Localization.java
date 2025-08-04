@@ -1396,11 +1396,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
         }
 
         @Override
-        public SubIntegrationConfig getInteractivechat() {
-            return null;
-        }
-
-        @Override
         public SubIntegrationConfig getItemsadder() {
             return null;
         }

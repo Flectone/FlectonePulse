@@ -156,14 +156,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
         Range chatRange = playerChat.getRange();
 
-        // in local chat you can mention it too,
-        // but I don't want to full support InteractiveChat
-        String finalMessage = chatRange.is(Range.Type.PROXY)
-                || chatRange.is(Range.Type.SERVER)
-                || chatRange.is(Range.Type.WORLD_NAME)
-                || chatRange.is(Range.Type.WORLD_TYPE)
-                ? integrationModule.checkMention(fPlayer, eventMessage)
-                : eventMessage;
+        String finalMessage = eventMessage;
 
         Builder builder = builder(fPlayer)
                 .tag(MessageType.CHAT)

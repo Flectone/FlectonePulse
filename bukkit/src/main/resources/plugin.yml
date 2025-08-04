@@ -16,7 +16,6 @@ softdepend:
   - SuperVanish
   - PremiumVanish
   - SkinsRestorer
-  - InteractiveChat
   - ProtocolLib
   - PacketEvents
   - TAB
