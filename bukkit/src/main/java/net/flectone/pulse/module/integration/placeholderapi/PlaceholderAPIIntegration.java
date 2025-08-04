@@ -5,28 +5,27 @@ import com.google.inject.Singleton;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 @Singleton
 public class PlaceholderAPIIntegration extends PlaceholderExpansion implements FIntegration, PulseListener {
@@ -93,10 +92,10 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     }
 
     @Override
-    public String onPlaceholderRequest(@Nullable Player player, @NotNull String params) {
+    public String onRequest(OfflinePlayer player, @NotNull String params) {
         if (player == null) return null;
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(player);
+        FPlayer fPlayer = fPlayerService.getFPlayer(player.getUniqueId());
 
         params = params.toLowerCase();
 
