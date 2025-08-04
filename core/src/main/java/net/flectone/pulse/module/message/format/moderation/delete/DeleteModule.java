@@ -131,12 +131,12 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
         // empty messages
         for (int i = 0; i < message.getHistoryLength(); i++) {
             if (i >= history.size()) {
-                messageSender.sendMessage(fPlayer, Component.newline());
+                messageSender.sendMessage(fPlayer, Component.newline(), true);
             }
         }
 
         history.forEach(historyMessage ->
-                messageSender.sendMessage(fPlayer, historyMessage.component())
+                messageSender.sendMessage(fPlayer, historyMessage.component(), true)
         );
     }
 
