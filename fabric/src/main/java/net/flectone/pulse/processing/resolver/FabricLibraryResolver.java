@@ -82,14 +82,6 @@ public class FabricLibraryResolver extends LibraryResolver {
         );
 
         addLibrary(Library.builder()
-                .groupId("org{}incendo")
-                .artifactId("cloud-fabric")
-                .version(BuildConfig.CLOUD_PAPER_VERSION)
-                .resolveTransitiveDependencies(true)
-                .build()
-        );
-
-        addLibrary(Library.builder()
                 .groupId("org{}xerial")
                 .artifactId("sqlite-jdbc")
                 .version("3.47.1.0")
