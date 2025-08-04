@@ -35,6 +35,8 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
     private final Injector injector;
     private final PlatformServerAdapter platformServerAdapter;
+    private final ReflectionResolver reflectionResolver;
+    private final FLogger fLogger;
 
     @Inject
     public BukkitIntegrationModule(FileResolver fileResolver,
@@ -44,8 +46,10 @@ public class BukkitIntegrationModule extends IntegrationModule {
                                    Injector injector) {
         super(fileResolver, fLogger, platformServerAdapter, reflectionResolver, injector);
 
-        this.platformServerAdapter = platformServerAdapter;
         this.injector = injector;
+        this.platformServerAdapter = platformServerAdapter;
+        this.reflectionResolver = reflectionResolver;
+        this.fLogger = fLogger;
     }
 
     @Override
@@ -65,7 +69,11 @@ public class BukkitIntegrationModule extends IntegrationModule {
         }
 
         if (platformServerAdapter.hasProject("InteractiveChat")) {
-            addChildren(InteractiveChatModule.class);
+            if (reflectionResolver.hasClass("com.loohp.interactivechat.registry.Registry")) {
+                addChildren(InteractiveChatModule.class);
+            } else {
+                fLogger.warning("Update InteractiveChat to the latest version");
+            }
         }
 
         if (platformServerAdapter.hasProject("ItemsAdder")) {
