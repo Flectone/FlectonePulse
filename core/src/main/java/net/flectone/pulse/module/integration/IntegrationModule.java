@@ -93,13 +93,11 @@ public abstract class IntegrationModule extends AbstractModule {
     public boolean hasFPlayerPermission(FPlayer fPlayer, String permission) {
         if (!isEnable()) return false;
 
-        boolean value = true;
-
         if (getChildren().contains(LuckPermsModule.class)) {
-            value = injector.getInstance(LuckPermsModule.class).hasLuckPermission(fPlayer, permission);
+            return injector.getInstance(LuckPermsModule.class).hasLuckPermission(fPlayer, permission);
         }
 
-        return value;
+        return false;
     }
 
     public String getTextureUrl(FEntity sender) {
