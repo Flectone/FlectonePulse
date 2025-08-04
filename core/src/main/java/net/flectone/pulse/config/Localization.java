@@ -553,7 +553,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.format.mention.person = "<fcolor:2>Тебя упомянули!";
 
-        message.format.moderation.delete.placeholder = "<color:#ff7171><hover:show_text:\"<color:#ff7171>Нажми, чтобы удалить\"><click:run_command:\"/delete <uuid>\">[x] ";
+        message.format.moderation.delete.placeholder = "<color:#ff7171><hover:show_text:\"<color:#ff7171>Нажми, чтобы удалить\"><click:run_command:\"/deletemessage <uuid>\">[x] ";
         message.format.moderation.delete.format = "<fcolor:3><i>Сообщение удалено</i>";
 
         message.format.moderation.newbie.reason = "Ты ещё слишком новичок";
