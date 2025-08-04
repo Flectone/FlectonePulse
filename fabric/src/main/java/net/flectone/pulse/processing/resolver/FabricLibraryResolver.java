@@ -18,6 +18,78 @@ public class FabricLibraryResolver extends LibraryResolver {
         super.addLibraries();
 
         addLibrary(Library.builder()
+                .groupId("net{}kyori")
+                .artifactId("adventure-api")
+                .version(BuildConfig.ADVENTURE_API)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("net{}kyori")
+                .artifactId("adventure-text-minimessage")
+                .version(BuildConfig.ADVENTURE_API)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("net{}kyori")
+                .artifactId("adventure-text-serializer-gson")
+                .version(BuildConfig.ADVENTURE_API)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("net{}kyori")
+                .artifactId("adventure-text-serializer-plain")
+                .version(BuildConfig.ADVENTURE_API)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("net{}kyori")
+                .artifactId("adventure-text-serializer-json-legacy-impl")
+                .version(BuildConfig.ADVENTURE_API)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("net{}kyori")
+                .artifactId("adventure-text-serializer-legacy")
+                .version(BuildConfig.ADVENTURE_API)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("net{}kyori")
+                .artifactId("adventure-nbt")
+                .version(BuildConfig.ADVENTURE_API)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("net{}kyori")
+                .artifactId("adventure-key")
+                .version(BuildConfig.ADVENTURE_API)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("org{}incendo")
+                .artifactId("cloud-fabric")
+                .version(BuildConfig.CLOUD_PAPER_VERSION)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        addLibrary(Library.builder()
                 .groupId("org{}xerial")
                 .artifactId("sqlite-jdbc")
                 .version("3.47.1.0")

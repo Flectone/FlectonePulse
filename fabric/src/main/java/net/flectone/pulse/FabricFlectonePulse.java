@@ -7,6 +7,7 @@ import io.github.retrooper.packetevents.PacketEventsServerMod;
 import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.processing.resolver.FabricLibraryResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
@@ -17,13 +18,19 @@ import org.slf4j.LoggerFactory;
 
 @Getter
 @Singleton
-public class FabricFlectonePulse implements ModInitializer, FlectonePulse {
+public class FabricFlectonePulse implements PreLaunchEntrypoint, ModInitializer, FlectonePulse {
 
 	@Setter private MinecraftServer minecraftServer;
 
 	private LibraryResolver libraryResolver;
 	private FLogger fLogger;
 	private Injector injector;
+
+	@Override
+	public void onPreLaunch() {
+		// configure packetevents api
+		PacketEventsServerMod.constructApi(BuildConfig.PROJECT_MOD_ID).init();
+	}
 
 	@Override
 	public void onInitialize() {
@@ -38,9 +45,6 @@ public class FabricFlectonePulse implements ModInitializer, FlectonePulse {
 		libraryResolver.addLibraries();
 		libraryResolver.resolveRepositories();
 		libraryResolver.loadLibraries();
-
-		// configure packetevents api
-		PacketEventsServerMod.constructApi(BuildConfig.PROJECT_MOD_ID).init();
 
 		onEnable();
 	}
