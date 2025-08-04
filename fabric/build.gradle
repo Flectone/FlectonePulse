@@ -5,39 +5,45 @@ plugins {
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:${fabric_minecraft_version}"
-	mappings "net.fabricmc:yarn:${yarn_mappings_version}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+	minecraft("com.mojang:minecraft:${fabric_minecraft_version}")
+	mappings("net.fabricmc:yarn:${yarn_mappings_version}:v2")
 
-	implementation("com.alessiodp.libby:libby-fabric:$libby_version")
-	implementation("org.apache.commons:commons-lang3:3.18.0")
-	implementation(project(":core"))
-
-	Set<String> apiModules = [
+	modCompileOnly("net.fabricmc:fabric-loader:${fabric_loader_version}")
+	Set<String> fabricApiModules = [
 			'fabric-api-base',
 			'fabric-command-api-v2',
 			'fabric-lifecycle-events-v1',
 			'fabric-networking-api-v1'
 	]
 
-	apiModules.forEach {
-		modCompileOnly(fabricApi.module(it, '0.129.0+1.21.8'))
+	fabricApiModules.forEach {
+		modCompileOnly(fabricApi.module(it, "$fabric_api_version"))
 	}
 
-	compileOnly "net.kyori:adventure-text-minimessage:$adventure_api"
-	compileOnly "net.kyori:adventure-api:$adventure_api"
-	compileOnly "net.kyori:adventure-nbt:$adventure_api"
-	compileOnly "net.kyori:adventure-key:$adventure_api"
-	compileOnly "net.kyori:adventure-text-serializer-gson:$adventure_api"
-	compileOnly "net.kyori:adventure-text-serializer-plain:$adventure_api"
-	compileOnly "net.kyori:adventure-text-serializer-json-legacy-impl:$adventure_api"
-	compileOnly "net.kyori:adventure-text-serializer-legacy:$adventure_api"
-	compileOnly("net.elytrium:serializer:$elytrium_serializer_version")
+	Set<String> adventureApiModules = [
+			'adventure-text-minimessage',
+			'adventure-api',
+			'adventure-nbt',
+			'adventure-key',
+			'adventure-text-serializer-gson',
+			'adventure-text-serializer-plain',
+			'adventure-text-serializer-json-legacy-impl',
+			'adventure-text-serializer-legacy'
+	]
+
+	adventureApiModules.forEach {
+		modCompileOnly("net.kyori:$it:$adventure_api")
+	}
 
 	modCompileOnly("com.github.retrooper:packetevents-fabric:$packetevents_spigot_version")
 	modCompileOnly("org.incendo:cloud-fabric:${cloud_paper_version}")
 	modCompileOnly("eu.pb4:placeholder-api:$text_placeholder_api_version")
 	modCompileOnly("maven.modrinth:vanish:1.5.20+1.21.1")
+
+	implementation("com.alessiodp.libby:libby-fabric:$libby_version")
+	implementation("org.apache.commons:commons-lang3:3.18.0")
+
+	implementation(project(":core"))
 }
 
 shadowJar {
