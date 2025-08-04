@@ -117,7 +117,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
                     : value;
         }
 
-        String placeholder = switch (params) {
+        return switch (params) {
             case "player" -> fPlayer.getName();
             case "ip" -> fPlayer.getIp();
             case "ping" -> String.valueOf(fPlayerService.getPing(fPlayer));
@@ -125,8 +125,6 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             case "tps" -> platformServerAdapter.getTPS();
             default -> null;
         };
-
-        return placeholder == null ? "" : placeholder;
     }
 
     @Pulse(priority = Event.Priority.LOW)
