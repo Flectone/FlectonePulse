@@ -17,7 +17,7 @@ softdepend:
   - PremiumVanish
   - SkinsRestorer
   - ProtocolLib
-  - PacketEvents
+  - packetevents
   - TAB
   - LiteBans
   - AdvancedBan
