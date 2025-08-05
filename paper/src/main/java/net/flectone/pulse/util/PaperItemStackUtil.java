@@ -1,18 +1,19 @@
 package net.flectone.pulse.util;
 
-import com.google.gson.JsonElement;
 import lombok.experimental.UtilityClass;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.event.DataComponentValue;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Map;
 
 @UtilityClass
 public class PaperItemStackUtil {
 
-    public JsonElement serialize(ItemStack itemStack) {
-        Component component = Component.text(itemStack.getType().name());
-
-        return GsonComponentSerializer.gson().serializeToTree(component.hoverEvent(itemStack));
+    public Map<Key, DataComponentValue> getDataComponents(ItemStack itemStack) {
+        HoverEvent.ShowItem showItem = itemStack.asHoverEvent().value();
+        return showItem.dataComponents();
     }
 
 }

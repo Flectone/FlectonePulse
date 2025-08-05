@@ -4,7 +4,6 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
-import com.github.retrooper.packetevents.util.adventure.AdventureSerializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
@@ -249,20 +248,22 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
         if (itemStack.getType() == Material.AIR) return component;
 
+        Key key = Key.key(itemStack.getType().name().toLowerCase());
+        int amount = itemStack.getAmount();
+
         try {
             // it's not really working full
-            // for some reason nbt components are not showing up
-            // waiting for new NBTSerializer by Kyori
+            // data components are not displayed
+            // waiting for PacketEvents to implement this https://github.com/retrooper/packetevents/pull/1277
             if (reflectionResolver.isPaper()) {
-                JsonElement element = PaperItemStackUtil.serialize(itemStack);
-                return component.hoverEvent(AdventureSerializer.serializer().fromJsonTree(element).hoverEvent());
+                HoverEvent.ShowItem showItem = HoverEvent.ShowItem.showItem(key, amount, PaperItemStackUtil.getDataComponents(itemStack));
+                return component.hoverEvent(HoverEvent.showItem(showItem));
             }
         } catch (Exception ignored) {
             // ignore incorrect hover
         }
 
-        Key key = Key.key(itemStack.getType().name().toLowerCase());
-        return component.hoverEvent(HoverEvent.showItem(key, itemStack.getAmount()));
+        return component.hoverEvent(HoverEvent.showItem(key, amount));
     }
 
     private Component createTranslatableItemName(org.bukkit.inventory.ItemStack itemStack, boolean translatable) {
