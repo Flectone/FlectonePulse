@@ -9,13 +9,8 @@ import com.google.inject.name.Names;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.data.database.Database;
+import net.flectone.pulse.execution.scheduler.BukkitTaskScheduler;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.platform.adapter.BukkitPlayerAdapter;
-import net.flectone.pulse.platform.adapter.BukkitServerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.platform.provider.*;
-import net.flectone.pulse.platform.registry.*;
 import net.flectone.pulse.listener.LegacyMiniConvertorPulseListener;
 import net.flectone.pulse.module.command.spy.BukkitSpyModule;
 import net.flectone.pulse.module.command.spy.SpyModule;
@@ -37,10 +32,15 @@ import net.flectone.pulse.module.message.quit.BukkitQuitModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.sign.BukkitSignModule;
 import net.flectone.pulse.module.message.sign.SignModule;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.platform.adapter.BukkitPlayerAdapter;
+import net.flectone.pulse.platform.adapter.BukkitServerAdapter;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.provider.*;
+import net.flectone.pulse.platform.registry.*;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
-import net.flectone.pulse.execution.scheduler.BukkitTaskScheduler;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.checker.BukkitPermissionChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.interceptor.AsyncInterceptor;
@@ -122,7 +122,11 @@ public class BukkitInjector extends AbstractModule {
 
         // Modules
         bind(IntegrationModule.class).to(BukkitIntegrationModule.class);
-        bind(SimpleVoiceModule.class).to(BukkitSimpleVoiceModule.class);
+
+        if (reflectionResolver.hasClass("de.maxhenkel.voicechat.api.VoicechatPlugin")) {
+            bind(SimpleVoiceModule.class).to(BukkitSimpleVoiceModule.class);
+        }
+
         bind(AnvilModule.class).to(BukkitAnvilModule.class);
         bind(BookModule.class).to(BukkitBookModule.class);
         bind(AfkModule.class).to(BukkitAfkModule.class);
