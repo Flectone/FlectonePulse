@@ -393,6 +393,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.prompt.language = "язык";
         command.prompt.url = "ссылка";
         command.prompt.move = "ход";
+        command.prompt.value = "значение";
 
         integration.discord.infoChannel.clear();
         integration.discord.infoChannel.put("айди", "ТПС <tps>");
@@ -722,6 +723,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String language = "language";
             private String url = "url";
             private String move = "move";
+            private String value = "value";
         }
 
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/anon/")})
