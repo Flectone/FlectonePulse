@@ -4,24 +4,32 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.util.checker.PermissionChecker;
+import lombok.NonNull;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.platform.controller.InventoryController;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.inventory.Inventory;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.InventoryController;
+import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
+import org.incendo.cloud.suggestion.Suggestion;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 @Singleton
 public class ChatsettingModule extends AbstractModuleCommand<Localization.Command.Chatsetting> {
@@ -34,6 +42,8 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     private final PermissionChecker permissionChecker;
     private final InventoryController inventoryController;
     private final PlatformServerAdapter platformServerAdapter;
+    private final CommandParserProvider commandParserProvider;
+    private final ProxySender proxySender;
     private final boolean modernVersion;
 
     @Inject
@@ -43,6 +53,8 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                              PermissionChecker permissionChecker,
                              InventoryController inventoryController,
                              PlatformServerAdapter platformServerAdapter,
+                             CommandParserProvider commandParserProvider,
+                             ProxySender proxySender,
                              PacketProvider packetProvider) {
         super(localization -> localization.getCommand().getChatsetting(), Command::getChatsetting);
 
@@ -54,6 +66,8 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         this.permissionChecker = permissionChecker;
         this.inventoryController = inventoryController;
         this.platformServerAdapter = platformServerAdapter;
+        this.commandParserProvider = commandParserProvider;
+        this.proxySender = proxySender;
         this.modernVersion = packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_14);
     }
 
@@ -66,17 +80,68 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
 
         permission.getSettings().values().forEach(this::registerPermission);
 
+        String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
+        String promptType = addPrompt(1, Localization.Command.Prompt::getType);
+        String promptValue = addPrompt(2, Localization.Command.Prompt::getValue);
         registerCommand(commandBuilder -> commandBuilder
                 .permission(permission.getName())
+                .optional(promptPlayer, commandParserProvider.offlinePlayerParser(), commandParserProvider.playerSuggestionPermission(permission.getOther()))
+                .optional(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
+                .optional(promptValue, commandParserProvider.messageParser())
         );
 
         addPredicate(this::checkCooldown);
+    }
+
+    private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
+        return (context, input) -> {
+            if (!permissionChecker.check(context.sender(), permission.getOther())) return Collections.emptyList();
+
+            return Arrays.stream(FPlayer.Setting.values())
+                    .map(setting -> Suggestion.suggestion(setting.name()))
+                    .toList();
+        };
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (isModuleDisabledFor(fPlayer)) return;
 
+        // example /chatsetting Notch ADVANCEMENT
+        // or /chatsetting Notch STYLE &c
+        if (permissionChecker.check(fPlayer, permission.getOther())) {
+            String promptPlayer = getPrompt(0);
+            Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
+
+            String promptType = getPrompt(1);
+            Optional<String> optionalType = commandContext.optional(promptType);
+
+            String promptValue = getPrompt(2);
+            Optional<String> optionalValue = commandContext.optional(promptValue);
+
+            if (optionalType.isPresent() && optionalPlayer.isPresent()) {
+                FPlayer.Setting setting = FPlayer.Setting.fromString(optionalType.get());
+                FPlayer fTarget = fPlayerService.getFPlayer(optionalPlayer.get());
+                if (setting == null) return;
+                if (fTarget.isUnknown()) return;
+
+                fPlayerService.loadSettings(fTarget);
+
+                if (fTarget.isSetting(setting) && optionalValue.isEmpty()) {
+                    fTarget.removeSetting(setting);
+                } else {
+                    fTarget.setSetting(setting, optionalValue.orElse(""));
+                }
+
+                fPlayerService.saveSettings(fTarget);
+
+                // update proxy players
+                proxySender.send(fTarget, MessageType.COMMAND_CHATSETTING, dataOutputStream -> {});
+                return;
+            }
+        }
+
+        // default command usage
         sendSettingInventory(fPlayer);
 
         playSound(fPlayer);

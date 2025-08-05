@@ -141,6 +141,7 @@ public class ProxyMessageHandler {
             case COMMAND_BAN -> handleBanCommand(input, fEntity);
             case COMMAND_BROADCAST -> handleBroadcastCommand(input, fEntity);
             case COMMAND_CHATCOLOR -> handleChatColorCommand(fEntity);
+            case COMMAND_CHATSETTING -> handleChatSettingCommand(fEntity);
             case COMMAND_CHATSTYLE -> handleChatStyleCommand(fEntity);
             case COMMAND_COIN -> handleCoinCommand(input, fEntity);
             case COMMAND_DELETE -> handleDeleteCommand(input, fEntity);
@@ -283,6 +284,10 @@ public class ProxyMessageHandler {
 
     private void handleChatColorCommand(FEntity fEntity) {
         fPlayerService.loadColors(fPlayerService.getFPlayer(fEntity.getUuid()));
+    }
+
+    private void handleChatSettingCommand(FEntity fEntity) {
+        fPlayerService.loadSettings(fPlayerService.getFPlayer(fEntity.getUuid()));
     }
 
     private void handleChatStyleCommand(FEntity fEntity) {

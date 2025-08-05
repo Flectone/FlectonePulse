@@ -239,6 +239,7 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                     put(FPlayer.Setting.WARN, new SettingItem("flectonepulse.module.command.chatsetting.warn", Type.TRUE));
                 }
             };
+            private PermissionEntry other = new PermissionEntry("flectonepulse.module.command.chatsetting.other", Type.OP);
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.chatsetting.cooldown.bypass", Type.OP);
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.chatsetting.sound", Type.TRUE);
 
