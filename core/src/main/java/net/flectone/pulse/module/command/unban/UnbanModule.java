@@ -70,7 +70,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         String promptId = addPrompt(1, Localization.Command.Prompt::getId);
         registerCommand(manager -> manager
                 .permission(permission.getName())
-                .required(promptPlayer, commandParserProvider.warnedParser())
+                .required(promptPlayer, commandParserProvider.bannedParser())
                 .optional(promptId, commandParserProvider.integerParser())
         );
     }

@@ -65,7 +65,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
         String promptId = addPrompt(1, Localization.Command.Prompt::getId);
         registerCommand(manager -> manager
                 .permission(permission.getName())
-                .required(promptPlayer, commandParserProvider.warnedParser())
+                .required(promptPlayer, commandParserProvider.mutedParser())
                 .optional(promptId, commandParserProvider.integerParser())
         );
     }
