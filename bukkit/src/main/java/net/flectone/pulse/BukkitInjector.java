@@ -61,7 +61,6 @@ public class BukkitInjector extends AbstractModule {
     private final Plugin plugin;
     private final LibraryResolver libraryResolver;
     private final FLogger fLogger;
-    private final PacketProvider packetProvider;
 
     public BukkitInjector(BukkitFlectonePulse instance,
                           Plugin plugin,
@@ -71,13 +70,10 @@ public class BukkitInjector extends AbstractModule {
         this.plugin = plugin;
         this.libraryResolver = libraryResolver;
         this.fLogger = fLogger;
-        this.packetProvider = new PacketProvider();
     }
 
     @Override
     protected void configure() {
-        bind(PacketProvider.class).toInstance(packetProvider);
-
         ReflectionResolver reflectionResolver = new ReflectionResolver(libraryResolver);
         bind(ReflectionResolver.class).toInstance(reflectionResolver);
 
