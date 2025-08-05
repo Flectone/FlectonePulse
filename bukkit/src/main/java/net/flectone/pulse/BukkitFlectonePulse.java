@@ -40,11 +40,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
                 .reEncodeByDefault(false)
                 .checkForUpdates(false)
                 .debug(false);
-        PacketEvents.getAPI().load();
-    }
 
-    @Override
-    public void onEnable() {
         try {
             // create guice injector for dependency injection
             injector = Guice.createInjector(new BukkitInjector(this, this, libraryResolver, fLogger));
@@ -54,6 +50,13 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
+
+        PacketEvents.getAPI().load();
+    }
+
+    @Override
+    public void onEnable() {
+        if (injector == null) return;
 
         injector.getInstance(FlectonePulseAPI.class).onEnable();
     }

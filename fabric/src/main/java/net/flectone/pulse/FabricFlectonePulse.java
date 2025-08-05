@@ -46,11 +46,6 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, ModInitializer,
 		libraryResolver.resolveRepositories();
 		libraryResolver.loadLibraries();
 
-		onEnable();
-	}
-
-	@Override
-	public void onEnable() {
 		try {
 			// create guice injector for dependency injection
 			injector = Guice.createInjector(new FabricInjector(this, libraryResolver, fLogger));
@@ -60,6 +55,13 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, ModInitializer,
 			e.printStackTrace();
 			return;
 		}
+
+		onEnable();
+	}
+
+	@Override
+	public void onEnable() {
+		if (injector == null) return;
 
 		injector.getInstance(FlectonePulseAPI.class).onEnable();
 	}
