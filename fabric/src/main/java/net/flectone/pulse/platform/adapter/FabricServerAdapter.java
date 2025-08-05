@@ -14,10 +14,10 @@ import com.google.inject.name.Named;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.fabricmc.loader.api.FabricLoader;
 import net.flectone.pulse.FabricFlectonePulse;
-import net.flectone.pulse.util.constant.PlatformType;
-import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.TpsTracker;
+import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -162,18 +162,15 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     @Override
     public @NotNull Component translateItemName(Object item, boolean translatable) {
         if (!(item instanceof net.minecraft.item.ItemStack itemStack)) return Component.empty();
-
-        String itemName = getItemName(item).toLowerCase().replace(" ", "_");
-        if (itemName.equalsIgnoreCase("air")) return Component.empty();
+        if (getItemName(item).equalsIgnoreCase("air")) return Component.translatable("block.minecraft.air");
 
         Component component = itemStack.getCustomName() == null
                 || itemStack.getCustomName().getString().isBlank()
                 ? createTranslatableItemName(itemStack, translatable)
                 : Component.text(itemStack.getCustomName().getString()).decorate(TextDecoration.ITALIC);
 
-        Key key = Key.key(itemName);
-        return component
-                .hoverEvent(HoverEvent.showItem(key, itemStack.getCount()));
+        Key key = Key.key(itemStack.getRegistryEntry().getIdAsString());
+        return component.hoverEvent(HoverEvent.showItem(key, itemStack.getCount()));
     }
 
     private Component createTranslatableItemName(net.minecraft.item.ItemStack itemStack, boolean translatable) {
