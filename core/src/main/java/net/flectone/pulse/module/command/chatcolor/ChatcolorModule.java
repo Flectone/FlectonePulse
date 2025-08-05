@@ -81,7 +81,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         String[] inputColors = null;
 
         if (commandContext.rawInput().input().split(" ").length != 1) {
-            String promptColor = getArgument(commandContext, 0);
+            String promptColor = getPrompt(0);
 
             List<String> inputList = new ArrayList<>();
             for (int i = 0; i < color.getValues().size(); i++) {
