@@ -396,8 +396,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             private boolean enable = true;
             private Map<Integer, String> defaultColors = new LinkedHashMap<>(){
                 {
-                    put(1, "<gradient:#B3E5FC:#75CBF2>");
-                    put(2, "<gradient:#70C7EF:#37B1F2>");
+                    put(1, "<gradient:#A6D8FF:#8CC8FF>");
+                    put(2, "<gradient:#6BB6FF:#4DA6FF>");
                     put(3, "#A9A9A9");
                     put(4, "#FFFAFA");
                 }
