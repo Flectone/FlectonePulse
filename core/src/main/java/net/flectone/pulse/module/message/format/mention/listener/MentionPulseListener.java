@@ -79,7 +79,7 @@ public class MentionPulseListener implements PulseListener {
             if (group.isPresent()) {
                 if (receiver instanceof FPlayer mentionFPlayer
                         && !permissionChecker.check(mentionFPlayer, permission.getBypass())
-                        && permissionChecker.check(mentionFPlayer, "group." + group.get())) {
+                        && permissionChecker.check(mentionFPlayer, permission.getGroup() + "." + group.get())) {
                     mentionModule.sendMention(processId, mentionFPlayer);
                 }
             } else {
