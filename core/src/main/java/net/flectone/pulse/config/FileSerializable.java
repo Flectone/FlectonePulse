@@ -9,6 +9,8 @@ import net.elytrium.serializer.annotations.Transient;
 import net.elytrium.serializer.custom.ClassSerializer;
 import net.elytrium.serializer.language.object.YamlSerializable;
 import net.flectone.pulse.data.database.Database;
+import net.flectone.pulse.model.FColor;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.util.*;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
@@ -27,6 +29,8 @@ public abstract class FileSerializable extends YamlSerializable {
     private static final SerializerConfig CONFIG = new SerializerConfig
             .Builder()
             .setBackupOnErrors(true)
+            .registerSerializer(new EnumSerializer<>(FColor.class))
+            .registerSerializer(new EnumSerializer<>(FPlayer.Setting.class))
             .registerSerializer(new EnumSerializer<>(Database.Type.class))
             .registerSerializer(new EnumSerializer<>(Permission.Type.class))
             .registerSerializer(new EnumSerializer<>(Destination.Type.class))
