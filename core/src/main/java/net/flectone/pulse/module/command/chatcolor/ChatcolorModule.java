@@ -117,21 +117,24 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         String promptColor = getPrompt(1);
         Optional<String> optionalClear = commandContext.optional(promptColor + " 1");
         if (optionalClear.isPresent() && optionalClear.get().equalsIgnoreCase("clear")) {
-            setColors(fTarget, fColorType.get(), null);
+            setColors(fTarget, fColorType.get(), Collections.emptySet());
             return;
         }
 
-        Set<FColor> newFColors = HashSet.newHashSet(fColorMessage.getDefaultColors().size());
+        Map<Integer, FColor> newFColors = new HashMap<>();
+        fTarget.getFColors().getOrDefault(fColorType.get(), Set.of())
+                .forEach(c -> newFColors.put(c.number(), c));
+
         for (int i = 0; i < fColorMessage.getDefaultColors().size(); i++) {
             Optional<String> optionalColor = commandContext.optional(promptColor + " " + (i + 1));
-            if (optionalColor.isEmpty()) break;
+            if (optionalColor.isEmpty()) continue;
 
             int number = i + 1;
             String name = colorConverter.convert(optionalColor.get());
-            if (name == null) break;
+            if (name == null) continue;
 
             FColor fColor = new FColor(number, name);
-            newFColors.add(fColor);
+            newFColors.put(number, fColor);
         }
 
         if (newFColors.isEmpty()) {
@@ -141,7 +144,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
             return;
         }
 
-        setColors(fTarget, fColorType.get(), newFColors);
+        setColors(fTarget, fColorType.get(), new HashSet<>(newFColors.values()));
     }
 
     private void setColors(FPlayer fPlayer, FColor.Type type, Set<FColor> newFColors) {
@@ -149,15 +152,9 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         Set<FColor> oldFColors = fColors.getOrDefault(type, Collections.emptySet());
 
         if (!oldFColors.equals(newFColors)) {
-            if (newFColors == null || newFColors.isEmpty()) {
+            if (newFColors.isEmpty()) {
                 fColors.remove(type);
             }  else {
-                if (newFColors.size() < oldFColors.size()) {
-                    oldFColors.stream()
-                            .skip(newFColors.size())
-                            .forEach(newFColors::add);
-                }
-
                 fColors.put(type, newFColors);
             }
 
