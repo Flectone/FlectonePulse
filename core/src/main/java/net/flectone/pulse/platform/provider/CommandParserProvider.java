@@ -133,11 +133,11 @@ public class CommandParserProvider {
         return ParserDescriptor.of(colorParser, String.class);
     }
 
-    public @NonNull BlockingSuggestionProvider<FPlayer> playerSuggestionPermission(Permission.IPermission permission) {
+    public @NonNull BlockingSuggestionProvider<FPlayer> playerSuggestionPermission(boolean offlinePlayers, Permission.IPermission permission) {
         return (context, input) -> {
             if (!permissionChecker.check(context.sender(), permission)) return Collections.emptyList();
 
-            return playerParser().parser().suggestionProvider().suggestionsFuture(context, input).join();
+            return playerParser(offlinePlayers).parser().suggestionProvider().suggestionsFuture(context, input).join();
         };
     }
 }

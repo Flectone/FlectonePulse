@@ -50,7 +50,7 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         registerCommand(commandBuilder -> commandBuilder
                         .permission(permission.getName())
-                        .optional(promptPlayer, commandParserProvider.playerParser(), commandParserProvider.playerSuggestionPermission(permission.getOther()))
+                        .optional(promptPlayer, commandParserProvider.playerParser(), commandParserProvider.playerSuggestionPermission(false, permission.getOther()))
         );
 
         addPredicate(this::checkCooldown);
