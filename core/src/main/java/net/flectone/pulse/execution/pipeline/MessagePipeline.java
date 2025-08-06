@@ -146,6 +146,10 @@ public class MessagePipeline {
         ONLINE,
         COORDS,
         STATS,
+
+        @Deprecated
+        STYLE,
+
         SKIN,
         ITEM,
         URL,
@@ -157,7 +161,10 @@ public class MessagePipeline {
         QUESTION,
         SPOILER,
         TRANSLATE,
+
+        @Deprecated
         TRANSLATETO,
+
         WORLD_PREFIX;
 
         @Subst("")

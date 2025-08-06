@@ -12,9 +12,9 @@ import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Config;
-import net.flectone.pulse.data.database.dao.ColorsDAO;
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
 import net.flectone.pulse.data.database.dao.SettingDAO;
+import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ignore;
 import net.flectone.pulse.model.util.Mail;
@@ -95,7 +95,7 @@ public class Database {
                 );
             }
 
-            jdbi.registerRowMapper(ConstructorMapper.factory(ColorsDAO.ColorEntry.class));
+            jdbi.registerRowMapper(ConstructorMapper.factory(FColor.class));
             jdbi.registerRowMapper(ConstructorMapper.factory(FPlayerDAO.PlayerInfo.class));
             jdbi.registerRowMapper(ConstructorMapper.factory(Ignore.class));
             jdbi.registerRowMapper(ConstructorMapper.factory(Mail.class));
@@ -109,6 +109,10 @@ public class Database {
 
         if (fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "0.9.0")) {
             MIGRATION_0_9_0();
+        }
+
+        if (fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "1.3.0")) {
+            MIGRATION_1_3_0();
         }
 
         if (config.getType() == Type.SQLITE) {
@@ -267,6 +271,17 @@ public class Database {
             fPlayer.setSetting(FPlayer.Setting.ANON);
             settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.ANON);
         });
+    }
+
+    private void MIGRATION_1_3_0() {
+        backupDatabase();
+
+        try {
+            InputStream sqlFile = platformServerAdapter.getResource("sqls/migrations/1_3_0.sql");
+            executeSQLFile(sqlFile);
+        } catch (IOException e) {
+            fLogger.warning(e);
+        }
     }
 
     private void backupDatabase() {

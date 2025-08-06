@@ -1,6 +1,7 @@
 package net.flectone.pulse.model.entity;
 
 import lombok.Getter;
+import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.util.Ignore;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +14,7 @@ public class FPlayer extends FEntity {
     public static final FPlayer UNKNOWN = new FPlayer(FEntity.unknownName);
 
     private final int id;
-    private final Map<String, String> colors = new HashMap<>();
+    private final Map<FColor.Type, Set<FColor>> fColors = new EnumMap<>(FColor.Type.class);
     private final Map<Setting, String> settings = new EnumMap<>(Setting.class);
     private final List<Ignore> ignores = new ArrayList<>();
 
@@ -100,7 +101,6 @@ public class FPlayer extends FEntity {
         setSetting(Setting.DISCORD);
         setSetting(Setting.TELEGRAM);
         setSetting(Setting.TWITCH);
-        setSetting(Setting.STYLE);
         setSetting(Setting.ANON);
     }
 
@@ -127,6 +127,12 @@ public class FPlayer extends FEntity {
     }
 
     public enum Setting {
+        @Deprecated
+        COLOR,
+
+        @Deprecated
+        STYLE,
+
         ADVANCEMENT,
         AFK,
         AFK_SUFFIX,
@@ -136,7 +142,6 @@ public class FPlayer extends FEntity {
         BROADCAST,
         CHAT,
         COIN,
-        COLOR,
         DEATH,
         DICE,
         DISCORD,
@@ -163,7 +168,6 @@ public class FPlayer extends FEntity {
         TWITCH,
         WARN,
         WORLD_PREFIX,
-        STYLE,
         ANON;
 
         @Nullable

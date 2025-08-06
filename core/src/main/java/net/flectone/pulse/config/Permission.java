@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
+import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.AdventureTag;
 
@@ -67,8 +68,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Chatcolor chatcolor = new Chatcolor();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatsetting/")})
         private Chatsetting chatsetting = new Chatsetting();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatstyle/")})
-        private Chatstyle chatstyle = new Chatstyle();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearchat/")})
         private Clearchat clearchat = new Clearchat();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearmail/")})
@@ -201,11 +200,10 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         public static final class Chatsetting implements SubCommandConfig, IPermission {
             private String name = "flectonepulse.module.command.chatsetting";
             private Type type = Type.TRUE;
+
             private Map<FPlayer.Setting, Chatsetting.SettingItem> settings = new LinkedHashMap<>(){
                 {
                     put(FPlayer.Setting.CHAT, new SettingItem("flectonepulse.module.command.chatsetting.chat", Type.TRUE));
-                    put(FPlayer.Setting.COLOR, new SettingItem("flectonepulse.module.command.chatsetting.color", Type.TRUE));
-                    put(FPlayer.Setting.STYLE, new SettingItem("flectonepulse.module.command.chatsetting.style", Type.OP));
                     put(FPlayer.Setting.SPY, new SettingItem("flectonepulse.module.command.chatsetting.spy", Type.OP));
                     put(FPlayer.Setting.STREAM, new SettingItem("flectonepulse.module.command.chatsetting.stream", Type.OP));
                     put(FPlayer.Setting.ADVANCEMENT, new SettingItem("flectonepulse.module.command.chatsetting.advancement", Type.TRUE));
@@ -239,6 +237,12 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                     put(FPlayer.Setting.WARN, new SettingItem("flectonepulse.module.command.chatsetting.warn", Type.TRUE));
                 }
             };
+            private Map<FColor.Type, Chatsetting.SettingItem> fcolors = new LinkedHashMap<>() {
+                {
+                    put(FColor.Type.SEE, new SettingItem("flectonepulse.module.command.chatsetting.see", Type.TRUE));
+                    put(FColor.Type.OUT, new SettingItem("flectonepulse.module.command.chatsetting.out", Type.OP));
+                }
+            };
             private PermissionEntry other = new PermissionEntry("flectonepulse.module.command.chatsetting.other", Type.OP);
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.chatsetting.cooldown.bypass", Type.OP);
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.chatsetting.sound", Type.TRUE);
@@ -250,15 +254,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                 private String name = "flectonepulse.module.command.chatsetting";
                 private Type type = Type.TRUE;
             }
-        }
-
-        @Getter
-        public static final class Chatstyle implements SubCommandConfig, IPermission {
-            private String name = "flectonepulse.module.command.chatstyle";
-            private Type type = Type.OP;
-            private PermissionEntry other = new PermissionEntry("flectonepulse.module.command.chatstyle.other", Type.OP);
-            private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.chatstyle.cooldown.bypass", Type.OP);
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.chatstyle.sound", Type.TRUE);
         }
 
         @Getter
@@ -947,10 +942,10 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                 }
             };
 
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/color/")})
-            private Color color = new Color();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/emoji/")})
             private Emoji emoji = new Emoji();
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fcolor/")})
+            private FColor fcolor = new FColor();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fixation/")})
             private Fixation fixation = new Fixation();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/image/")})
@@ -967,23 +962,27 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private Scoreboard scoreboard = new Scoreboard();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/spoiler/")})
             private Spoiler spoiler = new Spoiler();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/style/")})
-            private Style style = new Style();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/translate/")})
             private Translate translate = new Translate();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/world/")})
             private World world = new World();
 
             @Getter
-            public static final class Color implements SubFormatMessageConfig, IPermission {
-                private String name = "flectonepulse.module.message.format.fcolor";
+            public static final class Emoji implements SubFormatMessageConfig, IPermission {
+                private String name = "flectonepulse.module.message.format.emoji";
                 private Type type = Type.TRUE;
             }
 
             @Getter
-            public static final class Emoji implements SubFormatMessageConfig, IPermission {
-                private String name = "flectonepulse.module.message.format.emoji";
+            public static final class FColor implements SubFormatMessageConfig, IPermission {
+                private String name = "flectonepulse.module.message.format.fcolor";
                 private Type type = Type.TRUE;
+                private Map<net.flectone.pulse.model.FColor.Type, PermissionEntry> types = new LinkedHashMap<>(){
+                    {
+                        put(net.flectone.pulse.model.FColor.Type.OUT, new PermissionEntry("flectonepulse.module.message.format.fcolor.out", Type.OP));
+                        put(net.flectone.pulse.model.FColor.Type.SEE, new PermissionEntry("flectonepulse.module.message.format.fcolor.see", Type.TRUE));
+                    }
+                };
             }
 
             @Getter

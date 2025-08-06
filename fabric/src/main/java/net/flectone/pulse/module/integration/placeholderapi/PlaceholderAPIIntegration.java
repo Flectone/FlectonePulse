@@ -7,6 +7,7 @@ import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
 import net.flectone.pulse.BuildConfig;
+import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Pulse;
@@ -29,12 +30,12 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-import java.util.Arrays;
+import java.util.*;
 
 @Singleton
 public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
-    private final Message.Format.Color color;
+    private final Message.Format.FColor fColorMessage;
     private final Permission.Integration.Placeholderapi permission;
     private final FPlayerService fPlayerService;
     private final FPlayerMapper fPlayerMapper;
@@ -51,7 +52,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
                                      Provider<PlaceholderAPIModule> placeholderAPIModuleProvider,
                                      FLogger fLogger,
                                      PermissionChecker permissionChecker) {
-        this.color = fileResolver.getMessage().getFormat().getColor();
+        this.fColorMessage = fileResolver.getMessage().getFormat().getFcolor();
         this.permission = fileResolver.getPermission().getIntegration().getPlaceholderapi();
         this.fPlayerService = fPlayerService;
         this.fPlayerMapper = fPlayerMapper;
@@ -89,8 +90,24 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
             if (argument == null) return PlaceholderResult.invalid();
 
             FPlayer fPlayer = fPlayerMapper.map(context.source());
-            String value = fPlayer.getColors().getOrDefault(argument, color.getValues().get(argument));
-            return PlaceholderResult.value(value == null ? "" : value);
+
+            int colorNumber;
+            try {
+                colorNumber = Integer.parseInt(argument);
+            } catch (NumberFormatException e) {
+                return PlaceholderResult.invalid();
+            }
+
+            Map<Integer, String> colorsMap = new HashMap<>(fColorMessage.getDefaultColors());
+
+            for (FColor.Type type : FColor.Type.values()) {
+                Set<FColor> fColors = fPlayer.getFColors().getOrDefault(type, Collections.emptySet());
+                for (FColor fColor : fColors) {
+                    colorsMap.put(fColor.number(), fColor.name());
+                }
+            }
+
+            return PlaceholderResult.value(colorsMap.get(colorNumber));
         });
 
         Arrays.stream(FPlayer.Setting.values()).forEach(setting ->

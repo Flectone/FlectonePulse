@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.inventory.Inventory;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -31,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Singleton
 public class ChatsettingModule extends AbstractModuleCommand<Localization.Command.Chatsetting> {
@@ -83,6 +85,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         createSound(command.getSound(), permission.getSound());
 
         permission.getSettings().values().forEach(this::registerPermission);
+        permission.getFcolors().values().forEach(this::registerPermission);
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         String promptType = addPrompt(1, Localization.Command.Prompt::getType);
@@ -181,13 +184,13 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                 .addCloseConsumer(inventory -> updateSettings(fTarget));
 
         for (FPlayer.Setting setting : FPlayer.Setting.values()) {
-            inventoryBuilder = switch (setting) {
-                case CHAT -> handleChat(fPlayer, fTarget, inventoryBuilder);
-                case COLOR -> handleColor(fPlayer, fTarget, inventoryBuilder);
-                case STYLE -> handleStyle(fPlayer, fTarget, inventoryBuilder);
-                default -> handleCheckboxItem(fPlayer, fTarget, setting, inventoryBuilder);
-            };
+            inventoryBuilder = setting == FPlayer.Setting.CHAT
+                    ? handleChat(fPlayer, fTarget, inventoryBuilder)
+                    : handleCheckbox(fPlayer, fTarget, setting, inventoryBuilder);
         }
+
+        inventoryBuilder = handleFColors(fPlayer, fTarget, FColor.Type.SEE, inventoryBuilder, command.getMenu().getSee(), resolveLocalization(fPlayer).getMenu().getSee());
+        inventoryBuilder = handleFColors(fPlayer, fTarget, FColor.Type.OUT, inventoryBuilder, command.getMenu().getOut(), resolveLocalization(fPlayer).getMenu().getOut());
 
         inventoryController.open(fPlayer, inventoryBuilder.build(modernVersion));
     }
@@ -271,18 +274,18 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                 });
     }
 
-    private Inventory.Builder handleColor(FPlayer fPlayer, FPlayer fTarget, Inventory.Builder inventoryBuilder) {
-        Command.Chatsetting.Menu menu = command.getMenu();
-        Command.Chatsetting.Menu.Color color = menu.getColor();
-
+    private Inventory.Builder handleFColors(FPlayer fPlayer,
+                                            FPlayer fTarget,
+                                            FColor.Type type,
+                                            Inventory.Builder inventoryBuilder,
+                                            Command.Chatsetting.Menu.Color color,
+                                            Localization.Command.Chatsetting.Menu.SubMenu subMenu) {
         int slot = color.getSlot();
         if (slot == -1) return inventoryBuilder;
 
-        String material = menu.getMaterial();
+        String material = command.getMenu().getMaterial();
 
-        Localization.Command.Chatsetting localization = resolveLocalization(fTarget);
-
-        String[] messages = localization.getMenu().getColor().getItem()
+        String[] messages = subMenu.getItem()
                 .split("<br>");
 
         String title = messages.length > 0 ? messages[0] : "";
@@ -291,29 +294,29 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         return inventoryBuilder
                 .addItem(slot, platformServerAdapter.buildItemStack(fTarget, material, title, lore))
                 .addClickHandler(slot, (itemStack, inventory) -> {
-                    if (!permissionChecker.check(fPlayer, permission.getSettings().get(FPlayer.Setting.COLOR))) {
+                    if (!permissionChecker.check(fPlayer, permission.getFcolors().get(type))) {
                         builder(fPlayer)
                                 .format(Localization.Command.Chatsetting::getNoPermission)
                                 .sendBuilt();
                         return;
                     }
 
-                    String header = localization.getMenu().getColor().getInventory();
+                    String header = subMenu.getInventory();
                     Component componentHeader = messagePipeline.builder(fTarget, header).build();
 
                     Inventory.Builder inventoryColorsBuilder = new Inventory.Builder()
                             .name(componentHeader)
                             .size(54)
-                            .addCloseConsumer(colorsInventory -> updateSettings(fTarget));
+                            .addCloseConsumer(colorsInventory -> fPlayerService.saveColors(fTarget));
 
                     for (int i = 0; i < color.getTypes().size(); i++) {
                         Command.Chatsetting.Menu.Color.Type colorType = color.getTypes().get(i);
                         String colorName = colorType.getName();
                         String colorMaterial = colorType.getMaterial();
-                        Map<String, String> colors = colorType.getColors();
+                        Map<Integer, String> colors = colorType.getColors();
 
-                        String colorMessage = localization.getMenu().getColor().getTypes().getOrDefault(colorName, "");
-                        for (Map.Entry<String, String> entry : colors.entrySet()) {
+                        String colorMessage = subMenu.getTypes().getOrDefault(colorName, "");
+                        for (Map.Entry<Integer, String> entry : colors.entrySet()) {
                             colorMessage = colorMessage.replace("<fcolor:" + entry.getKey() + ">", entry.getValue());
                         }
 
@@ -325,10 +328,14 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                         inventoryColorsBuilder = inventoryColorsBuilder
                                 .addItem(i, platformServerAdapter.buildItemStack(fTarget, colorMaterial, colorTitle, colorLore))
                                 .addClickHandler(i, (colorItemStack, colorInventory) -> {
-                                    fTarget.getColors().clear();
+                                    fTarget.getFColors().remove(type);
 
                                     if (!colorName.equalsIgnoreCase("default")) {
-                                        fTarget.getColors().putAll(colors);
+                                        fTarget.getFColors().put(type, colors.entrySet()
+                                                .stream()
+                                                .map(entry -> new FColor(entry.getKey(), entry.getValue()))
+                                                .collect(Collectors.toSet())
+                                        );
                                     }
 
                                     inventoryController.close(fPlayer.getUuid());
@@ -340,72 +347,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                 });
     }
 
-    private Inventory.Builder handleStyle(FPlayer fPlayer, FPlayer fTarget, Inventory.Builder inventoryBuilder) {
-        Command.Chatsetting.Menu menu = command.getMenu();
-        Command.Chatsetting.Menu.Style style = menu.getStyle();
-
-        int slot = style.getSlot();
-        if (slot == -1) return inventoryBuilder;
-
-        String material = menu.getMaterial();
-
-        Localization.Command.Chatsetting localization = resolveLocalization(fTarget);
-
-        String[] messages = localization.getMenu().getStyle().getItem()
-                .split("<br>");
-
-        String title = messages.length > 0 ? messages[0] : "";
-        String[] lore = messages.length > 1 ? Arrays.copyOfRange(messages, 1, messages.length) : new String[]{};
-
-        return inventoryBuilder
-                .addItem(slot, platformServerAdapter.buildItemStack(fTarget, material, title, lore))
-                .addClickHandler(slot, (itemStack, inventory) -> {
-                    if (!permissionChecker.check(fPlayer, permission.getSettings().get(FPlayer.Setting.STYLE))) {
-                        builder(fPlayer)
-                                .format(Localization.Command.Chatsetting::getNoPermission)
-                                .sendBuilt();
-                        return;
-                    }
-
-                    String header = localization.getMenu().getStyle().getInventory();
-                    Component componentHeader = messagePipeline.builder(fTarget, header).build();
-
-                    Inventory.Builder inventoryStylesBuilder = new Inventory.Builder()
-                            .name(componentHeader)
-                            .addCloseConsumer(colorsInventory -> updateSettings(fTarget))
-                            .size(54);
-
-                    for (int i = 0; i < style.getTypes().size(); i++) {
-                        Command.Chatsetting.Menu.Style.Type styleType = style.getTypes().get(i);
-                        String styleName = styleType.getName();
-                        String styleMaterial = styleType.getMaterial();
-
-                        String[] styleMessages = localization.getMenu().getStyle().getTypes().getOrDefault(styleName, "")
-                                .replace("<style>", styleType.getValue())
-                                .split("<br>");
-
-                        String styleTitle = styleMessages.length > 0 ? styleMessages[0] : "";
-                        String[] styleLore = styleMessages.length > 1 ? Arrays.copyOfRange(styleMessages, 1, styleMessages.length) : new String[]{};
-
-                        inventoryStylesBuilder = inventoryStylesBuilder
-                                .addItem(i, platformServerAdapter.buildItemStack(fTarget, styleMaterial, styleTitle, styleLore))
-                                .addClickHandler(i, (styleItemStack, styleInventory) -> {
-                                    if (styleName.equalsIgnoreCase("default")) {
-                                        fPlayerService.deleteSetting(fTarget, FPlayer.Setting.STYLE);
-                                    } else {
-                                        fPlayerService.saveOrUpdateSetting(fTarget, FPlayer.Setting.STYLE, styleType.getValue());
-                                    }
-
-                                    inventoryController.close(fPlayer.getUuid());
-                                    sendSettingInventory(fPlayer, fTarget);
-                                });
-                    }
-
-                    inventoryController.open(fPlayer, inventoryStylesBuilder.build(modernVersion));
-                });
-    }
-
-    private Inventory.Builder handleCheckboxItem(FPlayer fPlayer, FPlayer fTarget, FPlayer.Setting setting, Inventory.Builder inventoryBuilder) {
+    private Inventory.Builder handleCheckbox(FPlayer fPlayer, FPlayer fTarget, FPlayer.Setting setting, Inventory.Builder inventoryBuilder) {
         Command.Chatsetting.Checkbox checkbox = command.getCheckbox();
         if (!checkbox.getTypes().containsKey(setting)) return inventoryBuilder;
 

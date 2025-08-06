@@ -91,18 +91,40 @@ public class ColorConverter {
     }
 
     @Nullable
-    public String convertOrDefault(String color, @Nullable String value) {
-        if (color == null) return value;
+    public String convert(String color) {
+        if (color == null) return null;
 
-        if (color.startsWith("#") && color.length() == 7) {
+        if (isHex(color)) {
             return color;
         }
 
-        if (color.startsWith("&")) {
-            return legacyHexMap.getOrDefault(color, value);
+        if (color.startsWith("<gradient:#") && color.endsWith(">") && color.length() == 26) {
+            String[] colorParts = color.split(":");
+            if (colorParts.length == 3 && isHex(colorParts[1]) && isHex(colorParts[2].substring(0, 7))) {
+                return color;
+            }
         }
 
-        return minecraftHexMap.getOrDefault(color, value);
+        if (color.startsWith("&")) {
+            return legacyHexMap.getOrDefault(color, null);
+        }
+
+        return minecraftHexMap.getOrDefault(color, null);
+    }
+
+    private boolean isHex(String color) {
+        if (color.length() != 7 || !color.startsWith("#")) {
+            return false;
+        }
+
+        for (int i = 1; i < color.length(); i++) {
+            char c = color.charAt(i);
+            int digit = Character.digit(c, 16);
+            if (digit == -1) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public int parseHexToArgb(String hex) {

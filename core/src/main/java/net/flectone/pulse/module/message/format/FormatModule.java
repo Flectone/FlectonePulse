@@ -6,10 +6,9 @@ import lombok.Getter;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.AdventureTag;
 import net.flectone.pulse.module.AbstractModuleLocalization;
-import net.flectone.pulse.module.message.format.color.ColorModule;
 import net.flectone.pulse.module.message.format.emoji.EmojiModule;
+import net.flectone.pulse.module.message.format.fcolor.FColorModule;
 import net.flectone.pulse.module.message.format.fixation.FixationModule;
 import net.flectone.pulse.module.message.format.image.ImageModule;
 import net.flectone.pulse.module.message.format.listener.FormatPulseListener;
@@ -19,11 +18,11 @@ import net.flectone.pulse.module.message.format.name.NameModule;
 import net.flectone.pulse.module.message.format.questionanswer.QuestionAnswerModule;
 import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.format.spoiler.SpoilerModule;
-import net.flectone.pulse.module.message.format.style.StyleModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.AdventureTag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 
@@ -81,8 +80,8 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
         putKyoriTag(AdventureTag.PRIDE, StandardTags.pride());
         putKyoriTag(AdventureTag.SHADOW_COLOR, StandardTags.shadowColor());
 
-        addChildren(ColorModule.class);
         addChildren(EmojiModule.class);
+        addChildren(FColorModule.class);
         addChildren(FixationModule.class);
         addChildren(ImageModule.class);
         addChildren(MentionModule.class);
@@ -90,7 +89,6 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
         addChildren(NameModule.class);
         addChildren(QuestionAnswerModule.class);
         addChildren(ScoreboardModule.class);
-        addChildren(StyleModule.class);
         addChildren(SpoilerModule.class);
         addChildren(TranslateModule.class);
         addChildren(WorldModule.class);

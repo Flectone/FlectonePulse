@@ -59,8 +59,6 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     private Chatcolor chatcolor = new Chatcolor();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatsetting/")})
     private Chatsetting chatsetting = new Chatsetting();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatstyle/")})
-    private Chatstyle chatstyle = new Chatstyle();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearchat/")})
     private Clearchat clearchat = new Clearchat();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearmail/")})
@@ -269,43 +267,43 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
                     new Chat.Type("local", "WHITE_DYE"),
                     new Chat.Type("global", "BLACK_DYE")
             ));
-            private Color color = new Color(1, List.of(
-                    new Color.Type("default", "ARROW", new LinkedHashMap<>(Map.of("1", "#ADD8E6", "2", "#87CEFA", "3", "#A9A9A9", "4", "#FFFAFA"))),
-                    new Color.Type("white", "WHITE_DYE", new LinkedHashMap<>(Map.of("1", "#F9FFFE", "2", "#E4E4E4", "3", "#A9A9A9", "4", "#FFFAFA"))),
-                    new Color.Type("light_gray", "LIGHT_GRAY_DYE", new LinkedHashMap<>(Map.of("1", "#9D9D97", "2", "#7A7A76", "3", "#A9A9A9", "4", "#FFFAFA"))),
-                    new Color.Type("gray", "GRAY_DYE", new LinkedHashMap<>(Map.of("1", "#474F52", "2", "#353A3C", "3", "#A9A9A9", "4", "#FFFAFA"))),
-                    new Color.Type("black", "BLACK_DYE", new LinkedHashMap<>(Map.of("1", "#1D1D21", "2", "#0E0E10", "3", "#A9A9A9", "4", "#FFFAFA"))),
-                    new Color.Type("brown", "BROWN_DYE", new LinkedHashMap<>(Map.of("1", "#835432", "2", "#5E3A1F", "3", "#A9A9A9", "4", "#FFFAFA"))),
-                    new Color.Type("red", "RED_DYE", new LinkedHashMap<>(Map.of("1", "#B02E26", "2", "#8C1A12", "3", "#A9A9A9", "4", "#FFFAFA"))),
-                    new Color.Type("orange", "ORANGE_DYE", new LinkedHashMap<>(Map.of("1", "#F9801D", "2", "#E35E1A", "3", "#A9A9A9", "4", "#FFFAFA"))),
-                    new Color.Type("yellow", "YELLOW_DYE", new LinkedHashMap<>(Map.of("1", "#FED83D", "2", "#F5C71A", "3", "#A9A9A9", "4", "#FFFAFA"))),
-                    new Color.Type("lime", "LIME_DYE", new LinkedHashMap<>(Map.of("1", "#80C71F", "2", "#6AAD17", "3", "#A9A9A9", "4", "#FFFAFA"))),
-                    new Color.Type("green", "GREEN_DYE", new LinkedHashMap<>(Map.of("1", "#5E7C16", "2", "#3B5A14", "3", "#A9A9A9", "4", "#FFFAFA"))),
-                    new Color.Type("cyan", "CYAN_DYE", new LinkedHashMap<>(Map.of("1", "#169C9C", "2", "#0E7D7D", "3", "#A9A9A9", "4", "#FFFAFA"))),
-                    new Color.Type("light_blue", "LIGHT_BLUE_DYE", new LinkedHashMap<>(Map.of("1", "#ADD8E6", "2", "#87CEFA", "3", "#A9A9A9", "4", "#FFFAFA"))),
-                    new Color.Type("blue", "BLUE_DYE", new LinkedHashMap<>(Map.of("1", "#3C44AA", "2", "#2A2F8A", "3", "#A9A9A9", "4", "#FFFAFA"))),
-                    new Color.Type("purple", "PURPLE_DYE", new LinkedHashMap<>(Map.of("1", "#8932B8", "2", "#6A1F9C", "3", "#A9A9A9", "4", "#FFFAFA"))),
-                    new Color.Type("magenta", "MAGENTA_DYE", new LinkedHashMap<>(Map.of("1", "#C74EBD", "2", "#B03AB0", "3", "#A9A9A9", "4", "#FFFAFA"))),
-                    new Color.Type("pink", "PINK_DYE", new LinkedHashMap<>(Map.of("1", "#F38BAA", "2", "#E57FA0", "3", "#A9A9A9", "4", "#FFFAFA")))
+            private Color see = new Color(1, List.of(
+                    new Color.Type("default", "ARROW", new LinkedHashMap<>(Map.of(1, "<gradient:#B3E5FC:#75CBF2>", 2, "<gradient:#70C7EF:#37B1F2>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("white", "WHITE_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#F5F9FF:#E6F0FF>", 2, "<gradient:#D4E4FF:#B8D2FF>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("light_gray", "LIGHT_GRAY_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#E0E3E6:#C8CCD0>", 2, "<gradient:#B5B9BD:#9DA2A6>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("gray", "GRAY_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#6B7378:#535A5F>", 2, "<gradient:#4A5054:#3A3F42>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("black", "BLACK_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#2E3133:#1F2123>", 2, "<gradient:#17191A:#0D0E0F>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("brown", "BROWN_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#A67C52:#8C6A4A>", 2, "<gradient:#7A5A40:#634A34>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("red", "RED_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#FF6B6B:#E74C4C>", 2, "<gradient:#D63E3E:#C12B2B>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("orange", "ORANGE_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#FFB347:#FF9A1F>", 2, "<gradient:#FF8C00:#E67E00>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("yellow", "YELLOW_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#FFF689:#FFEE57>", 2, "<gradient:#FFE83D:#FFD900>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("lime", "LIME_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#C1FF72:#A2F55F>", 2, "<gradient:#8EE53F:#7ACC29>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("green", "GREEN_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#77DD77:#5DC75D>", 2, "<gradient:#4BB54B:#3AA33A>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("cyan", "CYAN_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#7FE5F0:#5FD9E8>", 2, "<gradient:#3ECFDF:#2AB7C9>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("light_blue", "LIGHT_BLUE_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#A6D8FF:#8CC8FF>", 2, "<gradient:#6BB6FF:#4DA6FF>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("blue", "BLUE_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#7AA7FF:#5D8EFF>", 2, "<gradient:#3A75FF:#1F5AFF>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("purple", "PURPLE_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#C792EA:#B77DDA>", 2, "<gradient:#A368C7:#8A4DBF>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("magenta", "MAGENTA_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#FF9CEE:#FF7AE3>", 2, "<gradient:#FF5CD9:#FF3DCF>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("pink", "PINK_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#FFB6D9:#FF9BC8>", 2, "<gradient:#FF80B7:#FF66A6>", 3, "#A9A9A9", 4, "#FFFAFA")))
             ));
-            private Style style = new Style(2, List.of(
-                    new Style.Type("default", "ARROW", ""),
-                    new Style.Type("white", "WHITE_DYE", "<gradient:#F9FFFE:#E4E4E4>"),
-                    new Style.Type("light_gray", "LIGHT_GRAY_DYE", "<gradient:#9D9D97:#7A7A76>"),
-                    new Style.Type("gray", "GRAY_DYE", "<gradient:#474F52:#353A3C>"),
-                    new Style.Type("black", "BLACK_DYE", "<gradient:#1D1D21:#0E0E10>"),
-                    new Style.Type("brown", "BROWN_DYE", "<gradient:#835432:#5E3A1F>"),
-                    new Style.Type("red", "RED_DYE", "<gradient:#B02E26:#8C1A12>"),
-                    new Style.Type("orange", "ORANGE_DYE", "<gradient:#F9801D:#E35E1A>"),
-                    new Style.Type("yellow", "YELLOW_DYE", "<gradient:#FED83D:#F5C71A>"),
-                    new Style.Type("lime", "LIME_DYE", "<gradient:#80C71F:#6AAD17>"),
-                    new Style.Type("green", "GREEN_DYE", "<gradient:#5E7C16:#3B5A14>"),
-                    new Style.Type("cyan", "CYAN_DYE", "<gradient:#169C9C:#0E7D7D>"),
-                    new Style.Type("light_blue", "LIGHT_BLUE_DYE", "<gradient:#ADD8E6:#87CEFA>"),
-                    new Style.Type("blue", "BLUE_DYE", "<gradient:#3C44AA:#2A2F8A>"),
-                    new Style.Type("purple", "PURPLE_DYE", "<gradient:#8932B8:#6A1F9C>"),
-                    new Style.Type("magenta", "MAGENTA_DYE", "<gradient:#C74EBD:#B03AB0>"),
-                    new Style.Type("pink", "PINK_DYE", "<gradient:#F38BAA:#E57FA0>")
+            private Color out = new Color(2, List.of(
+                    new Color.Type("default", "ARROW", new LinkedHashMap<>(Map.of(1, "<gradient:#B3E5FC:#75CBF2>", 2, "<gradient:#70C7EF:#37B1F2>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("white", "WHITE_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#F5F9FF:#E6F0FF>", 2, "<gradient:#D4E4FF:#B8D2FF>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("light_gray", "LIGHT_GRAY_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#E0E3E6:#C8CCD0>", 2, "<gradient:#B5B9BD:#9DA2A6>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("gray", "GRAY_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#6B7378:#535A5F>", 2, "<gradient:#4A5054:#3A3F42>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("black", "BLACK_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#2E3133:#1F2123>", 2, "<gradient:#17191A:#0D0E0F>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("brown", "BROWN_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#A67C52:#8C6A4A>", 2, "<gradient:#7A5A40:#634A34>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("red", "RED_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#FF6B6B:#E74C4C>", 2, "<gradient:#D63E3E:#C12B2B>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("orange", "ORANGE_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#FFB347:#FF9A1F>", 2, "<gradient:#FF8C00:#E67E00>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("yellow", "YELLOW_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#FFF689:#FFEE57>", 2, "<gradient:#FFE83D:#FFD900>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("lime", "LIME_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#C1FF72:#A2F55F>", 2, "<gradient:#8EE53F:#7ACC29>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("green", "GREEN_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#77DD77:#5DC75D>", 2, "<gradient:#4BB54B:#3AA33A>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("cyan", "CYAN_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#7FE5F0:#5FD9E8>", 2, "<gradient:#3ECFDF:#2AB7C9>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("light_blue", "LIGHT_BLUE_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#A6D8FF:#8CC8FF>", 2, "<gradient:#6BB6FF:#4DA6FF>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("blue", "BLUE_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#7AA7FF:#5D8EFF>", 2, "<gradient:#3A75FF:#1F5AFF>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("purple", "PURPLE_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#C792EA:#B77DDA>", 2, "<gradient:#A368C7:#8A4DBF>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("magenta", "MAGENTA_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#FF9CEE:#FF7AE3>", 2, "<gradient:#FF5CD9:#FF3DCF>", 3, "#A9A9A9", 4, "#FFFAFA"))),
+                    new Color.Type("pink", "PINK_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#FFB6D9:#FF9BC8>", 2, "<gradient:#FF80B7:#FF66A6>", 3, "#A9A9A9", 4, "#FFFAFA")))
             ));
 
             @Getter
@@ -343,28 +341,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
 
                     private String name;
                     private String material;
-                    private LinkedHashMap<String, String> colors;
-
-                }
-
-            }
-
-            @Getter
-            @AllArgsConstructor
-            @NoArgsConstructor
-            public static final class Style {
-
-                private int slot;
-                private List<Type> types;
-
-                @Getter
-                @AllArgsConstructor
-                @NoArgsConstructor
-                public static final class Type {
-
-                    private String name;
-                    private String material;
-                    private String value;
+                    private LinkedHashMap<Integer, String> colors;
 
                 }
 
@@ -381,15 +358,6 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
             private int slot = -1;
             private List<String> materials = new ArrayList<>();
         }
-    }
-
-    @Getter
-    public static final class Chatstyle implements SubCommandConfig, ICommandFile {
-        private boolean enable = true;
-        private List<String> aliases = new ArrayList<>(List.of("chatstyle"));
-        private Destination destination = new Destination();
-        private Cooldown cooldown = new Cooldown();
-        private Sound sound = new Sound();
     }
 
     @Getter

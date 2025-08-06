@@ -2,27 +2,32 @@ package net.flectone.pulse.module.command.chatcolor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.util.checker.PermissionChecker;
+import lombok.NonNull;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.MessageType;
-import net.flectone.pulse.processing.converter.ColorConverter;
+import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.processing.converter.ColorConverter;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
+import org.incendo.cloud.suggestion.Suggestion;
 
 import java.util.*;
 
 @Singleton
 public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.Chatcolor> {
 
-    private final Message.Format.Color color;
+    private final Message.Format.FColor fColorMessage;
+    private final Permission.Message.Format.FColor fColorPermission;
     private final Command.Chatcolor command;
     private final Permission.Command.Chatcolor permission;
     private final FPlayerService fPlayerService;
@@ -40,7 +45,8 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
                            CommandParserProvider commandParserProvider) {
         super(localization -> localization.getCommand().getChatcolor(), Command::getChatcolor);
 
-        this.color = fileResolver.getMessage().getFormat().getColor();
+        this.fColorMessage = fileResolver.getMessage().getFormat().getFcolor();
+        this.fColorPermission = fileResolver.getPermission().getMessage().getFormat().getFcolor();
         this.command = fileResolver.getCommand().getChatcolor();
         this.permission = fileResolver.getPermission().getCommand().getChatcolor();
         this.fPlayerService = fPlayerService;
@@ -59,120 +65,111 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
 
         registerPermission(permission.getOther());
 
-        String promptColor = addPrompt(0, Localization.Command.Prompt::getColor);
+        String promptType = addPrompt(0, Localization.Command.Prompt::getType);
+        String promptColor = addPrompt(1, Localization.Command.Prompt::getColor);
+        String promptPlayer = addPrompt(2, Localization.Command.Prompt::getPlayer);
         registerCommand(commandBuilder -> {
             commandBuilder = commandBuilder
-                    .permission(permission.getName());
+                    .permission(permission.getName())
+                    .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion());
 
-            for (int i = 0; i < color.getValues().size(); i++) {
+            for (int i = 0; i < fColorMessage.getDefaultColors().size(); i++) {
                 commandBuilder = commandBuilder.optional(promptColor + " " + (i + 1), commandParserProvider.colorParser());
             }
 
-            return commandBuilder;
+            return commandBuilder.optional(promptPlayer, commandParserProvider.nativeMessageParser(), commandParserProvider.playerSuggestionPermission(true, permission.getOther()));
         });
 
         addPredicate(this::checkCooldown);
+    }
+
+    private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
+        return (context, input) -> Arrays.stream(FColor.Type.values())
+                .filter(type -> permissionChecker.check(context.sender(), fColorPermission.getTypes().get(type)))
+                .map(setting -> Suggestion.suggestion(setting.name().toLowerCase()))
+                .toList();
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        String[] inputColors = null;
+        String type = getArgument(commandContext, 0);
+        Optional<FColor.Type> fColorType = FColor.Type.fromString(type);
+        if (fColorType.isEmpty()) {
+            builder(fPlayer)
+                    .format(Localization.Command.Chatcolor::getNullType)
+                    .sendBuilt();
+            return;
+        }
 
-        if (commandContext.rawInput().input().split(" ").length != 1) {
-            String promptColor = getPrompt(0);
+        FPlayer fTarget = fPlayer;
 
-            List<String> inputList = new ArrayList<>();
-            for (int i = 0; i < color.getValues().size(); i++) {
-                Optional<String> optionalColor = commandContext.optional(promptColor + " " + (i + 1));
-                if (optionalColor.isEmpty()) continue;
-
-                inputList.add(optionalColor.get());
-            }
-
-            if (!inputList.isEmpty()) {
-                inputColors = inputList.toArray(new String[0]);
+        String promptPlayer = getPrompt(2);
+        Optional<String> optionalTarget = commandContext.optional(promptPlayer);
+        if (optionalTarget.isPresent()) {
+            fTarget = fPlayerService.getFPlayer(optionalTarget.get());
+            if (fTarget.isUnknown()) {
+                fTarget = fPlayer;
             }
         }
 
-        if (inputColors == null) {
+        String promptColor = getPrompt(1);
+        Optional<String> optionalClear = commandContext.optional(promptColor + " 1");
+        if (optionalClear.isPresent() && optionalClear.get().equalsIgnoreCase("clear")) {
+            setColors(fTarget, fColorType.get(), null);
+            return;
+        }
+
+        Set<FColor> newFColors = HashSet.newHashSet(fColorMessage.getDefaultColors().size());
+        for (int i = 0; i < fColorMessage.getDefaultColors().size(); i++) {
+            Optional<String> optionalColor = commandContext.optional(promptColor + " " + (i + 1));
+            if (optionalColor.isEmpty()) break;
+
+            int number = i + 1;
+            String name = colorConverter.convert(optionalColor.get());
+            if (name == null) break;
+
+            FColor fColor = new FColor(number, name);
+            newFColors.add(fColor);
+        }
+
+        if (newFColors.isEmpty()) {
             builder(fPlayer)
                     .format(Localization.Command.Chatcolor::getNullColor)
                     .sendBuilt();
             return;
         }
 
-        if (inputColors[0].equalsIgnoreCase("clear")) {
-            setColors(fPlayer, null);
-            return;
-        }
-
-        FPlayer fTarget = fPlayer;
-
-        if (permissionChecker.check(fPlayer, permission.getOther()) && inputColors.length > 1) {
-            String player = inputColors[0];
-            if (!player.startsWith("#") && !player.startsWith("&") && !player.equalsIgnoreCase("clear")) {
-                fTarget = fPlayerService.getFPlayer(player);
-
-                if (fTarget.isUnknown()) {
-                    builder(fPlayer)
-                            .format(Localization.Command.Chatcolor::getNullPlayer)
-                            .sendBuilt();
-                    return;
-                }
-
-                String[] finalInputColors = inputColors;
-                proxySender.send(fTarget, MessageType.COMMAND_CHATCOLOR, dataOutputStream ->
-                        dataOutputStream.writeUTF(String.join(" ", finalInputColors))
-                );
-
-                if (inputColors[1].equalsIgnoreCase("clear")) {
-                    setColors(fTarget, null);
-                    return;
-                }
-
-                inputColors = Arrays.copyOfRange(inputColors, 1, inputColors.length);
-            }
-        }
-
-        Map<String, String> defaultColors = color.getValues();
-        Iterator<String> mapKeyIterator = defaultColors.keySet().iterator();
-
-        Map<String, String> newColors = new HashMap<>();
-
-        for (int i = 0; i < inputColors.length; i++) {
-            if (i >= defaultColors.size()) {
-                break;
-            }
-
-            String inputColor = colorConverter.convertOrDefault(inputColors[i], null);
-
-            if (inputColor == null) {
-                builder(fPlayer)
-                        .format(Localization.Command.Chatcolor::getNullColor)
-                        .sendBuilt();
-                return;
-            }
-
-            newColors.put(mapKeyIterator.next(), inputColor);
-        }
-
-        setColors(fTarget, newColors);
+        setColors(fTarget, fColorType.get(), newFColors);
     }
 
-    private void setColors(FPlayer fPlayer, Map<String, String> newColors) {
-        fPlayer.getColors().clear();
+    private void setColors(FPlayer fPlayer, FColor.Type type, Set<FColor> newFColors) {
+        Map<FColor.Type, Set<FColor>> fColors = fPlayer.getFColors();
+        Set<FColor> oldFColors = fColors.getOrDefault(type, Collections.emptySet());
 
-        if (newColors != null) {
-            fPlayer.getColors().putAll(newColors);
+        if (!oldFColors.equals(newFColors)) {
+            if (newFColors == null || newFColors.isEmpty()) {
+                fColors.remove(type);
+            }  else {
+                if (newFColors.size() < oldFColors.size()) {
+                    oldFColors.stream()
+                            .skip(newFColors.size())
+                            .forEach(newFColors::add);
+                }
+
+                fColors.put(type, newFColors);
+            }
+
+            fPlayerService.saveColors(fPlayer);
+
+            // update proxy players
+            proxySender.send(fPlayer, MessageType.COMMAND_CHATCOLOR, dataOutputStream -> {});
         }
-
-        fPlayerService.saveColors(fPlayer);
 
         builder(fPlayer)
                 .destination(command.getDestination())
-                .format((fResolver, s) -> s.getFormat())
+                .format(Localization.Command.Chatcolor::getFormat)
                 .sound(getSound())
                 .sendBuilt();
     }

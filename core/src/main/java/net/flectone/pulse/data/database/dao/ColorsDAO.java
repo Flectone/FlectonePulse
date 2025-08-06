@@ -3,63 +3,88 @@ package net.flectone.pulse.data.database.dao;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.data.database.Database;
-import net.flectone.pulse.data.database.sql.ColorsSQL;
+import net.flectone.pulse.data.database.sql.FColorSQL;
+import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Singleton
-public class ColorsDAO extends BaseDAO<ColorsSQL> {
+public class ColorsDAO extends BaseDAO<FColorSQL> {
 
     @Inject
     public ColorsDAO(Database database) {
-        super(database, ColorsSQL.class);
+        super(database, FColorSQL.class);
     }
 
-    public record ColorEntry(int number, String name) {}
-
     public void save(FPlayer fPlayer) {
-        Map<String, String> colors = fPlayer.getColors();
-        if (colors == null || colors.isEmpty()) {
-            useHandle(sql -> sql.deleteAllColors(fPlayer.getId()));
+        if (fPlayer.getFColors().isEmpty()) {
+            delete(fPlayer);
             return;
         }
 
-        useTransaction(sql -> {
-            Map<Integer, Integer> currentColors = sql.getCurrentColors(fPlayer.getId());
+        useTransaction(sql ->
+                Arrays.stream(FColor.Type.values()).forEach(type -> saveType(sql, fPlayer, type))
+        );
+    }
 
-            colors.forEach((key, colorName) -> {
-                int number = Integer.parseInt(key);
-                int colorId = sql.findColorIdByName(colorName)
-                        .orElseGet(() -> sql.insertColor(colorName));
-
-                if (currentColors.containsKey(number)) {
-                    if (currentColors.get(number) != colorId) {
-                        sql.updatePlayerColor(fPlayer.getId(), number, colorId);
-                    }
-                } else {
-                    sql.insertPlayerColor(fPlayer.getId(), number, colorId);
-                }
-            });
-
-            List<Integer> numbersToDelete = currentColors.keySet().stream()
-                    .filter(num -> !colors.containsKey(String.valueOf(num)))
-                    .toList();
-
-            if (!numbersToDelete.isEmpty()) {
-                sql.deletePlayerColors(fPlayer.getId(), numbersToDelete);
-            }
-        });
+    public void delete(FPlayer fPlayer) {
+        useHandle(sql -> sql.deleteFColors(fPlayer.getId()));
     }
 
     public void load(FPlayer fPlayer) {
         if (fPlayer.isUnknown()) return;
-        fPlayer.getColors().clear();
 
-        useHandle(colorsSQL -> colorsSQL
-                .loadPlayerColors(fPlayer.getId())
-                .forEach(e -> fPlayer.getColors().put(String.valueOf(e.number()), e.name()))
+        fPlayer.getFColors().clear();
+
+        useHandle(sql ->
+                Arrays.stream(FColor.Type.values()).forEach(type -> loadType(sql, fPlayer, type))
         );
+    }
+
+    private void saveType(FColorSQL sql, FPlayer fPlayer, FColor.Type type) {
+        Set<FColor> newFColors = fPlayer.getFColors().getOrDefault(type, Collections.emptySet());
+        Set<FColor> oldFColors = sql.findFColors(fPlayer.getId(), type.name());
+        if (newFColors.equals(oldFColors)) {
+            return;
+        }
+
+        if (newFColors.isEmpty()) {
+            sql.deleteFColors(fPlayer.getId(), type.name());
+            return;
+        }
+
+        List<Integer> fColorsToDelete = new ArrayList<>(oldFColors.stream()
+                .map(FColor::number)
+                .toList()
+        );
+
+        newFColors.forEach(newFColor -> {
+            fColorsToDelete.remove((Integer) newFColor.number());
+
+            Optional<FColor> optionalOldFColor = oldFColors.stream()
+                    .filter(oldFColor -> oldFColor.number() == newFColor.number())
+                    .findFirst();
+            if (optionalOldFColor.isPresent() && optionalOldFColor.get().equals(newFColor)) return;
+
+            int fColorId = sql.findFColorIdByName(newFColor.name()).orElseGet(() -> sql.insertFColor(newFColor.name()));
+
+            if (optionalOldFColor.isPresent()) {
+                sql.updateFColor(fPlayer.getId(), newFColor.number(), fColorId, type.name());
+            } else {
+                sql.insertFColor(fPlayer.getId(), newFColor.number(), fColorId, type.name());
+            }
+        });
+
+        if (!fColorsToDelete.isEmpty()) {
+            sql.deleteFColors(fPlayer.getId(), type.name(), fColorsToDelete);
+        }
+    }
+
+    private void loadType(FColorSQL sql, FPlayer fPlayer, FColor.Type type) {
+        Set<FColor> newFColors = sql.findFColors(fPlayer.getId(), type.name());
+        if (!newFColors.isEmpty()) {
+            fPlayer.getFColors().put(type, newFColors);
+        }
     }
 }

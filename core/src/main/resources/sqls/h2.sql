@@ -47,16 +47,17 @@ CREATE TABLE IF NOT EXISTS `moderation` (
     FOREIGN KEY (`moderator`) REFERENCES `player`(`id`)
 );
 
-CREATE TABLE IF NOT EXISTS `color` (
+CREATE TABLE IF NOT EXISTS `fcolor` (
     `id` INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
     `name` TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE IF NOT EXISTS `player_color` (
+CREATE TABLE IF NOT EXISTS `player_fcolor` (
     `id` INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
     `number` INT NOT NULL,
     `player` INT NOT NULL,
-    `color` INT NOT NULL,
+    `fcolor` INT NOT NULL,
+    `type` TEXT NOT NULL,
     FOREIGN KEY (`player`) REFERENCES `player`(`id`),
-    FOREIGN KEY (`color`) REFERENCES `color`(`id`)
+    FOREIGN KEY (`fcolor`) REFERENCES `fcolor`(`id`)
 );

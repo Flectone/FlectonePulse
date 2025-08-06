@@ -13,7 +13,6 @@ import net.flectone.pulse.module.command.banlist.BanlistModule;
 import net.flectone.pulse.module.command.broadcast.BroadcastModule;
 import net.flectone.pulse.module.command.chatcolor.ChatcolorModule;
 import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
-import net.flectone.pulse.module.command.chatstyle.ChatstyleModule;
 import net.flectone.pulse.module.command.clearchat.ClearchatModule;
 import net.flectone.pulse.module.command.clearmail.ClearmailModule;
 import net.flectone.pulse.module.command.coin.CoinModule;
@@ -75,7 +74,6 @@ public class CommandModule extends AbstractModule {
         addChildren(BroadcastModule.class);
         addChildren(ChatcolorModule.class);
         addChildren(ChatsettingModule.class);
-        addChildren(ChatstyleModule.class);
         addChildren(ClearchatModule.class);
         addChildren(ClearmailModule.class);
         addChildren(CoinModule.class);

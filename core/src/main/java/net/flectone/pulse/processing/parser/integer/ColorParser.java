@@ -3,12 +3,12 @@ package net.flectone.pulse.processing.parser.integer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
-import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.processing.converter.ColorConverter;
+import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.checker.PermissionChecker;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.context.CommandInput;
 import org.incendo.cloud.parser.ArgumentParseResult;
@@ -23,7 +23,7 @@ import java.util.List;
 @Singleton
 public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSuggestionProvider.Strings<FPlayer> {
 
-    private final Message.Format.Color colorMessage;
+    private final Message.Format.FColor message;
     private final Permission.Command.Chatcolor chatcolorPermission;
     private final PermissionChecker permissionChecker;
     private final ColorConverter colorConverter;
@@ -33,7 +33,7 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
     public ColorParser(FileResolver fileResolver,
                        PermissionChecker permissionChecker,
                        ColorConverter colorConverter) {
-        this.colorMessage = fileResolver.getMessage().getFormat().getColor();
+        this.message = fileResolver.getMessage().getFormat().getFcolor();
         this.chatcolorPermission = fileResolver.getPermission().getCommand().getChatcolor();
         this.permissionChecker = permissionChecker;
         this.colorConverter = colorConverter;
@@ -54,7 +54,7 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
 
         String current = args.length == 0 || currentInput.endsWith(" ") ? "" : args[args.length - 1];
 
-        int maxColors = colorMessage.getValues().size();
+        int maxColors = message.getDefaultColors().size();
         boolean hasOtherPermission = permissionChecker.check(context.sender(), chatcolorPermission.getOther());
         if (!hasOtherPermission && args.length >= maxColors ||
                 hasOtherPermission && args.length >= maxColors + 1) {
@@ -63,25 +63,29 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
 
         List<String> suggestions = new ArrayList<>();
 
-        if (args.length < 2) {
-            suggestions.add("clear");
+        // basic suggestions
+        List<String> constants = List.of("clear", "<gradient:#", "#", "&");
+        for (String constant : constants) {
+            if (current.isEmpty() || constant.startsWith(current)) {
+                suggestions.add(constant);
+            }
         }
 
-        if (current.isEmpty()) {
-            suggestions.add("#");
-            suggestions.add("&");
-        } else if (current.startsWith("#") && current.length() <= 6 ||
-                (current.startsWith("&") && current.length() == 1)) {
-            colorConverter.getHexSymbolList()
-                    .stream()
-                    .map(s -> current + s)
-                    .forEach(suggestions::add);
+        if (current.startsWith("#") && current.length() < 7) {
+            for (String c : colorConverter.getHexSymbolList()) {
+                suggestions.add(current + c);
+            }
+        } else if (current.startsWith("&") && current.length() == 1) {
+            for (String s : colorConverter.getHexSymbolList()) {
+                suggestions.add(current + s);
+            }
+        } else if (!current.isEmpty()) {
+            for (String s : colorConverter.getMinecraftList()) {
+                if (s.startsWith(current)) {
+                    suggestions.add(s);
+                }
+            }
         }
-
-        colorConverter.getMinecraftList()
-                .stream()
-                .filter(s -> s.startsWith(current))
-                .forEach(suggestions::add);
 
         return suggestions;
     }

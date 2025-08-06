@@ -51,9 +51,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         command.anon.format = "<fcolor:1>\uD83D\uDC7B <fcolor:2>Анон</fcolor:2> <fcolor:1><message>";
 
-        command.dice.format = "<fcolor:1>✎ <display_name> кинул кубики <style><message><reset> <fcolor:1>(<sum>)";
+        command.dice.format = "<fcolor:1>✎ <display_name> кинул кубики <message><reset> <fcolor:1>(<sum>)";
 
-        command.ball.format = "<color:#9370DB>❓ <display_name> спросил: <style><message><reset> <color:#9370DB><br>🔮 Магический шар: <u><answer></u>";
+        command.ball.format = "<color:#9370DB>❓ <display_name> спросил: <message><reset> <color:#9370DB><br>🔮 Магический шар: <u><answer></u>";
         command.ball.answers.clear();
         command.ball.answers.addAll(List.of(
                 "Бесспорно",
@@ -86,17 +86,14 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         command.coin.head = "орёл";
         command.coin.tail = "решка";
-        command.coin.format = "<fcolor:1>✎ <display_name> подбросил монетку - <style><result>";
+        command.coin.format = "<fcolor:1>✎ <display_name> подбросил монетку - <result>";
         command.coin.formatDraw = "<fcolor:1>✎ <display_name> неудачно подбросил монетку ребром :)";
 
         command.deletemessage.nullMessage = "<color:#ff7171><b>⁉</b> Сообщение не существует";
         command.deletemessage.format = "<color:#98FB98>☒ Сообщение успешно удалено";
 
         command.translateto.nullOrError = "<color:#ff7171><b>⁉</b> Ошибка, возможно указан неправильный язык";
-        command.translateto.format = "<fcolor:1>📖 Перевод на [<language>] → <fcolor:2><style><message>";
-
-        command.chatstyle.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
-        command.chatstyle.format = "<fcolor:1>💬 Теперь твой <style>стиль выглядит так";
+        command.translateto.format = "<fcolor:1>📖 Перевод на [<language>] → <fcolor:2><message>";
 
         command.clearchat.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.clearchat.format = "<fcolor:1>\uD83D\uDCAC Чат очищен";
@@ -105,7 +102,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.geolocate.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.geolocate.format = "<fcolor:1>Геолокация <display_name><br>Страна: <fcolor:2><country><br><fcolor:1>Регион: <fcolor:2><region_name><br><fcolor:1>Город: <fcolor:2><city><br><fcolor:1>Часовой пояс: <fcolor:2><timezone><br><fcolor:1>Мобильный интернет? <fcolor:2><mobile><br><fcolor:1>ВПН? <fcolor:2><proxy><br><fcolor:1>Хостинг? <fcolor:2><hosting><br><fcolor:1>Айпи: <fcolor:2><query>";
 
-        command.broadcast.format = "<br><color:#ffd500>│ \uD83D\uDD6B Сообщение для всех <br>│<br>│ Автор <display_name> <br>│<br>│ <fcolor:1><style><message> <br>";
+        command.broadcast.format = "<br><color:#ffd500>│ \uD83D\uDD6B Сообщение для всех <br>│<br>│ Автор <display_name> <br>│<br>│ <fcolor:1><message> <br>";
 
         command.spy.formatLog = "<fcolor:1>[👁] <display_name> <color:#98FB98><action> <fcolor:1>→ <fcolor:2><message>";
         command.spy.formatTrue = "<fcolor:1>[👁] Ты <color:#98FB98>включил <fcolor:1>слежку";
@@ -123,13 +120,13 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.kick.person = "<color:#ff7171>🔒 КИК 🔒 <fcolor:1><br><br>Айди: <id><br><br>Дата: <date><br><br>Модератор: <moderator><br><br>Причина: <reason>";
 
         command.helper.nullHelper = "<color:#ff7171><b>⁉</b> Сейчас нет людей, кто бы смог помочь";
-        command.helper.global = "<fcolor:2>👤 <display_name> просит помощи ⏩ <fcolor:1><style><message>";
+        command.helper.global = "<fcolor:2>👤 <display_name> просит помощи ⏩ <fcolor:1><message>";
         command.helper.player = "<fcolor:2>👤 Запрос отправлен, ожидай ответа";
 
         command.tell.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.tell.sender = "<fcolor:2>✉ Ты → <display_name> » <fcolor:1><message>";
         command.tell.receiver = "<fcolor:2>✉ <display_name> → Тебе » <fcolor:1><message>";
-        command.tell.myself = "<fcolor:2>✉ [Заметка] <fcolor:1><style><message>";
+        command.tell.myself = "<fcolor:2>✉ [Заметка] <fcolor:1><message>";
 
         command.reply.nullReceiver = "<color:#ff7171><b>⁉</b> Некому отвечать";
 
@@ -138,7 +135,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.poll.nullPoll = "<color:#ff7171><b>⁉</b> Голосование не найдено";
         command.poll.voteTrue = "<color:#4eff52>👍 Ты выбрал <answer_id> в голосовании #<id>. Всего таких голосов <count>";
         command.poll.voteFalse = "<color:#ff4e4e>\uD83D\uDD93 Ты передумал об <answer_id> в голосовании #<id>. Всего таких голосов <count> без тебя";
-        command.poll.format = "<br><color:#fce303>│ <status> <br>│ <style><message><reset> <color:#fce303><br>├─────────────<br><answers>";
+        command.poll.format = "<br><color:#fce303>│ <status> <br>│ <message><reset> <color:#fce303><br>├─────────────<br><answers>";
         command.poll.status.start = "Создано новое голосование #<b><id></b>";
         command.poll.status.run = "Идёт голосование #<b><id></b>";
         command.poll.status.end = "Голосование #<b><id></b> завершено";
@@ -228,7 +225,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.flectonepulse.formatEditor = "<fcolor:2>★ Ссылка для веб-редактирования <u><fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\"><url>";
 
         command.chatcolor.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
-        command.chatcolor.format = "<color:#98FB98>★ Теперь цвета <fcolor:1>сообщение</fcolor> <fcolor:2>сообщение</fcolor> <fcolor:3>сообщение <fcolor:4>сообщение";
+        command.chatcolor.format = "<br><color:#98FB98>│ Твои цвета выглядят так: <br><color:#98FB98>│ <fcolor:2><player><fcolor:3>: привет мир! Это FlectonePulse <br><color:#98FB98>│ <fcolor:2><player><fcolor:4>: привет мир! Это FlectonePulse <br><color:#98FB98>│ <fcolor:2><player><fcolor:1>: привет мир! Это FlectonePulse <br>";
+        command.chatcolor.nullType = "<color:#ff7171><b>⁉</b> Тип введён неверно";
         command.chatcolor.nullColor = "<color:#ff7171><b>⁉</b> Цвета введены неверно";
 
         command.chatsetting.noPermission = "<color:#ff7171><b>⁉</b> Нет разрешения на изменение этой настройки";
@@ -276,53 +274,53 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.chatsetting.menu.chat.types.put("default", "<fcolor:2>Стандартный чат<br><fcolor:1>Ты можешь видеть <fcolor:2>все</fcolor:2> чаты и писать в любой чат");
         command.chatsetting.menu.chat.types.put("local", "<fcolor:2>Локальный чат<br><fcolor:1>Ты можешь писать только в <fcolor:2>локальный</fcolor:2> чат и видишь только его");
         command.chatsetting.menu.chat.types.put("global", "<fcolor:2>Глобальный чат<br><fcolor:1>Ты можешь писать только в <fcolor:2>глобальный</fcolor:2> чат и видишь только его");
-        command.chatsetting.menu.color.item = "<fcolor:2>Цвета <br><fcolor:1>Главные цвета FlectonePulse <br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир! <br><br><u><color:#ff7171>Только ты это видишь";
-        command.chatsetting.menu.color.inventory = "<reset>                Цвета";
-        command.chatsetting.menu.color.types.clear();
-        command.chatsetting.menu.color.types.put("default", "<fcolor:2>Стандартные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.color.types.put("white", "<fcolor:2>Белые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.color.types.put("light_gray", "<fcolor:2>Светло-серые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.color.types.put("gray", "<fcolor:2>Серые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.color.types.put("black", "<fcolor:2>Черные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.color.types.put("brown", "<fcolor:2>Коричневые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.color.types.put("red", "<fcolor:2>Красные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.color.types.put("orange", "<fcolor:2>Оранжевые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.color.types.put("yellow", "<fcolor:2>Желтые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.color.types.put("lime", "<fcolor:2>Лаймовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.color.types.put("green", "<fcolor:2>Зеленые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.color.types.put("cyan", "<fcolor:2>Бирюзовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.color.types.put("light_blue", "<fcolor:2>Голубые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.color.types.put("blue", "<fcolor:2>Синие цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.color.types.put("purple", "<fcolor:2>Фиолетовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.color.types.put("magenta", "<fcolor:2>Пурпурные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.color.types.put("pink", "<fcolor:2>Розовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.style.item = "<fcolor:2>Стиль <br><fcolor:1>Стиль сообщений, который ты отправил <br><br><fcolor:1>Твой стиль <gray><style>привет мир! <br><br><u><color:#ff7171>Это видят все";
-        command.chatsetting.menu.style.inventory = "<reset>                Стили";
-        command.chatsetting.menu.style.types.clear();
-        command.chatsetting.menu.style.types.put("default", "<style>Стандартный стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
-        command.chatsetting.menu.style.types.put("white", "<style>Белый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
-        command.chatsetting.menu.style.types.put("light_gray", "<style>Светло-серый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
-        command.chatsetting.menu.style.types.put("gray", "<style>Серый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
-        command.chatsetting.menu.style.types.put("black", "<style>Чёрный стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
-        command.chatsetting.menu.style.types.put("brown", "<style>Коричневый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
-        command.chatsetting.menu.style.types.put("red", "<style>Красный стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
-        command.chatsetting.menu.style.types.put("orange", "<style>Оранжевый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
-        command.chatsetting.menu.style.types.put("yellow", "<style>Жёлтый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
-        command.chatsetting.menu.style.types.put("lime", "<style>Лаймовый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
-        command.chatsetting.menu.style.types.put("green", "<style>Зелёный стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
-        command.chatsetting.menu.style.types.put("cyan", "<style>Бирюзовый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
-        command.chatsetting.menu.style.types.put("light_blue", "<style>Голубой стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
-        command.chatsetting.menu.style.types.put("blue", "<style>Синий стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
-        command.chatsetting.menu.style.types.put("purple", "<style>Фиолетовый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
-        command.chatsetting.menu.style.types.put("magenta", "<style>Пурпурный стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
-        command.chatsetting.menu.style.types.put("pink", "<style>Розовый стиль<br><br><fcolor:2><player><fcolor:3>: <style>привет мир!");
+        command.chatsetting.menu.see.item = "<fcolor:2>Цвета \"see\" <br><fcolor:1>Цвета для /chatcolor see <br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир! <br><br><u><color:#ff7171>Это видишь только ТЫ в любых сообщений";
+        command.chatsetting.menu.see.inventory = "<reset>                Цвета";
+        command.chatsetting.menu.see.types.clear();
+        command.chatsetting.menu.see.types.put("default", "<fcolor:2>Стандартные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.see.types.put("white", "<fcolor:2>Белые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.see.types.put("light_gray", "<fcolor:2>Светло-серые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.see.types.put("gray", "<fcolor:2>Серые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.see.types.put("black", "<fcolor:2>Черные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.see.types.put("brown", "<fcolor:2>Коричневые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.see.types.put("red", "<fcolor:2>Красные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.see.types.put("orange", "<fcolor:2>Оранжевые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.see.types.put("yellow", "<fcolor:2>Желтые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.see.types.put("lime", "<fcolor:2>Лаймовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.see.types.put("green", "<fcolor:2>Зеленые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.see.types.put("cyan", "<fcolor:2>Бирюзовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.see.types.put("light_blue", "<fcolor:2>Голубые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.see.types.put("blue", "<fcolor:2>Синие цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.see.types.put("purple", "<fcolor:2>Фиолетовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.see.types.put("magenta", "<fcolor:2>Пурпурные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.see.types.put("pink", "<fcolor:2>Розовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.item = "<fcolor:2>Цвета \"out\" <br><fcolor:1>Цвета для /chatcolor out <br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир! <br><br><u><color:#ff7171>Это видят ВСЕ у твоих сообщений";
+        command.chatsetting.menu.out.inventory = "<reset>                Цвета";
+        command.chatsetting.menu.out.types.clear();
+        command.chatsetting.menu.out.types.put("default", "<fcolor:2>Стандартные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.types.put("white", "<fcolor:2>Белые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.types.put("light_gray", "<fcolor:2>Светло-серые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.types.put("gray", "<fcolor:2>Серые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.types.put("black", "<fcolor:2>Черные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.types.put("brown", "<fcolor:2>Коричневые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.types.put("red", "<fcolor:2>Красные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.types.put("orange", "<fcolor:2>Оранжевые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.types.put("yellow", "<fcolor:2>Желтые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.types.put("lime", "<fcolor:2>Лаймовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.types.put("green", "<fcolor:2>Зеленые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.types.put("cyan", "<fcolor:2>Бирюзовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.types.put("light_blue", "<fcolor:2>Голубые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.types.put("blue", "<fcolor:2>Синие цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.types.put("purple", "<fcolor:2>Фиолетовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.types.put("magenta", "<fcolor:2>Пурпурные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.types.put("pink", "<fcolor:2>Розовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
 
-        command.symbol.format = "<click:suggest_command:\"<message>\"><fcolor:2>\uD83D\uDDA5 Нажми, чтобы использовать: <fcolor:1><style><message>";
+        command.symbol.format = "<click:suggest_command:\"<message>\"><fcolor:2>\uD83D\uDDA5 Нажми, чтобы использовать: <fcolor:1><message>";
 
         command.mail.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.mail.onlinePlayer = "<color:#ff7171><b>⁉</b> Игрок в сети";
-        command.mail.sender = "<fcolor:2>✉ Письмо #<id> для <display_name> » <fcolor:1><style><message>";
-        command.mail.receiver = "<fcolor:2>✉ Письмо от <display_name> » <fcolor:1><style><message>";
+        command.mail.sender = "<fcolor:2>✉ Письмо #<id> для <display_name> » <fcolor:1><message>";
+        command.mail.receiver = "<fcolor:2>✉ Письмо от <display_name> » <fcolor:1><message>";
 
         command.clearmail.nullMail = "<color:#ff7171><b>⁉</b> Письма не найдено";
         command.clearmail.format = "<fcolor:2>✉ [УДАЛЕНО] Письмо #<id> для <display_name> » <fcolor:1><message>";
@@ -432,8 +430,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.chat.types.clear();
         message.chat.types.putAll(Map.of(
-                "local", "<delete><display_name><fcolor:3>: <style><message> <translate>",
-                "global", "<delete><display_name> <world_prefix>»<fcolor:4> <style><message> <translate>"
+                "local", "<delete><display_name><fcolor:3>: <message> <translate>",
+                "global", "<delete><display_name> <world_prefix>»<fcolor:4> <message> <translate>"
         ));
         message.chat.nullChat = "<color:#ff7171><b>⁉</b> На сервер выключен чат";
         message.chat.nullReceiver = "<color:#ff7171><b>⁉</b> Тебя никто не услышал";
@@ -740,8 +738,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Chatcolor chatcolor = new Chatcolor();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatsetting/")})
         private Chatsetting chatsetting = new Chatsetting();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatstyle/")})
-        private Chatstyle chatstyle = new Chatstyle();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearchat/")})
         private Clearchat clearchat = new Clearchat();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearmail/")})
@@ -820,7 +816,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Ball implements SubCommandConfig, Localizable {
-            private String format = "<color:#9370DB>❓ <display_name> asked: <style><message><reset> <color:#9370DB><br>\uD83D\uDD2E Ball answered: <u><answer></u>";
+            private String format = "<color:#9370DB>❓ <display_name> asked: <message><reset> <color:#9370DB><br>\uD83D\uDD2E Ball answered: <u><answer></u>";
             private List<String> answers = new LinkedList<>(){
                 {
                     push("Undeniably");
@@ -885,14 +881,15 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Broadcast implements SubCommandConfig, Localizable {
-            private String format = "<br><color:#ffd500>│ \uD83D\uDD6B Message for everyone <br>│<br>│ Author <display_name> <br>│<br>│ <fcolor:1><style><message> <br>";
+            private String format = "<br><color:#ffd500>│ \uD83D\uDD6B Message for everyone <br>│<br>│ Author <display_name> <br>│<br>│ <fcolor:1><message> <br>";
         }
 
         @Getter
         public static final class Chatcolor implements SubCommandConfig, Localizable {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
+            private String nullType = "<color:#ff7171><b>⁉</b> Incorrect type entered";
             private String nullColor = "<color:#ff7171><b>⁉</b> Incorrect colors entered";
-            private String format = "<color:#98FB98>★ You set <fcolor:1>message</fcolor> <fcolor:2>message</fcolor> <fcolor:3>message <fcolor:4>message";
+            private String format = "<br><color:#98FB98>│ Your colors: <br><color:#98FB98>│ <fcolor:2><player><fcolor:3>: hello world! This is FlectonePulse <br><color:#98FB98>│ <fcolor:2><player><fcolor:4>: hello world! This is FlectonePulse <br><color:#98FB98>│ <fcolor:2><player><fcolor:1>: hello world! This is FlectonePulse <br>";
         }
 
         @Getter
@@ -966,7 +963,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                         put("global", "<fcolor:2>Global chat<br><fcolor:1>You can only write to <fcolor:2>global</fcolor:2> chat and see it");
                     }
                 });
-                private SubMenu color = new SubMenu("<fcolor:2>Colors <br><fcolor:1>Main colors of FlectonePulse <br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world! <br><br><u><color:#ff7171>Only you see it", "<reset>                Colors", new LinkedHashMap<>() {
+                private SubMenu see = new SubMenu("<fcolor:2>Colors \"see\" <br><fcolor:1>Colors for /chatcolor see <br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world! <br><br><u><color:#ff7171>Only you see it in all messages", "<reset>                Colors", new LinkedHashMap<>() {
                     {
                         put("default", "<fcolor:2>Default colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
                         put("white", "<fcolor:2>White colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
@@ -987,25 +984,25 @@ public final class Localization extends FileSerializable implements ModuleConfig
                         put("pink", "<fcolor:2>Pink colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
                     }
                 });
-                private SubMenu style = new SubMenu("<fcolor:2>Style <br><fcolor:1>Style of the messages you sent <br><br><fcolor:1>Your style is <gray><style>hello world! <br><br><u><color:#ff7171>Everyone sees it",  "<reset>                Styles", new LinkedHashMap<>() {
+                private SubMenu out = new SubMenu("<fcolor:2>Colors \"out\" <br><fcolor:1>Colors for /chatcolor out <br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world! <br><br><u><color:#ff7171>Everyone sees it in your messages", "<reset>                Colors", new LinkedHashMap<>() {
                     {
-                        put("default", "<style>Default style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
-                        put("white", "<style>White style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
-                        put("light_gray", "<style>Light gray style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
-                        put("gray", "<style>Gray style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
-                        put("black", "<style>Black style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
-                        put("brown", "<style>Brown style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
-                        put("red", "<style>Red style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
-                        put("orange", "<style>Orange style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
-                        put("yellow", "<style>Yellow style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
-                        put("lime", "<style>Lime style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
-                        put("green", "<style>Green style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
-                        put("cyan", "<style>Cyan style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
-                        put("light_blue", "<style>Light blue style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
-                        put("blue", "<style>Blue style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
-                        put("purple", "<style>Purple style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
-                        put("magenta", "<style>Magenta style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
-                        put("pink", "<style>Pink style<br><br><fcolor:2><player><fcolor:3>: <style>hello world!");
+                        put("default", "<fcolor:2>Default colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("white", "<fcolor:2>White colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("light_gray", "<fcolor:2>Light gray colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("gray", "<fcolor:2>Gray colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("black", "<fcolor:2>Black colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("brown", "<fcolor:2>Brown colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("red", "<fcolor:2>Red colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("orange", "<fcolor:2>Orange colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("yellow", "<fcolor:2>Yellow colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("lime", "<fcolor:2>Lime colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("green", "<fcolor:2>Green colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("cyan", "<fcolor:2>Cyan colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("light_blue", "<fcolor:2>Light blue colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("blue", "<fcolor:2>Blue colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("purple", "<fcolor:2>Purple colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("magenta", "<fcolor:2>Magenta colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("pink", "<fcolor:2>Pink colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
                     }
                 });
 
@@ -1019,12 +1016,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 }
 
             }
-        }
-
-        @Getter
-        public static final class Chatstyle implements SubCommandConfig, Localizable {
-            private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
-            private String format = "<fcolor:1>💬 Now your <style>style is like this";
         }
 
         @Getter
@@ -1043,7 +1034,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         public static final class Coin implements SubCommandConfig, Localizable {
             private String head = "heads";
             private String tail = "tails";
-            private String format = "<fcolor:1>✎ <display_name> player got <style><result>";
+            private String format = "<fcolor:1>✎ <display_name> player got <result>";
             private String formatDraw = "<fcolor:1>✎ <display_name> player got edge :)";
         }
 
@@ -1065,12 +1056,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
                     put(6, "⚅");
                 }
             };
-            private String format = "<fcolor:1>✎ <display_name> roll <style><message><reset> <fcolor:1>(<sum>)";
+            private String format = "<fcolor:1>✎ <display_name> roll <message><reset> <fcolor:1>(<sum>)";
         }
 
         @Getter
         public static final class Do implements SubCommandConfig, Localizable {
-            private String format = "<fcolor:1>✎ <style><message><reset> <fcolor:1>(<i><display_name></i>)";
+            private String format = "<fcolor:1>✎ <message><reset> <fcolor:1>(<i><display_name></i>)";
         }
 
         @Getter
@@ -1092,7 +1083,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Helper implements SubCommandConfig, Localizable {
             private String nullHelper = "<color:#ff7171><b>⁉</b> There are no people who can help you";
-            private String global = "<fcolor:2>👤 <display_name> needs help ⏩ <fcolor:1><style><message>";
+            private String global = "<fcolor:2>👤 <display_name> needs help ⏩ <fcolor:1><message>";
             private String player = "<fcolor:2>👤 Request sent, awaiting reply";
         }
 
@@ -1132,8 +1123,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         public static final class Mail implements SubCommandConfig, Localizable {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String onlinePlayer = "<color:#ff7171><b>⁉</b> This player is online";
-            private String sender = "<fcolor:2>✉ Mail #<id> for <display_name> » <fcolor:1><style><message>";
-            private String receiver = "<fcolor:2>✉ Mail from <display_name> » <fcolor:1><style><message>";
+            private String sender = "<fcolor:2>✉ Mail #<id> for <display_name> » <fcolor:1><message>";
+            private String receiver = "<fcolor:2>✉ Mail from <display_name> » <fcolor:1><message>";
         }
 
         @Getter
@@ -1147,7 +1138,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Me implements SubCommandConfig, Localizable {
-            private String format = "<fcolor:1>✎ <display_name> <fcolor:1><style><message>";
+            private String format = "<fcolor:1>✎ <display_name> <fcolor:1><message>";
         }
 
         @Getter
@@ -1203,7 +1194,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String already = "<color:#ff7171><b>⁉</b> You have already voted in this poll";
             private String voteTrue = "<color:#4eff52>👍 You voted for <answer_id> in poll #<id>. There are <count> of you";
             private String voteFalse = "<color:#ff4e4e>🖓 You rejected <answer_id> in poll #<id>. There are <count> without you";
-            private String format = "<br><color:#fce303>│ <status> <br>│ <style><message><reset> <color:#fce303><br>├─────────────<br><answers>";
+            private String format = "<br><color:#fce303>│ <status> <br>│ <message><reset> <color:#fce303><br>├─────────────<br><answers>";
             private String answerTemplate = "<color:#fce303>│ <count> → <color:#4eff52><hover:show_text:\"<color:#4eff52>Vote for <bold><answer>\"><click:run_command:\"/pollvote <id> <number>\"><answer> [👍]<br>";
             private Status status = new Status();
 
@@ -1261,7 +1252,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Symbol implements SubCommandConfig, Localizable {
-            private String format = "<click:suggest_command:\"<message>\"><fcolor:2>🖥 Click for using: <fcolor:1><style><message>";
+            private String format = "<click:suggest_command:\"<message>\"><fcolor:2>🖥 Click for using: <fcolor:1><message>";
         }
 
         @Getter
@@ -1269,7 +1260,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String sender = "<fcolor:2>✉ You → <display_name> » <fcolor:1><message>";
             private String receiver = "<fcolor:2>✉ <display_name> → You » <fcolor:1><message>";
-            private String myself = "<fcolor:2>✉ [Note] <fcolor:1><style><message>";
+            private String myself = "<fcolor:2>✉ [Note] <fcolor:1><message>";
         }
 
         @Getter
@@ -1314,13 +1305,13 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Translateto implements SubCommandConfig, Localizable {
             private String nullOrError = "<color:#ff7171><b>⁉</b> Error, you may have specified an unsupported language";
-            private String format = "<fcolor:1>📖 Translation to [<language>] → <fcolor:2><style><message>";
+            private String format = "<fcolor:1>📖 Translation to [<language>] → <fcolor:2><message>";
         }
 
         @Getter
         public static final class Try implements SubCommandConfig, Localizable {
-            private String formatTrue = "<color:#98FB98>☺ <display_name> <style><message><reset> <color:#98FB98><percent>%";
-            private String formatFalse = "<color:#F08080>☹ <display_name> <style><message><reset> <color:#98FB98><percent>%";
+            private String formatTrue = "<color:#98FB98>☺ <display_name> <message><reset> <color:#98FB98><percent>%";
+            private String formatFalse = "<color:#F08080>☹ <display_name> <message><reset> <color:#98FB98><percent>%";
         }
 
         @Getter
@@ -1759,7 +1750,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Bubble implements SubMessageConfig, Localizable {
-            private String format = "<fcolor:3><style><message>";
+            private String format = "<fcolor:3><message>";
         }
 
         @Getter
@@ -1768,8 +1759,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String nullReceiver = "<color:#ff7171><b>⁉</b> Nobody heard you";
             private Map<String, String> types = new LinkedHashMap<>(){
                 {
-                    put("global", "<delete><display_name> <world_prefix>»<fcolor:4> <style><message> <translate>");
-                    put("local", "<delete><display_name><fcolor:3>: <style><message> <translate>");
+                    put("global", "<delete><display_name> <world_prefix>»<fcolor:4> <message> <translate>");
+                    put("local", "<delete><display_name><fcolor:3>: <message> <translate>");
                 }
             };
         }
@@ -1919,7 +1910,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             };
 
             @Override
-            public SubFormatMessageConfig getColor() {
+            public SubFormatMessageConfig getFcolor() {
                 return null;
             }
 

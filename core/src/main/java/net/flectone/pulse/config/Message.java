@@ -323,10 +323,10 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             }
         };
 
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/color/")})
-        private Color color = new Color();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/emoji/")})
         private Emoji emoji = new Emoji();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fcolor/")})
+        private FColor fcolor = new FColor();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fixation/")})
         private Fixation fixation = new Fixation();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/image/")})
@@ -343,8 +343,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         private Scoreboard scoreboard = new Scoreboard();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/spoiler/")})
         private Spoiler spoiler = new Spoiler();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/style/")})
-        private Style style = new Style();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/translate/")})
         private Translate translate = new Translate();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/world/")})
@@ -365,20 +363,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         public static final class KyoriTag extends Tag {
             private boolean enable = true;
             private String trigger = null;
-        }
-
-        @Getter
-        public static final class Color implements SubFormatMessageConfig, Config.IEnable {
-            private boolean enable = true;
-            private boolean useRecipientColors = true;
-            private Map<String, String> values = new LinkedHashMap<>(){
-                {
-                    put("1", "#ADD8E6");
-                    put("2", "#87CEFA");
-                    put("3", "#A9A9A9");
-                    put("4", "#FFFAFA");
-                }
-            };
         }
 
         @Getter
@@ -403,6 +387,19 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
                     put(":idk:", "<click:suggest_command:\":idk:\"><hover:show_text:\":idk:\">¯\\_(ツ)_/¯</hover></click>");
                     put(":angry:", "<click:suggest_command:\":angry:\"><hover:show_text:\":angry:\">(╯°□°)╯︵ ┻━┻</hover></click>");
                     put(":happy:", "<click:suggest_command:\":happy:\"><hover:show_text:\":happy:\">＼(＾O＾)／</hover></click>");
+                }
+            };
+        }
+
+        @Getter
+        public static final class FColor implements SubFormatMessageConfig, Config.IEnable {
+            private boolean enable = true;
+            private Map<Integer, String> defaultColors = new LinkedHashMap<>(){
+                {
+                    put(1, "<gradient:#B3E5FC:#75CBF2>");
+                    put(2, "<gradient:#70C7EF:#37B1F2>");
+                    put(3, "#A9A9A9");
+                    put(4, "#FFFAFA");
                 }
             };
         }
@@ -546,11 +543,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         public static final class Spoiler implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
             private String color = "<fcolor:2>";
-        }
-
-        @Getter
-        public static final class Style implements SubFormatMessageConfig, Config.IEnable {
-            private boolean enable = true;
         }
 
         @Getter

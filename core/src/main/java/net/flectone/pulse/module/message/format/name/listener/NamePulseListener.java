@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.format.name.listener;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -73,12 +74,17 @@ public class NamePulseListener implements PulseListener {
         }
 
         if (!(sender instanceof FPlayer fPlayer)) {
-            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) ->
-                    Tag.preProcessParsed(nameModule.resolveLocalization(receiver).getEntity()
-                            .replace("<name>", sender.getName())
-                            .replace("<type>", sender.getType())
-                            .replace("<uuid>", sender.getUuid().toString())
-                    ));
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) -> {
+                String formatEntity = nameModule.resolveLocalization(receiver).getEntity()
+                        .replace("<name>", sender.getName())
+                        .replace("<type>", sender.getType())
+                        .replace("<uuid>", sender.getUuid().toString());
+
+                Component name = messagePipeline.builder(sender, receiver, formatEntity)
+                        .build();
+
+                return Tag.selfClosingInserting(name);
+            });
             return;
         }
 
@@ -100,17 +106,15 @@ public class NamePulseListener implements PulseListener {
         });
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) -> {
-            if (fPlayer.isUnknown()) {
-                return Tag.preProcessParsed(nameModule.resolveLocalization(receiver).getUnknown()
-                        .replace("<name>", fPlayer.getName())
-                );
-            }
+            Localization.Message.Format.Name localization = nameModule.resolveLocalization(receiver);
 
-            String displayName = nameModule.resolveLocalization(receiver).getDisplay();
-            Component name = messagePipeline.builder(sender, receiver, displayName)
-                    .build();
+            String displayName = fPlayer.isUnknown()
+                    ? localization.getUnknown().replace("<name>", fPlayer.getName())
+                    : localization.getDisplay();
 
-            return Tag.selfClosingInserting(name);
+            Component displayNameComponent = messagePipeline.builder(sender, receiver, displayName).build();
+
+            return Tag.selfClosingInserting(displayNameComponent);
         });
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.VAULT_PREFIX, (argumentQueue, context) -> {

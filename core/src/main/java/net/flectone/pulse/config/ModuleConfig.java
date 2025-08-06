@@ -117,8 +117,8 @@ public interface ModuleConfig {
 
         interface FormatMessageConfig extends SubMessageConfig {
 
-            SubFormatMessageConfig getColor();
             SubFormatMessageConfig getEmoji();
+            SubFormatMessageConfig getFcolor();
             SubFormatMessageConfig getFixation();
             SubFormatMessageConfig getImage();
             SubFormatMessageConfig getMention();
