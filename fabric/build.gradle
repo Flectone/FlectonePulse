@@ -64,6 +64,7 @@ shadowJar {
 
 		include(dependency("com.alessiodp.libby:.*"))
 		include(dependency("org.xerial:.*"))
+		include(dependency("net.kyori:.*"))
 		include(project(":core"))
 	}
 
