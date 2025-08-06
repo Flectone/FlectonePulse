@@ -49,7 +49,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         time.permanent = "НАВСЕГДА";
         time.zero = "0с";
 
-        command.anon.format = "<fcolor:1>\uD83D\uDC7B <fcolor:2>Анон</fcolor:2> <fcolor:1><message>";
+        command.anon.format = "<fcolor:1>\uD83D\uDC7B <fcolor:2>Анон <fcolor:1><message>";
 
         command.dice.format = "<fcolor:1>✎ <display_name> кинул кубики <message><reset> <fcolor:1>(<sum>)";
 
@@ -82,7 +82,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.online.formatTotal = "<fcolor:1>⌛ <display_name> <fcolor:1>всего провёл на сервере <time>";
 
         command.ping.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
-        command.ping.format = "<fcolor:1>🖧 Пинг игрока <fcolor:2><player></fcolor:2> равен <ping>";
+        command.ping.format = "<fcolor:1>🖧 Пинг игрока <fcolor:2><player><fcolor:1> равен <ping>";
 
         command.coin.head = "орёл";
         command.coin.tail = "решка";
@@ -116,7 +116,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.kick.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.kick.reasons.clear();
         command.kick.reasons.put("default", "Исключён модератором");
-        command.kick.server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> исключил <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
+        command.kick.server = "<color:#ff7171>🔒 <fcolor:2><moderator><fcolor:1> исключил <fcolor:2><player><fcolor:1> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
         command.kick.person = "<color:#ff7171>🔒 КИК 🔒 <fcolor:1><br><br>Айди: <id><br><br>Дата: <date><br><br>Модератор: <moderator><br><br>Причина: <reason>";
 
         command.helper.nullHelper = "<color:#ff7171><b>⁉</b> Сейчас нет людей, кто бы смог помочь";
@@ -158,13 +158,13 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.ban.nullTime = "<color:#ff7171><b>⁉</b> Невозможное время";
         command.ban.reasons.clear();
         command.ban.reasons.put("default", "Ты заблокирован на этом сервере");
-        command.ban.server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> заблокировал игрока <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
+        command.ban.server = "<color:#ff7171>🔒 <fcolor:2><moderator><fcolor:1> заблокировал игрока <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
         command.ban.person = "<color:#ff7171>🔒 БАН 🔒 <fcolor:1><br><br>Дата: <date><br><br>Время: <time><br><br>Осталось: <time_left><br><br>Модератор: <moderator><br><br>Причина: <reason>";
-        command.ban.connectionAttempt = "<color:#ff7171>🔒 Заблокированный <fcolor:2><player></fcolor> попытался подключиться <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
+        command.ban.connectionAttempt = "<color:#ff7171>🔒 Заблокированный <fcolor:2><player><fcolor:1> попытался подключиться <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
 
         command.unban.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.unban.notBanned = "<color:#ff7171><b>⁉</b> Игрок не заблокирован";
-        command.unban.format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator></fcolor> разблокировал игрока <fcolor:2><player></fcolor>";
+        command.unban.format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator><color:#98FB98> разблокировал игрока <fcolor:2><player>";
 
         command.banlist.empty = "<color:#98FB98>☺ Блокировки не найдены";
         command.banlist.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
@@ -180,12 +180,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.mute.nullTime = "<color:#ff7171><b>⁉</b> Невозможное время";
         command.mute.reasons.clear();
         command.mute.reasons.put("default", "Ты был замучен на сервере");
-        command.mute.server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> выдал мут игроку <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
+        command.mute.server = "<color:#ff7171>🔒 <fcolor:2><moderator><fcolor:1> выдал мут игроку <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
         command.mute.person = "<color:#ff7171>🔒 Ты замучен, осталось <time_left>";
 
         command.unmute.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.unmute.notMuted = "<color:#ff7171><b>⁉</b> Игрок не замучен";
-        command.unmute.format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator></fcolor> размутил игрока <fcolor:2><player></fcolor>";
+        command.unmute.format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator><color:#98FB98> размутил игрока <fcolor:2><player>";
 
         command.mutelist.empty = "<color:#98FB98>☺ Муты не найдены";
         command.mutelist.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
@@ -201,12 +201,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.warn.nullTime = "<color:#ff7171><b>⁉</b> Невозможное время";
         command.warn.reasons.clear();
         command.warn.reasons.put("default", "Ты получил предупреждение");
-        command.warn.server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> выдал предупреждение игроку <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
+        command.warn.server = "<color:#ff7171>🔒 <fcolor:2><moderator><fcolor:1> выдал предупреждение игроку <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>Айди: <id><br>Дата: <date><br>Время: <time><br>Осталось: <time_left><br>Модератор: <moderator><br>Причина: <reason>\">[ПОДРОБНЕЕ]</hover>";
         command.warn.person = "<color:#ff7171>🔒 Ты получил предупреждение на <time>";
 
         command.unwarn.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.unwarn.notWarned = "<color:#ff7171><b>⁉</b> Игрок не имеет предупреждений";
-        command.unwarn.format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator></fcolor> снял предупреждение с игрока <fcolor:2><player></fcolor>";
+        command.unwarn.format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator><color:#98FB98> снял предупреждение с игрока <fcolor:2><player>";
 
         command.warnlist.empty = "<color:#98FB98>☺ Предупреждения не найдены";
         command.warnlist.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
@@ -271,9 +271,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.chatsetting.menu.chat.item = "<fcolor:2>Тип чата <br><fcolor:1>Чат для просмотра и отправки сообщений <br><br><fcolor:1>Выбранный чат <fcolor:2><chat>";
         command.chatsetting.menu.chat.inventory = "<reset>                 Чаты";
         command.chatsetting.menu.chat.types.clear();
-        command.chatsetting.menu.chat.types.put("default", "<fcolor:2>Стандартный чат<br><fcolor:1>Ты можешь видеть <fcolor:2>все</fcolor:2> чаты и писать в любой чат");
-        command.chatsetting.menu.chat.types.put("local", "<fcolor:2>Локальный чат<br><fcolor:1>Ты можешь писать только в <fcolor:2>локальный</fcolor:2> чат и видишь только его");
-        command.chatsetting.menu.chat.types.put("global", "<fcolor:2>Глобальный чат<br><fcolor:1>Ты можешь писать только в <fcolor:2>глобальный</fcolor:2> чат и видишь только его");
+        command.chatsetting.menu.chat.types.put("default", "<fcolor:2>Стандартный чат<br><fcolor:1>Ты можешь видеть <fcolor:2>все<fcolor:1> чаты и писать в любой чат");
+        command.chatsetting.menu.chat.types.put("local", "<fcolor:2>Локальный чат<br><fcolor:1>Ты можешь писать только в <fcolor:2>локальный<fcolor:1> чат и видишь только его");
+        command.chatsetting.menu.chat.types.put("global", "<fcolor:2>Глобальный чат<br><fcolor:1>Ты можешь писать только в <fcolor:2>глобальный<fcolor:1> чат и видишь только его");
         command.chatsetting.menu.see.item = "<fcolor:2>Цвета \"see\" <br><fcolor:1>Цвета для /chatcolor see <br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир! <br><br><u><color:#ff7171>Это видишь только ТЫ в любых сообщений";
         command.chatsetting.menu.see.inventory = "<reset>                Цвета";
         command.chatsetting.menu.see.types.clear();
@@ -332,8 +332,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.tictactoe.wrongGame = "<color:#ff7171><b>⁉</b> Этой игры не существует";
         command.tictactoe.wrongByPlayer = "<color:#ff7171><b>⁉</b> Игра закончена, потому что один из игроков не в сети";
         command.tictactoe.wrongMove = "<color:#ff7171><b>⁉</b> Такой ход невозможен";
-        command.tictactoe.formatMove = "<fcolor:2>Ход <player> </fcolor:2>";
-        command.tictactoe.lastMove = "<fcolor:2>Последний ход (<move>)</fcolor:2>";
+        command.tictactoe.formatMove = "<fcolor:2>Ход <player> ";
+        command.tictactoe.lastMove = "<fcolor:2>Последний ход (<move>)";
         command.tictactoe.formatWin = "<color:#98FB98><player> выиграл</color:#98FB98>";
         command.tictactoe.formatDraw = "<color:#98FB98>Ничья \uD83D\uDC6C</color:#98FB98>";
         command.tictactoe.symbol.blank = "<hover:show_text:\"<fcolor:1>Ход <move>\"><click:run_command:\"/tictactoemove %d <move>\">☐</click></hover>";
@@ -346,8 +346,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.maintenance.kick = "<color:#ff7171>★ На сервере ведутся технические работы";
         command.maintenance.serverDescription = "<color:#ff7171>В настоящее время проводятся технические работы";
         command.maintenance.serverVersion = "Технические работы";
-        command.maintenance.formatTrue = "<fcolor:1>★ Ты <fcolor:2>включил</fcolor:2> технические работы на сервере";
-        command.maintenance.formatFalse = "<fcolor:1>★ Ты <fcolor:2>выключил</fcolor:2> технические работы на сервере";
+        command.maintenance.formatTrue = "<fcolor:1>★ Ты <fcolor:2>включил <fcolor:1>технические работы на сервере";
+        command.maintenance.formatFalse = "<fcolor:1>★ Ты <fcolor:2>выключил <fcolor:1>технические работы на сервере";
 
         command.rockpaperscissors.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.rockpaperscissors.wrongMove = "<color:#ff7171><b>⁉</b> Такой ход невозможен";
@@ -404,17 +404,17 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.advancement.goal.tag = "<color:#FFFF00>[<hover:show_text:\"<color:#FFFF00><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]";
         message.advancement.challenge.format = "<color:#834eff>🌠 <fcolor:2><display_name> <fcolor:1>завершил испытание <advancement>";
         message.advancement.challenge.tag = "<color:#834eff>[<hover:show_text:\"<color:#834eff><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]";
-        message.advancement.revoke.manyToOne = "<fcolor:1>🌠 Отозвано <fcolor:2><number></fcolor:2> достижений у игрока <display_name>";
-        message.advancement.revoke.oneToOne = "<fcolor:1>🌠 Отозвано достижение <fcolor:2><advancement></fcolor:2> у игрока <display_name>";
-        message.advancement.grant.manyToOne = "<fcolor:1>🌠 Выдано <fcolor:2><number></fcolor:2> достижений игроку <display_name>";
-        message.advancement.grant.oneToOne = "<fcolor:1>🌠 Достижение <fcolor:2><advancement></fcolor:2> выдано игроку <display_name>";
+        message.advancement.revoke.manyToOne = "<fcolor:1>🌠 Отозвано <fcolor:2><number> <fcolor:1>достижений у игрока <display_name>";
+        message.advancement.revoke.oneToOne = "<fcolor:1>🌠 Отозвано достижение <fcolor:2><advancement> <fcolor:1>у игрока <display_name>";
+        message.advancement.grant.manyToOne = "<fcolor:1>🌠 Выдано <fcolor:2><number> <fcolor:1>достижений игроку <display_name>";
+        message.advancement.grant.oneToOne = "<fcolor:1>🌠 Достижение <fcolor:2><advancement> <fcolor:1>выдано игроку <display_name>";
 
         message.auto.types.clear();
         message.auto.types.put("announcement", new LinkedList<>(){
             {
                 push("<br><fcolor:1>◇ Сервер использует <click:open_url:\"https://flectone.net/pulse/\"><hover:show_text:\"<fcolor:2>https://flectone.net/pulse/\"><fcolor:2>FlectonePulse</hover></click> :)<br>");
                 push("<br><fcolor:1>      ❝ Заходи в дискорд ❠<br><fcolor:2>    <u><click:open_url:\"https://discord.flectone.net\"><hover:show_text:\"<fcolor:2>https://discord.flectone.net\">https://discord.flectone.net</hover></click></u><br>");
-                push("<br><fcolor:1>⚡ Поддержи <fcolor:2>FlectonePulse</fcolor:2> на Boosty <br><fcolor:1>⚡ <u><click:open_url:\"https://boosty.to/thefaser/\"><hover:show_text:\"<fcolor:2>https://boosty.to/thefaser/\">https://boosty.to/thefaser/</hover></click></u><br>");
+                push("<br><fcolor:1>⚡ Поддержи <fcolor:2>FlectonePulse <fcolor:1>на Boosty <br><fcolor:1>⚡ <u><click:open_url:\"https://boosty.to/thefaser/\"><hover:show_text:\"<fcolor:2>https://boosty.to/thefaser/\">https://boosty.to/thefaser/</hover></click></u><br>");
                 push("<br><fcolor:1>   ✉ Заходи в телеграм ✉ <br><fcolor:2>    <u><click:open_url:\"https://t.me/flectone\"><hover:show_text:\"<fcolor:2>https://t.me/flectone\">https://t.me/flectone</hover></click></u><br>");
             }
         });
@@ -436,8 +436,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.chat.nullChat = "<color:#ff7171><b>⁉</b> На сервер выключен чат";
         message.chat.nullReceiver = "<color:#ff7171><b>⁉</b> Тебя никто не услышал";
 
-        message.clear.single = "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><number></fcolor:2> предметов у игрока <display_name>";
-        message.clear.multiple = "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><number></fcolor:2> предметов у <fcolor:2><count></fcolor:2> игроков";
+        message.clear.single = "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><number> <fcolor:1>предметов у игрока <display_name>";
+        message.clear.multiple = "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><number> <fcolor:1>предметов у <fcolor:2><count> <fcolor:1>игроков";
 
         message.afk.formatTrue.global = "<gradient:#ffd500:#FFFF00>⌚ <player> отошёл";
         message.afk.formatTrue.local = "<gradient:#ffd500:#FFFF00>⌚ Ты отошёл от игры";
@@ -523,7 +523,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.death.types.put("death.attack.sweetBerryBush", "<color:#778899>🪦 <fcolor:1><display_name> искололся до смерти в кустах сладких ягод");
         message.death.types.put("death.attack.sweetBerryBush.player", "<color:#778899>🪦 <fcolor:1><display_name> искололся до смерти в кустах сладких ягод, спасаясь от <killer>");
         message.death.types.put("death.attack.thorns", "<color:#778899>🪦 <fcolor:1><display_name> был убит, пытаясь навредить <killer>");
-        message.death.types.put("death.attack.thorns.item", "<color:#778899>🪦 <fcolor:1><display_name> был убит <fcolor:2>[<i><by_item></i>]</fcolor:2>, пытаясь навредить <killer>");
+        message.death.types.put("death.attack.thorns.item", "<color:#778899>🪦 <fcolor:1><display_name> был убит <fcolor:2>[<i><by_item></i>]<fcolor:1>, пытаясь навредить <killer>");
         message.death.types.put("death.attack.thrown", "<color:#778899>🪦 <fcolor:1><display_name> был избит <killer>");
         message.death.types.put("death.attack.thrown.item", "<color:#778899>🪦 <fcolor:1><display_name> был избит <killer> с помощью <fcolor:2>[<i><by_item></i>]");
         message.death.types.put("death.attack.trident", "<color:#778899>🪦 <fcolor:1><display_name> был пронзён <killer>");
@@ -547,8 +547,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.deop.format = "<fcolor:1>\uD83E\uDD16 <display_name> больше не является оператором сервера";
 
-        message.enchant.single = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'></fcolor:2>» на предмет <display_name>";
-        message.enchant.multiple = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'></fcolor:2>» на предмет <fcolor:2><count></fcolor:2> сущностей";
+        message.enchant.single = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» на предмет <display_name>";
+        message.enchant.multiple = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» на предмет <fcolor:2><count><fcolor:1> сущностей";
 
         message.format.mention.person = "<fcolor:2>Тебя упомянули!";
 
@@ -557,13 +557,13 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.format.moderation.newbie.reason = "Ты ещё слишком новичок";
 
-        message.format.tags.put(AdventureTag.URL, "<click:open_url:\"<message>\"><hover:show_text:\"<fcolor:2>Открыть ссылку <br><u><message>\"><fcolor:2><u>🗗 Ссылка</u></fcolor:2></hover></click>");
+        message.format.tags.put(AdventureTag.URL, "<click:open_url:\"<message>\"><hover:show_text:\"<fcolor:2>Открыть ссылку <br><u><message>\"><fcolor:2><u>🗗 Ссылка</u></hover></click>");
         message.format.tags.put(AdventureTag.IMAGE, "<image:\"<message>\"><u>🖃 Картинка</u></image>");
         message.format.tags.put(AdventureTag.SKIN, "<image:\"<message>\"><u>👨 Скин</u></image>");
 
-        message.format.name_.display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <player>\"><vault_prefix><stream_prefix><fcolor:2><player></fcolor><afk_suffix><vault_suffix></hover></click>";
-        message.format.name_.entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<name>'> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><lang:'<name>'></hover></fcolor:2>";
-        message.format.name_.unknown = "<fcolor:2><name></fcolor:2>";
+        message.format.name_.display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <player>\"><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>";
+        message.format.name_.entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<name>'> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><lang:'<name>'></hover>";
+        message.format.name_.unknown = "<fcolor:2><name>";
         message.format.name_.invisible = "<fcolor:2>\uD83D\uDC7B Невидимка";
 
         message.format.translate.action = "<click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Перевести сообщение\"><fcolor:1>⇄";
@@ -580,7 +580,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.join.formatFirstTime = "<color:#4eff52>→ <display_name> <fcolor:1>впервые тут!";
 
         message.kill.single = "<color:#778899>🪦 <fcolor:1><display_name> убит";
-        message.kill.multiple = "<color:#778899>🪦 <fcolor:1>Уничтожено <fcolor:2><count></fcolor:2> сущностей";
+        message.kill.multiple = "<color:#778899>🪦 <fcolor:1>Уничтожено <fcolor:2><count> <fcolor:1>сущностей";
 
         message.objective.belowname.format = "<fcolor:1>мс";
 
@@ -608,18 +608,18 @@ public final class Localization extends FileSerializable implements ModuleConfig
             }
         });
 
-        message.seed.format = "<fcolor:1>\uD83C\uDF10 Ключ генератора: [<fcolor:2><hover:show_text:'<fcolor:2>Нажми, чтобы скопировать в буфер обмена'><click:copy_to_clipboard:<seed>><seed></click></fcolor:2>]";
+        message.seed.format = "<fcolor:1>\uD83C\uDF10 Ключ генератора: [<fcolor:2><hover:show_text:'<fcolor:2>Нажми, чтобы скопировать в буфер обмена'><click:copy_to_clipboard:<seed>><seed></click>]";
 
-        message.setblock.format = "<fcolor:1>⏹ Изменён блок в точке <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2>";
+        message.setblock.format = "<fcolor:1>⏹ Изменён блок в точке <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>";
 
         message.sleep.notPossible = "<fcolor:1>\uD83D\uDECC Никакой отдых не поможет пропустить эту ночь";
-        message.sleep.playersSleeping = "<fcolor:1>\uD83D\uDECC <fcolor:2><sleep_count></fcolor:2> из <fcolor:2><all_count></fcolor:2> игроков спят";
+        message.sleep.playersSleeping = "<fcolor:1>\uD83D\uDECC <fcolor:2><sleep_count> <fcolor:1>из <fcolor:2><all_count> <fcolor:1>игроков спят";
         message.sleep.skippingNight = "<fcolor:1>\uD83D\uDECC Вы проспите всю ночь";
 
         message.spawn.notValid = "<fcolor:1>\uD83D\uDECC У вас нет кровати или заряженного якоря возрождения, либо доступ к ним затруднён";
         message.spawn.set = "<fcolor:1>\uD83D\uDECC Точка возрождения установлена";
-        message.spawn.single = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2> [<fcolor:2><angle></fcolor:2>] в <fcolor:2><world></fcolor:2> для <display_name>";
-        message.spawn.multiple = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2> [<fcolor:2><angle></fcolor:2>] в <fcolor:2><world></fcolor:2> для <fcolor:2><count></fcolor:2> игроков";
+        message.spawn.single = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>] в <fcolor:2><world> <fcolor:1>для <display_name>";
+        message.spawn.multiple = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>] в <fcolor:2><world> <fcolor:1>для <fcolor:2><count><fcolor:1> игроков";
 
         message.status.motd.values.clear();
         message.status.motd.values.addAll(List.of(
@@ -639,7 +639,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 push(new LinkedList<>(){
                     {
                         push(" ");
-                        push("<fcolor:1>Привет <fcolor:2><player></fcolor:2>!");
+                        push("<fcolor:1>Привет <fcolor:2><player><fcolor:1>!");
                         push(" ");
                     }
                 });
@@ -653,8 +653,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
             }
         });
 
-        message.update.formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse)</fcolor:2> Твоя версия <fcolor:2><current_version></fcolor:2> устарела! Обновись до <fcolor:2><latest_version></fcolor:2> с помощью <url:https://modrinth.com/plugin/flectonepulse>, чтобы получить новые возможности!";
-        message.update.formatConsole = "<fcolor:1>Твоя версия <fcolor:2><current_version></fcolor:2> устарела! Обновись до <fcolor:2><latest_version></fcolor:2> с помощью <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse";
+        message.update.formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse) <fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <url:https://modrinth.com/plugin/flectonepulse>, чтобы получить новые возможности!";
+        message.update.formatConsole = "<fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse";
     }
 
 
@@ -811,7 +811,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Anon implements SubCommandConfig, Localizable {
-            private String format = "<fcolor:1>\uD83D\uDC7B <fcolor:2>Anon</fcolor:2> <fcolor:1><message>";
+            private String format = "<fcolor:1>\uD83D\uDC7B <fcolor:2>Anon <fcolor:1><message>";
         }
 
         @Getter
@@ -849,9 +849,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
                     put("default", "You have been banned from this server");
                 }
             };
-            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> has banned <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
+            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator> <fcolor:1>has banned <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
             private String person = "<color:#ff7171>🔒 BAN 🔒<fcolor:1><br><br>Date: <date><br><br>Time: <time><br><br>Remaining time: <time_left><br><br>Moderator: <moderator><br><br>Reason: <reason>";
-            private String connectionAttempt = "<color:#ff7171>🔒 Banned <fcolor:2><player></fcolor> tried to log in <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
+            private String connectionAttempt = "<color:#ff7171>🔒 Banned <fcolor:2><player> <fcolor:1>tried to log in <hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
 
             @Getter
             @AllArgsConstructor
@@ -958,9 +958,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
                 private SubMenu chat = new SubMenu("<fcolor:2>Chat type <br><fcolor:1>Chat for viewing and sending messages <br><br><fcolor:1>Your chat is <fcolor:2><chat>", "<reset>                 Chats", new LinkedHashMap<>() {
                     {
-                        put("default", "<fcolor:2>Default chat<br><fcolor:1>You can see <fcolor:2>all</fcolor:2> chats and write to any chat");
-                        put("local", "<fcolor:2>Local chat<br><fcolor:1>You can only write to <fcolor:2>local</fcolor:2> chat and see it");
-                        put("global", "<fcolor:2>Global chat<br><fcolor:1>You can only write to <fcolor:2>global</fcolor:2> chat and see it");
+                        put("default", "<fcolor:2>Default chat<br><fcolor:1>You can see <fcolor:2>all <fcolor:1>chats and write to any chat");
+                        put("local", "<fcolor:2>Local chat<br><fcolor:1>You can only write to <fcolor:2>local <fcolor:1>chat and see it");
+                        put("global", "<fcolor:2>Global chat<br><fcolor:1>You can only write to <fcolor:2>global <fcolor:1>chat and see it");
                     }
                 });
                 private SubMenu see = new SubMenu("<fcolor:2>Colors \"see\" <br><fcolor:1>Colors for /chatcolor see <br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world! <br><br><u><color:#ff7171>Only you see it in all messages", "<reset>                Colors", new LinkedHashMap<>() {
@@ -1115,7 +1115,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 }
             };
 
-            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> kicked <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
+            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator> <fcolor:1>kicked <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
             private String person = "<color:#ff7171>🔒 KICK 🔒 <fcolor:1><br><br>ID: <id><br><br>Date: <date><br><br>Moderator: <moderator><br><br>Reason: <reason>";
         }
 
@@ -1132,8 +1132,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String serverDescription = "<color:#ff7171>The server is under maintenance";
             private String serverVersion = "Maintenance";
             private String kick = "<color:#ff7171>★ The server is under maintenance";
-            private String formatTrue = "<fcolor:1>★ You have <fcolor:2>enabled</fcolor:2> maintenance on the server";
-            private String formatFalse = "<fcolor:1>★ You have <fcolor:2>disabled</fcolor:2> maintenance on the server";
+            private String formatTrue = "<fcolor:1>★ You have <fcolor:2>enabled <fcolor:1>maintenance on the server";
+            private String formatFalse = "<fcolor:1>★ You have <fcolor:2>disabled <fcolor:1>maintenance on the server";
         }
 
         @Getter
@@ -1150,7 +1150,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                     put("default", "You have been muted on this server");
                 }
             };
-            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> has muted <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
+            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator> <fcolor:1>has muted <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
             private String person = "<color:#ff7171>🔒 You are muted, <time_left> left";
         }
 
@@ -1184,7 +1184,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Ping implements SubCommandConfig, Localizable {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
-            private String format = "<fcolor:1>🖧 <fcolor:2><player>'s</fcolor:2> ping is <ping>";
+            private String format = "<fcolor:1>🖧 <fcolor:2><player>'s <fcolor:1>ping is <ping>";
         }
 
         @Getter
@@ -1276,18 +1276,18 @@ public final class Localization extends FileSerializable implements ModuleConfig
             @NoArgsConstructor
             public static final class Symbol {
                 private String blank = "<hover:show_text:\"<fcolor:1>Move <move>\"><click:run_command:\"/tictactoemove %d <move>\">☐</click></hover>";
-                private String first = "<fcolor:2>☑</fcolor:2>";
+                private String first = "<fcolor:2>☑";
                 private String firstRemove = "<color:#ff7171>☑</color:#ff7171>";
                 private String firstWin = "<color:#98FB98>☑</color:#98FB98>";
-                private String second = "<fcolor:2>☒</fcolor:2>";
+                private String second = "<fcolor:2>☒";
                 private String secondRemove = "<color:#ff7171>☒</color:#ff7171>";
                 private String secondWin = "<color:#98FB98>☒</color:#98FB98>";
             }
 
-            private String field = "<fcolor:1><br>|[#][#][#]| <title> <current_move> <br>|[#][#][#]| <br>|[#][#][#]| <last_move><br>";
-            private String currentMove = "<fcolor:2>☐ → <symbol></fcolor:2>";
-            private String lastMove = "<fcolor:2>Last move (<move>)</fcolor:2>";
-            private String formatMove = "<fcolor:2><player>'s move</fcolor:2>";
+            private String field = "<fcolor:1><br>|[#][#][#]| <title> <current_move> <br><fcolor:1>|[#][#][#]| <br>|[#][#][#]| <last_move><br>";
+            private String currentMove = "<fcolor:2>☐ → <symbol>";
+            private String lastMove = "<fcolor:2>Last move (<move>)";
+            private String formatMove = "<fcolor:2><player>'s move";
             private String formatWin = "<color:#98FB98><player> won this game</color:#98FB98>";
             private String formatDraw = "<color:#98FB98>The game ended in a draw 👬</color:#98FB98>";
             private String sender = "<fcolor:1>☐ An offer to play was sent to <display_name>";
@@ -1311,28 +1311,28 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Try implements SubCommandConfig, Localizable {
             private String formatTrue = "<color:#98FB98>☺ <display_name> <message><reset> <color:#98FB98><percent>%";
-            private String formatFalse = "<color:#F08080>☹ <display_name> <message><reset> <color:#98FB98><percent>%";
+            private String formatFalse = "<color:#F08080>☹ <display_name> <message><reset> <color:#F08080><percent>%";
         }
 
         @Getter
         public static final class Unban implements SubCommandConfig, Localizable {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String notBanned = "<color:#ff7171><b>⁉</b> This player is not banned";
-            private String format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator></fcolor> unbanned the player <fcolor:2><player></fcolor>";
+            private String format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator> <color:#98FB98>unbanned the player <fcolor:2><player>";
         }
 
         @Getter
         public static final class Unmute implements SubCommandConfig, Localizable {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String notMuted = "<color:#ff7171><b>⁉</b> This player is not muted";
-            private String format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator></fcolor> unmutted the player <fcolor:2><player></fcolor>";
+            private String format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator> <color:#98FB98>unmutted the player <fcolor:2><player>";
         }
 
         @Getter
         public static final class Unwarn implements SubCommandConfig, Localizable {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String notWarned = "<color:#ff7171><b>⁉</b> This player is not warned";
-            private String format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator></fcolor> unwarned the player <fcolor:2><player></fcolor>";
+            private String format = "<color:#98FB98>\uD83D\uDD13 <fcolor:2><moderator> <color:#98FB98>unwarned the player <fcolor:2><player>";
         }
 
         @Getter
@@ -1345,7 +1345,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 }
             };
 
-            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator></fcolor> gave a warning to <fcolor:2><player></fcolor> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
+            private String server = "<color:#ff7171>🔒 <fcolor:2><moderator> <fcolor:1>gave a warning to <fcolor:2><player> <fcolor:1><hover:show_text:\"<fcolor:1>ID: <id><br>Date: <date><br>Time: <time><br>Remaining time: <time_left><br>Moderator: <moderator><br>Reason: <reason>\">[INFO]</hover>";
             private String person = "<color:#ff7171>🔒 You are warned a <time>";
         }
 
@@ -1669,13 +1669,13 @@ public final class Localization extends FileSerializable implements ModuleConfig
             );
 
             private Command revoke = new Command(
-                    "<fcolor:1>🌠 Revoked <fcolor:2><number></fcolor:2> advancements from <display_name>",
-                    "<fcolor:1>🌠 Revoked the advancement <fcolor:2><advancement></fcolor:2> from <display_name>"
+                    "<fcolor:1>🌠 Revoked <fcolor:2><number> <fcolor:1>advancements from <display_name>",
+                    "<fcolor:1>🌠 Revoked the advancement <fcolor:2><advancement> <fcolor:1>from <display_name>"
             );
 
             private Command grant = new Command(
-                    "<fcolor:1>🌠 Granted <fcolor:2><number></fcolor:2> advancements to <display_name>",
-                    "<fcolor:1>🌠 Granted the advancement <fcolor:2><advancement></fcolor:2> to <display_name>"
+                    "<fcolor:1>🌠 Granted <fcolor:2><number> <fcolor:1>advancements to <display_name>",
+                    "<fcolor:1>🌠 Granted the advancement <fcolor:2><advancement> <fcolor:1>to <display_name>"
             );
 
             @Getter
@@ -1721,7 +1721,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                         {
                             push("<br><fcolor:1>◇ This server uses <click:open_url:\"https://flectone.net/pulse/\"><hover:show_text:\"<fcolor:2>https://flectone.net/pulse/\"><fcolor:2>FlectonePulse</hover></click> :)<br>");
                             push("<br><fcolor:1>      ❝ Join our discord ❠ <br><fcolor:2>   <u><click:open_url:\"https://discord.flectone.net\"><hover:show_text:\"<fcolor:2>https://discord.flectone.net\">https://discord.flectone.net</hover></click></u><br>");
-                            push("<br><fcolor:1>⚡ Support <fcolor:2>FlectonePulse</fcolor:2> on Boosty <br><fcolor:1>⚡ <u><click:open_url:\"https://boosty.to/thefaser/\"><hover:show_text:\"<fcolor:2>https://boosty.to/thefaser/\">https://boosty.to/thefaser/</hover></click></u><br>");
+                            push("<br><fcolor:1>⚡ Support <fcolor:2>FlectonePulse <fcolor:1>on Boosty <br><fcolor:1>⚡ <u><click:open_url:\"https://boosty.to/thefaser/\"><hover:show_text:\"<fcolor:2>https://boosty.to/thefaser/\">https://boosty.to/thefaser/</hover></click></u><br>");
                             push("<br><fcolor:1>      ✉ Join our telegram ✉ <br><fcolor:2>    <u><click:open_url:\"https://t.me/flectone\"><hover:show_text:\"<fcolor:2>https://t.me/flectone\">https://t.me/flectone</hover></click></u><br>");
                         }
                     });
@@ -1767,8 +1767,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Clear implements SubMessageConfig, Localizable {
-            private String single = "<fcolor:1>🌊 Removed <fcolor:2><number></fcolor:2> item(s) from player <display_name>";
-            private String multiple = "<fcolor:1>🌊 Removed <fcolor:2><number></fcolor:2> item(s) from <fcolor:2><count></fcolor:2> players";
+            private String single = "<fcolor:1>🌊 Removed <fcolor:2><number> <fcolor:1>item(s) from player <display_name>";
+            private String multiple = "<fcolor:1>🌊 Removed <fcolor:2><number> <fcolor:1>item(s) from <fcolor:2><count> <fcolor:1>players";
         }
 
         @Getter
@@ -1856,7 +1856,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                     put("death.attack.sweetBerryBush", "<color:#778899>🪦 <fcolor:1><display_name> was poked to death by a sweet berry bush");
                     put("death.attack.sweetBerryBush.player", "<color:#778899>🪦 <fcolor:1><display_name> was poked to death by a sweet berry bush while trying to escape <killer>");
                     put("death.attack.thorns", "<color:#778899>🪦 <fcolor:1><display_name> was killed while trying to hurt <killer>");
-                    put("death.attack.thorns.item", "<color:#778899>🪦 <fcolor:1><display_name> was killed by <fcolor:2>[<i><by_item></i>]</fcolor:2> while trying to hurt <killer>");
+                    put("death.attack.thorns.item", "<color:#778899>🪦 <fcolor:1><display_name> was killed by <fcolor:2>[<i><by_item></i>] <fcolor:1>while trying to hurt <killer>");
                     put("death.attack.thrown", "<color:#778899>🪦 <fcolor:1><display_name> was pummeled by <killer>");
                     put("death.attack.thrown.item", "<color:#778899>🪦 <fcolor:1><display_name> was pummeled by <killer> using <fcolor:2>[<i><by_item></i>]");
                     put("death.attack.trident", "<color:#778899>🪦 <fcolor:1><display_name> was impaled by <killer>");
@@ -1888,8 +1888,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Enchant implements SubMessageConfig, Localizable {
-            private String single = "<fcolor:1>📖 Applied enchantment «<fcolor:2><lang:'<enchant>'> <lang:'<level>'></fcolor:2>» to <display_name>'s item";
-            private String multiple = "<fcolor:1>📖 Applied enchantment «<fcolor:2><lang:'<enchant>'> <lang:'<level>'></fcolor:2>» to <fcolor:2><count></fcolor:2> entities";
+            private String single = "<fcolor:1>📖 Applied enchantment «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» to <display_name>'s item";
+            private String multiple = "<fcolor:1>📖 Applied enchantment «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» to <fcolor:2><count><fcolor:1> entities";
         }
 
         @Getter
@@ -1897,14 +1897,14 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
             private Map<AdventureTag, String> tags = new LinkedHashMap<>(){
                 {
-                    put(AdventureTag.PING, "<fcolor:2><ping></fcolor>");
-                    put(AdventureTag.TPS, "<fcolor:2><tps></fcolor>");
-                    put(AdventureTag.ONLINE, "<fcolor:2><online></fcolor>");
-                    put(AdventureTag.COORDS, "<fcolor:2><x> <y> <z></fcolor>");
+                    put(AdventureTag.PING, "<fcolor:2><ping>");
+                    put(AdventureTag.TPS, "<fcolor:2><tps>");
+                    put(AdventureTag.ONLINE, "<fcolor:2><online>");
+                    put(AdventureTag.COORDS, "<fcolor:2><x> <y> <z>");
                     put(AdventureTag.STATS, "<color:#ff7171><hp>♥</color> <color:#3de0d8><armor>🛡 <color:#e33059><attack>🗡 <color:#4eff52><exp>⏺ <color:#f0a01f><food>🍖");
                     put(AdventureTag.SKIN, "<image:\"<message>\"><u>👨 Skin</u></image>");
-                    put(AdventureTag.ITEM, "<fcolor:2>[<message>]</fcolor>");
-                    put(AdventureTag.URL, "<click:open_url:\"<message>\"><hover:show_text:\"<fcolor:2>Open url <br><u><message>\"><fcolor:2><u>🗗 Url</u></fcolor:2></hover></click>");
+                    put(AdventureTag.ITEM, "<fcolor:2>[<message>]");
+                    put(AdventureTag.URL, "<click:open_url:\"<message>\"><hover:show_text:\"<fcolor:2>Open url <br><u><message>\"><fcolor:2><u>🗗 Url</u></hover></click>");
                     put(AdventureTag.IMAGE, "<image:\"<message>\"><u>🖃 Image</u></image>");
                 }
             };
@@ -1955,7 +1955,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             @Getter
             public static final class Mention implements SubFormatMessageConfig, Localizable {
                 private String person = "<fcolor:2>You were mentioned";
-                private String format = "<fcolor:2>@<target></fcolor>";
+                private String format = "<fcolor:2>@<target>";
             }
 
             @Getter
@@ -2001,9 +2001,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
             @Getter
             public static final class Name implements SubFormatMessageConfig, Localizable {
                 private String constant = "";
-                private String display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <player>\"><vault_prefix><stream_prefix><fcolor:2><player></fcolor><afk_suffix><vault_suffix></hover></click>";
-                private String entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<name>'> <br><fcolor:1>Type <fcolor:2><lang:'<type>'> <br><fcolor:1>ID <fcolor:2><uuid>\"><lang:'<name>'></hover></fcolor:2>";
-                private String unknown = "<fcolor:2><name></fcolor:2>";
+                private String display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <player>\"><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>";
+                private String entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<name>'> <br><fcolor:1>Type <fcolor:2><lang:'<type>'> <br><fcolor:1>ID <fcolor:2><uuid>\"><lang:'<name>'></hover>";
+                private String unknown = "<fcolor:2><name>";
                 private String invisible = "<fcolor:2>\uD83D\uDC7B Invisible";
             }
 
@@ -2051,7 +2051,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Kill implements SubMessageConfig, Localizable {
             private String single = "<color:#778899>🪦 <fcolor:1>Killed <display_name>";
-            private String multiple = "<color:#778899>🪦 <fcolor:1>Killed <fcolor:2><count></fcolor:2> entities";
+            private String multiple = "<color:#778899>🪦 <fcolor:1>Killed <fcolor:2><count> <fcolor:1>entities";
         }
 
         @Getter
@@ -2090,12 +2090,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Seed implements SubMessageConfig, Localizable {
-            private String format = "<fcolor:1>🌐 Seed: [<fcolor:2><hover:show_text:'<fcolor:2>Click to Copy to Clipboard'><click:copy_to_clipboard:<seed>><seed></click></fcolor:2>]";
+            private String format = "<fcolor:1>🌐 Seed: [<fcolor:2><hover:show_text:'<fcolor:2>Click to Copy to Clipboard'><click:copy_to_clipboard:<seed>><seed></click><fcolor:1>]";
         }
 
         @Getter
         public static final class Setblock implements SubMessageConfig, Localizable {
-            private String format = "<fcolor:1>⏹ Changed the block at <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2>";
+            private String format = "<fcolor:1>⏹ Changed the block at <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z>";
         }
 
         @Getter
@@ -2125,7 +2125,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Sleep implements SubMessageConfig, Localizable {
             private String notPossible = "<fcolor:1>\uD83D\uDECC No amount of rest can pass this night";
-            private String playersSleeping = "<fcolor:1>\uD83D\uDECC <fcolor:2><sleep_count></fcolor:2>/<fcolor:2><all_count></fcolor:2> players sleeping";
+            private String playersSleeping = "<fcolor:1>\uD83D\uDECC <fcolor:2><sleep_count><fcolor:1>/<fcolor:2><all_count><fcolor:1> players sleeping";
             private String skippingNight = "<fcolor:1>\uD83D\uDECC Sleeping through this night";
         }
 
@@ -2133,8 +2133,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         public static final class Spawn implements SubMessageConfig, Localizable {
             private String notValid = "<fcolor:1>\uD83D\uDECC You have no home bed or charged respawn anchor, or it was obstructed";
             private String set = "<fcolor:1>\uD83D\uDECC Respawn point set";
-            private String single = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2> [<fcolor:2><angle></fcolor:2>] in <fcolor:2><world></fcolor:2> for <display_name>";
-            private String multiple = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x></fcolor:2>, <fcolor:2><y></fcolor:2>, <fcolor:2><z></fcolor:2> [<fcolor:2><angle></fcolor:2>] in <fcolor:2><world></fcolor:2> for <fcolor:2><count></fcolor:2> players";
+            private String single = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>] in <fcolor:2><world><fcolor:1> for <display_name>";
+            private String multiple = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>] in <fcolor:2><world><fcolor:1> for <fcolor:2><count><fcolor:1> players";
         }
 
         @Getter
@@ -2204,7 +2204,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                         push(new LinkedList<>(){
                             {
                                 push(" ");
-                                push("<fcolor:1>Hello <fcolor:2><player></fcolor:2>!");
+                                push("<fcolor:1>Hello <fcolor:2><player><fcolor:1>!");
                                 push(" ");
                             }
                         });
@@ -2249,8 +2249,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Update implements SubMessageConfig, Localizable {
-            private String formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse)</fcolor:2> Your version <fcolor:2><current_version></fcolor:2> is outdated! Update to <fcolor:2><latest_version></fcolor:2> at <url:https://github.com/Flectone/FlectonePulse/releases> for the latest features!";
-            private String formatConsole = "<fcolor:1>Your version <fcolor:2><current_version></fcolor:2> is outdated! Update to <fcolor:2><latest_version></fcolor:2> at <click:open_url:https://github.com/Flectone/FlectonePulse/releases>https://github.com/Flectone/FlectonePulse/releases";
+            private String formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse)<fcolor:1> Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <url:https://github.com/Flectone/FlectonePulse/releases> for the latest features!";
+            private String formatConsole = "<fcolor:1>Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <click:open_url:https://github.com/Flectone/FlectonePulse/releases>https://github.com/Flectone/FlectonePulse/releases";
         }
 
     }
