@@ -4,7 +4,6 @@ import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
 import net.flectone.pulse.BuildConfig;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -111,10 +110,6 @@ public class FLogger extends Logger {
             string = string.replace("<version>", BuildConfig.PROJECT_VERSION);
             info(string);
         });
-    }
-
-    public void info(Component component) {
-        info(PlainTextComponentSerializer.plainText().serialize(component));
     }
 
     @Override

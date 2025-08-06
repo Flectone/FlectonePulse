@@ -26,6 +26,7 @@ import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.serializer.PacketSerializer;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.ansi.ANSIComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.*;
@@ -33,6 +34,7 @@ import java.util.*;
 @Singleton
 public class MessageSender {
 
+    private final ANSIComponentSerializer ansiSerializer = ANSIComponentSerializer.ansi();
     private final PacketSerializer packetSerializer;
     private final TaskScheduler taskScheduler;
     private final PacketSender packetSender;
@@ -55,7 +57,7 @@ public class MessageSender {
 
     public void sendMessage(FPlayer fPlayer, Component component, boolean silent) {
         if (fPlayer.isUnknown()) {
-            fLogger.info(component);
+            fLogger.info(ansiSerializer.serialize(component));
             return;
         }
 

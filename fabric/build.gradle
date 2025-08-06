@@ -28,7 +28,8 @@ dependencies {
 			'adventure-text-serializer-gson',
 			'adventure-text-serializer-plain',
 			'adventure-text-serializer-json-legacy-impl',
-			'adventure-text-serializer-legacy'
+			'adventure-text-serializer-legacy',
+			'adventure-text-serializer-ansi'
 	]
 
 	adventureApiModules.forEach {
