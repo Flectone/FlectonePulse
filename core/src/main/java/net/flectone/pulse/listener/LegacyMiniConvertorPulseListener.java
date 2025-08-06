@@ -101,10 +101,11 @@ public final class LegacyMiniConvertorPulseListener implements PulseListener {
      * @return translated string
      */
     public @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
-        text = text.replace('§', '&');
         if (options.contains(Option.DOUBLE_TO_ESCAPE)) {
             text = text.replace("&&", "§");
         }
+
+        text = text.replace('§', '&');
 
         if (options.contains(Option.COLOR_DOUBLE_HASH)) {
             text = replaceDoubleHashHexColor(text);
