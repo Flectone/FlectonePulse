@@ -225,7 +225,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.flectonepulse.formatEditor = "<fcolor:2>★ Ссылка для веб-редактирования <u><fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\"><url>";
 
         command.chatcolor.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
-        command.chatcolor.format = "<br><color:#98FB98>│ Твои цвета выглядят так: <br><color:#98FB98>│ <fcolor:1>Сообщение написал <fcolor:2><player><fcolor:3>: привет мир! <br><color:#98FB98>│ <fcolor:1>Сообщение написал <fcolor:2><player><fcolor:4>: привет мир! <br>";
+        command.chatcolor.format = "<br><color:#98FB98>│ Твои цвета выглядят так: <br><color:#98FB98>│ <br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><color:#98FB98>│ <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир! <br>";
         command.chatcolor.nullType = "<color:#ff7171><b>⁉</b> Тип введён неверно";
         command.chatcolor.nullColor = "<color:#ff7171><b>⁉</b> Цвета введены неверно";
 
@@ -274,46 +274,46 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.chatsetting.menu.chat.types.put("default", "<fcolor:2>Стандартный чат<br><fcolor:1>Ты можешь видеть <fcolor:2>все<fcolor:1> чаты и писать в любой чат");
         command.chatsetting.menu.chat.types.put("local", "<fcolor:2>Локальный чат<br><fcolor:1>Ты можешь писать только в <fcolor:2>локальный<fcolor:1> чат и видишь только его");
         command.chatsetting.menu.chat.types.put("global", "<fcolor:2>Глобальный чат<br><fcolor:1>Ты можешь писать только в <fcolor:2>глобальный<fcolor:1> чат и видишь только его");
-        command.chatsetting.menu.see.item = "<fcolor:2>Цвета \"see\" <br><fcolor:1>Цвета для /chatcolor see <br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир! <br><br><u><color:#ff7171>Это видишь только ТЫ в любых сообщений";
+        command.chatsetting.menu.see.item = "<fcolor:2>Цвета \"see\" <br><fcolor:1>Цвета для /chatcolor see <br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир! <br><br><u><color:#ff7171>Это видишь только ТЫ в любых сообщений";
         command.chatsetting.menu.see.inventory = "<reset>                Цвета";
         command.chatsetting.menu.see.types.clear();
-        command.chatsetting.menu.see.types.put("default", "<fcolor:2>Стандартные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.see.types.put("white", "<fcolor:2>Белые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.see.types.put("light_gray", "<fcolor:2>Светло-серые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.see.types.put("gray", "<fcolor:2>Серые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.see.types.put("black", "<fcolor:2>Черные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.see.types.put("brown", "<fcolor:2>Коричневые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.see.types.put("red", "<fcolor:2>Красные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.see.types.put("orange", "<fcolor:2>Оранжевые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.see.types.put("yellow", "<fcolor:2>Желтые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.see.types.put("lime", "<fcolor:2>Лаймовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.see.types.put("green", "<fcolor:2>Зеленые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.see.types.put("cyan", "<fcolor:2>Бирюзовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.see.types.put("light_blue", "<fcolor:2>Голубые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.see.types.put("blue", "<fcolor:2>Синие цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.see.types.put("purple", "<fcolor:2>Фиолетовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.see.types.put("magenta", "<fcolor:2>Пурпурные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.see.types.put("pink", "<fcolor:2>Розовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.out.item = "<fcolor:2>Цвета \"out\" <br><fcolor:1>Цвета для /chatcolor out <br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир! <br><br><u><color:#ff7171>Это видят ВСЕ у твоих сообщений";
+        command.chatsetting.menu.see.types.put("default", "<fcolor:2>Стандартные цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.see.types.put("white", "<fcolor:2>Белые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.see.types.put("light_gray", "<fcolor:2>Светло-серые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.see.types.put("gray", "<fcolor:2>Серые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.see.types.put("black", "<fcolor:2>Черные цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.see.types.put("brown", "<fcolor:2>Коричневые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.see.types.put("red", "<fcolor:2>Красные цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.see.types.put("orange", "<fcolor:2>Оранжевые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.see.types.put("yellow", "<fcolor:2>Желтые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.see.types.put("lime", "<fcolor:2>Лаймовые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.see.types.put("green", "<fcolor:2>Зеленые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.see.types.put("cyan", "<fcolor:2>Бирюзовые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.see.types.put("light_blue", "<fcolor:2>Голубые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.see.types.put("blue", "<fcolor:2>Синие цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.see.types.put("purple", "<fcolor:2>Фиолетовые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.see.types.put("magenta", "<fcolor:2>Пурпурные цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.see.types.put("pink", "<fcolor:2>Розовые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.out.item = "<fcolor:2>Цвета \"out\" <br><fcolor:1>Цвета для /chatcolor out <br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир! <br><br><u><color:#ff7171>Это видят ВСЕ у твоих сообщений";
         command.chatsetting.menu.out.inventory = "<reset>                Цвета";
         command.chatsetting.menu.out.types.clear();
-        command.chatsetting.menu.out.types.put("default", "<fcolor:2>Стандартные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.out.types.put("white", "<fcolor:2>Белые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.out.types.put("light_gray", "<fcolor:2>Светло-серые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.out.types.put("gray", "<fcolor:2>Серые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.out.types.put("black", "<fcolor:2>Черные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.out.types.put("brown", "<fcolor:2>Коричневые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.out.types.put("red", "<fcolor:2>Красные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.out.types.put("orange", "<fcolor:2>Оранжевые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.out.types.put("yellow", "<fcolor:2>Желтые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.out.types.put("lime", "<fcolor:2>Лаймовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.out.types.put("green", "<fcolor:2>Зеленые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.out.types.put("cyan", "<fcolor:2>Бирюзовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.out.types.put("light_blue", "<fcolor:2>Голубые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.out.types.put("blue", "<fcolor:2>Синие цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.out.types.put("purple", "<fcolor:2>Фиолетовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.out.types.put("magenta", "<fcolor:2>Пурпурные цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
-        command.chatsetting.menu.out.types.put("pink", "<fcolor:2>Розовые цвета<br><br><fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:2><player><fcolor:4>: привет мир! <br><fcolor:2><player><fcolor:1>: привет мир!");
+        command.chatsetting.menu.out.types.put("default", "<fcolor:2>Стандартные цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.out.types.put("white", "<fcolor:2>Белые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.out.types.put("light_gray", "<fcolor:2>Светло-серые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.out.types.put("gray", "<fcolor:2>Серые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.out.types.put("black", "<fcolor:2>Черные цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.out.types.put("brown", "<fcolor:2>Коричневые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.out.types.put("red", "<fcolor:2>Красные цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.out.types.put("orange", "<fcolor:2>Оранжевые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.out.types.put("yellow", "<fcolor:2>Желтые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.out.types.put("lime", "<fcolor:2>Лаймовые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.out.types.put("green", "<fcolor:2>Зеленые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.out.types.put("cyan", "<fcolor:2>Бирюзовые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.out.types.put("light_blue", "<fcolor:2>Голубые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.out.types.put("blue", "<fcolor:2>Синие цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.out.types.put("purple", "<fcolor:2>Фиолетовые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.out.types.put("magenta", "<fcolor:2>Пурпурные цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
+        command.chatsetting.menu.out.types.put("pink", "<fcolor:2>Розовые цвета<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир!");
 
         command.symbol.format = "<click:suggest_command:\"<message>\"><fcolor:2>\uD83D\uDDA5 Нажми, чтобы использовать: <fcolor:1><message>";
 
@@ -889,7 +889,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String nullType = "<color:#ff7171><b>⁉</b> Incorrect type entered";
             private String nullColor = "<color:#ff7171><b>⁉</b> Incorrect colors entered";
-            private String format = "<br><color:#98FB98>│ Your colors: <br><color:#98FB98>│ <fcolor:1>Message written by <fcolor:2><player><fcolor:3>: hello world! <br><color:#98FB98>│ <fcolor:1>Message written by <fcolor:2><player><fcolor:4>: hello world! <br>";
+            private String format = "<br><color:#98FB98>│ Your colors: <br><color:#98FB98>│ <br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><color:#98FB98>│ <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world! <br>";
         }
 
         @Getter
@@ -963,46 +963,46 @@ public final class Localization extends FileSerializable implements ModuleConfig
                         put("global", "<fcolor:2>Global chat<br><fcolor:1>You can only write to <fcolor:2>global <fcolor:1>chat and see it");
                     }
                 });
-                private SubMenu see = new SubMenu("<fcolor:2>Colors \"see\" <br><fcolor:1>Colors for /chatcolor see <br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world! <br><br><u><color:#ff7171>Only you see it in all messages", "<reset>                Colors", new LinkedHashMap<>() {
+                private SubMenu see = new SubMenu("<fcolor:2>Colors \"see\" <br><fcolor:1>Colors for /chatcolor see <br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world! <br><br><u><color:#ff7171>Only you see it in all messages", "<reset>                Colors", new LinkedHashMap<>() {
                     {
-                        put("default", "<fcolor:2>Default colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("white", "<fcolor:2>White colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("light_gray", "<fcolor:2>Light gray colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("gray", "<fcolor:2>Gray colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("black", "<fcolor:2>Black colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("brown", "<fcolor:2>Brown colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("red", "<fcolor:2>Red colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("orange", "<fcolor:2>Orange colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("yellow", "<fcolor:2>Yellow colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("lime", "<fcolor:2>Lime colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("green", "<fcolor:2>Green colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("cyan", "<fcolor:2>Cyan colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("light_blue", "<fcolor:2>Light blue colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("blue", "<fcolor:2>Blue colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("purple", "<fcolor:2>Purple colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("magenta", "<fcolor:2>Magenta colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("pink", "<fcolor:2>Pink colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("default", "<fcolor:2>Default colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("white", "<fcolor:2>White colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("light_gray", "<fcolor:2>Light gray colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("gray", "<fcolor:2>Gray colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("black", "<fcolor:2>Black colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("brown", "<fcolor:2>Brown colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("red", "<fcolor:2>Red colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("orange", "<fcolor:2>Orange colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("yellow", "<fcolor:2>Yellow colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("lime", "<fcolor:2>Lime colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("green", "<fcolor:2>Green colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("cyan", "<fcolor:2>Cyan colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("light_blue", "<fcolor:2>Light blue colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("blue", "<fcolor:2>Blue colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("purple", "<fcolor:2>Purple colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("magenta", "<fcolor:2>Magenta colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("pink", "<fcolor:2>Pink colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
                     }
                 });
-                private SubMenu out = new SubMenu("<fcolor:2>Colors \"out\" <br><fcolor:1>Colors for /chatcolor out <br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world! <br><br><u><color:#ff7171>Everyone sees it in your messages", "<reset>                Colors", new LinkedHashMap<>() {
+                private SubMenu out = new SubMenu("<fcolor:2>Colors \"out\" <br><fcolor:1>Colors for /chatcolor out <br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world! <br><br><u><color:#ff7171>Everyone sees it in your messages", "<reset>                Colors", new LinkedHashMap<>() {
                     {
-                        put("default", "<fcolor:2>Default colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("white", "<fcolor:2>White colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("light_gray", "<fcolor:2>Light gray colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("gray", "<fcolor:2>Gray colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("black", "<fcolor:2>Black colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("brown", "<fcolor:2>Brown colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("red", "<fcolor:2>Red colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("orange", "<fcolor:2>Orange colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("yellow", "<fcolor:2>Yellow colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("lime", "<fcolor:2>Lime colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("green", "<fcolor:2>Green colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("cyan", "<fcolor:2>Cyan colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("light_blue", "<fcolor:2>Light blue colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("blue", "<fcolor:2>Blue colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("purple", "<fcolor:2>Purple colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("magenta", "<fcolor:2>Magenta colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
-                        put("pink", "<fcolor:2>Pink colors<br><br><fcolor:2><player><fcolor:3>: hello world! <br><fcolor:2><player><fcolor:4>: hello world! <br><fcolor:2><player><fcolor:1>: hello world!");
+                        put("default", "<fcolor:2>Default colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("white", "<fcolor:2>White colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("light_gray", "<fcolor:2>Light gray colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("gray", "<fcolor:2>Gray colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("black", "<fcolor:2>Black colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("brown", "<fcolor:2>Brown colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("red", "<fcolor:2>Red colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("orange", "<fcolor:2>Orange colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("yellow", "<fcolor:2>Yellow colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("lime", "<fcolor:2>Lime colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("green", "<fcolor:2>Green colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("cyan", "<fcolor:2>Cyan colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("light_blue", "<fcolor:2>Light blue colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("blue", "<fcolor:2>Blue colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("purple", "<fcolor:2>Purple colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("magenta", "<fcolor:2>Magenta colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
+                        put("pink", "<fcolor:2>Pink colors<br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world!");
                     }
                 });
 
