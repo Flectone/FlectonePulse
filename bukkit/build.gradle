@@ -8,6 +8,7 @@ dependencies {
     compileOnly "me.clip:placeholderapi:$placeholderapi_version"
     compileOnly "com.github.MilkBowl:VaultAPI:$vaultapi_version"
     compileOnly "com.github.LeonMangler:SuperVanish:$supervanishapi_version"
+    compileOnly "com.loohp:InteractiveChat:$interactivechatapi_version"
     compileOnly "com.rexcantor64.triton:triton-api:$tritonapi_version"
     compileOnly "com.gitlab.ruany:LiteBansAPI:$litebans_version"
     compileOnly "com.github.DevLeoko:AdvancedBan:$advancedban_version"

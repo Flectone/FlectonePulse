@@ -42,6 +42,11 @@ public class FabricIntegrationModule extends IntegrationModule {
     }
 
     @Override
+    public String checkMention(FEntity fPlayer, String message) {
+        return message;
+    }
+
+    @Override
     public boolean isVanished(FEntity sender) {
         if (getChildren().contains(VanishModule.class)) {
             return injector.getInstance(VanishModule.class).isVanished(sender);

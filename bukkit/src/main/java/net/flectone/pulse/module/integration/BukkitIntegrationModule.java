@@ -3,10 +3,12 @@ package net.flectone.pulse.module.integration;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.integration.advancedban.AdvancedBanModule;
+import net.flectone.pulse.module.integration.interactivechat.InteractiveChatModule;
 import net.flectone.pulse.module.integration.itemsadder.ItemsAdderModule;
 import net.flectone.pulse.module.integration.litebans.LiteBansModule;
 import net.flectone.pulse.module.integration.minimotd.MiniMOTDModule;
@@ -17,10 +19,10 @@ import net.flectone.pulse.module.integration.supervanish.SuperVanishModule;
 import net.flectone.pulse.module.integration.tab.TABModule;
 import net.flectone.pulse.module.integration.triton.TritonModule;
 import net.flectone.pulse.module.integration.vault.VaultModule;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.logging.FLogger;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
@@ -33,6 +35,8 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
     private final Injector injector;
     private final PlatformServerAdapter platformServerAdapter;
+    private final ReflectionResolver reflectionResolver;
+    private final FLogger fLogger;
 
     @Inject
     public BukkitIntegrationModule(FileResolver fileResolver,
@@ -44,6 +48,8 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
         this.injector = injector;
         this.platformServerAdapter = platformServerAdapter;
+        this.reflectionResolver = reflectionResolver;
+        this.fLogger = fLogger;
     }
 
     @Override
@@ -60,6 +66,14 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
         if (platformServerAdapter.hasProject("Vault")) {
             addChildren(VaultModule.class);
+        }
+
+        if (platformServerAdapter.hasProject("InteractiveChat")) {
+            if (reflectionResolver.hasClass("com.loohp.interactivechat.registry.Registry")) {
+                addChildren(InteractiveChatModule.class);
+            } else {
+                fLogger.warning("Update InteractiveChat to the latest version");
+            }
         }
 
         if (platformServerAdapter.hasProject("ItemsAdder")) {
@@ -93,6 +107,17 @@ public class BukkitIntegrationModule extends IntegrationModule {
         if (platformServerAdapter.hasProject("Triton")) {
             addChildren(TritonModule.class);
         }
+    }
+
+    @Override
+    public String checkMention(FEntity fSender, String message) {
+        if (isModuleDisabledFor(fSender)) return message;
+
+        if (getChildren().contains(InteractiveChatModule.class)) {
+            return injector.getInstance(InteractiveChatModule.class).checkMention(fSender, message);
+        }
+
+        return message;
     }
 
     @Override
@@ -196,5 +221,15 @@ public class BukkitIntegrationModule extends IntegrationModule {
         if (!getChildren().contains(TritonModule.class)) return null;
 
         return injector.getInstance(TritonModule.class).getLocale(fPlayer);
+    }
+
+    public boolean sendMessageWithInteractiveChat(FEntity fReceiver, Component message) {
+        if (isModuleDisabledFor(fReceiver)) return false;
+
+        if (getChildren().contains(InteractiveChatModule.class)) {
+            return injector.getInstance(InteractiveChatModule.class).sendMessage(fReceiver, message);
+        }
+
+        return false;
     }
 }

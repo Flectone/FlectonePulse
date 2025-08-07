@@ -45,6 +45,8 @@ public final class Integration extends FileSerializable implements ModuleConfig.
     private Deepl deepl = new Deepl();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/discord/")})
     private Discord discord = new Discord();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/interactivechat/")})
+    private Interactivechat interactivechat = new Interactivechat();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/itemsadder/")})
     private Itemsadder itemsadder = new Itemsadder();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/litebans/")})
@@ -130,6 +132,11 @@ public final class Integration extends FileSerializable implements ModuleConfig.
             private boolean enable = false;
             private Ticker ticker = new Ticker(true, 1200);
         }
+    }
+
+    @Getter
+    public static final class Interactivechat implements SubIntegrationConfig, Config.IEnable {
+        private boolean enable = true;
     }
 
     @Getter

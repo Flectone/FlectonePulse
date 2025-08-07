@@ -132,7 +132,8 @@ Tailor every aspect of your server’s messaging to match your vision:
 ### 🔌 Plugins
 
 | 🖼️ **Plugin**                                                                                | 💬 **Description**                                                 |  
-|-----------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+|-----------------------------------------------------------------------------------------------|--------------------------------------------------------------------|  
+| 💬 **[InteractiveChat](https://flectone.net/pulse/docs/integration/interactivechat/)**        | Enhanced chat formatting with interactive components              | 
 | 🛡️ **[LuckPerms](https://flectone.net/pulse/docs/integration/luckperms/)**                   | Manage roles, permissions, and weighted groups seamlessly         |  
 | 🧩 **[PlaceholderAPI](https://flectone.net/pulse/docs/integration/placeholderapi/)**          | Use dynamic variables like `%player_level%` in messages           |  
 | 🎙️ **[PlasmoVoice & SimpleVoice](https://flectone.net/pulse/docs/integration/plasmovoice/)** | Synchronize ignores/mutes between voice and server chat           |  
