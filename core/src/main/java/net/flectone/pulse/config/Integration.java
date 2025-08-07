@@ -8,7 +8,6 @@ import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.util.constant.MessageType;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -216,8 +215,8 @@ public final class Integration extends FileSerializable implements ModuleConfig.
         private String token = "";
         private Map<MessageType, List<String>> messageChannel = new LinkedHashMap<>(){
             {
-                put(MessageType.FROM_TELEGRAM_TO_MINECRAFT, new ArrayList<>());
-                put(MessageType.CHAT, new ArrayList<>());
+                put(MessageType.FROM_TELEGRAM_TO_MINECRAFT, List.of("123456"));
+                put(MessageType.CHAT, List.of("123456"));
             }
         };
         private Destination destination = new Destination();
@@ -235,8 +234,8 @@ public final class Integration extends FileSerializable implements ModuleConfig.
         private String token = "";
         private Map<MessageType, List<String>> messageChannel = new LinkedHashMap<>(){
             {
-                put(MessageType.FROM_TWITCH_TO_MINECRAFT, new ArrayList<>());
-                put(MessageType.CHAT, new ArrayList<>());
+                put(MessageType.FROM_TWITCH_TO_MINECRAFT, List.of("faseri4ka"));
+                put(MessageType.CHAT, List.of("faseri4ka"));
             }
         };
         private Map<String, List<String>> followChannel = new LinkedHashMap<>(Map.of(
