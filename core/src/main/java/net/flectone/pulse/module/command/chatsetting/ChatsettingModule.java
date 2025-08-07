@@ -7,6 +7,7 @@ import com.google.inject.Singleton;
 import lombok.NonNull;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.FColor;
@@ -28,15 +29,13 @@ import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Singleton
 public class ChatsettingModule extends AbstractModuleCommand<Localization.Command.Chatsetting> {
 
+    private final Message.Format.FColor fColorMessage;
     private final Permission.Message.Chat chatPermission;
     private final Command.Chatsetting command;
     private final Permission.Command.Chatsetting permission;
@@ -63,6 +62,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                              PacketProvider packetProvider) {
         super(localization -> localization.getCommand().getChatsetting(), Command::getChatsetting);
 
+        this.fColorMessage = fileResolver.getMessage().getFormat().getFcolor();
         this.chatPermission = fileResolver.getPermission().getMessage().getChat();
         this.command = fileResolver.getCommand().getChatsetting();
         this.permission = fileResolver.getPermission().getCommand().getChatsetting();
@@ -313,7 +313,13 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                         Command.Chatsetting.Menu.Color.Type colorType = color.getTypes().get(i);
                         String colorName = colorType.getName();
                         String colorMaterial = colorType.getMaterial();
-                        Map<Integer, String> colors = colorType.getColors();
+
+                        Map<Integer, String> colors = new HashMap<>(fColorMessage.getDefaultColors());
+                        colorType.getColors().forEach((integer, string) -> {
+                            if (string.isBlank()) return;
+
+                            colors.put(integer, string);
+                        });
 
                         String colorMessage = subMenu.getTypes().getOrDefault(colorName, "");
                         for (Map.Entry<Integer, String> entry : colors.entrySet()) {
@@ -330,13 +336,11 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                                 .addClickHandler(i, (colorItemStack, colorInventory) -> {
                                     fTarget.getFColors().remove(type);
 
-                                    if (!colorName.equalsIgnoreCase("default")) {
-                                        fTarget.getFColors().put(type, colors.entrySet()
-                                                .stream()
-                                                .map(entry -> new FColor(entry.getKey(), entry.getValue()))
-                                                .collect(Collectors.toSet())
-                                        );
-                                    }
+                                    fTarget.getFColors().put(type, colors.entrySet()
+                                            .stream()
+                                            .map(entry -> new FColor(entry.getKey(), entry.getValue()))
+                                            .collect(Collectors.toSet())
+                                    );
 
                                     inventoryController.close(fPlayer.getUuid());
                                     sendSettingInventory(fPlayer, fTarget);
