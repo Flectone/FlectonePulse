@@ -325,6 +325,12 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fcolor/")})
         private FColor fcolor = new FColor();
+
+        // fix Elytrium issue with Map
+        // upgrade from 1.2.2 and older
+        @Deprecated(forRemoval = true)
+        private String emoji = "";
+
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fixation/")})
         private Fixation fixation = new Fixation();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/image/")})
