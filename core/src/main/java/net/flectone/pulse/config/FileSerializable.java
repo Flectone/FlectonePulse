@@ -42,6 +42,8 @@ public abstract class FileSerializable extends YamlSerializable {
             .registerSerializer(new EnumSerializer<>(WorldModule.Mode.class))
             .registerSerializer(new EnumSerializer<>(ObjectiveModule.Mode.class))
             .registerSerializer(new EnumSerializer<>(Event.Priority.class))
+            .setLogMissingFields(false)
+            .setSafeMode(true)
             .registerSerializer(new ClassSerializer<Range, Object>() {
 
                 @Override
