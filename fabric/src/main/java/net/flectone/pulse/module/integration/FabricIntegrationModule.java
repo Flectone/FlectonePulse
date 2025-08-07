@@ -13,6 +13,7 @@ import net.flectone.pulse.module.integration.placeholderapi.PlaceholderAPIModule
 import net.flectone.pulse.module.integration.supervanish.VanishModule;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.logging.FLogger;
+import net.kyori.adventure.text.Component;
 
 @Singleton
 public class FabricIntegrationModule extends IntegrationModule {
@@ -58,6 +59,11 @@ public class FabricIntegrationModule extends IntegrationModule {
     @Override
     public boolean hasSeeVanishPermission(FEntity sender) {
         return permissionChecker.check(sender, "vanish.feature.view");
+    }
+
+    @Override
+    public boolean sendMessageWithInteractiveChat(FEntity fReceiver, Component message) {
+        return false;
     }
 
     @Override

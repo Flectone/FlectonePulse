@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import net.flectone.pulse.listener.BukkitBaseListener;
-import net.flectone.pulse.listener.BukkitMessageListener;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.event.*;
@@ -95,6 +94,5 @@ public class BukkitListenerRegistry extends ListenerRegistry {
         super.registerDefaultListeners();
 
         register(BukkitBaseListener.class, net.flectone.pulse.model.event.Event.Priority.LOWEST);
-        register(BukkitMessageListener.class);
     }
 }

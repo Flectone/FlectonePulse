@@ -22,6 +22,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.BossBar;
 import net.flectone.pulse.model.util.Times;
 import net.flectone.pulse.model.util.Toast;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.serializer.PacketSerializer;
 import net.flectone.pulse.util.logging.FLogger;
@@ -39,6 +40,7 @@ public class MessageSender {
     private final TaskScheduler taskScheduler;
     private final PacketSender packetSender;
     private final PacketProvider packetProvider;
+    private final IntegrationModule integrationModule;
     private final FLogger fLogger;
 
     @Inject
@@ -46,11 +48,13 @@ public class MessageSender {
                          TaskScheduler taskScheduler,
                          PacketSender packetSender,
                          PacketProvider packetProvider,
+                         IntegrationModule integrationModule,
                          FLogger fLogger) {
         this.packetSerializer = packetSerializer;
         this.taskScheduler = taskScheduler;
         this.packetSender = packetSender;
         this.packetProvider = packetProvider;
+        this.integrationModule = integrationModule;
         this.fLogger = fLogger;
     }
 
@@ -60,6 +64,9 @@ public class MessageSender {
             fLogger.info(ansiSerializer.serialize(component));
             return;
         }
+
+        // integration with InteractiveChat
+        if (integrationModule.sendMessageWithInteractiveChat(fPlayer, component)) return;
 
         User user = packetProvider.getUser(fPlayer);
         if (user == null) return;

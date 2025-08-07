@@ -223,6 +223,7 @@ public class BukkitIntegrationModule extends IntegrationModule {
         return injector.getInstance(TritonModule.class).getLocale(fPlayer);
     }
 
+    @Override
     public boolean sendMessageWithInteractiveChat(FEntity fReceiver, Component message) {
         if (isModuleDisabledFor(fReceiver)) return false;
 

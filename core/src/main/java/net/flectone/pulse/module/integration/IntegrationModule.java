@@ -21,6 +21,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
+import net.kyori.adventure.text.Component;
 
 import java.util.Collections;
 import java.util.Set;
@@ -83,6 +84,8 @@ public abstract class IntegrationModule extends AbstractModule {
     public abstract boolean isVanished(FEntity sender);
 
     public abstract boolean hasSeeVanishPermission(FEntity sender);
+
+    public abstract boolean sendMessageWithInteractiveChat(FEntity fReceiver, Component message);
 
     public abstract boolean isMuted(FPlayer fPlayer);
 
