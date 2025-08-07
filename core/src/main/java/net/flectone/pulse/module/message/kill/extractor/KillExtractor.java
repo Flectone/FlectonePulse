@@ -3,7 +3,7 @@ package net.flectone.pulse.module.message.kill.extractor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.kill.model.Kill;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.EntityUtil;
@@ -29,8 +29,8 @@ public class KillExtractor {
         this.fPlayerService = fPlayerService;
     }
 
-    public Optional<Kill> extractMultipleKill(TranslatableMessageReceiveEvent event) {
-        TranslatableComponent translatableComponent = event.getComponent();
+    public Optional<Kill> extractMultipleKill(MessageReceiveEvent event) {
+        TranslatableComponent translatableComponent = event.getTranslatableComponent();
         if (!(translatableComponent.args().get(0) instanceof TextComponent firstArgument)) return Optional.empty();
 
         String value = firstArgument.content();
@@ -38,8 +38,8 @@ public class KillExtractor {
         return Optional.of(kill);
     }
 
-    public Optional<Kill> extractSingleKill(TranslatableMessageReceiveEvent event) {
-        TranslatableComponent translatableComponent = event.getComponent();
+    public Optional<Kill> extractSingleKill(MessageReceiveEvent event) {
+        TranslatableComponent translatableComponent = event.getTranslatableComponent();
         if (translatableComponent.args().isEmpty()) return Optional.empty();
 
         Component firstArgument = translatableComponent.args().get(0);

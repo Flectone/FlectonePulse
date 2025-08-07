@@ -7,7 +7,7 @@ import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
@@ -37,8 +37,8 @@ public class JoinPulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onTranslatableMessageReceiveEvent(TranslatableMessageReceiveEvent event) {
-        if (event.getKey() != MinecraftTranslationKey.MULTIPLAYER_PLAYER_JOINED) return;
+    public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
+        if (event.getTranslationKey() != MinecraftTranslationKey.MULTIPLAYER_PLAYER_JOINED) return;
 
         event.setCancelled(true);
     }

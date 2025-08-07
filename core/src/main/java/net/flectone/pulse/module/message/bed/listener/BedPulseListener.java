@@ -4,8 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.bed.BedModule;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 
 @Singleton
 public class BedPulseListener implements PulseListener {
@@ -18,11 +19,12 @@ public class BedPulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onTranslatableMessageReceiveEvent(TranslatableMessageReceiveEvent event) {
-        if (!event.getKey().startsWith("block.minecraft.bed.") && !event.getKey().startsWith("tile.bed")) return;
+    public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
+        MinecraftTranslationKey translationKey = event.getTranslationKey();
+        if (!translationKey.startsWith("block.minecraft.bed.") && !translationKey.startsWith("tile.bed")) return;
 
         event.setCancelled(true);
-        bedModule.send(event.getFPlayer(), event.getKey());
+        bedModule.send(event.getFPlayer(), translationKey);
     }
 
 }

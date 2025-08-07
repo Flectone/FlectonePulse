@@ -3,7 +3,7 @@ package net.flectone.pulse.module.message.advancement.extractor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
 import net.flectone.pulse.module.message.advancement.model.ChatAdvancement;
 import net.flectone.pulse.module.message.advancement.model.CommandAdvancement;
@@ -25,8 +25,8 @@ public class AdvancementExtractor {
     public AdvancementExtractor() {
     }
 
-    public Optional<ChatAdvancement> extractFromChat(TranslatableMessageReceiveEvent event) {
-        TranslatableComponent translatableComponent = event.getComponent();
+    public Optional<ChatAdvancement> extractFromChat(MessageReceiveEvent event) {
+        TranslatableComponent translatableComponent = event.getTranslatableComponent();
         List<Component> translationArguments = translatableComponent.args();
         if (translationArguments.size() < 2) return Optional.empty();
 
@@ -50,18 +50,18 @@ public class AdvancementExtractor {
             description = title.replace(".title", ".description");
         }
 
-        ChatAdvancement chatAdvancement = new ChatAdvancement(target, title, description, event.getKey());
+        ChatAdvancement chatAdvancement = new ChatAdvancement(target, title, description, event.getTranslationKey());
         return Optional.of(chatAdvancement);
     }
 
-    public Optional<CommandAdvancement> extractFromCommand(TranslatableMessageReceiveEvent event) {
-        TranslatableComponent translatableComponent = event.getComponent();
+    public Optional<CommandAdvancement> extractFromCommand(MessageReceiveEvent event) {
+        TranslatableComponent translatableComponent = event.getTranslatableComponent();
         if (translatableComponent.args().size() < 2) return Optional.empty();
 
         Component argument;
         Component playerArgument;
 
-        MinecraftTranslationKey type = event.getKey();
+        MinecraftTranslationKey type = event.getTranslationKey();
         if (type == MinecraftTranslationKey.COMMANDS_ACHIEVEMENT_GIVE_ONE
                 || type == MinecraftTranslationKey.COMMANDS_ADVANCEMENT_GRANT_EVERYTHING_SUCCESS
                 || type == MinecraftTranslationKey.COMMANDS_ADVANCEMENT_REVOKE_EVERYTHING_SUCCESS) {

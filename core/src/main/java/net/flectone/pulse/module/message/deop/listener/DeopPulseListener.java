@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.deop.DeopModule;
 import net.flectone.pulse.module.message.deop.extractor.DeopExtractor;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
@@ -25,8 +25,8 @@ public class DeopPulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onTranslatableMessageReceiveEvent(TranslatableMessageReceiveEvent event) {
-        if (event.getKey() != MinecraftTranslationKey.COMMANDS_DEOP_SUCCESS) return;
+    public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
+        if (event.getTranslationKey() != MinecraftTranslationKey.COMMANDS_DEOP_SUCCESS) return;
 
         Optional<String> target = deopExtractor.extract(event);
         if (target.isEmpty()) return;

@@ -2,7 +2,7 @@ package net.flectone.pulse.module.message.enchant.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.enchant.model.Enchant;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.TextComponent;
@@ -17,14 +17,15 @@ public class EnchantExtractor {
     public EnchantExtractor() {
     }
 
-    public Optional<Enchant> extract(TranslatableMessageReceiveEvent event) {
-        if (!event.getKey().startsWith("commands.enchant.success")) return Optional.empty();
-        if (event.getKey() == MinecraftTranslationKey.COMMANDS_ENCHANT_SUCCESS) {
+    public Optional<Enchant> extract(MessageReceiveEvent event) {
+        MinecraftTranslationKey translationKey = event.getTranslationKey();
+        if (!translationKey.startsWith("commands.enchant.success")) return Optional.empty();
+        if (translationKey == MinecraftTranslationKey.COMMANDS_ENCHANT_SUCCESS) {
             Enchant enchant = new Enchant("", "", "");
             return Optional.of(enchant);
         }
 
-        TranslatableComponent translatableComponent = event.getComponent();
+        TranslatableComponent translatableComponent = event.getTranslatableComponent();
         if (translatableComponent.args().size() < 2) return Optional.empty();
         if (!(translatableComponent.args().get(0) instanceof TranslatableComponent enchantComponent)) return Optional.empty();
         String enchantKey = enchantComponent.key();

@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.gamemode.GamemodeModule;
 import net.flectone.pulse.module.message.gamemode.extractor.GamemodeExtractor;
 import net.flectone.pulse.module.message.gamemode.model.Gamemode;
@@ -26,8 +26,8 @@ public class GamemodePulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onTranslatableMessageReceiveEvent(TranslatableMessageReceiveEvent event) {
-        MinecraftTranslationKey key = event.getKey();
+    public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
+        MinecraftTranslationKey key = event.getTranslationKey();
         if (!key.startsWith("commands.gamemode.success") && key != MinecraftTranslationKey.GAMEMODE_CHANGED) return;
 
         Optional<Gamemode> gamemode = gamemodeExtractor.extract(event);

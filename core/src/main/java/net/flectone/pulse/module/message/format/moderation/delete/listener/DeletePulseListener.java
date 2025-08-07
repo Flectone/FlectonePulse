@@ -9,8 +9,8 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
@@ -73,15 +73,23 @@ public class DeletePulseListener implements PulseListener {
     }
 
     @Pulse(priority = Event.Priority.MONITOR)
-    public void onTranslatableMessageReceiveEvent(TranslatableMessageReceiveEvent event) {
-        // save only unknown messages for FlectonePulse
-        if (event.getKey() != MinecraftTranslationKey.UNKNOWN) return;
+    public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
+        // skip action bar messages
+        if (event.isOverlay()) return;
+
+        Component component = event.getComponent();
+
+        // skip FlectonePulse messages
+        if (event.getTranslationKey() != MinecraftTranslationKey.UNKNOWN) return;
+        if (deleteModule.isCached(component)) {
+            deleteModule.removeCache(component);
+            return;
+        }
 
         FPlayer fReceiver = event.getFPlayer();
         UUID messageUUID = UUID.randomUUID();
-        Component component = event.getComponent();
 
-        deleteModule.save(fReceiver, messageUUID, component);
+        deleteModule.save(fReceiver, messageUUID, component, false);
     }
 
     @Pulse(priority = Event.Priority.MONITOR)
@@ -92,7 +100,7 @@ public class DeletePulseListener implements PulseListener {
         UUID messageUUID = event.getMessageUUID();
         Component component = event.getMessage();
 
-        deleteModule.save(fReceiver, messageUUID, component);
+        deleteModule.save(fReceiver, messageUUID, component, true);
     }
 
 }

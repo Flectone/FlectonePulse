@@ -6,7 +6,7 @@ import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.module.message.quit.QuitModule;
 
@@ -27,8 +27,8 @@ public class QuitPulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onTranslatableMessageReceive(TranslatableMessageReceiveEvent event) {
-        if (event.getKey() != MinecraftTranslationKey.MULTIPLAYER_PLAYER_LEFT) return;
+    public void onTranslatableMessageReceive(MessageReceiveEvent event) {
+        if (event.getTranslationKey() != MinecraftTranslationKey.MULTIPLAYER_PLAYER_LEFT) return;
 
         event.setCancelled(true);
     }

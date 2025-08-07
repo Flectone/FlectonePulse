@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.setblock.SetblockModule;
 import net.flectone.pulse.module.message.setblock.extractor.SetblockExtractor;
 import net.flectone.pulse.module.message.setblock.model.Setblock;
@@ -26,8 +26,8 @@ public class SetblockPulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onTranslatableMessageReceiveEvent(TranslatableMessageReceiveEvent event) {
-        if (event.getKey() != MinecraftTranslationKey.COMMANDS_SETBLOCK_SUCCESS) return;
+    public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
+        if (event.getTranslationKey() != MinecraftTranslationKey.COMMANDS_SETBLOCK_SUCCESS) return;
 
         Optional<Setblock> setblock = setblockExtractor.extract(event);
         if (setblock.isEmpty()) return;

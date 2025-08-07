@@ -2,7 +2,7 @@ package net.flectone.pulse.module.message.spawn.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.spawn.model.Spawn;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
@@ -19,8 +19,8 @@ public class SpawnExtractor {
     public SpawnExtractor() {
     }
 
-    public Optional<Spawn> extract(TranslatableMessageReceiveEvent event) {
-        TranslatableComponent translatableComponent = event.getComponent();
+    public Optional<Spawn> extract(MessageReceiveEvent event) {
+        TranslatableComponent translatableComponent = event.getTranslatableComponent();
         List<Component> translationArguments = translatableComponent.args();
         if (translationArguments.size() < 4) return Optional.empty();
 
@@ -31,7 +31,7 @@ public class SpawnExtractor {
         String angle = "";
         String world = "";
 
-        if (event.getKey() == MinecraftTranslationKey.COMMANDS_SPAWNPOINT_SUCCESS) {
+        if (event.getTranslationKey() == MinecraftTranslationKey.COMMANDS_SPAWNPOINT_SUCCESS) {
             // legacy format, player first
             targetComponent = translationArguments.get(0);
             xComponent = translationArguments.get(1);

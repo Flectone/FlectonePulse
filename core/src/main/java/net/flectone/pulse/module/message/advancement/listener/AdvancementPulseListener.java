@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
 import net.flectone.pulse.module.message.advancement.extractor.AdvancementExtractor;
 import net.flectone.pulse.module.message.advancement.model.ChatAdvancement;
@@ -31,8 +31,8 @@ public class AdvancementPulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onTranslatableMessageReceiveEvent(TranslatableMessageReceiveEvent event) {
-        switch (event.getKey()) {
+    public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
+        switch (event.getTranslationKey()) {
             case CHAT_TYPE_ADVANCEMENT_TASK, CHAT_TYPE_ADVANCEMENT_GOAL, CHAT_TYPE_ADVANCEMENT_CHALLENGE,
                  CHAT_TYPE_ACHIEVEMENT, CHAT_TYPE_ACHIEVEMENT_TAKEN -> {
                 Optional<ChatAdvancement> advancement = advancementExtractor.extractFromChat(event);

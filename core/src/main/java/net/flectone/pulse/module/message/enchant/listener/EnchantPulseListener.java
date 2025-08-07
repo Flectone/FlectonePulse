@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.enchant.EnchantModule;
 import net.flectone.pulse.module.message.enchant.extractor.EnchantExtractor;
 import net.flectone.pulse.module.message.enchant.model.Enchant;
@@ -25,12 +25,12 @@ public class EnchantPulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onTranslatableMessageReceiveEvent(TranslatableMessageReceiveEvent event) {
+    public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
         Optional<Enchant> enchant = enchantExtractor.extract(event);
         if (enchant.isEmpty()) return;
 
         event.setCancelled(true);
-        enchantModule.send(event.getFPlayer(), event.getKey(), enchant.get());
+        enchantModule.send(event.getFPlayer(), event.getTranslationKey(), enchant.get());
     }
 
 }

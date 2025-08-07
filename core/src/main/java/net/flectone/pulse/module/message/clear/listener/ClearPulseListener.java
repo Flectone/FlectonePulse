@@ -4,10 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.clear.ClearModule;
 import net.flectone.pulse.module.message.clear.extractor.ClearExtractor;
 import net.flectone.pulse.module.message.clear.model.Clear;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+
 import java.util.Optional;
 
 @Singleton
@@ -24,14 +26,15 @@ public class ClearPulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onTranslatableMessageReceiveEvent(TranslatableMessageReceiveEvent event) {
-        if (!event.getKey().startsWith("commands.clear.success")) return;
+    public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
+        MinecraftTranslationKey translationKey = event.getTranslationKey();
+        if (!translationKey.startsWith("commands.clear.success")) return;
 
         Optional<Clear> clear = clearExtractor.extract(event);
         if (clear.isEmpty()) return;
 
         event.setCancelled(true);
-        clearModule.send(event.getFPlayer(), event.getKey(), clear.get());
+        clearModule.send(event.getFPlayer(), translationKey, clear.get());
     }
 
 }

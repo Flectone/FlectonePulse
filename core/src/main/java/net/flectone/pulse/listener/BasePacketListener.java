@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerDisconnect;
 import com.github.retrooper.packetevents.wrapper.login.server.WrapperLoginServerLoginSuccess;
@@ -14,17 +15,19 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCh
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
-import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
+import org.incendo.cloud.type.tuple.Triplet;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Singleton
@@ -96,26 +99,34 @@ public class BasePacketListener implements PacketListener {
             );
         }
 
-        TranslatableComponent translatableComponent = extractTranslatableComponent(event);
-        if (translatableComponent == null) return;
+        Optional<Triplet<Component, MinecraftTranslationKey, Boolean>> optionalTriplet = toMessageReceiveEvent(event);
+        if (optionalTriplet.isEmpty()) return;
 
-        MinecraftTranslationKey key = MinecraftTranslationKey.fromString(translatableComponent.key());
+        User user = event.getUser();
+        if (user == null) return;
+
+        UUID userUUID = user.getUUID();
+        if (userUUID == null) return;
+
+        Triplet<Component, MinecraftTranslationKey, Boolean> triplet = optionalTriplet.get();
 
         // skip minecraft warning
-        if (key == MinecraftTranslationKey.MULTIPLAYER_MESSAGE_NOT_DELIVERED) {
+        if (triplet.second() == MinecraftTranslationKey.MULTIPLAYER_MESSAGE_NOT_DELIVERED) {
             event.setCancelled(true);
             return;
         }
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getUser().getUUID());
-        TranslatableMessageReceiveEvent translatableMessageReceiveEvent = new TranslatableMessageReceiveEvent(fPlayer, key, translatableComponent);
-        eventDispatcher.dispatch(translatableMessageReceiveEvent);
+        FPlayer fPlayer = fPlayerService.getFPlayer(userUUID);
+        MessageReceiveEvent messageReceiveEvent = new MessageReceiveEvent(fPlayer, triplet);
 
-        event.setCancelled(translatableMessageReceiveEvent.isCancelled());
+        eventDispatcher.dispatch(messageReceiveEvent);
+        event.setCancelled(messageReceiveEvent.isCancelled());
     }
 
-    private TranslatableComponent extractTranslatableComponent(PacketSendEvent event) {
+    private Optional<Triplet<Component, MinecraftTranslationKey, Boolean>> toMessageReceiveEvent(PacketSendEvent event) {
         Component component = null;
+        MinecraftTranslationKey translationKey = MinecraftTranslationKey.UNKNOWN;
+        boolean overlay = false;
 
         if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
             WrapperPlayServerChatMessage wrapper = new WrapperPlayServerChatMessage(event);
@@ -123,12 +134,17 @@ public class BasePacketListener implements PacketListener {
         } else if (event.getPacketType() == PacketType.Play.Server.SYSTEM_CHAT_MESSAGE) {
             WrapperPlayServerSystemChatMessage wrapper = new WrapperPlayServerSystemChatMessage(event);
             component = wrapper.getMessage();
+            overlay = wrapper.isOverlay();
         }
 
         if (component instanceof TranslatableComponent translatableComponent) {
-            return translatableComponent;
+            translationKey = MinecraftTranslationKey.fromString(translatableComponent);
         }
 
-        return null;
+        if (component != null) {
+            return Optional.of(Triplet.of(component, translationKey, overlay));
+        }
+
+        return Optional.empty();
     }
 }

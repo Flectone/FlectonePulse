@@ -2,7 +2,7 @@ package net.flectone.pulse.module.message.gamemode.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.gamemode.model.Gamemode;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -16,11 +16,11 @@ public class GamemodeExtractor {
     public GamemodeExtractor() {
     }
 
-    public Optional<Gamemode> extract(TranslatableMessageReceiveEvent event) {
+    public Optional<Gamemode> extract(MessageReceiveEvent event) {
         String target = event.getFPlayer().getName();
         String gamemodeKey = "";
 
-        TranslatableComponent translatableComponent = event.getComponent();
+        TranslatableComponent translatableComponent = event.getTranslatableComponent();
         if (translatableComponent.args().isEmpty()) {
             Gamemode gamemode = new Gamemode(gamemodeKey, target);
             return Optional.of(gamemode);

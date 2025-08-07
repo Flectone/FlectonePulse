@@ -4,10 +4,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.kill.KillModule;
 import net.flectone.pulse.module.message.kill.extractor.KillExtractor;
 import net.flectone.pulse.module.message.kill.model.Kill;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 
 import java.util.Optional;
 
@@ -25,8 +26,9 @@ public class KillPulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onTranslatableMessageReceiveEvent(TranslatableMessageReceiveEvent event) {
-        Optional<Kill> kill = switch (event.getKey()) {
+    public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
+        MinecraftTranslationKey translationKey = event.getTranslationKey();
+        Optional<Kill> kill = switch (translationKey) {
             case COMMANDS_KILL_SUCCESS_MULTIPLE -> killExtractor.extractMultipleKill(event);
             case COMMANDS_KILL_SUCCESS_SINGLE, COMMANDS_KILL_SUCCESS -> killExtractor.extractSingleKill(event);
             default -> Optional.empty();
@@ -35,7 +37,7 @@ public class KillPulseListener implements PulseListener {
         if (kill.isEmpty()) return;
 
         event.setCancelled(true);
-        killModule.send(event.getFPlayer(), event.getKey(), kill.get());
+        killModule.send(event.getFPlayer(), translationKey, kill.get());
     }
 
 }

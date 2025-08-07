@@ -2,7 +2,7 @@ package net.flectone.pulse.module.message.setblock.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.setblock.model.Setblock;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -18,8 +18,8 @@ public class SetblockExtractor {
     public SetblockExtractor() {
     }
 
-    public Optional<Setblock> extract(TranslatableMessageReceiveEvent event) {
-        TranslatableComponent translatableComponent = event.getComponent();
+    public Optional<Setblock> extract(MessageReceiveEvent event) {
+        TranslatableComponent translatableComponent = event.getTranslatableComponent();
         List<Component> translationArguments = translatableComponent.args();
 
         String x = "";

@@ -22,11 +22,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Singleton
 public class DeleteModule extends AbstractModuleLocalization<Localization.Message.Format.Moderation.Delete> {
 
     private final Map<UUID, List<HistoryMessage>> playersHistory = new ConcurrentHashMap<>();
+
+    // only for skipping FlectonePulse messages
+    private final List<Component> cachedComponents = new CopyOnWriteArrayList<>();
 
     private final Message.Format.Moderation.Delete message;
     private final Permission.Message.Format.Moderation.Delete permission;
@@ -61,13 +65,14 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
     @Override
     public void onDisable() {
         playersHistory.clear();
+        cachedComponents.clear();
     }
 
     public void clearHistory(FPlayer fPlayer) {
         playersHistory.remove(fPlayer.getUuid());
     }
 
-    public void save(FPlayer receiver, UUID messageUUID, Component component) {
+    public void save(FPlayer receiver, UUID messageUUID, Component component, boolean needToCache) {
         // skip console
         if (receiver.isUnknown()) return;
         // skip offline history
@@ -83,6 +88,20 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
         }
 
         history.add(historyMessage);
+
+        if (needToCache && !isCached(component)) {
+            cachedComponents.add(component);
+        }
+    }
+
+    public boolean isCached(Component component) {
+        // idk why, but this doesn't work
+        // return playersHistory.values().stream().anyMatch(historyMessages -> historyMessages.stream().anyMatch(historyMessage -> historyMessage.component().equals(component)));
+        return cachedComponents.contains(component);
+    }
+
+    public void removeCache(Component component) {
+        cachedComponents.remove(component);
     }
 
     public boolean remove(FEntity sender, UUID messageUUID) {

@@ -2,7 +2,7 @@ package net.flectone.pulse.module.message.seed.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -16,8 +16,8 @@ public class SeedExtractor {
     public SeedExtractor() {
     }
 
-    public Optional<String> extract(TranslatableMessageReceiveEvent event) {
-        TranslatableComponent translatableComponent = event.getComponent();
+    public Optional<String> extract(MessageReceiveEvent event) {
+        TranslatableComponent translatableComponent = event.getTranslatableComponent();
         if (translatableComponent.args().isEmpty()) return Optional.empty();
 
         Component firstArg = translatableComponent.args().get(0);

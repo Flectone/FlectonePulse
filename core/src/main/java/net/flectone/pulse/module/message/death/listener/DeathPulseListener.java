@@ -4,11 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.model.event.message.TranslatableMessageReceiveEvent;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.death.DeathModule;
 import net.flectone.pulse.module.message.death.extractor.DeathExtractor;
 import net.flectone.pulse.module.message.death.model.Death;
 import net.flectone.pulse.module.message.death.model.Item;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.TranslatableComponent;
 
 @Singleton
@@ -25,10 +26,11 @@ public class DeathPulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onTranslatableMessageReceiveEvent(TranslatableMessageReceiveEvent event) {
-        if (!event.getKey().startsWith("death.")) return;
+    public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
+        MinecraftTranslationKey translationKey = event.getTranslationKey();
+        if (!translationKey.startsWith("death.")) return;
 
-        TranslatableComponent translatableComponent = event.getComponent();
+        TranslatableComponent translatableComponent = event.getTranslatableComponent();
         Death death = deathExtractor.extractDeath(translatableComponent, 0);
         if (death == null) return;
 
