@@ -118,7 +118,6 @@ public interface ModuleConfig {
 
         interface FormatMessageConfig extends SubMessageConfig {
 
-            SubFormatMessageConfig getEmoji();
             SubFormatMessageConfig getFcolor();
             SubFormatMessageConfig getFixation();
             SubFormatMessageConfig getImage();
@@ -126,6 +125,7 @@ public interface ModuleConfig {
             ModerationFormatMessageConfig getModeration();
             SubFormatMessageConfig getName_();
             SubFormatMessageConfig getQuestionAnswer();
+            SubFormatMessageConfig getReplacement();
             SubFormatMessageConfig getScoreboard();
             SubFormatMessageConfig getSpoiler();
             SubFormatMessageConfig getTranslate();

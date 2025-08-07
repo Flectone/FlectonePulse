@@ -154,7 +154,7 @@ public class MessagePipeline {
         ITEM,
         URL,
         FCOLOR,
-        EMOJI,
+        REPLACEMENT,
         IMAGE,
         MENTION,
         SWEAR,

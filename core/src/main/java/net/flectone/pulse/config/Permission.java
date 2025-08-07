@@ -950,8 +950,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                 }
             };
 
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/emoji/")})
-            private Emoji emoji = new Emoji();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fcolor/")})
             private FColor fcolor = new FColor();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fixation/")})
@@ -966,6 +964,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private Name name_ = new Name();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/questionanswer/")})
             private QuestionAnswer questionAnswer = new QuestionAnswer();
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/replacement/")})
+            private Replacement replacement = new Replacement();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/scoreboard/")})
             private Scoreboard scoreboard = new Scoreboard();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/spoiler/")})
@@ -974,12 +974,6 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private Translate translate = new Translate();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/world/")})
             private World world = new World();
-
-            @Getter
-            public static final class Emoji implements SubFormatMessageConfig, IPermission {
-                private String name = "flectonepulse.module.message.format.emoji";
-                private Type type = Type.TRUE;
-            }
 
             @Getter
             public static final class FColor implements SubFormatMessageConfig, IPermission {
@@ -1107,6 +1101,12 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                     private PermissionEntry sound = new PermissionEntry();
                     private PermissionEntry cooldownBypass = new PermissionEntry();
                 }
+            }
+
+            @Getter
+            public static final class Replacement implements SubFormatMessageConfig, IPermission {
+                private String name = "flectonepulse.module.message.format.replacement";
+                private Type type = Type.TRUE;
             }
 
             @Getter

@@ -4,7 +4,7 @@ public enum MessageFlag {
 
     USER_MESSAGE(false),
     MENTION(false),
-    EMOJI(true),
+    REPLACEMENT(true),
     FIXATION(true),
     QUESTION(true),
     SPOILER(true),

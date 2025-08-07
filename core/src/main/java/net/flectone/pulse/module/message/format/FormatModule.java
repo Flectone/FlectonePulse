@@ -7,7 +7,6 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModuleLocalization;
-import net.flectone.pulse.module.message.format.emoji.EmojiModule;
 import net.flectone.pulse.module.message.format.fcolor.FColorModule;
 import net.flectone.pulse.module.message.format.fixation.FixationModule;
 import net.flectone.pulse.module.message.format.image.ImageModule;
@@ -16,6 +15,7 @@ import net.flectone.pulse.module.message.format.mention.MentionModule;
 import net.flectone.pulse.module.message.format.moderation.ModerationModule;
 import net.flectone.pulse.module.message.format.name.NameModule;
 import net.flectone.pulse.module.message.format.questionanswer.QuestionAnswerModule;
+import net.flectone.pulse.module.message.format.replacement.ReplacementModule;
 import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.format.spoiler.SpoilerModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
@@ -80,7 +80,6 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
         putKyoriTag(AdventureTag.PRIDE, StandardTags.pride());
         putKyoriTag(AdventureTag.SHADOW_COLOR, StandardTags.shadowColor());
 
-        addChildren(EmojiModule.class);
         addChildren(FColorModule.class);
         addChildren(FixationModule.class);
         addChildren(ImageModule.class);
@@ -88,6 +87,7 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
         addChildren(ModerationModule.class);
         addChildren(NameModule.class);
         addChildren(QuestionAnswerModule.class);
+        addChildren(ReplacementModule.class);
         addChildren(ScoreboardModule.class);
         addChildren(SpoilerModule.class);
         addChildren(TranslateModule.class);

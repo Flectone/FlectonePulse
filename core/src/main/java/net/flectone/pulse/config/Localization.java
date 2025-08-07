@@ -1920,17 +1920,17 @@ public final class Localization extends FileSerializable implements ModuleConfig
             }
 
             @Override
-            public SubFormatMessageConfig getEmoji() {
-                return null;
-            }
-
-            @Override
             public SubFormatMessageConfig getFixation() {
                 return null;
             }
 
             @Override
             public SubFormatMessageConfig getImage() {
+                return null;
+            }
+
+            @Override
+            public SubFormatMessageConfig getReplacement() {
                 return null;
             }
 

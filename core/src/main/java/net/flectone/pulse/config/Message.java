@@ -323,8 +323,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             }
         };
 
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/emoji/")})
-        private Emoji emoji = new Emoji();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fcolor/")})
         private FColor fcolor = new FColor();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fixation/")})
@@ -339,6 +337,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         private Name name_ = new Name();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/questionanswer/")})
         private QuestionAnswer questionAnswer = new QuestionAnswer();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/replacement/")})
+        private Replacement replacement = new Replacement();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/scoreboard/")})
         private Scoreboard scoreboard = new Scoreboard();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/spoiler/")})
@@ -363,32 +363,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         public static final class KyoriTag extends Tag {
             private boolean enable = true;
             private String trigger = null;
-        }
-
-        @Getter
-        public static final class Emoji implements SubFormatMessageConfig, Config.IEnable {
-            private boolean enable = true;
-            private Map<String, String> values = new LinkedHashMap<>(){
-                {
-                    put(":)", "<click:suggest_command:\":)\"><hover:show_text:\":)\">☺</hover></click>");
-                    put(":D", "<click:suggest_command:\":D\"><hover:show_text:\":D\">☻</hover></click>");
-                    put(":(", "<click:suggest_command:\":(\"><hover:show_text:\":(\">☹</hover></click>");
-                    put(":ok:", "<click:suggest_command:\":ok:\"><hover:show_text:\":ok:\">\uD83D\uDD92</hover></click>");
-                    put(":+1:", "<click:suggest_command:\":+1:\"><hover:show_text:\":+1:\">\uD83D\uDD92</hover></click>");
-                    put(":-1:", "<click:suggest_command:\":-1:\"><hover:show_text:\":-1:\">\uD83D\uDD93</hover></click>");
-                    put(":cool:", "<click:suggest_command:\":cool:\"><hover:show_text:\":cool:\">\uD83D\uDE0E</hover></click>");
-                    put("B)", "<click:suggest_command:\"B)\"><hover:show_text:\"B)\">\uD83D\uDE0E</hover></click>");
-                    put(":clown:", "<click:suggest_command:\":clown:\"><hover:show_text:\":clown:\">\uD83E\uDD21</hover></click>");
-                    put("<3", "<click:suggest_command:\"<3\"><hover:show_text:\"<3\">❤</hover></click>");
-                    put("XD", "<click:suggest_command:\"XD\"><hover:show_text:\"XD\">\uD83D\uDE06</hover></click>");
-                    put("%)", "<click:suggest_command:\"%)\"><hover:show_text:\"%)\">\uD83D\uDE35</hover></click>");
-                    put("=D", "<click:suggest_command:\"=D\"><hover:show_text:\"=D\">\uD83D\uDE03</hover></click>");
-                    put(">:(", "<click:suggest_command:\">:(\"><hover:show_text:\">:(\">\uD83D\uDE21</hover></click>");
-                    put(":idk:", "<click:suggest_command:\":idk:\"><hover:show_text:\":idk:\">¯\\_(ツ)_/¯</hover></click>");
-                    put(":angry:", "<click:suggest_command:\":angry:\"><hover:show_text:\":angry:\">(╯°□°)╯︵ ┻━┻</hover></click>");
-                    put(":happy:", "<click:suggest_command:\":happy:\"><hover:show_text:\":happy:\">＼(＾O＾)／</hover></click>");
-                }
-            };
         }
 
         @Getter
@@ -525,6 +499,44 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
                 public Question(String target) {
                     this.target = target;
+                }
+            }
+        }
+
+        @Getter
+        public static final class Replacement implements SubFormatMessageConfig, Config.IEnable {
+            private boolean enable = true;
+            private final List<ReplacementValue> values = new LinkedList<>() {
+                {
+                    push(new ReplacementValue("%flectonepulse%", "<fcolor:2>FlectonePulse"));
+                    push(new ReplacementValue(":)", "<click:suggest_command:\":)\"><hover:show_text:\":)\">☺</hover></click>"));
+                    push(new ReplacementValue(":D", "<click:suggest_command:\":D\"><hover:show_text:\":D\">☻</hover></click>"));
+                    push(new ReplacementValue(":(", "<click:suggest_command:\":(\"><hover:show_text:\":(\">☹</hover></click>"));
+                    push(new ReplacementValue(":ok:", "<click:suggest_command:\":ok:\"><hover:show_text:\":ok:\">\uD83D\uDD92</hover></click>"));
+                    push(new ReplacementValue(":+1:", "<click:suggest_command:\":+1:\"><hover:show_text:\":+1:\">\uD83D\uDD92</hover></click>"));
+                    push(new ReplacementValue(":-1:", "<click:suggest_command:\":-1:\"><hover:show_text:\":-1:\">\uD83D\uDD93</hover></click>"));
+                    push(new ReplacementValue(":cool:", "<click:suggest_command:\":cool:\"><hover:show_text:\":cool:\">\uD83D\uDE0E</hover></click>"));
+                    push(new ReplacementValue("B)", "<click:suggest_command:\"B)\"><hover:show_text:\"B)\">\uD83D\uDE0E</hover></click>"));
+                    push(new ReplacementValue(":clown:", "<click:suggest_command:\":clown:\"><hover:show_text:\":clown:\">\uD83E\uDD21</hover></click>"));
+                    push(new ReplacementValue("<3", "<click:suggest_command:\"<3\"><hover:show_text:\"<3\">❤</hover></click>"));
+                    push(new ReplacementValue("XD", "<click:suggest_command:\"XD\"><hover:show_text:\"XD\">\uD83D\uDE06</hover></click>"));
+                    push(new ReplacementValue("%)", "<click:suggest_command:\"%)\"><hover:show_text:\"%)\">\uD83D\uDE35</hover></click>"));
+                    push(new ReplacementValue("=D", "<click:suggest_command:\"=D\"><hover:show_text:\"=D\">\uD83D\uDE03</hover></click>"));
+                    push(new ReplacementValue(">:(", "<click:suggest_command:\">:(\"><hover:show_text:\">:(\">\uD83D\uDE21</hover></click>"));
+                    push(new ReplacementValue(":idk:", "<click:suggest_command:\":idk:\"><hover:show_text:\":idk:\">¯\\_(ツ)_/¯</hover></click>"));
+                    push(new ReplacementValue(":angry:", "<click:suggest_command:\":angry:\"><hover:show_text:\":angry:\">(╯°□°)╯︵ ┻━┻</hover></click>"));
+                    push(new ReplacementValue(":happy:", "<click:suggest_command:\":happy:\"><hover:show_text:\":happy:\">＼(＾O＾)／</hover></click>"));
+                }
+            };
+
+            @Getter
+            public static final class ReplacementValue {
+                private String trigger = "";
+                private String replace = "";
+
+                public ReplacementValue(String trigger, String replace) {
+                    this.trigger = trigger;
+                    this.replace = replace;
                 }
             }
         }
