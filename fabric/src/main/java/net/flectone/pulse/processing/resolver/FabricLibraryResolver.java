@@ -75,7 +75,7 @@ public class FabricLibraryResolver extends LibraryResolver {
 
         addLibrary(Library.builder()
                 .groupId("net{}kyori")
-                .artifactId("adventure-translationKey")
+                .artifactId("adventure-key")
                 .version(BuildConfig.ADVENTURE_API)
                 .resolveTransitiveDependencies(true)
                 .build()
