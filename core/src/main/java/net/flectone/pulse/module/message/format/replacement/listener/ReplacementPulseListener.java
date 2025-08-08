@@ -40,7 +40,7 @@ public class ReplacementPulseListener implements PulseListener {
         FEntity sender = messageContext.getSender();
         if (replacementModule.isModuleDisabledFor(sender)) return;
 
-        String processedMessage = replace(messageContext.getMessage());
+        String processedMessage = replacementModule.processMessage(messageContext.getMessage());
         messageContext.setMessage(processedMessage);
 
         FPlayer receiver = messageContext.getReceiver();
@@ -62,14 +62,6 @@ public class ReplacementPulseListener implements PulseListener {
 
             return Tag.selfClosingInserting(component);
         });
-    }
-
-    private String replace(String string) {
-        for (Message.Format.Replacement.ReplacementValue replacementValue : message.getValues()) {
-            string = string.replace(replacementValue.getTrigger(), "<replacement:'" + replacementValue.getTrigger() + "'>");
-        }
-
-        return string;
     }
 
 }
