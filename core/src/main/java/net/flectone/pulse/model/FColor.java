@@ -6,8 +6,8 @@ import java.util.Optional;
 public record FColor(int number, String name) {
 
     public enum Type {
-        OUT,
-        SEE;
+        SEE, // always first
+        OUT; // always second
 
         public static Optional<Type> fromString(String string) {
             return Arrays.stream(Type.values())
