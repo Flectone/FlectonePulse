@@ -48,6 +48,8 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
     public void onEnable() {
         registerModulePermission(permission);
 
+        createSound(message.getSound(), permission.getSound());
+
         listenerRegistry.register(UpdatePulseListener.class);
 
         checkAndUpdateLatestVersion();
