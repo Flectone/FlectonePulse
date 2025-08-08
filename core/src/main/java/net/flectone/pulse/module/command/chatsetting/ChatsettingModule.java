@@ -314,16 +314,14 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                         String colorName = colorType.getName();
                         String colorMaterial = colorType.getMaterial();
 
-                        Map<Integer, String> colors = new HashMap<>(fColorMessage.getDefaultColors());
-                        colorType.getColors().forEach((integer, string) -> {
-                            if (string.isBlank()) return;
-
-                            colors.put(integer, string);
-                        });
+                        Map<Integer, String> colors = colorType.getColors();
 
                         String colorMessage = subMenu.getTypes().getOrDefault(colorName, "");
                         for (Map.Entry<Integer, String> entry : colors.entrySet()) {
-                            colorMessage = colorMessage.replace("<fcolor:" + entry.getKey() + ">", entry.getValue());
+                            String trigger = "<fcolor:" + entry.getKey() + ">";
+                            String value = entry.getValue().isBlank() ? trigger : entry.getValue();
+
+                            colorMessage = colorMessage.replace(trigger, value);
                         }
 
                         String[] colorMessages = colorMessage.split("<br>");
@@ -334,10 +332,9 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                         inventoryColorsBuilder = inventoryColorsBuilder
                                 .addItem(i, platformServerAdapter.buildItemStack(fTarget, colorMaterial, colorTitle, colorLore))
                                 .addClickHandler(i, (colorItemStack, colorInventory) -> {
-                                    fTarget.getFColors().remove(type);
-
                                     fTarget.getFColors().put(type, colors.entrySet()
                                             .stream()
+                                            .filter(entry -> !entry.getValue().isBlank())
                                             .map(entry -> new FColor(entry.getKey(), entry.getValue()))
                                             .collect(Collectors.toSet())
                                     );
