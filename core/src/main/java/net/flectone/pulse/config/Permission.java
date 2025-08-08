@@ -1323,9 +1323,9 @@ public final class Permission extends FileSerializable implements ModuleConfig {
 
         @Getter
         public static final class Update implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.op";
+            private String name = "flectonepulse.module.message.update";
             private Type type = Type.OP;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.op.sound", Type.TRUE);
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.update.sound", Type.TRUE);
         }
     }
 
