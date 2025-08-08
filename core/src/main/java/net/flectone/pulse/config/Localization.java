@@ -225,7 +225,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.flectonepulse.formatEditor = "<fcolor:2>★ Ссылка для веб-редактирования <u><fcolor:2><click:open_url:\"<url>\"><hover:show_text:\"<fcolor:2><url>\"><url>";
 
         command.chatcolor.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
-        command.chatcolor.format = "<br><color:#98FB98>│ Твои цвета выглядят так: <br><color:#98FB98>│ <br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><color:#98FB98>│ <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир! <br>";
+        command.chatcolor.format = "<br><color:#98FB98>│ Твои цвета выглядят так: <br><color:#98FB98>│ <fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><color:#98FB98>│ <fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир! <br>";
         command.chatcolor.nullType = "<color:#ff7171><b>⁉</b> Тип введён неверно";
         command.chatcolor.nullColor = "<color:#ff7171><b>⁉</b> Цвета введены неверно";
 
@@ -889,7 +889,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String nullType = "<color:#ff7171><b>⁉</b> Incorrect type entered";
             private String nullColor = "<color:#ff7171><b>⁉</b> Incorrect colors entered";
-            private String format = "<br><color:#98FB98>│ Your colors: <br><color:#98FB98>│ <br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><color:#98FB98>│ <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world! <br>";
+            private String format = "<br><color:#98FB98>│ Your colors: <br><color:#98FB98>│ <fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><color:#98FB98>│ <fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world! <br>";
         }
 
         @Getter
