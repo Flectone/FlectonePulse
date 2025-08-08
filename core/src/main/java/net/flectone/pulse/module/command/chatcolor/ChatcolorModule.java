@@ -95,8 +95,13 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         if (isModuleDisabledFor(fPlayer)) return;
 
         String type = getArgument(commandContext, 0);
-        Optional<FColor.Type> fColorType = FColor.Type.fromString(type);
-        if (fColorType.isEmpty()) {
+        Optional<FColor.Type> fColorType = switch (type.toLowerCase()) {
+            case "out" -> Optional.of(FColor.Type.OUT);
+            case "see" -> Optional.of(FColor.Type.SEE);
+            default -> Optional.empty();
+        };
+
+        if (fColorType.isEmpty() || !permissionChecker.check(commandContext.sender(), fColorPermission.getTypes().get(fColorType.get()))) {
             builder(fPlayer)
                     .format(Localization.Command.Chatcolor::getNullType)
                     .sendBuilt();
