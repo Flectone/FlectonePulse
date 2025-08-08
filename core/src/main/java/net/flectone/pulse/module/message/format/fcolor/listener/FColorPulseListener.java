@@ -16,7 +16,6 @@ import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.Collections;
 import java.util.HashMap;
