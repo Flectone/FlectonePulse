@@ -207,7 +207,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Chat implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
-        private boolean packetBased = false;
+        private Mode mode = Mode.BUKKIT;
         private Event.Priority priority = Event.Priority.NORMAL;
         private Map<String, Type> types = new LinkedHashMap<>(){
             {
@@ -215,6 +215,12 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
                 put("global", new Type("!", true, false, Range.get(Range.Type.PROXY), 5));
             }
         };
+
+        public enum Mode {
+            BUKKIT,
+            PAPER,
+            PACKET
+        }
 
         @Getter
         @NoArgsConstructor

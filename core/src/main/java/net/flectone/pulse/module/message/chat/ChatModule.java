@@ -89,7 +89,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
             soundMap.put(key, createSound(value.getSound(), permissions.getSound()));
         });
 
-        if (message.isPacketBased() || platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
+        if (message.getMode() == Message.Chat.Mode.PACKET || platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
             listenerRegistry.register(ChatPacketListener.class);
         }
     }
