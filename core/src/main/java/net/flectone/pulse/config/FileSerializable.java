@@ -29,6 +29,7 @@ public abstract class FileSerializable extends YamlSerializable {
     private static final SerializerConfig CONFIG = new SerializerConfig
             .Builder()
             .setBackupOnErrors(true)
+            .registerSerializer(new EnumSerializer<>(Message.Chat.Mode.class))
             .registerSerializer(new EnumSerializer<>(FColor.class))
             .registerSerializer(new EnumSerializer<>(FPlayer.Setting.class))
             .registerSerializer(new EnumSerializer<>(Database.Type.class))
