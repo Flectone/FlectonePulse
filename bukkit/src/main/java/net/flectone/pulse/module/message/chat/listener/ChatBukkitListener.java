@@ -29,8 +29,6 @@ public class ChatBukkitListener implements Listener {
         if (event.isCancelled()) return;
         if (event.getRecipients().isEmpty()) return;
         if (!event.getFormat().equals("<%1$s> %2$s")) return;
-
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
         if (!chatModule.isEnable()) return;
 
         Runnable cancelRunnable = () -> {
@@ -44,6 +42,7 @@ public class ChatBukkitListener implements Listener {
             event.getRecipients().clear();
         };
 
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
         chatModule.send(fPlayer, event.getMessage(), cancelRunnable, successConsumer);
     }
 }
