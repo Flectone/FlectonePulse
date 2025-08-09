@@ -52,6 +52,8 @@ public final class Integration extends FileSerializable implements ModuleConfig.
     private Litebans litebans = new Litebans();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/luckperms/")})
     private Luckperms luckperms = new Luckperms();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/maintenance/")})
+    private Maintenance maintenance = new Maintenance();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/minimotd/")})
     private MiniMOTD minimotd = new MiniMOTD();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/miniplaceholders/")})
@@ -156,6 +158,12 @@ public final class Integration extends FileSerializable implements ModuleConfig.
     public static final class Luckperms implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = true;
         private boolean tabSort = true;
+    }
+
+    @Getter
+    public static final class Maintenance implements SubIntegrationConfig, Config.IEnable {
+        private boolean enable = true;
+        private boolean disableFlectonepulseMaintenance = true;
     }
 
     @Getter

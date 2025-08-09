@@ -562,6 +562,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Litebans litebans = new Litebans();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/luckperms/")})
         private Luckperms luckperms = new Luckperms();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/maintenance/")})
+        private Maintenance maintenance = new Maintenance();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/minimotd/")})
         private MiniMOTD minimotd = new MiniMOTD();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/miniplaceholders/")})
@@ -630,6 +632,12 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         @Getter
         public static final class Luckperms implements SubIntegrationConfig, IPermission {
             private String name = "flectonepulse.module.integration.luckperms";
+            private Type type = Type.TRUE;
+        }
+
+        @Getter
+        public static final class Maintenance implements SubIntegrationConfig, IPermission {
+            private String name = "flectonepulse.module.integration.maintenance";
             private Type type = Type.TRUE;
         }
 

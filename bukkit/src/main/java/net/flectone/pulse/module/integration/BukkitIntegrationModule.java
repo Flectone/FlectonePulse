@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import net.flectone.pulse.module.integration.maintenance.MaintenanceModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.model.entity.FEntity;
@@ -82,6 +83,10 @@ public class BukkitIntegrationModule extends IntegrationModule {
 
         if (platformServerAdapter.hasProject("LiteBans")) {
             addChildren(LiteBansModule.class);
+        }
+
+        if (platformServerAdapter.hasProject("Maintenance")) {
+            addChildren(MaintenanceModule.class);
         }
 
         if (platformServerAdapter.hasProject("MiniMOTD")) {

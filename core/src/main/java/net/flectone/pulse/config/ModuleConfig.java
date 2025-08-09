@@ -64,6 +64,7 @@ public interface ModuleConfig {
         SubIntegrationConfig getItemsadder();
         SubIntegrationConfig getLitebans();
         SubIntegrationConfig getLuckperms();
+        SubIntegrationConfig getMaintenance();
         SubIntegrationConfig getMinimotd();
         SubIntegrationConfig getMiniplaceholders();
         SubIntegrationConfig getMotd();

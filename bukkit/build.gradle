@@ -14,6 +14,7 @@ dependencies {
     compileOnly "com.github.DevLeoko:AdvancedBan:$advancedban_version"
     compileOnly "dev.lone:api-itemsadder:$itemsadder_version"
     compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
+    compileOnly "eu.kennytv.maintenance:maintenance-api:$maintenance_version"
 
     compileOnly project(":core")
     compileOnly project(":paper")

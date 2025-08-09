@@ -1409,6 +1409,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
         }
 
         @Override
+        public SubIntegrationConfig getMaintenance() {
+            return null;
+        }
+
+        @Override
         public SubIntegrationConfig getMinimotd() {
             return null;
         }
