@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.execution.scheduler.SchedulerRunnable;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.util.logging.FLogger;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -15,6 +16,7 @@ import java.lang.reflect.Method;
 public class SyncInterceptor implements MethodInterceptor {
 
     @Inject private TaskScheduler taskScheduler;
+    @Inject private PlatformServerAdapter platformServerAdapter;
     @Inject private FLogger fLogger;
 
     @Override
@@ -31,6 +33,9 @@ public class SyncInterceptor implements MethodInterceptor {
 
         if (delay > 0) {
             taskScheduler.runSyncLater(task, delay);
+        } else if (platformServerAdapter.isPrimaryThread()) {
+            // already sync
+            task.run();
         } else {
             taskScheduler.runSync(task);
         }

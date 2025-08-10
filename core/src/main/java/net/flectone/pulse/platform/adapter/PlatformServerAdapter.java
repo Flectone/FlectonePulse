@@ -71,6 +71,8 @@ public interface PlatformServerAdapter {
      */
     boolean isOnlineMode();
 
+    boolean isPrimaryThread();
+
     /**
      * Gets the Minecraft name of an item
      *

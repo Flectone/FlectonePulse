@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.execution.scheduler.SchedulerRunnable;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.util.logging.FLogger;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -15,6 +16,7 @@ import java.lang.reflect.Method;
 public class AsyncInterceptor implements MethodInterceptor {
 
     @Inject private TaskScheduler taskScheduler;
+    @Inject private PlatformServerAdapter platformServerAdapter;
     @Inject private FLogger fLogger;
 
     @Override
@@ -26,13 +28,15 @@ public class AsyncInterceptor implements MethodInterceptor {
         }
 
         long delay = method.getAnnotation(Async.class).delay();
-
         SchedulerRunnable task = () -> proceedSafely(invocation);
 
         if (delay > 0) {
             taskScheduler.runAsyncLater(task, delay);
-        } else {
+        } else if (platformServerAdapter.isPrimaryThread()) {
             taskScheduler.runAsync(task);
+        } else {
+            // already async
+            task.run();
         }
 
         return null;

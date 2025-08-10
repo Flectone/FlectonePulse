@@ -127,6 +127,14 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
+    public boolean isPrimaryThread() {
+        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return false;
+
+        return minecraftServer.isOnThread();
+    }
+
+    @Override
     public @NotNull String getItemName(Object item) {
         return item instanceof net.minecraft.item.ItemStack itemStack ? itemStack.getItemName().getString() : "";
     }

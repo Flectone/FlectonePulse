@@ -135,6 +135,11 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     @Override
+    public boolean isPrimaryThread() {
+        return Bukkit.isPrimaryThread();
+    }
+
+    @Override
     public @NotNull ItemStack buildItemStack(FPlayer fPlayer, String material, String title, String lore) {
         String[] stringsLore = lore.split("<br>");
 
