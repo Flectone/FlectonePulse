@@ -10,6 +10,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
 
@@ -37,7 +38,7 @@ public class DeathExtractor {
             default -> null;
         };
 
-        if (itemName == null || itemName.isEmpty()) return null;
+        if (StringUtils.isEmpty(itemName)) return null;
 
         Item item = new Item(itemName);
         item.setHoverEvent(HoverEvent.showText(Component.text(itemName).decorate(TextDecoration.ITALIC)));
@@ -54,7 +55,7 @@ public class DeathExtractor {
                 death.setPlayer(false);
 
                 String insertion = targetComponent.insertion();
-                if (insertion != null && !insertion.isEmpty()) {
+                if (StringUtils.isNotEmpty(insertion)) {
                     try {
                         death.setTargetUUID(UUID.fromString(insertion));
                     } catch (IllegalArgumentException e) {
@@ -86,7 +87,7 @@ public class DeathExtractor {
                     death.setTargetName(target);
                     death.setPlayer(true);
 
-                    if (insertion != null && !insertion.isEmpty()) {
+                    if (StringUtils.isNotEmpty(insertion)) {
                         try {
                             UUID uuid = UUID.fromString(insertion);
                             death.setTargetUUID(uuid);

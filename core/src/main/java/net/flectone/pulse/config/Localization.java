@@ -8,6 +8,7 @@ import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.AdventureTag;
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -2278,7 +2279,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
     public static class ReasonMap extends LinkedHashMap<String, String> {
 
         public String getConstant(String reason) {
-            if (reason == null || reason.isEmpty()) {
+            if (StringUtils.isEmpty(reason)) {
                 return super.getOrDefault("default", "UNKNOWN");
             }
 

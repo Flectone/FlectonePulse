@@ -18,6 +18,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import org.apache.commons.lang3.StringUtils;
 
 @Singleton
 public class StreamPulseListener implements PulseListener {
@@ -52,7 +53,7 @@ public class StreamPulseListener implements PulseListener {
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.STREAM_PREFIX, (argumentQueue, context) -> {
             String streamPrefix = fPlayer.getSettingValue(FPlayer.Setting.STREAM_PREFIX);
-            if (streamPrefix == null) return Tag.selfClosingInserting(Component.empty());
+            if (StringUtils.isEmpty(streamPrefix)) return Tag.selfClosingInserting(Component.empty());
 
             return Tag.preProcessParsed(streamPrefix);
         });

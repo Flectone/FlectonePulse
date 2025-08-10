@@ -13,6 +13,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class BrandModule extends AbstractModuleListLocalization<Localization.Mes
         if (isModuleDisabledFor(fPlayer)) return;
 
         String format = getNextMessage(fPlayer, this.message.isRandom());
-        if (format == null) return;
+        if (StringUtils.isEmpty(format)) return;
 
         builder(fPlayer)
                 .destination(message.getDestination())

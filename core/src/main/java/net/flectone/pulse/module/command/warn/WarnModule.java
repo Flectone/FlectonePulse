@@ -19,6 +19,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.type.tuple.Pair;
 
@@ -145,7 +146,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
                 .toList().size();
 
         String action = command.getActions().get(countWarns);
-        if (action == null) return;
+        if (StringUtils.isEmpty(action)) return;
 
         platformServerAdapter.dispatchCommand(action.replace("<target>", fTarget.getName()));
     }

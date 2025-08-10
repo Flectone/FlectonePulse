@@ -12,6 +12,7 @@ import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -62,7 +63,7 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
         if (messages == null) return;
 
         String format = getNextMessage(fPlayer, type.isRandom(), messages);
-        if (format == null) return;
+        if (StringUtils.isEmpty(format)) return;
 
         builder(fPlayer)
                 .destination(type.getDestination())

@@ -15,6 +15,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -90,7 +91,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
         String message = getArgument(commandContext, 1);
 
         String messageToTranslate = translateModuleProvider.get().getMessage(message);
-        if (messageToTranslate == null) {
+        if (StringUtils.isEmpty(messageToTranslate)) {
             messageToTranslate = message;
         }
 

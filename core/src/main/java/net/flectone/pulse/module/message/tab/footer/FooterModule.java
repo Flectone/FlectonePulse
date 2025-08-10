@@ -17,6 +17,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -71,7 +72,7 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
         if (isModuleDisabledFor(fPlayer)) return;
 
         String format = getNextMessage(fPlayer, message.isRandom());
-        if (format == null) return;
+        if (StringUtils.isEmpty(format)) return;
 
         builder(fPlayer)
                 .format(format)

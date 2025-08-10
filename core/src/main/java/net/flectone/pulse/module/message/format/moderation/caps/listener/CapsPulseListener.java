@@ -13,6 +13,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.message.format.moderation.caps.CapsModule;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import org.apache.commons.lang3.StringUtils;
 
 @Singleton
 public class CapsPulseListener implements PulseListener {
@@ -45,7 +46,7 @@ public class CapsPulseListener implements PulseListener {
     private String replace(FEntity sender, String string) {
         if (capsModule.isModuleDisabledFor(sender)) return string;
         if (permissionChecker.check(sender, permission.getBypass())) return string;
-        if (string == null || string.isEmpty()) return string;
+        if (StringUtils.isEmpty(string)) return string;
 
         return needApplyAntiCaps(string) ? string.toLowerCase() : string;
     }

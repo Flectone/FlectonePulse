@@ -33,6 +33,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutputStream;
@@ -420,7 +421,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
 
         private Component buildMessageComponent(FPlayer fReceiver) {
             String messageContent = resolveString(fReceiver, this.message);
-            if (messageContent == null || messageContent.isBlank()) return Component.empty();
+            if (StringUtils.isEmpty(messageContent)) return Component.empty();
 
             MessagePipeline.Builder messageBuilder = messagePipeline.builder(fPlayer, fReceiver, messageContent)
                     .flag(MessageFlag.USER_MESSAGE, true)
@@ -435,7 +436,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
 
         private Component buildFormatComponent(UUID messageUUID, FPlayer fReceiver, Component message) {
             String formatContent = resolveString(fReceiver, this.format);
-            if (formatContent == null) return Component.empty();
+            if (StringUtils.isEmpty(formatContent)) return Component.empty();
 
             MessagePipeline.Builder formatBuilder = messagePipeline
                     .builder(messageUUID, fPlayer, fReceiver, formatContent)
@@ -472,7 +473,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
                     .build();
 
             String messageContent = resolveString(FPlayer.UNKNOWN, this.message);
-            Component componentMessage = messageContent == null
+            Component componentMessage = StringUtils.isEmpty(messageContent)
                     ? Component.empty()
                     : messagePipeline
                     .builder(fPlayer, FPlayer.UNKNOWN, messageContent)

@@ -18,6 +18,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import org.apache.commons.lang3.StringUtils;
 
 @Singleton
 public class AfkPulseListener implements PulseListener {
@@ -53,7 +54,7 @@ public class AfkPulseListener implements PulseListener {
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.AFK_SUFFIX, (argumentQueue, context) -> {
             String afkSuffix = fPlayer.getSettingValue(FPlayer.Setting.AFK_SUFFIX);
-            if (afkSuffix == null) return Tag.selfClosingInserting(Component.empty());
+            if (StringUtils.isEmpty(afkSuffix)) return Tag.selfClosingInserting(Component.empty());
 
             return Tag.preProcessParsed(afkSuffix);
         });

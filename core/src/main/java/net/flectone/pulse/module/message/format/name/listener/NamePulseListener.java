@@ -22,6 +22,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Set;
 
@@ -90,10 +91,6 @@ public class NamePulseListener implements PulseListener {
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.CONSTANT, (argumentQueue, context) -> {
             String constantName = fPlayer.getConstantName();
-            if (constantName != null && constantName.isEmpty()) {
-                return Tag.preProcessParsed(constantName);
-            }
-
             if (constantName == null) {
                 constantName = nameModule.resolveLocalization(fPlayer).getConstant();
             }
@@ -119,7 +116,7 @@ public class NamePulseListener implements PulseListener {
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.VAULT_PREFIX, (argumentQueue, context) -> {
             String prefix = integrationModule.getPrefix(fPlayer);
-            if (prefix == null || prefix.isEmpty()) return Tag.selfClosingInserting(Component.empty());
+            if (StringUtils.isEmpty(prefix)) return Tag.selfClosingInserting(Component.empty());
 
             String text = messagePipeline.builder(fPlayer, receiver, prefix)
                     .defaultSerializerBuild();
@@ -129,7 +126,7 @@ public class NamePulseListener implements PulseListener {
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.VAULT_SUFFIX, (argumentQueue, context) -> {
             String suffix = integrationModule.getSuffix(fPlayer);
-            if (suffix == null || suffix.isEmpty()) return Tag.selfClosingInserting(Component.empty());
+            if (StringUtils.isEmpty(suffix)) return Tag.selfClosingInserting(Component.empty());
 
             String text = messagePipeline.builder(fPlayer, receiver, suffix)
                     .defaultSerializerBuild();

@@ -13,6 +13,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.message.format.moderation.flood.FloodModule;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import org.apache.commons.lang3.StringUtils;
 
 @Singleton
 public class FloodPulseListener implements PulseListener {
@@ -45,7 +46,7 @@ public class FloodPulseListener implements PulseListener {
     private String replace(FEntity sender, String string) {
         if (floodModule.isModuleDisabledFor(sender)) return string;
         if (permissionChecker.check(sender, permission.getBypass())) return string;
-        if (string == null || string.isEmpty()) return string;
+        if (StringUtils.isEmpty(string)) return string;
 
         string = replaceRepeatedSymbols(string);
 
@@ -55,9 +56,7 @@ public class FloodPulseListener implements PulseListener {
     }
 
     private String replaceRepeatedSymbols(String string) {
-        if (string == null || string.isEmpty()) {
-            return string;
-        }
+        if (StringUtils.isEmpty(string)) return string;
 
         StringBuilder stringBuilder = new StringBuilder();
         char prevChar = string.charAt(0);
@@ -89,9 +88,7 @@ public class FloodPulseListener implements PulseListener {
     }
 
     private String replaceRepeatedWords(String text) {
-        if (text == null || text.isEmpty()) {
-            return text;
-        }
+        if (StringUtils.isEmpty(text)) return text;
 
         String[] words = text.split(" ");
         if (words.length == 0) return text;

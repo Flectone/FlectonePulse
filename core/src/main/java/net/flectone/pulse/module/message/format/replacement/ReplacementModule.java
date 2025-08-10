@@ -8,6 +8,7 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.replacement.listener.ReplacementPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +65,7 @@ public class ReplacementModule extends AbstractModule {
     }
 
     public String processMessage(String message) {
-        if (message == null || message.isEmpty()) return message;
+        if (StringUtils.isEmpty(message)) return message;
 
         StringBuilder stringBuilder = new StringBuilder();
         Matcher matcher = pattern.matcher(message);
