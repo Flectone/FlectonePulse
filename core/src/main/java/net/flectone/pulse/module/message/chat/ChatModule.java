@@ -113,7 +113,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
             return;
         }
 
-        Message.Chat.Type playerChat = message.getTypes().getOrDefault(fPlayer.getSettingValue(FPlayer.Setting.CHAT), getPlayerChat(fPlayer, eventMessage));
+        Message.Chat.Type playerChat = getPreferenceBasedChat(fPlayer, eventMessage);
 
         var configChatEntry = message.getTypes().entrySet()
                 .stream()
@@ -249,6 +249,25 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                 .message(string)
                 .sound(getSound())
                 .sendBuilt();
+    }
+
+    private Message.Chat.Type getPreferenceBasedChat(FPlayer fPlayer, String message) {
+        Message.Chat.Prefer prefer = this.message.getPrefer();
+
+        if (prefer.equals(Message.Chat.Prefer.TRIGGER)) {
+            // If that chat *does* have a trigger, override all behavior.
+            if (this.message.getTypes().get(fPlayer.getSettingValue(FPlayer.Setting.CHAT)) != null) {
+                Message.Chat.Type playerChat = this.message.getTypes().get(fPlayer.getSettingValue(FPlayer.Setting.CHAT));
+
+                if (playerChat.getTrigger() != null
+                        && !playerChat.getTrigger().isEmpty()) {
+                    return playerChat;
+                }
+            }
+
+            return getPlayerChat(fPlayer, message);
+        }
+        return this.message.getTypes().getOrDefault(fPlayer.getSettingValue(FPlayer.Setting.CHAT), getPlayerChat(fPlayer, message));
     }
 
     private Message.Chat.Type getPlayerChat(FPlayer fPlayer, String message) {
