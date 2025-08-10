@@ -32,7 +32,7 @@ public class JoinPulseListener implements PulseListener {
             // delay for vanish plugins and newer versions
             joinModule.sendLater(fPlayer);
         } else {
-            joinModule.send(fPlayer);
+            joinModule.send(fPlayer, false);
         }
     }
 

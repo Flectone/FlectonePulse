@@ -23,7 +23,7 @@ public class QuitPulseListener implements PulseListener {
     @Pulse
     public void onPlayerQuitEvent(PlayerQuitEvent event) {
         FPlayer fPlayer = event.getPlayer();
-        quitModule.send(fPlayer);
+        quitModule.send(fPlayer, false);
     }
 
     @Pulse

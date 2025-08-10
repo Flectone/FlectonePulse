@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.quit;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -47,7 +48,8 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
         return message.isEnable();
     }
 
-    public void send(FPlayer fPlayer) {
+    @Async
+    public void send(FPlayer fPlayer, boolean ignoreVanish) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         builder(fPlayer)
@@ -55,7 +57,7 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
                 .destination(message.getDestination())
                 .range(message.getRange())
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.QUIT))
-                .filter(fReceiver -> integrationModule.isVanishedVisible(fPlayer, fReceiver))
+                .filter(fReceiver -> ignoreVanish || integrationModule.isVanishedVisible(fPlayer, fReceiver))
                 .format(Localization.Message.Quit::getFormat)
                 .integration()
                 .proxy()

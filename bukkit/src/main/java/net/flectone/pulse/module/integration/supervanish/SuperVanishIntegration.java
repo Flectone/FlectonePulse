@@ -4,13 +4,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
-import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.logging.FLogger;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
+import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -48,14 +47,9 @@ public class SuperVanishIntegration implements Listener, FIntegration {
         if (event.isCancelled()) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
-        handlePlayerQuit(fPlayer);
+        quitModule.send(fPlayer, true);
 
         event.setSilent(true);
-    }
-
-    @Async
-    public void handlePlayerQuit(FPlayer fPlayer) {
-        quitModule.send(fPlayer);
     }
 
     @EventHandler
@@ -63,8 +57,8 @@ public class SuperVanishIntegration implements Listener, FIntegration {
         if (event.isCancelled()) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
+        joinModule.send(fPlayer, true);
 
-        joinModule.send(fPlayer);
         event.setSilent(true);
     }
 }

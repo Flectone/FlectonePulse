@@ -33,9 +33,9 @@ public class VanishIntegration implements FIntegration {
             FPlayer fPlayer = fPlayerService.getFPlayer(player.getUuid());
 
             if (vanish) {
-                quitModule.send(fPlayer);
+                quitModule.send(fPlayer, true);
             } else {
-                joinModule.send(fPlayer);
+                joinModule.send(fPlayer, true);
             }
         });
     }
