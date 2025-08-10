@@ -23,6 +23,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.logging.FLogger;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -105,12 +106,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
         if (params.startsWith("fcolor")) {
 
             String number = params.substring(7);
-            int colorNumber;
-            try {
-                colorNumber = Integer.parseInt(number);
-            } catch (NumberFormatException e) {
-                return null;
-            }
+            if (!StringUtils.isNumeric(number)) return null;
 
             Map<Integer, String> colorsMap = new HashMap<>(fColorMessage.getDefaultColors());
 
@@ -121,7 +117,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
                 }
             }
 
-            return colorsMap.get(colorNumber);
+            return colorsMap.get(Integer.parseInt(number));
         }
 
         FPlayer.Setting setting = FPlayer.Setting.fromString(params);

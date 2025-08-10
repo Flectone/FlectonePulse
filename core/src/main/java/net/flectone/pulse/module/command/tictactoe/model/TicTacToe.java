@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.tictactoe.model;
 import lombok.Getter;
 import lombok.Setter;
 import net.flectone.pulse.model.entity.FPlayer;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
@@ -205,12 +206,13 @@ public class TicTacToe {
     }
 
     private int[] parseMove(String move) {
-        try {
-            String[] stringMove = move.split("-");
+        String[] stringMove = move.split("-");
+        if (!StringUtils.isNumeric(stringMove[0])) return null;
+        if (!StringUtils.isNumeric(stringMove[1])) return null;
 
-            return new int[]{Integer.parseInt(stringMove[0]), Integer.parseInt(stringMove[1])};
-        } catch (NumberFormatException ignored) {}
-
-        return null;
+        return new int[]{
+                Integer.parseInt(stringMove[0]),
+                Integer.parseInt(stringMove[1])
+        };
     }
 }

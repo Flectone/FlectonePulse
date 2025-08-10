@@ -29,6 +29,7 @@ import net.flectone.pulse.util.logging.FLogger;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
@@ -88,18 +89,11 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
         Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor"), (context, argument) -> {
             if (argument == null) return PlaceholderResult.invalid();
+            if (!StringUtils.isNumeric(argument)) return PlaceholderResult.invalid();
 
             FPlayer fPlayer = fPlayerMapper.map(context.source());
 
-            int colorNumber;
-            try {
-                colorNumber = Integer.parseInt(argument);
-            } catch (NumberFormatException e) {
-                return PlaceholderResult.invalid();
-            }
-
             Map<Integer, String> colorsMap = new HashMap<>(fColorMessage.getDefaultColors());
-
             for (FColor.Type type : FColor.Type.values()) {
                 Set<FColor> fColors = fPlayer.getFColors().getOrDefault(type, Collections.emptySet());
                 for (FColor fColor : fColors) {
@@ -107,6 +101,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
                 }
             }
 
+            int colorNumber = Integer.parseInt(argument);
             return PlaceholderResult.value(colorsMap.get(colorNumber));
         });
 

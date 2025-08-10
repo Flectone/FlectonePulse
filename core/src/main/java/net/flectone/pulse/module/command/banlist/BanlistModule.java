@@ -18,6 +18,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.kyori.adventure.text.Component;
+import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
@@ -97,9 +98,9 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         if (optionalPlayer.isPresent()) {
             String playerName = optionalPlayer.get();
 
-            try {
+            if (StringUtils.isNumeric(playerName)) {
                 page = Integer.parseInt(playerName);
-            } catch (NumberFormatException e) {
+            } else {
                 String promptNumber = getPrompt(1);
                 Optional<Integer> optionalNumber = commandContext.optional(promptNumber);
                 page = optionalNumber.orElse(page);
