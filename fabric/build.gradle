@@ -44,7 +44,6 @@ dependencies {
 	modImplementation(include("org.incendo:cloud-fabric:${cloud_paper_version}"))
 
 	implementation("com.alessiodp.libby:libby-fabric:$libby_version")
-	implementation("org.apache.commons:commons-lang3:3.18.0")
 
 	implementation(project(":core"))
 }

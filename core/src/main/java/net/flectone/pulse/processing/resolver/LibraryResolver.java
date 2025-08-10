@@ -119,5 +119,18 @@ public abstract class LibraryResolver {
                 )
                 .build()
         );
+
+        addLibrary(Library.builder()
+                .groupId("org{}apache{}commons")
+                .artifactId("commons-lang3")
+                .version(BuildConfig.APACHE_COMMONS_LANG3_VERSION)
+                .resolveTransitiveDependencies(true)
+                .relocate(Relocation.builder()
+                        .pattern("org{}apache{}commons")
+                        .relocatedPattern("net.flectone.pulse.library.apache")
+                        .build()
+                )
+                .build()
+        );
     }
 }
