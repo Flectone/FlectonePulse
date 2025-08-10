@@ -77,6 +77,7 @@ subprojects {
         relocate("com.alessiodp.libby", "net.flectone.pulse.library.libby")
         relocate("net.elytrium.serializer", "net.flectone.pulse.library.elytrium")
         relocate("spark.", "net.flectone.pulse.library.spark.")
+        relocate("org.apache.commons", "net.flectone.pulse.library.apache")
 
         if (!project.name.is("fabric")) {
             relocate("com.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents")

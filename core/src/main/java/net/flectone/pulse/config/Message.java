@@ -339,10 +339,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fcolor/")})
         private FColor fcolor = new FColor();
 
-        // fix Elytrium issue with Map
-        // upgrade from 1.2.2 and older
         @Deprecated(forRemoval = true)
-        private String emoji = "";
+        private Emoji emoji = new Emoji();
 
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fixation/")})
         private Fixation fixation = new Fixation();
@@ -395,6 +393,12 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
                     put(4, "#FFFAFA");
                 }
             };
+        }
+
+        @Getter
+        public static final class Emoji implements SubFormatMessageConfig, Config.IEnable {
+            private boolean enable = false;
+            private Map<String, String> values = new LinkedHashMap<>();
         }
 
         @Getter

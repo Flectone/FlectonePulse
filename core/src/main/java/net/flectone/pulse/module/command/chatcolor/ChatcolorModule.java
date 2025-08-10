@@ -101,18 +101,20 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
             default -> Optional.empty();
         };
 
-        if (fColorType.isEmpty() || !permissionChecker.check(commandContext.sender(), fColorPermission.getTypes().get(fColorType.get()))) {
+        if (fColorType.isEmpty() || !permissionChecker.check(fPlayer, fColorPermission.getTypes().get(fColorType.get()))) {
             builder(fPlayer)
                     .format(Localization.Command.Chatcolor::getNullType)
                     .sendBuilt();
             return;
         }
 
+        boolean hasOtherPermission = permissionChecker.check(fPlayer, permission.getOther());
+
         FPlayer fTarget = fPlayer;
 
         String promptPlayer = getPrompt(2);
         Optional<String> optionalTarget = commandContext.optional(promptPlayer);
-        if (optionalTarget.isPresent()) {
+        if (optionalTarget.isPresent() && hasOtherPermission) {
             fTarget = fPlayerService.getFPlayer(optionalTarget.get());
             if (fTarget.isUnknown()) {
                 fTarget = fPlayer;
@@ -134,11 +136,14 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
             Optional<String> optionalColor = commandContext.optional(promptColor + " " + (i + 1));
             if (optionalColor.isEmpty()) continue;
 
-            int number = i + 1;
-            String name = colorConverter.convert(optionalColor.get());
-            if (name == null) continue;
+            String name = hasOtherPermission
+                    ? optionalColor.get() // allow any input
+                    : colorConverter.isCorrect(optionalColor.get().toLowerCase());
+            if (name == null || name.equals("null")) continue;
 
+            int number = i + 1;
             FColor fColor = new FColor(number, name);
+
             newFColors.put(number, fColor);
         }
 

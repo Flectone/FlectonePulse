@@ -52,7 +52,12 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @Nullable Object convertToPlatformPlayer(@NotNull FPlayer fPlayer) {
-        return Bukkit.getPlayer(fPlayer.getUuid());
+        return convertToPlatformPlayer(fPlayer.getUuid());
+    }
+
+    @Override
+    public @Nullable Object convertToPlatformPlayer(@NotNull UUID uuid) {
+        return Bukkit.getPlayer(uuid);
     }
 
     @Override

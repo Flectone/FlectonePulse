@@ -29,6 +29,11 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
     private final ColorConverter colorConverter;
     private final StringParser<FPlayer> stringParser;
 
+    private final List<String> hexSymbols = List.of(
+            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+            "a", "b", "c", "d", "e", "f"
+    );
+
     @Inject
     public ColorParser(FileResolver fileResolver,
                        PermissionChecker permissionChecker,
@@ -64,7 +69,7 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
         List<String> suggestions = new ArrayList<>();
 
         // basic suggestions
-        List<String> constants = List.of("clear", "<gradient:#", "#", "&");
+        List<String> constants = List.of("clear", "<gradient:#", "<", "#", "&");
         for (String constant : constants) {
             if (current.isEmpty() || constant.startsWith(current)) {
                 suggestions.add(constant);
@@ -72,17 +77,17 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
         }
 
         if (current.startsWith("#") && current.length() < 7) {
-            for (String c : colorConverter.getHexSymbolList()) {
-                suggestions.add(current + c);
+            for (String symbol : hexSymbols) {
+                suggestions.add(current + symbol);
             }
+
         } else if (current.startsWith("&") && current.length() == 1) {
-            for (String s : colorConverter.getHexSymbolList()) {
-                suggestions.add(current + s);
-            }
+            suggestions.addAll(colorConverter.getLegacyColors());
+
         } else if (!current.isEmpty()) {
-            for (String s : colorConverter.getMinecraftList()) {
-                if (s.startsWith(current)) {
-                    suggestions.add(s);
+            for (String color : colorConverter.getNamedColors()) {
+                if (color.startsWith(current)) {
+                    suggestions.add(color);
                 }
             }
         }

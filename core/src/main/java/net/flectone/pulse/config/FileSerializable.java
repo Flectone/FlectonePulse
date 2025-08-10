@@ -29,6 +29,7 @@ public abstract class FileSerializable extends YamlSerializable {
     private static final SerializerConfig CONFIG = new SerializerConfig
             .Builder()
             .setBackupOnErrors(true)
+            .registerSerializer(new EnumSerializer<>(Message.Chat.Mode.class))
             .registerSerializer(new EnumSerializer<>(FColor.class))
             .registerSerializer(new EnumSerializer<>(FPlayer.Setting.class))
             .registerSerializer(new EnumSerializer<>(Database.Type.class))
@@ -44,6 +45,20 @@ public abstract class FileSerializable extends YamlSerializable {
             .registerSerializer(new EnumSerializer<>(Event.Priority.class))
             .setLogMissingFields(false)
             .setSafeMode(true)
+
+            // fix Elytrium issue with Map
+            // upgrade from 1.2.2 and older
+            .registerSerializer(new ClassSerializer<Message.Format.Emoji, String>() {
+                @Override
+                public String serialize(Message.Format.Emoji emoji) {
+                    return "";
+                }
+
+                @Override
+                public Message.Format.Emoji deserialize(String string) {
+                    return new Message.Format.Emoji();
+                }
+            })
             .registerSerializer(new ClassSerializer<Range, Object>() {
 
                 @Override

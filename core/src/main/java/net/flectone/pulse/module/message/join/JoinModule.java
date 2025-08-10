@@ -53,10 +53,11 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
 
     @Async(delay = 5)
     public void sendLater(FPlayer fPlayer) {
-        send(fPlayer);
+        send(fPlayer, false);
     }
 
-    public void send(FPlayer fPlayer) {
+    @Async
+    public void send(FPlayer fPlayer, boolean ignoreVanish) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         boolean hasPlayedBefore = platformPlayerAdapter.hasPlayedBefore(fPlayer);
@@ -66,7 +67,7 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
                 .destination(message.getDestination())
                 .range(message.getRange())
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.JOIN))
-                .filter(fReceiver -> integrationModule.isVanishedVisible(fPlayer, fReceiver))
+                .filter(fReceiver -> ignoreVanish || integrationModule.isVanishedVisible(fPlayer, fReceiver))
                 .format(s -> hasPlayedBefore || !message.isFirst() ? s.getFormat() : s.getFormatFirstTime())
                 .proxy(dataOutputStream -> dataOutputStream.writeBoolean(hasPlayedBefore))
                 .integration()
