@@ -26,6 +26,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import org.apache.commons.lang3.Strings;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -176,7 +177,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                     output.writeUTF(chatName);
                     output.writeUTF(finalMessage);
                 })
-                .integration(s -> s.replace("<message>", finalMessage))
+                .integration(s -> Strings.CS.replace(s, "<message>", finalMessage))
                 .sound(soundMap.get(chatName));
 
         List<FPlayer> receivers = builder.build();

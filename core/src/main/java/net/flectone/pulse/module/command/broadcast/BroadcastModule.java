@@ -11,6 +11,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton
@@ -61,7 +62,7 @@ public class BroadcastModule extends AbstractModuleCommand<Localization.Command.
                 .format(Localization.Command.Broadcast::getFormat)
                 .message((fResolver, s) -> message)
                 .proxy(output -> output.writeUTF(message))
-                .integration(s -> s.replace("<message>", message))
+                .integration(s -> Strings.CS.replace(s, "<message>", message))
                 .sound(getSound())
                 .sendBuilt();
     }

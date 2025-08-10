@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.model.entity.FPlayer;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.text.Format;
@@ -80,7 +81,7 @@ public class TimeFormatter {
 
     public String format(FPlayer fPlayer, long time, String message) {
         if (time < 0) time = 0;
-        return message.replace("<time>", format(fPlayer, time));
+        return Strings.CS.replace(message, "<time>", format(fPlayer, time));
     }
 
     public String formatDate(long date) {

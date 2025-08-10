@@ -10,6 +10,8 @@ import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.exception.ArgumentParseException;
 import org.incendo.cloud.exception.CommandExecutionException;
 import org.incendo.cloud.exception.InvalidSyntaxException;
@@ -47,16 +49,21 @@ public class CommandExceptionHandler {
 
         Throwable throwable = context.exception().getCause();
         String message = switch (throwable) {
-            case BooleanParser.BooleanParseException e -> localizationException.getParseBoolean()
-                    .replace("<input>", e.input());
-            case NumberParseException e -> localizationException.getParseNumber()
-                    .replace("<input>", e.input());
-            case DurationParser.DurationParseException e -> localizationException.getParseNumber()
-                    .replace("<input>", e.input());
-            case StringParser.StringParseException e -> localizationException.getParseString()
-                    .replace("<input>", e.input());
-            default -> localizationException.getParseUnknown()
-                    .replace("<input>", throwable.getMessage());
+            case BooleanParser.BooleanParseException e -> Strings.CS.replace(
+                    localizationException.getParseBoolean(), "<input>", e.input()
+            );
+            case NumberParseException e -> Strings.CS.replace(
+                    localizationException.getParseNumber(), "<input>", e.input()
+            );
+            case DurationParser.DurationParseException e -> Strings.CS.replace(
+                    localizationException.getParseNumber(), "<input>", e.input()
+            );
+            case StringParser.StringParseException e -> Strings.CS.replace(
+                    localizationException.getParseString(), "<input>", e.input()
+            );
+            default -> Strings.CS.replace(
+                    localizationException.getParseUnknown(), "<input>", String.valueOf(throwable.getMessage())
+            );
         };
 
         send(fPlayer, messagePipeline.builder(fPlayer, message).build());
@@ -66,10 +73,11 @@ public class CommandExceptionHandler {
         FPlayer fPlayer = context.context().sender();
 
         String correctSyntax = context.exception().correctSyntax();
-        String message = fileResolver.getLocalization(fPlayer)
-                .getCommand().getException().getSyntax()
-                .replace("<correct_syntax>", correctSyntax)
-                .replace("<command>", correctSyntax.split(" ")[0]);
+        String message = StringUtils.replaceEach(
+                fileResolver.getLocalization(fPlayer).getCommand().getException().getSyntax(),
+                new String[]{"<correct_syntax>", "<command>"},
+                new String[]{correctSyntax, String.valueOf(correctSyntax.split(" ")[0])}
+        );
 
         send(fPlayer, messagePipeline.builder(fPlayer, message).build());
     }
@@ -89,9 +97,11 @@ public class CommandExceptionHandler {
 
         FPlayer fPlayer = context.context().sender();
 
-        String message = fileResolver.getLocalization(fPlayer)
-                .getCommand().getException().getExecution()
-                .replace("<exception>", context.exception().getMessage());
+        String message = Strings.CS.replace(
+                fileResolver.getLocalization(fPlayer).getCommand().getException().getExecution(),
+                "<exception>",
+                context.exception().getMessage()
+        );
 
         send(fPlayer, messagePipeline.builder(fPlayer, message).build());
     }

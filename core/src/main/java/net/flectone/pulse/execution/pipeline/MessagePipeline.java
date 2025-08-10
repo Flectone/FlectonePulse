@@ -20,6 +20,7 @@ import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.apache.commons.lang3.Strings;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
@@ -104,7 +105,7 @@ public class MessagePipeline {
 
             try {
                 return miniMessage.deserialize(
-                        context.getMessage().replace("§", "&"),
+                        Strings.CS.replace(context.getMessage(), "§", "&"),
                         context.getTagResolvers().toArray(new TagResolver[0])
                 );
             } catch (Exception e) {

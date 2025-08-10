@@ -36,6 +36,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -101,11 +102,11 @@ public final class LegacyMiniConvertorPulseListener implements PulseListener {
      * @return translated string
      */
     public @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
-        if (options.contains(Option.DOUBLE_TO_ESCAPE)) {
-            text = text.replace("&&", "§");
-        }
-
-        text = text.replace('§', '&');
+        text = StringUtils.replaceEach(
+                text,
+                new String[]{"&&", "&"},
+                new String[]{"§", "&"}
+        );
 
         if (options.contains(Option.COLOR_DOUBLE_HASH)) {
             text = replaceDoubleHashHexColor(text);
@@ -233,7 +234,8 @@ public final class LegacyMiniConvertorPulseListener implements PulseListener {
         if (closeLastTag || !fastReset) {
             handleClosing(order, builder, closeLastTag, closeLastTag && fastReset);
         }
-        return builder.toString().replace('§', '&');
+
+        return builder.toString();
     }
 
     private @Nullable String extractLegacyHex(String input, int from) {

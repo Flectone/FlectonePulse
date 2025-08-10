@@ -22,6 +22,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.logging.FLogger;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -122,7 +123,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
             builder(fPlayer)
                     .destination(command.getDestination())
-                    .format(flectonepulse -> flectonepulse.getFormatEditor().replace("<url>", url))
+                    .format(flectonepulse -> Strings.CS.replace(flectonepulse.getFormatEditor(), "<url>", url))
                     .sound(getSound())
                     .sendBuilt();
             return;
@@ -139,7 +140,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
             builder(fPlayer)
                     .destination(command.getDestination())
-                    .format(flectonepulse -> flectonepulse.getFormatTrue().replace("<time>", formattedTime))
+                    .format(flectonepulse -> Strings.CS.replace(flectonepulse.getFormatTrue(), "<time>", formattedTime))
                     .sound(getSound())
                     .sendBuilt();
 

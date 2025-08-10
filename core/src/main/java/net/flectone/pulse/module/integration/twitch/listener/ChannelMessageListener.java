@@ -9,6 +9,7 @@ import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -46,9 +47,11 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
                 .destination(integration.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.TWITCH))
                 .tag(MessageType.FROM_TWITCH_TO_MINECRAFT)
-                .format(s -> s.getForMinecraft()
-                        .replace("<name>", nickname)
-                        .replace("<channel>", channel))
+                .format(s -> StringUtils.replaceEach(
+                        s.getForMinecraft(),
+                        new String[]{"<name>", "<channel>"},
+                        new String[]{String.valueOf(nickname), String.valueOf(channel)}
+                ))
                 .message(message)
                 .proxy(output -> {
                     output.writeUTF(nickname);

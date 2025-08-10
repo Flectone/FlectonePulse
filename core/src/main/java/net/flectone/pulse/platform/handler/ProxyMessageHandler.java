@@ -57,6 +57,8 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -383,7 +385,7 @@ public class ProxyMessageHandler {
                 .destination(fileResolver.getCommand().getUnban().getDestination())
                 .range(Range.get(Range.Type.SERVER))
                 .filter(filter -> filter.isSetting(FPlayer.Setting.BAN))
-                .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
+                .format(unban -> Strings.CS.replace(unban.getFormat(), "<moderator>", fPlayer.getName()))
                 .sound(unbanModule.getSound())
                 .sendBuilt();
     }
@@ -398,7 +400,7 @@ public class ProxyMessageHandler {
                 .destination(fileResolver.getCommand().getUnmute().getDestination())
                 .range(Range.get(Range.Type.SERVER))
                 .filter(filter -> filter.isSetting(FPlayer.Setting.MUTE))
-                .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
+                .format(unwarn -> Strings.CS.replace(unwarn.getFormat(), "<moderator>", fPlayer.getName()))
                 .sound(unmuteModule.getSound())
                 .sendBuilt();
     }
@@ -413,7 +415,7 @@ public class ProxyMessageHandler {
                 .destination(fileResolver.getCommand().getUnwarn().getDestination())
                 .range(Range.get(Range.Type.SERVER))
                 .filter(filter -> filter.isSetting(FPlayer.Setting.WARN))
-                .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
+                .format(unwarn -> Strings.CS.replace(unwarn.getFormat(), "<moderator>", fPlayer.getName()))
                 .sound(unwarnModule.getSound())
                 .sendBuilt();
     }
@@ -620,7 +622,7 @@ public class ProxyMessageHandler {
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getIntegration().getDiscord().getDestination())
                 .tag(MessageType.FROM_DISCORD_TO_MINECRAFT)
-                .format(s -> s.getForMinecraft().replace("<name>", nickname))
+                .format(s -> Strings.CS.replace(s.getForMinecraft(), "<name>", nickname))
                 .message(string)
                 .sound(messageCreateListener.getSound())
                 .sendBuilt();
@@ -636,10 +638,11 @@ public class ProxyMessageHandler {
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getIntegration().getTwitch().getDestination())
                 .tag(MessageType.FROM_TWITCH_TO_MINECRAFT)
-                .format(s -> s.getForMinecraft()
-                        .replace("<name>", nickname)
-                        .replace("<channel>", channelName)
-                )
+                .format(s -> StringUtils.replaceEach(
+                        s.getForMinecraft(),
+                        new String[]{"<name>", "<channel>"},
+                        new String[]{nickname, channelName}
+                ))
                 .message(string)
                 .sound(channelMessageListener.getSound())
                 .sendBuilt();
@@ -655,10 +658,11 @@ public class ProxyMessageHandler {
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getIntegration().getTelegram().getDestination())
                 .tag(MessageType.FROM_TELEGRAM_TO_MINECRAFT)
-                .format(s -> s.getForMinecraft()
-                        .replace("<name>", author)
-                        .replace("<chat>", chat)
-                )
+                .format(s -> StringUtils.replaceEach(
+                        s.getForMinecraft(),
+                        new String[]{"<name>", "<chat>"},
+                        new String[]{author, chat}
+                ))
                 .message(text)
                 .sound(messageListener.getSound())
                 .sendBuilt();

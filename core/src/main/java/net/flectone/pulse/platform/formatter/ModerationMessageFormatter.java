@@ -13,6 +13,7 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.moderation.newbie.NewbieModule;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -49,14 +50,10 @@ public class ModerationMessageFormatter {
                                       String date,
                                       String time,
                                       String timeLeft) {
-        return message
-                .replace("<player>", playerName)
-                .replace("<moderator>", moderatorName)
-                .replace("<id>", moderationId)
-                .replace("<reason>", reason)
-                .replace("<date>", date)
-                .replace("<time>", time)
-                .replace("<time_left>", timeLeft);
+        return StringUtils.replaceEach(message,
+                new String[]{"<player>", "<moderator>", "<id>", "<reason>", "<date>", "<time>", "<time_left>"},
+                new String[]{playerName, moderatorName, moderationId, reason, date, time, timeLeft}
+        );
     }
 
     public String replacePlaceholders(String message, FPlayer fReceiver, Moderation moderation) {

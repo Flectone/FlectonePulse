@@ -14,6 +14,7 @@ import net.flectone.pulse.module.message.gamemode.listener.GamemodePulseListener
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import org.apache.commons.lang3.Strings;
 
 @Singleton
 public class GamemodeModule extends AbstractModuleLocalization<Localization.Message.Gamemode> {
@@ -69,7 +70,11 @@ public class GamemodeModule extends AbstractModuleLocalization<Localization.Mess
         builder(fTarget)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> (isSelf ? s.getFormatSelf() : s.getFormatOther()).replace("<gamemode>", gamemodeType))
+                .format(s -> Strings.CS.replace(
+                        isSelf ? s.getFormatSelf() : s.getFormatOther(),
+                        "<gamemode>",
+                        gamemodeType
+                ))
                 .sound(getSound())
                 .sendBuilt();
     }

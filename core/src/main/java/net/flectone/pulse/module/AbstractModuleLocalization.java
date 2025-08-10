@@ -33,7 +33,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutputStream;
@@ -485,13 +487,23 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
                     .build();
 
             PlainTextComponentSerializer serializer = PlainTextComponentSerializer.plainText();
-            String finalFormattedMessage = serializer.serialize(componentFormat)
-                    .replace("<message>", serializer.serialize(componentMessage));
+            String finalFormattedMessage = Strings.CS.replace(
+                    serializer.serialize(componentFormat),
+                    "<message>",
+                    serializer.serialize(componentMessage)
+            );
 
-            UnaryOperator<String> interfaceReplaceString = s -> integrationString.apply(s)
-                    .replace("<player>", fPlayer.getName())
-                    .replace("<final_message>", finalFormattedMessage)
-                    .replace("<final_clear_message>", finalClearMessagePattern.matcher(finalFormattedMessage).replaceAll(""));
+            UnaryOperator<String> interfaceReplaceString = s -> {
+                String input = integrationString.apply(s);
+                if (StringUtils.isBlank(input)) return StringUtils.EMPTY;
+
+                String clearMessage = RegExUtils.replaceAll((CharSequence) finalFormattedMessage, finalClearMessagePattern, StringUtils.EMPTY);
+                return StringUtils.replaceEach(
+                        input,
+                        new String[]{"<player>", "<final_message>", "<final_clear_message>"},
+                        new String[]{fPlayer.getName(), finalFormattedMessage, clearMessage}
+                );
+            };
 
             integrationModule.sendMessage(fPlayer, tag, interfaceReplaceString);
         }

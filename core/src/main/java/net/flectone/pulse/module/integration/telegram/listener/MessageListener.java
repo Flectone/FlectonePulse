@@ -10,6 +10,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.telegram.TelegramIntegration;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import org.apache.commons.lang3.StringUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
@@ -76,10 +77,11 @@ public class MessageListener extends EventListener {
                 .destination(integration.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELEGRAM))
                 .tag(MessageType.FROM_TELEGRAM_TO_MINECRAFT)
-                .format(s -> s.getForMinecraft()
-                        .replace("<name>", author)
-                        .replace("<chat>", chat)
-                )
+                .format(s -> StringUtils.replaceEach(
+                        s.getForMinecraft(),
+                        new String[]{"<name>", "<chat>"},
+                        new String[]{String.valueOf(author), String.valueOf(chat)}
+                ))
                 .message(message)
                 .proxy(output -> {
                     output.writeUTF(author);

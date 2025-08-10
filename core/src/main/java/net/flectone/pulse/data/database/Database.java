@@ -25,6 +25,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.logging.FLogger;
+import org.apache.commons.lang3.Strings;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.ConstructorMapper;
 import org.jdbi.v3.core.statement.SqlStatements;
@@ -91,7 +92,7 @@ public class Database {
 
             if (config.getType() == Type.POSTGRESQL) {
                 jdbi.getConfig(SqlStatements.class).setTemplateEngine((sql, ctx) ->
-                        sql.replace("`", "\"")
+                        Strings.CS.replace(sql, "`", "\"")
                 );
             }
 

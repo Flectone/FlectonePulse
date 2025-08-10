@@ -14,6 +14,7 @@ import net.flectone.pulse.module.message.enchant.listener.EnchantPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import org.apache.commons.lang3.StringUtils;
 
 @Singleton
 public class EnchantModule extends AbstractModuleLocalization<Localization.Message.Enchant> {
@@ -66,10 +67,11 @@ public class EnchantModule extends AbstractModuleLocalization<Localization.Messa
         builder(fTarget)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> (isSingle ? s.getSingle() : s.getMultiple().replace("<count>", enchant.value()))
-                        .replace("<enchant>", enchant.name())
-                        .replace("<level>", enchant.level())
-                )
+                .format(s -> StringUtils.replaceEach(
+                        isSingle ? s.getSingle() : s.getMultiple(),
+                        new String[]{"<count>", "<enchant>", "<level>"},
+                        new String[]{enchant.value(), enchant.name(), enchant.level()}
+                ))
                 .sound(getSound())
                 .sendBuilt();
     }

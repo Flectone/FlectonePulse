@@ -12,6 +12,7 @@ import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import org.apache.commons.lang3.Strings;
 import reactor.core.publisher.Mono;
 
 @Singleton
@@ -66,7 +67,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
                 .destination(integration.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DISCORD))
                 .tag(MessageType.FROM_DISCORD_TO_MINECRAFT)
-                .format(s -> s.getForMinecraft().replace("<name>", nickname))
+                .format(s -> Strings.CS.replace(s.getForMinecraft(), "<name>", nickname))
                 .message(message)
                 .proxy(output -> {
                     output.writeUTF(nickname);

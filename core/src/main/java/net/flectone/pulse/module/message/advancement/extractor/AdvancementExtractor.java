@@ -12,6 +12,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.type.tuple.Pair;
 import org.incendo.cloud.type.tuple.Triplet;
 
@@ -47,7 +48,7 @@ public class AdvancementExtractor {
         String description = pair.second();
 
         if (description.isBlank() && title.contains(".title")) {
-            description = title.replace(".title", ".description");
+            description = Strings.CS.replace(title, ".title", ".description");
         }
 
         ChatAdvancement chatAdvancement = new ChatAdvancement(target, title, description, event.getTranslationKey());

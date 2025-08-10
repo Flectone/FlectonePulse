@@ -16,6 +16,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -126,7 +127,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                     .tag(MessageType.COMMAND_STREAM)
                     .format(replaceUrls(urls))
                     .proxy(output -> output.writeUTF(urls))
-                    .integration(s -> s.replace("<urls>", urls))
+                    .integration(s -> Strings.CS.replace(s, "<urls>", urls))
                     .sound(getSound())
                     .sendBuilt();
 
@@ -141,11 +142,10 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
     public Function<Localization.Command.Stream, String> replaceUrls(String string) {
         return message -> {
             List<String> urls = Arrays.stream(string.split(" "))
-                    .map(url -> message.getUrlTemplate().replace("<url>", url))
+                    .map(url -> Strings.CS.replace(message.getUrlTemplate(), "<url>", url))
                     .toList();
 
-            return message.getFormatStart()
-                    .replace("<urls>", String.join("<br>", urls));
+            return Strings.CS.replace(message.getFormatStart(), "<urls>", String.join("<br>", urls));
         };
     }
 

@@ -23,6 +23,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.Set;
 
@@ -76,10 +77,11 @@ public class NamePulseListener implements PulseListener {
 
         if (!(sender instanceof FPlayer fPlayer)) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) -> {
-                String formatEntity = nameModule.resolveLocalization(receiver).getEntity()
-                        .replace("<name>", sender.getName())
-                        .replace("<type>", sender.getType())
-                        .replace("<uuid>", sender.getUuid().toString());
+                String formatEntity = StringUtils.replaceEach(
+                        nameModule.resolveLocalization(receiver).getEntity(),
+                        new String[]{"<name>", "<type>", "<uuid>"},
+                        new String[]{sender.getName(), sender.getType(), sender.getUuid().toString()}
+                );
 
                 Component name = messagePipeline.builder(sender, receiver, formatEntity)
                         .build();
@@ -106,7 +108,7 @@ public class NamePulseListener implements PulseListener {
             Localization.Message.Format.Name localization = nameModule.resolveLocalization(receiver);
 
             String displayName = fPlayer.isUnknown()
-                    ? localization.getUnknown().replace("<name>", fPlayer.getName())
+                    ? Strings.CS.replace(localization.getUnknown(), "<name>", fPlayer.getName())
                     : localization.getDisplay();
 
             Component displayNameComponent = messagePipeline.builder(sender, receiver, displayName).build();

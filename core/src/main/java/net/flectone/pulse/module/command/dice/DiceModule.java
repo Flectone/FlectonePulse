@@ -13,6 +13,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.RandomUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.ArrayList;
@@ -99,8 +100,10 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
                                 .append(" ");
                     }
 
-                    return s.replace("<sum>", String.valueOf(sum))
-                            .replace("<message>", stringBuilder.toString());
+                    return StringUtils.replaceEach(s,
+                            new String[]{"<sum>", "<message>"},
+                            new String[]{String.valueOf(sum), stringBuilder.toString().trim()}
+                    );
                 })
                 .sound(getSound())
                 .sendBuilt();
@@ -121,9 +124,10 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
                         .append(" ");
             }
 
-            return message.getFormat()
-                    .replace("<sum>", String.valueOf(sum))
-                    .replace("<message>", stringBuilder.toString().trim());
+            return StringUtils.replaceEach(message.getFormat(),
+                    new String[]{"<sum>", "<message>"},
+                    new String[]{String.valueOf(sum), stringBuilder.toString().trim()}
+            );
         };
     }
 }

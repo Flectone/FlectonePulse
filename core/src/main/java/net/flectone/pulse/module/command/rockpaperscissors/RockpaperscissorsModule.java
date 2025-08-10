@@ -16,6 +16,8 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.parser.standard.UUIDParser;
 
@@ -126,10 +128,10 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         create(rockPaperScissors.getId(), fPlayer, fReceiver.getUuid());
 
         builder(fPlayer)
-                .format((fResolver, s) -> s.getFormatMove()
-                        .replace("<target>", fReceiver.getName())
-                        .replace("<uuid>", rockPaperScissors.getId().toString())
-                )
+                .format(s -> StringUtils.replaceEach(s.getFormatMove(),
+                        new String[]{"<target>", "<uuid>"},
+                        new String[]{fReceiver.getName(), rockPaperScissors.getId().toString()}
+                ))
                 .sound(getSound())
                 .sendBuilt();
     }
@@ -204,7 +206,11 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         if (isDraw) {
             BiFunction<FPlayer, Localization.Command.Rockpaperscissors, String> message =
-                    (p, m) -> m.getFormatDraw().replace("<move>", resolveLocalization(p).getStrategies().get(move));
+                    (p, m) -> Strings.CS.replace(
+                            m.getFormatDraw(),
+                            "<move>",
+                            resolveLocalization(p).getStrategies().get(move)
+                    );
 
             builder(fPlayer)
                     .format(message)
@@ -217,9 +223,11 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
             return;
         }
 
-        BiFunction<FPlayer, Localization.Command.Rockpaperscissors, String> message = (p, m) -> m.getFormatWin()
-                        .replace("<sender_move>", resolveLocalization(p).getStrategies().get(senderMove))
-                        .replace("<receiver_move>", resolveLocalization(p).getStrategies().get(move));
+        BiFunction<FPlayer, Localization.Command.Rockpaperscissors, String> message = (p, m) -> StringUtils.replaceEach(
+                m.getFormatWin(),
+                new String[]{"<sender_move>", "<receiver_move>"},
+                new String[]{resolveLocalization(p).getStrategies().get(senderMove), resolveLocalization(p).getStrategies().get(move)}
+        );
 
         FEntity winFPlayer = command.getStrategies().get(move).contains(senderMove) ? fPlayer : fReceiver;
 
@@ -251,9 +259,11 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         builder(fPlayer)
                 .receiver(fReceiver)
-                .format((fResolver, s) -> s.getFormatMove()
-                        .replace("<target>", fPlayer.getName())
-                        .replace("<uuid>", rockPaperScissors.getId().toString()))
+                .format((fResolver, s) -> StringUtils.replaceEach(
+                        s.getFormatMove(),
+                        new String[]{"<target>", "<uuid>"},
+                        new String[]{fPlayer.getName(), rockPaperScissors.getId().toString()}
+                ))
                 .sendBuilt();
     }
 

@@ -1,7 +1,6 @@
 dependencies {
     implementation "net.kyori:adventure-text-serializer-ansi:$adventure_api"
 
-    compileOnly "org.apache.commons:commons-lang3:$apache_commons_lang3_version"
     compileOnly "com.alessiodp.libby:libby-bukkit:$libby_version"
     compileOnly "com.github.retrooper:packetevents-api:$packetevents_spigot_version"
     compileOnly "org.jdbi:jdbi3-core:$jdbi3_core_version"

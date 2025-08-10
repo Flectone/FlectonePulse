@@ -12,6 +12,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.apache.commons.lang3.Strings;
 
 @Singleton
 public class SignModule extends AbstractModule {
@@ -44,7 +45,7 @@ public class SignModule extends AbstractModule {
         try {
             Component deserialized = LegacyComponentSerializer.legacySection().deserialize(string);
 
-            Component component = messagePipeline.builder(fPlayer, string.replace("§", "&"))
+            Component component = messagePipeline.builder(fPlayer, Strings.CS.replace(string, "§", "&"))
                     .flag(MessageFlag.USER_MESSAGE, true)
                     .build()
                     .mergeStyle(deserialized);

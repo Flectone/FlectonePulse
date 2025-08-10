@@ -15,6 +15,7 @@ import net.flectone.pulse.module.message.spawn.listener.SpawnPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import org.apache.commons.lang3.StringUtils;
 
 @Singleton
 public class SpawnModule extends AbstractModuleLocalization<Localization.Message.Spawn> {
@@ -81,13 +82,11 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
         builder(fTarget)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> (isSingle ? s.getSingle() : s.getMultiple().replace("<count>", spawn.value()))
-                        .replace("<x>", spawn.x())
-                        .replace("<y>", spawn.y())
-                        .replace("<z>", spawn.z())
-                        .replace("<angle>", spawn.angle())
-                        .replace("<world>", spawn.world())
-                )
+                .format(s -> StringUtils.replaceEach(
+                        isSingle ? s.getSingle() : s.getMultiple(),
+                        new String[]{"<count>", "<x>", "<y>", "<z>", "<angle>", "<world>"},
+                        new String[]{spawn.value(), spawn.x(), spawn.y(), spawn.z(), spawn.angle(), spawn.world()}
+                ))
                 .sound(getSound())
                 .sendBuilt();
     }

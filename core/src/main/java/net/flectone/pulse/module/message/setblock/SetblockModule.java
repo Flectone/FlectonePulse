@@ -12,6 +12,7 @@ import net.flectone.pulse.module.message.setblock.listener.SetblockPulseListener
 import net.flectone.pulse.module.message.setblock.model.Setblock;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import org.apache.commons.lang3.StringUtils;
 
 @Singleton
 public class SetblockModule extends AbstractModuleLocalization<Localization.Message.Setblock> {
@@ -51,11 +52,11 @@ public class SetblockModule extends AbstractModuleLocalization<Localization.Mess
         builder(fPlayer)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> s.getFormat()
-                        .replace("<x>", setblock.x())
-                        .replace("<y>", setblock.y())
-                        .replace("<z>", setblock.y())
-                )
+                .format(s -> StringUtils.replaceEach(
+                        s.getFormat(),
+                        new String[]{"<x>", "<y>", "<z>"},
+                        new String[]{String.valueOf(setblock.x()), String.valueOf(setblock.y()), String.valueOf(setblock.z())}
+                ))
                 .sound(getSound())
                 .sendBuilt();
     }

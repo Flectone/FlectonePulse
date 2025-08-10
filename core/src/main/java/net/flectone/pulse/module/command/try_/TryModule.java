@@ -12,6 +12,8 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.RandomUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.function.Function;
@@ -80,16 +82,19 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
                     output.writeInt(random);
                     output.writeUTF(message);
                 })
-                .integration(s -> s
-                        .replace("<message>", message)
-                        .replace("<percent>", String.valueOf(random))
-                )
+                .integration(s -> StringUtils.replaceEach(s,
+                        new String[]{"<message>", "<percent>"},
+                        new String[]{message, String.valueOf(random)}
+                ))
                 .sound(getSound())
                 .sendBuilt();
     }
 
     public Function<Localization.Command.Try, String> replacePercent(int value) {
-        return message -> (value >= command.getGood() ? message.getFormatTrue() : message.getFormatFalse())
-                .replace("<percent>", String.valueOf(value));
+        return message -> Strings.CS.replace(
+                value >= command.getGood() ? message.getFormatTrue() : message.getFormatFalse(),
+                "<percent>",
+                String.valueOf(value)
+        );
     }
 }

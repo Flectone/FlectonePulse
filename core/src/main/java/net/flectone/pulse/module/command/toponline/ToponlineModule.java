@@ -19,6 +19,8 @@ import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.Comparator;
@@ -113,29 +115,28 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
 
         Localization.Command.Toponline localization = resolveLocalization(fPlayer);
 
-        String header = localization.getHeader().replace("<count>", String.valueOf(size));
+        String header = Strings.CS.replace(localization.getHeader(), "<count>", String.valueOf(size));
         Component component = messagePipeline.builder(fPlayer, header)
                 .build()
                 .append(Component.newline());
 
         for (PlatformPlayerAdapter.PlayedTimePlayer timePlayer : finalPlayedTimePlayers) {
 
-
-            String line = localization.getLine()
-                    .replace("<time_player>", timePlayer.name())
-                    .replace("<time>", timeFormatter.format(fPlayer, timePlayer.playedTime()));
+            String line = StringUtils.replaceEach(
+                    localization.getLine(),
+                    new String[]{"<time_player>", "<time>"},
+                    new String[]{timePlayer.name(), timeFormatter.format(fPlayer, timePlayer.playedTime())}
+            );
 
             component = component
                     .append(messagePipeline.builder(fPlayer, line).build())
                     .append(Component.newline());
         }
 
-        String footer = localization.getFooter()
-                .replace("<command>", "/" + getCommandName())
-                .replace("<prev_page>", String.valueOf(page-1))
-                .replace("<next_page>", String.valueOf(page+1))
-                .replace("<current_page>", String.valueOf(page))
-                .replace("<last_page>", String.valueOf(countPage));
+        String footer = StringUtils.replaceEach(localization.getFooter(),
+                new String[]{"<command>", "<prev_page>", "<next_page>", "<current_page>", "<last_page>"},
+                new String[]{"/" + getCommandName(), String.valueOf(page - 1), String.valueOf(page + 1), String.valueOf(page), String.valueOf(countPage)}
+        );
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 

@@ -13,6 +13,7 @@ import net.flectone.pulse.module.message.sleep.model.Sleep;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+import org.apache.commons.lang3.StringUtils;
 
 @Singleton
 public class SleepModule extends AbstractModuleLocalization<Localization.Message.Sleep> {
@@ -54,9 +55,11 @@ public class SleepModule extends AbstractModuleLocalization<Localization.Message
                 .receiver(fPlayer)
                 .format(bed -> switch (key) {
                     case SLEEP_NOT_POSSIBLE -> bed.getNotPossible();
-                    case SLEEP_PLAYERS_SLEEPING -> bed.getPlayersSleeping()
-                            .replace("<sleep_count>", sleep.sleepCount())
-                            .replace("<all_count>", sleep.allCount());
+                    case SLEEP_PLAYERS_SLEEPING -> StringUtils.replaceEach(
+                            bed.getPlayersSleeping(),
+                            new String[]{"<sleep_count>", "<all_count>"},
+                            new String[]{String.valueOf(sleep.sleepCount()), String.valueOf(sleep.allCount())}
+                    );
                     case SLEEP_SKIPPING_NIGHT -> bed.getSkippingNight();
                     default -> "";
                 })

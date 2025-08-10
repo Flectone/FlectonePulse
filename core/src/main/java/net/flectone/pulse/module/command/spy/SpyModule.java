@@ -11,6 +11,8 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
@@ -89,19 +91,20 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
                 .filter(FPlayer::isOnline)
                 .tag(MessageType.COMMAND_SPY)
                 .format(replaceAction(action))
-                .message((fResolver, s) -> string)
+                .message(string)
                 .proxy(output -> {
                     output.writeUTF(action);
                     output.writeUTF(string);
                 })
-                .integration(s -> s
-                        .replace("<action>", action)
-                        .replace("<message>", string)
-                )
+                .integration(s -> StringUtils.replaceEach(
+                        s,
+                        new String[]{"<action>", "<message>"},
+                        new String[]{action, string}
+                ))
                 .sendBuilt();
     }
 
     public Function<Localization.Command.Spy, String> replaceAction(String action) {
-        return message -> message.getFormatLog().replace("<action>", action);
+        return message -> Strings.CS.replace(message.getFormatLog(), "<action>", action);
     }
 }

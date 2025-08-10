@@ -10,6 +10,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -86,7 +87,7 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
 
         builder(fPlayer)
                 .destination(command.getDestination())
-                .format(s -> s.getFormat().replace("<message>", message))
+                .format(s -> Strings.CS.replace(s.getFormat(), "<message>", message))
                 .message(message)
                 .sound(getSound())
                 .sendBuilt();

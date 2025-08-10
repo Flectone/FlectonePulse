@@ -15,6 +15,7 @@ import net.flectone.pulse.module.message.kill.listener.KillPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import org.apache.commons.lang3.Strings;
 
 @Singleton
 public class KillModule extends AbstractModuleLocalization<Localization.Message.Kill> {
@@ -71,7 +72,7 @@ public class KillModule extends AbstractModuleLocalization<Localization.Message.
                 .destination(message.getDestination())
                 .receiver(fPlayer)
                 .format(s -> key == MinecraftTranslationKey.COMMANDS_KILL_SUCCESS_MULTIPLE
-                        ? s.getMultiple().replace("<count>", kill.value())
+                        ? Strings.CS.replace(s.getMultiple(), "<count>", kill.value())
                         : s.getSingle()
                 )
                 .sound(getSound())

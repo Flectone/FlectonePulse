@@ -12,6 +12,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.apache.commons.lang3.Strings;
 import org.bukkit.inventory.meta.ItemMeta;
 
 @Singleton
@@ -48,7 +49,7 @@ public class BukkitAnvilModule extends AnvilModule {
         try {
             Component deserialized = LegacyComponentSerializer.legacySection().deserialize(displayName);
 
-            Component component = messagePipeline.builder(fPlayer, displayName.replace("§", "&"))
+            Component component = messagePipeline.builder(fPlayer, Strings.CS.replace(displayName, "§", "&"))
                     .flag(MessageFlag.USER_MESSAGE, true)
                     .flag(MessageFlag.COLORS, false)
                     .build()

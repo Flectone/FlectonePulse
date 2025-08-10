@@ -11,6 +11,7 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.seed.listener.SeedPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import org.apache.commons.lang3.Strings;
 
 @Singleton
 public class SeedModule extends AbstractModuleLocalization<Localization.Message.Seed> {
@@ -50,7 +51,7 @@ public class SeedModule extends AbstractModuleLocalization<Localization.Message.
         builder(fPlayer)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> s.getFormat().replace("<seed>", seed))
+                .format(s -> Strings.CS.replace(s.getFormat(), "<seed>", seed))
                 .sound(getSound())
                 .sendBuilt();
     }

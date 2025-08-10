@@ -22,6 +22,8 @@ import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jetbrains.annotations.NotNull;
 
 import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.empty;
@@ -105,8 +107,14 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
                     Localization.Message.Advancement.Command subcommand = revoke ? s.getRevoke() : s.getGrant();
 
                     return switch (commandAdvancement.relation()) {
-                        case MANY_TO_ONE -> subcommand.getManyToOne().replace("<number>", commandAdvancement.content());
-                        case ONE_TO_ONE_TEXT -> subcommand.getOneToOne().replace("<advancement>", commandAdvancement.content());
+                        case MANY_TO_ONE -> Strings.CS.replace(
+                                subcommand.getManyToOne(),
+                                "<number>", String.valueOf(commandAdvancement.content())
+                        );
+                        case ONE_TO_ONE_TEXT -> Strings.CS.replace(
+                                subcommand.getOneToOne(),
+                                "<advancement>", String.valueOf(commandAdvancement.content())
+                        );
                         case ONE_TO_ONE_ADVANCEMENT -> subcommand.getOneToOne();
                     };
                 })
@@ -127,9 +135,11 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
             default -> message.getTask().getFormat();
         };
 
-        return string
-                .replace("<title>", chatAdvancement.title())
-                .replace("<description>", chatAdvancement.description());
+        return StringUtils.replaceEach(
+                string,
+                new String[]{"<title>", "<description>"},
+                new String[]{String.valueOf(chatAdvancement.title()), String.valueOf(chatAdvancement.description())}
+        );
     }
 
     public TagResolver advancementTag(FEntity sender, FPlayer receiver, @NotNull ChatAdvancement chatAdvancement) {
@@ -146,12 +156,13 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
                 default -> localization.getTask().getTag();
             };
 
-            Component component = messagePipeline.builder(sender, receiver, title
-                            .replace("<title>", chatAdvancement.title())
-                            .replace("<description>", chatAdvancement.description())
-                    )
-                    .build();
+            title = StringUtils.replaceEach(
+                    title,
+                    new String[]{"<title>", "<description>"},
+                    new String[]{String.valueOf(chatAdvancement.title()), String.valueOf(chatAdvancement.description())}
+            );
 
+            Component component = messagePipeline.builder(sender, receiver, title).build();
             return Tag.inserting(component);
         });
     }

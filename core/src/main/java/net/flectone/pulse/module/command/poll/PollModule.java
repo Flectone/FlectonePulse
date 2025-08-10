@@ -22,6 +22,7 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
@@ -260,10 +261,11 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     }
 
     public Function<Localization.Command.Poll, String> resolveVote(int voteType, int answerID, int pollID, int count) {
-        return message -> (voteType == 1 ? message.getVoteTrue() : message.getVoteFalse())
-                .replace("<answer_id>", String.valueOf(answerID + 1))
-                .replace("<id>", String.valueOf(pollID))
-                .replace("<count>", String.valueOf(count));
+        return message -> StringUtils.replaceEach(
+                voteType == 1 ? message.getVoteTrue() : message.getVoteFalse(),
+                new String[]{"<answer_id>", "<id>", "<count>"},
+                new String[]{String.valueOf(answerID + 1), String.valueOf(pollID), String.valueOf(count)}
+        );
     }
 
     public Function<Localization.Command.Poll, String> resolvePollFormat(FEntity fPlayer, Poll poll, Status status) {
@@ -275,12 +277,16 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
                 Component answerComponent = messagePipeline.builder(fPlayer, FPlayer.UNKNOWN, answer).build();
 
-                answersBuilder.append(message.getAnswerTemplate()
-                        .replace("<id>", String.valueOf(poll.getId()))
-                        .replace("<number>", String.valueOf(k))
-                        .replace("<answer>", PlainTextComponentSerializer.plainText().serialize(answerComponent))
-                        .replace("<count>", String.valueOf(poll.getCountAnswers()[k]))
-                );
+                answersBuilder.append(StringUtils.replaceEach(
+                        message.getAnswerTemplate(),
+                        new String[]{"<id>", "<number>", "<answer>", "<count>"},
+                        new String[]{
+                                String.valueOf(poll.getId()),
+                                String.valueOf(k),
+                                PlainTextComponentSerializer.plainText().serialize(answerComponent),
+                                String.valueOf(poll.getCountAnswers()[k])
+                        }
+                ));
 
                 k++;
             }
@@ -291,10 +297,11 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 case END -> message.getStatus().getEnd();
             };
 
-            return message.getFormat()
-                    .replace("<status>", messageStatus)
-                    .replace("<id>", String.valueOf(poll.getId()))
-                    .replace("<answers>", answersBuilder.toString());
+            return StringUtils.replaceEach(
+                    message.getFormat(),
+                    new String[]{"<status>", "<id>", "<answers>"},
+                    new String[]{messageStatus, String.valueOf(poll.getId()), answersBuilder.toString()}
+            );
         };
     }
 

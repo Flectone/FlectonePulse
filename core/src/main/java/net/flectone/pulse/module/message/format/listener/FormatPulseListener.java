@@ -25,6 +25,11 @@ import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import org.apache.commons.lang3.RegExUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+
+import java.util.regex.Pattern;
 
 @Singleton
 public class FormatPulseListener implements PulseListener {
@@ -83,8 +88,11 @@ public class FormatPulseListener implements PulseListener {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.PING, (argumentQueue, context) -> {
                 int ping = fPlayerService.getPing(fPlayer);
 
-                String string = formatModule.resolveLocalization(receiver).getTags().get(AdventureTag.PING)
-                        .replace("<ping>", String.valueOf(ping));
+                String string = Strings.CS.replace(
+                        formatModule.resolveLocalization(receiver).getTags().get(AdventureTag.PING),
+                        "<ping>",
+                        String.valueOf(ping)
+                );
 
                 Component component = messagePipeline.builder(sender, receiver, string).build();
 
@@ -94,8 +102,11 @@ public class FormatPulseListener implements PulseListener {
 
         if (isCorrectTag(AdventureTag.TPS, sender)) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.TPS, (argumentQueue, context) -> {
-                String string = formatModule.resolveLocalization(receiver).getTags().get(AdventureTag.TPS)
-                        .replace("<tps>", platformServerAdapter.getTPS());
+                String string = Strings.CS.replace(
+                        formatModule.resolveLocalization(receiver).getTags().get(AdventureTag.TPS),
+                        "<tps>",
+                        platformServerAdapter.getTPS()
+                );
 
                 Component component = messagePipeline.builder(sender, receiver, string).build();
 
@@ -105,8 +116,11 @@ public class FormatPulseListener implements PulseListener {
 
         if (isCorrectTag(AdventureTag.ONLINE, sender)) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.ONLINE, (argumentQueue, context) -> {
-                String string = formatModule.resolveLocalization(receiver).getTags().get(AdventureTag.ONLINE)
-                        .replace("<online>", String.valueOf(platformServerAdapter.getOnlinePlayerCount()));
+                String string = Strings.CS.replace(
+                        formatModule.resolveLocalization(receiver).getTags().get(AdventureTag.ONLINE),
+                        "<online>",
+                        String.valueOf(platformServerAdapter.getOnlinePlayerCount())
+                );
 
                 Component component = messagePipeline.builder(sender, receiver, string).build();
 
@@ -118,10 +132,15 @@ public class FormatPulseListener implements PulseListener {
             PlatformPlayerAdapter.Coordinates coordinates = platformPlayerAdapter.getCoordinates(sender);
             if (coordinates != null) {
                 messageContext.addReplacementTag(MessagePipeline.ReplacementTag.COORDS, (argumentQueue, context) -> {
-                    String string = formatModule.resolveLocalization(receiver).getTags().get(AdventureTag.COORDS)
-                            .replace("<x>", String.valueOf(coordinates.x()))
-                            .replace("<y>", String.valueOf(coordinates.y()))
-                            .replace("<z>", String.valueOf(coordinates.z()));
+                    String string = StringUtils.replaceEach(
+                            formatModule.resolveLocalization(receiver).getTags().get(AdventureTag.COORDS),
+                            new String[]{"<x>", "<y>", "<z>"},
+                            new String[]{
+                                    String.valueOf(coordinates.x()),
+                                    String.valueOf(coordinates.y()),
+                                    String.valueOf(coordinates.z())
+                            }
+                    );
 
                     Component component = messagePipeline.builder(sender, receiver, string).build();
 
@@ -134,12 +153,17 @@ public class FormatPulseListener implements PulseListener {
             PlatformPlayerAdapter.Statistics statistics = platformPlayerAdapter.getStatistics(sender);
             if (statistics != null) {
                 messageContext.addReplacementTag(MessagePipeline.ReplacementTag.STATS, (argumentQueue, context) -> {
-                    String string = formatModule.resolveLocalization(receiver).getTags().get(AdventureTag.STATS)
-                            .replace("<hp>", String.valueOf(statistics.health()))
-                            .replace("<armor>", String.valueOf(statistics.armor()))
-                            .replace("<exp>", String.valueOf(statistics.level()))
-                            .replace("<food>", String.valueOf(statistics.food()))
-                            .replace("<attack>", String.valueOf(statistics.damage()));
+                    String string = StringUtils.replaceEach(
+                            formatModule.resolveLocalization(receiver).getTags().get(AdventureTag.STATS),
+                            new String[]{"<hp>", "<armor>", "<exp>", "<food>", "<attack>"},
+                            new String[]{
+                                    String.valueOf(statistics.health()),
+                                    String.valueOf(statistics.armor()),
+                                    String.valueOf(statistics.level()),
+                                    String.valueOf(statistics.food()),
+                                    String.valueOf(statistics.damage())
+                            }
+                    );
 
                     Component component = messagePipeline.builder(sender, receiver, string).build();
 
@@ -151,8 +175,11 @@ public class FormatPulseListener implements PulseListener {
         if (isCorrectTag(AdventureTag.SKIN, sender)) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SKIN, (argumentQueue, context) -> {
                 String url = skinService.getBodyUrl(sender);
-                String string = formatModule.resolveLocalization(receiver).getTags().get(AdventureTag.SKIN)
-                        .replace("<message>", url);
+                String string = Strings.CS.replace(
+                        formatModule.resolveLocalization(receiver).getTags().get(AdventureTag.SKIN),
+                        "<message>",
+                        url
+                );
 
                 Component component = messagePipeline.builder(sender, receiver, string).build();
 
@@ -185,8 +212,11 @@ public class FormatPulseListener implements PulseListener {
                 String url = urlFormatter.toASCII(urlArgument.value());
                 if (url.isEmpty()) return Tag.selfClosingInserting(Component.empty());
 
-                String string = formatModule.resolveLocalization(receiver).getTags().get(AdventureTag.URL)
-                        .replace("<message>", url);
+                String string = Strings.CS.replace(
+                        formatModule.resolveLocalization(receiver).getTags().get(AdventureTag.URL),
+                        "<message>",
+                        url
+                );
 
                 Component component = messagePipeline.builder(sender, receiver, string)
                         .flag(MessageFlag.URL, false)
@@ -205,64 +235,81 @@ public class FormatPulseListener implements PulseListener {
     private String replaceAll(FEntity sender, FEntity fReceiver, String message) {
         if (formatModule.isModuleDisabledFor(sender)) return message;
 
+        String[] searchList = new String[9];
+        String[] replacementList = new String[9];
+        int index = 0;
+
+        if (isCorrectTag(AdventureTag.PING, sender)) {
+            searchList[index] = this.message.getTags().get(AdventureTag.PING).getTrigger();
+            replacementList[index] = "<ping>";
+            index++;
+        }
+
+        if (isCorrectTag(AdventureTag.TPS, sender)) {
+            searchList[index] = this.message.getTags().get(AdventureTag.TPS).getTrigger();
+            replacementList[index] = "<tps>";
+            index++;
+        }
+
+        if (isCorrectTag(AdventureTag.ONLINE, sender)) {
+            searchList[index] = this.message.getTags().get(AdventureTag.ONLINE).getTrigger();
+            replacementList[index] = "<online>";
+            index++;
+        }
+
+        if (isCorrectTag(AdventureTag.COORDS, sender)) {
+            searchList[index] = this.message.getTags().get(AdventureTag.COORDS).getTrigger();
+            replacementList[index] = "<coords>";
+            index++;
+        }
+
+        if (isCorrectTag(AdventureTag.STATS, sender)) {
+            searchList[index] = this.message.getTags().get(AdventureTag.STATS).getTrigger();
+            replacementList[index] = "<stats>";
+            index++;
+        }
+
+        if (isCorrectTag(AdventureTag.SKIN, sender)) {
+            searchList[index] = this.message.getTags().get(AdventureTag.SKIN).getTrigger();
+            replacementList[index] = "<skin>";
+            index++;
+        }
+
+        if (isCorrectTag(AdventureTag.ITEM, sender)) {
+            searchList[index] = this.message.getTags().get(AdventureTag.ITEM).getTrigger();
+            replacementList[index] = "<item>";
+            index++;
+        }
+
+        if (index > 0) {
+            String[] trimmedSearchList = new String[index];
+            String[] trimmedReplacementList = new String[index];
+            System.arraycopy(searchList, 0, trimmedSearchList, 0, index);
+            System.arraycopy(replacementList, 0, trimmedReplacementList, 0, index);
+            message = StringUtils.replaceEach(message, trimmedSearchList, trimmedReplacementList);
+        }
+
         if (isCorrectTag(AdventureTag.IMAGE, sender)) {
             Localization.Message.Format localization = formatModule.resolveLocalization(fReceiver);
             message = replaceAll(sender, message,
                     permission.getTags().get(AdventureTag.IMAGE),
-                    this.message.getTags().get(AdventureTag.IMAGE).getTrigger(),
-                    localization.getTags().get(AdventureTag.IMAGE).replace("<message>", "$1")
+                    formatModule.getPatternsMap().get(AdventureTag.IMAGE),
+                    Strings.CS.replace(localization.getTags().get(AdventureTag.IMAGE), "<message>", "$1")
             );
         }
 
         if (isCorrectTag(AdventureTag.URL, sender)) {
             message = replaceAll(sender, message,
                     permission.getTags().get(AdventureTag.URL),
-                    this.message.getTags().get(AdventureTag.URL).getTrigger(),
+                    formatModule.getPatternsMap().get(AdventureTag.URL),
                     "<url:'$1'>"
             );
         }
 
-        if (isCorrectTag(AdventureTag.PING, sender)) {
-            message = message
-                    .replace(this.message.getTags().get(AdventureTag.PING).getTrigger(), "<ping>");
-        }
-
-        if (isCorrectTag(AdventureTag.TPS, sender)) {
-            message = message
-                    .replace(this.message.getTags().get(AdventureTag.TPS).getTrigger(), "<tps>");
-        }
-
-        if (isCorrectTag(AdventureTag.ONLINE, sender)) {
-            message = message
-                    .replace(this.message.getTags().get(AdventureTag.ONLINE).getTrigger(), "<online>");
-        }
-
-        if (isCorrectTag(AdventureTag.COORDS, sender)) {
-            message = message
-                    .replace(this.message.getTags().get(AdventureTag.COORDS).getTrigger(), "<coords>");
-        }
-
-        if (isCorrectTag(AdventureTag.STATS, sender)) {
-            message = message
-                    .replace(this.message.getTags().get(AdventureTag.STATS).getTrigger(), "<stats>");
-        }
-
-        if (isCorrectTag(AdventureTag.SKIN, sender)) {
-            message = message
-                    .replace(this.message.getTags().get(AdventureTag.SKIN).getTrigger(), "<skin>");
-        }
-
-        if (isCorrectTag(AdventureTag.ITEM, sender)) {
-            message = message
-                    .replace(this.message.getTags().get(AdventureTag.ITEM).getTrigger(), "<item>");
-        }
-
-        String regex = "(?<!\\\\)<trigger>(.*?)(?<!\\\\)<trigger>";
-
         if (isCorrectTag(AdventureTag.SPOILER, sender)) {
             message = replaceAll(sender, message,
                     permission.getTags().get(AdventureTag.SPOILER),
-                    regex.replace("<trigger>", this.message.getTags().get(AdventureTag.SPOILER).getTrigger()),
+                    formatModule.getPatternsMap().get(AdventureTag.SPOILER),
                     "<spoiler:'$1'>"
             );
         }
@@ -270,7 +317,7 @@ public class FormatPulseListener implements PulseListener {
         if (isCorrectTag(AdventureTag.BOLD, sender)) {
             message = replaceAll(sender, message,
                     permission.getTags().get(AdventureTag.BOLD),
-                    regex.replace("<trigger>", this.message.getTags().get(AdventureTag.BOLD).getTrigger()),
+                    formatModule.getPatternsMap().get(AdventureTag.BOLD),
                     "<bold>$1</bold>"
             );
         }
@@ -278,7 +325,7 @@ public class FormatPulseListener implements PulseListener {
         if (isCorrectTag(AdventureTag.ITALIC, sender)) {
             message = replaceAll(sender, message,
                     permission.getTags().get(AdventureTag.ITALIC),
-                    regex.replace("<trigger>", this.message.getTags().get(AdventureTag.ITALIC).getTrigger()),
+                    formatModule.getPatternsMap().get(AdventureTag.ITALIC),
                     "<italic>$1</italic>"
             );
         }
@@ -286,7 +333,7 @@ public class FormatPulseListener implements PulseListener {
         if (isCorrectTag(AdventureTag.UNDERLINE, sender)) {
             message = replaceAll(sender, message,
                     permission.getTags().get(AdventureTag.UNDERLINE),
-                    regex.replace("<trigger>", this.message.getTags().get(AdventureTag.UNDERLINE).getTrigger()),
+                    formatModule.getPatternsMap().get(AdventureTag.UNDERLINE),
                     "<underlined>$1</underlined>"
             );
         }
@@ -294,7 +341,7 @@ public class FormatPulseListener implements PulseListener {
         if (isCorrectTag(AdventureTag.OBFUSCATED, sender)) {
             message = replaceAll(sender, message,
                     permission.getTags().get(AdventureTag.OBFUSCATED),
-                    regex.replace("<trigger>", this.message.getTags().get(AdventureTag.OBFUSCATED).getTrigger()),
+                    formatModule.getPatternsMap().get(AdventureTag.OBFUSCATED),
                     "<obfuscated>$1</obfuscated>"
             );
         }
@@ -302,7 +349,7 @@ public class FormatPulseListener implements PulseListener {
         if (isCorrectTag(AdventureTag.STRIKETHROUGH, sender)) {
             message = replaceAll(sender, message,
                     permission.getTags().get(AdventureTag.STRIKETHROUGH),
-                    regex.replace("<trigger>", this.message.getTags().get(AdventureTag.STRIKETHROUGH).getTrigger()),
+                    formatModule.getPatternsMap().get(AdventureTag.STRIKETHROUGH),
                     "<strikethrough>$1</strikethrough>"
             );
         }
@@ -310,11 +357,11 @@ public class FormatPulseListener implements PulseListener {
         return message;
     }
 
-    private String replaceAll(FEntity sender, String message, Permission.PermissionEntry permission, String trigger, String format) {
+    private String replaceAll(FEntity sender, String message, Permission.PermissionEntry permission, Pattern trigger, String format) {
         if (formatModule.isModuleDisabledFor(sender)) return message;
         if (!permissionChecker.check(sender, permission)) return message;
 
-        return message.replaceAll(trigger, format);
+        return RegExUtils.replaceAll((CharSequence) message, trigger, format);
     }
 
     public boolean isCorrectTag(AdventureTag adventureTag, FEntity sender, boolean needPermission) {

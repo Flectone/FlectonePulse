@@ -13,6 +13,8 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.update.listener.UpdatePulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.io.IOException;
 import java.net.URI;
@@ -70,10 +72,11 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
 
         builder(fPlayer)
                 .destination(message.getDestination())
-                .format((fResolver, s) -> (fResolver.isUnknown() ? s.getFormatConsole() : s.getFormatPlayer())
-                        .replace("<current_version>", currentVersion)
-                        .replace("<latest_version>", latestVersion)
-                )
+                .format((fResolver, s) -> StringUtils.replaceEach(
+                        fResolver.isUnknown() ? s.getFormatConsole() : s.getFormatPlayer(),
+                        new String[]{"<current_version>", "<latest_version>"},
+                        new String[]{String.valueOf(currentVersion), String.valueOf(latestVersion)}
+                ))
                 .sound(getSound())
                 .sendBuilt();
     }
@@ -93,7 +96,7 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
             if (response.statusCode() != 200) return;
 
             LatestRelease latestRelease = gson.fromJson(response.body(), LatestRelease.class);
-            latestVersion = latestRelease.tagName.replace("v", "");
+            latestVersion = Strings.CS.replace(latestRelease.tagName, "v", "");
 
             // send to console
             send(FPlayer.UNKNOWN);

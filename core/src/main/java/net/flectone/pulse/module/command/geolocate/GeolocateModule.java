@@ -12,6 +12,8 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.io.BufferedReader;
@@ -79,7 +81,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
 
         String ip = platformPlayerAdapter.isOnline(fTarget) ? platformPlayerAdapter.getIp(fTarget) : fTarget.getIp();
 
-        List<String> request = ip == null ? List.of() : readResponse(apiUrl.replace("<ip>", ip));
+        List<String> request = ip == null ? List.of() : readResponse(Strings.CS.replace(apiUrl, "<ip>", ip));
         if (request.isEmpty() || request.get(0).equals("fail")) {
             builder(fPlayer)
                     .format(Localization.Command.Geolocate::getNullOrError)
@@ -90,16 +92,10 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
         builder(fTarget)
                 .destination(command.getDestination())
                 .receiver(fPlayer)
-                .format(s -> s.getFormat()
-                        .replace("<country>", request.get(1))
-                        .replace("<region_name>", request.get(2))
-                        .replace("<city>", request.get(3))
-                        .replace("<timezone>", request.get(4))
-                        .replace("<mobile>", request.get(5))
-                        .replace("<proxy>", request.get(6))
-                        .replace("<hosting>", request.get(7))
-                        .replace("<query>", request.get(8))
-                )
+                .format(s -> StringUtils.replaceEach(s.getFormat(),
+                        new String[]{"<country>", "<region_name>", "<city>", "<timezone>", "<mobile>", "<proxy>", "<hosting>", "<query>"},
+                        new String[]{request.get(1), request.get(2), request.get(3), request.get(4), request.get(5), request.get(6), request.get(7), request.get(8)}
+                ))
                 .sound(getSound())
                 .sendBuilt();
     }

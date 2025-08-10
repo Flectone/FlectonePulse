@@ -30,6 +30,7 @@ import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.apache.commons.lang3.Strings;
 
 import java.awt.*;
 import java.time.Instant;
@@ -86,8 +87,11 @@ public class DiscordIntegration implements FIntegration {
         if (messageChannelEmbed == null) return;
 
         String skin = skinService.getSkin(sender);
-        UnaryOperator<String> replaceString = s -> discordString.apply(s)
-                .replace("<skin>", skin);
+        UnaryOperator<String> replaceString = s -> Strings.CS.replace(
+                discordString.apply(s),
+                "<skin>",
+                skin
+        );
 
         EmbedCreateSpec embed = null;
 

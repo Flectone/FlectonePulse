@@ -3,7 +3,9 @@ package net.flectone.pulse.module.command.tictactoe.model;
 import lombok.Getter;
 import lombok.Setter;
 import net.flectone.pulse.model.entity.FPlayer;
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.*;
 
@@ -74,15 +76,17 @@ public class TicTacToe {
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                formatField = formatField.replaceFirst("\\[#]", switch (field[i][j]) {
-                    case FIRST_VALUE -> first;
-                    case FIRST_VALUE * REMOVE_MULTIPLIER -> firstRemove;
-                    case FIRST_VALUE + WIN_OFFSET -> firstWin;
-                    case SECOND_VALUE -> second;
-                    case SECOND_VALUE * REMOVE_MULTIPLIER -> secondRemove;
-                    case SECOND_VALUE + WIN_OFFSET -> secondWin;
-                    default -> empty.replace("<move>", i + "-" + j);
-                });
+                formatField = RegExUtils.replaceFirst(formatField, "\\[#]",
+                        switch (field[i][j]) {
+                            case FIRST_VALUE -> first;
+                            case FIRST_VALUE * REMOVE_MULTIPLIER -> firstRemove;
+                            case FIRST_VALUE + WIN_OFFSET -> firstWin;
+                            case SECOND_VALUE -> second;
+                            case SECOND_VALUE * REMOVE_MULTIPLIER -> secondRemove;
+                            case SECOND_VALUE + WIN_OFFSET -> secondWin;
+                            default -> Strings.CS.replace(empty, "<move>", i + "-" + j);
+                        }
+                );
             }
         }
 

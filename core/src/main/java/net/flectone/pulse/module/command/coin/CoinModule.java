@@ -11,6 +11,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.RandomUtil;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.function.Function;
@@ -60,14 +61,14 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
                 .tag(MessageType.COMMAND_COIN)
                 .format(replaceResult(percent))
                 .proxy(output -> output.writeInt(percent))
-                .integration(s -> s.replace("<result>", replaceResult(percent).apply(resolveLocalization())))
+                .integration(s -> Strings.CS.replace(s, "<result>", replaceResult(percent).apply(resolveLocalization())))
                 .sound(getSound())
                 .sendBuilt();
     }
 
     public Function<Localization.Command.Coin, String> replaceResult(int percent) {
         return message -> percent != 0
-                ? message.getFormat().replace("<result>", percent > 50 ? message.getHead() : message.getTail())
+                ? Strings.CS.replace(message.getFormat(), "<result>", percent > 50 ? message.getHead() : message.getTail())
                 : message.getFormatDraw();
     }
 }

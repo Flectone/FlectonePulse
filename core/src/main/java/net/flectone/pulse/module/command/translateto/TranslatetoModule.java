@@ -16,6 +16,7 @@ import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -113,16 +114,16 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
                     output.writeUTF(targetLang);
                     output.writeUTF(translatedMessage);
                 })
-                .integration(s -> s
-                        .replace("<message>", translatedMessage)
-                        .replace("<language>", targetLang)
-                )
+                .integration(s -> StringUtils.replaceEach(s,
+                        new String[]{"<message>", "<language>"},
+                        new String[]{translatedMessage, targetLang}
+                ))
                 .sound(getSound())
                 .sendBuilt();
     }
 
     public Function<Localization.Command.Translateto, String> replaceLanguage(String targetLang) {
-        return message -> message.getFormat().replace("<language>", targetLang);
+        return message -> Strings.CS.replace(message.getFormat(), "<language>", targetLang);
     }
 
     public String translate(FPlayer fPlayer, String source, String target, String text) {

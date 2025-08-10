@@ -17,6 +17,8 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.Optional;
@@ -233,27 +235,37 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                                                                                       int typeTile,
                                                                                       String move) {
         return (fResolver, message) -> {
+            String title = Strings.CS.replace(
+                    switch (typeTile) {
+                        case 1 -> message.getFormatWin();
+                        case -1 -> message.getFormatDraw();
+                        default -> message.getFormatMove();
+                    },
+                    "<player>",
+                    fPlayer.getName()
+            );
 
-            String symbolEmpty = message.getSymbol().getBlank();
-            String symbolFirst = message.getSymbol().getFirst();
-            String symbolFirstRemove = message.getSymbol().getFirstRemove();
-            String symbolFirstWin = message.getSymbol().getFirstWin();
-            String symbolSecond = message.getSymbol().getSecond();
-            String symbolSecondRemove = message.getSymbol().getSecondRemove();
-            String symbolSecondWin = message.getSymbol().getSecondWin();
+            Localization.Command.Tictactoe.Symbol messageSymbol = message.getSymbol();
 
-            String title = (switch (typeTile) {
-                case 1 -> message.getFormatWin().replace("<player>", fReceiver.getName());
-                case -1 -> message.getFormatDraw();
-                default -> message.getFormatMove().replace("<player>", fPlayer.getName());
-            });
+            String symbolFirst = messageSymbol.getFirst();
+            String symbolSecond = messageSymbol.getSecond();
+            String formatField = StringUtils.replaceEach(
+                    String.join("<br>", message.getField()),
+                    new String[]{"<title>", "<current_move>", "<last_move>", "<symbol>", "<move>"},
+                    new String[]{
+                            title,
+                            ticTacToe.isEnded() ? "" : message.getCurrentMove(),
+                            message.getLastMove(),
+                            ticTacToe.getFirstPlayer() == fPlayer.getId() ? symbolFirst : symbolSecond,
+                            move
+                    }
+            );
 
-            String formatField = String.join("<br>", message.getField())
-                    .replace("<title>", title)
-                    .replace("<current_move>", ticTacToe.isEnded() ? "" : message.getCurrentMove())
-                    .replace("<last_move>", message.getLastMove())
-                    .replace("<symbol>", ticTacToe.getFirstPlayer() == fPlayer.getId() ? symbolFirst : symbolSecond)
-                    .replace("<move>", move);
+            String symbolEmpty = messageSymbol.getBlank();
+            String symbolFirstRemove = messageSymbol.getFirstRemove();
+            String symbolFirstWin = messageSymbol.getFirstWin();
+            String symbolSecondRemove = messageSymbol.getSecondRemove();
+            String symbolSecondWin = messageSymbol.getSecondWin();
 
             return ticTacToe.build(
                     formatField,

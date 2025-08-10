@@ -19,6 +19,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
@@ -144,7 +145,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
                 .limit(perPage)
                 .toList();
 
-        String header = localizationType.getHeader().replace("<count>", String.valueOf(size));
+        String header = Strings.CS.replace(localizationType.getHeader(), "<count>", String.valueOf(size));
         Component component = messagePipeline.builder(fPlayer, header)
                 .build()
                 .append(Component.newline());
@@ -153,7 +154,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
 
             FPlayer fTarget = fPlayerService.getFPlayer(moderation.getPlayer());
 
-            String line = localizationType.getLine().replace("<command>", "/" + unwarnModule.getCommandName() + " <player> <id>");
+            String line = Strings.CS.replace(localizationType.getLine(), "<command>", "/" + unwarnModule.getCommandName() + " <player> <id>");
             line = moderationMessageFormatter.replacePlaceholders(line, fPlayer, moderation);
 
             component = component
@@ -161,12 +162,17 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
                     .append(Component.newline());
         }
 
-        String footer = localizationType.getFooter()
-                .replace("<command>", commandLine)
-                .replace("<prev_page>", String.valueOf(page-1))
-                .replace("<next_page>", String.valueOf(page+1))
-                .replace("<current_page>", String.valueOf(page))
-                .replace("<last_page>", String.valueOf(countPage));
+        String footer = StringUtils.replaceEach(
+                localizationType.getFooter(),
+                new String[]{"<command>", "<prev_page>", "<next_page>", "<current_page>", "<last_page>"},
+                new String[]{
+                        commandLine,
+                        String.valueOf(page - 1),
+                        String.valueOf(page + 1),
+                        String.valueOf(page),
+                        String.valueOf(countPage)
+                }
+        );
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 

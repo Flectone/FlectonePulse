@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import lombok.Getter;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.apache.commons.lang3.Strings;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -74,7 +75,7 @@ public class ColorConverter {
     }
 
     public int parseHexToArgb(String hex) {
-        hex = hex.trim().replace("#", "");
+        hex = Strings.CS.replace(hex.trim(), "#", "");
 
         if (hex.length() != 3 && hex.length() != 4 && hex.length() != 6 && hex.length() != 8) {
             fLogger.warning("Incorrect HEX string length");

@@ -19,6 +19,7 @@ import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import org.apache.commons.lang3.Strings;
 
 import java.util.UUID;
 
@@ -51,9 +52,11 @@ public class DeletePulseListener implements PulseListener {
         UUID messageUUID = messageContext.getMessageUUID();
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DELETE, (argumentQueue, context) -> {
-            String placeholder = deleteModule.resolveLocalization(receiver)
-                    .getPlaceholder()
-                    .replace("<uuid>", messageUUID.toString());
+            String placeholder = Strings.CS.replace(
+                    deleteModule.resolveLocalization(receiver).getPlaceholder(),
+                    "<uuid>",
+                    messageUUID.toString()
+            );
 
             Component componentPlaceholder = messagePipeline.builder(sender, receiver, placeholder)
                     .flag(MessageFlag.MENTION, false)

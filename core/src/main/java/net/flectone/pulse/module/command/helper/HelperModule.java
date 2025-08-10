@@ -14,6 +14,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
@@ -99,7 +100,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
                 .format(Localization.Command.Helper::getGlobal)
                 .message(message)
                 .proxy(output -> output.writeUTF(message))
-                .integration(s -> s.replace("<message>", message))
+                .integration(s -> Strings.CS.replace(s, "<message>", message))
                 .sound(getSound())
                 .sendBuilt();
     }

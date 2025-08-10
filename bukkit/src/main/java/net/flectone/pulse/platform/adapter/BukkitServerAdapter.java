@@ -24,6 +24,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.apache.commons.lang3.Strings;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
@@ -278,7 +279,11 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
             return Component.translatable(itemName);
         }
 
-        String itemName = itemStack.getType().name().toLowerCase().replace("_", " ");
+        String itemName = Strings.CS.replace(
+                itemStack.getType().name().toLowerCase(),
+                "_",
+                " "
+        );
 
         return Component.text(itemName);
     }

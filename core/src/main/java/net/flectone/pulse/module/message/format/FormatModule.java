@@ -26,13 +26,16 @@ import net.flectone.pulse.util.constant.AdventureTag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @Singleton
 public class FormatModule extends AbstractModuleLocalization<Localization.Message.Format> {
 
     @Getter private final Map<AdventureTag, TagResolver> tagResolverMap = new EnumMap<>(AdventureTag.class);
+    @Getter private final Map<AdventureTag, Pattern> patternsMap = new EnumMap<>(AdventureTag.class);
 
     private final Message.Format message;
     private final Permission.Message.Format permission;
@@ -94,11 +97,28 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
         addChildren(WorldModule.class);
 
         listenerRegistry.register(FormatPulseListener.class);
+
+        Arrays.asList(
+                AdventureTag.SPOILER,
+                AdventureTag.BOLD,
+                AdventureTag.ITALIC,
+                AdventureTag.UNDERLINE,
+                AdventureTag.OBFUSCATED,
+                AdventureTag.STRIKETHROUGH
+        ).forEach(tag -> {
+            String trigger = this.message.getTags().get(tag).getTrigger();
+            String regex = "(?<!\\\\)" + trigger + "(.*?)(?<!\\\\)" + trigger;
+            patternsMap.put(tag, Pattern.compile(regex));
+        });
+
+        patternsMap.put(AdventureTag.IMAGE, Pattern.compile(message.getTags().get(AdventureTag.IMAGE).getTrigger()));
+        patternsMap.put(AdventureTag.URL, Pattern.compile(message.getTags().get(AdventureTag.IMAGE).getTrigger()));
     }
 
     @Override
     public void onDisable() {
         tagResolverMap.clear();
+        patternsMap.clear();
     }
 
     @Override

@@ -11,6 +11,7 @@ import net.flectone.pulse.config.*;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.logging.FLogger;
+import org.apache.commons.lang3.Strings;
 
 import java.io.File;
 import java.io.IOException;
@@ -103,7 +104,7 @@ public class FileResolver {
                 File localization = path.toFile();
                 String localizationName = localization.getName();
                 if (localizationName.endsWith(".yml")) {
-                    newLanguages.add(localizationName.replace(".yml", ""));
+                    newLanguages.add(Strings.CS.replace(localizationName, ".yml", ""));
                 }
             });
         } catch (NoSuchFileException ignored) {

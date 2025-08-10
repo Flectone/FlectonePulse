@@ -20,6 +20,7 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.type.tuple.Pair;
 
@@ -148,7 +149,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         String action = command.getActions().get(countWarns);
         if (StringUtils.isEmpty(action)) return;
 
-        platformServerAdapter.dispatchCommand(action.replace("<target>", fTarget.getName()));
+        platformServerAdapter.dispatchCommand(Strings.CS.replace(action, "<target>", fTarget.getName()));
     }
 
     public BiFunction<FPlayer, Localization.Command.Warn, String> buildFormat(Moderation warn) {

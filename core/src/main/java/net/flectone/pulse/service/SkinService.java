@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import org.apache.commons.lang3.Strings;
 
 @Singleton
 public class SkinService {
@@ -24,11 +25,11 @@ public class SkinService {
     }
 
     public String getAvatarUrl(FEntity entity) {
-        return avatarApiUrl.replace("<skin>", getSkin(entity));
+        return Strings.CS.replace(avatarApiUrl, "<skin>", getSkin(entity));
     }
 
     public String getBodyUrl(FEntity entity) {
-        return bodyApiUrl.replace("<skin>", getSkin(entity));
+        return Strings.CS.replace(bodyApiUrl, "<skin>", getSkin(entity));
     }
 
 }

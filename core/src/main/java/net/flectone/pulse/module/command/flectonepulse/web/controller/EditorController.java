@@ -6,6 +6,7 @@ import net.flectone.pulse.config.FileSerializable;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import org.apache.commons.lang3.StringUtils;
 import spark.Request;
 import spark.Response;
 import spark.Service;
@@ -190,10 +191,10 @@ public class EditorController {
         }
 
         String template = loadTemplate("editor.html");
-
-        return template
-                .replace("{{mainFiles}}", mainFiles.toString())
-                .replace("{{localeFiles}}", localeFiles.toString());
+        return StringUtils.replaceEach(template,
+                new String[]{"{{mainFiles}}", "{{localeFiles}}"},
+                new String[]{mainFiles.toString(), localeFiles.toString()}
+        );
     }
 
     private String loadTemplate(String name) {

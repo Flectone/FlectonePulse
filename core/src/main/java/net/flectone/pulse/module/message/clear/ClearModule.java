@@ -14,6 +14,7 @@ import net.flectone.pulse.module.message.clear.listener.ClearPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import org.apache.commons.lang3.StringUtils;
 
 @Singleton
 public class ClearModule extends AbstractModuleLocalization<Localization.Message.Clear> {
@@ -65,13 +66,11 @@ public class ClearModule extends AbstractModuleLocalization<Localization.Message
         builder(fTarget)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
-                .format(s -> {
-                    String format = isSingle
-                            ? s.getSingle()
-                            : s.getMultiple().replace("<count>", clear.value());
-
-                    return format.replace("<number>", clear.count());
-                })
+                .format(s -> StringUtils.replaceEach(
+                        isSingle ? s.getSingle() : s.getMultiple(),
+                        new String[]{"<count>", "<number>"},
+                        new String[]{clear.value(), clear.count()}
+                ))
                 .sound(getSound())
                 .sendBuilt();
     }

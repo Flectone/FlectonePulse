@@ -12,6 +12,8 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.RandomUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
@@ -76,10 +78,15 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
                 .integration(s -> {
                     List<String> answers = resolveLocalization().getAnswers();
 
-                    return s.replace("<message>", message)
-                            .replace("<answer>", answers.size() >= answer
-                                    ? answers.get(answer)
-                                    : answers.get(answers.size() - 1));
+                    String answerString = !answers.isEmpty()
+                            ? answers.get(Math.min(answer, answers.size() - 1))
+                            : StringUtils.EMPTY;
+
+                    return StringUtils.replaceEach(
+                            s,
+                            new String[]{"<message>", "<answer>"},
+                            new String[]{StringUtils.defaultString(message), answerString}
+                    );
                 })
                 .sound(getSound())
                 .sendBuilt();
@@ -89,11 +96,11 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
         return message -> {
             List<String> answers = message.getAnswers();
 
-            String string = answers.size() >= answer
-                    ? answers.get(answer)
-                    : answers.get(answers.size() - 1);
+            String answerString = !answers.isEmpty()
+                    ? answers.get(Math.min(answer, answers.size() - 1))
+                    : StringUtils.EMPTY;
 
-            return message.getFormat().replace("<answer>", string);
+            return Strings.CS.replace(message.getFormat(), "<answer>", answerString);
         };
     }
 }

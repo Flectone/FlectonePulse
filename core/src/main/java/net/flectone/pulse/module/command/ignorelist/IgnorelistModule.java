@@ -16,6 +16,8 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
@@ -101,7 +103,8 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
                  .skip((long) (page - 1) * perPage)
                  .limit(perPage)
                  .toList();
-        String header = localization.getHeader().replace("<count>", String.valueOf(size));
+
+        String header = Strings.CS.replace(localization.getHeader(), "<count>", String.valueOf(size));
         Component component = messagePipeline.builder(fPlayer, header)
                 .build()
                 .append(Component.newline());
@@ -109,21 +112,22 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         for (Ignore ignore : finalIgnoreList) {
 
             FPlayer fTarget = fPlayerService.getFPlayer(ignore.target());
-            String line = localization.getLine()
-                    .replace("<command>", "/ignore " + fTarget.getName())
-                    .replace("<date>", timeFormatter.formatDate(ignore.date()));
+            String line = StringUtils.replaceEach(
+                    localization.getLine(),
+                    new String[]{"<command>", "<date>"},
+                    new String[]{"/ignore " + fTarget.getName(), timeFormatter.formatDate(ignore.date())}
+            );
 
             component = component
                     .append(messagePipeline.builder(fTarget, fPlayer, line).build())
                     .append(Component.newline());
         }
 
-        String footer = localization.getFooter()
-                .replace("<command>", commandLine)
-                .replace("<prev_page>", String.valueOf(page-1))
-                .replace("<next_page>", String.valueOf(page+1))
-                .replace("<current_page>", String.valueOf(page))
-                .replace("<last_page>", String.valueOf(countPage));
+        String footer = StringUtils.replaceEach(
+                localization.getFooter(),
+                new String[]{"<command>", "<prev_page>", "<next_page>", "<current_page>", "<last_page>"},
+                new String[]{commandLine, String.valueOf(page - 1), String.valueOf(page + 1), String.valueOf(page), String.valueOf(countPage)}
+        );
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 

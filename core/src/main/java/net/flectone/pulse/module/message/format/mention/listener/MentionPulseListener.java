@@ -19,6 +19,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -89,9 +90,10 @@ public class MentionPulseListener implements PulseListener {
                 }
             }
 
-            String format = mentionModule.resolveLocalization(receiver).getFormat()
-                    .replace("<player>", mention)
-                    .replace("<target>", mention);
+            String format = StringUtils.replaceEach(mentionModule.resolveLocalization(receiver).getFormat(),
+                    new String[]{"<player>", "<target>"},
+                    new String[]{mention, mention}
+            );
 
             return Tag.selfClosingInserting(messagePipeline.builder(receiver, format).build());
         });

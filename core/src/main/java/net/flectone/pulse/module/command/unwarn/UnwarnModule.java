@@ -15,6 +15,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.ArrayList;
@@ -122,9 +123,9 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
                 .destination(command.getDestination())
                 .range(command.getRange())
                 .filter(filter -> filter.isSetting(FPlayer.Setting.WARN))
-                .format(unwarn -> unwarn.getFormat().replace("<moderator>", fPlayer.getName()))
+                .format(unwarn -> Strings.CS.replace(unwarn.getFormat(), "<moderator>", fPlayer.getName()))
                 .proxy(output -> output.writeUTF(gson.toJson(fPlayer)))
-                .integration(s -> s.replace("<moderator>", fPlayer.getName()))
+                .integration(s -> Strings.CS.replace(s, "<moderator>", fPlayer.getName()))
                 .sound(getSound())
                 .sendBuilt();
     }
