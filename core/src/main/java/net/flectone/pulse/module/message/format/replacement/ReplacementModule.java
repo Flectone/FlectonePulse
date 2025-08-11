@@ -41,8 +41,9 @@ public class ReplacementModule extends AbstractModule {
 
         listenerRegistry.register(ReplacementPulseListener.class);
 
-        for (Message.Format.Replacement.ReplacementValue r : message.getValues()) {
-            replacements.put(r.getTrigger(), "<replacement:'" + r.getTrigger() + "'>");
+        for (Message.Format.Replacement.ReplacementValue replacement : message.getValues()) {
+            String trigger = replacement.getTrigger().toLowerCase();
+            replacements.put(trigger, "<replacement:'" + trigger + "'>");
         }
 
         String regex = "(?<!\\\\)(?<![^\\s\\p{Punct}])(?i)(" +
@@ -72,7 +73,11 @@ public class ReplacementModule extends AbstractModule {
 
         while (matcher.find()) {
             String trigger = matcher.group(1).toLowerCase();
-            matcher.appendReplacement(stringBuilder, replacements.get(trigger));
+
+            String replacement = replacements.get(trigger);
+            if (replacement == null) continue;
+
+            matcher.appendReplacement(stringBuilder, replacement);
         }
 
         matcher.appendTail(stringBuilder);
