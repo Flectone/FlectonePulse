@@ -51,7 +51,7 @@ public class WorldModule extends AbstractModule {
 
         Ticker ticker = message.getTicker();
         if (ticker.isEnable() || packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_9)) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::update), ticker.getPeriod());
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::update), ticker.getPeriod());
         }
 
         listenerRegistry.register(WorldPacketListener.class);

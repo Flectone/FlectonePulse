@@ -171,7 +171,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     }
 
     private void kickOnlinePlayers(FPlayer fSender) {
-        fPlayerService.getFPlayers()
+        fPlayerService.getOnlineFPlayers()
                 .stream()
                 .filter(filter -> !permissionChecker.check(filter, permission.getJoin()))
                 .forEach(fReceiver -> {

@@ -65,11 +65,9 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
     public void onEnable() {
         registerModulePermission(permission);
 
-        fPlayerService.getFPlayers().forEach(this::create);
-
         Ticker ticker = message.getTicker();
         if (ticker.isEnable()) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::update), ticker.getPeriod());
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::update), ticker.getPeriod());
         }
 
         listenerRegistry.register(SidebarPulseListener.class);
@@ -77,7 +75,7 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
 
     @Override
     public void onDisable() {
-        fPlayerService.getFPlayers().forEach(this::remove);
+        fPlayerService.getOnlineFPlayers().forEach(this::remove);
         // no clear playerSidebar map for next sidebars
     }
 

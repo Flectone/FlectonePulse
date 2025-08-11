@@ -56,7 +56,7 @@ public class SoundPlayer {
         com.github.retrooper.packetevents.protocol.sound.Sound packetSound = Sounds.getByName(sound.getName());
         if (packetSound == null) return;
 
-        fPlayerService.getFPlayers().stream()
+        fPlayerService.getOnlineFPlayers().stream()
                 .filter(fReceiver -> {
                     double distance = platformPlayerAdapter.distance(fPlayer, fReceiver);
                     return distance >= 0 && distance <= 16;

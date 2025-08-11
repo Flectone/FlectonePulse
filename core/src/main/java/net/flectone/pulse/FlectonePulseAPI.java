@@ -104,7 +104,7 @@ public class FlectonePulseAPI  {
         FPlayerService fPlayerService = injector.getInstance(FPlayerService.class);
 
         // update and clear all fplayers
-        fPlayerService.getFPlayers().forEach(fPlayer -> {
+        fPlayerService.getOnlineFPlayers().forEach(fPlayer -> {
             fPlayer.setOnline(false);
             fPlayerService.updateFPlayer(fPlayer);
         });

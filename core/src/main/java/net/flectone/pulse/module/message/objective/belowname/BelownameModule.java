@@ -53,13 +53,11 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
 
     @Override
     public void onEnable() {
-        fPlayerService.getFPlayers().forEach(this::create);
-
         registerModulePermission(permission);
 
         Ticker ticker = config.getTicker();
         if (ticker.isEnable()) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::update), ticker.getPeriod());
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::update), ticker.getPeriod());
         }
 
         listenerRegistry.register(BelownamePulseListener.class);
@@ -88,7 +86,7 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
     public void update(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        fPlayerService.getPlatformFPlayers().forEach(fObjective -> {
+        fPlayerService.getVisibleFPlayersFor(fPlayer).forEach(fObjective -> {
             int score = platformPlayerAdapter.getObjectiveScore(fObjective.getUuid(), config.getMode());
             objectiveModule.updateObjective(fPlayer, fObjective, score, ScoreboardPosition.BELOWNAME);
         });

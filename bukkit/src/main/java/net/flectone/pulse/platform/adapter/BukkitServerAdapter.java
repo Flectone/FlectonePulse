@@ -109,7 +109,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
     @Override
     public int getOnlinePlayerCount() {
-        return (int) fPlayerServiceProvider.get().getFPlayers().stream()
+        return (int) fPlayerServiceProvider.get().getOnlineFPlayers().stream()
                 .filter(fPlayer -> !fPlayer.isUnknown())
                 .filter(fPlayer -> !integrationModuleProvider.get().isVanished(fPlayer))
                 .count();

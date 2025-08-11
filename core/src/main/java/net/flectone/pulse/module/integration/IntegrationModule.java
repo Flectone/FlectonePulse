@@ -168,9 +168,11 @@ public abstract class IntegrationModule extends AbstractModule {
                 || injector.getInstance(TelegramModule.class).isEnable();
     }
 
-    public boolean canSeeVanished(FEntity sender, FEntity receiver) {
-        boolean isVanished = isVanished(sender);
-        return !isVanished || hasSeeVanishPermission(receiver);
+    public boolean canSeeVanished(FEntity fTarget, FEntity fViewer) {
+        if (fTarget.equals(fViewer)) return true;
+
+        boolean isVanished = isVanished(fTarget);
+        return !isVanished || hasSeeVanishPermission(fViewer);
     }
 
     public String deeplTranslate(FPlayer sender, String source, String target, String text) {

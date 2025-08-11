@@ -15,6 +15,7 @@ import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.tab.playerlist.listener.PlayerlistnamePulseListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
@@ -36,6 +37,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
     private final PacketProvider packetProvider;
     private final TaskScheduler taskScheduler;
     private final ListenerRegistry listenerRegistry;
+    private final IntegrationModule integrationModule;
 
     @Inject
     public PlayerlistnameModule(FPlayerService fPlayerService,
@@ -45,7 +47,8 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
                                 PacketSender packetSender,
                                 PacketProvider packetProvider,
                                 TaskScheduler taskScheduler,
-                                ListenerRegistry listenerRegistry) {
+                                ListenerRegistry listenerRegistry,
+                                IntegrationModule integrationModule) {
         super(module -> module.getMessage().getTab().getPlayerlistname());
 
         this.message = fileResolver.getMessage().getTab().getPlayerlistname();
@@ -57,6 +60,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
         this.packetProvider = packetProvider;
         this.taskScheduler = taskScheduler;
         this.listenerRegistry = listenerRegistry;
+        this.integrationModule = integrationModule;
     }
 
     @Override
@@ -67,7 +71,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
 
         Ticker ticker = message.getTicker();
         if (ticker.isEnable()) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::send), ticker.getPeriod());
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::send), ticker.getPeriod());
         }
 
         listenerRegistry.register(PlayerlistnamePulseListener.class);
@@ -83,8 +87,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
     public void send(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        fPlayerService.getFPlayers().stream()
-                .filter(FPlayer::isOnline)
+        fPlayerService.getFPlayersWhoCanSee(fPlayer)
                 .forEach(fReceiver -> updatePlayerlistname(fPlayer, fReceiver));
     }
 

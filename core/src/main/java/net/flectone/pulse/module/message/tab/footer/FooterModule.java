@@ -53,7 +53,7 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
 
         Ticker ticker = message.getTicker();
         if (ticker.isEnable()) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::send), ticker.getPeriod());
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::send), ticker.getPeriod());
         }
 
         listenerRegistry.register(FooterPulseListener.class);

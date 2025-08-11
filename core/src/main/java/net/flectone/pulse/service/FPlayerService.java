@@ -198,8 +198,22 @@ public class FPlayerService {
         return fPlayerRepository.getOnlinePlayersDatabase();
     }
 
-    public List<FPlayer> getFPlayers() {
+    public List<FPlayer> getOnlineFPlayers() {
         return fPlayerRepository.getOnlinePlayers();
+    }
+
+    public List<FPlayer> getVisibleFPlayersFor(FPlayer fViewer) {
+        return getOnlineFPlayers()
+                .stream()
+                .filter(target -> integrationModule.canSeeVanished(target, fViewer))
+                .toList();
+    }
+
+    public List<FPlayer> getFPlayersWhoCanSee(FPlayer target) {
+        return getOnlineFPlayers()
+                .stream()
+                .filter(viewer -> integrationModule.canSeeVanished(target, viewer))
+                .toList();
     }
 
     public List<FPlayer> getPlatformFPlayers() {

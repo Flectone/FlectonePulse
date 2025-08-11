@@ -45,13 +45,11 @@ public class TabnameModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        fPlayerService.getFPlayers().forEach(this::create);
-
         registerModulePermission(permission);
 
         Ticker ticker = config.getTicker();
         if (ticker.isEnable()) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getFPlayers().forEach(this::update), ticker.getPeriod());
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::update), ticker.getPeriod());
         }
 
         listenerRegistry.register(TabnamePulseListener.class);
@@ -77,7 +75,7 @@ public class TabnameModule extends AbstractModule {
     public void update(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        fPlayerService.getPlatformFPlayers().forEach(fObjective -> {
+        fPlayerService.getVisibleFPlayersFor(fPlayer).forEach(fObjective -> {
             int score = platformPlayerAdapter.getObjectiveScore(fObjective.getUuid(), config.getMode());
             objectiveModule.updateObjective(fPlayer, fObjective, score, ScoreboardPosition.TABLIST);
         });

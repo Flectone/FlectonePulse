@@ -36,7 +36,7 @@ public class PlayerPreLoginProcessor {
     public void processLogin(UUID uuid, String name, Consumer<PlayerPreLoginEvent> allowedConsumer, Consumer<PlayerPreLoginEvent> kickConsumer) {
         // if no one was on the server, the cache may be invalid for other servers
         // because FlectonePulse on Proxy cannot send a message for servers that have no player
-        if (fPlayerService.getFPlayers().isEmpty() && proxyRegistry.hasEnabledProxy()) {
+        if (fPlayerService.getOnlineFPlayers().isEmpty() && proxyRegistry.hasEnabledProxy()) {
             // clears the cache of players who might have left from other servers
             fPlayerService.clear();
         }
