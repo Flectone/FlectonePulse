@@ -27,8 +27,10 @@ import net.minecraft.server.PlayerManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -305,15 +307,27 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public @NotNull Set<UUID> getNearbyEntities(FPlayer fPlayer, double x, double y, double z) {
+    public @NotNull Set<UUID> findPlayersWhoCanSee(FPlayer fPlayer, double x, double y, double z) {
         ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
         if (player == null) return Collections.emptySet();
 
         Vec3d position = new Vec3d(player.getX(), player.getY(), player.getZ());
-
         Box searchBox = new Box(position.subtract(x, y, z), position.add(x, y, z));
-        return player.getWorld().getOtherEntities(null, searchBox)
+        return player.getWorld().getEntitiesByClass(ServerPlayerEntity.class, searchBox, entity -> true)
                 .stream()
+                .filter(target -> {
+                    HitResult hitResult = target.getWorld().raycast(
+                            new RaycastContext(
+                                    target.getCameraPosVec(1.0F),
+                                    player.getCameraPosVec(1.0F),
+                                    RaycastContext.ShapeType.VISUAL,
+                                    RaycastContext.FluidHandling.SOURCE_ONLY,
+                                    target
+                            )
+                    );
+
+                    return hitResult.getType() == HitResult.Type.MISS;
+                })
                 .map(Entity::getUuid)
                 .collect(Collectors.toSet());
     }

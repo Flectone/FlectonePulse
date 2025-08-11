@@ -300,24 +300,20 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public @NotNull Set<UUID> getNearbyEntities(FPlayer fPlayer, double x, double y, double z) {
+    public @NotNull Set<UUID> findPlayersWhoCanSee(FPlayer fPlayer, double x, double y, double z) {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         if (player == null) return Collections.emptySet();
 
         World world = player.getWorld();
         Location location = player.getLocation();
 
-        Set<UUID> entities = world.getNearbyEntities(location, x, y, z)
+        return world.getNearbyEntities(location, x, y, z)
                 .stream()
-                .filter(player::canSee)
+                .filter(Player.class::isInstance)
+                .map(Player.class::cast)
+                .filter(target -> target.canSee(player))
                 .map(Entity::getUniqueId)
                 .collect(Collectors.toSet());
-
-        world.getPlayers().stream()
-                .filter(receiver -> receiver.canSee(player))
-                .forEach(receiver -> entities.add(receiver.getUniqueId()));
-
-        return entities;
     }
 
     @Override
