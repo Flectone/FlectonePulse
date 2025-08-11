@@ -92,7 +92,7 @@ public class FColorPulseListener implements PulseListener {
     }
 
     private void updateColorsMap(Map<Integer, String> colorsMap, FPlayer fPlayer, FColor.Type type) {
-        if (permissionChecker.check(fPlayer, permission.getTypes().get(type))) {
+        if (permissionChecker.check(fPlayer, permission.getColors().get(type))) {
             fPlayer.getFColors()
                     .getOrDefault(type, Collections.emptySet())
                     .forEach(fColor -> colorsMap.put(fColor.number(), fColor.name()));

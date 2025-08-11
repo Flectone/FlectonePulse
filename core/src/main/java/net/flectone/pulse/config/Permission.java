@@ -194,6 +194,12 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private PermissionEntry other = new PermissionEntry("flectonepulse.module.command.chatcolor.other", Type.OP);
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.chatcolor.cooldown.bypass", Type.OP);
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.chatcolor.sound", Type.TRUE);
+            private Map<net.flectone.pulse.model.FColor.Type, PermissionEntry> colors = new LinkedHashMap<>(){
+                {
+                    put(net.flectone.pulse.model.FColor.Type.OUT, new PermissionEntry("flectonepulse.module.command.chatcolor.out", Type.OP));
+                    put(net.flectone.pulse.model.FColor.Type.SEE, new PermissionEntry("flectonepulse.module.command.chatcolor.see", Type.TRUE));
+                }
+            };
         }
 
         @Getter
@@ -987,9 +993,9 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             public static final class FColor implements SubFormatMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.format.fcolor";
                 private Type type = Type.TRUE;
-                private Map<net.flectone.pulse.model.FColor.Type, PermissionEntry> types = new LinkedHashMap<>(){
+                private Map<net.flectone.pulse.model.FColor.Type, PermissionEntry> colors = new LinkedHashMap<>(){
                     {
-                        put(net.flectone.pulse.model.FColor.Type.OUT, new PermissionEntry("flectonepulse.module.message.format.fcolor.out", Type.OP));
+                        put(net.flectone.pulse.model.FColor.Type.OUT, new PermissionEntry("flectonepulse.module.message.format.fcolor.out", Type.TRUE));
                         put(net.flectone.pulse.model.FColor.Type.SEE, new PermissionEntry("flectonepulse.module.message.format.fcolor.see", Type.TRUE));
                     }
                 };

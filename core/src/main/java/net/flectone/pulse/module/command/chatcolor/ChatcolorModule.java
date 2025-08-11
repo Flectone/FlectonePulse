@@ -27,7 +27,6 @@ import java.util.*;
 public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.Chatcolor> {
 
     private final Message.Format.FColor fColorMessage;
-    private final Permission.Message.Format.FColor fColorPermission;
     private final Command.Chatcolor command;
     private final Permission.Command.Chatcolor permission;
     private final FPlayerService fPlayerService;
@@ -46,7 +45,6 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         super(localization -> localization.getCommand().getChatcolor(), Command::getChatcolor);
 
         this.fColorMessage = fileResolver.getMessage().getFormat().getFcolor();
-        this.fColorPermission = fileResolver.getPermission().getMessage().getFormat().getFcolor();
         this.command = fileResolver.getCommand().getChatcolor();
         this.permission = fileResolver.getPermission().getCommand().getChatcolor();
         this.fPlayerService = fPlayerService;
@@ -64,6 +62,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         createSound(command.getSound(), permission.getSound());
 
         registerPermission(permission.getOther());
+        permission.getColors().values().forEach(this::registerPermission);
 
         String promptType = addPrompt(0, Localization.Command.Prompt::getType);
         String promptColor = addPrompt(1, Localization.Command.Prompt::getColor);
@@ -85,7 +84,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
         return (context, input) -> Arrays.stream(FColor.Type.values())
-                .filter(type -> permissionChecker.check(context.sender(), fColorPermission.getTypes().get(type)))
+                .filter(type -> permissionChecker.check(context.sender(), permission.getColors().get(type)))
                 .map(setting -> Suggestion.suggestion(setting.name().toLowerCase()))
                 .toList();
     }
@@ -101,7 +100,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
             default -> Optional.empty();
         };
 
-        if (fColorType.isEmpty() || !permissionChecker.check(fPlayer, fColorPermission.getTypes().get(fColorType.get()))) {
+        if (fColorType.isEmpty() || !permissionChecker.check(fPlayer, permission.getColors().get(fColorType.get()))) {
             builder(fPlayer)
                     .format(Localization.Command.Chatcolor::getNullType)
                     .sendBuilt();

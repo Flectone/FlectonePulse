@@ -30,7 +30,7 @@ public class FColorModule extends AbstractModule {
         registerModulePermission(permission);
 
         // register fColor types
-        permission.getTypes().forEach((key, value) -> registerPermission(value));
+        permission.getColors().forEach((key, value) -> registerPermission(value));
 
         listenerRegistry.register(FColorPulseListener.class);
     }
