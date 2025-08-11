@@ -3,18 +3,19 @@ package net.flectone.pulse.module.message.format.scoreboard;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.format.scoreboard.listener.ScoreboardPulseListener;
 import net.flectone.pulse.module.message.format.scoreboard.model.Team;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -60,8 +61,6 @@ public class ScoreboardModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        fPlayerService.getPlatformFPlayers().forEach(this::create);
-
         registerModulePermission(permission);
 
         Ticker ticker = message.getTicker();
@@ -88,18 +87,23 @@ public class ScoreboardModule extends AbstractModule {
         uuidTeamMap.clear();
     }
 
-    public void create(FPlayer fPlayer) {
+    @Async
+    public void create(FPlayer fPlayer, boolean reload) {
         if (isModuleDisabledFor(fPlayer)) return;
+
+        if (!reload) {
+            uuidTeamMap.values().forEach(cacheTeam ->
+                    packetSender.send(fPlayer, new WrapperPlayServerTeams(cacheTeam.name(), WrapperPlayServerTeams.TeamMode.CREATE, cacheTeam.info(), List.of(cacheTeam.owner())))
+            );
+        }
 
         Team team = createTeam(fPlayer);
         sendPacket(team, WrapperPlayServerTeams.TeamMode.CREATE);
-        uuidTeamMap.put(fPlayer.getUuid(), team);
 
-        uuidTeamMap.forEach((uuid, cacheTeam) ->
-                packetSender.send(fPlayer, new WrapperPlayServerTeams(cacheTeam.name(), WrapperPlayServerTeams.TeamMode.CREATE, cacheTeam.info(), List.of(cacheTeam.owner())))
-        );
+        uuidTeamMap.put(fPlayer.getUuid(), team);
     }
 
+    @Async
     public void remove(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 

@@ -196,7 +196,7 @@ public class FlectonePulseAPI  {
         // process player load event for all platform fplayers
         EventDispatcher eventDispatcher = injector.getInstance(EventDispatcher.class);
         fPlayerService.getPlatformFPlayers().forEach(fPlayer ->
-                eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer))
+                eventDispatcher.dispatch(new PlayerLoadEvent(fPlayer, true))
         );
 
         // reload metrics service if enabled

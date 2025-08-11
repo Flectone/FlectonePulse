@@ -22,7 +22,7 @@ public class ScoreboardPulseListener implements PulseListener {
     @Pulse
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
         FPlayer fPlayer = event.getPlayer();
-        scoreboardModule.create(fPlayer);
+        scoreboardModule.create(fPlayer, event.isReload());
     }
 
     @Pulse
