@@ -19,6 +19,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 
 import java.util.List;
 import java.util.Map;
@@ -132,7 +133,7 @@ public class ScoreboardModule extends AbstractModule {
                 ? WrapperPlayServerTeams.NameTagVisibility.ALWAYS
                 : WrapperPlayServerTeams.NameTagVisibility.HIDE_FOR_OTHER_TEAMS;
         WrapperPlayServerTeams.CollisionRule collisionRule = WrapperPlayServerTeams.CollisionRule.ALWAYS;
-        NamedTextColor color = (NamedTextColor) messagePipeline.builder(fPlayer, message.getColor()).build().color();
+        TextColor color = messagePipeline.builder(fPlayer, message.getColor()).build().color();
         WrapperPlayServerTeams.OptionData optionData = WrapperPlayServerTeams.OptionData.NONE;
 
         WrapperPlayServerTeams.ScoreBoardTeamInfo info = new WrapperPlayServerTeams.ScoreBoardTeamInfo(
@@ -141,7 +142,7 @@ public class ScoreboardModule extends AbstractModule {
                 suffix,
                 nameTagVisibility,
                 collisionRule,
-                color,
+                color == null ? NamedTextColor.WHITE : NamedTextColor.nearestTo(color),
                 optionData
         );
 
