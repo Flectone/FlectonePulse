@@ -149,8 +149,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         }
 
         String trigger = playerChat.getTrigger();
-
-        if (trigger != null && !trigger.isEmpty() && eventMessage.startsWith(trigger)) {
+        if (!StringUtils.isEmpty(trigger) && eventMessage.startsWith(trigger)) {
             eventMessage = eventMessage.substring(trigger.length()).trim();
         }
 

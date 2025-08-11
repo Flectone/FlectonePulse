@@ -17,6 +17,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton
@@ -107,7 +108,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         builder(fReceiver)
                 .destination(command.getDestination())
                 .receiver(fPlayer)
-                .format(s -> s.getSender().replaceFirst("<id>", String.valueOf(mail.id())))
+                .format(s -> Strings.CS.replaceOnce(s.getSender(), "<id>", String.valueOf(mail.id())))
                 .message(message)
                 .sendBuilt();
     }

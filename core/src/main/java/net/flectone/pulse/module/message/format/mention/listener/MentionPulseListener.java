@@ -20,6 +20,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -107,7 +108,7 @@ public class MentionPulseListener implements PulseListener {
 
             if (!word.startsWith(this.message.getTrigger())) continue;
 
-            String wordWithoutPrefix = word.replaceFirst(this.message.getTrigger(), "");
+            String wordWithoutPrefix = Strings.CS.replaceOnce(word, this.message.getTrigger(), "");
 
             boolean isMention = !fPlayerService.getFPlayer(wordWithoutPrefix).isUnknown()
                     || integrationModule.getGroups().contains(wordWithoutPrefix)

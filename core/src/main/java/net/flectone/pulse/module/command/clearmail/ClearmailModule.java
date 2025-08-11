@@ -11,6 +11,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.SuggestionProvider;
 
@@ -84,7 +85,7 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
         builder(fReceiver)
                 .destination(command.getDestination())
                 .receiver(fPlayer)
-                .format(s -> s.getFormat().replaceFirst("<id>", String.valueOf(mailID)))
+                .format(s -> Strings.CS.replaceOnce(s.getFormat(), "<id>", String.valueOf(mailID)))
                 .message(optionalMail.get().message())
                 .sound(getSound())
                 .sendBuilt();

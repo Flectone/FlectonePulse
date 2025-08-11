@@ -1,7 +1,20 @@
 package net.flectone.pulse.module.command.chatsetting;
 
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.dialog.CommonDialogData;
+import com.github.retrooper.packetevents.protocol.dialog.DialogAction;
+import com.github.retrooper.packetevents.protocol.dialog.MultiActionDialog;
+import com.github.retrooper.packetevents.protocol.dialog.action.DynamicCustomAction;
+import com.github.retrooper.packetevents.protocol.dialog.body.DialogBody;
+import com.github.retrooper.packetevents.protocol.dialog.body.PlainMessage;
+import com.github.retrooper.packetevents.protocol.dialog.body.PlainMessageDialogBody;
+import com.github.retrooper.packetevents.protocol.dialog.button.ActionButton;
+import com.github.retrooper.packetevents.protocol.dialog.button.CommonButtonData;
+import com.github.retrooper.packetevents.protocol.dialog.input.Input;
+import com.github.retrooper.packetevents.protocol.dialog.input.InputControl;
+import com.github.retrooper.packetevents.protocol.dialog.input.SingleOptionInputControl;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
+import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
@@ -11,23 +24,30 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.FColor;
+import net.flectone.pulse.model.dialog.Dialog;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.inventory.Inventory;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.DialogController;
 import net.flectone.pulse.platform.controller.InventoryController;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
+import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
+import org.incendo.cloud.type.tuple.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,8 +62,10 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
     private final PermissionChecker permissionChecker;
+    private final DialogController dialogController;
     private final InventoryController inventoryController;
     private final PlatformServerAdapter platformServerAdapter;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
     private final ProxyRegistry proxyRegistry;
@@ -54,8 +76,10 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                              FPlayerService fPlayerService,
                              MessagePipeline messagePipeline,
                              PermissionChecker permissionChecker,
+                             DialogController dialogController,
                              InventoryController inventoryController,
                              PlatformServerAdapter platformServerAdapter,
+                             PlatformPlayerAdapter platformPlayerAdapter,
                              CommandParserProvider commandParserProvider,
                              ProxySender proxySender,
                              ProxyRegistry proxyRegistry,
@@ -69,8 +93,10 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         this.fPlayerService = fPlayerService;
         this.messagePipeline = messagePipeline;
         this.permissionChecker = permissionChecker;
+        this.dialogController = dialogController;
         this.inventoryController = inventoryController;
         this.platformServerAdapter = platformServerAdapter;
+        this.platformPlayerAdapter = platformPlayerAdapter;
         this.commandParserProvider = commandParserProvider;
         this.proxySender = proxySender;
         this.proxyRegistry = proxyRegistry;
@@ -110,19 +136,39 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         };
     }
 
+    @Inject
+    private PacketSender packetSender;
+
+    @Inject
+    private PacketProvider packetProvider;
+
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        // example /chatsetting TheFaser
-        if (permissionChecker.check(fPlayer, permission.getOther())) {
-            String promptPlayer = getPrompt(0);
-            Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
-            if (optionalPlayer.isPresent()) {
-                executeOther(fPlayer, optionalPlayer.get(), commandContext);
-                return;
-            }
-        }
+//        // example /chatsetting TheFaser
+//        if (permissionChecker.check(fPlayer, permission.getOther())) {
+//            String promptPlayer = getPrompt(0);
+//            Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
+//            if (optionalPlayer.isPresent()) {
+//                executeOther(fPlayer, optionalPlayer.get(), commandContext);
+//                return;
+//            }
+//        }
+
+//        PocketEventsDialogManager pocketEventsDialogManager = new PocketEventsDialogManager("flectonepulse") {
+//            @Override
+//            protected @Nullable Object getPlayer(UUID uuid) {
+//                return packetProvider.getUser(uuid);
+//            }
+//
+//            @Override
+//            protected UUID getPlayerId(Object o) {
+//                return packetProvider.getPlayerManager().getUser(o).getUUID();
+//            }
+//        };
+
+//        sendSettingDialog(fPlayer, fPlayer);
 
         // default command usage
         sendSettingInventory(fPlayer);
@@ -170,6 +216,75 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         }
     }
 
+    private void sendSettingDialog(FPlayer fPlayer, FPlayer fTarget) {
+        Dialog dialog = new Dialog.Builder()
+                .build(() -> {
+                    Localization.Command.Chatsetting localization = resolveLocalization(fTarget);
+                    Component header = messagePipeline.builder(fTarget, localization.getInventory().trim()).build();
+
+                    DialogBody dialogBody = new PlainMessageDialogBody(new PlainMessage(Component.empty(), 10));
+
+                    InputControl input = new SingleOptionInputControl(100, List.of(
+                            new SingleOptionInputControl.Entry("test", Component.text("test"), true),
+                            new SingleOptionInputControl.Entry("test1", Component.text("test1"), false)),
+                            Component.text("label"), true);
+
+                    InputControl input1 = new SingleOptionInputControl(100, List.of(
+                            new SingleOptionInputControl.Entry("test2", Component.text("test2"), true),
+                            new SingleOptionInputControl.Entry("test3", Component.text("test3"), false)),
+                            Component.text("label"), true);
+
+                    List<ActionButton> buttons = Arrays.stream(FPlayer.Setting.values())
+                            .filter(setting -> setting != FPlayer.Setting.CHAT)
+                            .map(setting -> createInputCheckbox(fPlayer, fTarget, setting))
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
+                            .sorted(Comparator.comparing(Pair::first))
+                            .map(Pair::second)
+                            .toList();
+
+                    CommonDialogData commonDialogData = new CommonDialogData(
+                            header,
+                            null,
+                            true,
+                            false,
+                            DialogAction.CLOSE,
+                            List.of(dialogBody),
+                            List.of(new Input("INPUT1", input), new Input("INPUT2", input1))
+                    );
+
+
+
+                    return new MultiActionDialog(commonDialogData, buttons, null, 5);
+                });
+
+        dialogController.open(fPlayer, dialog);
+    }
+
+    private Optional<Pair<Integer, ActionButton>> createInputCheckbox(FPlayer fPlayer, FPlayer fTarget, FPlayer.Setting setting) {
+        Command.Chatsetting.Checkbox checkbox = command.getCheckbox();
+        if (!checkbox.getTypes().containsKey(setting)) return Optional.empty();
+
+        int slot = checkbox.getTypes().get(setting);
+        if (slot == -1) return Optional.empty();
+
+        boolean enabled = fTarget.isSetting(setting);
+
+        Localization.Command.Chatsetting localization = resolveLocalization(fTarget);
+        String title = localization.getCheckbox().getTypes().getOrDefault(setting, "");
+        Component componentTile = messagePipeline.builder(fPlayer, fTarget, title).build();
+
+        String lore = enabled ? localization.getCheckbox().getFormatEnable() : localization.getCheckbox().getFormatDisable();
+        Component componentLore = messagePipeline.builder(fPlayer, fTarget, lore).build();
+
+        ActionButton button = new ActionButton(
+                new CommonButtonData(componentTile, componentLore, 100),
+                new DynamicCustomAction(ResourceLocation.minecraft("fp_" + setting.ordinal()), null)
+        );
+
+        return Optional.of(Pair.of(slot, button));
+    }
+
     private void sendSettingInventory(FPlayer fPlayer) {
         sendSettingInventory(fPlayer, fPlayer);
     }
@@ -203,7 +318,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         if (slot == -1) return inventoryBuilder;
 
         String currentChat = fTarget.getSettingValue(FPlayer.Setting.CHAT);
-        if (currentChat == null) {
+        if (StringUtils.isEmpty(currentChat)) {
             currentChat = "default";
         }
 
@@ -211,9 +326,10 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
 
         Localization.Command.Chatsetting localization = resolveLocalization(fTarget);
 
-        String[] messages = localization.getMenu().getChat().getItem()
-                .replace("<chat>", currentChat)
-                .split("<br>");
+        String[] messages = Strings.CS.replace(
+                localization.getMenu().getChat().getItem(),
+                "<chat>", currentChat
+        ).split("<br>");
 
         String title = messages.length > 0 ? messages[0] : "";
         String[] lore = messages.length > 1 ? Arrays.copyOfRange(messages, 1, messages.length) : new String[]{};
@@ -241,9 +357,10 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                         String chatName = chatType.getName();
                         String chatMaterial = chatType.getMaterial();
 
-                        String[] chatMessages = localization.getMenu().getChat().getTypes().getOrDefault(chatName, "")
-                                .replace("<chat>", chatName)
-                                .split("<br>");
+                        String[] chatMessages = Strings.CS.replace(
+                                localization.getMenu().getChat().getTypes().getOrDefault(chatName, ""),
+                                "<chat>", chatName
+                        ).split("<br>");
 
                         String chatTitle = chatMessages.length > 0 ? chatMessages[0] : "";
                         String[] chatLore = chatMessages.length > 1 ? Arrays.copyOfRange(chatMessages, 1, chatMessages.length) : new String[]{};
@@ -321,7 +438,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                             String trigger = "<fcolor:" + entry.getKey() + ">";
                             String value = entry.getValue().isBlank() ? trigger : entry.getValue();
 
-                            colorMessage = colorMessage.replace(trigger, value);
+                            colorMessage = Strings.CS.replace(colorMessage, trigger, value);
                         }
 
                         String[] colorMessages = colorMessage.split("<br>");

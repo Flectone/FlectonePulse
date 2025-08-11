@@ -13,6 +13,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.logging.FLogger;
+import org.apache.commons.lang3.Strings;
 
 import java.io.IOException;
 import java.util.List;
@@ -68,7 +69,7 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
                         String greetingMessage = String.join("<br>", resolveLocalization(fPlayer).getFormat());
 
                         for (String pixel : pixels) {
-                            greetingMessage = greetingMessage.replaceFirst("\\[#]\\[#]\\[#]\\[#]\\[#]\\[#]\\[#]\\[#]", pixel);
+                            greetingMessage = Strings.CS.replaceOnce(greetingMessage, "\\[#]\\[#]\\[#]\\[#]\\[#]\\[#]\\[#]\\[#]", pixel);
                         }
 
                         return greetingMessage;
