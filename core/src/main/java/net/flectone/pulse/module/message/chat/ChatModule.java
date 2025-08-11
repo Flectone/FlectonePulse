@@ -26,6 +26,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -113,7 +114,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
             return;
         }
 
-        Message.Chat.Type playerChat = message.getTypes().getOrDefault(fPlayer.getSettingValue(FPlayer.Setting.CHAT), getPlayerChat(fPlayer, eventMessage));
+        Message.Chat.Type playerChat = getPlayerChat(fPlayer, eventMessage);
 
         var configChatEntry = message.getTypes().entrySet()
                 .stream()
@@ -251,21 +252,25 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                 .sendBuilt();
     }
 
-    private Message.Chat.Type getPlayerChat(FPlayer fPlayer, String message) {
-        Message.Chat.Type playerChat = null;
+    private Message.Chat.Type getPlayerChat(FPlayer fPlayer, String eventMessage) {
+        Message.Chat.Type playerChat = message.getTypes().get(fPlayer.getSettingValue(FPlayer.Setting.CHAT));
+
+        // if that chat *does* have a trigger, return it
+        if (playerChat != null && !StringUtils.isEmpty(playerChat.getTrigger())) {
+            return playerChat;
+        }
 
         int priority = Integer.MIN_VALUE;
 
         for (var entry : this.message.getTypes().entrySet()) {
-
             Message.Chat.Type chat = entry.getValue();
             String chatName = entry.getKey();
 
             if (!chat.isEnable()) continue;
             if (chat.getTrigger() != null
                     && !chat.getTrigger().isEmpty()
-                    && !message.startsWith(chat.getTrigger())) continue;
-            if (message.equals(chat.getTrigger())) continue;
+                    && !eventMessage.startsWith(chat.getTrigger())) continue;
+            if (eventMessage.equals(chat.getTrigger())) continue;
 
             if (chat.getPriority() <= priority) continue;
             if (!permissionChecker.check(fPlayer, permission.getTypes().get(chatName))) continue;
