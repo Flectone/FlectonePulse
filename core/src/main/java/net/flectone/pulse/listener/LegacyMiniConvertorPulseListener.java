@@ -104,8 +104,8 @@ public final class LegacyMiniConvertorPulseListener implements PulseListener {
     public @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
         text = StringUtils.replaceEach(
                 text,
-                new String[]{"&&", "&"},
-                new String[]{"§", "&"}
+                new String[]{"&&", "§"},
+                new String[]{"&", "&"}
         );
 
         if (options.contains(Option.COLOR_DOUBLE_HASH)) {
