@@ -236,6 +236,8 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public double distance(@NotNull FPlayer first, @NotNull FPlayer second) {
+        if (first.equals(second)) return 0.0;
+
         Player firstPlayer = Bukkit.getPlayer(first.getUuid());
         if (firstPlayer == null) return -1.0;
 
