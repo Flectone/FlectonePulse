@@ -67,7 +67,7 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
 
         FPlayer fTarget = optionalTarget.isPresent() ? fPlayerService.getFPlayer(optionalTarget.get()) : fPlayer;
         if (!platformPlayerAdapter.isOnline(fTarget)
-                || (!integrationModule.isVanishedVisible(fTarget, fPlayer) && !fPlayer.equals(fTarget))) {
+                || (!integrationModule.canSeeVanished(fTarget, fPlayer) && !fPlayer.equals(fTarget))) {
             builder(fPlayer)
                     .format(Localization.Command.Ping::getNullPlayer)
                     .sendBuilt();

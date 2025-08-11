@@ -57,7 +57,7 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
                 .destination(message.getDestination())
                 .range(message.getRange())
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.QUIT))
-                .filter(fReceiver -> ignoreVanish || integrationModule.isVanishedVisible(fPlayer, fReceiver))
+                .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
                 .format(Localization.Message.Quit::getFormat)
                 .integration()
                 .proxy()

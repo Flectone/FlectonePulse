@@ -83,7 +83,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
             return;
         }
 
-        if (fReceiver.isOnline() && integrationModule.isVanishedVisible(fReceiver, fPlayer)) {
+        if (fReceiver.isOnline() && integrationModule.canSeeVanished(fReceiver, fPlayer)) {
             if (!tellModule.isEnable()) {
                 builder(fPlayer)
                         .format(Localization.Command.Mail::getOnlinePlayer)

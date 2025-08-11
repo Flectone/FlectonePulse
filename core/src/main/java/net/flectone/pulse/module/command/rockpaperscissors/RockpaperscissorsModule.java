@@ -86,7 +86,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         String player = getArgument(commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(player);
-        if (!fReceiver.isOnline() || !integrationModule.isVanishedVisible(fReceiver, fPlayer)) {
+        if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
             builder(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::getNullPlayer)
                     .sendBuilt();

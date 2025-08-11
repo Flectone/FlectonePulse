@@ -482,7 +482,7 @@ public class ProxyMessageHandler {
         if (fReceiver.isUnknown()) return;
 
         IntegrationModule integrationModule = injector.getInstance(IntegrationModule.class);
-        if (!integrationModule.isVanishedVisible(fReceiver, fEntity)) return;
+        if (!integrationModule.canSeeVanished(fReceiver, fEntity)) return;
 
         tellModule.send(fEntity, fReceiver, (fResolver, s) -> s.getReceiver(), message);
     }

@@ -110,7 +110,7 @@ public class MentionPulseListener implements PulseListener {
             String wordWithoutPrefix = Strings.CS.replaceOnce(word, this.message.getTrigger(), "");
 
             FPlayer mentionFPlayer = fPlayerService.getFPlayer(wordWithoutPrefix);
-            boolean isMention = !mentionFPlayer.isUnknown() && integrationModule.isVanishedVisible(mentionFPlayer, sender)
+            boolean isMention = !mentionFPlayer.isUnknown() && integrationModule.canSeeVanished(mentionFPlayer, sender)
                     || integrationModule.getGroups().contains(wordWithoutPrefix) && permissionChecker.check(sender, permission.getGroup());
             if (isMention) {
                 words[i] = "<mention:" + wordWithoutPrefix + ">";

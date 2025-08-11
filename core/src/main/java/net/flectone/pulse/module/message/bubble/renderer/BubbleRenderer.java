@@ -98,7 +98,7 @@ public class BubbleRenderer {
                 .map(fPlayerService::getFPlayer)
                 .filter(fViewer -> !fViewer.isUnknown())
                 .filter(fViewer -> !fViewer.isIgnored(sender))
-                .filter(fViewer -> integrationModule.isVanishedVisible(sender, fViewer))
+                .filter(fViewer -> integrationModule.canSeeVanished(sender, fViewer))
                 .forEach(fViewer -> {
                     Component formattedMessage = createFormattedMessage(bubble, fViewer);
 
@@ -145,7 +145,7 @@ public class BubbleRenderer {
         if (bubbleEntities == null) return;
         if (bubbleEntities.isEmpty()) return;
         if (!isCorrectPlayer(sender)) return;
-        if (!integrationModule.isVanishedVisible(sender, viewer)) return;
+        if (!integrationModule.canSeeVanished(sender, viewer)) return;
 
         boolean hasSeenVisible = false;
         boolean hasSpawnedSpace = false;

@@ -115,7 +115,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
                             System.currentTimeMillis() - platformPlayerAdapter.getFirstPlayed(targetFPlayer),
                             s.getFormatFirst()
                     );
-                    case "last" -> platformPlayerAdapter.isOnline(targetFPlayer) && integrationModule.isVanishedVisible(targetFPlayer, fPlayer)
+                    case "last" -> platformPlayerAdapter.isOnline(targetFPlayer) && integrationModule.canSeeVanished(targetFPlayer, fPlayer)
                             ? s.getFormatCurrent()
                             : timeFormatter.format(fPlayer, System.currentTimeMillis() - platformPlayerAdapter.getLastPlayed(targetFPlayer), s.getFormatLast());
                     case "total" -> timeFormatter.format(fPlayer,

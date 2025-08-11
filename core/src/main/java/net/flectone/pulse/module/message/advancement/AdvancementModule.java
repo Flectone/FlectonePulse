@@ -83,7 +83,7 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
                 .range(message.getRange())
                 .destination(message.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.ADVANCEMENT))
-                .filter(fPlayer -> integrationModule.isVanishedVisible(fTarget, fPlayer))
+                .filter(fPlayer -> integrationModule.canSeeVanished(fTarget, fPlayer))
                 .tag(MessageType.ADVANCEMENT)
                 .format(s -> convert(s, chatAdvancement))
                 .tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fResolver, chatAdvancement)})

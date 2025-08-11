@@ -168,7 +168,7 @@ public abstract class IntegrationModule extends AbstractModule {
                 || injector.getInstance(TelegramModule.class).isEnable();
     }
 
-    public boolean isVanishedVisible(FEntity sender, FEntity receiver) {
+    public boolean canSeeVanished(FEntity sender, FEntity receiver) {
         boolean isVanished = isVanished(sender);
         return !isVanished || hasSeeVanishPermission(receiver);
     }

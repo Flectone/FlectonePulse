@@ -186,7 +186,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
         List<UUID> receiversUUID = receivers.stream()
                 .filter(fReceiver -> !fReceiver.isUnknown())
-                .filter(fReceiver -> integrationModule.isVanishedVisible(fReceiver, fPlayer))
+                .filter(fReceiver -> integrationModule.canSeeVanished(fReceiver, fPlayer))
                 .map(FEntity::getUuid)
                 .toList();
 

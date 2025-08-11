@@ -166,7 +166,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
                 .destination(message.getDestination())
                 .tag(MessageType.AFK)
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.AFK))
-                .filter(fReceiver -> integrationModule.isVanishedVisible(fPlayer, fReceiver))
+                .filter(fReceiver -> integrationModule.canSeeVanished(fPlayer, fReceiver))
                 .format(s -> isAfk
                         ? s.getFormatFalse().getGlobal()
                         : s.getFormatTrue().getGlobal()

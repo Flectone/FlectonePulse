@@ -67,7 +67,7 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
                 .destination(message.getDestination())
                 .range(message.getRange())
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.JOIN))
-                .filter(fReceiver -> ignoreVanish || integrationModule.isVanishedVisible(fPlayer, fReceiver))
+                .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
                 .format(s -> hasPlayedBefore || !message.isFirst() ? s.getFormat() : s.getFormatFirstTime())
                 .proxy(dataOutputStream -> dataOutputStream.writeBoolean(hasPlayedBefore))
                 .integration()

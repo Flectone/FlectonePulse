@@ -133,7 +133,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         }
 
         FPlayer fNewReceiver = fPlayerService.getFPlayer(fReceiver.getUuid());
-        if (!integrationModule.isVanishedVisible(fNewReceiver, fPlayer)) {
+        if (!integrationModule.canSeeVanished(fNewReceiver, fPlayer)) {
             builder(fPlayer)
                     .format(Localization.Command.Tell::getNullPlayer)
                     .sendBuilt();

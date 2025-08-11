@@ -37,7 +37,7 @@ public class PlayerParser implements ArgumentParser<FPlayer, String>, BlockingSu
     @Override
     public @NonNull Iterable<@NonNull String> stringSuggestions(@NonNull CommandContext<FPlayer> context, @NonNull CommandInput input) {
         return playerService.findOnlineFPlayers().stream()
-                .filter(player -> integrationModule.isVanishedVisible(player, context.sender()))
+                .filter(player -> integrationModule.canSeeVanished(player, context.sender()))
                 .map(FEntity::getName)
                 .toList();
     }
