@@ -208,8 +208,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     public static final class Chat implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Mode mode = Mode.BUKKIT;
-        // Settings is the default because this was the old functionality
-        private Prefer prefer = Prefer.SETTINGS;
         private Event.Priority priority = Event.Priority.NORMAL;
         private Map<String, Type> types = new LinkedHashMap<>(){
             {
@@ -222,11 +220,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             BUKKIT,
             PAPER,
             PACKET
-        }
-
-        public enum Prefer {
-            TRIGGER,
-            SETTINGS
         }
 
         @Getter
