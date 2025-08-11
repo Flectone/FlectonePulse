@@ -69,7 +69,7 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
                         String greetingMessage = String.join("<br>", resolveLocalization(fPlayer).getFormat());
 
                         for (String pixel : pixels) {
-                            greetingMessage = Strings.CS.replaceOnce(greetingMessage, "\\[#]\\[#]\\[#]\\[#]\\[#]\\[#]\\[#]\\[#]", pixel);
+                            greetingMessage = Strings.CS.replaceOnce(greetingMessage, "[#][#][#][#][#][#][#][#]", pixel);
                         }
 
                         return greetingMessage;
