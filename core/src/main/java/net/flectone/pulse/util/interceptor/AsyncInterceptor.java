@@ -32,7 +32,7 @@ public class AsyncInterceptor implements MethodInterceptor {
 
         if (delay > 0) {
             taskScheduler.runAsyncLater(task, delay);
-        } else if (platformServerAdapter.isPrimaryThread()) {
+        } else if (platformServerAdapter.isPrimaryThread() || Thread.currentThread().getName().startsWith("Netty")) {
             taskScheduler.runAsync(task);
         } else {
             // already async
