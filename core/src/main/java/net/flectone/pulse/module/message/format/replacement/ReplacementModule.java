@@ -26,9 +26,9 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.IOException;
 import java.util.EnumMap;
@@ -112,6 +112,8 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         String result = message;
         for (Map.Entry<String, Pattern> entry : triggerPatterns.entrySet()) {
             String name = entry.getKey();
+            boolean isUrl = name.equals("url") || name.equals("image");
+
             Pattern pattern = entry.getValue();
 
             StringBuilder stringBuilder = new StringBuilder();
@@ -123,7 +125,9 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                     String groupText = matcher.group(i);
                     finalReplacement
                             .append("':'")
-                            .append(StringEscapeUtils.escapeJava(groupText));
+                            .append(StringEscapeUtils.escapeJava(
+                                    !isUrl ? groupText : urlFormatter.escapeAmpersand(groupText))
+                            );
                 }
 
                 finalReplacement.append("'>");

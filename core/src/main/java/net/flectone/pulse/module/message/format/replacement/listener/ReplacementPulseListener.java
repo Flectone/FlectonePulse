@@ -14,10 +14,11 @@ import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,9 @@ public class ReplacementPulseListener implements PulseListener {
         this.messagePipeline = messagePipeline;
         this.permissionChecker = permissionChecker;
     }
+
+    @Inject
+    private FLogger fLogger;
 
     @Pulse
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
@@ -64,7 +68,6 @@ public class ReplacementPulseListener implements PulseListener {
 
             String replacement = replacementModule.resolveLocalization(receiver).getValues().get(name);
             if (replacement == null) return Tag.selfClosingInserting(Component.empty());
-
 
             List<String> values = new ArrayList<>();
             while (argumentQueue.hasNext()) {
