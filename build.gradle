@@ -57,7 +57,7 @@ subprojects {
         compileOnly "net.kyori:adventure-text-minimessage:$adventure_api"
         compileOnly "net.kyori:adventure-text-serializer-gson:$adventure_api"
         compileOnly "net.kyori:adventure-text-serializer-plain:$adventure_api"
-        compileOnly "org.apache.commons:commons-lang3:$apache_commons_lang3_version"
+        compileOnly "org.apache.commons:commons-text:$apache_commons_text_version"
 
         annotationProcessor "org.projectlombok:lombok:$lombok_version"
     }
