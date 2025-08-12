@@ -271,9 +271,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.chatsetting.menu.chat.item = "<fcolor:2>Тип чата <br><fcolor:1>Чат для просмотра и отправки сообщений <br><br><fcolor:1>Выбранный чат <fcolor:2><chat>";
         command.chatsetting.menu.chat.inventory = "<reset>                 Чаты";
         command.chatsetting.menu.chat.types.clear();
-        command.chatsetting.menu.chat.types.put("default", "<fcolor:2>Стандартный чат<br><fcolor:1>Ты можешь видеть <fcolor:2>все<fcolor:1> чаты и писать в любой чат");
-        command.chatsetting.menu.chat.types.put("local", "<fcolor:2>Локальный чат<br><fcolor:1>Ты можешь писать только в <fcolor:2>локальный<fcolor:1> чат и видишь только его");
-        command.chatsetting.menu.chat.types.put("global", "<fcolor:2>Глобальный чат<br><fcolor:1>Ты можешь писать только в <fcolor:2>глобальный<fcolor:1> чат и видишь только его");
+        command.chatsetting.menu.chat.types.put("default", "<fcolor:2>Стандартный чат<br><fcolor:1>Ты можешь видеть <fcolor:2>все <fcolor:1>чаты и писать в любой чат");
+        command.chatsetting.menu.chat.types.put("local", "<fcolor:2>Локальный чат<br><fcolor:1>Ты можешь писать в <fcolor:2>любой <fcolor:1>чат");
+        command.chatsetting.menu.chat.types.put("global", "<fcolor:2>Глобальный чат<br><fcolor:1>Ты можешь писать только в <fcolor:2>глобальный <fcolor:1>чат");
         command.chatsetting.menu.see.item = "<fcolor:2>Цвета \"see\" <br><fcolor:1>Цвета для /chatcolor see <br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: привет мир! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: привет мир! <br><br><u><color:#ff7171>Это видишь только ТЫ в любых сообщений";
         command.chatsetting.menu.see.inventory = "<reset>                Цвета";
         command.chatsetting.menu.see.types.clear();
@@ -430,8 +430,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.chat.types.clear();
         message.chat.types.putAll(Map.of(
-                "local", "<delete><display_name><fcolor:3>: <message> <translate>",
-                "global", "<delete><display_name> <world_prefix>»<fcolor:4> <message> <translate>"
+                "local", "<delete><display_name><fcolor:3>: <message><reset><translate>",
+                "global", "<delete><display_name> <world_prefix>»<fcolor:4> <message><reset><translate>"
         ));
         message.chat.nullChat = "<color:#ff7171><b>⁉</b> На сервер выключен чат";
         message.chat.nullReceiver = "<color:#ff7171><b>⁉</b> Тебя никто не услышал";
@@ -566,7 +566,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.format.name_.unknown = "<fcolor:2><name>";
         message.format.name_.invisible = "<fcolor:2>\uD83D\uDC7B Невидимка";
 
-        message.format.translate.action = "<click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Перевести сообщение\"><fcolor:1>⇄";
+        message.format.translate.action = " <click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Перевести сообщение\"><fcolor:1>⇄";
 
         message.format.questionAnswer.questions.clear();
         message.format.questionAnswer.questions.put("server", "<fcolor:2>[Вопрос-Ответ] @<player><fcolor:1>, это ванильный сервер в Майнкрафте!");
@@ -959,8 +959,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 private SubMenu chat = new SubMenu("<fcolor:2>Chat type <br><fcolor:1>Chat for viewing and sending messages <br><br><fcolor:1>Your chat is <fcolor:2><chat>", "<reset>                 Chats", new LinkedHashMap<>() {
                     {
                         put("default", "<fcolor:2>Default chat<br><fcolor:1>You can see <fcolor:2>all <fcolor:1>chats and write to any chat");
-                        put("local", "<fcolor:2>Local chat<br><fcolor:1>You can only write to <fcolor:2>local <fcolor:1>chat and see it");
-                        put("global", "<fcolor:2>Global chat<br><fcolor:1>You can only write to <fcolor:2>global <fcolor:1>chat and see it");
+                        put("local", "<fcolor:2>Local chat<br><fcolor:1>You can write to <fcolor:2>any <fcolor:1>chats");
+                        put("global", "<fcolor:2>Global chat<br><fcolor:1>You can only write to <fcolor:2>global <fcolor:1>chat");
                     }
                 });
                 private SubMenu see = new SubMenu("<fcolor:2>Colors \"see\" <br><fcolor:1>Colors for /chatcolor see <br><br><fcolor:1>(local) <fcolor:2><player><fcolor:3>: hello world! <br><fcolor:1>(global) <fcolor:2><player><fcolor:4>: hello world! <br><br><u><color:#ff7171>Only you see it in all messages", "<reset>                Colors", new LinkedHashMap<>() {
@@ -1769,8 +1769,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String nullReceiver = "<color:#ff7171><b>⁉</b> Nobody heard you";
             private Map<String, String> types = new LinkedHashMap<>(){
                 {
-                    put("global", "<delete><display_name> <world_prefix>»<fcolor:4> <message> <translate>");
-                    put("local", "<delete><display_name><fcolor:3>: <message> <translate>");
+                    put("global", "<delete><display_name> <world_prefix>»<fcolor:4> <message><reset><translate>");
+                    put("local", "<delete><display_name><fcolor:3>: <message><reset><translate>");
                 }
             };
         }
@@ -2056,7 +2056,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
             @Getter
             public static final class Translate implements SubFormatMessageConfig, Localizable {
-                private String action = "<click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Translate message\"><fcolor:1>⇄";
+                private String action = " <click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Translate message\"><fcolor:1>⇄";
             }
         }
 
