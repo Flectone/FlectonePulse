@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import net.flectone.pulse.platform.controller.DialogController;
 import net.flectone.pulse.platform.controller.InventoryController;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
@@ -99,6 +100,7 @@ public class FlectonePulseAPI  {
 
         // close all open inventories
         injector.getInstance(InventoryController.class).closeAll();
+        injector.getInstance(DialogController.class).closeAll();
 
         // get fplayer service
         FPlayerService fPlayerService = injector.getInstance(FPlayerService.class);
@@ -159,6 +161,7 @@ public class FlectonePulseAPI  {
 
         // close all open inventories
         injector.getInstance(InventoryController.class).closeAll();
+        injector.getInstance(DialogController.class).closeAll();
 
         // reload registries
         injector.getInstance(CommandRegistry.class).reload();

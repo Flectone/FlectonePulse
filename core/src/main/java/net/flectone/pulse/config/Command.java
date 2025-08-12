@@ -213,8 +213,16 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
         private boolean enable = true;
         private List<String> aliases = new ArrayList<>(List.of("chatsetting"));
 
+        private Modern modern = new Modern();
         private Checkbox checkbox = new Checkbox();
         private Menu menu = new Menu();
+
+        @Getter
+        public static final class Modern {
+            private boolean enable = true;
+            private int buttonWidth = 100;
+            private int columns = 5;
+        }
 
         @Getter
         public static final class Checkbox {

@@ -24,21 +24,21 @@ public class InventoryPacketListener implements PacketListener {
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
         PacketTypeCommon packetType = event.getPacketType();
-        if (packetType != PacketType.Play.Client.CLOSE_WINDOW
-                && packetType != PacketType.Play.Client.CLICK_WINDOW) return;
-
-        User user = event.getUser();
 
         if (packetType == PacketType.Play.Client.CLOSE_WINDOW) {
-            inventoryController.close(user.getUUID());
+            inventoryController.close(event.getUser().getUUID());
             return;
         }
 
-        Inventory inventory = inventoryController.get(user.getUUID());
-        if (inventory == null) return;
+        if (packetType == PacketType.Play.Client.CLICK_WINDOW) {
+            User user = event.getUser();
 
-        event.setCancelled(true);
+            Inventory inventory = inventoryController.get(user.getUUID());
+            if (inventory == null) return;
 
-        inventoryController.process(event.getUser().getUUID(), new WrapperPlayClientClickWindow(event));
+            event.setCancelled(true);
+
+            inventoryController.process(user.getUUID(), new WrapperPlayClientClickWindow(event));
+        }
     }
 }
