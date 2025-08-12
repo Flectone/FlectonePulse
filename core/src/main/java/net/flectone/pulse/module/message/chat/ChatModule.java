@@ -108,8 +108,6 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
     }
 
     public void send(FPlayer fPlayer, String eventMessage, Runnable cancelEvent, BiConsumer<String, Boolean> successEvent) {
-        if (isModuleDisabledFor(fPlayer)) return;
-
         if (checkMute(fPlayer)) {
             cancelEvent.run();
             return;

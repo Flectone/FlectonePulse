@@ -28,6 +28,11 @@ public class ChatPaperListener implements Listener {
         if (event.isCancelled()) return;
         if (!chatModule.isEnable()) return;
 
+        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
+        if (chatModule.isModuleDisabledFor(fPlayer)) return;
+
+        String format = plainSerializer.serialize(event.message());
+
         Runnable cancelRunnable = () -> {
             event.setCancelled(true);
             event.viewers().clear();
@@ -38,9 +43,6 @@ public class ChatPaperListener implements Listener {
             event.setCancelled(isCancel);
             event.viewers().clear();
         };
-
-        FPlayer fPlayer = fPlayerService.getFPlayer(event.getPlayer());
-        String format = plainSerializer.serialize(event.message());
 
         chatModule.send(fPlayer, format, cancelRunnable, successConsumer);
     }

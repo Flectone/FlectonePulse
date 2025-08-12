@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.service.FPlayerService;
@@ -29,14 +30,17 @@ public class ChatPacketListener implements PacketListener {
         if (!chatModule.isEnable()) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getUser().getUUID());
+        if (chatModule.isModuleDisabledFor(fPlayer)) return;
 
         WrapperPlayClientChatMessage wrapper = new WrapperPlayClientChatMessage(event);
         String message = wrapper.getMessage();
 
-        chatModule.send(fPlayer,
-                message,
-                () -> event.setCancelled(true),
-                (string, aBoolean) -> event.setCancelled(true)
-        );
+        event.setCancelled(true);
+        asyncSend(fPlayer, message);
+    }
+
+    @Async
+    public void asyncSend(FPlayer fPlayer, String message) {
+        chatModule.send(fPlayer, message, () -> {}, (string, value) -> {});
     }
 }

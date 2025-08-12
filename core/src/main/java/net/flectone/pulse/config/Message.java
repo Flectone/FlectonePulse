@@ -206,7 +206,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Chat implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
-        private Mode mode = Mode.BUKKIT;
+        private Mode mode = Mode.PACKET;
         private Event.Priority priority = Event.Priority.NORMAL;
         private Map<String, Type> types = new LinkedHashMap<>(){
             {
