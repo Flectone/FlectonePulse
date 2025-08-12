@@ -79,7 +79,7 @@ public final class LegacyMiniConvertorPulseListener implements PulseListener {
         FEntity sender = messageContext.getSender();
         if (!messageContext.isFlag(MessageFlag.COLORS)) return;
         // parameters &b -> <aqua> (incorrect url)
-        if (!messageContext.isFlag(MessageFlag.URL)) return;
+        if (!messageContext.isFlag(MessageFlag.REPLACEMENT)) return;
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission.getAll())) return;
 
         String message = toMini(messageContext.getMessage());

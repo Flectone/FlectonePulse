@@ -7,7 +7,6 @@ import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.constant.MessageType;
-import net.flectone.pulse.util.constant.AdventureTag;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
@@ -551,16 +550,16 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.enchant.single = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» на предмет <display_name>";
         message.enchant.multiple = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» на предмет <fcolor:2><count><fcolor:1> сущностей";
 
+        message.format.replacement.values.put("skin", "<image:\"<message_1>\"><u>👨 Скин</u></image>");
+        message.format.replacement.values.put("url", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2>Открыть ссылку <br><u><message_1>\"><fcolor:2><u>🗗 Ссылка</u></hover></click>");
+        message.format.replacement.values.put("image", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2><pixels>\"><fcolor:2><u>🖃 Картинка</u></hover></click>");
+
         message.format.mention.person = "<fcolor:2>Тебя упомянули!";
 
         message.format.moderation.delete.placeholder = "<color:#ff7171><hover:show_text:\"<color:#ff7171>Нажми, чтобы удалить\"><click:run_command:\"/deletemessage <uuid>\">[x] ";
         message.format.moderation.delete.format = "<fcolor:3><i>Сообщение удалено</i>";
 
         message.format.moderation.newbie.reason = "Ты ещё слишком новичок";
-
-        message.format.tags.put(AdventureTag.URL, "<click:open_url:\"<message>\"><hover:show_text:\"<fcolor:2>Открыть ссылку <br><u><message>\"><fcolor:2><u>🗗 Ссылка</u></hover></click>");
-        message.format.tags.put(AdventureTag.IMAGE, "<image:\"<message>\"><u>🖃 Картинка</u></image>");
-        message.format.tags.put(AdventureTag.SKIN, "<image:\"<message>\"><u>👨 Скин</u></image>");
 
         message.format.name_.display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <player>\"><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>";
         message.format.name_.entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<name>'> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><lang:'<name>'></hover>";
@@ -1906,20 +1905,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Format implements FormatMessageConfig, Localizable {
 
-            private Map<AdventureTag, String> tags = new LinkedHashMap<>(){
-                {
-                    put(AdventureTag.PING, "<fcolor:2><ping>");
-                    put(AdventureTag.TPS, "<fcolor:2><tps>");
-                    put(AdventureTag.ONLINE, "<fcolor:2><online>");
-                    put(AdventureTag.COORDS, "<fcolor:2><x> <y> <z>");
-                    put(AdventureTag.STATS, "<color:#ff7171><hp>♥</color> <color:#3de0d8><armor>🛡 <color:#e33059><attack>🗡 <color:#4eff52><exp>⏺ <color:#f0a01f><food>🍖");
-                    put(AdventureTag.SKIN, "<image:\"<message>\"><u>👨 Skin</u></image>");
-                    put(AdventureTag.ITEM, "<fcolor:2>[<message>]");
-                    put(AdventureTag.URL, "<click:open_url:\"<message>\"><hover:show_text:\"<fcolor:2>Open url <br><u><message>\"><fcolor:2><u>🗗 Url</u></hover></click>");
-                    put(AdventureTag.IMAGE, "<image:\"<message>\"><u>🖃 Image</u></image>");
-                }
-            };
-
             @Override
             public SubFormatMessageConfig getFcolor() {
                 return null;
@@ -1930,15 +1915,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 return null;
             }
 
-            @Override
-            public SubFormatMessageConfig getImage() {
-                return null;
-            }
-
-            @Override
-            public SubFormatMessageConfig getReplacement() {
-                return null;
-            }
+            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/replacement/")})
+            private Replacement replacement = new Replacement();
 
             @Override
             public SubFormatMessageConfig getScoreboard() {
@@ -1953,14 +1931,62 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private Name name_ = new Name();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/questionanswer/")})
             private QuestionAnswer questionAnswer = new QuestionAnswer();
-            @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/spoiler/")})
-            private Spoiler spoiler = new Spoiler();
             @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/translate/")})
             private Translate translate = new Translate();
 
             @Override
             public SubFormatMessageConfig getWorld() {
                 return null;
+            }
+
+            @Getter
+            public static final class Replacement implements SubFormatMessageConfig, Localizable {
+
+                private String hoverSymbol = "█";
+
+                private Map<String, String> values = new LinkedHashMap<>() {
+                    {
+                        // emoticons
+                        put("smile", "<click:suggest_command:\":)\"><hover:show_text:\":)\">☺</hover></click>");
+                        put("big_smile", "<click:suggest_command:\":D\"><hover:show_text:\":D\">☻</hover></click>");
+                        put("sad", "<click:suggest_command:\":(\"><hover:show_text:\":(\">☹</hover></click>");
+                        put("ok_hand", "<click:suggest_command:\":ok:\"><hover:show_text:\":ok:\">\uD83D\uDD92</hover></click>");
+                        put("thumbs_up", "<click:suggest_command:\":+1:\"><hover:show_text:\":+1:\">\uD83D\uDD92</hover></click>");
+                        put("thumbs_down", "<click:suggest_command:\":-1:\"><hover:show_text:\":-1:\">\uD83D\uDD93</hover></click>");
+                        put("cool_smile", "<click:suggest_command:\":cool:\"><hover:show_text:\":cool:\">\uD83D\uDE0E</hover></click>");
+                        put("cool_glasses", "<click:suggest_command:\"B)\"><hover:show_text:\"B)\">\uD83D\uDE0E</hover></click>");
+                        put("clown", "<click:suggest_command:\":clown:\"><hover:show_text:\":clown:\">\uD83E\uDD21</hover></click>");
+                        put("heart", "<click:suggest_command:\"<3\"><hover:show_text:\"<3\">❤</hover></click>");
+                        put("laughing", "<click:suggest_command:\"XD\"><hover:show_text:\"XD\">\uD83D\uDE06</hover></click>");
+                        put("confused", "<click:suggest_command:\"%)\"><hover:show_text:\"%)\">\uD83D\uDE35</hover></click>");
+                        put("happy", "<click:suggest_command:\"=D\"><hover:show_text:\"=D\">\uD83D\uDE03</hover></click>");
+                        put("angry", "<click:suggest_command:\">:(\"><hover:show_text:\">:(\">\uD83D\uDE21</hover></click>");
+
+                        // ascii art
+                        put("ascii_idk", "<click:suggest_command:\":idk:\"><hover:show_text:\":idk:\">¯\\_(ツ)_/¯</hover></click>");
+                        put("ascii_angry", "<click:suggest_command:\":angry:\"><hover:show_text:\":angry:\">(╯°□°)╯︵ ┻━┻</hover></click>");
+                        put("ascii_happy", "<click:suggest_command:\":happy:\"><hover:show_text:\":happy:\">＼(＾O＾)／</hover></click>");
+
+                        // dynamic placeholders
+                        put("ping", "<fcolor:2><ping>");
+                        put("tps", "<fcolor:2><tps>");
+                        put("online", "<fcolor:2><online>");
+                        put("coords", "<fcolor:2><x> <y> <z>");
+                        put("stats", "<color:#ff7171><hp>♥</color> <color:#3de0d8><armor>🛡 <color:#e33059><attack>🗡 <color:#4eff52><exp>⏺ <color:#f0a01f><food>🍖");
+                        put("skin", "<image:\"<message_1>\"><u>👨 Skin</u></image>");
+                        put("item", "<fcolor:2>[<message_1>]");
+
+                        // text formatting
+                        put("url", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2>Open url <br><u><message_1>\"><fcolor:2><u>🗗 Url</u></hover></click>");
+                        put("image", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2><pixels>\"><fcolor:2><u>🖃 Image</u></hover></click>");
+                        put("spoiler", "<hover:show_text:\"<fcolor:2><message_1>\"><fcolor:2><symbols></hover>");
+                        put("bold", "<b><message_1></b>");
+                        put("italic", "<i><message_1></i>");
+                        put("underline", "<u><message_1></u>");
+                        put("obfuscated", "<obf><message_1></obf>");
+                        put("strikethrough", "<st><message_1></st>");
+                    }
+                };
             }
 
             @Getter
@@ -2026,12 +2052,6 @@ public final class Localization extends FileSerializable implements ModuleConfig
                         put("flectone", "<fcolor:2>[Answer] @<player><fcolor:1>, this is a brand and projects created by TheFaser");
                     }
                 };
-            }
-
-            @Getter
-            public static final class Spoiler implements SubFormatMessageConfig, Localizable {
-                private String symbol = "█";
-                private String hover = "<fcolor:2><message>";
             }
 
             @Getter

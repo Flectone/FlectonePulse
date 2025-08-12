@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.format.image.model;
+package net.flectone.pulse.model.util;
 
 import lombok.Getter;
 
@@ -67,7 +67,7 @@ public class FImage {
 
                 String hexColor = String.format("#%06x", rgb);
                 String pixel = "█";
-                text.append("<color:").append(hexColor).append(">").append(pixel);
+                text.append("<").append(hexColor).append(">").append(pixel);
                 x += stepSize;
             }
 

@@ -121,14 +121,12 @@ public interface ModuleConfig {
 
             SubFormatMessageConfig getFcolor();
             SubFormatMessageConfig getFixation();
-            SubFormatMessageConfig getImage();
             SubFormatMessageConfig getMention();
             ModerationFormatMessageConfig getModeration();
             SubFormatMessageConfig getName_();
             SubFormatMessageConfig getQuestionAnswer();
             SubFormatMessageConfig getReplacement();
             SubFormatMessageConfig getScoreboard();
-            SubFormatMessageConfig getSpoiler();
             SubFormatMessageConfig getTranslate();
             SubFormatMessageConfig getWorld();
 

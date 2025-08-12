@@ -925,23 +925,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
 
             private PermissionEntry all = new PermissionEntry("flectonepulse.module.message.format.all", Type.OP);
 
-            private Map<AdventureTag, PermissionEntry> tags = new LinkedHashMap<>(){
+            private Map<AdventureTag, PermissionEntry> adventureTags = new LinkedHashMap<>(){
                 {
-                    put(AdventureTag.PING, new PermissionEntry("flectonepulse.module.message.format.ping", Type.TRUE));
-                    put(AdventureTag.TPS, new PermissionEntry("flectonepulse.module.message.format.tps", Type.TRUE));
-                    put(AdventureTag.ONLINE, new PermissionEntry("flectonepulse.module.message.format.online", Type.TRUE));
-                    put(AdventureTag.COORDS, new PermissionEntry("flectonepulse.module.message.format.coords", Type.TRUE));
-                    put(AdventureTag.STATS, new PermissionEntry("flectonepulse.module.message.format.stats", Type.TRUE));
-                    put(AdventureTag.SKIN, new PermissionEntry("flectonepulse.module.message.format.skin", Type.TRUE));
-                    put(AdventureTag.ITEM, new PermissionEntry("flectonepulse.module.message.format.item", Type.TRUE));
-                    put(AdventureTag.URL, new PermissionEntry("flectonepulse.module.message.format.url", Type.TRUE));
-                    put(AdventureTag.IMAGE, new PermissionEntry("flectonepulse.module.message.format.image", Type.TRUE));
-                    put(AdventureTag.SPOILER, new PermissionEntry("flectonepulse.module.message.format.spoiler", Type.TRUE));
-                    put(AdventureTag.BOLD, new PermissionEntry("flectonepulse.module.message.format.bold", Type.TRUE));
-                    put(AdventureTag.ITALIC, new PermissionEntry("flectonepulse.module.message.format.italic", Type.TRUE));
-                    put(AdventureTag.UNDERLINE, new PermissionEntry("flectonepulse.module.message.format.underline", Type.TRUE));
-                    put(AdventureTag.OBFUSCATED, new PermissionEntry("flectonepulse.module.message.format.obfuscated", Type.TRUE));
-                    put(AdventureTag.STRIKETHROUGH, new PermissionEntry("flectonepulse.module.message.format.strikethrough", Type.TRUE));
                     put(AdventureTag.HOVER, new PermissionEntry("flectonepulse.module.message.format.hover", Type.OP));
                     put(AdventureTag.CLICK, new PermissionEntry("flectonepulse.module.message.format.click", Type.OP));
                     put(AdventureTag.COLOR, new PermissionEntry("flectonepulse.module.message.format.color", Type.OP));
@@ -1121,6 +1106,50 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             public static final class Replacement implements SubFormatMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.format.replacement";
                 private Type type = Type.TRUE;
+
+                private Map<String, PermissionEntry> values = new LinkedHashMap<>() {
+                    {
+                        // emoticons
+                        put("smile", new PermissionEntry("flectonepulse.module.message.format.replacement.smile", Type.TRUE));
+                        put("big_smile", new PermissionEntry("flectonepulse.module.message.format.replacement.big_smile", Type.TRUE));
+                        put("sad", new PermissionEntry("flectonepulse.module.message.format.replacement.sad", Type.TRUE));
+                        put("ok_hand", new PermissionEntry("flectonepulse.module.message.format.replacement.ok_hand", Type.TRUE));
+                        put("thumbs_up", new PermissionEntry("flectonepulse.module.message.format.replacement.thumbs_up", Type.TRUE));
+                        put("thumbs_down", new PermissionEntry("flectonepulse.module.message.format.replacement.thumbs_down", Type.TRUE));
+                        put("cool_smile", new PermissionEntry("flectonepulse.module.message.format.replacement.cool_smile", Type.TRUE));
+                        put("cool_glasses", new PermissionEntry("flectonepulse.module.message.format.replacement.cool_glasses", Type.TRUE));
+                        put("clown", new PermissionEntry("flectonepulse.module.message.format.replacement.clown", Type.TRUE));
+                        put("heart", new PermissionEntry("flectonepulse.module.message.format.replacement.heart", Type.TRUE));
+                        put("laughing", new PermissionEntry("flectonepulse.module.message.format.replacement.laughing", Type.TRUE));
+                        put("confused", new PermissionEntry("flectonepulse.module.message.format.replacement.confused", Type.TRUE));
+                        put("happy", new PermissionEntry("flectonepulse.module.message.format.replacement.happy", Type.TRUE));
+                        put("angry", new PermissionEntry("flectonepulse.module.message.format.replacement.angry", Type.TRUE));
+
+                        // ascii art
+                        put("ascii_idk", new PermissionEntry("flectonepulse.module.message.format.replacement.ascii_idk", Type.TRUE));
+                        put("ascii_angry", new PermissionEntry("flectonepulse.module.message.format.replacement.ascii_angry", Type.TRUE));
+                        put("ascii_happy", new PermissionEntry("flectonepulse.module.message.format.replacement.ascii_happy", Type.TRUE));
+
+                        // dynamic placeholders
+                        put("ping", new PermissionEntry("flectonepulse.module.message.format.replacement.ping", Type.TRUE));
+                        put("tps", new PermissionEntry("flectonepulse.module.message.format.replacement.tps", Type.TRUE));
+                        put("online", new PermissionEntry("flectonepulse.module.message.format.replacement.online", Type.TRUE));
+                        put("coords", new PermissionEntry("flectonepulse.module.message.format.replacement.coords", Type.TRUE));
+                        put("stats", new PermissionEntry("flectonepulse.module.message.format.replacement.stats", Type.TRUE));
+                        put("skin", new PermissionEntry("flectonepulse.module.message.format.replacement.skin", Type.TRUE));
+                        put("item", new PermissionEntry("flectonepulse.module.message.format.replacement.item", Type.TRUE));
+
+                        // text formatting
+                        put("url", new PermissionEntry("flectonepulse.module.message.format.replacement.url", Type.TRUE));
+                        put("image", new PermissionEntry("flectonepulse.module.message.format.replacement.image", Type.TRUE));
+                        put("spoiler", new PermissionEntry("flectonepulse.module.message.format.replacement.spoiler", Type.TRUE));
+                        put("bold", new PermissionEntry("flectonepulse.module.message.format.replacement.bold", Type.TRUE));
+                        put("italic", new PermissionEntry("flectonepulse.module.message.format.replacement.italic", Type.TRUE));
+                        put("underline", new PermissionEntry("flectonepulse.module.message.format.replacement.underline", Type.TRUE));
+                        put("obfuscated", new PermissionEntry("flectonepulse.module.message.format.replacement.obfuscated", Type.TRUE));
+                        put("strikethrough", new PermissionEntry("flectonepulse.module.message.format.replacement.strikethrough", Type.TRUE));
+                    }
+                };
             }
 
             @Getter

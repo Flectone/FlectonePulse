@@ -1,21 +1,6 @@
 package net.flectone.pulse.util.constant;
 
 public enum AdventureTag {
-    PING,
-    TPS,
-    ONLINE,
-    COORDS,
-    STATS,
-    SKIN,
-    ITEM,
-    URL,
-    IMAGE,
-    SPOILER,
-    BOLD,
-    ITALIC,
-    UNDERLINE,
-    OBFUSCATED,
-    STRIKETHROUGH,
     HOVER,
     CLICK,
     COLOR,

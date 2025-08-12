@@ -4,12 +4,12 @@ import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
+import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -25,6 +25,7 @@ import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.UUID;
 
 @Singleton
@@ -73,6 +74,11 @@ public class MessagePipeline {
 
         public Builder flag(MessageFlag flag, boolean value) {
             context.setFlag(flag, value);
+            return this;
+        }
+
+        public Builder flags(Map<MessageFlag, Boolean> flags) {
+            context.setFlags(flags);
             return this;
         }
 
@@ -142,31 +148,51 @@ public class MessagePipeline {
         DISPLAY_NAME,
         PLAYER,
         CONSTANT,
+        REPLACEMENT,
+        MENTION,
+        SWEAR,
+        QUESTION,
+        TRANSLATE,
+        WORLD_PREFIX,
+
+        @Deprecated
+        IMAGE,
+
+        @Deprecated
         PING,
+
+        @Deprecated
         TPS,
+
+        @Deprecated
         ONLINE,
+
+        @Deprecated
         COORDS,
+
+        @Deprecated
         STATS,
 
         @Deprecated
         STYLE,
 
+        @Deprecated
         SKIN,
+
+        @Deprecated
         ITEM,
+
+        @Deprecated
         URL,
+
+        @Deprecated
         FCOLOR,
-        REPLACEMENT,
-        IMAGE,
-        MENTION,
-        SWEAR,
-        QUESTION,
-        SPOILER,
-        TRANSLATE,
 
         @Deprecated
         TRANSLATETO,
 
-        WORLD_PREFIX;
+        @Deprecated
+        SPOILER;
 
         @Subst("")
         public String getTagName() {

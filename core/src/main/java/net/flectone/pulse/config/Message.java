@@ -15,7 +15,6 @@ import net.flectone.pulse.util.constant.AdventureTag;
 
 import java.nio.file.Path;
 import java.util.*;
-import java.util.regex.Pattern;
 
 @SuppressWarnings({"FieldMayBeFinal", "unused"})
 @Comment(
@@ -290,44 +289,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
         private boolean enable = true;
 
-        private Map<AdventureTag, Tag> tags = new LinkedHashMap<>(){
-            {
-                put(AdventureTag.PING, new Tag("%ping%"));
-                put(AdventureTag.TPS, new Tag("%tps%"));
-                put(AdventureTag.ONLINE, new Tag("%online%"));
-                put(AdventureTag.COORDS, new Tag("%coords%"));
-                put(AdventureTag.STATS, new Tag("%stats%"));
-                put(AdventureTag.SKIN, new Tag("%skin%"));
-                put(AdventureTag.ITEM, new Tag("%item%"));
-                put(AdventureTag.URL, new Tag("(?<!\\\\)(?<!:\")((https?|ftp|gopher|telnet|file)://[\\w.-]+\\.[a-zA-Z]{2,}(?::\\d+)?(?:/[\\w:#@%/;$()~_?+\\-=.&]*)?(?:#[\\w\\-=/&%]*)?)"));
-                put(AdventureTag.IMAGE, new Tag("(?<!:\")((https?|ftp|gopher|telnet|file)://(?:i\\.imgur\\.com|media\\.discordapp\\.net)/[\\w:#@%/;$()~_?+\\-=.&]*[^\\\\\\s])"));
-                put(AdventureTag.SPOILER, new Tag(Pattern.quote("||")));
-                put(AdventureTag.BOLD, new Tag(Pattern.quote("**")));
-                put(AdventureTag.ITALIC, new Tag(Pattern.quote("*")));
-                put(AdventureTag.UNDERLINE, new Tag(Pattern.quote("__")));
-                put(AdventureTag.OBFUSCATED, new Tag(Pattern.quote("??")));
-                put(AdventureTag.STRIKETHROUGH, new Tag(Pattern.quote("~~")));
-                put(AdventureTag.HOVER, new KyoriTag());
-                put(AdventureTag.CLICK, new KyoriTag());
-                put(AdventureTag.COLOR, new KyoriTag());
-                put(AdventureTag.KEYBIND, new KyoriTag());
-                put(AdventureTag.TRANSLATABLE, new KyoriTag());
-                put(AdventureTag.TRANSLATABLE_FALLBACK, new KyoriTag());
-                put(AdventureTag.INSERTION, new KyoriTag());
-                put(AdventureTag.FONT, new KyoriTag());
-                put(AdventureTag.DECORATION, new KyoriTag());
-                put(AdventureTag.GRADIENT, new KyoriTag());
-                put(AdventureTag.RAINBOW, new KyoriTag());
-                put(AdventureTag.RESET, new KyoriTag());
-                put(AdventureTag.NEWLINE, new KyoriTag());
-                put(AdventureTag.TRANSITION, new KyoriTag());
-                put(AdventureTag.SELECTOR, new KyoriTag());
-                put(AdventureTag.SCORE, new KyoriTag());
-                put(AdventureTag.NBT, new KyoriTag());
-                put(AdventureTag.PRIDE, new KyoriTag());
-                put(AdventureTag.SHADOW_COLOR, new KyoriTag());
-            }
-        };
+        private List<AdventureTag> adventureTags = new ArrayList<>(List.of(AdventureTag.values()));
 
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fcolor/")})
         private FColor fcolor = new FColor();
@@ -337,8 +299,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fixation/")})
         private Fixation fixation = new Fixation();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/image/")})
-        private Image image = new Image();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/mention/")})
         private Mention mention = new Mention();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/moderation/")})
@@ -351,8 +311,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         private Replacement replacement = new Replacement();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/scoreboard/")})
         private Scoreboard scoreboard = new Scoreboard();
-        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/spoiler/")})
-        private Spoiler spoiler = new Spoiler();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/translate/")})
         private Translate translate = new Translate();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/world/")})
@@ -367,12 +325,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             public Tag(String trigger) {
                 this.trigger = trigger;
             }
-        }
-
-        @Getter
-        public static final class KyoriTag extends Tag {
-            private boolean enable = true;
-            private String trigger = null;
         }
 
         @Getter
@@ -411,12 +363,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
                     push(";");
                 }
             };
-        }
-
-        @Getter
-        public static final class Image implements SubFormatMessageConfig, Config.IEnable {
-            private boolean enable = true;
-            private String color = "<fcolor:2>";
         }
 
         @Getter
@@ -522,39 +468,53 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         @Getter
         public static final class Replacement implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
-            private final List<ReplacementValue> values = new LinkedList<>() {
+
+            private static final String BOUNDARY = "(?<!\\\\{2,})(?<=\\s|^)(%s)(?=\\s|$|\\p{Punct})";
+            private static final String FORMAT_TEMPLATE = "(?<!\\\\{2,})(?<=\\s|^)%s([^\\n]*?)%s(?=\\s|$|\\p{Punct})";
+
+            private Map<String, String> triggers = new LinkedHashMap<>() {
                 {
-                    push(new ReplacementValue("%flectonepulse%", "<fcolor:2>FlectonePulse"));
-                    push(new ReplacementValue(":)", "<click:suggest_command:\":)\"><hover:show_text:\":)\">☺</hover></click>"));
-                    push(new ReplacementValue(":D", "<click:suggest_command:\":D\"><hover:show_text:\":D\">☻</hover></click>"));
-                    push(new ReplacementValue(":(", "<click:suggest_command:\":(\"><hover:show_text:\":(\">☹</hover></click>"));
-                    push(new ReplacementValue(":ok:", "<click:suggest_command:\":ok:\"><hover:show_text:\":ok:\">\uD83D\uDD92</hover></click>"));
-                    push(new ReplacementValue(":+1:", "<click:suggest_command:\":+1:\"><hover:show_text:\":+1:\">\uD83D\uDD92</hover></click>"));
-                    push(new ReplacementValue(":-1:", "<click:suggest_command:\":-1:\"><hover:show_text:\":-1:\">\uD83D\uDD93</hover></click>"));
-                    push(new ReplacementValue(":cool:", "<click:suggest_command:\":cool:\"><hover:show_text:\":cool:\">\uD83D\uDE0E</hover></click>"));
-                    push(new ReplacementValue("B)", "<click:suggest_command:\"B)\"><hover:show_text:\"B)\">\uD83D\uDE0E</hover></click>"));
-                    push(new ReplacementValue(":clown:", "<click:suggest_command:\":clown:\"><hover:show_text:\":clown:\">\uD83E\uDD21</hover></click>"));
-                    push(new ReplacementValue("<3", "<click:suggest_command:\"<3\"><hover:show_text:\"<3\">❤</hover></click>"));
-                    push(new ReplacementValue("XD", "<click:suggest_command:\"XD\"><hover:show_text:\"XD\">\uD83D\uDE06</hover></click>"));
-                    push(new ReplacementValue("%)", "<click:suggest_command:\"%)\"><hover:show_text:\"%)\">\uD83D\uDE35</hover></click>"));
-                    push(new ReplacementValue("=D", "<click:suggest_command:\"=D\"><hover:show_text:\"=D\">\uD83D\uDE03</hover></click>"));
-                    push(new ReplacementValue(">:(", "<click:suggest_command:\">:(\"><hover:show_text:\">:(\">\uD83D\uDE21</hover></click>"));
-                    push(new ReplacementValue(":idk:", "<click:suggest_command:\":idk:\"><hover:show_text:\":idk:\">¯\\_(ツ)_/¯</hover></click>"));
-                    push(new ReplacementValue(":angry:", "<click:suggest_command:\":angry:\"><hover:show_text:\":angry:\">(╯°□°)╯︵ ┻━┻</hover></click>"));
-                    push(new ReplacementValue(":happy:", "<click:suggest_command:\":happy:\"><hover:show_text:\":happy:\">＼(＾O＾)／</hover></click>"));
+                    // emoticons
+                    put("smile", String.format(BOUNDARY, ":-?\\)"));
+                    put("big_smile", String.format(BOUNDARY, ":-?D"));
+                    put("sad", String.format(BOUNDARY, ":-?\\("));
+                    put("ok_hand", String.format(BOUNDARY, "(?i):ok:"));
+                    put("thumbs_up", String.format(BOUNDARY, ":\\+1:"));
+                    put("thumbs_down", String.format(BOUNDARY, ":-1:"));
+                    put("cool_smile", String.format(BOUNDARY, "(?i):cool:"));
+                    put("cool_glasses", String.format(BOUNDARY, "B-?\\)"));
+                    put("clown", String.format(BOUNDARY, "(?i):clown:"));
+                    put("heart", String.format(BOUNDARY, "<3"));
+                    put("laughing", String.format(BOUNDARY, "(?i)xd"));
+                    put("confused", String.format(BOUNDARY, "%-?\\)"));
+                    put("happy", String.format(BOUNDARY, "=D"));
+                    put("angry", String.format(BOUNDARY, ">:-?\\("));
+
+                    // ascii Art
+                    put("ascii_idk", String.format(BOUNDARY, "(?i):idk:"));
+                    put("ascii_angry", String.format(BOUNDARY, "(?i):angry:"));
+                    put("ascii_happy", String.format(BOUNDARY, "(?i):happy:"));
+
+                    // dynamic Placeholders
+                    put("ping", String.format(BOUNDARY, "%ping%"));
+                    put("tps", String.format(BOUNDARY, "%tps%"));
+                    put("online", String.format(BOUNDARY, "%online%"));
+                    put("coords", String.format(BOUNDARY, "%coords%"));
+                    put("stats", String.format(BOUNDARY, "%stats%"));
+                    put("skin", String.format(BOUNDARY, "%skin%"));
+                    put("item", String.format(BOUNDARY, "%item%"));
+
+                    // text formatting
+                    put("image", "(?<!\\\\{2,})(?<=\\s|^)((?:https?)://(?:[a-zA-Z0-9-]{1,63}\\.)*(?:imgur\\.com|discordapp\\.net|cdn\\.discordapp\\.com)/[\\w\\-./?=&%]*\\.(?:jpg|jpeg|png|gif|webp|bmp))(?!\\S)");
+                    put("url", "(?<!\\\\{2,})(?<=\\s|^)((?:https?|ftp)://(?:[\\p{L}a-zA-Z0-9-]{1,63}\\.)+[\\p{L}a-zA-Z]{2,6}(?::\\d{1,5})?(?:/[\\w\\-./?=&%]*)?)(?!\\S)");
+                    put("spoiler", String.format(FORMAT_TEMPLATE, "\\|\\|", "\\|\\|"));
+                    put("bold", String.format(FORMAT_TEMPLATE, "\\*\\*", "\\*\\*"));
+                    put("italic", String.format(FORMAT_TEMPLATE, "\\*", "\\*"));
+                    put("underline", String.format(FORMAT_TEMPLATE, "__", "__"));
+                    put("obfuscated", String.format(FORMAT_TEMPLATE, "\\?\\?", "\\?\\?"));
+                    put("strikethrough", String.format(FORMAT_TEMPLATE, "~~", "~~"));
                 }
             };
-
-            @Getter
-            public static final class ReplacementValue {
-                private String trigger = "";
-                private String replace = "";
-
-                public ReplacementValue(String trigger, String replace) {
-                    this.trigger = trigger;
-                    this.replace = replace;
-                }
-            }
         }
 
         @Getter
@@ -565,12 +525,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             private String prefix = "<vault_prefix><stream_prefix>";
             private String suffix = "<afk_suffix><vault_suffix>";
             private Ticker ticker = new Ticker();
-        }
-
-        @Getter
-        public static final class Spoiler implements SubFormatMessageConfig, Config.IEnable {
-            private boolean enable = true;
-            private String color = "<fcolor:2>";
         }
 
         @Getter

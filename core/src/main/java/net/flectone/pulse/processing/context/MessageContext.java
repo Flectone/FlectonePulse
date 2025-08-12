@@ -64,4 +64,8 @@ public class MessageContext {
     public void setFlag(MessageFlag flag, boolean value) {
         flags.put(flag, value);
     }
+
+    public void setFlags(Map<MessageFlag, Boolean> flags) {
+        this.flags.putAll(flags);
+    }
 }
