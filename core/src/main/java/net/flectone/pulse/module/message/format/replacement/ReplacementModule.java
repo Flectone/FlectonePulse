@@ -21,6 +21,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -31,10 +32,7 @@ import org.apache.commons.lang3.Strings;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.IOException;
-import java.util.EnumMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -44,6 +42,10 @@ import java.util.regex.Pattern;
 public class ReplacementModule extends AbstractModuleLocalization<Localization.Message.Format.Replacement> {
 
     private final Map<String, Pattern> triggerPatterns = new LinkedHashMap<>();
+    private final Cache<String, String> messageCache = CacheBuilder.newBuilder()
+            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .maximumSize(10000)
+            .build();
     private final Cache<String, Component> imageCache = CacheBuilder.newBuilder()
             .expireAfterAccess(10, TimeUnit.MINUTES)
             .maximumSize(100)
@@ -59,6 +61,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     private final SkinService skinService;
     private final UrlFormatter urlFormatter;
     private final MiniMessage defaultMiniMessage;
+    private final FLogger fLogger;
 
     @Inject
     public ReplacementModule(FileResolver fileResolver,
@@ -68,7 +71,8 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                              PlatformServerAdapter platformServerAdapter,
                              PlatformPlayerAdapter platformPlayerAdapter,
                              SkinService skinService,
-                             UrlFormatter urlFormatter) {
+                             UrlFormatter urlFormatter,
+                             FLogger fLogger) {
         super(localization -> localization.getMessage().getFormat().getReplacement());
 
         this.message = fileResolver.getMessage().getFormat().getReplacement();
@@ -81,6 +85,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         this.skinService = skinService;
         this.urlFormatter = urlFormatter;
         this.defaultMiniMessage = MiniMessage.miniMessage();
+        this.fLogger = fLogger;
     }
 
     @Override
@@ -99,6 +104,8 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     @Override
     public void onDisable() {
         triggerPatterns.clear();
+        messageCache.invalidateAll();
+        imageCache.invalidateAll();
     }
 
     @Override
@@ -106,40 +113,64 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         return message.isEnable();
     }
 
-    public String processMessage(String message) {
+    public String cacheProcessMessage(String message) {
         if (StringUtils.isEmpty(message)) return message;
 
-        String result = message;
+        try {
+            return messageCache.get(message, () -> processMessage(message));
+        } catch (ExecutionException e) {
+            fLogger.warning(e);
+        }
+
+        return message;
+    }
+
+    private String processMessage(String message) {
+        List<MatchInfo> matches = new ArrayList<>();
+
         for (Map.Entry<String, Pattern> entry : triggerPatterns.entrySet()) {
             String name = entry.getKey();
             boolean isUrl = name.equals("url") || name.equals("image");
-
-            Pattern pattern = entry.getValue();
-
-            StringBuilder stringBuilder = new StringBuilder();
-            Matcher matcher = pattern.matcher(result);
+            Matcher matcher = entry.getValue().matcher(message);
 
             while (matcher.find()) {
-                StringBuilder finalReplacement = new StringBuilder("<replacement:'" + name);
-                for (int i = 1; i <= matcher.groupCount(); i++) {
-                    String groupText = matcher.group(i);
-                    finalReplacement
-                            .append("':'")
-                            .append(StringEscapeUtils.escapeJava(
-                                    !isUrl ? groupText : urlFormatter.escapeAmpersand(groupText))
-                            );
-                }
-
-                finalReplacement.append("'>");
-                matcher.appendReplacement(stringBuilder, Matcher.quoteReplacement(finalReplacement.toString()));
+                String replacement = buildReplacement(name, matcher, isUrl);
+                matches.add(new MatchInfo(matcher.start(), matcher.end(), replacement));
             }
-
-            matcher.appendTail(stringBuilder);
-            result = stringBuilder.toString();
         }
 
-        return result;
+        matches.sort(Comparator.comparingInt(MatchInfo::start));
+
+        StringBuilder stringBuilder = new StringBuilder();
+        int lastPos = 0;
+        for (MatchInfo matchInfo : matches) {
+            if (matchInfo.start() < lastPos) continue;
+
+            stringBuilder.append(message, lastPos, matchInfo.start());
+            stringBuilder.append(matchInfo.replacement());
+            lastPos = matchInfo.end();
+        }
+
+        stringBuilder.append(message.substring(lastPos));
+
+        return stringBuilder.toString();
     }
+
+    private String buildReplacement(String name, Matcher matcher, boolean isUrl) {
+        StringBuilder stringBuilder = new StringBuilder("<replacement:'").append(name);
+        for (int i = 1; i <= matcher.groupCount(); i++) {
+            String groupText = matcher.group(i);
+            stringBuilder
+                    .append("':'")
+                    .append(StringEscapeUtils.escapeJava(
+                            isUrl ? urlFormatter.escapeAmpersand(groupText) : groupText
+                    ));
+        }
+
+        return stringBuilder.append("'>").toString();
+    }
+
+    private record MatchInfo(int start, int end, String replacement) {}
 
     public Tag spoilerTag(FEntity sender, FPlayer receiver, String spoilerText, Map<MessageFlag, Boolean> flags) {
         // skip deprecated issue <spoiler:\>
@@ -151,7 +182,8 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                 .flag(MessageFlag.TRANSLATE_ITEM, false) // we don't need to double format "|| %item% ||"
                 .build();
 
-        int length = Math.max(PlainTextComponentSerializer.plainText().serialize(spoilerComponent).length() - 1, 1);
+        int length = PlainTextComponentSerializer.plainText().serialize(spoilerComponent).length();
+        length = spoilerText.endsWith(" ") ? length : Math.max(1, length - 1);
 
         Localization.Message.Format.Replacement replacement = resolveLocalization(receiver);
         String format = StringUtils.replaceEach(

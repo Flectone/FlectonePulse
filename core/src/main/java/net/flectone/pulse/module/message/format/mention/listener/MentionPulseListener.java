@@ -3,24 +3,23 @@ package net.flectone.pulse.module.message.format.mention.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.mention.MentionModule;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -57,7 +56,7 @@ public class MentionPulseListener implements PulseListener {
         MessageContext messageContext = event.getContext();
         if (!messageContext.isFlag(MessageFlag.MENTION)) return;
 
-        String processedMessage = replace(messageContext.getSender(), messageContext.getMessage());
+        String processedMessage = mentionModule.cacheReplace(messageContext.getSender(), messageContext.getMessage());
         messageContext.setMessage(processedMessage);
 
         FEntity sender = messageContext.getSender();
@@ -98,26 +97,5 @@ public class MentionPulseListener implements PulseListener {
 
             return Tag.selfClosingInserting(messagePipeline.builder(receiver, format).build());
         });
-    }
-
-    private String replace(FEntity sender, String message) {
-        String[] words = message.split(" ");
-
-        for (int i = 0; i < words.length; i++) {
-            String word = words[i];
-            if (!word.startsWith(this.message.getTrigger())) continue;
-
-            String wordWithoutPrefix = Strings.CS.replaceOnce(word, this.message.getTrigger(), "");
-
-            FPlayer mentionFPlayer = fPlayerService.getFPlayer(wordWithoutPrefix);
-            boolean isMention = !mentionFPlayer.isUnknown() && integrationModule.canSeeVanished(mentionFPlayer, sender)
-                    || integrationModule.getGroups().contains(wordWithoutPrefix) && permissionChecker.check(sender, permission.getGroup());
-            if (isMention) {
-                words[i] = "<mention:" + wordWithoutPrefix + ">";
-                break;
-            }
-        }
-
-        return String.join(" ", words);
     }
 }

@@ -42,9 +42,6 @@ public class ReplacementPulseListener implements PulseListener {
         this.permissionChecker = permissionChecker;
     }
 
-    @Inject
-    private FLogger fLogger;
-
     @Pulse
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.getContext();
@@ -53,7 +50,7 @@ public class ReplacementPulseListener implements PulseListener {
         FEntity sender = messageContext.getSender();
         if (replacementModule.isModuleDisabledFor(sender)) return;
 
-        String processedMessage = replacementModule.processMessage(messageContext.getMessage());
+        String processedMessage = replacementModule.cacheProcessMessage(messageContext.getMessage());
         messageContext.setMessage(processedMessage);
 
         FPlayer receiver = messageContext.getReceiver();

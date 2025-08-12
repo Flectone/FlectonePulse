@@ -24,6 +24,8 @@ package net.flectone.pulse.listener;
     SOFTWARE.
  */
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
@@ -35,12 +37,15 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 /**
@@ -61,16 +66,24 @@ public final class LegacyMiniConvertorPulseListener implements PulseListener {
             Option.DOUBLE_TO_ESCAPE
     ));
 
+    private final Cache<String, String> messageCache = CacheBuilder.newBuilder()
+            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .maximumSize(10000)
+            .build();
+
     private final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
 
     private final Permission.Message.Format formatPermission;
     private final PermissionChecker permissionChecker;
+    private final FLogger fLogger;
 
     @Inject
     public LegacyMiniConvertorPulseListener(FileResolver fileResolver,
-                                            PermissionChecker permissionChecker) {
+                                            PermissionChecker permissionChecker,
+                                            FLogger fLogger) {
         this.formatPermission = fileResolver.getPermission().getMessage().getFormat();
         this.permissionChecker = permissionChecker;
+        this.fLogger = fLogger;
     }
 
     @Pulse(priority = Event.Priority.HIGHEST)
@@ -80,7 +93,7 @@ public final class LegacyMiniConvertorPulseListener implements PulseListener {
         if (!messageContext.isFlag(MessageFlag.COLORS)) return;
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission.getAll())) return;
 
-        String message = toMini(messageContext.getMessage());
+        String message = cacheTranslate(messageContext.getMessage());
         messageContext.setMessage(message);
     }
 
@@ -89,8 +102,16 @@ public final class LegacyMiniConvertorPulseListener implements PulseListener {
      * @param text text to translate
      * @return translated string
      */
-    public @NotNull String toMini(@NotNull String text) {
-        return toMini(text, DEF_OPTIONS);
+    public @NotNull String cacheTranslate(@NotNull String text) {
+        if (StringUtils.isEmpty(text)) return text;
+
+        try {
+            return messageCache.get(text, () -> translate(text, DEF_OPTIONS));
+        } catch (ExecutionException e) {
+            fLogger.warning(e);
+        }
+
+        return translate(text, DEF_OPTIONS);
     }
 
     /**
@@ -99,7 +120,7 @@ public final class LegacyMiniConvertorPulseListener implements PulseListener {
      * @param options options to use
      * @return translated string
      */
-    public @NotNull String toMini(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
+    private @NotNull String translate(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
         text = StringUtils.replaceEach(
                 text,
                 new String[]{"&&", "§"},
