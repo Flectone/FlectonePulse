@@ -110,6 +110,7 @@ subprojects {
     }
 
     mavenPublishing {
+        publishToMavenCentral(true)
         coordinates(project.group, project.name, project.version)
 
         pom {
@@ -163,10 +164,4 @@ tasks.register("bukkitMergeJars", Jar) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     dependsOn platforms.collect { proj -> proj.tasks.named("shadeDowngradedApi") }
-}
-
-mavenPublishing {
-    publishToMavenCentral(true)
-
-    signAllPublications()
 }
