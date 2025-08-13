@@ -8,6 +8,8 @@ on:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     env:
       ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
@@ -44,4 +46,4 @@ jobs:
           if-no-files-found: warn
 
       - name: Publish to Maven Central
-        run: ./gradlew publishAllPublicationsToMavenCentral --stacktrace
+        run: ./gradlew publishAllPublicationsToMavenCentral
