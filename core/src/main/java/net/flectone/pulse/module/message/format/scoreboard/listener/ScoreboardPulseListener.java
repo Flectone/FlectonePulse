@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
@@ -20,9 +21,17 @@ public class ScoreboardPulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onPlayerLoadEvent(PlayerLoadEvent event) {
+    public void onPlayerJoinEvent(PlayerJoinEvent event) {
         FPlayer fPlayer = event.getPlayer();
-        scoreboardModule.create(fPlayer, event.isReload());
+        scoreboardModule.create(fPlayer, false);
+    }
+
+    @Pulse
+    public void onPlayerLoadEvent(PlayerLoadEvent event) {
+        if (!event.isReload()) return;
+
+        FPlayer fPlayer = event.getPlayer();
+        scoreboardModule.create(fPlayer, true);
     }
 
     @Pulse

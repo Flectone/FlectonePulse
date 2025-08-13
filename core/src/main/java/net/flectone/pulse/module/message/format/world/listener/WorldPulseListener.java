@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.format.world.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -35,9 +36,16 @@ public class WorldPulseListener implements PulseListener {
         this.permissionChecker = permissionChecker;
     }
 
+    @Pulse
+    public void onPlayerJoinEvent(PlayerJoinEvent event) {
+        FPlayer fPlayer = event.getPlayer();
+        worldModule.update(fPlayer);
+    }
 
     @Pulse
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
+        if (!event.isReload()) return;
+
         FPlayer fPlayer = event.getPlayer();
         worldModule.update(fPlayer);
     }

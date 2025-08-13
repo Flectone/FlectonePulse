@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.afk.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -37,11 +38,18 @@ public class AfkPulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onPlayerLoadEvent(PlayerLoadEvent event) {
+    public void onPlayerJoinEvent(PlayerJoinEvent event) {
         FPlayer fPlayer = event.getPlayer();
         afkModule.remove("", fPlayer);
     }
 
+    @Pulse
+    public void onPlayerLoadEvent(PlayerLoadEvent event) {
+        if (!event.isReload()) return;
+
+        FPlayer fPlayer = event.getPlayer();
+        afkModule.remove("", fPlayer);
+    }
 
     @Pulse(priority = Event.Priority.HIGH)
     public void onMessageFormattingEvent(MessageFormattingEvent event) {

@@ -5,8 +5,8 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.util.Mail;
-import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.module.command.mail.MailModule;
 import net.flectone.pulse.service.FPlayerService;
 
@@ -26,7 +26,7 @@ public class MailPulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onPlayerLoadEvent(PlayerLoadEvent event) {
+    public void onPlayerJoinEvent(PlayerJoinEvent event) {
         FPlayer fReceiver = event.getPlayer();
         if (mailModule.isModuleDisabledFor(fReceiver)) return;
 

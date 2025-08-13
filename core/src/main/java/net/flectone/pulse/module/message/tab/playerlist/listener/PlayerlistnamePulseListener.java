@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 
@@ -18,7 +19,14 @@ public class PlayerlistnamePulseListener implements PulseListener {
     }
 
     @Pulse
+    public void onPlayerJoinEvent(PlayerJoinEvent event) {
+        playerlistnameModule.update();
+    }
+
+    @Pulse
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
+        if (!event.isReload()) return;
+
         playerlistnameModule.update();
     }
 

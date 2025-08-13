@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.stream.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.util.constant.MessageFlag;
@@ -37,7 +38,15 @@ public class StreamPulseListener implements PulseListener {
     }
 
     @Pulse
+    public void onPlayerJoinEvent(PlayerJoinEvent event) {
+        FPlayer fPlayer = event.getPlayer();
+        streamModule.setStreamPrefix(fPlayer, fPlayer.isSetting(FPlayer.Setting.STREAM));
+    }
+
+    @Pulse
     public void onPlayerLoadEvent(PlayerLoadEvent event) {
+        if (!event.isReload()) return;
+
         FPlayer fPlayer = event.getPlayer();
         streamModule.setStreamPrefix(fPlayer, fPlayer.isSetting(FPlayer.Setting.STREAM));
     }
