@@ -58,7 +58,6 @@ shadowJar {
 	outputs.cacheIf { true }
 
 	archiveBaseName.set("${project_name}-${project.name}")
-	archiveClassifier.set("")
 	archiveVersion.set("${project_version}")
 
 	dependencies {
@@ -92,3 +91,7 @@ tasks.register('fabricRemapJar', RemapJarTask) {
 }
 
 tasks.assemble.dependsOn tasks.fabricRemapJar
+
+artifacts {
+	archives fabricRemapJar
+}
