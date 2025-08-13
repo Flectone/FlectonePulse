@@ -30,7 +30,7 @@ public class ReflectionResolver {
 
     public void hasClassOrElse(String className, Consumer<LibraryResolver> libraryConsumer) {
         boolean isAvailable = hasClass(className);
-        if (isAvailable) {
+        if (!isAvailable) {
             libraryConsumer.accept(libraryResolver);
         }
     }
