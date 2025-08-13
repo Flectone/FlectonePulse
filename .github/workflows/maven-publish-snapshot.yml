@@ -1,8 +1,9 @@
 name: Publish Snapshot to Sonatype
+
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   publish:
@@ -10,15 +11,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Java
+      - name: Setup JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
           distribution: 'temurin'
+          java-version: '21'
           cache: gradle
 
       - name: Publish Snapshot
-        run: ./gradlew clean build publishToSonatype
+        run: ./gradlew clean fabricRemapJar bukkitMergeJars publishToSonatype --stacktrace
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
