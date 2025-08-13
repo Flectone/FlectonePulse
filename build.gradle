@@ -107,6 +107,39 @@ subprojects {
 
         minimize()
     }
+
+    mavenPublishing {
+        publishToMavenCentral(true)
+        coordinates("net.flectone.pulse", "bukkit", project_version)
+
+        pom {
+            name = "FlectonePulse ${project.name.capitalize()}"
+            description = "FlectonePulse module for ${project.name.capitalize()} - Every Message Under Your Control!"
+            url = 'https://github.com/Flectone/FlectonePulse'
+            licenses {
+                license {
+                    name = 'GNU General Public License v3.0'
+                    url = 'https://www.gnu.org/licenses/gpl-3.0'
+                }
+            }
+
+            developers {
+                developer {
+                    id = 'TheFaser'
+                    name = 'TheFaser'
+                    email = 'artem.mochalin11@gmail.com'
+                }
+            }
+
+            scm {
+                connection = 'scm:git:https://github.com/Flectone/FlectonePulse.git'
+                developerConnection = 'scm:git:ssh://github.com/Flectone/FlectonePulse.git'
+                url = 'https://github.com/Flectone/FlectonePulse'
+            }
+        }
+
+        signAllPublications()
+    }
 }
 
 tasks.register("bukkitMergeJars", Jar) {
@@ -114,7 +147,7 @@ tasks.register("bukkitMergeJars", Jar) {
     archiveVersion.set("${project_version}")
 
     def platforms = subprojects.findAll {
-        it.name != "fabric"
+        it.name != "fabric" && it.name != "core"
     }
 
     from {
@@ -130,48 +163,4 @@ tasks.register("bukkitMergeJars", Jar) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     dependsOn platforms.collect { proj -> proj.tasks.named("shadeDowngradedApi") }
-}
-
-
-mavenPublishing {
-    publishToMavenCentral(true)
-    coordinates("net.flectone.pulse", "bukkit", project_version)
-
-    pom {
-        name = "FlectonePulse ${project.name.capitalize()}"
-        description = "FlectonePulse module for ${project.name.capitalize()} - Every Message Under Your Control!"
-        url = 'https://github.com/Flectone/FlectonePulse'
-        licenses {
-            license {
-                name = 'GNU General Public License v3.0'
-                url = 'https://www.gnu.org/licenses/gpl-3.0'
-            }
-        }
-
-        developers {
-            developer {
-                id = 'TheFaser'
-                name = 'TheFaser'
-                email = 'artem.mochalin11@gmail.com'
-            }
-        }
-
-        scm {
-            connection = 'scm:git:https://github.com/Flectone/FlectonePulse.git'
-            developerConnection = 'scm:git:ssh://github.com/Flectone/FlectonePulse.git'
-            url = 'https://github.com/Flectone/FlectonePulse'
-        }
-    }
-
-    signAllPublications()
-}
-
-afterEvaluate {
-    publishing.publications.withType(MavenPublication).configureEach {
-        artifacts.clear()
-
-        artifact(tasks.named("bukkitMergeJars").get()) {
-            classifier = null
-        }
-    }
 }
