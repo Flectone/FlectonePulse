@@ -27,11 +27,16 @@ public abstract class AbstractModule {
     @Setter private boolean enable;
 
     protected AbstractModule() {
+    }
+
+    public void onLoad() {
+        predicates.clear();
+
         addPredicate(fPlayer -> !isEnable());
         addPredicate(fPlayer -> !permissionChecker.check(fPlayer, modulePermission));
     }
 
-    public abstract void onEnable();
+    public void onEnable() {}
 
     public void onDisable() {}
 
@@ -106,6 +111,7 @@ public abstract class AbstractModule {
         module.setEnable(isEnabled);
 
         if (isEnabled) {
+            module.onLoad();
             module.onEnable();
             module.getChildren().forEach(subModule -> reloadWithChildren(subModule, AbstractModule::isConfigEnable));
         } else {
