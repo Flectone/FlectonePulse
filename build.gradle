@@ -110,6 +110,7 @@ subprojects {
 
     if (!project.name.is("fabric")) {
         mavenPublishing {
+            publishToMavenCentral()
             coordinates(project.group, project.name, project.version)
 
             pom {
@@ -141,12 +142,6 @@ subprojects {
             signAllPublications()
         }
     }
-}
-
-mavenPublishing {
-    publishToMavenCentral()
-
-    signAllPublications()
 }
 
 tasks.register("bukkitMergeJars", Jar) {
