@@ -22,7 +22,7 @@ jobs:
           cache: gradle
 
       - name: Publish to Maven Central
-        run: ./gradlew clean fabricRemapJar bukkitMergeJars publishToSonatype closeAndReleaseSonatypeStagingRepository
+        run: bash ./gradlew clean fabricRemapJar bukkitMergeJars publishToSonatype closeAndReleaseSonatypeStagingRepository
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}

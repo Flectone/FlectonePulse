@@ -22,7 +22,7 @@ jobs:
           cache: gradle
 
       - name: Publish Snapshot
-        run: ./gradlew clean fabricRemapJar bukkitMergeJars publishToSonatype
+        run: bash ./gradlew clean fabricRemapJar bukkitMergeJars publishToSonatype
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
