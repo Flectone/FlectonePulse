@@ -143,6 +143,12 @@ subprojects {
     }
 }
 
+mavenPublishing {
+    publishToMavenCentral()
+
+    signAllPublications()
+}
+
 tasks.register("bukkitMergeJars", Jar) {
     archiveBaseName.set("${project_name}-bukkit")
     archiveVersion.set("${project_version}")
