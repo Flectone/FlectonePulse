@@ -30,7 +30,6 @@ subprojects {
         sourceCompatibility = java_version
         targetCompatibility = java_version
         withSourcesJar()
-        withJavadocJar()
     }
 
     repositories {
