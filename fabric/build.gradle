@@ -48,10 +48,6 @@ dependencies {
 	implementation(project(":core"))
 }
 
-tasks.named("jar") {
-	enabled = false
-}
-
 shadowJar {
 	archiveFileName = "flectonepulsedev-" + project.name + "-" + project_version + ".jar"
 
