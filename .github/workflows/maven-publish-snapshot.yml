@@ -8,6 +8,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
     steps:
       - uses: actions/checkout@v4
 
@@ -19,7 +22,7 @@ jobs:
           cache: gradle
 
       - name: Publish Snapshot
-        run: ./gradlew clean fabricRemapJar bukkitMergeJars publishToSonatype --stacktrace
+        run: ./gradlew clean fabricRemapJar bukkitMergeJars publishToSonatype
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
