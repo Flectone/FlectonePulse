@@ -111,7 +111,7 @@ subprojects {
     if (!project.name.is("fabric")) {
         mavenPublishing {
             publishToMavenCentral()
-            coordinates("net.flectone.pulse", project.name, project.version)
+            coordinates("net.flectone.pulse", project.name, project_version)
 
             pom {
                 name = "FlectonePulse ${project.name.capitalize()}"
