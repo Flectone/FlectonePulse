@@ -179,9 +179,11 @@ tasks.register("bukkitMergeJars", Jar) {
 nexusPublishing {
     repositories {
         sonatype {
-            nexusUrl.set(uri('https://central.sonatype.com/api/v1/publisher/'))
-            username = System.getenv('OSSRH_USERNAME')
-            password = System.getenv('OSSRH_PASSWORD')
+            nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
+            snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+
+            username = System.getenv("OSSRH_USERNAME")
+            password = System.getenv("OSSRH_PASSWORD")
         }
     }
 }
