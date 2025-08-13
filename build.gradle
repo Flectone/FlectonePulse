@@ -3,9 +3,7 @@ plugins {
     id 'com.gradleup.shadow' version '8.3.0'
     id 'com.github.gmazzo.buildconfig' version '5.6.2'
     id 'xyz.wagyourtail.jvmdowngrader' version '1.3.3'
-    id 'maven-publish'
-    id 'signing'
-    id 'io.github.gradle-nexus.publish-plugin' version '2.0.0'
+    id 'com.vanniktech.maven.publish' version "0.34.0"
 }
 
 group = "net.flectone.pulse"
@@ -16,13 +14,16 @@ subprojects {
     apply plugin: 'com.github.gmazzo.buildconfig'
     apply plugin: 'com.gradleup.shadow'
     apply plugin: 'xyz.wagyourtail.jvmdowngrader'
-    apply plugin: 'maven-publish'
-    apply plugin: 'signing'
+    apply plugin: 'com.vanniktech.maven.publish'
 
     compileJava.options.encoding = 'UTF-8'
 
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
+    }
+
+    tasks.withType(Javadoc).configureEach {
+        enabled = false
     }
 
     java {
@@ -108,48 +109,36 @@ subprojects {
         minimize()
     }
 
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                from components.java
-                groupId = project.group
-                artifactId = project.name
-                version = project.version
+    mavenPublishing {
+        coordinates(project.group, project.name, project.version)
 
-                pom {
-                    name = "FlectonePulse ${project.name.capitalize()}"
-                    description = "FlectonePulse module for ${project.name.capitalize()} - Every Message Under Your Control!"
-                    url = 'https://github.com/Flectone/FlectonePulse'
-                    licenses {
-                        license {
-                            name = 'GNU General Public License v3.0'
-                            url = 'https://www.gnu.org/licenses/gpl-3.0'
-                        }
-                    }
-                    developers {
-                        developer {
-                            id = 'TheFaser'
-                            name = 'TheFaser'
-                            email = 'artem.mochalin11@gmail.com'
-                        }
-                    }
-                    scm {
-                        connection = 'scm:git:https://github.com/Flectone/FlectonePulse.git'
-                        developerConnection = 'scm:git:ssh://github.com/Flectone/FlectonePulse.git'
-                        url = 'https://github.com/Flectone/FlectonePulse'
-                    }
+        pom {
+            name = "FlectonePulse ${project.name.capitalize()}"
+            description = "FlectonePulse module for ${project.name.capitalize()} - Every Message Under Your Control!"
+            url = 'https://github.com/Flectone/FlectonePulse'
+            licenses {
+                license {
+                    name = 'GNU General Public License v3.0'
+                    url = 'https://www.gnu.org/licenses/gpl-3.0'
                 }
             }
-        }
-    }
 
-    signing {
-        useInMemoryPgpKeys(
-                System.getenv("SIGNING_KEY_ID"),
-                System.getenv("SIGNING_KEY"),
-                System.getenv("SIGNING_PASSWORD")
-        )
-        sign publishing.publications.mavenJava
+            developers {
+                developer {
+                    id = 'TheFaser'
+                    name = 'TheFaser'
+                    email = 'artem.mochalin11@gmail.com'
+                }
+            }
+
+            scm {
+                connection = 'scm:git:https://github.com/Flectone/FlectonePulse.git'
+                developerConnection = 'scm:git:ssh://github.com/Flectone/FlectonePulse.git'
+                url = 'https://github.com/Flectone/FlectonePulse'
+            }
+        }
+
+        signAllPublications()
     }
 }
 
@@ -176,13 +165,8 @@ tasks.register("bukkitMergeJars", Jar) {
     dependsOn platforms.collect { proj -> proj.tasks.named("shadeDowngradedApi") }
 }
 
-nexusPublishing {
-    repositories {
-        sonatype {
-            nexusUrl.set(uri("https://central.sonatype.com/"))
-            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/"))
-            username = System.getenv("OSSRH_USERNAME")
-            password = System.getenv("OSSRH_PASSWORD")
-        }
-    }
+mavenPublishing {
+    publishToMavenCentral(true)
+
+    signAllPublications()
 }

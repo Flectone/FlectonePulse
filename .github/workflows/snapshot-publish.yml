@@ -35,8 +35,8 @@ jobs:
           path: build/libs
           if-no-files-found: warn
 
-      - name: Publish Snapshot to Sonatype
-        run: bash ./gradlew publishToSonatype
+      - name: Publish to Maven Central
+        run: bash ./gradlew publishToMavenCentral
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
