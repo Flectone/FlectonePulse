@@ -12,11 +12,11 @@ jobs:
       contents: read
 
     env:
-      ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ vars.ORG_GRADLE_PROJECT_MAVENCENTRALUSERNAME }}
-      ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ vars.ORG_GRADLE_PROJECT_MAVENCENTRALPASSWORD }}
-      ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ vars.ORG_GRADLE_PROJECT_SIGNINGINMEMORYKEYID }}
-      ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ vars.ORG_GRADLE_PROJECT_SIGNINGINMEMORYKEY }}
-      ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ vars.ORG_GRADLE_PROJECT_SIGNINGINMEMORYKEYPASSWORD }}
+      ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.ORG_GRADLE_PROJECT_MAVENCENTRALUSERNAME }}
+      ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.ORG_GRADLE_PROJECT_MAVENCENTRALPASSWORD }}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGINMEMORYKEYID }}
+      ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGINMEMORYKEY }}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGINMEMORYKEYPASSWORD }}
 
     steps:
       - name: Checkout sources
