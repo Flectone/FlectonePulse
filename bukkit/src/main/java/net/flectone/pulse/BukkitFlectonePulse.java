@@ -55,22 +55,36 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
     }
 
     @Override
+    public <T> T get(Class<T> type) {
+        if (injector == null) {
+            throw new IllegalStateException("FlectonePulse not initialized yet");
+        }
+
+        return injector.getInstance(type);
+    }
+
+    @Override
+    public boolean isInitialized() {
+        return injector != null;
+    }
+
+    @Override
     public void onEnable() {
-        if (injector == null) return;
+        if (!isInitialized()) return;
 
         injector.getInstance(FlectonePulseAPI.class).onEnable();
     }
 
     @Override
     public void onDisable() {
-        if (injector == null) return;
+        if (!isInitialized()) return;
 
         injector.getInstance(FlectonePulseAPI.class).onDisable();
     }
 
     @Override
     public void reload() throws ReloadException {
-        if (injector == null) return;
+        if (!isInitialized()) return;
 
         injector.getInstance(FlectonePulseAPI.class).reload();
     }

@@ -1,11 +1,12 @@
 package net.flectone.pulse;
 
-import com.google.inject.Injector;
 import net.flectone.pulse.exception.ReloadException;
 
 public interface FlectonePulse {
 
-    Injector getInjector();
+    <T> T get(Class<T> type);
+
+    boolean isInitialized();
 
     void onEnable();
 
