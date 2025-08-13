@@ -108,39 +108,37 @@ subprojects {
         minimize()
     }
 
-    if (!project.name.is("fabric")) {
-        mavenPublishing {
-            publishToMavenCentral()
-            coordinates("net.flectone.pulse", project.name, project_version)
+    mavenPublishing {
+        publishToMavenCentral(true)
+        coordinates("net.flectone.pulse", project.name, project_version)
 
-            pom {
-                name = "FlectonePulse ${project.name.capitalize()}"
-                description = "FlectonePulse module for ${project.name.capitalize()} - Every Message Under Your Control!"
-                url = 'https://github.com/Flectone/FlectonePulse'
-                licenses {
-                    license {
-                        name = 'GNU General Public License v3.0'
-                        url = 'https://www.gnu.org/licenses/gpl-3.0'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id = 'TheFaser'
-                        name = 'TheFaser'
-                        email = 'artem.mochalin11@gmail.com'
-                    }
-                }
-
-                scm {
-                    connection = 'scm:git:https://github.com/Flectone/FlectonePulse.git'
-                    developerConnection = 'scm:git:ssh://github.com/Flectone/FlectonePulse.git'
-                    url = 'https://github.com/Flectone/FlectonePulse'
+        pom {
+            name = "FlectonePulse ${project.name.capitalize()}"
+            description = "FlectonePulse module for ${project.name.capitalize()} - Every Message Under Your Control!"
+            url = 'https://github.com/Flectone/FlectonePulse'
+            licenses {
+                license {
+                    name = 'GNU General Public License v3.0'
+                    url = 'https://www.gnu.org/licenses/gpl-3.0'
                 }
             }
 
-            signAllPublications()
+            developers {
+                developer {
+                    id = 'TheFaser'
+                    name = 'TheFaser'
+                    email = 'artem.mochalin11@gmail.com'
+                }
+            }
+
+            scm {
+                connection = 'scm:git:https://github.com/Flectone/FlectonePulse.git'
+                developerConnection = 'scm:git:ssh://github.com/Flectone/FlectonePulse.git'
+                url = 'https://github.com/Flectone/FlectonePulse'
+            }
         }
+
+        signAllPublications()
     }
 }
 
