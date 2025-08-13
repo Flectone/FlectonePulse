@@ -3,15 +3,21 @@ plugins {
     id 'com.gradleup.shadow' version '8.3.0'
     id 'com.github.gmazzo.buildconfig' version '5.6.2'
     id 'xyz.wagyourtail.jvmdowngrader' version '1.3.3'
+    id 'maven-publish'
+    id 'signing'
+    id 'io.github.gradle-nexus.publish-plugin' version '2.0.0'
 }
+
+group = "net.flectone.pulse"
+version = project_version
 
 subprojects {
     apply plugin: 'java'
     apply plugin: 'com.github.gmazzo.buildconfig'
     apply plugin: 'com.gradleup.shadow'
     apply plugin: 'xyz.wagyourtail.jvmdowngrader'
-
-    group = "net.flectone.pulse.${project.name}"
+    apply plugin: 'maven-publish'
+    apply plugin: 'signing'
 
     compileJava.options.encoding = 'UTF-8'
 
@@ -22,6 +28,8 @@ subprojects {
     java {
         sourceCompatibility = java_version
         targetCompatibility = java_version
+        withSourcesJar()
+        withJavadocJar()
     }
 
     repositories {
@@ -97,16 +105,53 @@ subprojects {
 
         outputs.cacheIf { true }
 
-        archiveBaseName.set("${project_name}-${project.name}")
-        archiveClassifier.set("")
-        archiveVersion.set("${project_version}")
-
         minimize()
     }
-}
 
-tasks.named("shadowJar").configure { enabled = false }
-tasks.named("jar").configure { enabled = false }
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                groupId = project.group
+                artifactId = project.name
+                version = project.version
+
+                pom {
+                    name = "FlectonePulse ${project.name.capitalize()}"
+                    description = "FlectonePulse module for ${project.name.capitalize()} - Every Message Under Your Control!"
+                    url = 'https://github.com/Flectone/FlectonePulse'
+                    licenses {
+                        license {
+                            name = 'GNU General Public License v3.0'
+                            url = 'https://www.gnu.org/licenses/gpl-3.0'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'TheFaser'
+                            name = 'TheFaser'
+                            email = 'artem.mochalin11@gmail.com'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:https://github.com/Flectone/FlectonePulse.git'
+                        developerConnection = 'scm:git:ssh://github.com/Flectone/FlectonePulse.git'
+                        url = 'https://github.com/Flectone/FlectonePulse'
+                    }
+                }
+            }
+        }
+    }
+
+    signing {
+        useInMemoryPgpKeys(
+                System.getenv("SIGNING_KEY_ID"),
+                System.getenv("SIGNING_KEY"),
+                System.getenv("SIGNING_PASSWORD")
+        )
+        sign publishing.publications.mavenJava
+    }
+}
 
 tasks.register("bukkitMergeJars", Jar) {
     archiveBaseName.set("${project_name}-bukkit")
@@ -129,4 +174,14 @@ tasks.register("bukkitMergeJars", Jar) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     dependsOn platforms.collect { proj -> proj.tasks.named("shadeDowngradedApi") }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri('https://central.sonatype.com/api/v1/publisher/'))
+            username = System.getenv('OSSRH_USERNAME')
+            password = System.getenv('OSSRH_PASSWORD')
+        }
+    }
 }
