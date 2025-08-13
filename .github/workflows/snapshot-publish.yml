@@ -44,4 +44,4 @@ jobs:
           if-no-files-found: warn
 
       - name: Publish to Maven Central
-        run: ./gradlew publishAllPublicationsToMavenCentral
+        run: ./gradlew publishAllPublicationsToMavenCentral --stacktrace
