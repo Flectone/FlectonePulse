@@ -28,7 +28,7 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
 
     private final Cache<String, String> messageCache = CacheBuilder.newBuilder()
             .expireAfterWrite(10, TimeUnit.MINUTES)
-            .maximumSize(10000)
+            .maximumSize(100000)
             .build();
 
     private final Message.Format.Moderation.Swear message;

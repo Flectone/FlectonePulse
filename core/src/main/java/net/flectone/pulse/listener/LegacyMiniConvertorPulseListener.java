@@ -68,7 +68,7 @@ public final class LegacyMiniConvertorPulseListener implements PulseListener {
 
     private final Cache<String, String> messageCache = CacheBuilder.newBuilder()
             .expireAfterWrite(10, TimeUnit.MINUTES)
-            .maximumSize(10000)
+            .maximumSize(100000)
             .build();
 
     private final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");

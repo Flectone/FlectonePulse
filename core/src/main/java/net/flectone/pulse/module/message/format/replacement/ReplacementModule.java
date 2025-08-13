@@ -44,7 +44,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     private final Map<String, Pattern> triggerPatterns = new LinkedHashMap<>();
     private final Cache<String, String> messageCache = CacheBuilder.newBuilder()
             .expireAfterWrite(10, TimeUnit.MINUTES)
-            .maximumSize(10000)
+            .maximumSize(100000)
             .build();
     private final Cache<String, Component> imageCache = CacheBuilder.newBuilder()
             .expireAfterAccess(10, TimeUnit.MINUTES)
@@ -96,9 +96,9 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
         listenerRegistry.register(ReplacementPulseListener.class);
 
-        message.getTriggers().forEach((name, regex) -> {
-            triggerPatterns.put(name, Pattern.compile(regex));
-        });
+        message.getTriggers().forEach((name, regex) ->
+                triggerPatterns.put(name, Pattern.compile(regex))
+        );
     }
 
     @Override

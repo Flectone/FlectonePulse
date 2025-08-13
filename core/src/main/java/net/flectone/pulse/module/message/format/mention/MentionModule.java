@@ -32,7 +32,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
     private final Cache<String, String> messageCache = CacheBuilder.newBuilder()
             .expireAfterWrite(10, TimeUnit.MINUTES)
-            .maximumSize(10000)
+            .maximumSize(1000)
             .build();
 
     private final Message.Format.Mention message;
