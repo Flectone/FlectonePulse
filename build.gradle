@@ -166,6 +166,12 @@ mavenPublishing {
     signAllPublications()
 }
 
-tasks.named("publishAllPublicationsToMavenCentralRepository").configure {
-    dependsOn(tasks.named("bukkitMergeJars"))
+afterEvaluate {
+    publishing.publications.withType(MavenPublication).configureEach {
+        artifacts.clear()
+
+        artifact(tasks.named("bukkitMergeJars").get()) {
+            classifier = null
+        }
+    }
 }
