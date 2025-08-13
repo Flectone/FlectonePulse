@@ -1,4 +1,4 @@
-name: Java CI with Gradle
+name: Java CI and Publish
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build:
+  build-and-publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -20,12 +20,13 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+          cache: gradle
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build with Gradle
-        run: bash ./gradlew fabricRemapJar bukkitMergeJars
+        run: bash ./gradlew clean fabricRemapJar bukkitMergeJars
 
       - name: Publish artifact
         uses: actions/upload-artifact@v4
@@ -33,3 +34,12 @@ jobs:
           name: FlectonePulse
           path: build/libs
           if-no-files-found: warn
+
+      - name: Publish Snapshot to Sonatype
+        run: bash ./gradlew publishToSonatype
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
+          SIGNING_PASSWORD: ${{ secrets.GPG_PASSPHRASE }}
+          SIGNING_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
