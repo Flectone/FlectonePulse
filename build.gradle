@@ -109,7 +109,6 @@ subprojects {
     }
 
     mavenPublishing {
-        publishToMavenCentral(true)
         coordinates(project.group, project.name, project.version)
 
         pom {
@@ -140,6 +139,12 @@ subprojects {
 
         signAllPublications()
     }
+}
+
+mavenPublishing {
+    publishToMavenCentral(true)
+
+    signAllPublications()
 }
 
 tasks.register("bukkitMergeJars", Jar) {
