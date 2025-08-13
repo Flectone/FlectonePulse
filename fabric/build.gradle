@@ -91,5 +91,4 @@ tasks.assemble.dependsOn tasks.fabricRemapJar
 
 artifacts {
 	archives fabricRemapJar
-	shadow shadowJar
 }
