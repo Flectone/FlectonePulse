@@ -48,6 +48,10 @@ dependencies {
 	implementation(project(":core"))
 }
 
+tasks.named("jar") {
+	enabled = false
+}
+
 shadowJar {
 	archiveFileName = "flectonepulsedev-" + project.name + "-" + project_version + ".jar"
 
@@ -88,7 +92,3 @@ tasks.register('fabricRemapJar', RemapJarTask) {
 }
 
 tasks.assemble.dependsOn tasks.fabricRemapJar
-
-artifacts {
-	archives fabricRemapJar
-}
