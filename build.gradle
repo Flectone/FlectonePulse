@@ -109,12 +109,12 @@ subprojects {
     }
 
     mavenPublishing {
-        publishToMavenCentral(true)
+        publishToMavenCentral()
         coordinates("net.flectone.pulse", project.name, project_version)
 
         pom {
             name = "FlectonePulse ${project.name.capitalize()}"
-            description = "FlectonePulse module for ${project.name.capitalize()} - Every Message Under Your Control!"
+            description = "${project.name.capitalize()} for FlectonePulse - Every Message Under Your Control!"
             url = 'https://github.com/Flectone/FlectonePulse'
             licenses {
                 license {
