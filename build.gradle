@@ -109,7 +109,7 @@ subprojects {
     }
 
     mavenPublishing {
-        publishToMavenCentral()
+        publishToMavenCentral(true)
         coordinates("net.flectone.pulse", project.name, project_version)
 
         pom {
