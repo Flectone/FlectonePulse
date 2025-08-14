@@ -189,7 +189,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         String format = StringUtils.replaceEach(
                 replacement.getValues().getOrDefault("spoiler", ""),
                 new String[]{"<message_1>", "<symbols>"},
-                new String[]{spoilerText, StringUtils.repeat(replacement.getHoverSymbol(), length)}
+                new String[]{spoilerText, StringUtils.repeat(replacement.getSpoilerSymbol(), length)}
         );
 
         Component component = messagePipeline.builder(sender, receiver, format)

@@ -1944,7 +1944,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             @Getter
             public static final class Replacement implements SubFormatMessageConfig, Localizable {
 
-                private String hoverSymbol = "█";
+                private String spoilerSymbol = "█";
 
                 private Map<String, String> values = new LinkedHashMap<>() {
                     {
