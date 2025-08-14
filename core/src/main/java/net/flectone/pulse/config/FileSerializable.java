@@ -17,6 +17,7 @@ import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.processing.serializer.EnumSerializer;
+import net.flectone.pulse.util.constant.AdventureTag;
 import net.kyori.adventure.bossbar.BossBar;
 import org.apache.commons.lang3.StringUtils;
 
@@ -30,6 +31,7 @@ public abstract class FileSerializable extends YamlSerializable {
     private static final SerializerConfig CONFIG = new SerializerConfig
             .Builder()
             .setBackupOnErrors(true)
+            .registerSerializer(new EnumSerializer<>(AdventureTag.class))
             .registerSerializer(new EnumSerializer<>(Message.Chat.Mode.class))
             .registerSerializer(new EnumSerializer<>(FColor.class))
             .registerSerializer(new EnumSerializer<>(FPlayer.Setting.class))
