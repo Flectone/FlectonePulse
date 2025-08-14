@@ -110,7 +110,7 @@ subprojects {
 
     mavenPublishing {
         publishToMavenCentral(true)
-        coordinates("net.flectone.pulse", "bukkit", project_version)
+        coordinates("net.flectone.pulse", project.name, project_version)
 
         pom {
             name = "FlectonePulse ${project.name.capitalize()}"
