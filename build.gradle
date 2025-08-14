@@ -140,6 +140,18 @@ subprojects {
 
         signAllPublications()
     }
+
+    afterEvaluate {
+        publishing.publications.withType(MavenPublication).configureEach { pub ->
+            def jarsToRemove = pub.artifacts.findAll { it.extension == 'jar' && (it.classifier == null || it.classifier == '') }
+            jarsToRemove.each { pub.artifacts.remove(it) }
+
+            pub.artifact(tasks.named('shadeDowngradedApi')) {
+                builtBy(tasks.named('shadeDowngradedApi'))
+            }
+
+        }
+    }
 }
 
 tasks.register("bukkitMergeJars", Jar) {
