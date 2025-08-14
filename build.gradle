@@ -145,7 +145,11 @@ subprojects {
         publishing {
             publications {
                 named('maven', MavenPublication) {
-                    artifact shadeDowngradedApi
+                    if (project.name.is("fabric")) {
+                        artifact shadowJar
+                    } else {
+                        artifact shadeDowngradedApi
+                    }
                 }
             }
         }
