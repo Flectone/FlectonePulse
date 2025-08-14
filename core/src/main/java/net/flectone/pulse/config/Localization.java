@@ -336,7 +336,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.tictactoe.lastMove = "<fcolor:2>Последний ход (<move>)";
         command.tictactoe.formatWin = "<color:#98FB98><player> выиграл</color:#98FB98>";
         command.tictactoe.formatDraw = "<color:#98FB98>Ничья \uD83D\uDC6C</color:#98FB98>";
-        command.tictactoe.symbol.blank = "<hover:show_text:\"<fcolor:1>Ход <move>\"><click:run_command:\"/tictactoemove %d <move>\">☐</click></hover>";
+        command.tictactoe.symbol.blank = "<fcolor:1><hover:show_text:\"<fcolor:1>Ход <move>\"><click:run_command:\"/tictactoemove %d <move>\">☐</click></hover>";
 
         command.toponline.nullPage = "<color:#ff7171><b>⁉</b> Страница не найдена";
         command.toponline.header = "<fcolor:2>▋ Игроков: <count> <br>";
@@ -1277,7 +1277,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             @Getter
             @NoArgsConstructor
             public static final class Symbol {
-                private String blank = "<hover:show_text:\"<fcolor:1>Move <move>\"><click:run_command:\"/tictactoemove %d <move>\">☐</click></hover>";
+                private String blank = "<fcolor:1><hover:show_text:\"<fcolor:1>Move <move>\"><click:run_command:\"/tictactoemove %d <move>\">☐</click></hover>";
                 private String first = "<fcolor:2>☑";
                 private String firstRemove = "<color:#ff7171>☑</color:#ff7171>";
                 private String firstWin = "<color:#98FB98>☑</color:#98FB98>";

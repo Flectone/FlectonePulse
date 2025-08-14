@@ -235,27 +235,31 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                                                                                       int typeTile,
                                                                                       String move) {
         return (fResolver, message) -> {
-            String title = Strings.CS.replace(
-                    switch (typeTile) {
-                        case 1 -> message.getFormatWin();
-                        case -1 -> message.getFormatDraw();
-                        default -> message.getFormatMove();
-                    },
-                    "<player>",
-                    fPlayer.getName()
-            );
+            String title = (switch (typeTile) {
+                case 1 -> Strings.CS.replace(message.getFormatWin(), "<player>", fReceiver.getName());
+                case -1 -> message.getFormatDraw();
+                default -> Strings.CS.replace(message.getFormatMove(), "<player>", fPlayer.getName());
+            });
 
             Localization.Command.Tictactoe.Symbol messageSymbol = message.getSymbol();
 
             String symbolFirst = messageSymbol.getFirst();
             String symbolSecond = messageSymbol.getSecond();
+
             String formatField = StringUtils.replaceEach(
                     String.join("<br>", message.getField()),
-                    new String[]{"<title>", "<current_move>", "<last_move>", "<symbol>", "<move>"},
+                    new String[]{"<current_move>", "<last_move>"},
+                    new String[]{
+                            ticTacToe.isEnded() ? "" : message.getCurrentMove(),
+                            message.getLastMove()
+                    }
+            );
+
+           formatField = StringUtils.replaceEach(
+                    formatField,
+                    new String[]{"<title>", "<symbol>", "<move>"},
                     new String[]{
                             title,
-                            ticTacToe.isEnded() ? "" : message.getCurrentMove(),
-                            message.getLastMove(),
                             ticTacToe.getFirstPlayer() == fPlayer.getId() ? symbolFirst : symbolSecond,
                             move
                     }
