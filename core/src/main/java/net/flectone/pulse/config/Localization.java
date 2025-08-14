@@ -233,7 +233,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.chatsetting.disable.you = "<color:#ff7171><b>⁉</b> Команда скрыта, проверь /chatsetting";
         command.chatsetting.disable.he = "<color:#ff7171><b>⁉</b> Он выключил команду с помощью /chatsetting";
         command.chatsetting.disable.server = "<color:#ff7171><b>⁉</b> Команда отключена на сервере";
-        command.chatsetting.inventory = "<reset>          Настройки чата";
+        command.chatsetting.inventory = "Настройки чата";
         command.chatsetting.checkbox.enabledHover = "<color:#98FB98>Отображение включено";
         command.chatsetting.checkbox.disabledHover = "<color:#ff7171>Отображение выключено";
         command.chatsetting.checkbox.types.clear();
