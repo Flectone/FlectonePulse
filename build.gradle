@@ -145,13 +145,11 @@ subprojects {
         signAllPublications()
     }
 
-    afterEvaluate {
-        publishing {
-            publications {
-                named('maven', MavenPublication) {
-                    if (project.name.is("fabric")) {
-                        artifact shadowJar
-                    } else {
+    if (!project.name.is("fabric")) {
+        afterEvaluate {
+            publishing {
+                publications {
+                    named('maven', MavenPublication) {
                         artifact shadeDowngradedApi
                     }
                 }
