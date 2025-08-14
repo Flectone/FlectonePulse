@@ -114,7 +114,7 @@ subprojects {
 
         pom {
             name = "FlectonePulse ${project.name.capitalize()}"
-            description = "${project.name.capitalize()} for FlectonePulse - Every Message Under Your Control!"
+            description = "Every Message Under Your Control!"
             url = 'https://github.com/Flectone/FlectonePulse'
             licenses {
                 license {
