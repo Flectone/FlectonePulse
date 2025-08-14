@@ -147,7 +147,7 @@ tasks.register("bukkitMergeJars", Jar) {
     archiveVersion.set("${project_version}")
 
     def platforms = subprojects.findAll {
-        it.name != "fabric" && it.name != "core"
+        it.name != "fabric" && it.name != "core" && it.name != "paper"
     }
 
     from {
