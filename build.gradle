@@ -148,6 +148,7 @@ subprojects {
 
             pub.artifact(tasks.named('shadeDowngradedApi')) {
                 builtBy(tasks.named('shadeDowngradedApi'))
+                classifier = null
             }
 
         }
