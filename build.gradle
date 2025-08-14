@@ -80,6 +80,10 @@ subprojects {
         }
     }
 
+    downgradeJar {
+        quiet = true
+    }
+
     shadowJar {
         relocate("com.zaxxer", "net.flectone.pulse.library.hikaricp")
         relocate("org.jdbi", "net.flectone.pulse.library.jdbi3")
