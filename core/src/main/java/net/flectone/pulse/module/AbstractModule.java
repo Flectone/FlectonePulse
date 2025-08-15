@@ -27,12 +27,7 @@ public abstract class AbstractModule {
     @Setter private boolean enable;
 
     protected AbstractModule() {
-        onLoad();
-    }
-
-    public void onLoad() {
-        addPredicate(fPlayer -> !isEnable());
-        addPredicate(fPlayer -> !permissionChecker.check(fPlayer, modulePermission));
+        addDefaultPredicates();
     }
 
     public void onEnable() {}
@@ -105,7 +100,7 @@ public abstract class AbstractModule {
         AbstractModule module = injector.getInstance(clazz);
 
         module.getPredicates().clear();
-        module.onLoad();
+        module.addDefaultPredicates();
 
         module.getChildren().forEach(this::load);
     }
@@ -128,5 +123,10 @@ public abstract class AbstractModule {
                 ? AbstractModule::isConfigEnable
                 : abstractModule -> false;
         module.getChildren().forEach(subModule -> enable(subModule, childPredicate));
+    }
+
+    private void addDefaultPredicates() {
+        addPredicate(fPlayer -> !isEnable());
+        addPredicate(fPlayer -> !permissionChecker.check(fPlayer, modulePermission));
     }
 }
