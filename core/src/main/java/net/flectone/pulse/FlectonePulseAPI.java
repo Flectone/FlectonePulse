@@ -61,7 +61,7 @@ public class FlectonePulseAPI  {
         PacketEvents.getAPI().init();
 
         // reload modules and their children
-        instance.get(net.flectone.pulse.module.Module.class).reloadWithChildren();
+        instance.get(net.flectone.pulse.module.Module.class).reload();
 
         // reload fplayer service
         instance.get(FPlayerService.class).reload();
@@ -190,7 +190,7 @@ public class FlectonePulseAPI  {
         instance.get(ModerationService.class).reload();
 
         // reload modules and their children
-        instance.get(Module.class).reloadWithChildren();
+        instance.get(Module.class).reload();
 
         // process player load event for all platform fplayers
         EventDispatcher eventDispatcher = instance.get(EventDispatcher.class);
