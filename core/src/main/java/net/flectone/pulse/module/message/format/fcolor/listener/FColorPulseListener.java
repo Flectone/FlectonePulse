@@ -17,7 +17,6 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -93,9 +92,7 @@ public class FColorPulseListener implements PulseListener {
 
     private void updateColorsMap(Map<Integer, String> colorsMap, FPlayer fPlayer, FColor.Type type) {
         if (permissionChecker.check(fPlayer, permission.getColors().get(type))) {
-            fPlayer.getFColors()
-                    .getOrDefault(type, Collections.emptySet())
-                    .forEach(fColor -> colorsMap.put(fColor.number(), fColor.name()));
+            colorsMap.putAll(fPlayer.getFColors(type));
         }
     }
 

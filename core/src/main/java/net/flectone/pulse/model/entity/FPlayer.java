@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 public class FPlayer extends FEntity {
@@ -124,6 +125,12 @@ public class FPlayer extends FEntity {
     @Override
     public boolean isUnknown() {
         return this.getId() == -1;
+    }
+
+    public Map<Integer, String> getFColors(FColor.Type type) {
+        return fColors.getOrDefault(type, Collections.emptySet())
+                .stream()
+                .collect(Collectors.toMap(FColor::number, FColor::name));
     }
 
     public enum Setting {
