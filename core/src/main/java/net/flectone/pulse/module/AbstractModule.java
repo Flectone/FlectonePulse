@@ -27,6 +27,8 @@ public abstract class AbstractModule {
     @Setter private boolean enable;
 
     protected AbstractModule() {
+        addPredicate(fPlayer -> !isEnable());
+        addPredicate(fPlayer -> !permissionChecker.check(fPlayer, modulePermission));
     }
 
     public void onLoad() {
