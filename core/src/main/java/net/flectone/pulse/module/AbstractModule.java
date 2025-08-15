@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.Setter;
-import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.platform.registry.PermissionRegistry;
+import net.flectone.pulse.util.checker.PermissionChecker;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -27,13 +27,10 @@ public abstract class AbstractModule {
     @Setter private boolean enable;
 
     protected AbstractModule() {
-        addPredicate(fPlayer -> !isEnable());
-        addPredicate(fPlayer -> !permissionChecker.check(fPlayer, modulePermission));
+        onLoad();
     }
 
     public void onLoad() {
-        predicates.clear();
-
         addPredicate(fPlayer -> !isEnable());
         addPredicate(fPlayer -> !permissionChecker.check(fPlayer, modulePermission));
     }
@@ -81,12 +78,13 @@ public abstract class AbstractModule {
         return collectModuleStatuses(this.getClass());
     }
 
-    public void reloadWithChildren() {
-        reloadWithChildren(this.getClass(), AbstractModule::isConfigEnable);
+    public void reload() {
+        load(this.getClass());
+        enable(this.getClass(), AbstractModule::isConfigEnable);
     }
 
     public void terminate() {
-        reloadWithChildren(this.getClass(), module -> false);
+        enable(this.getClass(), module -> false);
     }
 
     private Map<String, String> collectModuleStatuses(Class<? extends AbstractModule> clazz) {
@@ -103,21 +101,32 @@ public abstract class AbstractModule {
         return modules;
     }
 
-    private void reloadWithChildren(Class<? extends AbstractModule> clazz, Predicate<AbstractModule> predicate) {
+    private void load(Class<? extends AbstractModule> clazz) {
         AbstractModule module = injector.getInstance(clazz);
+
+        module.getPredicates().clear();
+        module.onLoad();
+
+        module.getChildren().forEach(this::load);
+    }
+
+    private void enable(Class<? extends AbstractModule> clazz, Predicate<AbstractModule> enablePredicate) {
+        AbstractModule module = injector.getInstance(clazz);
+
         if (module.isEnable()) {
             module.onDisable();
         }
 
-        boolean isEnabled = predicate.test(module);
+        boolean isEnabled = enablePredicate.test(module);
         module.setEnable(isEnabled);
 
         if (isEnabled) {
-            module.onLoad();
             module.onEnable();
-            module.getChildren().forEach(subModule -> reloadWithChildren(subModule, AbstractModule::isConfigEnable));
-        } else {
-            module.getChildren().forEach(subModule -> reloadWithChildren(subModule, m -> false));
         }
+
+        Predicate<AbstractModule> childPredicate = isEnabled
+                ? AbstractModule::isConfigEnable
+                : abstractModule -> false;
+        module.getChildren().forEach(subModule -> enable(subModule, childPredicate));
     }
 }
