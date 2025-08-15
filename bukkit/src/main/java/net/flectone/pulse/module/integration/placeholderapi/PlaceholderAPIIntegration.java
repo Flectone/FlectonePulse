@@ -105,16 +105,17 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
 
         if (params.startsWith("fcolor")) {
 
-            String number = params.substring(7);
+            String number = params.substring(params.lastIndexOf("_") + 1);
             if (!StringUtils.isNumeric(number)) return null;
 
             Map<Integer, String> colorsMap = new HashMap<>(fColorMessage.getDefaultColors());
-
-            for (FColor.Type type : FColor.Type.values()) {
-                Set<FColor> fColors = fPlayer.getFColors().getOrDefault(type, Collections.emptySet());
-                for (FColor fColor : fColors) {
-                    colorsMap.put(fColor.number(), fColor.name());
-                }
+            if (params.startsWith("fcolor_out")) {
+                colorsMap.putAll(fPlayer.getFColors(FColor.Type.OUT));
+            } else if (params.startsWith("fcolor_see")) {
+                colorsMap.putAll(fPlayer.getFColors(FColor.Type.SEE));
+            } else {
+                colorsMap.putAll(fPlayer.getFColors(FColor.Type.SEE));
+                colorsMap.putAll(fPlayer.getFColors(FColor.Type.OUT));
             }
 
             return colorsMap.get(Integer.parseInt(number));

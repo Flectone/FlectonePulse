@@ -87,23 +87,17 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     @Async(delay = 20)
     public void register() {
 
-        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor"), (context, argument) -> {
-            if (argument == null) return PlaceholderResult.invalid();
-            if (!StringUtils.isNumeric(argument)) return PlaceholderResult.invalid();
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor"), (context, argument) ->
+                fColorPlaceholder(context, argument, FColor.Type.SEE, FColor.Type.OUT)
+        );
 
-            FPlayer fPlayer = fPlayerMapper.map(context.source());
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor_out"), (context, argument) ->
+                fColorPlaceholder(context, argument, FColor.Type.OUT)
+        );
 
-            Map<Integer, String> colorsMap = new HashMap<>(fColorMessage.getDefaultColors());
-            for (FColor.Type type : FColor.Type.values()) {
-                Set<FColor> fColors = fPlayer.getFColors().getOrDefault(type, Collections.emptySet());
-                for (FColor fColor : fColors) {
-                    colorsMap.put(fColor.number(), fColor.name());
-                }
-            }
-
-            int colorNumber = Integer.parseInt(argument);
-            return PlaceholderResult.value(colorsMap.get(colorNumber));
-        });
+        Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor_see"), (context, argument) ->
+                fColorPlaceholder(context, argument, FColor.Type.SEE)
+        );
 
         Arrays.stream(FPlayer.Setting.values()).forEach(setting ->
             Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, setting.name().toLowerCase()), (context, argument) -> {
@@ -163,5 +157,20 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
         Text text = Placeholders.parseText(Text.literal(message), PlaceholderContext.of(playerEntity.getCommandSource()));
         messageContext.setMessage(text.getString());
+    }
+
+    private PlaceholderResult fColorPlaceholder(PlaceholderContext context, String argument, FColor.Type... types) {
+        if (argument == null) return PlaceholderResult.invalid();
+        if (!StringUtils.isNumeric(argument)) return PlaceholderResult.invalid();
+
+        FPlayer fPlayer = fPlayerMapper.map(context.source());
+
+        Map<Integer, String> colorsMap = new HashMap<>(fColorMessage.getDefaultColors());
+        for (FColor.Type type : types) {
+            colorsMap.putAll(fPlayer.getFColors(type));
+        }
+
+        int colorNumber = Integer.parseInt(argument);
+        return PlaceholderResult.value(colorsMap.get(colorNumber));
     }
 }
