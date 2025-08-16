@@ -6,7 +6,7 @@ public interface FlectonePulse {
 
     <T> T get(Class<T> type);
 
-    boolean isInitialized();
+    boolean isReady();
 
     void onEnable();
 

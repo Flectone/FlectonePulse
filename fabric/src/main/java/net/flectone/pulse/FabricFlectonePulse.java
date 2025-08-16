@@ -61,7 +61,7 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, ModInitializer,
 
 	@Override
 	public <T> T get(Class<T> type) {
-		if (!isInitialized()) {
+		if (!isReady()) {
 			throw new IllegalStateException("FlectonePulse not initialized yet");
 		}
 
@@ -69,27 +69,27 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, ModInitializer,
 	}
 
 	@Override
-	public boolean isInitialized() {
+	public boolean isReady() {
 		return injector != null;
 	}
 
 	@Override
 	public void onEnable() {
-		if (!isInitialized()) return;
+		if (!isReady()) return;
 
 		injector.getInstance(FlectonePulseAPI.class).onEnable();
 	}
 
 	@Override
 	public void onDisable() {
-		if (!isInitialized()) return;
+		if (!isReady()) return;
 
 		injector.getInstance(FlectonePulseAPI.class).onDisable();
 	}
 
 	@Override
 	public void reload() throws ReloadException {
-		if (!isInitialized()) return;
+		if (!isReady()) return;
 
 		injector.getInstance(FlectonePulseAPI.class).reload();
 	}

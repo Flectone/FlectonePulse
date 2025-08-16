@@ -34,7 +34,7 @@ public class FlectonePulseAPI  {
     }
 
     public void onEnable() {
-        if (!instance.isInitialized()) return;
+        if (!instance.isReady()) return;
 
         FLogger fLogger = instance.get(FLogger.class);
 
@@ -79,7 +79,7 @@ public class FlectonePulseAPI  {
     }
 
     public void onDisable() {
-        if (!instance.isInitialized()) {
+        if (!instance.isReady()) {
             // terminate packetevents if injector is not initialized
             PacketEvents.getAPI().terminate();
             return;
@@ -136,7 +136,7 @@ public class FlectonePulseAPI  {
     }
 
     public void reload() throws ReloadException {
-        if (!instance.isInitialized()) return;
+        if (!instance.isReady()) return;
 
         ReloadException reloadException = null;
 
