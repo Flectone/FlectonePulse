@@ -1,7 +1,5 @@
 package net.flectone.pulse.util.constant;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Arrays;
 
 public enum MessageType {
@@ -57,7 +55,7 @@ public enum MessageType {
     }
 
     public static MessageType fromProxyString(String string) {
-        if (StringUtils.isEmpty(string)) return null;
+        if (string == null || string.isEmpty()) return null;
 
         return Arrays.stream(MessageType.values())
                 .filter(tag -> string.equals("FlectonePulse:" + tag.name()))
