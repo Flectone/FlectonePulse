@@ -19,7 +19,6 @@ import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.processing.serializer.EnumSerializer;
 import net.flectone.pulse.util.constant.AdventureTag;
 import net.kyori.adventure.bossbar.BossBar;
-import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
@@ -78,7 +77,7 @@ public abstract class FileSerializable extends YamlSerializable {
                 public Range deserialize(Object object) {
                     String string = String.valueOf(object);
 
-                    if (StringUtils.isNumeric(string)) {
+                    try {
                         int value = Integer.parseInt(string);
                         Range.Type type = Range.Type.fromInt(value);
                         if (type == Range.Type.BLOCKS) {
@@ -86,10 +85,10 @@ public abstract class FileSerializable extends YamlSerializable {
                         }
 
                         return new Range(type);
+                    } catch (NumberFormatException e) {
+                        Range.Type type = Range.Type.fromString(string);
+                        return new Range(type);
                     }
-
-                    Range.Type type = Range.Type.fromString(string);
-                    return new Range(type);
                 }
             })
             .registerSerializer(new ClassSerializer<Sound, Map<String, Object>>() {

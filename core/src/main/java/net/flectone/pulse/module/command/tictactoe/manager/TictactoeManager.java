@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.util.RandomUtil;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,27 +42,30 @@ public class TictactoeManager {
     public TicTacToe fromString(String string) {
         String[] values = string.split(",");
         if (values.length < 5) return null;
-        if (!StringUtils.isNumeric(values[0])) return null;
+        try {
+            int id = Integer.parseInt(values[0]);
 
-        int id = Integer.parseInt(values[0]);
+            TicTacToe ticTacToe = ticTacToeMap.get(id);
+            if (ticTacToe == null) return null;
 
-        TicTacToe ticTacToe = ticTacToeMap.get(id);
-        if (ticTacToe == null) return null;
+            int nextPlayer = Integer.parseInt(values[1]);
+            ticTacToe.setNextPlayer(nextPlayer);
+            ticTacToe.setEnded(string.endsWith("1"));
 
-        int nextPlayer = Integer.parseInt(values[1]);
-        ticTacToe.setNextPlayer(nextPlayer);
-        ticTacToe.setEnded(string.endsWith("1"));
+            for (int i = 2; i < 5; i++) {
+                String[] column = values[i].split(";");
+                if (column.length != 3) return null;
 
-        for (int i = 2; i < 5; i++) {
-            String[] column = values[i].split(";");
-            if (column.length != 3) return null;
+                ticTacToe.getField()[i-2][0] = Integer.parseInt(column[0]);
+                ticTacToe.getField()[i-2][1] = Integer.parseInt(column[1]);
+                ticTacToe.getField()[i-2][2] = Integer.parseInt(column[2]);
+            }
 
-            ticTacToe.getField()[i-2][0] = Integer.parseInt(column[0]);
-            ticTacToe.getField()[i-2][1] = Integer.parseInt(column[1]);
-            ticTacToe.getField()[i-2][2] = Integer.parseInt(column[2]);
+            return ticTacToe;
+
+        } catch (NumberFormatException ignored) {
+            return null;
         }
-
-        return ticTacToe;
     }
 
     public void clear() {
