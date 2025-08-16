@@ -16,8 +16,8 @@ dependencies {
     compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
     compileOnly "eu.kennytv.maintenance:maintenance-api:$maintenance_version"
 
-    implementation project(":core")
-    implementation project(":paper")
+    compileOnly project(":core")
+    compileOnly project(":paper")
 }
 
 shadowJar {
