@@ -78,7 +78,9 @@ public class FLogger extends Logger {
 
     @Override
     public void info(String msg) {
-        log(buildLogRecord(Level.INFO, msg));
+        LogRecord logRecord = new LogRecord(Level.INFO, msg);
+
+        log(logRecord);
     }
 
     public void logEnabling() {
@@ -114,27 +116,20 @@ public class FLogger extends Logger {
 
     @Override
     public void warning(String exception) {
-        LogRecord warn = new LogRecord(Level.WARNING, "An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues");
-        warn.setMessage(exception);
+        LogRecord logRecord = new LogRecord(Level.WARNING, exception);
 
-        log(warn);
+        log(logRecord);
     }
 
-    public void warning(Exception exception) {
-        LogRecord warn = new LogRecord(Level.WARNING, "An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues");
-        warn.setThrown(exception);
+    public void warning(Throwable throwable) {
+        LogRecord logRecord = new LogRecord(Level.WARNING, "An error occurred, report it to https://github.com/Flectone/FlectonePulse/issues");
+        logRecord.setThrown(throwable);
 
-        log(warn);
+        log(logRecord);
     }
 
     public void warningTree(Component component) {
         String json = GsonComponentSerializer.gson().serialize(component);
         warning(json);
-    }
-
-    private LogRecord buildLogRecord(Level level, String message) {
-        LogRecord logRecord = new LogRecord(level, message);
-        logRecord.setLoggerName("");
-        return logRecord;
     }
 }

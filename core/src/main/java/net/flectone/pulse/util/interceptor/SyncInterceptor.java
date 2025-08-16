@@ -47,7 +47,7 @@ public class SyncInterceptor implements MethodInterceptor {
         try {
             invocation.proceed();
         } catch (Throwable e) {
-            fLogger.warning(e.getMessage());
+            fLogger.warning(e);
             e.printStackTrace();
         }
     }
