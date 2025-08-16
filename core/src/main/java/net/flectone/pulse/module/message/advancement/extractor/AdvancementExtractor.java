@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.advancement.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.processing.extractor.Extractor;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
-public class AdvancementExtractor {
+public class AdvancementExtractor extends Extractor {
 
     @Inject
     public AdvancementExtractor() {
@@ -32,7 +33,7 @@ public class AdvancementExtractor {
         if (translationArguments.size() < 2) return Optional.empty();
 
         if (!(translationArguments.get(0) instanceof TextComponent targetComponent)) return Optional.empty();
-        String target = targetComponent.content();
+        String target = extractTarget(targetComponent);
 
         Component achievementComp = translationArguments.get(1);
         Pair<String, String> pair = switch (achievementComp) {
@@ -74,8 +75,7 @@ public class AdvancementExtractor {
         }
 
         if (!(playerArgument instanceof TextComponent playerComponent)) return Optional.empty();
-
-        String target = playerComponent.content();
+        String target = extractTarget(playerComponent);
 
         String content = null;
         ChatAdvancement chatAdvancement = null;

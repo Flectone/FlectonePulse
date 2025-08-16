@@ -4,13 +4,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.gamemode.model.Gamemode;
+import net.flectone.pulse.processing.extractor.Extractor;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 
 import java.util.Optional;
 
 @Singleton
-public class GamemodeExtractor {
+public class GamemodeExtractor extends Extractor {
 
     @Inject
     public GamemodeExtractor() {
@@ -31,7 +32,7 @@ public class GamemodeExtractor {
         } else if (translatableComponent.args().size() > 1
                 && translatableComponent.args().get(0) instanceof TextComponent playerComponent
                 && translatableComponent.args().get(1) instanceof TranslatableComponent gamemodeComponent) {
-            target = playerComponent.content();
+            target = extractTarget(playerComponent);
             gamemodeKey = gamemodeComponent.key();
         }
 

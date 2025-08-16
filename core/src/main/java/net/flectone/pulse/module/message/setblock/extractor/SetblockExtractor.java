@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.setblock.model.Setblock;
+import net.flectone.pulse.processing.extractor.Extractor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
-public class SetblockExtractor {
+public class SetblockExtractor extends Extractor {
 
     @Inject
     public SetblockExtractor() {

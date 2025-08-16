@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.kill.model.Kill;
+import net.flectone.pulse.processing.extractor.Extractor;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.EntityUtil;
 import net.kyori.adventure.text.Component;
@@ -18,7 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Singleton
-public class KillExtractor {
+public class KillExtractor extends Extractor {
 
     private final EntityUtil entityUtil;
     private final FPlayerService fPlayerService;

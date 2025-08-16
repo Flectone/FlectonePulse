@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.module.message.death.model.Death;
 import net.flectone.pulse.module.message.death.model.Item;
+import net.flectone.pulse.processing.extractor.Extractor;
 import net.flectone.pulse.util.EntityUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -15,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.UUID;
 
 @Singleton
-public class DeathExtractor {
+public class DeathExtractor extends Extractor {
 
     private final EntityUtil entityUtil;
 
@@ -98,6 +99,12 @@ public class DeathExtractor {
                             // invalid UUID
                         }
                     }
+                } else if (!targetComponent.children().isEmpty()
+                        && targetComponent.children().getFirst() instanceof TextComponent extraText
+                        && !extraText.content().isEmpty()) {
+                    death = new Death(translatableComponent.key());
+                    death.setTargetName(extraText.content());
+                    death.setPlayer(true);
                 }
 
                 HoverEvent<?> hoverEvent = targetComponent.hoverEvent();

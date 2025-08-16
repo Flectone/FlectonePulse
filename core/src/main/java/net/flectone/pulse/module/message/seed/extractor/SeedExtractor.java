@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.seed.extractor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
+import net.flectone.pulse.processing.extractor.Extractor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
@@ -10,7 +11,7 @@ import net.kyori.adventure.text.TranslatableComponent;
 import java.util.Optional;
 
 @Singleton
-public class SeedExtractor {
+public class SeedExtractor extends Extractor {
 
     @Inject
     public SeedExtractor() {

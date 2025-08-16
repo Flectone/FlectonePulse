@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.spawn.extractor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
+import net.flectone.pulse.processing.extractor.Extractor;
 import net.flectone.pulse.module.message.spawn.model.Spawn;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
-public class SpawnExtractor {
+public class SpawnExtractor extends Extractor {
 
     @Inject
     public SpawnExtractor() {
@@ -62,7 +63,8 @@ public class SpawnExtractor {
         String x = xComp.content();
         String y = yComp.content();
         String z = zComp.content();
-        String value = tgtComp.content();
+        String value = extractTarget(tgtComp);
+
         Spawn spawn = new Spawn(x, y, z, angle, world, value);
         return Optional.of(spawn);
     }
