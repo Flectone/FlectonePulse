@@ -332,9 +332,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.tictactoe.wrongGame = "<color:#ff7171><b>⁉</b> Этой игры не существует";
         command.tictactoe.wrongByPlayer = "<color:#ff7171><b>⁉</b> Игра закончена, потому что один из игроков не в сети";
         command.tictactoe.wrongMove = "<color:#ff7171><b>⁉</b> Такой ход невозможен";
-        command.tictactoe.formatMove = "<fcolor:2>Ход <player> ";
+        command.tictactoe.formatMove = "<fcolor:2>Ход <display_name> ";
         command.tictactoe.lastMove = "<fcolor:2>Последний ход (<move>)";
-        command.tictactoe.formatWin = "<color:#98FB98><player> выиграл</color:#98FB98>";
+        command.tictactoe.formatWin = "<color:#98FB98><display_name> выиграл</color:#98FB98>";
         command.tictactoe.formatDraw = "<color:#98FB98>Ничья \uD83D\uDC6C</color:#98FB98>";
         command.tictactoe.symbol.blank = "<fcolor:1><hover:show_text:\"<fcolor:1>Ход <move>\"><click:run_command:\"/tictactoemove %d <move>\">☐</click></hover>";
 
@@ -1289,8 +1289,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String field = "<fcolor:1><br>|[#][#][#]| <title> <current_move> <br><fcolor:1>|[#][#][#]| <br>|[#][#][#]| <last_move><br>";
             private String currentMove = "<fcolor:2>☐ → <symbol>";
             private String lastMove = "<fcolor:2>Last move (<move>)";
-            private String formatMove = "<fcolor:2><player>'s move";
-            private String formatWin = "<color:#98FB98><player> won this game</color:#98FB98>";
+            private String formatMove = "<fcolor:2><display_name>'s move";
+            private String formatWin = "<color:#98FB98><display_name> won this game</color:#98FB98>";
             private String formatDraw = "<color:#98FB98>The game ended in a draw 👬</color:#98FB98>";
             private String sender = "<fcolor:1>☐ An offer to play was sent to <display_name>";
             private String receiver = "<click:run_command:\"/tictactoemove %d create\"><fcolor:1>☐ Received an invite to play tic-tac-toe with <display_name>, accept? [+]";

@@ -6,19 +6,18 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tictactoe.manager.TictactoeManager;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.Optional;
@@ -126,7 +125,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         builder(fReceiver)
                 .receiver(fPlayer)
-                .format((fResolver, s) -> s.getSender())
+                .format(Localization.Command.Tictactoe::getSender)
                 .sound(getSound())
                 .sendBuilt();
 
@@ -163,7 +162,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         builder(fPlayer)
                 .receiver(fReceiver)
-                .format(getMoveMessage(ticTacToe, fReceiver, fPlayer, typeTitle, move))
+                .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
                 .sendBuilt();
     }
 
@@ -195,50 +194,57 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
             return;
         }
 
-        int typeTitle = 0;
-
+        int typeTitle;
         if (ticTacToe.isWin()) {
             ticTacToe.setEnded(true);
             typeTitle = 1;
-        }
 
-        if (ticTacToe.isDraw()) {
+            // swap FPlayers
+            FPlayer tempFPlayer = fPlayer;
+            fPlayer = fReceiver;
+            fReceiver = tempFPlayer;
+        } else if (ticTacToe.isDraw()) {
             ticTacToe.setEnded(true);
             typeTitle = -1;
-        }
 
-        int finalTypeTitle = typeTitle;
+            // swap FPlayers
+            FPlayer tempFPlayer = fPlayer;
+            fPlayer = fReceiver;
+            fReceiver = tempFPlayer;
+        } else {
+            typeTitle = 0;
+        }
 
         builder(fReceiver)
                 .receiver(fPlayer)
-                .format(getMoveMessage(ticTacToe, fReceiver, fPlayer, finalTypeTitle, move))
+                .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
                 .sendBuilt();
 
+        FPlayer finalFReceiver = fReceiver;
         boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TICTACTOE_MOVE, dataOutputStream -> {
-            dataOutputStream.writeUTF(gson.toJson(fReceiver));
+            dataOutputStream.writeUTF(gson.toJson(finalFReceiver));
             dataOutputStream.writeUTF(ticTacToe.toString());
-            dataOutputStream.writeInt(finalTypeTitle);
+            dataOutputStream.writeInt(typeTitle);
             dataOutputStream.writeUTF(move);
         });
 
         if (isSent) return;
 
-        builder(fPlayer)
+        builder(fReceiver)
                 .receiver(fReceiver)
-                .format(getMoveMessage(ticTacToe, fReceiver, fPlayer, finalTypeTitle, move))
+                .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
                 .sendBuilt();
     }
 
     public BiFunction<FPlayer, Localization.Command.Tictactoe, String> getMoveMessage(TicTacToe ticTacToe,
                                                                                       FPlayer fPlayer,
-                                                                                      FPlayer fReceiver,
                                                                                       int typeTile,
                                                                                       String move) {
         return (fResolver, message) -> {
             String title = (switch (typeTile) {
-                case 1 -> Strings.CS.replace(message.getFormatWin(), "<player>", fReceiver.getName());
+                case 1 -> message.getFormatWin();
                 case -1 -> message.getFormatDraw();
-                default -> Strings.CS.replace(message.getFormatMove(), "<player>", fPlayer.getName());
+                default -> message.getFormatMove();
             });
 
             Localization.Command.Tictactoe.Symbol messageSymbol = message.getSymbol();
