@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
@@ -18,19 +19,19 @@ import net.kyori.adventure.text.Component;
 @Singleton
 public class FabricIntegrationModule extends IntegrationModule {
 
-    private final PermissionChecker permissionChecker;
+    private final Provider<PermissionChecker> permissionCheckerProvider;
     private final Injector injector;
 
     @Inject
     public FabricIntegrationModule(FileResolver fileManager,
                                    FLogger fLogger,
                                    PlatformServerAdapter platformServerAdapter,
-                                   PermissionChecker permissionChecker,
+                                   Provider<PermissionChecker> permissionCheckerProvider,
                                    ReflectionResolver reflectionResolver,
                                    Injector injector) {
         super(fileManager, fLogger, platformServerAdapter, reflectionResolver, injector);
 
-        this.permissionChecker = permissionChecker;
+        this.permissionCheckerProvider = permissionCheckerProvider;
         this.injector = injector;
 
         if (platformServerAdapter.hasProject("melius-vanish")) {
@@ -58,7 +59,7 @@ public class FabricIntegrationModule extends IntegrationModule {
 
     @Override
     public boolean hasSeeVanishPermission(FEntity sender) {
-        return permissionChecker.check(sender, "vanish.feature.view");
+        return permissionCheckerProvider.get().check(sender, "vanish.feature.view");
     }
 
     @Override
