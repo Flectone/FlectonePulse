@@ -3,6 +3,7 @@ package net.flectone.pulse.util.constant;
 public enum MessageFlag {
 
     USER_MESSAGE(false),
+    SENDER_COLOR_OUT(true),
     MENTION(false),
     REPLACEMENT(true),
     FIXATION(true),

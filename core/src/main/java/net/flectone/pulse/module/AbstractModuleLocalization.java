@@ -250,6 +250,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         private BiFunction<FPlayer, M, String> message = null;
         private UnaryOperator<MessagePipeline.Builder> messageComponentBuilder = null;
         private Function<FPlayer, TagResolver[]> tagResolvers = null;
+        private boolean senderColorOut = true;
 
         public Builder(FEntity fEntity) {
             this.fPlayer = fEntity;
@@ -261,8 +262,13 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         }
 
         public Builder receiver(FPlayer fPlayer) {
+            return receiver(fPlayer, false);
+        }
+
+        public Builder receiver(FPlayer fPlayer, boolean senderColorOut) {
             this.fReceiver = fPlayer;
             this.range = Range.get(Range.Type.PLAYER);
+            this.senderColorOut = senderColorOut;
             return this;
         }
 
@@ -417,6 +423,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
             return destination.getSubtext().isEmpty()
                     ? Component.empty()
                     : messagePipeline.builder(fPlayer, fReceiver, destination.getSubtext())
+                    .flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut)
                     .tagResolvers(messageTag(message))
                     .build();
         }
@@ -427,6 +434,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
 
             MessagePipeline.Builder messageBuilder = messagePipeline.builder(fPlayer, fReceiver, messageContent)
                     .flag(MessageFlag.USER_MESSAGE, true)
+                    .flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut)
                     .flag(MessageFlag.MENTION, !fReceiver.isUnknown());
 
             if (messageComponentBuilder != null) {
@@ -442,6 +450,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
 
             MessagePipeline.Builder formatBuilder = messagePipeline
                     .builder(messageUUID, fPlayer, fReceiver, formatContent)
+                    .flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut)
                     .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(fReceiver))
                     .tagResolvers(messageTag(message));
 
@@ -470,6 +479,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
             }
 
             Component componentFormat = messagePipeline.builder(fPlayer, FPlayer.UNKNOWN, formatContent)
+                    .flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut)
                     .flag(MessageFlag.TRANSLATE, false)
                     .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(FPlayer.UNKNOWN))
                     .build();
@@ -479,6 +489,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
                     ? Component.empty()
                     : messagePipeline
                     .builder(fPlayer, FPlayer.UNKNOWN, messageContent)
+                    .flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut)
                     .flag(MessageFlag.TRANSLATE, false)
                     .flag(MessageFlag.USER_MESSAGE, true)
                     .flag(MessageFlag.MENTION, false)

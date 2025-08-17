@@ -147,7 +147,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 || !integrationModule.canSeeVanished(fReceiver, fPlayer)) return;
 
         builder(fPlayer)
-                .receiver(fReceiver)
+                .receiver(fReceiver, true)
                 .format(message -> String.format(message.getReceiver(), ticTacToe.getId()))
                 .sound(getSound())
                 .sendBuilt();
@@ -160,7 +160,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 || !integrationModule.canSeeVanished(fReceiver, fPlayer)) return;
         if (ticTacToe == null) return;
 
-        builder(fPlayer)
+        builder(fReceiver)
                 .receiver(fReceiver)
                 .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
                 .sendBuilt();
@@ -216,7 +216,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         }
 
         builder(fReceiver)
-                .receiver(fPlayer)
+                .receiver(fPlayer, true)
                 .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
                 .sendBuilt();
 

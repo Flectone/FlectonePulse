@@ -37,7 +37,7 @@ public class MailPulseListener implements PulseListener {
             FPlayer fPlayer = fPlayerService.getFPlayer(mail.sender());
 
             mailModule.builder(fPlayer)
-                    .receiver(fReceiver)
+                    .receiver(fReceiver, true)
                     .format((fResolver, s) -> s.getReceiver())
                     .message((fResolver, s) -> mail.message())
                     .sendBuilt();

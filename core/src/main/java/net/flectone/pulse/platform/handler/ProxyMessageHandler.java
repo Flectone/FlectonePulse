@@ -484,7 +484,7 @@ public class ProxyMessageHandler {
         IntegrationModule integrationModule = injector.getInstance(IntegrationModule.class);
         if (!integrationModule.canSeeVanished(fReceiver, fEntity)) return;
 
-        tellModule.send(fEntity, fReceiver, (fResolver, s) -> s.getReceiver(), message);
+        tellModule.send(fEntity, fReceiver, (fResolver, s) -> s.getReceiver(), message, true);
     }
 
     private void handleTranslateToCommand(DataInputStream input, FEntity fEntity) throws IOException {

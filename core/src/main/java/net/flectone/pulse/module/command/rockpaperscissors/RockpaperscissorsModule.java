@@ -253,12 +253,12 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         rockPaperScissors.setSenderMove(move);
 
         builder(fPlayer)
-                .receiver(fReceiver)
+                .receiver(fReceiver, true)
                 .format((fResolver, s) -> s.getReceiver())
                 .sendBuilt();
 
         builder(fPlayer)
-                .receiver(fReceiver)
+                .receiver(fReceiver, true)
                 .format((fResolver, s) -> StringUtils.replaceEach(
                         s.getFormatMove(),
                         new String[]{"<target>", "<uuid>"},

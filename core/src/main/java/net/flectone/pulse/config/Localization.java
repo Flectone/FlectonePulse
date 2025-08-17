@@ -82,7 +82,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.online.formatTotal = "<fcolor:1>⌛ <display_name> <fcolor:1>всего провёл на сервере <time>";
 
         command.ping.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
-        command.ping.format = "<fcolor:1>🖧 Пинг игрока <fcolor:2><player><fcolor:1> равен <ping>";
+        command.ping.format = "<fcolor:1>🖧 Пинг игрока <display_name>< равен <ping>";
 
         command.coin.head = "орёл";
         command.coin.tail = "решка";
@@ -1186,7 +1186,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Ping implements SubCommandConfig, Localizable {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
-            private String format = "<fcolor:1>🖧 <fcolor:2><player>'s <fcolor:1>ping is <ping>";
+            private String format = "<fcolor:1>🖧 <display_name>'s ping is <ping>";
         }
 
         @Getter
@@ -1223,7 +1223,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String sender = "<fcolor:1>Now goes <display_name>";
             private String receiver = "<fcolor:2>✂ <display_name> <fcolor:1>suggested a game of rock-paper-scissors";
             private String formatMove = "<fcolor:2>✂ <fcolor:1>Choose your move <fcolor:2><click:run_command:\"/rps <target> rock <uuid>\">[🪨 rock]</click> <click:run_command:\"/rps <target> scissors <uuid>\">[✂ scissors]</click> <click:run_command:\"/rps <target> paper <uuid>\">[🧻 paper]</click>";
-            private String formatWin = "<color:#98FB98>✂ Winning <player>! <b><sender_move></b> on <b><receiver_move></b>";
+            private String formatWin = "<color:#98FB98>✂ Winning <display_name>! <b><sender_move></b> on <b><receiver_move></b>";
             private String formatDraw = "<color:#98FB98>✂ It's a draw! You both chose <b><move>";
             private Map<String, String> strategies = new LinkedHashMap<>(){
                 {

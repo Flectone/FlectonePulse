@@ -128,7 +128,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         });
 
         if (isSent) {
-            send(fReceiver, fPlayer, (fResolver, s) -> s.getSender(), message);
+            send(fReceiver, fPlayer, (fResolver, s) -> s.getSender(), message, true);
             return;
         }
 
@@ -140,14 +140,18 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
             return;
         }
 
-        send(fPlayer, fNewReceiver, (fResolver, s) -> s.getReceiver(), message);
-        send(fNewReceiver, fPlayer, (fResolver, s) -> s.getSender(), message);
+        send(fPlayer, fNewReceiver, (fResolver, s) -> s.getReceiver(), message, true);
+        send(fNewReceiver, fPlayer, (fResolver, s) -> s.getSender(), message, false);
     }
 
-    public void send(FEntity fPlayer, FPlayer fReceiver, BiFunction<FPlayer, Localization.Command.Tell, String> format, String string) {
+    public void send(FEntity fPlayer,
+                     FPlayer fReceiver,
+                     BiFunction<FPlayer, Localization.Command.Tell, String> format,
+                     String string,
+                     boolean senderColorOut) {
         builder(fPlayer)
                 .destination(command.getDestination())
-                .receiver(fReceiver)
+                .receiver(fReceiver, senderColorOut)
                 .format(format)
                 .message(string)
                 .sound(getSound())

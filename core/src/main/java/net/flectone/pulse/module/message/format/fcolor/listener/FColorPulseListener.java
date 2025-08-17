@@ -61,8 +61,12 @@ public class FColorPulseListener implements PulseListener {
         updateColorsMap(colorsMap, receiver, FColor.Type.SEE);
 
         // send out colors
-        if (sender instanceof FPlayer fPlayer) {
-            updateColorsMap(colorsMap, fPlayer, FColor.Type.OUT);
+        if (messageContext.isFlag(MessageFlag.SENDER_COLOR_OUT)) {
+            if (sender instanceof FPlayer fPlayer) {
+                updateColorsMap(colorsMap, fPlayer, FColor.Type.OUT);
+            }
+        } else {
+            updateColorsMap(colorsMap, receiver, FColor.Type.OUT);
         }
 
         String replacedMessage = replaceFColorPlaceholders(messageContext.getMessage(), colorsMap);
