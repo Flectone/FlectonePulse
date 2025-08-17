@@ -151,7 +151,6 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
         FEntity fReceiver = messageContext.getReceiver();
         boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
         if (!permissionChecker.check(sender, permission.getUse()) && isUserMessage) return;
-        if (!permissionChecker.check(fReceiver, permission.getUse()) && isUserMessage) return;
         if (!(sender instanceof FPlayer fPlayer)) return;
 
         String message = messageContext.getMessage();
