@@ -13,7 +13,6 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.status.icon.IconModule;
 import net.flectone.pulse.module.message.status.listener.StatusPacketListener;
 import net.flectone.pulse.module.message.status.motd.MOTDModule;
@@ -42,7 +41,6 @@ public class StatusModule extends AbstractModule {
     private final PlatformServerAdapter platformServerAdapter;
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
-    private final IntegrationModule integrationModule;
     private final PacketProvider packetProvider;
 
     @Inject
@@ -55,7 +53,6 @@ public class StatusModule extends AbstractModule {
                         PlatformServerAdapter platformServerAdapter,
                         FPlayerService fPlayerService,
                         ListenerRegistry listenerRegistry,
-                        IntegrationModule integrationModule,
                         PacketProvider packetProvider) {
         this.message = fileResolver.getMessage().getStatus();
         this.permission = fileResolver.getPermission().getMessage().getStatus();
@@ -67,7 +64,6 @@ public class StatusModule extends AbstractModule {
         this.platformServerAdapter = platformServerAdapter;
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
-        this.integrationModule = integrationModule;
         this.packetProvider = packetProvider;
     }
 

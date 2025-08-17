@@ -144,7 +144,6 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
         FEntity sender = messageContext.getSender();
         if (placeholderAPIModuleProvider.get().isModuleDisabledFor(sender)) return;
 
-        FEntity receiver = messageContext.getReceiver();
         boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
         if (!permissionChecker.check(sender, permission.getUse()) && isUserMessage) return;
         if (!(sender instanceof FPlayer fPlayer)) return;
