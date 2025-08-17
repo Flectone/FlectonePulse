@@ -288,6 +288,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     public static final class Format implements FormatMessageConfig, Config.IEnable {
 
         private boolean enable = true;
+        private boolean convertLegacyColor = true;
 
         private List<AdventureTag> adventureTags = new ArrayList<>(List.of(AdventureTag.values()));
 

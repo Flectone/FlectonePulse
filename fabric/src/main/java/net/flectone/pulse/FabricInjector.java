@@ -7,26 +7,25 @@ import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
 import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.flectone.pulse.platform.adapter.FabricPlayerAdapter;
-import net.flectone.pulse.platform.adapter.FabricServerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.platform.registry.*;
-import net.flectone.pulse.util.checker.FabricPermissionChecker;
-import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.listener.LegacyMiniConvertorPulseListener;
 import net.flectone.pulse.data.database.Database;
+import net.flectone.pulse.execution.scheduler.FabricTaskScheduler;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.integration.FabricIntegrationModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.anvil.AnvilModule;
 import net.flectone.pulse.module.message.anvil.FabricAnvilModule;
+import net.flectone.pulse.platform.adapter.FabricPlayerAdapter;
+import net.flectone.pulse.platform.adapter.FabricServerAdapter;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.platform.registry.*;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
-import net.flectone.pulse.execution.scheduler.FabricTaskScheduler;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.util.checker.FabricPermissionChecker;
+import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.interceptor.AsyncInterceptor;
 import net.flectone.pulse.util.interceptor.SyncInterceptor;
 import net.flectone.pulse.util.logging.FLogger;
@@ -87,7 +86,6 @@ public class FabricInjector extends AbstractModule {
         // Libraries and serialization
         bind(LibraryResolver.class).toInstance(libraryResolver);
         bind(Gson.class).toInstance(GsonComponentSerializer.gson().serializer());
-        bind(LegacyMiniConvertorPulseListener.class).asEagerSingleton();
 
         // Core bindings
         bind(FlectonePulse.class).toInstance(flectonePulse);

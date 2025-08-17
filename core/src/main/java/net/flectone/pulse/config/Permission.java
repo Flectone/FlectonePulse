@@ -923,7 +923,7 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private String name = "flectonepulse.module.message.format";
             private Type type = Type.TRUE;
 
-            private PermissionEntry all = new PermissionEntry("flectonepulse.module.message.format.all", Type.OP);
+            private PermissionEntry legacyColors = new PermissionEntry("flectonepulse.module.message.format.legacy_color", Type.OP);
 
             private Map<AdventureTag, PermissionEntry> adventureTags = new LinkedHashMap<>(){
                 {
@@ -1069,25 +1069,25 @@ public final class Permission extends FileSerializable implements ModuleConfig {
 
             @Getter
             public static final class Scoreboard implements SubFormatMessageConfig, IPermission {
-                private String name = "flectonepulse.module.format.scoreboard";
+                private String name = "flectonepulse.module.message.format.scoreboard";
                 private Type type = Type.TRUE;
             }
 
             @Getter
             public static final class QuestionAnswer implements SubFormatMessageConfig, IPermission {
-                private String name = "flectonepulse.module.format.questionanswer";
+                private String name = "flectonepulse.module.message.format.questionanswer";
                 private Type type = Type.TRUE;
                 private Map<String, Question> questions = new LinkedHashMap<>(){
                     {
                         put("server", new Question(
-                                new PermissionEntry("flectonepulse.module.format.questionanswer.server", Type.TRUE),
-                                new PermissionEntry("flectonepulse.module.format.questionanswer.sound.server", Type.TRUE),
-                                new PermissionEntry("flectonepulse.module.format.questionanswer.cooldown.bypass.server", Type.TRUE)
+                                new PermissionEntry("flectonepulse.module.message.format.questionanswer.server", Type.TRUE),
+                                new PermissionEntry("flectonepulse.module.message.format.questionanswer.sound.server", Type.TRUE),
+                                new PermissionEntry("flectonepulse.module.message.format.questionanswer.cooldown.bypass.server", Type.TRUE)
                         ));
                         put("flectone", new Question(
-                                new PermissionEntry("flectonepulse.module.format.questionanswer.flectone", Type.TRUE),
-                                new PermissionEntry("flectonepulse.module.format.questionanswer.sound.flectone", Type.TRUE),
-                                new PermissionEntry("flectonepulse.module.format.questionanswer.cooldown.bypass.flectone", Type.TRUE)
+                                new PermissionEntry("flectonepulse.module.message.format.questionanswer.flectone", Type.TRUE),
+                                new PermissionEntry("flectonepulse.module.message.format.questionanswer.sound.flectone", Type.TRUE),
+                                new PermissionEntry("flectonepulse.module.message.format.questionanswer.cooldown.bypass.flectone", Type.TRUE)
                         ));
                     }
                 };
@@ -1154,25 +1154,25 @@ public final class Permission extends FileSerializable implements ModuleConfig {
 
             @Getter
             public static final class Spoiler implements SubFormatMessageConfig, IPermission {
-                private String name = "flectonepulse.module.format.spoiler";
+                private String name = "flectonepulse.module.message.format.spoiler";
                 private Type type = Type.TRUE;
             }
 
             @Getter
             public static final class Style implements SubFormatMessageConfig, IPermission {
-                private String name = "flectonepulse.module.format.style";
+                private String name = "flectonepulse.module.message.format.style";
                 private Type type = Type.TRUE;
             }
 
             @Getter
             public static final class Translate implements SubFormatMessageConfig, IPermission {
-                private String name = "flectonepulse.module.format.translate";
+                private String name = "flectonepulse.module.message.format.translate";
                 private Type type = Type.TRUE;
             }
 
             @Getter
             public static final class World implements SubFormatMessageConfig, IPermission {
-                private String name = "flectonepulse.module.format.world";
+                private String name = "flectonepulse.module.message.format.world";
                 private Type type = Type.TRUE;
             }
         }

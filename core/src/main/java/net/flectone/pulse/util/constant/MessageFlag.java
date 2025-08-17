@@ -16,7 +16,7 @@ public enum MessageFlag {
     FLOOD(true),
     ADVENTURE_TAGS(true),
     IMAGE(true),
-    COLORS(true),
+    LEGACY_COLORS(true),
     INTERACTIVE_CHAT(true);
 
     private final boolean defaultValue;

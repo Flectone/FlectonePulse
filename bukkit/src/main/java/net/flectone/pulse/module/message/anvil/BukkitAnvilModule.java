@@ -51,7 +51,7 @@ public class BukkitAnvilModule extends AnvilModule {
 
             Component component = messagePipeline.builder(fPlayer, Strings.CS.replace(displayName, "§", "&"))
                     .flag(MessageFlag.USER_MESSAGE, true)
-                    .flag(MessageFlag.COLORS, false)
+                    .flag(MessageFlag.LEGACY_COLORS, false)
                     .build()
                     .applyFallbackStyle(deserialized.style())
                     .mergeStyle(deserialized);

@@ -11,7 +11,6 @@ import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.execution.scheduler.BukkitTaskScheduler;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
-import net.flectone.pulse.listener.LegacyMiniConvertorPulseListener;
 import net.flectone.pulse.module.command.spy.BukkitSpyModule;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.BukkitIntegrationModule;
@@ -139,7 +138,6 @@ public class BukkitInjector extends AbstractModule {
         // Libraries and serialization
         bind(LibraryResolver.class).toInstance(libraryResolver);
         bind(Gson.class).toInstance(GsonComponentSerializer.gson().serializer());
-        bind(LegacyMiniConvertorPulseListener.class).asEagerSingleton();
 
         // Core bindings
         bind(FlectonePulse.class).toInstance(instance);

@@ -1,4 +1,4 @@
-package net.flectone.pulse.listener;
+package net.flectone.pulse.module.message.format.convertor;
 
 /*
     MIT License
@@ -28,19 +28,15 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.model.event.message.MessageFormattingEvent;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -48,14 +44,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-/**
- * A "translator" from legacy minecraft formatting (e.g. &a &4 &l) to MiniMessage-acceptable format
- */
-
 @Singleton
-public final class LegacyMiniConvertorPulseListener implements PulseListener {
+public class LegacyColorConvertor {
 
-    private final Set<Option> DEF_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
+    private final Set<Option> defOptions = Collections.unmodifiableSet(EnumSet.of(
             Option.COLOR,
             Option.HEX_COLOR_STANDALONE,
             Option.COLOR_DOUBLE_HASH,
@@ -71,56 +63,41 @@ public final class LegacyMiniConvertorPulseListener implements PulseListener {
             .maximumSize(100000)
             .build();
 
-    private final Pattern HEX_COLOR = Pattern.compile("[\\da-fA-F]{6}");
+    private final Pattern hexColorPattern = Pattern.compile("[\\da-fA-F]{6}");
 
     private final Permission.Message.Format formatPermission;
     private final PermissionChecker permissionChecker;
     private final FLogger fLogger;
 
     @Inject
-    public LegacyMiniConvertorPulseListener(FileResolver fileResolver,
-                                            PermissionChecker permissionChecker,
-                                            FLogger fLogger) {
+    public LegacyColorConvertor(FileResolver fileResolver,
+                                PermissionChecker permissionChecker,
+                                FLogger fLogger) {
         this.formatPermission = fileResolver.getPermission().getMessage().getFormat();
         this.permissionChecker = permissionChecker;
         this.fLogger = fLogger;
     }
 
-    @Pulse(priority = Event.Priority.HIGHEST)
-    public void onMessageFormattingEvent(MessageFormattingEvent event) {
-        MessageContext messageContext = event.getContext();
+    public void convert(MessageContext messageContext) {
         FEntity sender = messageContext.getSender();
-        if (!messageContext.isFlag(MessageFlag.COLORS)) return;
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE) && !permissionChecker.check(sender, formatPermission.getAll())) return;
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)
+                && !permissionChecker.check(sender, formatPermission.getLegacyColors())) return;
 
-        String message = cacheTranslate(messageContext.getMessage());
-        messageContext.setMessage(message);
-    }
+        String contextMessage = messageContext.getMessage();
+        if (StringUtils.isEmpty(contextMessage)) return;
 
-    /**
-     * Translate text to MiniMessage format with default options (everything but {@link Option#CLOSE_COLORS})
-     * @param text text to translate
-     * @return translated string
-     */
-    public @NotNull String cacheTranslate(@NotNull String text) {
-        if (StringUtils.isEmpty(text)) return text;
-
+        String convertedMessage;
         try {
-            return messageCache.get(text, () -> translate(text, DEF_OPTIONS));
+            convertedMessage = messageCache.get(contextMessage, () -> convert(contextMessage, defOptions));
         } catch (ExecutionException e) {
             fLogger.warning(e);
+            convertedMessage = convert(contextMessage, defOptions);
         }
 
-        return translate(text, DEF_OPTIONS);
+        messageContext.setMessage(convertedMessage);
     }
 
-    /**
-     * Translate text to MiniMessage format
-     * @param text text to translate
-     * @param options options to use
-     * @return translated string
-     */
-    private @NotNull String translate(@NotNull String text, @NotNull Collection<@NotNull Option> options) {
+    private String convert(String text, Collection<Option> options) {
         text = StringUtils.replaceEach(
                 text,
                 new String[]{"&&", "§"},
@@ -307,7 +284,7 @@ public final class LegacyMiniConvertorPulseListener implements PulseListener {
 
             if (startIndex + 9 <= text.length() && text.charAt(startIndex + 9) == '>') {
                 String hexColor = text.substring(startIndex + 3, startIndex + 9);
-                if (HEX_COLOR.matcher(hexColor).matches()) {
+                if (hexColorPattern.matcher(hexColor).matches()) {
                     result.append("<#").append(hexColor).append(">");
                     index = startIndex + 10;
                 } else {

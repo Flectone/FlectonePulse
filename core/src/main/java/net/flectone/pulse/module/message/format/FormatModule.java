@@ -57,9 +57,9 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
     public void onEnable() {
         registerModulePermission(permission);
 
-        message.getAdventureTags().forEach(adventureTag -> registerPermission(permission.getAdventureTags().get(adventureTag)));
+        registerPermission(permission.getLegacyColors());
 
-        registerPermission(permission.getAll());
+        message.getAdventureTags().forEach(adventureTag -> registerPermission(permission.getAdventureTags().get(adventureTag)));
 
         putAdventureTag(AdventureTag.HOVER, StandardTags.hoverEvent());
         putAdventureTag(AdventureTag.CLICK, StandardTags.clickEvent());
@@ -93,6 +93,10 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
         addChildren(WorldModule.class);
 
         listenerRegistry.register(FormatPulseListener.class);
+
+        if (message.isConvertLegacyColor()) {
+            listenerRegistry.register(LegacyColorPulseListener.class);
+        }
     }
 
     @Override
