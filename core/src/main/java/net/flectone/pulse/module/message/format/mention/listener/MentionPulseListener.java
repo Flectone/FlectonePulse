@@ -3,52 +3,20 @@ package net.flectone.pulse.module.message.format.mention.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.mention.MentionModule;
 import net.flectone.pulse.processing.context.MessageContext;
-import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.Tag;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Optional;
-import java.util.UUID;
 
 @Singleton
 public class MentionPulseListener implements PulseListener {
 
-    private final Message.Format.Mention message;
-    private final Permission.Message.Format.Mention permission;
     private final MentionModule mentionModule;
-    private final FPlayerService fPlayerService;
-    private final PermissionChecker permissionChecker;
-    private final IntegrationModule integrationModule;
-    private final MessagePipeline messagePipeline;
 
     @Inject
-    public MentionPulseListener(FileResolver fileResolver,
-                                MentionModule mentionModule,
-                                FPlayerService fPlayerService,
-                                PermissionChecker permissionChecker,
-                                IntegrationModule integrationModule,
-                                MessagePipeline messagePipeline) {
-        this.message = fileResolver.getMessage().getFormat().getMention();
-        this.permission = fileResolver.getPermission().getMessage().getFormat().getMention();
+    public MentionPulseListener(MentionModule mentionModule) {
         this.mentionModule = mentionModule;
-        this.fPlayerService = fPlayerService;
-        this.permissionChecker = permissionChecker;
-        this.integrationModule = integrationModule;
-        this.messagePipeline = messagePipeline;
     }
 
     @Pulse
@@ -56,46 +24,7 @@ public class MentionPulseListener implements PulseListener {
         MessageContext messageContext = event.getContext();
         if (!messageContext.isFlag(MessageFlag.MENTION)) return;
 
-        String processedMessage = mentionModule.cacheReplace(messageContext.getSender(), messageContext.getMessage());
-        messageContext.setMessage(processedMessage);
-
-        FEntity sender = messageContext.getSender();
-        if (mentionModule.isModuleDisabledFor(sender)) return;
-
-        UUID processId = messageContext.getMessageUUID();
-        FPlayer receiver = messageContext.getReceiver();
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.MENTION, (argumentQueue, context) -> {
-            Tag.Argument mentionTag = argumentQueue.peek();
-            if (mentionTag == null) return Tag.selfClosingInserting(Component.empty());
-
-            String mention = mentionTag.value();
-            if (mention.isEmpty()) {
-                return Tag.preProcessParsed(message.getTrigger() + mention);
-            }
-
-            Optional<String> group = integrationModule.getGroups().stream()
-                    .filter(name -> name.equalsIgnoreCase(mention))
-                    .findFirst();
-
-            if (group.isPresent()) {
-                if (receiver instanceof FPlayer mentionFPlayer
-                        && !permissionChecker.check(mentionFPlayer, permission.getBypass())
-                        && permissionChecker.check(mentionFPlayer, permission.getGroup() + "." + group.get())) {
-                    mentionModule.sendMention(processId, mentionFPlayer);
-                }
-            } else {
-                FPlayer mentionFPlayer = fPlayerService.getFPlayer(mention);
-                if (mentionFPlayer.equals(receiver) && !permissionChecker.check(mentionFPlayer, permission.getBypass())) {
-                    mentionModule.sendMention(processId, mentionFPlayer);
-                }
-            }
-
-            String format = StringUtils.replaceEach(mentionModule.resolveLocalization(receiver).getFormat(),
-                    new String[]{"<player>", "<target>"},
-                    new String[]{mention, mention}
-            );
-
-            return Tag.selfClosingInserting(messagePipeline.builder(receiver, format).build());
-        });
+        mentionModule.format(messageContext);
+        mentionModule.addTags(messageContext);
     }
 }

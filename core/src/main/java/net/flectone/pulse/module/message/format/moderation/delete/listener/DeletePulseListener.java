@@ -3,9 +3,7 @@ package net.flectone.pulse.module.message.format.moderation.delete.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
@@ -18,8 +16,6 @@ import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.Tag;
-import org.apache.commons.lang3.Strings;
 
 import java.util.UUID;
 
@@ -27,46 +23,18 @@ import java.util.UUID;
 public class DeletePulseListener implements PulseListener {
 
     private final DeleteModule deleteModule;
-    private final MessagePipeline messagePipeline;
 
     @Inject
-    public DeletePulseListener(DeleteModule deleteModule,
-                               MessagePipeline messagePipeline) {
+    public DeletePulseListener(DeleteModule deleteModule) {
         this.deleteModule = deleteModule;
-        this.messagePipeline = messagePipeline;
     }
 
     @Pulse
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.getContext();
-        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
         if (!messageContext.isFlag(MessageFlag.DELETE)) return;
 
-        FEntity sender = messageContext.getSender();
-        FPlayer receiver = messageContext.getReceiver();
-        if (deleteModule.isModuleDisabledFor(receiver)) return;
-
-        String message = messageContext.getMessage();
-        if (message == null || !message.contains("<delete>")) return;
-
-        UUID messageUUID = messageContext.getMessageUUID();
-
-        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DELETE, (argumentQueue, context) -> {
-            String placeholder = Strings.CS.replace(
-                    deleteModule.resolveLocalization(receiver).getPlaceholder(),
-                    "<uuid>",
-                    messageUUID.toString()
-            );
-
-            Component componentPlaceholder = messagePipeline.builder(sender, receiver, placeholder)
-                    .flag(MessageFlag.MENTION, false)
-                    .flag(MessageFlag.INTERACTIVE_CHAT, false)
-                    .flag(MessageFlag.QUESTION, false)
-                    .flag(MessageFlag.DELETE, false)
-                    .build();
-
-            return Tag.selfClosingInserting(componentPlaceholder);
-        });
+        deleteModule.addTag(messageContext);
     }
 
     @Pulse(priority = Event.Priority.MONITOR)

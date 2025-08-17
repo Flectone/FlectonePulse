@@ -2,14 +2,15 @@ package net.flectone.pulse.module.message.format;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.fcolor.FColorModule;
 import net.flectone.pulse.module.message.format.fixation.FixationModule;
 import net.flectone.pulse.module.message.format.listener.FormatPulseListener;
+import net.flectone.pulse.module.message.format.listener.LegacyColorPulseListener;
 import net.flectone.pulse.module.message.format.mention.MentionModule;
 import net.flectone.pulse.module.message.format.moderation.ModerationModule;
 import net.flectone.pulse.module.message.format.name.NameModule;
@@ -19,33 +20,37 @@ import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.AdventureTag;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 @Singleton
 public class FormatModule extends AbstractModuleLocalization<Localization.Message.Format> {
 
-    @Getter private final Map<AdventureTag, TagResolver> tagResolverMap = new EnumMap<>(AdventureTag.class);
-    @Getter private final Map<AdventureTag, Pattern> patternsMap = new EnumMap<>(AdventureTag.class);
+    private final Map<AdventureTag, TagResolver> tagResolverMap = new EnumMap<>(AdventureTag.class);
 
     private final Message.Format message;
     private final Permission.Message.Format permission;
     private final ListenerRegistry listenerRegistry;
+    private final PermissionChecker permissionChecker;
 
     @Inject
     public FormatModule(FileResolver fileResolver,
-                        ListenerRegistry listenerRegistry) {
+                        ListenerRegistry listenerRegistry,
+                        PermissionChecker permissionChecker) {
         super(localization -> localization.getMessage().getFormat());
 
         this.message = fileResolver.getMessage().getFormat();
         this.permission = fileResolver.getPermission().getMessage().getFormat();
         this.listenerRegistry = listenerRegistry;
+        this.permissionChecker = permissionChecker;
     }
 
     @Override
@@ -93,12 +98,31 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
     @Override
     public void onDisable() {
         tagResolverMap.clear();
-        patternsMap.clear();
     }
 
     @Override
     protected boolean isConfigEnable() {
         return message.isEnable();
+    }
+
+    public void addTags(MessageContext messageContext) {
+        FEntity sender = messageContext.getSender();
+        if (isModuleDisabledFor(sender)) return;
+
+        boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
+
+        tagResolverMap
+                .entrySet()
+                .stream()
+                .filter(entry -> isCorrectTag(entry.getKey(), sender, isUserMessage))
+                .forEach(entry -> messageContext.addReplacementTag(entry.getValue()));
+    }
+
+    public boolean isCorrectTag(AdventureTag adventureTag, FEntity sender, boolean needPermission) {
+        if (!message.getAdventureTags().contains(adventureTag)) return false;
+        if (!tagResolverMap.containsKey(adventureTag)) return false;
+
+        return !needPermission || permissionChecker.check(sender, permission.getAdventureTags().get(adventureTag));
     }
 
     private void putAdventureTag(AdventureTag adventureTag, TagResolver tagResolver) {

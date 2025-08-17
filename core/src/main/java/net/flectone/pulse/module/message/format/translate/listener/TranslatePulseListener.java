@@ -3,32 +3,22 @@ package net.flectone.pulse.module.message.format.translate.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.Tag;
-import org.apache.commons.lang3.Strings;
 
-import java.util.Set;
 import java.util.UUID;
 
 @Singleton
 public class TranslatePulseListener implements PulseListener {
 
     private final TranslateModule translateModule;
-    private final MessagePipeline messagePipeline;
 
     @Inject
-    public TranslatePulseListener(TranslateModule translateModule,
-                                  MessagePipeline messagePipeline) {
+    public TranslatePulseListener(TranslateModule translateModule) {
         this.translateModule = translateModule;
-        this.messagePipeline = messagePipeline;
     }
 
     @Pulse
@@ -39,46 +29,7 @@ public class TranslatePulseListener implements PulseListener {
         String messageToTranslate = messageContext.getUserMessage();
         UUID key = translateModule.saveMessage(messageToTranslate);
 
-        FEntity sender = messageContext.getSender();
-        if (translateModule.isModuleDisabledFor(sender)) return;
-
-        FPlayer receiver = messageContext.getReceiver();
-
-        messageContext.addReplacementTag(Set.of(MessagePipeline.ReplacementTag.TRANSLATE, MessagePipeline.ReplacementTag.TRANSLATETO), (argumentQueue, context) -> {
-            String firstLang = "auto";
-            String secondLang = receiver.getSettingValue(FPlayer.Setting.LOCALE);
-
-            if (argumentQueue.hasNext()) {
-                Tag.Argument first = argumentQueue.pop();
-
-                if (argumentQueue.hasNext()) {
-                    Tag.Argument second = argumentQueue.pop();
-
-                    if (argumentQueue.hasNext()) {
-                        // translateto language language message
-                        firstLang = first.value();
-                        secondLang = second.value();
-                    } else {
-                        // translateto auto language message
-                        secondLang = first.value();
-                    }
-                }
-            }
-
-            String action = translateModule.resolveLocalization(receiver).getAction();
-            action = Strings.CS.replaceOnce(action, "<language>", firstLang);
-            action = Strings.CS.replaceOnce(action, "<language>", secondLang == null ? "ru_ru" : secondLang);
-            action = Strings.CS.replace(action, "<message>", key.toString());
-
-            Component component = messagePipeline.builder(sender, receiver, action)
-                    .flag(MessageFlag.MENTION, false)
-                    .flag(MessageFlag.INTERACTIVE_CHAT, false)
-                    .flag(MessageFlag.QUESTION, false)
-                    .flag(MessageFlag.TRANSLATE, false)
-                    .build();
-
-            return Tag.selfClosingInserting(component);
-        });
+        translateModule.addTag(messageContext, key);
     }
 
 }

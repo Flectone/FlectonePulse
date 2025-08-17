@@ -7,13 +7,22 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.translate.listener.TranslatePulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageFlag;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import org.apache.commons.lang3.Strings;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -28,15 +37,18 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
     private final Message.Format.Translate message;
     private final Permission.Message.Format.Translate permission;
     private final ListenerRegistry listenerRegistry;
+    private final MessagePipeline messagePipeline;
 
     @Inject
     public TranslateModule(FileResolver fileResolver,
-                           ListenerRegistry listenerRegistry) {
+                           ListenerRegistry listenerRegistry,
+                           MessagePipeline messagePipeline) {
         super(localization -> localization.getMessage().getFormat().getTranslate());
 
         this.message = fileResolver.getMessage().getFormat().getTranslate();
         this.permission = fileResolver.getPermission().getMessage().getFormat().getTranslate();
         this.listenerRegistry = listenerRegistry;
+        this.messagePipeline = messagePipeline;
     }
 
     @Override
@@ -64,6 +76,49 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
         }
 
         return uuid;
+    }
+
+    public void addTag(MessageContext messageContext, UUID key) {
+        FEntity sender = messageContext.getSender();
+        if (isModuleDisabledFor(sender)) return;
+
+        FPlayer receiver = messageContext.getReceiver();
+
+        messageContext.addReplacementTag(Set.of(MessagePipeline.ReplacementTag.TRANSLATE, MessagePipeline.ReplacementTag.TRANSLATETO), (argumentQueue, context) -> {
+            String firstLang = "auto";
+            String secondLang = receiver.getSettingValue(FPlayer.Setting.LOCALE);
+
+            if (argumentQueue.hasNext()) {
+                Tag.Argument first = argumentQueue.pop();
+
+                if (argumentQueue.hasNext()) {
+                    Tag.Argument second = argumentQueue.pop();
+
+                    if (argumentQueue.hasNext()) {
+                        // translateto language language message
+                        firstLang = first.value();
+                        secondLang = second.value();
+                    } else {
+                        // translateto auto language message
+                        secondLang = first.value();
+                    }
+                }
+            }
+
+            String action = resolveLocalization(receiver).getAction();
+            action = Strings.CS.replaceOnce(action, "<language>", firstLang);
+            action = Strings.CS.replaceOnce(action, "<language>", secondLang == null ? "ru_ru" : secondLang);
+            action = Strings.CS.replace(action, "<message>", key.toString());
+
+            Component component = messagePipeline.builder(sender, receiver, action)
+                    .flag(MessageFlag.MENTION, false)
+                    .flag(MessageFlag.INTERACTIVE_CHAT, false)
+                    .flag(MessageFlag.QUESTION, false)
+                    .flag(MessageFlag.TRANSLATE, false)
+                    .build();
+
+            return Tag.selfClosingInserting(component);
+        });
     }
 
     public String getMessage(String stringUUID) {

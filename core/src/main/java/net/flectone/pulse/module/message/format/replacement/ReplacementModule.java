@@ -17,9 +17,11 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.formatter.UrlFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SkinService;
+import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -61,6 +63,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     private final SkinService skinService;
     private final UrlFormatter urlFormatter;
     private final MiniMessage defaultMiniMessage;
+    private final PermissionChecker permissionChecker;
     private final FLogger fLogger;
 
     @Inject
@@ -72,6 +75,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                              PlatformPlayerAdapter platformPlayerAdapter,
                              SkinService skinService,
                              UrlFormatter urlFormatter,
+                             PermissionChecker permissionChecker,
                              FLogger fLogger) {
         super(localization -> localization.getMessage().getFormat().getReplacement());
 
@@ -84,6 +88,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.skinService = skinService;
         this.urlFormatter = urlFormatter;
+        this.permissionChecker = permissionChecker;
         this.defaultMiniMessage = MiniMessage.miniMessage();
         this.fLogger = fLogger;
     }
@@ -113,16 +118,159 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         return message.isEnable();
     }
 
-    public String cacheProcessMessage(String message) {
-        if (StringUtils.isEmpty(message)) return message;
+    public void format(MessageContext messageContext) {
+        FEntity sender = messageContext.getSender();
+        if (isModuleDisabledFor(sender)) return;
 
+        String contextMessage = messageContext.getMessage();
+        if (StringUtils.isEmpty(contextMessage)) return;
+
+        String formattedMessage;
         try {
-            return messageCache.get(message, () -> processMessage(message));
+            formattedMessage = messageCache.get(contextMessage, () -> processMessage(contextMessage));
         } catch (ExecutionException e) {
             fLogger.warning(e);
+            formattedMessage = processMessage(contextMessage);
         }
 
-        return message;
+        messageContext.setMessage(formattedMessage);
+    }
+
+    public void addTags(MessageContext messageContext) {
+        FEntity sender = messageContext.getSender();
+        if (isModuleDisabledFor(sender)) return;
+
+        FPlayer receiver = messageContext.getReceiver();
+        boolean isTranslateItem = messageContext.isFlag(MessageFlag.TRANSLATE_ITEM);
+
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.REPLACEMENT, (argumentQueue, context) -> {
+            Tag.Argument argument = argumentQueue.peek();
+            if (argument == null) return Tag.selfClosingInserting(Component.empty());
+
+            String name = argument.value();
+            if (!permissionChecker.check(sender, permission.getValues().get(name))) return Tag.selfClosingInserting(Component.empty());
+
+            String replacement = resolveLocalization(receiver).getValues().get(name);
+            if (replacement == null) return Tag.selfClosingInserting(Component.empty());
+
+            List<String> values = new ArrayList<>();
+            while (argumentQueue.hasNext()) {
+                Tag.Argument groupArg = argumentQueue.pop();
+                values.add(StringEscapeUtils.unescapeJava(groupArg.value()));
+            }
+
+            return switch (name) {
+                case "ping" -> pingTag(sender, receiver);
+                case "tps" -> tpsTag(sender, receiver);
+                case "online" -> onlineTag(sender, receiver);
+                case "coords" -> coordsTag(sender, receiver);
+                case "stats" -> statsTag(sender, receiver);
+                case "skin" -> skinTag(sender, receiver);
+                case "item" -> itemTag(sender, receiver, isTranslateItem);
+                case "url" -> {
+                    if (values.size() < 2) yield Tag.selfClosingInserting(Component.empty());
+
+                    yield urlTag(sender, receiver, values.get(1));
+                }
+                case "image" -> {
+                    if (values.size() < 2) yield Tag.selfClosingInserting(Component.empty());
+
+                    yield imageTag(sender, receiver, values.get(1));
+                }
+                case "spoiler" -> {
+                    if (values.size() < 2) yield Tag.selfClosingInserting(Component.empty());
+
+                    yield spoilerTag(sender, receiver, values.get(1), messageContext.getFlags());
+                }
+                default -> {
+                    String[] searchList = new String[values.size()];
+                    String[] replacementList = new String[values.size()];
+
+                    for (int i = 0; i < values.size(); i++) {
+                        searchList[i] = "<message_" + i + ">";
+                        replacementList[i] = values.get(i);
+                    }
+
+                    replacement = StringUtils.replaceEach(replacement, searchList, replacementList);
+
+                    Component component = messagePipeline.builder(sender, receiver, replacement)
+                            .flag(MessageFlag.REPLACEMENT, false)
+                            .build();
+
+                    yield Tag.selfClosingInserting(component);
+                }
+            };
+        });
+
+        // deprecated resolvers
+        if (permissionChecker.check(sender, permission.getValues().get("ping"))) {
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.PING, (argumentQueue, context) ->
+                    pingTag(sender, receiver)
+            );
+        }
+
+        if (permissionChecker.check(sender, permission.getValues().get("tps"))) {
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.TPS, (argumentQueue, context) ->
+                    tpsTag(sender, receiver)
+            );
+        }
+
+        if (permissionChecker.check(sender, permission.getValues().get("online"))) {
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.ONLINE, (argumentQueue, context) ->
+                    onlineTag(sender, receiver)
+            );
+        }
+
+        if (permissionChecker.check(sender, permission.getValues().get("coords"))) {
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.COORDS, (argumentQueue, context) ->
+                    coordsTag(sender, receiver)
+            );
+        }
+
+        if (permissionChecker.check(sender, permission.getValues().get("stats"))) {
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.STATS, (argumentQueue, context) ->
+                    statsTag(sender, receiver)
+            );
+        }
+
+        if (permissionChecker.check(sender, permission.getValues().get("skin"))) {
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SKIN, (argumentQueue, context) ->
+                    skinTag(sender, receiver)
+            );
+        }
+
+        if (permissionChecker.check(sender, permission.getValues().get("item"))) {
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.ITEM, (argumentQueue, context) ->
+                    itemTag(sender, receiver, isTranslateItem)
+            );
+        }
+
+        if (permissionChecker.check(sender, permission.getValues().get("url"))) {
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.URL, (argumentQueue, context) -> {
+                Tag.Argument argument = argumentQueue.peek();
+                if (argument == null) return Tag.selfClosingInserting(Component.empty());
+
+                return urlTag(sender, receiver, argument.value());
+            });
+        }
+
+        if (permissionChecker.check(sender, permission.getValues().get("image"))) {
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.IMAGE, (argumentQueue, context) -> {
+                Tag.Argument argument = argumentQueue.peek();
+                if (argument == null) return Tag.selfClosingInserting(Component.empty());
+
+                return imageTag(sender, receiver, argument.value());
+            });
+        }
+
+        if (permissionChecker.check(sender, permission.getValues().get("spoiler"))) {
+            messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SPOILER, (argumentQueue, context) -> {
+                Tag.Argument argument = argumentQueue.peek();
+                if (argument == null) return Tag.selfClosingInserting(Component.empty());
+
+                return spoilerTag(sender, receiver, argument.value(), messageContext.getFlags());
+            });
+        }
     }
 
     private String processMessage(String message) {
@@ -172,7 +320,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     private record MatchInfo(int start, int end, String replacement) {}
 
-    public Tag spoilerTag(FEntity sender, FPlayer receiver, String spoilerText, Map<MessageFlag, Boolean> flags) {
+    private Tag spoilerTag(FEntity sender, FPlayer receiver, String spoilerText, Map<MessageFlag, Boolean> flags) {
         // skip deprecated issue <spoiler:\>
         if (spoilerText.equals("\\")) return Tag.selfClosingInserting(Component.empty());
 
@@ -199,7 +347,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         return Tag.selfClosingInserting(component);
     }
 
-    public Tag pingTag(FEntity sender, FPlayer receiver) {
+    private Tag pingTag(FEntity sender, FPlayer receiver) {
         if (!(sender instanceof FPlayer fPlayer)) return Tag.selfClosingInserting(Component.empty());
 
         int ping = fPlayerService.getPing(fPlayer);
@@ -217,7 +365,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         return Tag.selfClosingInserting(component);
     }
 
-    public Tag tpsTag(FEntity sender, FPlayer receiver) {
+    private Tag tpsTag(FEntity sender, FPlayer receiver) {
         String format = Strings.CS.replace(
                 resolveLocalization(receiver).getValues().getOrDefault("tps", ""),
                 "<tps>",
@@ -231,7 +379,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         return Tag.selfClosingInserting(component);
     }
 
-    public Tag onlineTag(FEntity sender, FPlayer receiver) {
+    private Tag onlineTag(FEntity sender, FPlayer receiver) {
         String format = Strings.CS.replace(
                 resolveLocalization(receiver).getValues().getOrDefault("online", ""),
                 "<online>",
@@ -245,7 +393,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         return Tag.selfClosingInserting(component);
     }
 
-    public Tag coordsTag(FEntity sender, FPlayer receiver) {
+    private Tag coordsTag(FEntity sender, FPlayer receiver) {
         Component component = Component.empty();
 
         PlatformPlayerAdapter.Coordinates coordinates = platformPlayerAdapter.getCoordinates(sender);
@@ -268,7 +416,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         return Tag.selfClosingInserting(component);
     }
 
-    public Tag statsTag(FEntity sender, FPlayer receiver) {
+    private Tag statsTag(FEntity sender, FPlayer receiver) {
         Component component = Component.empty();
 
         PlatformPlayerAdapter.Statistics statistics = platformPlayerAdapter.getStatistics(sender);
@@ -293,7 +441,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         return Tag.selfClosingInserting(component);
     }
 
-    public Tag skinTag(FEntity sender, FPlayer receiver) {
+    private Tag skinTag(FEntity sender, FPlayer receiver) {
         String url = skinService.getBodyUrl(sender);
         String format = Strings.CS.replace(
                 resolveLocalization(receiver).getValues().getOrDefault("skin", ""),
@@ -308,7 +456,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         return Tag.selfClosingInserting(component);
     }
 
-    public Tag itemTag(FEntity sender, FPlayer receiver, boolean isTranslateItem) {
+    private Tag itemTag(FEntity sender, FPlayer receiver, boolean isTranslateItem) {
         Object itemStackObject = platformPlayerAdapter.getItem(sender.getUuid());
         Component componentItem = platformServerAdapter.translateItemName(itemStackObject, isTranslateItem);
 
@@ -323,7 +471,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         return Tag.selfClosingInserting(componentFormat);
     }
 
-    public Tag urlTag(FEntity sender, FPlayer receiver, String url) {
+    private Tag urlTag(FEntity sender, FPlayer receiver, String url) {
         url = urlFormatter.toASCII(url);
         if (url.isEmpty()) return Tag.selfClosingInserting(Component.empty());
 
@@ -340,7 +488,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         return Tag.selfClosingInserting(component);
     }
 
-    public Tag imageTag(FEntity sender, FPlayer receiver, String url) {
+    private Tag imageTag(FEntity sender, FPlayer receiver, String url) {
         url = urlFormatter.toASCII(url);
         if (url.isEmpty()) return Tag.selfClosingInserting(Component.empty());
 

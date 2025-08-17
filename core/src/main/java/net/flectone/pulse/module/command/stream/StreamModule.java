@@ -6,16 +6,23 @@ import lombok.NonNull;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.stream.listener.StreamPulseListener;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
@@ -137,6 +144,21 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                     .format(Localization.Command.Stream::getFormatEnd)
                     .sendBuilt();
         }
+    }
+
+    public void addTag(MessageContext messageContext) {
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
+
+        FEntity sender = messageContext.getSender();
+        if (!(sender instanceof FPlayer fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer)) return;
+
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.STREAM_PREFIX, (argumentQueue, context) -> {
+            String streamPrefix = fPlayer.getSettingValue(FPlayer.Setting.STREAM_PREFIX);
+            if (StringUtils.isEmpty(streamPrefix)) return Tag.selfClosingInserting(Component.empty());
+
+            return Tag.preProcessParsed(streamPrefix);
+        });
     }
 
     public Function<Localization.Command.Stream, String> replaceUrls(String string) {

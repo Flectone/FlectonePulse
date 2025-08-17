@@ -3,6 +3,8 @@ package net.flectone.pulse.module.message.format.world;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
@@ -14,9 +16,13 @@ import net.flectone.pulse.module.message.format.world.listener.WorldPacketListen
 import net.flectone.pulse.module.message.format.world.listener.WorldPulseListener;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageFlag;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.Tag;
 
 @Singleton
 public class WorldModule extends AbstractModule {
@@ -61,6 +67,21 @@ public class WorldModule extends AbstractModule {
     @Override
     protected boolean isConfigEnable() {
         return message.isEnable();
+    }
+
+    public void addTag(MessageContext messageContext) {
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
+
+        FEntity sender = messageContext.getSender();
+        if (isModuleDisabledFor(sender)) return;
+        if (!(sender instanceof FPlayer fPlayer)) return;
+
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.WORLD_PREFIX, (argumentQueue, context) -> {
+            String worldPrefix = fPlayer.getSettingValue(FPlayer.Setting.WORLD_PREFIX);
+            if (worldPrefix == null) return Tag.selfClosingInserting(Component.empty());
+
+            return Tag.preProcessParsed(worldPrefix);
+        });
     }
 
     @Async

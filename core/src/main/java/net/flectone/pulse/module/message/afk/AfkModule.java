@@ -2,21 +2,28 @@ package net.flectone.pulse.module.message.afk;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.afk.listener.AfkPulseListener;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.type.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -74,6 +81,21 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
     @Override
     protected boolean isConfigEnable() {
         return message.isEnable();
+    }
+
+    public void addTag(MessageContext messageContext) {
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
+
+        FEntity sender = messageContext.getSender();
+        if (isModuleDisabledFor(sender)) return;
+        if (!(sender instanceof FPlayer fPlayer)) return;
+
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.AFK_SUFFIX, (argumentQueue, context) -> {
+            String afkSuffix = fPlayer.getSettingValue(FPlayer.Setting.AFK_SUFFIX);
+            if (StringUtils.isEmpty(afkSuffix)) return Tag.selfClosingInserting(Component.empty());
+
+            return Tag.preProcessParsed(afkSuffix);
+        });
     }
 
     @Async

@@ -13,9 +13,13 @@ import net.flectone.pulse.module.message.format.moderation.delete.listener.Delet
 import net.flectone.pulse.module.message.format.moderation.delete.model.HistoryMessage;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.MessageSender;
+import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import org.apache.commons.lang3.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +74,36 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
 
     public void clearHistory(FPlayer fPlayer) {
         playersHistory.remove(fPlayer.getUuid());
+    }
+
+    public void addTag(MessageContext messageContext) {
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
+
+        FEntity sender = messageContext.getSender();
+        FPlayer receiver = messageContext.getReceiver();
+        if (isModuleDisabledFor(receiver)) return;
+
+        String contextMessage = messageContext.getMessage();
+        if (contextMessage == null || !contextMessage.contains("<delete>")) return;
+
+        UUID messageUUID = messageContext.getMessageUUID();
+
+        messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DELETE, (argumentQueue, context) -> {
+            String placeholder = Strings.CS.replace(
+                    resolveLocalization(receiver).getPlaceholder(),
+                    "<uuid>",
+                    messageUUID.toString()
+            );
+
+            Component componentPlaceholder = messagePipeline.builder(sender, receiver, placeholder)
+                    .flag(MessageFlag.MENTION, false)
+                    .flag(MessageFlag.INTERACTIVE_CHAT, false)
+                    .flag(MessageFlag.QUESTION, false)
+                    .flag(MessageFlag.DELETE, false)
+                    .build();
+
+            return Tag.selfClosingInserting(componentPlaceholder);
+        });
     }
 
     public void save(FPlayer receiver, UUID messageUUID, Component component, boolean needToCache) {
