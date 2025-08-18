@@ -2,6 +2,7 @@ package net.flectone.pulse.execution.scheduler;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.exception.SchedulerTaskException;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.List;
@@ -16,30 +17,54 @@ public class FabricTaskScheduler implements TaskScheduler {
     private final FLogger logger;
 
     private ExecutorService asyncExecutor;
+    private volatile boolean disabled = false;
 
     @Inject
     public FabricTaskScheduler(FLogger logger) {
         this.logger = logger;
 
         createExecutorService();
-
-        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
     }
 
     @Override
-    public void setDisabled(boolean value) {
-        if (value) {
-            shutdown();
+    public void shutdown() {
+        disabled = true;
+
+        asyncExecutor.shutdown();
+
+        try {
+            if (!asyncExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
+                asyncExecutor.shutdownNow();
+            }
+        } catch (InterruptedException ignored) {
+            asyncExecutor.shutdownNow();
         }
+
+        scheduledTasks.clear();
+    }
+
+    @Override
+    public void reload() {
+        shutdown();
+
+        createExecutorService();
+        scheduledTasks.clear();
+        currentTick.set(0L);
+
+        disabled = false;
     }
 
     @Override
     public void runAsync(SchedulerRunnable runnable) {
+        if (disabled) return;
+
         asyncExecutor.execute(wrapExceptionRunnable(runnable));
     }
 
     @Override
     public void runAsyncTimer(SchedulerRunnable runnable, long tick, long period) {
+        if (disabled) return;
+
         long firstTick = currentTick.get() + tick;
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, period, true);
         registerTask(firstTick, task);
@@ -52,6 +77,8 @@ public class FabricTaskScheduler implements TaskScheduler {
 
     @Override
     public void runAsyncLater(SchedulerRunnable runnable, long tick) {
+        if (disabled) return;
+
         long firstTick = currentTick.get() + tick;
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, -1, true);
         registerTask(firstTick, task);
@@ -59,6 +86,8 @@ public class FabricTaskScheduler implements TaskScheduler {
 
     @Override
     public void runSync(SchedulerRunnable runnable) {
+        if (disabled) return;
+
         long firstTick = currentTick.get();
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, -1, false);
         registerTask(firstTick, task);
@@ -71,6 +100,8 @@ public class FabricTaskScheduler implements TaskScheduler {
 
     @Override
     public void runSyncTimer(SchedulerRunnable runnable, long tick, long period) {
+        if (disabled) return;
+
         long firstTick = currentTick.get() + tick;
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, period, false);
         registerTask(firstTick, task);
@@ -83,20 +114,16 @@ public class FabricTaskScheduler implements TaskScheduler {
 
     @Override
     public void runSyncLater(SchedulerRunnable runnable, long tick) {
+        if (disabled) return;
+
         long firstTick = currentTick.get() + tick;
         ScheduledTask task = new ScheduledTask(wrapExceptionRunnable(runnable), firstTick, -1, false);
         registerTask(firstTick, task);
     }
 
-    @Override
-    public void reload() {
-        shutdown();
-        createExecutorService();
-        scheduledTasks.clear();
-        currentTick.set(0L);
-    }
-
     public void onTick() {
+        if (disabled) return;
+
         long tick = currentTick.getAndIncrement();
         processTasks(tick);
     }
@@ -144,7 +171,7 @@ public class FabricTaskScheduler implements TaskScheduler {
         return () -> {
             try {
                 runnable.run();
-            } catch (Exception e) {
+            } catch (SchedulerTaskException e) {
                 logger.warning("Task error: " + e.getMessage());
             }
         };
@@ -163,11 +190,6 @@ public class FabricTaskScheduler implements TaskScheduler {
         };
 
         this.asyncExecutor = Executors.newCachedThreadPool(namedThreadFactory);
-    }
-
-    public void shutdown() {
-        asyncExecutor.shutdownNow();
-        scheduledTasks.clear();
     }
 
     private static class ScheduledTask {

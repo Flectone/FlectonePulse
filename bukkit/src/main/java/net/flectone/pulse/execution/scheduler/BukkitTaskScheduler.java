@@ -2,9 +2,6 @@ package net.flectone.pulse.execution.scheduler;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Setter;
-import net.flectone.pulse.execution.scheduler.SchedulerRunnable;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.IllegalPluginAccessException;
@@ -17,7 +14,7 @@ public class BukkitTaskScheduler implements TaskScheduler {
     private final com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler taskScheduler;
     private final FLogger fLogger;
 
-    @Setter private boolean disabled = false;
+    private volatile boolean disabled = false;
 
     @Inject
     public BukkitTaskScheduler(Plugin plugin,
@@ -29,10 +26,22 @@ public class BukkitTaskScheduler implements TaskScheduler {
     }
 
     @Override
+    public void shutdown() {
+        disabled = true;
+
+        taskScheduler.cancelTasks(plugin);
+    }
+
+    @Override
+    public void reload() {
+        shutdown();
+
+        disabled = false;
+    }
+
+    @Override
     public void runAsync(SchedulerRunnable runnable) {
-        if (disabled) {
-            return;
-        }
+        if (disabled) return;
 
         taskScheduler.runTaskAsynchronously(() -> {
             try {
@@ -47,9 +56,7 @@ public class BukkitTaskScheduler implements TaskScheduler {
 
     @Override
     public void runAsyncTimer(SchedulerRunnable runnable, long tick, long period) {
-        if (disabled) {
-            return;
-        }
+        if (disabled) return;
 
         taskScheduler.runTaskTimerAsynchronously(() -> {
             try {
@@ -86,9 +93,7 @@ public class BukkitTaskScheduler implements TaskScheduler {
 
     @Override
     public void runSync(SchedulerRunnable runnable) {
-        if (disabled) {
-            return;
-        }
+        if (disabled) return;
 
         taskScheduler.runTask(() -> {
             try {
@@ -103,9 +108,7 @@ public class BukkitTaskScheduler implements TaskScheduler {
 
     @Override
     public void runSyncRegion(Object entity, SchedulerRunnable runnable) {
-        if (disabled) {
-            return;
-        }
+        if (disabled) return;
 
         if (!(entity instanceof Entity bukkitEntity)) {
             runSync(runnable);
@@ -125,9 +128,7 @@ public class BukkitTaskScheduler implements TaskScheduler {
 
     @Override
     public void runSyncTimer(SchedulerRunnable runnable, long tick, long period) {
-        if (disabled) {
-            return;
-        }
+        if (disabled) return;
 
         taskScheduler.runTaskTimer(() -> {
             try {
@@ -147,9 +148,7 @@ public class BukkitTaskScheduler implements TaskScheduler {
 
     @Override
     public void runSyncLater(SchedulerRunnable runnable, long tick) {
-        if (disabled) {
-            return;
-        }
+        if (disabled) return;
 
         taskScheduler.runTaskLater(() -> {
             try {
@@ -160,10 +159,5 @@ public class BukkitTaskScheduler implements TaskScheduler {
                 fLogger.warning(e);
             }
         }, tick);
-    }
-
-    @Override
-    public void reload() {
-        taskScheduler.cancelTasks(plugin);
     }
 }

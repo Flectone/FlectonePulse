@@ -90,6 +90,9 @@ public class FlectonePulseAPI  {
         // log plugin disabling
         fLogger.logDisabling();
 
+        // disable task scheduler
+        instance.get(TaskScheduler.class).shutdown();
+
         // send metrics data if enabled
         if (instance.get(FileResolver.class).getConfig().isMetrics()) {
             instance.get(MetricsService.class).send();
@@ -109,10 +112,6 @@ public class FlectonePulseAPI  {
         });
         fPlayerService.clear();
 
-        // disable task scheduler
-        TaskScheduler taskScheduler = instance.get(TaskScheduler.class);
-        taskScheduler.setDisabled(true);
-
         // disable all modules
         instance.get(net.flectone.pulse.module.Module.class).terminate();
 
@@ -127,9 +126,6 @@ public class FlectonePulseAPI  {
 
         // disconnect from database
         instance.get(Database.class).disconnect();
-
-        // reload task scheduler
-        taskScheduler.reload();
 
         // log plugin disabled
         fLogger.logDisabled();

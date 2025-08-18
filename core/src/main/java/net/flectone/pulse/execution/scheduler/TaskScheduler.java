@@ -2,7 +2,9 @@ package net.flectone.pulse.execution.scheduler;
 
 public interface TaskScheduler {
 
-    void setDisabled(boolean value);
+    void shutdown();
+
+    void reload();
 
     void runAsync(SchedulerRunnable runnable);
 
@@ -21,7 +23,4 @@ public interface TaskScheduler {
     void runSyncTimer(SchedulerRunnable runnable, long tick);
 
     void runSyncLater(SchedulerRunnable runnable, long tick);
-
-    void reload();
-
 }
