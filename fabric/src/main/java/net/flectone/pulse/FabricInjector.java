@@ -72,7 +72,7 @@ public class FabricInjector extends AbstractModule {
 
         // Registries
         bind(PermissionRegistry.class).to(FabricPermissionRegistry.class);
-//        bind(ProxyRegistry.class).to(BukkitProxyRegistry.class);
+        bind(ProxyRegistry.class).to(FabricProxyRegistry.class);
         bind(ListenerRegistry.class).to(FabricListenerRegistry.class);
         bind(CommandRegistry.class).to(FabricCommandRegistry.class);
 
