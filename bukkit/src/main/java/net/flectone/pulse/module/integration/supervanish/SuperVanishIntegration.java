@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
+import de.myzelyam.api.vanish.VanishAPI;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.message.join.JoinModule;
@@ -60,5 +62,9 @@ public class SuperVanishIntegration implements Listener, FIntegration {
         joinModule.send(fPlayer, true);
 
         event.setSilent(true);
+    }
+
+    public boolean isVanished(FEntity sender) {
+        return VanishAPI.isInvisibleOffline(sender.getUuid());
     }
 }

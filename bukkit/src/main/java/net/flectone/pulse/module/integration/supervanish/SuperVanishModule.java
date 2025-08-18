@@ -53,10 +53,13 @@ public class SuperVanishModule extends AbstractModule {
         if (isModuleDisabledFor(sender)) return false;
 
         Player player = Bukkit.getPlayer(sender.getUuid());
-        if (player == null) return false;
+        if (player != null) {
+            return player
+                    .getMetadata("vanished").stream()
+                    .anyMatch(MetadataValue::asBoolean);
+        }
 
-        return player
-                .getMetadata("vanished").stream()
-                .anyMatch(MetadataValue::asBoolean);
+        // offline check
+        return superVanishIntegration.isVanished(sender);
     }
 }
