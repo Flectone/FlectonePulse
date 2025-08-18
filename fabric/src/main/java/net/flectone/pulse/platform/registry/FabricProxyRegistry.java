@@ -33,12 +33,7 @@ public class FabricProxyRegistry extends ProxyRegistry {
         super.onEnable();
 
         Config config = fileResolver.getConfig();
-        if (config.isBungeecord()) {
-            fLogger.warning("BungeeCord is not supported on Fabric");
-            return;
-        }
-
-        if (config.isVelocity()) {
+        if (config.isBungeecord() || config.isVelocity()) {
             warnIfLocalDatabase();
 
             FabricProxy fabricProxy = injector.getInstance(FabricProxy.class);

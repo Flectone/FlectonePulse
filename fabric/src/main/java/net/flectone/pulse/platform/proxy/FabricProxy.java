@@ -26,8 +26,8 @@ public class FabricProxy implements Proxy {
     private final FabricFlectonePulse fabricFlectonePulse;
     private final ProxyMessageHandler proxyMessageHandler;
 
-    private CustomPayload.Id<VelocityPayload> channel;
-    PacketCodec<RegistryByteBuf, VelocityPayload> packetCodec;
+    private CustomPayload.Id<ProxyPayload> channel;
+    private PacketCodec<RegistryByteBuf, ProxyPayload> packetCodec;
 
     @Inject
     public FabricProxy(FileResolver fileResolver,
@@ -48,7 +48,7 @@ public class FabricProxy implements Proxy {
         String channelName = getChannel();
         if (channelName == null) return;
 
-        channel = new CustomPayload.Id<>(Identifier.of("flectonepulse", "main"));
+        channel = new CustomPayload.Id<>(Identifier.of(channelName));
 
         if (packetCodec == null) {
             packetCodec = PacketCodec.of(
@@ -56,7 +56,7 @@ public class FabricProxy implements Proxy {
                     buf -> {
                         byte[] data = new byte[buf.readableBytes()];
                         buf.readBytes(data);
-                        return new VelocityPayload(channel, data);
+                        return new ProxyPayload(channel, data);
                     }
             );
 
@@ -92,12 +92,16 @@ public class FabricProxy implements Proxy {
 
         if (player == null) return false;
 
-        ServerPlayNetworking.send(player, new VelocityPayload(channel, message));
+        ServerPlayNetworking.send(player, new ProxyPayload(channel, message));
         return true;
     }
 
     @Nullable
     public String getChannel() {
+        if (config.isBungeecord()) {
+            return "bungeecord:main";
+        }
+
         if (config.isVelocity()) {
             return "flectonepulse:main";
         }
@@ -105,7 +109,7 @@ public class FabricProxy implements Proxy {
         return null;
     }
 
-    public record VelocityPayload(Id<? extends CustomPayload> id, byte[] data) implements CustomPayload {
+    public record ProxyPayload(Id<? extends CustomPayload> id, byte[] data) implements CustomPayload {
 
         @Override
         public CustomPayload.Id<? extends CustomPayload> getId() {
