@@ -29,10 +29,11 @@ import net.flectone.pulse.util.constant.PlatformType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Singleton
 public class ChatModule extends AbstractModuleLocalization<Localization.Message.Chat> {
@@ -182,39 +183,38 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
         builder.send(receivers);
 
-        List<UUID> receiversUUID = receivers.stream()
+        int receiversCount = (int) receivers.stream()
                 .filter(fReceiver -> !fReceiver.isUnknown())
+                .filter(fReceiver -> !fReceiver.equals(fPlayer))
                 .filter(fReceiver -> integrationModule.canSeeVanished(fReceiver, fPlayer))
-                .map(FEntity::getUuid)
-                .toList();
+                .count();
 
         spyModuleProvider.get().checkChat(fPlayer, chatName, finalMessage);
 
-        int countReceivers = receiversUUID.size();
-        Message.Chat.Type.NullReceiver nullReceiver = playerChat.getNullReceiver();
-
-        checkReceiversLater(fPlayer, countReceivers, chatRange, receiversUUID, nullReceiver);
+        checkReceiversLater(fPlayer, chatRange, receiversCount, playerChat.getNullReceiver());
 
         successEvent.accept(finalMessage, playerChat.isCancel());
 
         bubbleModuleProvider.get().add(fPlayer, eventMessage);
     }
 
-
-    @Async(delay = 5L)
-    public void checkReceiversLater(FPlayer fPlayer, int countReceivers, Range chatRange,
-                                    List<UUID> receiversUUID, Message.Chat.Type.NullReceiver nullReceiver) {
-        if (!nullReceiver.isEnable() || countReceivers > 1) {
+    @Async(delay = 1L)
+    public void checkReceiversLater(FPlayer fPlayer,
+                                    Range chatRange,
+                                    int receiversCount,
+                                    Message.Chat.Type.NullReceiver nullReceiver) {
+        if (!nullReceiver.isEnable() || receiversCount != 0) {
             return;
         }
 
-        Set<UUID> onlinePlayers = fPlayerService.findOnlineFPlayers()
+        int onlinePlayersCount = (int) fPlayerService.findOnlineFPlayers()
                 .stream()
-                .map(FEntity::getUuid)
-                .collect(Collectors.toSet());
+                .filter(fReceiver -> !fReceiver.isUnknown())
+                .filter(fReceiver -> !fReceiver.equals(fPlayer))
+                .filter(fReceiver -> integrationModule.canSeeVanished(fReceiver, fPlayer))
+                .count();
 
-        if ((onlinePlayers.containsAll(receiversUUID) && onlinePlayers.size() <= countReceivers)
-                || chatRange.is(Range.Type.BLOCKS)) {
+        if (chatRange.is(Range.Type.BLOCKS) || onlinePlayersCount == 0) {
             builder(fPlayer)
                     .destination(nullReceiver.getDestination())
                     .format(Localization.Message.Chat::getNullReceiver)
