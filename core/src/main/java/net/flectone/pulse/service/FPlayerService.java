@@ -98,11 +98,6 @@ public class FPlayerService {
         return fPlayer;
     }
 
-    public void loadData(UUID uuid) {
-        FPlayer fPlayer = getFPlayer(uuid);
-        loadData(fPlayer);
-    }
-
     public void loadData(FPlayer fPlayer) {
         fPlayer.setOnline(true);
 

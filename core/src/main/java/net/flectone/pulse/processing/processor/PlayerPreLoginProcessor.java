@@ -46,11 +46,10 @@ public class PlayerPreLoginProcessor {
         eventDispatcher.dispatch(event);
 
         if (event.isAllowed()) {
-            fPlayerService.loadData(uuid);
+            fPlayerService.loadData(fPlayer);
             allowedConsumer.accept(event);
         } else {
             kickConsumer.accept(event);
         }
     }
-
 }
