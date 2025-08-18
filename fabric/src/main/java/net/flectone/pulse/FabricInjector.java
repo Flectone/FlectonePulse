@@ -37,12 +37,12 @@ import java.nio.file.Path;
 @Singleton
 public class FabricInjector extends AbstractModule {
 
-    private final FlectonePulse flectonePulse;
+    private final FabricFlectonePulse flectonePulse;
     private final LibraryResolver libraryResolver;
     private final FLogger fLogger;
     private final PacketProvider packetProvider;
 
-    public FabricInjector(FlectonePulse flectonePulse,
+    public FabricInjector(FabricFlectonePulse flectonePulse,
                           LibraryResolver libraryResolver,
                           FLogger fLogger) {
         this.flectonePulse = flectonePulse;
@@ -89,6 +89,7 @@ public class FabricInjector extends AbstractModule {
 
         // Core bindings
         bind(FlectonePulse.class).toInstance(flectonePulse);
+        bind(FabricFlectonePulse.class).toInstance(flectonePulse);
         bind(FlectonePulseAPI.class).asEagerSingleton();
         bind(FLogger.class).toInstance(fLogger);
 
