@@ -106,8 +106,17 @@ public class FPlayerService {
         loadColors(fPlayer);
         loadIgnores(fPlayer);
 
-        // update old database data
-        fPlayerRepository.update(fPlayer);
+        // delayed update to avoid race conditions during server transfers
+        // ensures accurate online status and last IP recording
+        updateFPlayerLater(fPlayer);
+    }
+
+    @Async(delay = 20)
+    public void updateFPlayerLater(FPlayer fPlayer) {
+        if (!platformPlayerAdapter.isOnline(fPlayer)) return;
+
+        fPlayer.setIp(platformPlayerAdapter.getIp(fPlayer));
+        updateFPlayer(fPlayer);
     }
 
     public int getPing(FPlayer player) {
