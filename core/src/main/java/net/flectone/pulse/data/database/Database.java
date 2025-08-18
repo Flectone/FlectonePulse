@@ -215,6 +215,15 @@ public class Database {
                 hikariConfig.addDataSourceProperty("journal_size_limit", "6144000");
             }
             case MYSQL -> {
+                reflectionResolver.hasClassOrElse("com.mysql.jdbc.Driver", libraryResolver ->
+                        libraryResolver.loadLibrary(Library.builder()
+                                .groupId("com{}mysql")
+                                .artifactId("mysql-connector-j")
+                                .version(BuildConfig.MYSQL_CONNECTOR_VERSION)
+                                .build()
+                        )
+                );
+
                 connectionURL = connectionURL +
                         "//" +
                         systemVariableResolver.substituteEnvVars(config.getHost()) +
