@@ -38,7 +38,7 @@ dependencies {
 
 	modCompileOnly("com.github.retrooper:packetevents-fabric:$packetevents_spigot_version")
 	modCompileOnly("eu.pb4:placeholder-api:$text_placeholder_api_version")
-	modCompileOnly("maven.modrinth:vanish:1.5.20+1.21.1")
+	modCompileOnly("maven.modrinth:vanish:1.5.20+1.21.7")
 
 	// fix integration with LuckPerms
 	modImplementation(include("org.incendo:cloud-fabric:${cloud_paper_version}"))
