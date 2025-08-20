@@ -165,7 +165,6 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
                     || integrationModule.getGroups().contains(wordWithoutPrefix) && permissionChecker.check(sender, permission.getGroup());
             if (isMention) {
                 words[i] = "<mention:" + wordWithoutPrefix + ">";
-                break;
             }
         }
 
