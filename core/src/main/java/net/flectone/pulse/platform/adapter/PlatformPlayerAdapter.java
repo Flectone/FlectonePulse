@@ -87,7 +87,6 @@ public interface PlatformPlayerAdapter {
     @Nullable Object getItem(@NotNull UUID uuid);
 
     // Player management
-    void clear(@NotNull FPlayer fPlayer);
     @NotNull List<UUID> getOnlinePlayers();
     @NotNull Set<UUID> findPlayersWhoCanSee(FPlayer fPlayer, double x, double y, double z);
     @NotNull List<Integer> getPassengers(FPlayer fPlayer);

@@ -293,11 +293,6 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public void clear(@NotNull FPlayer fPlayer) {
-        injector.getInstance(AfkModule.class).remove("quit", fPlayer);
-    }
-
-    @Override
     public @NotNull List<UUID> getOnlinePlayers() {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return Collections.emptyList();

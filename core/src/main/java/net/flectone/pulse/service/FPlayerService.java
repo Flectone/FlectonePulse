@@ -150,7 +150,6 @@ public class FPlayerService {
         fPlayer.setOnline(false);
         fPlayer.setIp(platformPlayerAdapter.getIp(fPlayer));
         invalidateOnline(fPlayer.getUuid());
-        platformPlayerAdapter.clear(fPlayer);
         updateFPlayer(fPlayer);
     }
 

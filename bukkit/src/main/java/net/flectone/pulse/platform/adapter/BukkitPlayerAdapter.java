@@ -333,10 +333,4 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
                 .map(offlinePlayer -> new PlayedTimePlayer(offlinePlayer.getName(), offlinePlayer.getStatistic(Statistic.PLAY_ONE_MINUTE) * 50L))
                 .toList();
     }
-
-
-    @Override
-    public void clear(@NotNull FPlayer fPlayer) {
-        injector.getInstance(AfkModule.class).remove("quit", fPlayer);
-    }
 }
