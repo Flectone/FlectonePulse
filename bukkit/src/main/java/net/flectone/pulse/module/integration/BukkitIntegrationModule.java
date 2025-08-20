@@ -102,7 +102,11 @@ public class BukkitIntegrationModule extends IntegrationModule {
         }
 
         if (platformServerAdapter.hasProject("SuperVanish") || platformServerAdapter.hasProject("PremiumVanish")) {
-            addChildren(SuperVanishModule.class);
+            if (reflectionResolver.hasClass("de.myzelyam.api.vanish.VanishAPI")) {
+                addChildren(SuperVanishModule.class);
+            } else {
+                fLogger.warning("Integration with SuperVanish is not possible. Are you using another plugin with the same name? It is only supported https://www.spigotmc.org/resources/supervanish-be-invisible.1331/");
+            }
         }
 
         if (platformServerAdapter.hasProject("TAB")) {
