@@ -109,11 +109,13 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
                     return switch (commandAdvancement.relation()) {
                         case MANY_TO_ONE -> Strings.CS.replace(
                                 subcommand.getManyToOne(),
-                                "<number>", String.valueOf(commandAdvancement.content())
+                                "<number>",
+                                String.valueOf(commandAdvancement.content())
                         );
                         case ONE_TO_ONE_TEXT -> Strings.CS.replace(
                                 subcommand.getOneToOne(),
-                                "<advancement>", String.valueOf(commandAdvancement.content())
+                                "<advancement>",
+                                stripSingleQuotes(commandAdvancement.content())
                         );
                         case ONE_TO_ONE_ADVANCEMENT -> subcommand.getOneToOne();
                     };
@@ -138,7 +140,7 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
         return StringUtils.replaceEach(
                 string,
                 new String[]{"<title>", "<description>"},
-                new String[]{String.valueOf(chatAdvancement.title()), String.valueOf(chatAdvancement.description())}
+                new String[]{stripSingleQuotes(chatAdvancement.title()), stripSingleQuotes(chatAdvancement.description())}
         );
     }
 
@@ -159,7 +161,7 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
             title = StringUtils.replaceEach(
                     title,
                     new String[]{"<title>", "<description>"},
-                    new String[]{String.valueOf(chatAdvancement.title()), String.valueOf(chatAdvancement.description())}
+                    new String[]{stripSingleQuotes(chatAdvancement.title()), stripSingleQuotes(chatAdvancement.description())}
             );
 
             Component component = messagePipeline.builder(sender, receiver, title).build();
@@ -171,5 +173,9 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
         MANY_TO_ONE,
         ONE_TO_ONE_ADVANCEMENT,
         ONE_TO_ONE_TEXT
+    }
+
+    private String stripSingleQuotes(String string) {
+        return Strings.CS.replace(string, "'", "");
     }
 }
