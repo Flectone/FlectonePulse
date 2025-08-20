@@ -72,6 +72,18 @@ public class FileResolver {
         preInitVersion = config.getVersion();
 
         if (!preInitVersion.equals(BuildConfig.PROJECT_VERSION)) {
+            // fix update permission name
+            if (isVersionOlderThan(preInitVersion, "1.4.3")) {
+                permission.reload();
+
+                Permission.Message.Update update = permission.getMessage().getUpdate();
+                if (update.getName().equals("flectonepulse.module.message.op")) {
+                    update.setName("flectonepulse.module.message.update");
+                    update.setSound(new Permission.PermissionEntry("flectonepulse.module.message.update.sound", Permission.Type.TRUE));
+                    permission.save();
+                }
+            }
+
             config.setVersion(BuildConfig.PROJECT_VERSION);
             config.save();
         }

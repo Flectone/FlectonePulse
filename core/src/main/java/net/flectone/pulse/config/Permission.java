@@ -3,6 +3,7 @@ package net.flectone.pulse.config;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.FColor;
@@ -1364,6 +1365,7 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             }
         }
 
+        @Setter
         @Getter
         public static final class Update implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.update";
