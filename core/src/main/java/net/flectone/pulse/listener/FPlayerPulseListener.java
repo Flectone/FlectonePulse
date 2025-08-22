@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.service.FPlayerService;
 
@@ -15,6 +17,12 @@ public class FPlayerPulseListener implements PulseListener {
     @Inject
     public FPlayerPulseListener(FPlayerService fPlayerService) {
         this.fPlayerService = fPlayerService;
+    }
+
+    @Pulse(priority = Event.Priority.LOWEST, ignoreCancelled = true)
+    public void onPlayerJoinEvent(PlayerJoinEvent event) {
+        FPlayer fPlayer = event.getPlayer();
+        fPlayerService.saveFPlayerData(fPlayer);
     }
 
     @Pulse
