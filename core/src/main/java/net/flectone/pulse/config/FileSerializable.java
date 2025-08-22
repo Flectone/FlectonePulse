@@ -30,6 +30,7 @@ public abstract class FileSerializable extends YamlSerializable {
     private static final SerializerConfig CONFIG = new SerializerConfig
             .Builder()
             .setBackupOnErrors(true)
+            .registerSerializer(new EnumSerializer<>(Message.Format.Moderation.Newbie.Mode.class))
             .registerSerializer(new EnumSerializer<>(Range.Type.class))
             .registerSerializer(new EnumSerializer<>(AdventureTag.class))
             .registerSerializer(new EnumSerializer<>(Message.Chat.Mode.class))
