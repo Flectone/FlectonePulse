@@ -44,18 +44,18 @@ public class FlectonePulseAPI  {
         // register default listeners
         instance.get(ListenerRegistry.class).registerDefaultListeners();
 
+        // get file resolver for configuration
+        FileResolver fileResolver = instance.get(FileResolver.class);
+
+        // reload logger with new configuration
+        fLogger.reload(fileResolver.getConfig().getLogFilter());
+
         try {
             // connect to database
             instance.get(Database.class).connect();
         } catch (Exception e) {
             fLogger.warning(e);
         }
-
-        // get file resolver for configuration
-        FileResolver fileResolver = instance.get(FileResolver.class);
-
-        // reload logger with new configuration
-        fLogger.reload(fileResolver.getConfig().getLogFilter());
 
         // initialize packetevents
         PacketEvents.getAPI().init();
