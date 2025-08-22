@@ -12,7 +12,6 @@ import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
