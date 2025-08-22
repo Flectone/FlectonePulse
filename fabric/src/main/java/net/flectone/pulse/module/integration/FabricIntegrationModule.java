@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import net.flectone.pulse.module.integration.miniplaceholders.MiniPlaceholdersModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -36,6 +37,10 @@ public class FabricIntegrationModule extends IntegrationModule {
 
         if (platformServerAdapter.hasProject("melius-vanish")) {
             addChildren(VanishModule.class);
+        }
+
+        if (platformServerAdapter.hasProject("MiniPlaceholders")) {
+            addChildren(MiniPlaceholdersModule.class);
         }
 
         if (platformServerAdapter.hasProject("placeholder-api")) {
