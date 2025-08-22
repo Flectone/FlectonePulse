@@ -8,7 +8,6 @@ import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.death.DeathModule;
 import net.flectone.pulse.module.message.death.extractor.DeathExtractor;
 import net.flectone.pulse.module.message.death.model.Death;
-import net.flectone.pulse.module.message.death.model.Item;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.TranslatableComponent;
 
@@ -37,8 +36,8 @@ public class DeathPulseListener implements PulseListener {
         Death killer = deathExtractor.extractDeath(translatableComponent, 1);
         death.setKiller(killer);
 
-        Item item = deathExtractor.extractItem(translatableComponent);
-        death.setItem(item);
+        String itemName = deathExtractor.extractItemName(translatableComponent);
+        death.setItem(itemName);
 
         event.setCancelled(true);
         deathModule.send(event.getFPlayer(), death);

@@ -18,7 +18,7 @@ public class Death {
     private UUID targetUUID;
 
     private Death killer;
-    private Item item;
+    private String item;
 
     public Death(String key) {
         this.key = key;

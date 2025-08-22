@@ -3,14 +3,13 @@ package net.flectone.pulse.module.message.death.extractor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.module.message.death.model.Death;
-import net.flectone.pulse.module.message.death.model.Item;
 import net.flectone.pulse.processing.extractor.Extractor;
 import net.flectone.pulse.util.EntityUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
@@ -19,13 +18,14 @@ import java.util.UUID;
 public class DeathExtractor extends Extractor {
 
     private final EntityUtil entityUtil;
+    private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     @Inject
     public DeathExtractor(EntityUtil entityUtil) {
         this.entityUtil = entityUtil;
     }
 
-    public Item extractItem(TranslatableComponent translatableComponent) {
+    public String extractItemName(TranslatableComponent translatableComponent) {
         if (translatableComponent.args().size() < 3) return null;
 
         Component itemComp = translatableComponent.args().get(2);
@@ -41,9 +41,7 @@ public class DeathExtractor extends Extractor {
 
         if (StringUtils.isEmpty(itemName)) return null;
 
-        Item item = new Item(itemName);
-        item.setHoverEvent(HoverEvent.showText(Component.text(itemName).decorate(TextDecoration.ITALIC)));
-        return item;
+        return itemName;
     }
 
     public Death extractDeath(TranslatableComponent translatableComponent, int index) {
@@ -142,14 +140,18 @@ public class DeathExtractor extends Extractor {
     }
 
     private String extractItemComponent(Component component) {
-        if (component instanceof TextComponent extraText && !extraText.children().isEmpty()) {
-            Component itemText = extraText.children().get(0);
-            if (itemText instanceof TextComponent itemTextComp) {
-                return itemTextComp.content();
+        try {
+            return miniMessage.serialize(component);
+        } catch (Exception ignored) {
+            if (component instanceof TextComponent extraText && !extraText.children().isEmpty()) {
+                Component itemText = extraText.children().getFirst();
+                if (itemText instanceof TextComponent itemTextComp) {
+                    return itemTextComp.content();
+                }
             }
-        }
 
-        return null;
+            return null;
+        }
     }
 
 }

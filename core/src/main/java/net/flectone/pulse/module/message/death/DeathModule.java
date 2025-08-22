@@ -9,7 +9,7 @@ import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -18,15 +18,18 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.death.listener.DeathPacketListener;
 import net.flectone.pulse.module.message.death.listener.DeathPulseListener;
 import net.flectone.pulse.module.message.death.model.Death;
-import net.flectone.pulse.module.message.death.model.Item;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.apache.commons.lang3.StringUtils;
 
 import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.empty;
 
@@ -41,6 +44,7 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
     private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
     private final Gson gson;
+    private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     @Inject
     public DeathModule(FileResolver fileResolver,
@@ -138,19 +142,25 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
         return fTarget;
     }
 
-    public TagResolver byItemTag(Item item) {
+    public TagResolver byItemTag(String itemName) {
         String tag = "by_item";
         if (!isEnable()) return empty(tag);
-        if (item == null) return empty(tag);
+        if (StringUtils.isEmpty(itemName)) return empty(tag);
 
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            Component component = Component.text(item.getName());
-            if (item.getHoverEvent() != null) {
-                component = component.hoverEvent(item.getHoverEvent());
-            }
+        Component itemComponent;
+        try {
+            itemComponent = miniMessage.deserialize(itemName);
+        } catch (Exception ignored) {
+            itemComponent = Component.text(itemName);
+        }
 
-            return Tag.selfClosingInserting(component);
-        });
+        Component itemComponentWithHover = itemComponent.hoverEvent(HoverEvent.showText(
+                itemComponent.decorate(TextDecoration.ITALIC))
+        );
+
+        return TagResolver.resolver(tag, (argumentQueue, context) ->
+                Tag.selfClosingInserting(itemComponentWithHover)
+        );
     }
 
     public TagResolver killerTag(FPlayer receiver, Death killer) {
