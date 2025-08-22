@@ -69,6 +69,7 @@ public class FPlayerService {
             String name = platformPlayerAdapter.getName(uuid);
             FPlayer fPlayer = addFPlayer(uuid, name);
             loadData(fPlayer);
+            saveFPlayerData(fPlayer);
         });
     }
 
@@ -90,7 +91,13 @@ public class FPlayerService {
             saveSettings(fPlayer);
         }
 
+        // most often this is not a real IP (this is server ip) on login,
+        // need to update it before calling saveFPlayerData from PlayerJoinEvent
         fPlayer.setIp(platformPlayerAdapter.getIp(fPlayer));
+
+        // player is not fully online on server,
+        // but it should already be
+        fPlayer.setOnline(true);
 
         // add player to online cache and remove from offline
         fPlayerRepository.add(fPlayer);
@@ -98,10 +105,8 @@ public class FPlayerService {
         return fPlayer;
     }
 
+    // load player data
     public void loadData(FPlayer fPlayer) {
-        fPlayer.setOnline(true);
-
-        // load player data
         loadSettings(fPlayer);
         loadColors(fPlayer);
         loadIgnores(fPlayer);
@@ -109,9 +114,10 @@ public class FPlayerService {
 
     @Async
     public void saveFPlayerData(FPlayer fPlayer) {
+        // skip offline FPlayer
         if (!platformPlayerAdapter.isOnline(fPlayer)) return;
 
-        fPlayer.setIp(platformPlayerAdapter.getIp(fPlayer));
+        // update data in database
         updateFPlayer(fPlayer);
     }
 
