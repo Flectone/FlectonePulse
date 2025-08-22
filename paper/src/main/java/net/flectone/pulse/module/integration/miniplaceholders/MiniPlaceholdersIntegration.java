@@ -1,21 +1,24 @@
 package net.flectone.pulse.module.integration.miniplaceholders;
 
 import io.github.miniplaceholders.api.MiniPlaceholders;
+import io.github.miniplaceholders.api.types.RelationalAudience;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.logging.FLogger;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,40 +47,40 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
     @Pulse(priority = Event.Priority.HIGH)
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.getContext();
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) return;
 
         Set<TagResolver> resolvers = new HashSet<>();
-        resolvers.add(MiniPlaceholders.getGlobalPlaceholders());
+        resolvers.add(MiniPlaceholders.globalPlaceholders());
 
-        Player sender = Bukkit.getPlayer(messageContext.getSender().getUuid());
+        Audience sender = getAudienceOrDefault(messageContext.getSender().getUuid(), null);
+        Audience receiver = null;
         if (sender != null) {
-            try {
-                resolvers.add(MiniPlaceholders.getAudiencePlaceholders(sender));
+            receiver = getAudienceOrDefault(messageContext.getReceiver().getUuid(), sender);
 
-                Player receiver = Bukkit.getPlayer(messageContext.getReceiver().getUuid());
-                if (receiver == null) {
-                    receiver = sender;
-                }
-
-                resolvers.add(MiniPlaceholders.getRelationalPlaceholders(sender, receiver));
-
-            } catch (ClassCastException e) {
-                fLogger.warning(e);
-            }
+            resolvers.add(MiniPlaceholders.audiencePlaceholders());
+            resolvers.add(MiniPlaceholders.relationalPlaceholders());
         }
 
         TagResolver[] resolversArray = resolvers.toArray(new TagResolver[0]);
-        String message = replaceMiniPlaceholders(messageContext.getMessage(), resolversArray);
+        String message = replaceMiniPlaceholders(messageContext.getMessage(), resolversArray, sender, receiver);
 
         messageContext.setMessage(message);
     }
 
-    private String replaceMiniPlaceholders(String text, TagResolver[] resolvers) {
+    private Audience getAudienceOrDefault(UUID uuid, Audience defaultAudience) {
+        Audience audience = Bukkit.getPlayer(uuid);
+        return audience == null ? defaultAudience : audience;
+    }
+
+    private String replaceMiniPlaceholders(String text, TagResolver[] resolvers, Audience sender, Audience receiver) {
         Matcher matcher = bracesPattern.matcher(text);
         StringBuilder result = new StringBuilder();
         while (matcher.find()) {
             String content = matcher.group(1);
 
-            Component parsedMessage = miniMessage.deserialize(content, resolvers);
+            Component parsedMessage = sender == null || receiver == null
+                    ? miniMessage.deserialize(content, resolvers)
+                    : miniMessage.deserialize(content, new RelationalAudience<>(sender, receiver), resolvers);
 
             // fix colors problems for custom RP
             // https://github.com/BertTowne/InlineHeads
