@@ -37,25 +37,36 @@ public final class Config extends FileSerializable {
 
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/config/")})
     private String console = "Console";
+
     @Setter
     private String version = BuildConfig.PROJECT_VERSION;
+
     @Setter
     private String language = "en_us";
+
     private boolean languagePlayer = true;
+
     private boolean unregisterOwnCommands = false;
+
     private boolean metrics = true;
+
     private boolean bungeecord = false;
+
     private boolean velocity = false;
+
     private Set<String> clusters = new HashSet<>();
+
     private Set<String> fabricDisabledCommands = new HashSet<>(Set.of(
             "tell", "msg", "w", "me", "ban", "kick", "pardon", "banlist"
     ));
+
     private List<String> logFilter = new ArrayList<>(List.of(
             "Paper Async Command Builder",
             "Caught previously unhandled exception :",
             "Error received from Telegram GetUpdates Request",
             "OkHttp TaskRunner",
-            "Exception in thread \"ForkJoinPool"
+            "Exception in thread \"ForkJoinPool",
+            "FlectonePulseDatabase - "
     ));
 
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/config/#database")})
