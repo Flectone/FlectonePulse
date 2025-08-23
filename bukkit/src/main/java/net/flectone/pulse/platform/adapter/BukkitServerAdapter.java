@@ -24,6 +24,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.Strings;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -48,6 +49,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private final Provider<MessagePipeline> messagePipelineProvider;
     private final PacketProvider packetProvider;
     private final ReflectionResolver reflectionResolver;
+    private final PlainTextComponentSerializer plainTextComponentSerializer = PlainTextComponentSerializer.plainText();
 
     @Inject
     public BukkitServerAdapter(Plugin plugin,
@@ -250,7 +252,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
                 || itemStack.getItemMeta().getDisplayName() == null // support legacy versions
                 || itemStack.getItemMeta().getDisplayName().isEmpty()
                 ? createTranslatableItemName(itemStack, translatable)
-                : Component.text(itemStack.getItemMeta().getDisplayName()).decorate(TextDecoration.ITALIC);
+                : createItemMetaName(itemStack);
 
         if (itemStack.getType() == Material.AIR) return component;
 
@@ -270,6 +272,16 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         }
 
         return component.hoverEvent(HoverEvent.showItem(key, amount));
+    }
+
+    private Component createItemMetaName(org.bukkit.inventory.ItemStack itemStack) {
+        String displayName = itemStack.getItemMeta().getDisplayName();
+        if (displayName == null) return Component.empty();
+
+        Component componentName = messagePipelineProvider.get().builder(displayName).build();
+        String clearedDisplayName = plainTextComponentSerializer.serialize(componentName);
+
+        return Component.text(clearedDisplayName).decorate(TextDecoration.ITALIC);
     }
 
     private Component createTranslatableItemName(org.bukkit.inventory.ItemStack itemStack, boolean translatable) {

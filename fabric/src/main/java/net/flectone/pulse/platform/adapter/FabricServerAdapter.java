@@ -23,6 +23,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +44,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     private final Path projectPath;
     private final TpsTracker tpsTracker;
     private final FLogger fLogger;
+    private final PlainTextComponentSerializer plainTextComponentSerializer = PlainTextComponentSerializer.plainText();
 
     @Inject
     public FabricServerAdapter(FabricFlectonePulse fabricFlectonePulse,
@@ -179,6 +181,17 @@ public class FabricServerAdapter implements PlatformServerAdapter {
 
         Key key = Key.key(itemStack.getRegistryEntry().getIdAsString());
         return component.hoverEvent(HoverEvent.showItem(key, itemStack.getCount()));
+    }
+
+
+    private Component createItemMetaName(net.minecraft.item.ItemStack itemStack) {
+        String displayName = itemStack.getCustomName().getString();
+        if (displayName == null) return Component.empty();
+
+        Component componentName = messagePipelineProvider.get().builder(displayName).build();
+        String clearedDisplayName = plainTextComponentSerializer.serialize(componentName);
+
+        return Component.text(clearedDisplayName).decorate(TextDecoration.ITALIC);
     }
 
     private Component createTranslatableItemName(net.minecraft.item.ItemStack itemStack, boolean translatable) {
