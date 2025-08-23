@@ -22,10 +22,6 @@ subprojects {
         options.encoding = 'UTF-8'
     }
 
-    tasks.withType(Javadoc).configureEach {
-        enabled = false
-    }
-
     java {
         sourceCompatibility = java_version
         targetCompatibility = java_version
