@@ -2,7 +2,7 @@ dependencies {
     implementation project(":core")
     implementation "com.alessiodp.libby:libby-bukkit:$libby_version"
 
-    compileOnly project(":bukkit:paper")
+    compileOnly project(":paper")
     compileOnly "com.github.Anon8281:UniversalScheduler:$UniversalScheduler_version"
     compileOnly "org.incendo:cloud-paper:$cloud_paper_version"
     compileOnly "org.spigotmc:spigot-api:$spigot_version"
@@ -34,7 +34,7 @@ processResources {
 
 
 tasks.named("buildFinalJar", Jar) {
-    def platforms = subprojects + project(":bukkit") + project(":velocity") + project(":bungeecord")
+    def platforms = [project(":paper"), project(":bukkit"), project(":velocity"), project(":bungeecord")]
 
     from {
         platforms.collect { proj ->
