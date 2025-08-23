@@ -1485,7 +1485,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 private String content = "<final_message>";
                 private Webhook webhook = new Webhook(
                         false,
-                        "https://mineskin.eu/avatar/<skin>/32.png",
+                        "https://mc-heads.net/avatar/<skin>/32.png",
                         ""
                 );
                 private Embed embed = new Embed(
@@ -1493,12 +1493,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
                         "",
                         "",
                         "",
-                        new Embed.Author("", "", "https://mineskin.eu/avatar/<skin>/16.png"),
+                        new Embed.Author("", "", "https://mc-heads.net/avatar/<skin>/16.png"),
                         "",
                         "",
                         "",
                         true,
-                        new Embed.Footer("", "https://mineskin.eu/avatar/<skin>/16.png")
+                        new Embed.Footer("", "https://mc-heads.net/avatar/<skin>/16.png")
                 );
             }
 
