@@ -27,7 +27,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew clean fabricRemapJar bukkitMergeJars
+        run: ./gradlew clean fabric:mergeJars bukkit:mergeJars
 
       - name: Publish artifact to GitHub
         uses: actions/upload-artifact@v4
