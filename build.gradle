@@ -123,7 +123,7 @@ subprojects {
         minimize()
     }
 
-    if (project.name in ["core", "bungeecord", "velocity", "paper"]) {
+    if (project.name in ["bungeecord", "velocity", "paper"]) {
         return
     }
 
