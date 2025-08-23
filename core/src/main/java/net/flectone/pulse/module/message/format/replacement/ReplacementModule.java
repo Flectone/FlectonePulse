@@ -464,7 +464,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         Component componentFormat = messagePipeline.builder(sender, receiver, format)
                 .flag(MessageFlag.REPLACEMENT, false)
                 .tagResolvers(TagResolver.resolver("message_1", (argumentQueue, context) ->
-                        Tag.inserting(componentItem))
+                        Tag.selfClosingInserting(componentItem))
                 )
                 .build();
 
