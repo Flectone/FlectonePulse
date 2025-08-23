@@ -86,15 +86,19 @@ public class LegacyColorConvertor {
         String contextMessage = messageContext.getMessage();
         if (StringUtils.isEmpty(contextMessage)) return;
 
+        messageContext.setMessage(convert(contextMessage));
+    }
+
+    public String convert(String text) {
         String convertedMessage;
         try {
-            convertedMessage = messageCache.get(contextMessage, () -> convert(contextMessage, defOptions));
+            convertedMessage = messageCache.get(text, () -> convert(text, defOptions));
         } catch (ExecutionException e) {
             fLogger.warning(e);
-            convertedMessage = convert(contextMessage, defOptions);
+            convertedMessage = convert(text, defOptions);
         }
 
-        messageContext.setMessage(convertedMessage);
+        return convertedMessage;
     }
 
     private String convert(String text, Collection<Option> options) {

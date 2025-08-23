@@ -1,6 +1,8 @@
 dependencies {
+    implementation project(":core")
     implementation "com.alessiodp.libby:libby-bukkit:$libby_version"
 
+    compileOnly project(":paper")
     compileOnly "com.github.Anon8281:UniversalScheduler:$UniversalScheduler_version"
     compileOnly "org.incendo:cloud-paper:$cloud_paper_version"
     compileOnly "org.spigotmc:spigot-api:$spigot_version"
@@ -15,9 +17,6 @@ dependencies {
     compileOnly "dev.lone:api-itemsadder:$itemsadder_version"
     compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
     compileOnly "eu.kennytv.maintenance:maintenance-api:$maintenance_version"
-
-    compileOnly project(":core")
-    compileOnly project(":paper")
 }
 
 shadowJar {
@@ -31,4 +30,19 @@ processResources {
     filesMatching('plugin.yml') {
         expand props
     }
+}
+
+
+tasks.named("buildFinalJar", Jar) {
+    def platforms = [project(":paper"), project(":bukkit"), project(":velocity"), project(":bungeecord")]
+
+    from {
+        platforms.collect { proj ->
+            zipTree(proj.tasks.named("shadeDowngradedApi").get().archiveFile.get().asFile)
+        }
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    dependsOn platforms.collect { proj -> proj.tasks.named("shadeDowngradedApi") }
 }

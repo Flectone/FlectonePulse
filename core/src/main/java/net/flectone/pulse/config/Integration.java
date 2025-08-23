@@ -38,6 +38,9 @@ public final class Integration extends FileSerializable implements ModuleConfig.
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/")})
     private boolean enable = true;
 
+    private String avatarApiUrl = "https://mc-heads.net/avatar/<skin>/8.png";
+    private String bodyApiUrl = "https://mc-heads.net/player/<skin>/16.png";
+
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/advancedban/")})
     private Advancedban advancedban = new Advancedban();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/deepl/")})

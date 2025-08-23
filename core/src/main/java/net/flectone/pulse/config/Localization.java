@@ -550,7 +550,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.enchant.single = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» на предмет <display_name>";
         message.enchant.multiple = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» на предмет <fcolor:2><count><fcolor:1> сущностей";
 
-        message.format.replacement.values.put("skin", "<image:\"<message_1>\"><u>👨 Скин</u></image>");
+        message.format.replacement.values.put("skin", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2><pixels>\"><fcolor:2><u>👨 Скин</u></hover></click>");
         message.format.replacement.values.put("url", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2>Открыть ссылку <br><u><message_1>\"><fcolor:2><u>🗗 Ссылка</u></hover></click>");
         message.format.replacement.values.put("image", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2><pixels>\"><fcolor:2><u>🖃 Картинка</u></hover></click>");
 
@@ -1975,7 +1975,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                         put("online", "<fcolor:2><online>");
                         put("coords", "<fcolor:2><x> <y> <z>");
                         put("stats", "<color:#ff7171><hp>♥</color> <color:#3de0d8><armor>🛡 <color:#e33059><attack>🗡 <color:#4eff52><exp>⏺ <color:#f0a01f><food>🍖");
-                        put("skin", "<image:\"<message_1>\"><u>👨 Skin</u></image>");
+                        put("skin", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2><pixels>\"><fcolor:2><u>👨 Skin</u></hover></click>");
                         put("item", "<fcolor:2>[<message_1>]");
 
                         // text formatting

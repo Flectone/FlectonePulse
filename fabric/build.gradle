@@ -79,16 +79,16 @@ processResources {
 	}
 }
 
-tasks.register('fabricRemapJar', RemapJarTask) {
-	dependsOn tasks.shadowJar
-	input = tasks.shadowJar.archiveFile
-	addNestedDependencies = true
-	archiveFileName = "FlectonePulse-" + project.name + "-" + project_version + ".jar"
-	destinationDirectory = file("$rootDir/build/libs")
+tasks.register("fabricRemapJar", RemapJarTask) {
+    dependsOn tasks.shadowJar
+    input = tasks.shadowJar.archiveFile
+    addNestedDependencies = true
 }
 
-tasks.assemble.dependsOn tasks.fabricRemapJar
+tasks.named("buildFinalJar", Jar) {
+    from {
+        zipTree(tasks.fabricRemapJar.archiveFile)
+    }
 
-artifacts {
-	archives fabricRemapJar
+    dependsOn tasks.fabricRemapJar
 }

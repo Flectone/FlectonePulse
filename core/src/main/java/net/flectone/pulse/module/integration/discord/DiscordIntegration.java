@@ -31,6 +31,7 @@ import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.awt.*;
 import java.time.Instant;
@@ -290,7 +291,11 @@ public class DiscordIntegration implements FIntegration {
 
         Localization.Integration.Discord localization = fileResolver.getLocalization().getIntegration().getDiscord();
         for (Map.Entry<String, String> entry : localization.getInfoChannel().entrySet()) {
-            gateway.getChannelById(Snowflake.of(entry.getKey()))
+            String id = entry.getKey();
+            if (!NumberUtils.isParsable(id)) continue;
+
+            Snowflake snowflake = Snowflake.of(id);
+            gateway.getChannelById(snowflake)
                     .blockOptional()
                     .ifPresent(channel -> {
                         String name = PlainTextComponentSerializer.plainText()

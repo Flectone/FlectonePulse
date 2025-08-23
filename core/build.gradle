@@ -25,3 +25,9 @@ dependencies {
     compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
     compileOnly "su.plo.voice.api:server:$plasmovoiceapi_version"
 }
+
+tasks.named("buildFinalJar", Jar) {
+    from(zipTree(tasks.shadeDowngradedApi.archiveFile))
+
+    dependsOn tasks.shadeDowngradedApi
+}

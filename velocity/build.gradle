@@ -1,6 +1,13 @@
 dependencies {
+    implementation project(":core")
+
     compileOnly "com.velocitypowered:velocity-api:$velocity_version"
-    compileOnly project(":core")
 
     annotationProcessor "com.velocitypowered:velocity-api:$velocity_version"
+}
+
+tasks.named("buildFinalJar", Jar) {
+    from(zipTree(tasks.shadeDowngradedApi.archiveFile))
+
+    dependsOn tasks.shadeDowngradedApi
 }
