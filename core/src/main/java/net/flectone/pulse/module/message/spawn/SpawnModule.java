@@ -6,8 +6,9 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.event.metadata.SpawnMessageMetadata;
+import net.flectone.pulse.module.message.spawn.model.metadata.SpawnMetadata;
 import net.flectone.pulse.module.message.spawn.model.Spawn;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
@@ -81,6 +82,7 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
         }
 
         builder(fTarget)
+                .tag(MessageType.SPAWN)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
                 .format(s -> StringUtils.replaceEach(
@@ -89,7 +91,7 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
                         new String[]{spawn.value(), spawn.x(), spawn.y(), spawn.z(), spawn.angle(), spawn.world()}
                 ))
                 .sound(getSound())
-                .addMetadata(new SpawnMessageMetadata(spawn))
+                .metadata(new SpawnMetadata(spawn))
                 .sendBuilt();
     }
 }

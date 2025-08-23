@@ -5,8 +5,6 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.event.metadata.AutoMessageMetadata;
-import net.flectone.pulse.model.event.metadata.MessageMetadata;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Sound;
@@ -69,11 +67,11 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
         if (StringUtils.isEmpty(format)) return;
 
         builder(fPlayer)
+                .tag(MessageType.AUTO)
                 .destination(type.getDestination())
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.AUTO))
                 .format(format)
                 .sound(sound)
-                .addMetadata(new AutoMessageMetadata(messages))
                 .sendBuilt();
     }
 

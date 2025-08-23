@@ -6,13 +6,11 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.event.metadata.AFKMessageMetadata;
-import net.flectone.pulse.model.event.metadata.MessageMetadata;
+import net.flectone.pulse.module.message.afk.model.metadata.AFKMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -199,7 +197,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
                 .integration()
                 .proxy(dataOutputStream -> dataOutputStream.writeBoolean(isAfk))
                 .sound(getSound())
-                .addMetadata(new AFKMessageMetadata(isAfk))
+                .metadata(new AFKMetadata(isAfk))
                 .sendBuilt();
     }
 }

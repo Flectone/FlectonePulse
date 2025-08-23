@@ -7,7 +7,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.event.metadata.SetblockMessageMetadata;
+import net.flectone.pulse.module.message.setblock.model.metadata.SetblockMetadata;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.setblock.listener.SetblockPulseListener;
 import net.flectone.pulse.module.message.setblock.model.Setblock;
@@ -52,6 +52,7 @@ public class SetblockModule extends AbstractModuleLocalization<Localization.Mess
         if (isModuleDisabledFor(fPlayer)) return;
 
         builder(fPlayer)
+                .tag(MessageType.SETBLOCK)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
                 .format(s -> StringUtils.replaceEach(
@@ -60,7 +61,7 @@ public class SetblockModule extends AbstractModuleLocalization<Localization.Mess
                         new String[]{String.valueOf(setblock.x()), String.valueOf(setblock.y()), String.valueOf(setblock.z())}
                 ))
                 .sound(getSound())
-                .addMetadata(new SetblockMessageMetadata(setblock))
+                .metadata(new SetblockMetadata(setblock))
                 .sendBuilt();
     }
 

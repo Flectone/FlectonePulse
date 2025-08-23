@@ -7,7 +7,6 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.event.metadata.EmptyMessageMetadata;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.op.listener.OpPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -57,11 +56,11 @@ public class OpModule extends AbstractModuleLocalization<Localization.Message.Op
         if (fTarget.isUnknown()) return;
 
         builder(fTarget)
+                .tag(MessageType.OP)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
                 .format(Localization.Message.Op::getFormat)
                 .sound(getSound())
-                .addMetadata(new EmptyMessageMetadata(MessageType.COMMAND_OP))
                 .sendBuilt();
     }
 

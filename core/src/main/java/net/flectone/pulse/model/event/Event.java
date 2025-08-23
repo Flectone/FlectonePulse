@@ -8,7 +8,6 @@ import lombok.Setter;
 public abstract class Event {
 
     private boolean cancelled;
-    private EventMetadata metadata;
 
     protected Event() {
     }

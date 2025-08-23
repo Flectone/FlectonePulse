@@ -2,7 +2,6 @@ package net.flectone.pulse.module.message.join;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.model.event.metadata.EmptyMessageMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
@@ -72,7 +71,6 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
                 .format(s -> hasPlayedBefore || !message.isFirst() ? s.getFormat() : s.getFormatFirstTime())
                 .proxy(dataOutputStream -> dataOutputStream.writeBoolean(hasPlayedBefore))
                 .integration()
-                .addMetadata(new EmptyMessageMetadata(MessageType.JOIN))
                 .sound(getSound())
                 .sendBuilt();
     }

@@ -1,4 +1,7 @@
 package net.flectone.pulse.model.event;
 
-public class EventMetadata {
+public interface EventMetadata {
+
+    EventMetadata EMPTY = new EventMetadata() {};
+
 }

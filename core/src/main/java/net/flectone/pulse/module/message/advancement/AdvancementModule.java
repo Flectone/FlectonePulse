@@ -7,8 +7,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.event.metadata.AdvancementMessageMetadata;
-import net.flectone.pulse.model.event.metadata.MessageMetadata;
+import net.flectone.pulse.module.message.advancement.model.metadata.AdvancementMetadata;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -82,17 +81,17 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
         if (!fTarget.equals(fReceiver)) return;
 
         builder(fTarget)
+                .tag(MessageType.ADVANCEMENT)
                 .range(message.getRange())
                 .destination(message.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.ADVANCEMENT))
                 .filter(fPlayer -> integrationModule.canSeeVanished(fTarget, fPlayer))
-                .tag(MessageType.ADVANCEMENT)
                 .format(s -> convert(s, chatAdvancement))
                 .tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fResolver, chatAdvancement)})
                 .proxy(output -> output.writeUTF(gson.toJson(chatAdvancement)))
                 .integration()
                 .sound(getSound())
-                .addMetadata(new AdvancementMessageMetadata(chatAdvancement))
+                .metadata(new AdvancementMetadata(chatAdvancement))
                 .sendBuilt();
     }
 

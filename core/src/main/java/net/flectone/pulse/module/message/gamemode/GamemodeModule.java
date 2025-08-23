@@ -2,7 +2,6 @@ package net.flectone.pulse.module.message.gamemode;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.model.event.metadata.EmptyMessageMetadata;
 import net.flectone.pulse.module.message.gamemode.model.Gamemode;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
@@ -70,6 +69,7 @@ public class GamemodeModule extends AbstractModuleLocalization<Localization.Mess
 
         // for sender
         builder(fTarget)
+                .tag(MessageType.GAMEMODE)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
                 .format(s -> Strings.CS.replace(
@@ -77,7 +77,6 @@ public class GamemodeModule extends AbstractModuleLocalization<Localization.Mess
                         "<gamemode>",
                         gamemodeType
                 ))
-                .addMetadata(new EmptyMessageMetadata(MessageType.COMMAND_GAMEMODE))
                 .sound(getSound())
                 .sendBuilt();
     }

@@ -6,7 +6,6 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.event.metadata.EmptyMessageMetadata;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
@@ -60,7 +59,6 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.QUIT))
                 .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
                 .format(Localization.Message.Quit::getFormat)
-                .addMetadata(new EmptyMessageMetadata(MessageType.QUIT))
                 .integration()
                 .proxy()
                 .sound(getSound())

@@ -9,7 +9,7 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
-import net.flectone.pulse.model.event.metadata.EmptyMessageMetadata;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
@@ -142,7 +142,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
-        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(fPlayer, component, new EmptyMessageMetadata(MessageType.COMMAND_TOP_ONLINE)));
+        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(MessageType.COMMAND_TOPONLINE, fPlayer, component));
 
         playSound(fPlayer);
     }

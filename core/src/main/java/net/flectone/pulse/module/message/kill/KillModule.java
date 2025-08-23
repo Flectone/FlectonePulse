@@ -6,8 +6,9 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.event.metadata.KillMessageMetadata;
+import net.flectone.pulse.module.message.kill.model.metadata.KillMetadata;
 import net.flectone.pulse.module.message.kill.model.Kill;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -70,6 +71,7 @@ public class KillModule extends AbstractModuleLocalization<Localization.Message.
         }
 
         builder(fTarget)
+                .tag(MessageType.KILL)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
                 .format(s -> key == MinecraftTranslationKey.COMMANDS_KILL_SUCCESS_MULTIPLE
@@ -77,7 +79,7 @@ public class KillModule extends AbstractModuleLocalization<Localization.Message.
                         : s.getSingle()
                 )
                 .sound(getSound())
-                .addMetadata(new KillMessageMetadata(kill))
+                .metadata(new KillMetadata(kill))
                 .sendBuilt();
     }
 }

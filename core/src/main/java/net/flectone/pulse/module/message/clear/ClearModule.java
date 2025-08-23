@@ -6,7 +6,6 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.event.metadata.EmptyMessageMetadata;
 import net.flectone.pulse.module.message.clear.model.Clear;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
@@ -66,6 +65,7 @@ public class ClearModule extends AbstractModuleLocalization<Localization.Message
         }
 
         builder(fTarget)
+                .tag(MessageType.CLEAR)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
                 .format(s -> StringUtils.replaceEach(
@@ -73,7 +73,6 @@ public class ClearModule extends AbstractModuleLocalization<Localization.Message
                         new String[]{"<count>", "<number>"},
                         new String[]{clear.value(), clear.count()}
                 ))
-                .addMetadata(new EmptyMessageMetadata(MessageType.CLEAR))
                 .sound(getSound())
                 .sendBuilt();
     }

@@ -7,7 +7,6 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.event.metadata.EmptyMessageMetadata;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.deop.listener.DeopPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -57,11 +56,11 @@ public class DeopModule extends AbstractModuleLocalization<Localization.Message.
         if (fTarget.isUnknown()) return;
 
         builder(fTarget)
+                .tag(MessageType.DEOP)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
                 .format(Localization.Message.Deop::getFormat)
                 .sound(getSound())
-                .addMetadata(new EmptyMessageMetadata(MessageType.COMMAND_DEOP))
                 .sendBuilt();
     }
 

@@ -6,7 +6,6 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.event.metadata.EmptyMessageMetadata;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.model.util.FImage;
 import net.flectone.pulse.module.message.greeting.listener.GreetingPulseListener;
@@ -65,6 +64,7 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
             List<String> pixels = fImage.convertImageUrl();
 
             builder(fPlayer)
+                    .tag(MessageType.GREETING)
                     .destination(message.getDestination())
                     .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.GREETING))
                     .format(s -> {
@@ -77,7 +77,6 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
                         return greetingMessage;
                     })
                     .sound(getSound())
-                    .addMetadata(new EmptyMessageMetadata(MessageType.GREETING))
                     .sendBuilt();
 
         } catch (IOException e) {
