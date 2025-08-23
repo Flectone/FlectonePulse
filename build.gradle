@@ -85,12 +85,6 @@ subprojects {
         destinationDirectory = file("$rootDir/build/libs")
     }
 
-    afterEvaluate {
-        artifacts {
-            archives tasks.named("mergeJars").get()
-        }
-    }
-
     shadowJar {
         relocate("com.zaxxer", "net.flectone.pulse.library.hikaricp")
         relocate("org.jdbi", "net.flectone.pulse.library.jdbi3")
@@ -121,10 +115,6 @@ subprojects {
         outputs.cacheIf { true }
 
         minimize()
-    }
-
-    if (project.name in ["bungeecord", "velocity", "paper"]) {
-        return
     }
 
     mavenPublishing {
