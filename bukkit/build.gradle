@@ -33,7 +33,7 @@ processResources {
 }
 
 
-tasks.named("mergeJars", Jar) {
+tasks.named("buildFinalJar", Jar) {
     def platforms = subprojects + project(":bukkit") + project(":velocity") + project(":bungeecord")
 
     from {

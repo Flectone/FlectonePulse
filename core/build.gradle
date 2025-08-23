@@ -26,7 +26,7 @@ dependencies {
     compileOnly "su.plo.voice.api:server:$plasmovoiceapi_version"
 }
 
-tasks.named("mergeJars", Jar) {
+tasks.named("buildFinalJar", Jar) {
     from(zipTree(tasks.shadeDowngradedApi.archiveFile))
 
     dependsOn tasks.shadeDowngradedApi

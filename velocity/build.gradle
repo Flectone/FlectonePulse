@@ -6,7 +6,7 @@ dependencies {
     annotationProcessor "com.velocitypowered:velocity-api:$velocity_version"
 }
 
-tasks.named("mergeJars", Jar) {
+tasks.named("buildFinalJar", Jar) {
     from(zipTree(tasks.shadeDowngradedApi.archiveFile))
 
     dependsOn tasks.shadeDowngradedApi

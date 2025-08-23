@@ -13,7 +13,7 @@ processResources {
     }
 }
 
-tasks.named("mergeJars", Jar) {
+tasks.named("buildFinalJar", Jar) {
     from(zipTree(tasks.shadeDowngradedApi.archiveFile))
 
     dependsOn tasks.shadeDowngradedApi

@@ -80,7 +80,7 @@ subprojects {
         quiet = true
     }
 
-    tasks.register("mergeJars", Jar) {
+    tasks.register("buildFinalJar", Jar) {
         archiveFileName = "FlectonePulse-" + project.name + "-" + project_version + ".jar"
         destinationDirectory = file("$rootDir/build/libs")
     }

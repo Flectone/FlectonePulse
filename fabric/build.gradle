@@ -85,7 +85,7 @@ tasks.register("fabricRemapJar", RemapJarTask) {
     addNestedDependencies = true
 }
 
-tasks.named("mergeJars", Jar) {
+tasks.named("buildFinalJar", Jar) {
     from {
         zipTree(tasks.fabricRemapJar.archiveFile)
     }
