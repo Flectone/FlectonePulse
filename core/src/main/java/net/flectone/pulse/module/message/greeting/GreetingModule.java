@@ -12,6 +12,7 @@ import net.flectone.pulse.module.message.greeting.listener.GreetingPulseListener
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.SkinService;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.Strings;
 
@@ -63,6 +64,7 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
             List<String> pixels = fImage.convertImageUrl();
 
             builder(fPlayer)
+                    .tag(MessageType.GREETING)
                     .destination(message.getDestination())
                     .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.GREETING))
                     .format(s -> {

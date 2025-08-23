@@ -14,6 +14,7 @@ import net.flectone.pulse.module.message.gamemode.listener.GamemodePulseListener
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.Strings;
 
 @Singleton
@@ -68,6 +69,7 @@ public class GamemodeModule extends AbstractModuleLocalization<Localization.Mess
 
         // for sender
         builder(fTarget)
+                .tag(MessageType.GAMEMODE)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
                 .format(s -> Strings.CS.replace(

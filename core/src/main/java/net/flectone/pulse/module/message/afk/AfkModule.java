@@ -10,6 +10,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.module.message.afk.model.metadata.AFKMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -196,6 +197,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
                 .integration()
                 .proxy(dataOutputStream -> dataOutputStream.writeBoolean(isAfk))
                 .sound(getSound())
+                .metadata(new AFKMetadata(isAfk))
                 .sendBuilt();
     }
 }

@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.module.message.chat.model.metadata.ChatMetadata;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.model.util.Sound;
@@ -28,6 +29,7 @@ import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.PlatformType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.incendo.cloud.type.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.List;
@@ -114,14 +116,14 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
             return;
         }
 
-        Message.Chat.Type playerChat = getPlayerChat(fPlayer, eventMessage);
+        Pair<String, Message.Chat.Type> playerChat = getPlayerChat(fPlayer, eventMessage);
 
         var configChatEntry = message.getTypes().entrySet()
                 .stream()
-                .filter(entry -> entry.getValue().equals(playerChat))
+                .filter(entry -> entry.getValue().equals(playerChat.second()))
                 .findAny();
 
-        if (playerChat == null || !playerChat.isEnable() || configChatEntry.isEmpty()) {
+        if (playerChat.second() == null || !playerChat.second().isEnable() || configChatEntry.isEmpty()) {
             builder(fPlayer)
                     .format(Localization.Message.Chat::getNullChat)
                     .sendBuilt();
@@ -147,14 +149,14 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
             }
         }
 
-        String trigger = playerChat.getTrigger();
+        String trigger = playerChat.second().getTrigger();
         if (!StringUtils.isEmpty(trigger) && eventMessage.startsWith(trigger)) {
             eventMessage = eventMessage.substring(trigger.length()).trim();
         }
 
         Predicate<FPlayer> chatPermissionFilter = fReceiver -> permissionChecker.check(fReceiver, permission.getTypes().get(chatName));
 
-        Range chatRange = playerChat.getRange();
+        Range chatRange = playerChat.second().getRange();
 
         // in local chat you can mention it too,
         // but I don't want to full support InteractiveChat
@@ -167,7 +169,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
         Builder builder = builder(fPlayer)
                 .tag(MessageType.CHAT)
-                .destination(playerChat.getDestination())
+                .destination(playerChat.second().getDestination())
                 .range(chatRange)
                 .filter(chatPermissionFilter)
                 .format(localization -> localization.getTypes().get(chatName))
@@ -176,6 +178,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                     output.writeUTF(chatName);
                     output.writeUTF(finalMessage);
                 })
+                .metadata(new ChatMetadata(eventMessage, playerChat.second(), playerChat.first()))
                 .integration(s -> Strings.CS.replace(s, "<message>", finalMessage))
                 .sound(soundMap.get(chatName));
 
@@ -191,9 +194,9 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
         spyModuleProvider.get().checkChat(fPlayer, chatName, finalMessage);
 
-        checkReceiversLater(fPlayer, chatRange, receiversCount, playerChat.getNullReceiver());
+        checkReceiversLater(fPlayer, chatRange, receiversCount, playerChat.second().getNullReceiver());
 
-        successEvent.accept(finalMessage, playerChat.isCancel());
+        successEvent.accept(finalMessage, playerChat.second().isCancel());
 
         bubbleModuleProvider.get().add(fPlayer, eventMessage);
     }
@@ -250,12 +253,13 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                 .sendBuilt();
     }
 
-    private Message.Chat.Type getPlayerChat(FPlayer fPlayer, String eventMessage) {
-        Message.Chat.Type playerChat = message.getTypes().get(fPlayer.getSettingValue(FPlayer.Setting.CHAT));
+    private Pair<String, Message.Chat.Type> getPlayerChat(FPlayer fPlayer, String eventMessage) {
+        String returnedChatName = fPlayer.getSettingValue(FPlayer.Setting.CHAT);
+        Message.Chat.Type playerChat = message.getTypes().get(returnedChatName);
 
         // if that chat *does* have a trigger, return it
         if (playerChat != null && !StringUtils.isEmpty(playerChat.getTrigger())) {
-            return playerChat;
+            return Pair.of(returnedChatName, playerChat);
         }
 
         int priority = Integer.MIN_VALUE;
@@ -275,8 +279,9 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
             playerChat = chat;
             priority = chat.getPriority();
+            returnedChatName = chatName;
         }
 
-        return playerChat;
+        return Pair.of(returnedChatName, playerChat);
     }
 }

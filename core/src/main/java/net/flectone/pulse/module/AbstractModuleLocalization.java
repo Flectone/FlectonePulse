@@ -9,6 +9,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Destination;
@@ -249,6 +250,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         private UnaryOperator<MessagePipeline.Builder> formatComponentBuilder = null;
         private BiFunction<FPlayer, M, String> message = null;
         private UnaryOperator<MessagePipeline.Builder> messageComponentBuilder = null;
+        private EventMetadata eventMetadata = EventMetadata.EMPTY;
         private Function<FPlayer, TagResolver[]> tagResolvers = null;
         private boolean senderColorOut = true;
 
@@ -347,6 +349,11 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
             return this;
         }
 
+        public Builder metadata(EventMetadata eventMetadata) {
+            this.eventMetadata = eventMetadata;
+            return this;
+        }
+
         public Builder formatBuilder(UnaryOperator<MessagePipeline.Builder> formatComponentBuilder) {
             this.formatComponentBuilder = formatComponentBuilder;
             return this;
@@ -400,11 +407,13 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
                 }
 
                 eventDispatcher.dispatch(new SenderToReceiverMessageEvent(messageUUID,
+                        tag,
                         fPlayer,
                         recipient,
                         formatComponent,
                         subComponent,
-                        destination
+                        destination,
+                        eventMetadata
                 ));
 
                 if (sound != null) {

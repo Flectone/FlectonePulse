@@ -13,6 +13,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.module.message.death.model.metadata.DeathMetadata;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.death.listener.DeathPacketListener;
@@ -88,6 +89,7 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
 
         if (!death.isPlayer()) {
             builder(fTarget)
+                    .tag(MessageType.DEATH)
                     .destination(message.getDestination())
                     .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DEATH))
                     .filter(fPlayer -> integrationModule.canSeeVanished(fTarget, fPlayer))
@@ -95,6 +97,7 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
                     .format(s -> s.getTypes().get(death.getKey()))
                     .tagResolvers(fResolver -> new TagResolver[]{killerTag(fResolver, death.getKiller()), byItemTag(death.getItem())})
                     .sound(getSound())
+                    .metadata(new DeathMetadata(death))
                     .sendBuilt();
             return;
         }
@@ -102,16 +105,17 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
         if (!fTarget.equals(fReceiver)) return;
 
         builder(fTarget)
+                .tag(MessageType.DEATH)
                 .range(message.getRange())
                 .destination(message.getDestination())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DEATH))
                 .filter(fPlayer -> integrationModule.canSeeVanished(fTarget, fPlayer))
-                .tag(MessageType.DEATH)
                 .format(s -> s.getTypes().get(death.getKey()))
                 .tagResolvers(fResolver -> new TagResolver[]{killerTag(fResolver, death.getKiller()), byItemTag(death.getItem())})
                 .proxy(output -> output.writeUTF(gson.toJson(death)))
                 .integration()
                 .sound(getSound())
+                .metadata(new DeathMetadata(death))
                 .sendBuilt();
 
         if (!death.isPlayer()) return;

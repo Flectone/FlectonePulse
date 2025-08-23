@@ -9,10 +9,12 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.module.message.update.model.metadata.UpdateMessageMetadata;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.update.listener.UpdatePulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
@@ -71,6 +73,7 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
         if (!fileResolver.isVersionOlderThan(currentVersion, latestVersion)) return;
 
         builder(fPlayer)
+                .tag(MessageType.UPDATE)
                 .destination(message.getDestination())
                 .format((fResolver, s) -> StringUtils.replaceEach(
                         fResolver.isUnknown() ? s.getFormatConsole() : s.getFormatPlayer(),
@@ -78,6 +81,7 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
                         new String[]{String.valueOf(currentVersion), String.valueOf(latestVersion)}
                 ))
                 .sound(getSound())
+                .metadata(new UpdateMessageMetadata(latestVersion, currentVersion))
                 .sendBuilt();
     }
 

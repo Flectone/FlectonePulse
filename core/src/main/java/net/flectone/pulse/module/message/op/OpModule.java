@@ -12,6 +12,7 @@ import net.flectone.pulse.module.message.op.listener.OpPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
 
 @Singleton
 public class OpModule extends AbstractModuleLocalization<Localization.Message.Op> {
@@ -55,6 +56,7 @@ public class OpModule extends AbstractModuleLocalization<Localization.Message.Op
         if (fTarget.isUnknown()) return;
 
         builder(fTarget)
+                .tag(MessageType.OP)
                 .destination(message.getDestination())
                 .receiver(fPlayer)
                 .format(Localization.Message.Op::getFormat)
