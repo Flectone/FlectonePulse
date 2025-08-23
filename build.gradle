@@ -117,6 +117,10 @@ subprojects {
         minimize()
     }
 
+    if (project.name in ["bungeecord", "velocity", "core"]) {
+        return
+    }
+
     mavenPublishing {
         publishToMavenCentral(true)
         coordinates("net.flectone.pulse", project.name, project_version)
@@ -159,4 +163,5 @@ subprojects {
             }
         }
     }
+
 }
