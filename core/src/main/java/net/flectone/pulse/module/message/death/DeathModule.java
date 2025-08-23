@@ -13,6 +13,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.metadata.DeathMessageMetadata;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.death.listener.DeathPacketListener;
@@ -95,6 +96,7 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
                     .format(s -> s.getTypes().get(death.getKey()))
                     .tagResolvers(fResolver -> new TagResolver[]{killerTag(fResolver, death.getKiller()), byItemTag(death.getItem())})
                     .sound(getSound())
+                    .addMetadata(new DeathMessageMetadata(death))
                     .sendBuilt();
             return;
         }
@@ -112,6 +114,7 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
                 .proxy(output -> output.writeUTF(gson.toJson(death)))
                 .integration()
                 .sound(getSound())
+                .addMetadata(new DeathMessageMetadata(death))
                 .sendBuilt();
 
         if (!death.isPlayer()) return;

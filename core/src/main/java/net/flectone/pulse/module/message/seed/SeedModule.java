@@ -7,10 +7,12 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.metadata.EmptyMessageMetadata;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.seed.listener.SeedPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.Strings;
 
 @Singleton
@@ -53,6 +55,7 @@ public class SeedModule extends AbstractModuleLocalization<Localization.Message.
                 .receiver(fPlayer)
                 .format(s -> Strings.CS.replace(s.getFormat(), "<seed>", seed))
                 .sound(getSound())
+                .addMetadata(new EmptyMessageMetadata(MessageType.COMMAND_SEED))
                 .sendBuilt();
     }
 

@@ -9,6 +9,7 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
+import net.flectone.pulse.model.event.metadata.MessageMetadata;
 import net.flectone.pulse.model.util.Ignore;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
@@ -131,7 +132,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
-        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(fPlayer, component));
+        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(fPlayer, component, new MessageMetadata(null,null)));
 
         playSound(fPlayer);
     }

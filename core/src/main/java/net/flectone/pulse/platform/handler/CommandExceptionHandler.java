@@ -7,7 +7,9 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
+import net.flectone.pulse.model.event.metadata.EmptyMessageMetadata;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
@@ -107,6 +109,6 @@ public class CommandExceptionHandler {
     }
 
     private void send(FPlayer fPlayer, Component component) {
-        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(fPlayer, component));
+        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(fPlayer, component, new EmptyMessageMetadata(MessageType.COMMAND_ERROR)));
     }
 }

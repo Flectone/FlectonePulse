@@ -7,6 +7,8 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.event.metadata.AdvancementMessageMetadata;
+import net.flectone.pulse.model.event.metadata.MessageMetadata;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -90,6 +92,7 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
                 .proxy(output -> output.writeUTF(gson.toJson(chatAdvancement)))
                 .integration()
                 .sound(getSound())
+                .addMetadata(new AdvancementMessageMetadata(chatAdvancement))
                 .sendBuilt();
     }
 

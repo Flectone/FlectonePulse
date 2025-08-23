@@ -9,6 +9,7 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
+import net.flectone.pulse.model.event.metadata.EmptyMessageMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unmute.UnmuteModule;
@@ -17,6 +18,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -171,7 +173,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
-        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(fPlayer, component));
+        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(fPlayer, component, new EmptyMessageMetadata(MessageType.COMMAND_MUTELIST)));
 
         playSound(fPlayer);
     }

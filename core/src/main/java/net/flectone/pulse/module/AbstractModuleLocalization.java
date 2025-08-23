@@ -9,6 +9,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.metadata.MessageMetadata;
 import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Destination;
@@ -249,6 +250,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         private UnaryOperator<MessagePipeline.Builder> formatComponentBuilder = null;
         private BiFunction<FPlayer, M, String> message = null;
         private UnaryOperator<MessagePipeline.Builder> messageComponentBuilder = null;
+        private MessageMetadata metadata;
         private Function<FPlayer, TagResolver[]> tagResolvers = null;
         private boolean senderColorOut = true;
 
@@ -347,6 +349,11 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
             return this;
         }
 
+        public Builder addMetadata(MessageMetadata metadata) {
+            this.metadata = metadata;
+            return this;
+        }
+
         public Builder formatBuilder(UnaryOperator<MessagePipeline.Builder> formatComponentBuilder) {
             this.formatComponentBuilder = formatComponentBuilder;
             return this;
@@ -404,7 +411,8 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
                         recipient,
                         formatComponent,
                         subComponent,
-                        destination
+                        destination,
+                        metadata
                 ));
 
                 if (sound != null) {

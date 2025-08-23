@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.event.metadata.KillMessageMetadata;
 import net.flectone.pulse.module.message.kill.model.Kill;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.entity.FEntity;
@@ -76,6 +77,7 @@ public class KillModule extends AbstractModuleLocalization<Localization.Message.
                         : s.getSingle()
                 )
                 .sound(getSound())
+                .addMetadata(new KillMessageMetadata(kill))
                 .sendBuilt();
     }
 }

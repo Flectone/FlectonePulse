@@ -9,6 +9,7 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
+import net.flectone.pulse.model.event.metadata.EmptyMessageMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
@@ -16,6 +17,7 @@ import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -140,7 +142,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
-        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(fPlayer, component));
+        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(fPlayer, component, new EmptyMessageMetadata(MessageType.COMMAND_TOP_ONLINE)));
 
         playSound(fPlayer);
     }
