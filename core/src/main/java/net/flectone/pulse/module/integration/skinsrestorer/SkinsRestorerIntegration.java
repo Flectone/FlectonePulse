@@ -34,7 +34,7 @@ public class SkinsRestorerIntegration implements FIntegration {
 
             fLogger.info("✔ SkinsRestorer hooked");
         } catch (IllegalStateException e) {
-            fLogger.warning("SkinsRestorer hook is failed, check https://github.com/SkinsRestorer/SkinsRestorer/blob/dev/shared/src/main/resources/proxy_warning.txt");
+            fLogger.warning("SkinsRestorer hook is failed, check https://skinsrestorer.net/docs/installation");
         }
     }
 
