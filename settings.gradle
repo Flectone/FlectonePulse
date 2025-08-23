@@ -10,9 +10,8 @@ pluginManagement {
 }
 
 include "core"
+include "fabric"
 include "bukkit"
-include "paper"
+include "bukkit:paper"
 include "velocity"
 include "bungeecord"
-include "fabric"
-

@@ -1,7 +1,7 @@
 dependencies {
-    compileOnly "net.md-5:bungeecord-api:$bungeecord_version"
-
     implementation project(":core")
+
+    compileOnly "net.md-5:bungeecord-api:$bungeecord_version"
 }
 
 processResources {
@@ -11,4 +11,10 @@ processResources {
     filesMatching('bungee.yml') {
         expand props
     }
+}
+
+tasks.named("mergeJars", Jar) {
+    from(zipTree(tasks.shadeDowngradedApi.archiveFile))
+
+    dependsOn tasks.shadeDowngradedApi
 }

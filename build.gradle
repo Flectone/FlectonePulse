@@ -80,6 +80,11 @@ subprojects {
         quiet = true
     }
 
+    tasks.register("mergeJars", Jar) {
+        archiveFileName = "FlectonePulse-" + project.name + "-" + project_version + ".jar"
+        destinationDirectory = file("$rootDir/build/libs")
+    }
+
     shadowJar {
         relocate("com.zaxxer", "net.flectone.pulse.library.hikaricp")
         relocate("org.jdbi", "net.flectone.pulse.library.jdbi3")
@@ -87,6 +92,10 @@ subprojects {
         relocate("net.elytrium.serializer", "net.flectone.pulse.library.elytrium")
         relocate("spark.", "net.flectone.pulse.library.spark.")
         relocate("org.apache.commons", "net.flectone.pulse.library.apache")
+
+        from(rootProject.file('LICENSE')) {
+            into('/')
+        }
 
         if (!project.name.is("fabric")) {
             relocate("com.github.retrooper.packetevents", "net.flectone.pulse.library.packetevents")
@@ -139,40 +148,15 @@ subprojects {
         }
 
         signAllPublications()
-    }
 
-    if (!project.name.is("fabric")) {
         afterEvaluate {
             publishing {
                 publications {
                     named('maven', MavenPublication) {
-                        artifact shadeDowngradedApi
+                        artifact mergeJars
                     }
                 }
             }
         }
     }
-}
-
-tasks.register("bukkitMergeJars", Jar) {
-    archiveBaseName.set("${project_name}-bukkit")
-    archiveVersion.set("${project_version}")
-
-    def platforms = subprojects.findAll {
-        it.name != "fabric"
-    }
-
-    from {
-        platforms.collect { proj ->
-            zipTree(proj.tasks.named("shadeDowngradedApi").get().archiveFile.get().asFile)
-        }
-    }
-
-    from(rootProject.file('LICENSE')) {
-        into('/')
-    }
-
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    dependsOn platforms.collect { proj -> proj.tasks.named("shadeDowngradedApi") }
 }
