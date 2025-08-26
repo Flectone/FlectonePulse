@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.seed.listener.SeedPulseListener;
+import net.flectone.pulse.module.message.seed.model.SeedMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
@@ -24,7 +25,7 @@ public class SeedModule extends AbstractModuleLocalization<Localization.Message.
     @Inject
     public SeedModule(FileResolver fileResolver,
                       ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getSeed());
+        super(localization -> localization.getMessage().getSeed(), MessageType.SEED);
 
         this.message = fileResolver.getMessage().getSeed();
         this.permission = fileResolver.getPermission().getMessage().getSeed();
@@ -49,13 +50,15 @@ public class SeedModule extends AbstractModuleLocalization<Localization.Message.
     public void send(FPlayer fPlayer, String seed) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        builder(fPlayer)
-                .tag(MessageType.SEED)
-                .destination(message.getDestination())
+        sendMessage(SeedMetadata.<Localization.Message.Seed>builder()
+                .sender(fPlayer)
                 .receiver(fPlayer)
                 .format(s -> Strings.CS.replace(s.getFormat(), "<seed>", seed))
-                .sound(getSound())
-                .sendBuilt();
+                .seed(seed)
+                .destination(message.getDestination())
+                .sound(getModuleSound())
+                .build()
+        );
     }
 
 }

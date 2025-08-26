@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.gamemode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.module.message.gamemode.model.Gamemode;
+import net.flectone.pulse.module.message.gamemode.model.GamemodeMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
@@ -31,7 +32,7 @@ public class GamemodeModule extends AbstractModuleLocalization<Localization.Mess
                           FPlayerService fPlayerService,
                           ListenerRegistry listenerRegistry,
                           PlatformPlayerAdapter platformPlayerAdapter) {
-        super(localization -> localization.getMessage().getGamemode());
+        super(localization -> localization.getMessage().getGamemode(), MessageType.GAMEMODE);
 
         this.message = fileResolver.getMessage().getGamemode();
         this.permission = fileResolver.getPermission().getMessage().getGamemode();
@@ -68,16 +69,18 @@ public class GamemodeModule extends AbstractModuleLocalization<Localization.Mess
                 : gamemode.type().split("\\.")[1];
 
         // for sender
-        builder(fTarget)
-                .tag(MessageType.GAMEMODE)
-                .destination(message.getDestination())
+        sendMessage(GamemodeMetadata.<Localization.Message.Gamemode>builder()
+                .sender(fTarget)
                 .receiver(fPlayer)
                 .format(s -> Strings.CS.replace(
                         isSelf ? s.getFormatSelf() : s.getFormatOther(),
                         "<gamemode>",
                         gamemodeType
                 ))
-                .sound(getSound())
-                .sendBuilt();
+                .gamemode(gamemode)
+                .destination(message.getDestination())
+                .sound(getModuleSound())
+                .build()
+        );
     }
 }

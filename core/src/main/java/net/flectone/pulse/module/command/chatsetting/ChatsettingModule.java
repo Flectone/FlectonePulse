@@ -55,7 +55,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                              Provider<DialogMenuBuilder> dialogMenuBuilderProvider,
                              Provider<InventoryMenuBuilder> inventoryMenuBuilderProvider,
                              PacketProvider packetProvider) {
-        super(localization -> localization.getCommand().getChatsetting(), Command::getChatsetting);
+        super(localization -> localization.getCommand().getChatsetting(), Command::getChatsetting, MessageType.COMMAND_CHATSETTING);
 
         this.command = fileResolver.getCommand().getChatsetting();
         this.permission = fileResolver.getPermission().getCommand().getChatsetting();

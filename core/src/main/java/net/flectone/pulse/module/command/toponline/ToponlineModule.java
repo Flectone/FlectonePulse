@@ -9,7 +9,6 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
-import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
@@ -51,7 +50,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
                            EventDispatcher eventDispatcher,
                            TimeFormatter timeFormatter,
                            FLogger fLogger) {
-        super(localization -> localization.getCommand().getToponline(), Command::getToponline);
+        super(localization -> localization.getCommand().getToponline(), Command::getToponline, MessageType.COMMAND_TOPONLINE);
 
         this.command = fileResolver.getCommand().getToponline();
         this.permission = fileResolver.getPermission().getCommand().getToponline();
@@ -104,9 +103,12 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Toponline::getNullPage)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 

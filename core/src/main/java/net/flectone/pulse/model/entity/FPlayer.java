@@ -2,7 +2,7 @@ package net.flectone.pulse.model.entity;
 
 import lombok.Getter;
 import net.flectone.pulse.model.FColor;
-import net.flectone.pulse.model.util.Ignore;
+import net.flectone.pulse.module.command.ignore.model.Ignore;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import net.flectone.pulse.service.FPlayerService;

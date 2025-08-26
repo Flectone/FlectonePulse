@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissorsMetadata;
 import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FEntity;
@@ -42,7 +43,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                                    FPlayerService fPlayerService,
                                    CommandParserProvider commandParserProvider,
                                    IntegrationModule integrationModule) {
-        super(localization -> localization.getCommand().getRockpaperscissors(), Command::getRockpaperscissors, fPlayer -> fPlayer.isSetting(FPlayer.Setting.ROCKPAPERSCISSORS));
+        super(localization -> localization.getCommand().getRockpaperscissors(), Command::getRockpaperscissors, fPlayer -> fPlayer.isSetting(FPlayer.Setting.ROCKPAPERSCISSORS), MessageType.COMMAND_ROCKPAPERSCISSORS);
 
         this.command = fileResolver.getCommand().getRockpaperscissors();
         this.permission = fileResolver.getPermission().getCommand().getRockpaperscissors();
@@ -87,16 +88,22 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         String player = getArgument(commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(player);
         if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::getNullPlayer)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
         if (fReceiver.equals(fPlayer)) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::getMyself)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -120,46 +127,58 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         RockPaperScissors rockPaperScissors = new RockPaperScissors(fPlayer.getUuid(), fReceiver.getUuid());
 
-        proxySender.send(fPlayer, MessageType.COMMAND_ROCKPAPERSCISSORS_CREATE, dataOutputStream -> {
+        proxySender.send(fPlayer, MessageType.COMMAND_ROCKPAPERSCISSORS, dataOutputStream -> {
             dataOutputStream.writeUTF(rockPaperScissors.getId().toString());
             dataOutputStream.writeUTF(rockPaperScissors.getReceiver().toString());
         });
 
         create(rockPaperScissors.getId(), fPlayer, fReceiver.getUuid());
 
-        builder(fPlayer)
+        sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
+                .sender(fPlayer)
                 .format(s -> StringUtils.replaceEach(s.getFormatMove(),
                         new String[]{"<target>", "<uuid>"},
                         new String[]{fReceiver.getName(), rockPaperScissors.getId().toString()}
                 ))
-                .sound(getSound())
-                .sendBuilt();
+                .rockPaperScissors(rockPaperScissors)
+                .sound(getModuleSound())
+                .build()
+        );
     }
 
     public void finalMove(FPlayer fPlayer, FPlayer fReceiver, String move, UUID uuid) {
         List<String> strategy = command.getStrategies().get(move);
 
         if (strategy == null) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::getWrongMove)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
         RockPaperScissors rockPaperScissors = gameMap.get(uuid);
 
         if (rockPaperScissors == null) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::getNullGame)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
         if (rockPaperScissors.getSenderMove() != null) {
             if (rockPaperScissors.getSender().equals(fPlayer.getUuid())) {
-                builder(fPlayer)
+                sendMessage(metadataBuilder()
+                        .sender(fPlayer)
                         .format(Localization.Command.Rockpaperscissors::getAlready)
-                        .sendBuilt();
+                        .build()
+                );
+
                 return;
             }
 
@@ -175,10 +194,12 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
             return;
         }
 
-        builder(fReceiver)
+        sendMessage(metadataBuilder()
+                .sender(fReceiver)
                 .receiver(fPlayer)
-                .format((fResolver, s) -> s.getSender())
-                .sendBuilt();
+                .format(Localization.Command.Rockpaperscissors::getSender)
+                .build()
+        );
 
         boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_ROCKPAPERSCISSORS_MOVE, dataOutputStream -> {
             dataOutputStream.writeUTF(rockPaperScissors.getId().toString());
@@ -212,13 +233,17 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                             resolveLocalization(p).getStrategies().get(move)
                     );
 
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(message)
-                    .sendBuilt();
+                    .build()
+            );
 
-            builder(fReceiver)
+            sendMessage(metadataBuilder()
+                    .sender(fReceiver)
                     .format(message)
-                    .sendBuilt();
+                    .build()
+            );
 
             return;
         }
@@ -231,15 +256,21 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         FEntity winFPlayer = command.getStrategies().get(move).contains(senderMove) ? fPlayer : fReceiver;
 
-        builder(winFPlayer)
+        sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
+                .sender(winFPlayer)
                 .receiver(fPlayer)
                 .format(message)
-                .sendBuilt();
+                .rockPaperScissors(rockPaperScissors)
+                .build()
+        );
 
-        builder(winFPlayer)
+        sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
+                .sender(winFPlayer)
                 .receiver(fReceiver)
                 .format(message)
-                .sendBuilt();
+                .rockPaperScissors(rockPaperScissors)
+                .build()
+        );
     }
 
     public void move(UUID id, FEntity fPlayer, String move) {
@@ -252,19 +283,25 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         rockPaperScissors.setSenderMove(move);
 
-        builder(fPlayer)
+        sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
+                .sender(fPlayer)
                 .receiver(fReceiver, true)
-                .format((fResolver, s) -> s.getReceiver())
-                .sendBuilt();
+                .format(Localization.Command.Rockpaperscissors::getReceiver)
+                .rockPaperScissors(rockPaperScissors)
+                .build()
+        );
 
-        builder(fPlayer)
+        sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
+                .sender(fPlayer)
                 .receiver(fReceiver, true)
-                .format((fResolver, s) -> StringUtils.replaceEach(
+                .format(s -> StringUtils.replaceEach(
                         s.getFormatMove(),
                         new String[]{"<target>", "<uuid>"},
                         new String[]{fPlayer.getName(), rockPaperScissors.getId().toString()}
                 ))
-                .sendBuilt();
+                .rockPaperScissors(rockPaperScissors)
+                .build()
+        );
     }
 
     public void create(UUID id, FEntity fPlayer, UUID receiver) {

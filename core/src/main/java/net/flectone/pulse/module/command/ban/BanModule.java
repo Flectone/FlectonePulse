@@ -1,25 +1,25 @@
 package net.flectone.pulse.module.command.ban;
 
-import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.MessageType;
-import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ban.listener.BanPulseListener;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.type.tuple.Pair;
 
@@ -36,7 +36,6 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final MessagePipeline messagePipeline;
     private final ProxySender proxySender;
-    private final Gson gson;
     private final ListenerRegistry listenerRegistry;
     private final CommandParserProvider commandParserProvider;
 
@@ -47,10 +46,9 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
                      ModerationMessageFormatter moderationMessageFormatter,
                      MessagePipeline messagePipeline,
                      ProxySender proxySender,
-                     Gson gson,
                      ListenerRegistry listenerRegistry,
                      CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getBan(), Command::getBan, fPlayer -> fPlayer.isSetting(FPlayer.Setting.BAN));
+        super(localization -> localization.getCommand().getBan(), Command::getBan, fPlayer -> fPlayer.isSetting(FPlayer.Setting.BAN), MessageType.COMMAND_BAN);
 
         this.command = fileResolver.getCommand().getBan();
         this.permission = fileResolver.getPermission().getCommand().getBan();
@@ -59,7 +57,6 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.messagePipeline = messagePipeline;
         this.proxySender = proxySender;
-        this.gson = gson;
         this.listenerRegistry = listenerRegistry;
         this.commandParserProvider = commandParserProvider;
     }
@@ -104,9 +101,12 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         String reason = timeReasonPair.second();
 
         if (time != -1 && time < 1) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Ban::getNullTime)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -118,9 +118,12 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Ban::getNullPlayer)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -133,18 +136,21 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
         kick(fPlayer, fTarget, ban);
 
-        builder(fTarget)
+        sendMessage(ModerationMetadata.<Localization.Command.Ban>builder()
+                .sender(fTarget)
+                .format(buildFormat(ban))
+                .moderation(ban)
                 .range(command.getRange())
                 .destination(command.getDestination())
-                .tag(MessageType.COMMAND_BAN)
-                .format(buildFormat(ban))
-                .proxy(output -> {
-                    output.writeUTF(gson.toJson(fPlayer));
-                    output.writeUTF(gson.toJson(ban));
-                })
-                .integration(s -> moderationMessageFormatter.replacePlaceholders(s, FPlayer.UNKNOWN, ban))
-                .sound(getSound())
-                .sendBuilt();
+                .sound(getModuleSound())
+                .proxy(dataOutputStream ->
+                        dataOutputStream.writeAsJson(ban)
+                )
+                .integration(string ->
+                        moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, ban)
+                )
+                .build()
+        );
     }
 
     public BiFunction<FPlayer, Localization.Command.Ban, String> buildFormat(Moderation ban) {

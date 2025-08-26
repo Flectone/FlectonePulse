@@ -3,18 +3,18 @@ package net.flectone.pulse.platform.sender;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.proxy.Proxy;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.ProxyDataConsumer;
+import net.flectone.pulse.util.SafeDataOutputStream;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Set;
 
@@ -40,7 +40,7 @@ public class ProxySender {
         this.fLogger = fLogger;
     }
 
-    public boolean send(FEntity sender, MessageType tag, ProxyDataConsumer<DataOutputStream> outputConsumer) {
+    public boolean send(FEntity sender, MessageType tag, ProxyDataConsumer<SafeDataOutputStream> outputConsumer) {
         boolean isPlayer = sender instanceof FPlayer;
 
         if (isPlayer) {
@@ -51,7 +51,7 @@ public class ProxySender {
 
         byte[] message;
         try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-             DataOutputStream output = new DataOutputStream(byteStream)) {
+             SafeDataOutputStream output = new SafeDataOutputStream(gson, byteStream)) {
 
             output.writeUTF(tag.toProxyTag());
 

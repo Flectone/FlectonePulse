@@ -9,6 +9,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.platform.registry.CommandRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
@@ -32,14 +33,16 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
     @Inject private CommandRegistry commandParserProvider;
 
     protected AbstractModuleCommand(Function<Localization, M> messageFunction,
-                                    Function<Command, Command.ICommandFile> commandFunction) {
-        this(messageFunction, commandFunction, null);
+                                    Function<Command, Command.ICommandFile> commandFunction,
+                                    MessageType messageType) {
+        this(messageFunction, commandFunction, null, messageType);
     }
 
     protected AbstractModuleCommand(Function<Localization, M> messageFunction,
                                     Function<Command, Command.ICommandFile> commandFunction,
-                                    Predicate<FPlayer> commandPredicate) {
-        super(messageFunction);
+                                    Predicate<FPlayer> commandPredicate,
+                                    MessageType messageType) {
+        super(messageFunction, messageType);
 
         this.commandFunction = commandFunction;
         this.commandPredicate = commandPredicate;

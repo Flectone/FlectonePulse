@@ -6,14 +6,16 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.module.message.enchant.model.Enchant;
-import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.enchant.listener.EnchantPulseListener;
+import net.flectone.pulse.module.message.enchant.model.Enchant;
+import net.flectone.pulse.module.message.enchant.model.EnchantMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import org.apache.commons.lang3.StringUtils;
 
 @Singleton
@@ -28,7 +30,7 @@ public class EnchantModule extends AbstractModuleLocalization<Localization.Messa
     public EnchantModule(FileResolver fileResolver,
                          FPlayerService fPlayerService,
                          ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getEnchant());
+        super(localization -> localization.getMessage().getEnchant(), MessageType.ENCHANT);
 
         this.message = fileResolver.getMessage().getEnchant();
         this.permission = fileResolver.getPermission().getMessage().getEnchant();
@@ -64,16 +66,19 @@ public class EnchantModule extends AbstractModuleLocalization<Localization.Messa
             if (fTarget.isUnknown()) return;
         }
 
-        builder(fTarget)
-                .destination(message.getDestination())
+        sendMessage(EnchantMetadata.<Localization.Message.Enchant>builder()
+                .sender(fTarget)
                 .receiver(fPlayer)
                 .format(s -> StringUtils.replaceEach(
                         isSingle ? s.getSingle() : s.getMultiple(),
                         new String[]{"<count>", "<enchant>", "<level>"},
                         new String[]{enchant.value(), enchant.name(), enchant.level()}
                 ))
-                .sound(getSound())
-                .sendBuilt();
+                .enchant(enchant)
+                .destination(message.getDestination())
+                .sound(getModuleSound())
+                .build()
+        );
     }
 
 }

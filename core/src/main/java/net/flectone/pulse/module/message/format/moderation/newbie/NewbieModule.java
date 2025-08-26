@@ -8,6 +8,7 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -31,7 +32,7 @@ public class NewbieModule extends AbstractModuleLocalization<Localization.Messag
                         PlatformPlayerAdapter platformPlayerAdapter,
                         PlatformServerAdapter platformServerAdapter,
                         FLogger fLogger) {
-        super(localization -> localization.getMessage().getFormat().getModeration().getNewbie());
+        super(localization -> localization.getMessage().getFormat().getModeration().getNewbie(), MessageType.NEWBIE);
 
         this.message = fileResolver.getMessage().getFormat().getModeration().getNewbie();
         this.permission = fileResolver.getPermission().getMessage().getFormat().getModeration().getNewbie();

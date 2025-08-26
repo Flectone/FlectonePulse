@@ -9,6 +9,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.model.util.FImage;
 import net.flectone.pulse.module.message.greeting.listener.GreetingPulseListener;
+import net.flectone.pulse.module.message.greeting.model.GreetingMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.SkinService;
@@ -33,7 +34,7 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
                           SkinService skinService,
                           FLogger fLogger,
                           ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getGreeting());
+        super(localization -> localization.getMessage().getGreeting(), MessageType.GREETING);
 
         this.message = fileResolver.getMessage().getGreeting();
         this.permission = fileResolver.getPermission().getMessage().getGreeting();
@@ -63,10 +64,8 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
         try {
             List<String> pixels = fImage.convertImageUrl();
 
-            builder(fPlayer)
-                    .tag(MessageType.GREETING)
-                    .destination(message.getDestination())
-                    .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.GREETING))
+            sendMessage(GreetingMetadata.<Localization.Message.Greeting>builder()
+                    .sender(fPlayer)
                     .format(s -> {
                         String greetingMessage = String.join("<br>", resolveLocalization(fPlayer).getFormat());
 
@@ -76,8 +75,12 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
 
                         return greetingMessage;
                     })
-                    .sound(getSound())
-                    .sendBuilt();
+                    .pixels(pixels)
+                    .destination(message.getDestination())
+                    .sound(getModuleSound())
+                    .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.GREETING))
+                    .build()
+            );
 
         } catch (IOException e) {
             fLogger.warning(e);

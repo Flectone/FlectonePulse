@@ -5,13 +5,14 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.ball.model.BallMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -31,7 +32,7 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
     public BallModule(FileResolver fileResolver,
                       RandomUtil randomUtil,
                       CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getBall(), Command::getBall, fPlayer -> fPlayer.isSetting(FPlayer.Setting.BALL));
+        super(localization -> localization.getCommand().getBall(), Command::getBall, fPlayer -> fPlayer.isSetting(FPlayer.Setting.BALL), MessageType.COMMAND_BALL);
 
         this.command = fileResolver.getCommand().getBall();
         this.permission = fileResolver.getPermission().getCommand().getBall();
@@ -61,21 +62,21 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (isModuleDisabledFor(fPlayer)) return;
 
+        int answer = randomUtil.nextInt(0, resolveLocalization().getAnswers().size());
         String message = getArgument(commandContext, 0);
 
-        int answer = randomUtil.nextInt(0, resolveLocalization().getAnswers().size());
-
-        builder(fPlayer)
-                .range(command.getRange())
-                .destination(command.getDestination())
-                .tag(MessageType.COMMAND_BALL)
+        sendMessage(BallMetadata.<Localization.Command.Ball>builder()
                 .format(replaceAnswer(answer))
+                .answer(answer)
                 .message(message)
-                .proxy(output -> {
-                    output.writeInt(answer);
-                    output.writeUTF(message);
+                .destination(command.getDestination())
+                .range(command.getRange())
+                .sound(getModuleSound())
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeInt(answer);
+                    dataOutputStream.writeString(message);
                 })
-                .integration(s -> {
+                .integration(string -> {
                     List<String> answers = resolveLocalization().getAnswers();
 
                     String answerString = !answers.isEmpty()
@@ -83,13 +84,13 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
                             : StringUtils.EMPTY;
 
                     return StringUtils.replaceEach(
-                            s,
+                            string,
                             new String[]{"<message>", "<answer>"},
                             new String[]{StringUtils.defaultString(message), answerString}
                     );
                 })
-                .sound(getSound())
-                .sendBuilt();
+                .build()
+        );
     }
 
     public Function<Localization.Command.Ball, String> replaceAnswer(int answer) {

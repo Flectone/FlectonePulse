@@ -14,11 +14,13 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.format.questionanswer.listener.QuestionAnswerPulseListener;
+import net.flectone.pulse.module.message.format.questionanswer.model.QuestionAnswerMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -50,7 +52,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
                                 FLogger fLogger,
                                 ListenerRegistry listenerRegistry,
                                 PermissionChecker permissionChecker) {
-        super(localization -> localization.getMessage().getFormat().getQuestionAnswer());
+        super(localization -> localization.getMessage().getFormat().getQuestionAnswer(), MessageType.QUESTION_ANSWER);
 
         this.message = fileResolver.getMessage().getFormat().getQuestionAnswer();
         this.permission = fileResolver.getPermission().getMessage().getFormat().getQuestionAnswer();
@@ -159,11 +161,14 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
         if (range.is(Range.Type.PLAYER) && !sender.equals(receiver)) return;
         if (!(receiver instanceof FPlayer fReceiver)) return;
 
-        builder(sender)
+        sendMessage(QuestionAnswerMetadata.<Localization.Message.Format.QuestionAnswer>builder()
+                .sender(sender)
                 .receiver(fReceiver)
-                .destination(questionMessage.getDestination())
                 .format(questionAnswer -> questionAnswer.getQuestions().getOrDefault(question, ""))
+                .question(question)
+                .destination(questionMessage.getDestination())
                 .sound(soundMap.get(question))
-                .sendBuilt();
+                .build()
+        );
     }
 }

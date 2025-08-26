@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Message;
-import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.module.command.spy.SpyModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
@@ -42,8 +41,7 @@ public class BukkitChatModule extends ChatModule {
                                Provider<SpyModule> spyModuleProvider,
                                BukkitListenerRegistry listenerRegistry,
                                ReflectionResolver reflectionResolver,
-                               FLogger fLogger,
-                               EventDispatcher eventDispatcher) {
+                               FLogger fLogger) {
         super(fileResolver, fPlayerService, platformPlayerAdapter, platformServerAdapter, permissionChecker,
                 integrationModule, timeFormatter, bubbleModuleProvider, spyModuleProvider, listenerRegistry);
 

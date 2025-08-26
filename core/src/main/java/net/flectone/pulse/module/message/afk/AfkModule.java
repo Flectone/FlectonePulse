@@ -10,7 +10,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.message.afk.model.metadata.AFKMetadata;
+import net.flectone.pulse.module.message.afk.model.AFKMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -52,7 +52,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
                      IntegrationModule integrationModule,
                      PlatformPlayerAdapter platformPlayerAdapter,
                      ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getAfk());
+        super(localization -> localization.getMessage().getAfk(), MessageType.AFK);
 
         this.message = fileResolver.getMessage().getAfk();
         this.permission = fileResolver.getPermission().getMessage().getAfk();
@@ -172,32 +172,37 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
         if (range.is(Range.Type.PLAYER)) {
             if (!fPlayer.isSetting(FPlayer.Setting.AFK)) return;
 
-            builder(fPlayer)
-                    .destination(message.getDestination())
+            sendMessage(AFKMetadata.<Localization.Message.Afk>builder()
+                    .sender(fPlayer)
                     .format(s -> isAfk
                             ? s.getFormatFalse().getLocal()
                             : s.getFormatTrue().getLocal()
                     )
-                    .sound(getSound())
-                    .sendBuilt();
+                    .newStatus(isAfk)
+                    .destination(message.getDestination())
+                    .sound(getModuleSound())
+                    .build()
+            );
 
             return;
         }
 
-        builder(fPlayer)
-                .range(range)
-                .destination(message.getDestination())
-                .tag(MessageType.AFK)
-                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.AFK))
-                .filter(fReceiver -> integrationModule.canSeeVanished(fPlayer, fReceiver))
+        sendMessage(AFKMetadata.<Localization.Message.Afk>builder()
+                .sender(fPlayer)
                 .format(s -> isAfk
                         ? s.getFormatFalse().getGlobal()
                         : s.getFormatTrue().getGlobal()
                 )
-                .integration()
+                .newStatus(isAfk)
+                .range(range)
+                .destination(message.getDestination())
+                .sound(getModuleSound())
+                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.AFK)
+                        && integrationModule.canSeeVanished(fPlayer, fReceiver)
+                )
                 .proxy(dataOutputStream -> dataOutputStream.writeBoolean(isAfk))
-                .sound(getSound())
-                .metadata(new AFKMetadata(isAfk))
-                .sendBuilt();
+                .integration()
+                .build()
+        );
     }
 }

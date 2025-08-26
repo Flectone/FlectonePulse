@@ -26,7 +26,7 @@ public class OpModule extends AbstractModuleLocalization<Localization.Message.Op
     public OpModule(FileResolver fileResolver,
                     FPlayerService fPlayerService,
                     ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getOp());
+        super(localization -> localization.getMessage().getOp(), MessageType.OP);
 
         this.message = fileResolver.getMessage().getOp();
         this.permission = fileResolver.getPermission().getMessage().getOp();
@@ -55,13 +55,14 @@ public class OpModule extends AbstractModuleLocalization<Localization.Message.Op
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) return;
 
-        builder(fTarget)
-                .tag(MessageType.OP)
-                .destination(message.getDestination())
+        sendMessage(metadataBuilder()
+                .sender(fTarget)
                 .receiver(fPlayer)
                 .format(Localization.Message.Op::getFormat)
-                .sound(getSound())
-                .sendBuilt();
+                .destination(message.getDestination())
+                .sound(getModuleSound())
+                .build()
+        );
     }
 
 }

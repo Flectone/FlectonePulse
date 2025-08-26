@@ -9,7 +9,6 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
-import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
@@ -49,7 +48,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
                           MessagePipeline messagePipeline,
                           CommandParserProvider commandParserProvider,
                           EventDispatcher eventDispatcher) {
-        super(localization -> localization.getCommand().getWarnlist(), Command::getWarnlist);
+        super(localization -> localization.getCommand().getWarnlist(), Command::getWarnlist, MessageType.COMMAND_WARNLIST);
 
         this.command = fileResolver.getCommand().getWarnlist();
         this.permission = fileResolver.getPermission().getCommand().getWarnlist();
@@ -109,9 +108,12 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
 
                 targetFPlayer = fPlayerService.getFPlayer(playerName);
                 if (targetFPlayer.isUnknown()) {
-                    builder(fPlayer)
+                    sendMessage(metadataBuilder()
+                            .sender(fPlayer)
                             .format(Localization.Command.Warnlist::getNullPlayer)
-                            .sendBuilt();
+                            .build()
+                    );
+
                     return;
                 }
 
@@ -125,9 +127,12 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
                 : moderationService.getValidWarns(targetFPlayer);
 
         if (moderationList.isEmpty()) {
-            builder(fPlayer)
-                    .format((fResolver, s) -> s.getEmpty())
-                    .sendBuilt();
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Warnlist::getEmpty)
+                    .build()
+            );
+
             return;
         }
 
@@ -136,9 +141,12 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
-            builder(fPlayer)
-                    .format((fResolver, s) -> s.getNullPage())
-                    .sendBuilt();
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
+                    .format(Localization.Command.Warnlist::getNullPage)
+                    .build()
+            );
+
             return;
         }
 

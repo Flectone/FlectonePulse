@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.MailSQL;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Mail;
+import net.flectone.pulse.module.command.mail.model.Mail;
 import org.jdbi.v3.core.Handle;
 import org.jetbrains.annotations.Nullable;
 

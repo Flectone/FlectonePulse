@@ -3,12 +3,14 @@ package net.flectone.pulse.module.command.online;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
+import net.flectone.pulse.module.command.online.model.OnlineMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -46,7 +48,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
                         IntegrationModule integrationModule,
                         TimeFormatter timeFormatter,
                         FLogger fLogger) {
-        super(localization -> localization.getCommand().getOnline(), Command::getOnline);
+        super(localization -> localization.getCommand().getOnline(), Command::getOnline, MessageType.COMMAND_ONLINE);
 
         this.command = fileResolver.getCommand().getOnline();
         this.permission = fileResolver.getPermission().getCommand().getOnline();
@@ -100,14 +102,17 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
 
         FPlayer targetFPlayer = fPlayerService.getFPlayer(target);
         if (targetFPlayer.isUnknown()) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Online::getNullPlayer)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
-        builder(targetFPlayer)
-                .destination(command.getDestination())
+        sendMessage(OnlineMetadata.<Localization.Command.Online>builder()
+                .sender(targetFPlayer)
                 .receiver(fPlayer)
                 .format(s -> switch (type) {
                     case "first" -> timeFormatter.format(
@@ -124,7 +129,10 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
                     );
                     default -> "";
                 })
-                .sound(getSound())
-                .sendBuilt();
+                .type(type)
+                .destination(command.getDestination())
+                .sound(getModuleSound())
+                .build()
+        );
     }
 }

@@ -6,17 +6,17 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.module.message.spawn.model.metadata.SpawnMetadata;
-import net.flectone.pulse.module.message.spawn.model.Spawn;
-import net.flectone.pulse.util.constant.MessageType;
-import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.spawn.listener.SpawnPacketListener;
 import net.flectone.pulse.module.message.spawn.listener.SpawnPulseListener;
+import net.flectone.pulse.module.message.spawn.model.Spawn;
+import net.flectone.pulse.module.message.spawn.model.SpawnMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import org.apache.commons.lang3.StringUtils;
 
 @Singleton
@@ -31,7 +31,7 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
     public SpawnModule(FileResolver fileResolver,
                        FPlayerService fPlayerService,
                        ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getSpawn());
+        super(localization -> localization.getMessage().getSpawn(), MessageType.SPAWN);
 
         this.message = fileResolver.getMessage().getSpawn();
         this.permission = fileResolver.getPermission().getMessage().getSpawn();
@@ -58,13 +58,17 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
     public void send(FPlayer fPlayer, MinecraftTranslationKey key) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        builder(fPlayer)
-                .destination(message.getDestination())
+        sendMessage(SpawnMetadata.<Localization.Message.Spawn>builder()
+                .sender(fPlayer)
                 .receiver(fPlayer)
                 .format(spawn -> key == MinecraftTranslationKey.BLOCK_MINECRAFT_SET_SPAWN
-                        ? spawn.getSet() : spawn.getNotValid())
-                .sound(getSound())
-                .sendBuilt();
+                        ? spawn.getSet() : spawn.getNotValid()
+                )
+                .destination(message.getDestination())
+                .translationKey(key)
+                .sound(getModuleSound())
+                .build()
+        );
     }
 
     @Async
@@ -81,17 +85,19 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
             if (fTarget.isUnknown()) return;
         }
 
-        builder(fTarget)
-                .tag(MessageType.SPAWN)
-                .destination(message.getDestination())
+        sendMessage(SpawnMetadata.<Localization.Message.Spawn>builder()
+                .sender(fTarget)
                 .receiver(fPlayer)
                 .format(s -> StringUtils.replaceEach(
                         isSingle ? s.getSingle() : s.getMultiple(),
                         new String[]{"<count>", "<x>", "<y>", "<z>", "<angle>", "<world>"},
                         new String[]{spawn.value(), spawn.x(), spawn.y(), spawn.z(), spawn.angle(), spawn.world()}
                 ))
-                .sound(getSound())
-                .metadata(new SpawnMetadata(spawn))
-                .sendBuilt();
+                .spawn(spawn)
+                .translationKey(key)
+                .destination(message.getDestination())
+                .sound(getModuleSound())
+                .build()
+        );
     }
 }

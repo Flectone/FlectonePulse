@@ -9,7 +9,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.message.update.model.metadata.UpdateMessageMetadata;
+import net.flectone.pulse.module.message.update.model.UpdateMessageMetadata;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.update.listener.UpdatePulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
@@ -39,7 +39,7 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
     public UpdateModule(FileResolver fileResolver,
                         ListenerRegistry listenerRegistry,
                         Gson gson) {
-        super(localization -> localization.getMessage().getUpdate());
+        super(localization -> localization.getMessage().getUpdate(), MessageType.UPDATE);
 
         this.message = fileResolver.getMessage().getUpdate();
         this.permission = fileResolver.getPermission().getMessage().getUpdate();
@@ -72,17 +72,19 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
         String currentVersion = fileResolver.getConfig().getVersion();
         if (!fileResolver.isVersionOlderThan(currentVersion, latestVersion)) return;
 
-        builder(fPlayer)
-                .tag(MessageType.UPDATE)
-                .destination(message.getDestination())
+        sendMessage(UpdateMessageMetadata.<Localization.Message.Update>builder()
+                .sender(fPlayer)
                 .format((fResolver, s) -> StringUtils.replaceEach(
                         fResolver.isUnknown() ? s.getFormatConsole() : s.getFormatPlayer(),
                         new String[]{"<current_version>", "<latest_version>"},
                         new String[]{String.valueOf(currentVersion), String.valueOf(latestVersion)}
                 ))
-                .sound(getSound())
-                .metadata(new UpdateMessageMetadata(latestVersion, currentVersion))
-                .sendBuilt();
+                .currentVersion(currentVersion)
+                .latestVersion(latestVersion)
+                .destination(message.getDestination())
+                .sound(getModuleSound())
+                .build()
+        );
     }
 
     private static class LatestRelease {

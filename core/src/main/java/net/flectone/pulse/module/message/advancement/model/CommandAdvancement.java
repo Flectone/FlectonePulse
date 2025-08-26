@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 public record CommandAdvancement(AdvancementModule.Relation relation,
                                  String owner,
                                  @Nullable ChatAdvancement chatAdvancement,
-                                 @Nullable String content) {
+                                 @Nullable String content) implements Advancement {
 
     public boolean isIncorrect() {
         return chatAdvancement == null && content == null;

@@ -12,15 +12,16 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.flectonepulse.web.SparkServer;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
+import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -54,7 +55,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                                FLogger fLogger,
                                ReflectionResolver reflectionResolver,
                                Injector injector) {
-        super(localization -> localization.getCommand().getFlectonepulse(), Command::getFlectonepulse);
+        super(localization -> localization.getCommand().getFlectonepulse(), Command::getFlectonepulse, MessageType.COMMAND_FLECTONEPULSE);
 
         this.config = fileResolver.getConfig().getEditor();
         this.command = fileResolver.getCommand().getFlectonepulse();
@@ -103,16 +104,21 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
         String type = getArgument(commandContext, 0);
         if (type.equalsIgnoreCase("editor")) {
             if (config.getHost().isEmpty()) {
-                builder(fPlayer)
+                sendMessage(metadataBuilder()
+                        .sender(fPlayer)
                         .format(Localization.Command.Flectonepulse::getNullHostEditor)
-                        .sendBuilt();
+                        .build()
+                );
+
                 return;
             }
 
-            builder(fPlayer)
-                    .destination(command.getDestination())
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Flectonepulse::getFormatWebStarting)
-                    .sendBuilt();
+                    .destination(command.getDestination())
+                    .build()
+            );
 
             UrlService urlService = injector.getInstance(UrlService.class);
             String url = urlService.generateUrl();
@@ -121,11 +127,14 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
             enableSpark();
 
-            builder(fPlayer)
-                    .destination(command.getDestination())
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(flectonepulse -> Strings.CS.replace(flectonepulse.getFormatEditor(), "<url>", url))
-                    .sound(getSound())
-                    .sendBuilt();
+                    .destination(command.getDestination())
+                    .sound(getModuleSound())
+                    .build()
+            );
+
             return;
         }
 
@@ -138,20 +147,25 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
             String formattedTime = timeFormatter.format(fPlayer, Duration.between(start, end).toMillis());
 
-            builder(fPlayer)
-                    .destination(command.getDestination())
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(flectonepulse -> Strings.CS.replace(flectonepulse.getFormatTrue(), "<time>", formattedTime))
-                    .sound(getSound())
-                    .sendBuilt();
+                    .destination(command.getDestination())
+                    .sound(getModuleSound())
+                    .build()
+            );
 
         } catch (Exception e) {
             fLogger.warning(e);
 
-            builder(fPlayer)
-                    .destination(command.getDestination())
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Flectonepulse::getFormatFalse)
                     .message(e.getLocalizedMessage())
-                    .sendBuilt();
+                    .destination(command.getDestination())
+                    .build()
+            );
+
         }
     }
 

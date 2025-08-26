@@ -5,18 +5,20 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Mail;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.mail.listener.MailPulseListener;
+import net.flectone.pulse.module.command.mail.model.Mail;
+import net.flectone.pulse.module.command.mail.model.MailMetadata;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
@@ -38,7 +40,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
                       FPlayerService fPlayerService,
                       CommandParserProvider commandParserProvider,
                       ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getCommand().getMail(), Command::getMail, fPlayer -> fPlayer.isSetting(FPlayer.Setting.MAIL));
+        super(localization -> localization.getCommand().getMail(), Command::getMail, fPlayer -> fPlayer.isSetting(FPlayer.Setting.MAIL), MessageType.COMMAND_MAIL);
 
         this.command = fileResolver.getCommand().getMail();
         this.permission = fileResolver.getPermission().getCommand().getMail();
@@ -77,17 +79,23 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         String playerName = getArgument(commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
         if (fReceiver.isUnknown()) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Mail::getNullPlayer)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
         if (fReceiver.isOnline() && integrationModule.canSeeVanished(fReceiver, fPlayer)) {
             if (!tellModule.isEnable()) {
-                builder(fPlayer)
+                sendMessage(metadataBuilder()
+                        .sender(fPlayer)
                         .format(Localization.Command.Mail::getOnlinePlayer)
-                        .sendBuilt();
+                        .build()
+                );
+
                 return;
             }
 
@@ -105,11 +113,15 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         Mail mail = fPlayerService.saveAndGetMail(fPlayer, fReceiver, message);
         if (mail == null) return;
 
-        builder(fReceiver)
-                .destination(command.getDestination())
+        sendMessage(MailMetadata.<Localization.Command.Mail>builder()
+                .sender(fReceiver)
                 .receiver(fPlayer)
                 .format(s -> Strings.CS.replaceOnce(s.getSender(), "<id>", String.valueOf(mail.id())))
+                .mail(mail)
                 .message(message)
-                .sendBuilt();
+                .destination(command.getDestination())
+                .sound(getModuleSound())
+                .build()
+        );
     }
 }

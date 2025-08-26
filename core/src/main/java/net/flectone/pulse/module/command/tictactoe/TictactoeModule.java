@@ -10,6 +10,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tictactoe.manager.TictactoeManager;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
+import net.flectone.pulse.module.command.tictactoe.model.TicTacToeMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
@@ -43,7 +44,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                            IntegrationModule integrationModule,
                            CommandParserProvider commandParserProvider,
                            Gson gson) {
-        super(localization -> localization.getCommand().getTictactoe(), Command::getTictactoe, fPlayer -> fPlayer.isSetting(FPlayer.Setting.TICTACTOE));
+        super(localization -> localization.getCommand().getTictactoe(), Command::getTictactoe, fPlayer -> fPlayer.isSetting(FPlayer.Setting.TICTACTOE), MessageType.COMMAND_TICTACTOE);
 
         this.command = fileResolver.getCommand().getTictactoe();
         this.permission = fileResolver.getPermission().getCommand().getTictactoe();
@@ -103,16 +104,22 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         FPlayer fReceiver = fPlayerService.getFPlayer(receiverName);
         if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Tictactoe::getNullPlayer)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
         if (fReceiver.equals(fPlayer)) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Tictactoe::getMyself)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -123,13 +130,16 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         TicTacToe ticTacToe = tictactoeManager.create(fPlayer, fReceiver, isHard);
 
-        builder(fReceiver)
+        sendMessage(TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
+                .sender(fReceiver)
                 .receiver(fPlayer)
                 .format(Localization.Command.Tictactoe::getSender)
-                .sound(getSound())
-                .sendBuilt();
+                .ticTacToe(ticTacToe)
+                .sound(getModuleSound())
+                .build()
+        );
 
-        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TICTACTOE_CREATE, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TICTACTOE, dataOutputStream -> {
             dataOutputStream.writeUTF(gson.toJson(fReceiver));
             dataOutputStream.writeInt(ticTacToe.getId());
             dataOutputStream.writeBoolean(isHard);
@@ -146,11 +156,14 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         if (!integrationModule.canSeeVanished(fPlayer, fReceiver)
                 || !integrationModule.canSeeVanished(fReceiver, fPlayer)) return;
 
-        builder(fPlayer)
+        sendMessage(TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
+                .sender(fPlayer)
                 .receiver(fReceiver, true)
                 .format(message -> String.format(message.getReceiver(), ticTacToe.getId()))
-                .sound(getSound())
-                .sendBuilt();
+                .ticTacToe(ticTacToe)
+                .sound(getModuleSound())
+                .build()
+        );
     }
 
     // /tictactoe %d <move>
@@ -160,10 +173,12 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 || !integrationModule.canSeeVanished(fReceiver, fPlayer)) return;
         if (ticTacToe == null) return;
 
-        builder(fReceiver)
+        sendMessage(metadataBuilder()
+                .sender(fReceiver)
                 .receiver(fReceiver)
                 .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
-                .sendBuilt();
+                .build()
+        );
     }
 
     public void executeMove(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
@@ -172,25 +187,34 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         TicTacToe ticTacToe = tictactoeManager.get(tictactoeID);
         if (ticTacToe == null || ticTacToe.isEnded() || !ticTacToe.contains(fPlayer) || (move.equals("create") && ticTacToe.isCreated())) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Tictactoe::getWrongGame)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
         if (!ticTacToe.move(fPlayer, move)) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Tictactoe::getWrongMove)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
         FPlayer fReceiver = fPlayerService.getFPlayer(ticTacToe.getNextPlayer());
         if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
             ticTacToe.setEnded(true);
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Tictactoe::getWrongByPlayer)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -215,10 +239,12 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
             typeTitle = 0;
         }
 
-        builder(fReceiver)
+        sendMessage(metadataBuilder()
+                .sender(fReceiver)
                 .receiver(fPlayer, true)
                 .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
-                .sendBuilt();
+                .build()
+        );
 
         FPlayer finalFReceiver = fReceiver;
         boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TICTACTOE_MOVE, dataOutputStream -> {
@@ -230,10 +256,12 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         if (isSent) return;
 
-        builder(fReceiver)
+        sendMessage(metadataBuilder()
+                .sender(fReceiver)
                 .receiver(fReceiver)
                 .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
-                .sendBuilt();
+                .build()
+        );
     }
 
     public BiFunction<FPlayer, Localization.Command.Tictactoe, String> getMoveMessage(TicTacToe ticTacToe,

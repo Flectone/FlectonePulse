@@ -18,6 +18,7 @@ import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -53,7 +54,7 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
                        ListenerRegistry listenerRegistry,
                        PermissionChecker permissionChecker,
                        MessagePipeline messagePipeline) {
-        super(localization -> localization.getMessage().getFormat().getModeration().getSwear());
+        super(localization -> localization.getMessage().getFormat().getModeration().getSwear(), MessageType.SWEAR);
 
         this.message = fileResolver.getMessage().getFormat().getModeration().getSwear();
         this.permission = fileResolver.getPermission().getMessage().getFormat().getModeration().getSwear();

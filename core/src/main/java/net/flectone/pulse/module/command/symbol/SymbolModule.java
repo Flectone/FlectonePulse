@@ -10,6 +10,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
@@ -28,7 +29,7 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
     @Inject
     public SymbolModule(FileResolver fileResolver,
                         CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getSymbol(), Command::getSymbol);
+        super(localization -> localization.getCommand().getSymbol(), Command::getSymbol, MessageType.COMMAND_SYMBOL);
 
         this.command = fileResolver.getCommand().getSymbol();
         this.permission = fileResolver.getPermission().getCommand().getSymbol();
@@ -85,11 +86,13 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
 
         String message = getArgument(commandContext, 1);
 
-        builder(fPlayer)
-                .destination(command.getDestination())
+        sendMessage(metadataBuilder()
+                .sender(fPlayer)
                 .format(s -> Strings.CS.replace(s.getFormat(), "<message>", message))
+                .destination(command.getDestination())
                 .message(message)
-                .sound(getSound())
-                .sendBuilt();
+                .sound(getModuleSound())
+                .build()
+        );
     }
 }

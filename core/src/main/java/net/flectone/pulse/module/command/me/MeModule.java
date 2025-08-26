@@ -5,12 +5,12 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
@@ -24,7 +24,7 @@ public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
     @Inject
     public MeModule(FileResolver fileResolver,
                     CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getMe(), Command::getMe, fPlayer -> fPlayer.isSetting(FPlayer.Setting.ME));
+        super(localization -> localization.getCommand().getMe(), Command::getMe, fPlayer -> fPlayer.isSetting(FPlayer.Setting.ME), MessageType.COMMAND_ME);
 
         this.command = fileResolver.getCommand().getMe();
         this.permission = fileResolver.getPermission().getCommand().getMe();
@@ -55,15 +55,17 @@ public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
 
         String message = getArgument(commandContext, 0);
 
-        builder(fPlayer)
-                .tag(MessageType.COMMAND_ME)
+        sendMessage(metadataBuilder()
+                .sender(fPlayer)
+                .format(Localization.Command.Me::getFormat)
                 .destination(command.getDestination())
                 .range(command.getRange())
-                .format(Localization.Command.Me::getFormat)
                 .message(message)
-                .proxy(output -> output.writeUTF(message))
-                .integration(s -> Strings.CS.replace(s, "<message>", message))
-                .sound(getSound())
-                .sendBuilt();
+                .sound(getModuleSound())
+                .proxy(dataOutputStream -> dataOutputStream.writeString(message))
+                .integration(string -> Strings.CS.replace(string, "<message>", message))
+                .build()
+        );
+
     }
 }

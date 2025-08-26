@@ -22,6 +22,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 
 @Singleton
@@ -46,7 +47,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
                                 PacketProvider packetProvider,
                                 TaskScheduler taskScheduler,
                                 ListenerRegistry listenerRegistry) {
-        super(module -> module.getMessage().getTab().getPlayerlistname());
+        super(module -> module.getMessage().getTab().getPlayerlistname(), MessageType.PLAYERLISTNAME);
 
         this.message = fileResolver.getMessage().getTab().getPlayerlistname();
         this.permission = fileResolver.getPermission().getMessage().getTab().getPlayerlistname();

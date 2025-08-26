@@ -15,6 +15,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +37,7 @@ public class NameModule extends AbstractModuleLocalization<Localization.Message.
                       ListenerRegistry listenerRegistry,
                       IntegrationModule integrationModule,
                       MessagePipeline messagePipeline) {
-        super(localization -> localization.getMessage().getFormat().getName_());
+        super(localization -> localization.getMessage().getFormat().getName_(), MessageType.NAME);
 
         this.message = fileResolver.getMessage().getFormat().getName_();
         this.permission = fileResolver.getPermission().getMessage().getFormat().getName_();

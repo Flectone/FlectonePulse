@@ -5,12 +5,12 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
@@ -24,7 +24,7 @@ public class AnonModule extends AbstractModuleCommand<Localization.Command.Anon>
     @Inject
     public AnonModule(FileResolver fileResolver,
                       CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getAnon(), Command::getAnon, fPlayer -> fPlayer.isSetting(FPlayer.Setting.ANON));
+        super(localization -> localization.getCommand().getAnon(), Command::getAnon, fPlayer -> fPlayer.isSetting(FPlayer.Setting.ANON), MessageType.COMMAND_ANON);
 
         this.command = fileResolver.getCommand().getAnon();
         this.permission = fileResolver.getPermission().getCommand().getAnon();
@@ -55,16 +55,17 @@ public class AnonModule extends AbstractModuleCommand<Localization.Command.Anon>
 
         String message = getArgument(commandContext, 0);
 
-        builder(fPlayer)
-                .tag(MessageType.COMMAND_ANON)
-                .destination(command.getDestination())
-                .range(command.getRange())
+        sendMessage(metadataBuilder()
+                .sender(fPlayer)
                 .format(Localization.Command.Anon::getFormat)
                 .message(message)
-                .proxy(output -> output.writeUTF(message))
-                .integration(s -> Strings.CS.replace(s, "<message>", message))
-                .sound(getSound())
-                .sendBuilt();
+                .destination(command.getDestination())
+                .range(command.getRange())
+                .sound(getModuleSound())
+                .proxy(dataOutputStream -> dataOutputStream.writeString(message))
+                .integration(string -> Strings.CS.replace(string, "<message>", message))
+                .build()
+        );
     }
 }
 

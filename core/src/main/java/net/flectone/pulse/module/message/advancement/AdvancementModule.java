@@ -1,25 +1,24 @@
 package net.flectone.pulse.module.message.advancement;
 
-import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.module.message.advancement.model.metadata.AdvancementMetadata;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.advancement.listener.AdvancementPulseListener;
+import net.flectone.pulse.module.message.advancement.model.AdvancementMetadata;
 import net.flectone.pulse.module.message.advancement.model.ChatAdvancement;
 import net.flectone.pulse.module.message.advancement.model.CommandAdvancement;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -37,7 +36,6 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
     private final FPlayerService fPlayerService;
     private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
-    private final Gson gson;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
@@ -45,16 +43,14 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
                              FPlayerService fPlayerService,
                              IntegrationModule integrationModule,
                              MessagePipeline messagePipeline,
-                             Gson gson,
                              ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getAdvancement());
+        super(localization -> localization.getMessage().getAdvancement(), MessageType.ADVANCEMENT);
 
         this.message = fileResolver.getMessage().getAdvancement();
         this.permission = fileResolver.getPermission().getMessage().getAdvancement();
         this.fPlayerService = fPlayerService;
         this.integrationModule = integrationModule;
         this.messagePipeline = messagePipeline;
-        this.gson = gson;
         this.listenerRegistry = listenerRegistry;
     }
 
@@ -80,19 +76,21 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
         if (isModuleDisabledFor(fTarget)) return;
         if (!fTarget.equals(fReceiver)) return;
 
-        builder(fTarget)
-                .tag(MessageType.ADVANCEMENT)
+        sendMessage(AdvancementMetadata.<Localization.Message.Advancement>builder()
+                .sender(fTarget)
+                .format(s -> convert(s, chatAdvancement))
+                .advancement(chatAdvancement)
                 .range(message.getRange())
                 .destination(message.getDestination())
-                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.ADVANCEMENT))
-                .filter(fPlayer -> integrationModule.canSeeVanished(fTarget, fPlayer))
-                .format(s -> convert(s, chatAdvancement))
+                .sound(getModuleSound())
+                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.ADVANCEMENT)
+                        && integrationModule.canSeeVanished(fTarget, fPlayer)
+                )
                 .tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fResolver, chatAdvancement)})
-                .proxy(output -> output.writeUTF(gson.toJson(chatAdvancement)))
+                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(chatAdvancement))
                 .integration()
-                .sound(getSound())
-                .metadata(new AdvancementMetadata(chatAdvancement))
-                .sendBuilt();
+                .build()
+        );
     }
 
     @Async
@@ -103,7 +101,8 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
         FPlayer fTarget = fPlayerService.getFPlayer(commandAdvancement.owner());
         if (fTarget.isUnknown()) return;
 
-        Builder builder = builder(fTarget)
+        AdvancementMetadata.AdvancementMetadataBuilder<Localization.Message.Advancement, ?, ?> metadataBuilder = AdvancementMetadata.<Localization.Message.Advancement>builder()
+                .sender(fTarget)
                 .receiver(fPlayer)
                 .format(s -> {
                     Localization.Message.Advancement.Command subcommand = revoke ? s.getRevoke() : s.getGrant();
@@ -122,13 +121,14 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
                         case ONE_TO_ONE_ADVANCEMENT -> subcommand.getOneToOne();
                     };
                 })
-                .sound(getSound());
+                .advancement(commandAdvancement)
+                .sound(getModuleSound());
 
         if (commandAdvancement.relation() == Relation.ONE_TO_ONE_ADVANCEMENT && commandAdvancement.chatAdvancement() != null) {
-            builder.tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fPlayer, commandAdvancement.chatAdvancement())});
+            metadataBuilder = metadataBuilder.tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fPlayer, commandAdvancement.chatAdvancement())});
         }
 
-        builder.sendBuilt();
+        sendMessage(metadataBuilder.build());
     }
 
     public String convert(Localization.Message.Advancement message, ChatAdvancement chatAdvancement) {

@@ -1,11 +1,11 @@
 package net.flectone.pulse.module.command.unban;
 
-import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
@@ -31,16 +31,14 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
     private final ModerationService moderationService;
     private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
-    private final Gson gson;
 
     @Inject
     public UnbanModule(FileResolver fileResolver,
                        FPlayerService fPlayerService,
                        ModerationService moderationService,
                        CommandParserProvider commandParserProvider,
-                       ProxySender proxySender,
-                       Gson gson) {
-        super(localization -> localization.getCommand().getUnban(), Command::getUnban);
+                       ProxySender proxySender) {
+        super(localization -> localization.getCommand().getUnban(), Command::getUnban, MessageType.COMMAND_UNBAN);
 
         this.command = fileResolver.getCommand().getUnban();
         this.permission = fileResolver.getPermission().getCommand().getUnban();
@@ -48,7 +46,6 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         this.moderationService = moderationService;
         this.commandParserProvider = commandParserProvider;
         this.proxySender = proxySender;
-        this.gson = gson;
     }
 
     @Override
@@ -95,9 +92,12 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Unban::getNullPlayer)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -114,9 +114,12 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         }
 
         if (bans.isEmpty()) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Unban::getNotBanned)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -124,15 +127,25 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
 
         proxySender.send(fTarget, MessageType.SYSTEM_BAN, dataOutputStream -> {});
 
-        builder(fTarget)
-                .tag(MessageType.COMMAND_UNBAN)
+        sendMessage(UnModerationMetadata.<Localization.Command.Unban>builder()
+                .sender(fTarget)
+                .format(unwarn -> Strings.CS.replace(unwarn.getFormat(), "<moderator>", fPlayer.getName()))
+                .moderator(fPlayer)
+                .moderations(bans)
                 .destination(command.getDestination())
                 .range(command.getRange())
+                .sound(getModuleSound())
                 .filter(filter -> filter.isSetting(FPlayer.Setting.BAN))
-                .format(unwarn -> Strings.CS.replace(unwarn.getFormat(), "<moderator>", fPlayer.getName()))
-                .proxy(output -> output.writeUTF(gson.toJson(fPlayer)))
-                .integration(s -> Strings.CS.replace(s, "<moderator>", fPlayer.getName()))
-                .sound(getSound())
-                .sendBuilt();
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeAsJson(fPlayer);
+                    dataOutputStream.writeAsJson(bans);
+                })
+                .integration(string -> Strings.CS.replace(
+                        string,
+                        "<moderator>",
+                        fPlayer.getName()
+                ))
+                .build()
+        );
     }
 }

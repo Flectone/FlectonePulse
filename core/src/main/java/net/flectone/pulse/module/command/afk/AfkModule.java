@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton
@@ -20,7 +21,7 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
     @Inject
     public AfkModule(FileResolver fileResolver,
                      net.flectone.pulse.module.message.afk.AfkModule afkMessageModule) {
-        super(Localization::getCommand, Command::getAfk,fPlayer -> fPlayer.isSetting(FPlayer.Setting.AFK));
+        super(Localization::getCommand, Command::getAfk,fPlayer -> fPlayer.isSetting(FPlayer.Setting.AFK), MessageType.AFK);
 
         this.command = fileResolver.getCommand().getAfk();
         this.permission = fileResolver.getPermission().getCommand().getAfk();

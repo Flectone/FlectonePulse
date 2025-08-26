@@ -6,17 +6,17 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.module.message.kill.model.metadata.KillMetadata;
-import net.flectone.pulse.module.message.kill.model.Kill;
-import net.flectone.pulse.util.constant.MessageType;
-import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.kill.listener.KillPulseListener;
+import net.flectone.pulse.module.message.kill.model.Kill;
+import net.flectone.pulse.module.message.kill.model.KillMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import org.apache.commons.lang3.Strings;
 
 @Singleton
@@ -31,7 +31,7 @@ public class KillModule extends AbstractModuleLocalization<Localization.Message.
     public KillModule(FileResolver fileResolver,
                       FPlayerService fPlayerService,
                       ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getKill());
+        super(localization -> localization.getMessage().getKill(), MessageType.KILL);
 
         this.message = fileResolver.getMessage().getKill();
         this.permission = fileResolver.getPermission().getMessage().getKill();
@@ -70,16 +70,17 @@ public class KillModule extends AbstractModuleLocalization<Localization.Message.
             }
         }
 
-        builder(fTarget)
-                .tag(MessageType.KILL)
-                .destination(message.getDestination())
+        sendMessage(KillMetadata.<Localization.Message.Kill>builder()
+                .sender(fTarget)
                 .receiver(fPlayer)
                 .format(s -> key == MinecraftTranslationKey.COMMANDS_KILL_SUCCESS_MULTIPLE
                         ? Strings.CS.replace(s.getMultiple(), "<count>", kill.value())
                         : s.getSingle()
                 )
-                .sound(getSound())
-                .metadata(new KillMetadata(kill))
-                .sendBuilt();
+                .kill(kill)
+                .destination(message.getDestination())
+                .sound(getModuleSound())
+                .build()
+        );
     }
 }

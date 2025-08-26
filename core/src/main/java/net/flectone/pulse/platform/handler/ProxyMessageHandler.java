@@ -1,25 +1,28 @@
 package net.flectone.pulse.platform.handler;
 
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import io.leangen.geantyref.TypeToken;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
-import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.ModerationMetadata;
+import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.command.anon.AnonModule;
 import net.flectone.pulse.module.command.ball.BallModule;
+import net.flectone.pulse.module.command.ball.model.BallMetadata;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.broadcast.BroadcastModule;
 import net.flectone.pulse.module.command.coin.CoinModule;
+import net.flectone.pulse.module.command.coin.model.CoinMetadata;
 import net.flectone.pulse.module.command.dice.DiceModule;
+import net.flectone.pulse.module.command.dice.model.DiceMetadata;
 import net.flectone.pulse.module.command.do_.DoModule;
 import net.flectone.pulse.module.command.helper.HelperModule;
 import net.flectone.pulse.module.command.kick.KickModule;
@@ -27,37 +30,45 @@ import net.flectone.pulse.module.command.me.MeModule;
 import net.flectone.pulse.module.command.mute.MuteModule;
 import net.flectone.pulse.module.command.poll.PollModule;
 import net.flectone.pulse.module.command.poll.model.Poll;
+import net.flectone.pulse.module.command.poll.model.PollMetadata;
 import net.flectone.pulse.module.command.rockpaperscissors.RockpaperscissorsModule;
 import net.flectone.pulse.module.command.spy.SpyModule;
+import net.flectone.pulse.module.command.spy.model.SpyMetadata;
 import net.flectone.pulse.module.command.stream.StreamModule;
+import net.flectone.pulse.module.command.stream.model.StreamMetadata;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.module.command.tictactoe.TictactoeModule;
 import net.flectone.pulse.module.command.tictactoe.manager.TictactoeManager;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.module.command.translateto.TranslatetoModule;
+import net.flectone.pulse.module.command.translateto.model.TranslatetoMetadata;
 import net.flectone.pulse.module.command.try_.TryModule;
+import net.flectone.pulse.module.command.try_.model.TryMetadata;
 import net.flectone.pulse.module.command.unban.UnbanModule;
 import net.flectone.pulse.module.command.unmute.UnmuteModule;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
 import net.flectone.pulse.module.command.warn.WarnModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.integration.discord.listener.MessageCreateListener;
-import net.flectone.pulse.module.integration.telegram.listener.MessageListener;
-import net.flectone.pulse.module.integration.twitch.listener.ChannelMessageListener;
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
+import net.flectone.pulse.module.message.advancement.model.AdvancementMetadata;
 import net.flectone.pulse.module.message.advancement.model.ChatAdvancement;
 import net.flectone.pulse.module.message.afk.AfkModule;
+import net.flectone.pulse.module.message.afk.model.AFKMetadata;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.death.DeathModule;
 import net.flectone.pulse.module.message.death.model.Death;
+import net.flectone.pulse.module.message.death.model.DeathMetadata;
+import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.module.message.join.JoinModule;
+import net.flectone.pulse.module.message.join.model.JoinMetadata;
 import net.flectone.pulse.module.message.quit.QuitModule;
+import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
 import java.io.ByteArrayInputStream;
@@ -154,7 +165,7 @@ public class ProxyMessageHandler {
             case COMMAND_UNMUTE -> handleUnmuteCommand(input, fEntity);
             case COMMAND_UNWARN -> handleUnwarnCommand(input, fEntity);
             case COMMAND_POLL_VOTE -> handlePollVote(input, fEntity);
-            case COMMAND_POLL_CREATE_MESSAGE -> handlePollCreate(input, fEntity);
+            case COMMAND_POLL -> handlePollCreate(input, fEntity);
             case COMMAND_SPY -> handleSpyCommand(input, fEntity);
             case COMMAND_STREAM -> handleStreamCommand(input, fEntity);
             case COMMAND_TELL -> handleTellCommand(input, fEntity);
@@ -162,15 +173,12 @@ public class ProxyMessageHandler {
             case COMMAND_TRY -> handleTryCommand(input, fEntity);
             case COMMAND_WARN -> handleWarnCommand(input, fEntity);
             case COMMAND_KICK -> handleKickCommand(input, fEntity);
-            case COMMAND_TICTACTOE_CREATE -> handleTicTacToeCreate(input, fEntity);
+            case COMMAND_TICTACTOE -> handleTicTacToeCreate(input, fEntity);
             case COMMAND_TICTACTOE_MOVE -> handleTicTacToeMove(input, fEntity);
             case CHAT -> handleChatMessage(input, fEntity);
-            case COMMAND_ROCKPAPERSCISSORS_CREATE -> handleRockPaperScissorsCreate(input, fEntity);
+            case COMMAND_ROCKPAPERSCISSORS -> handleRockPaperScissorsCreate(input, fEntity);
             case COMMAND_ROCKPAPERSCISSORS_MOVE -> handleRockPaperScissorsMove(input, fEntity);
             case COMMAND_ROCKPAPERSCISSORS_FINAL -> handleRockPaperScissorsFinal(input, fEntity);
-            case FROM_DISCORD_TO_MINECRAFT -> handleDiscordMessage(input, fEntity);
-            case FROM_TWITCH_TO_MINECRAFT -> handleTwitchMessage(input, fEntity);
-            case FROM_TELEGRAM_TO_MINECRAFT -> handleTelegramMessage(input, fEntity);
             case ADVANCEMENT -> handleAdvancement(input, fEntity);
             case DEATH -> handleDeath(input, fEntity);
             case JOIN -> handleJoin(input, fEntity);
@@ -212,13 +220,15 @@ public class ProxyMessageHandler {
 
         String message = input.readUTF();
 
-        module.builder(fEntity)
+        module.sendMessage(module.metadataBuilder()
+                .sender(fEntity)
+                .format(Localization.Command.Anon::getFormat)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getCommand().getAnon().getDestination())
-                .format(Localization.Command.Anon::getFormat)
+                .sound(module.getModuleSound())
                 .message(message)
-                .sound(module.getSound())
-                .sendBuilt();
+                .build()
+        );
     }
 
     private void handleMeCommand(DataInputStream input, FEntity fEntity) throws IOException {
@@ -227,13 +237,15 @@ public class ProxyMessageHandler {
 
         String message = input.readUTF();
 
-        module.builder(fEntity)
+        module.sendMessage(module.metadataBuilder()
+                .sender(fEntity)
+                .format(Localization.Command.Me::getFormat)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getCommand().getMe().getDestination())
-                .format(Localization.Command.Me::getFormat)
                 .message(message)
-                .sound(module.getSound())
-                .sendBuilt();
+                .sound(module.getModuleSound())
+                .build()
+        );
     }
 
     private void handleBallCommand(DataInputStream input, FEntity fEntity) throws IOException {
@@ -243,44 +255,54 @@ public class ProxyMessageHandler {
         int answer = input.readInt();
         String message = input.readUTF();
 
-        module.builder(fEntity)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getCommand().getBall().getDestination())
+        module.sendMessage(BallMetadata.<Localization.Command.Ball>builder()
+                .sender(fEntity)
                 .format(module.replaceAnswer(answer))
+                .answer(answer)
                 .message(message)
-                .sound(module.getSound())
-                .sendBuilt();
+                .destination(fileResolver.getCommand().getBall().getDestination())
+                .range(Range.get(Range.Type.SERVER))
+                .sound(module.getModuleSound())
+                .build()
+        );
     }
 
     private void handleBanCommand(DataInputStream input, FEntity fEntity) throws IOException {
         BanModule module = injector.getInstance(BanModule.class);
-        FPlayer moderator = gson.fromJson(input.readUTF(), FPlayer.class);
-        if (module.isModuleDisabledFor(moderator)) return;
 
         Moderation ban = gson.fromJson(input.readUTF(), Moderation.class);
-        module.kick(moderator, (FPlayer) fEntity, ban);
 
-        module.builder(fEntity)
+        FPlayer fModerator = fPlayerService.getFPlayer(ban.getModerator());
+        if (module.isModuleDisabledFor(fModerator)) return;
+
+        module.kick(fModerator, (FPlayer) fEntity, ban);
+
+        module.sendMessage(ModerationMetadata.<Localization.Command.Ban>builder()
+                .sender(fEntity)
+                .format(module.buildFormat(ban))
+                .moderation(ban)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getCommand().getBan().getDestination())
-                .format(module.buildFormat(ban))
-                .sound(module.getSound())
-                .sendBuilt();
+                .sound(module.getModuleSound())
+                .build()
+        );
     }
 
     private void handleBroadcastCommand(DataInputStream input, FEntity fEntity) throws IOException {
-        BroadcastModule broadcastModule = injector.getInstance(BroadcastModule.class);
-        if (broadcastModule.isModuleDisabledFor(fEntity)) return;
+        BroadcastModule module = injector.getInstance(BroadcastModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
 
         String message = input.readUTF();
 
-        broadcastModule.builder(fEntity)
+        module.sendMessage(module.metadataBuilder()
+                .sender(fEntity)
+                .format(Localization.Command.Broadcast::getFormat)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getCommand().getBroadcast().getDestination())
-                .format(Localization.Command.Broadcast::getFormat)
                 .message(message)
-                .sound(broadcastModule.getSound())
-                .sendBuilt();
+                .sound(module.getModuleSound())
+                .build()
+        );
     }
 
     private void handleChatColorCommand(FEntity fEntity) {
@@ -292,132 +314,163 @@ public class ProxyMessageHandler {
     }
 
     private void handleCoinCommand(DataInputStream input, FEntity fEntity) throws IOException {
-        CoinModule coinModule = injector.getInstance(CoinModule.class);
-        if (coinModule.isModuleDisabledFor(fEntity)) return;
+        CoinModule module = injector.getInstance(CoinModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
 
         int percent = input.readInt();
 
-        coinModule.builder(fEntity)
+        module.sendMessage(CoinMetadata.<Localization.Command.Coin>builder()
+                .sender(fEntity)
+                .format(module.replaceResult(percent))
+                .percent(percent)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getCommand().getCoin().getDestination())
-                .format(coinModule.replaceResult(percent))
-                .sound(coinModule.getSound())
-                .sendBuilt();
+                .sound(module.getModuleSound())
+                .build()
+        );
     }
 
     private void handleDeleteCommand(DataInputStream input, FEntity fEntity) throws IOException {
         // skip delete command checking, only format.moderation.delete module
-        DeleteModule deleteModule = injector.getInstance(DeleteModule.class);
+        DeleteModule module = injector.getInstance(DeleteModule.class);
 
         UUID messageUUID = UUID.fromString(input.readUTF());
-        deleteModule.remove(fEntity, messageUUID);
+        module.remove(fEntity, messageUUID);
     }
 
     private void handleDiceCommand(DataInputStream input, FEntity fEntity) throws IOException {
-        DiceModule diceModule = injector.getInstance(DiceModule.class);
-        if (diceModule.isModuleDisabledFor(fEntity)) return;
+        DiceModule module = injector.getInstance(DiceModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
 
         List<Integer> cubes = gson.fromJson(input.readUTF(), new TypeToken<List<Integer>>() {}.getType());
 
-        diceModule.builder(fEntity)
+        module.sendMessage(DiceMetadata.<Localization.Command.Dice>builder()
+                .sender(fEntity)
+                .format(dice -> module.replaceResult(cubes, dice.getSymbols(), dice.getFormat()))
+                .cubes(cubes)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getCommand().getDice().getDestination())
-                .format(diceModule.replaceResult(cubes))
-                .sound(diceModule.getSound())
-                .sendBuilt();
+                .sound(module.getModuleSound())
+                .build()
+        );
     }
 
     private void handleDoCommand(DataInputStream input, FEntity fEntity) throws IOException {
-        DoModule doModule = injector.getInstance(DoModule.class);
-        if (doModule.isModuleDisabledFor(fEntity)) return;
+        DoModule module = injector.getInstance(DoModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
 
         String message = input.readUTF();
 
-        doModule.builder(fEntity)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getCommand().getDo().getDestination())
+        module.sendMessage(module.metadataBuilder()
+                .sender(fEntity)
                 .format(Localization.Command.Do::getFormat)
                 .message(message)
-                .sound(doModule.getSound())
-                .sendBuilt();
+                .range(Range.get(Range.Type.SERVER))
+                .destination(fileResolver.getCommand().getDo().getDestination())
+                .sound(module.getModuleSound())
+                .build()
+        );
     }
 
     private void handleHelperCommand(DataInputStream input, FEntity fEntity) throws IOException {
-        HelperModule helperModule = injector.getInstance(HelperModule.class);
-        if (helperModule.isModuleDisabledFor(fEntity)) return;
+        HelperModule module = injector.getInstance(HelperModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
 
         String message = input.readUTF();
 
-        helperModule.builder(fEntity)
-                .destination(fileResolver.getCommand().getHelper().getDestination())
-                .filter(helperModule.getFilterSee())
+        module.sendMessage(module.metadataBuilder()
+                .sender(fEntity)
                 .format(Localization.Command.Helper::getGlobal)
+                .destination(fileResolver.getCommand().getHelper().getDestination())
                 .message(message)
-                .sound(helperModule.getSound())
-                .sendBuilt();
+                .sound(module.getModuleSound())
+                .filter(module.getFilterSee())
+                .build()
+        );
     }
 
     private void handleMuteCommand(DataInputStream input, FEntity fEntity) throws IOException {
-        MuteModule muteModule = injector.getInstance(MuteModule.class);
+        MuteModule module = injector.getInstance(MuteModule.class);
 
         FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
-        if (muteModule.isModuleDisabledFor(fModerator)) return;
+        if (module.isModuleDisabledFor(fModerator)) return;
 
         Moderation mute = gson.fromJson(input.readUTF(), Moderation.class);
 
-        muteModule.builder(fEntity)
+        module.sendMessage(ModerationMetadata.<Localization.Command.Mute>builder()
+                .sender(fEntity)
+                .format(module.buildFormat(mute))
+                .moderation(mute)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getCommand().getMute().getDestination())
-                .format(muteModule.buildFormat(mute))
-                .sound(muteModule.getSound())
-                .sendBuilt();
+                .sound(module.getModuleSound())
+                .build()
+        );
 
-        muteModule.sendForTarget(fModerator, (FPlayer) fEntity, mute);
+        module.sendForTarget(fModerator, (FPlayer) fEntity, mute);
     }
 
     private void handleUnbanCommand(DataInputStream input, FEntity fEntity) throws IOException {
-        UnbanModule unbanModule = injector.getInstance(UnbanModule.class);
+        UnbanModule module = injector.getInstance(UnbanModule.class);
 
-        FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
-        if (unbanModule.isModuleDisabledFor(fPlayer)) return;
+        FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
+        if (module.isModuleDisabledFor(fModerator)) return;
 
-        unbanModule.builder(fEntity)
+        List<Moderation> bans = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
+
+        module.sendMessage(UnModerationMetadata.<Localization.Command.Unban>builder()
+                .sender(fEntity)
+                .format(unban -> Strings.CS.replace(unban.getFormat(), "<moderator>", fModerator.getName()))
+                .moderator(fModerator)
+                .moderations(bans)
                 .destination(fileResolver.getCommand().getUnban().getDestination())
                 .range(Range.get(Range.Type.SERVER))
+                .sound(module.getModuleSound())
                 .filter(filter -> filter.isSetting(FPlayer.Setting.BAN))
-                .format(unban -> Strings.CS.replace(unban.getFormat(), "<moderator>", fPlayer.getName()))
-                .sound(unbanModule.getSound())
-                .sendBuilt();
+                .build()
+        );
     }
 
     private void handleUnmuteCommand(DataInputStream input, FEntity fEntity) throws IOException {
-        UnmuteModule unmuteModule = injector.getInstance(UnmuteModule.class);
+        UnmuteModule module = injector.getInstance(UnmuteModule.class);
 
-        FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
-        if (unmuteModule.isModuleDisabledFor(fPlayer)) return;
+        FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
+        if (module.isModuleDisabledFor(fModerator)) return;
 
-        unmuteModule.builder(fEntity)
+        List<Moderation> mutes = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
+
+        module.sendMessage(UnModerationMetadata.<Localization.Command.Unmute>builder()
+                .sender(fEntity)
+                .format(unwarn -> Strings.CS.replace(unwarn.getFormat(), "<moderator>", fModerator.getName()))
+                .moderator(fModerator)
+                .moderations(mutes)
                 .destination(fileResolver.getCommand().getUnmute().getDestination())
                 .range(Range.get(Range.Type.SERVER))
+                .sound(module.getModuleSound())
                 .filter(filter -> filter.isSetting(FPlayer.Setting.MUTE))
-                .format(unwarn -> Strings.CS.replace(unwarn.getFormat(), "<moderator>", fPlayer.getName()))
-                .sound(unmuteModule.getSound())
-                .sendBuilt();
+                .build()
+        );
     }
 
     private void handleUnwarnCommand(DataInputStream input, FEntity fEntity) throws IOException {
-        UnwarnModule unwarnModule = injector.getInstance(UnwarnModule.class);
+        UnwarnModule module = injector.getInstance(UnwarnModule.class);
 
-        FPlayer fPlayer = gson.fromJson(input.readUTF(), FPlayer.class);
-        if (unwarnModule.isModuleDisabledFor(fPlayer)) return;
+        FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
+        if (module.isModuleDisabledFor(fModerator)) return;
 
-        unwarnModule.builder(fEntity)
+        List<Moderation> warns = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
+
+        module.sendMessage(UnModerationMetadata.<Localization.Command.Unwarn>builder()
+                .sender(fEntity)
+                .format(unwarn -> Strings.CS.replace(unwarn.getFormat(), "<moderator>", fModerator.getName()))
+                .moderator(fModerator)
+                .moderations(warns)
                 .destination(fileResolver.getCommand().getUnwarn().getDestination())
                 .range(Range.get(Range.Type.SERVER))
+                .sound(module.getModuleSound())
                 .filter(filter -> filter.isSetting(FPlayer.Setting.WARN))
-                .format(unwarn -> Strings.CS.replace(unwarn.getFormat(), "<moderator>", fPlayer.getName()))
-                .sound(unwarnModule.getSound())
-                .sendBuilt();
+                .build()
+        );
     }
 
     private void handlePollVote(DataInputStream input, FEntity fEntity) throws IOException {
@@ -425,55 +478,68 @@ public class ProxyMessageHandler {
     }
 
     private void handlePollCreate(DataInputStream input, FEntity fEntity) throws IOException {
-        PollModule pollModule = injector.getInstance(PollModule.class);
-        if (pollModule.isModuleDisabledFor(fEntity)) return;
+        PollModule module = injector.getInstance(PollModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
 
         Poll poll = gson.fromJson(input.readUTF(), Poll.class);
-        pollModule.saveAndUpdateLast(poll);
+        module.saveAndUpdateLast(poll);
 
-        pollModule.builder(fEntity)
+        module.sendMessage(PollMetadata.<Localization.Command.Poll>builder()
+                .sender(fEntity)
+                .format(module.resolvePollFormat(fEntity, poll, PollModule.Status.START))
+                .poll(poll)
                 .range(Range.get(Range.Type.SERVER))
-                .format(pollModule.resolvePollFormat(fEntity, poll, PollModule.Status.START))
                 .message(poll.getTitle())
-                .sound(pollModule.getSound())
-                .sendBuilt();
+                .sound(module.getModuleSound())
+                .build()
+        );
     }
 
     private void handleSpyCommand(DataInputStream input, FEntity fEntity) throws IOException {
+        SpyModule module = injector.getInstance(SpyModule.class);
+        if (!module.isEnable()) return;
+
         String action = input.readUTF();
         String string = input.readUTF();
 
-        SpyModule spyModule = injector.getInstance(SpyModule.class);
-        if (!spyModule.isEnable()) return;
-
-        spyModule.builder(fEntity)
+        module.sendMessage(SpyMetadata.<Localization.Command.Spy>builder()
+                .sender(fEntity)
+                .format(module.replaceAction(action))
+                .turned(true)
+                .action(action)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getCommand().getSpy().getDestination())
+                .message(string)
                 .filter(fReceiver -> !fEntity.equals(fReceiver)
-                        && !spyModule.isModuleDisabledFor(fReceiver)
+                        && !module.isModuleDisabledFor(fReceiver)
                         && fReceiver.isSetting(FPlayer.Setting.SPY)
                         && fReceiver.isOnline()
                 )
-                .format(spyModule.replaceAction(action))
-                .message(string)
-                .sendBuilt();
+                .build()
+        );
     }
 
     private void handleStreamCommand(DataInputStream input, FEntity fEntity) throws IOException {
-        StreamModule streamModule = injector.getInstance(StreamModule.class);
-        if (streamModule.isModuleDisabledFor(fEntity)) return;
+        StreamModule module = injector.getInstance(StreamModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
 
         String message = input.readUTF();
-        streamModule.builder(fEntity)
+
+        module.sendMessage(StreamMetadata.<Localization.Command.Stream>builder()
+                .sender(fEntity)
+                .format(module.replaceUrls(message))
+                .turned(true)
+                .urls(message)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getCommand().getStream().getDestination())
-                .format(streamModule.replaceUrls(message))
-                .sendBuilt();
+                .sound(module.getModuleSound())
+                .build()
+        );
     }
 
     private void handleTellCommand(DataInputStream input, FEntity fEntity) throws IOException {
-        TellModule tellModule = injector.getInstance(TellModule.class);
-        if (tellModule.isModuleDisabledFor(fEntity)) return;
+        TellModule module = injector.getInstance(TellModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
 
         UUID receiverUUID = UUID.fromString(input.readUTF());
         String message = input.readUTF();
@@ -484,76 +550,89 @@ public class ProxyMessageHandler {
         IntegrationModule integrationModule = injector.getInstance(IntegrationModule.class);
         if (!integrationModule.canSeeVanished(fReceiver, fEntity)) return;
 
-        tellModule.send(fEntity, fReceiver, (fResolver, s) -> s.getReceiver(), message, true);
+        module.send(fEntity, fReceiver, (fResolver, s) -> s.getReceiver(), message, true);
     }
 
     private void handleTranslateToCommand(DataInputStream input, FEntity fEntity) throws IOException {
-        TranslatetoModule translatetoModule = injector.getInstance(TranslatetoModule.class);
-        if (translatetoModule.isModuleDisabledFor(fEntity)) return;
+        TranslatetoModule module = injector.getInstance(TranslatetoModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
 
         String targetLang = input.readUTF();
         String message = input.readUTF();
+        String messageToTranslate = input.readUTF();
 
-        translatetoModule.builder(fEntity)
+        module.sendMessage(TranslatetoMetadata.<Localization.Command.Translateto>builder()
+                .sender(fEntity)
+                .format(module.replaceLanguage(targetLang))
+                .targetLanguage(targetLang)
+                .messageToTranslate(messageToTranslate)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getCommand().getTranslateto().getDestination())
-                .format(translatetoModule.replaceLanguage(targetLang))
                 .message(message)
-                .sound(translatetoModule.getSound())
-                .sendBuilt();
+                .sound(module.getModuleSound())
+                .build()
+        );
     }
 
     private void handleTryCommand(DataInputStream input, FEntity fEntity) throws IOException {
-        TryModule tryModule = injector.getInstance(TryModule.class);
-        if (tryModule.isModuleDisabledFor(fEntity)) return;
+        TryModule module = injector.getInstance(TryModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
 
         int value = input.readInt();
         String message = input.readUTF();
 
-        tryModule.builder(fEntity)
+        module.sendMessage(TryMetadata.<Localization.Command.Try>builder()
+                .sender(fEntity)
+                .format(module.replacePercent(value))
+                .percent(value)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getCommand().getTry().getDestination())
-                .tag(MessageType.COMMAND_TRY)
-                .format(tryModule.replacePercent(value))
                 .message(message)
-                .sound(tryModule.getSound())
-                .sendBuilt();
+                .sound(module.getModuleSound())
+                .build()
+        );
     }
 
     private void handleWarnCommand(DataInputStream input, FEntity fEntity) throws IOException {
-        WarnModule warnModule = injector.getInstance(WarnModule.class);
+        WarnModule module = injector.getInstance(WarnModule.class);
 
         FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
-        if (warnModule.isModuleDisabledFor(fModerator)) return;
+        if (module.isModuleDisabledFor(fModerator)) return;
 
         Moderation warn = gson.fromJson(input.readUTF(), Moderation.class);
 
-        warnModule.builder(fEntity)
+        module.sendMessage(ModerationMetadata.<Localization.Command.Warn>builder()
+                .sender(fEntity)
+                .format(module.buildFormat(warn))
+                .moderation(warn)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getCommand().getWarn().getDestination())
-                .format(warnModule.buildFormat(warn))
-                .sound(warnModule.getSound())
-                .sendBuilt();
+                .sound(module.getModuleSound())
+                .build()
+        );
 
-        warnModule.send(fModerator, (FPlayer) fEntity, warn);
+        module.send(fModerator, (FPlayer) fEntity, warn);
     }
 
     private void handleKickCommand(DataInputStream input, FEntity fEntity) throws IOException {
-        KickModule kickModule = injector.getInstance(KickModule.class);
-
-        FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
-        if (kickModule.isModuleDisabledFor(fModerator)) return;
+        KickModule module = injector.getInstance(KickModule.class);
 
         Moderation kick = gson.fromJson(input.readUTF(), Moderation.class);
 
-        kickModule.builder(fEntity)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getCommand().getKick().getDestination())
-                .format(kickModule.buildFormat(kick))
-                .sound(kickModule.getSound())
-                .sendBuilt();
+        FPlayer fModerator = fPlayerService.getFPlayer(kick.getModerator());
+        if (module.isModuleDisabledFor(fModerator)) return;
 
-        kickModule.kick(fModerator, (FPlayer) fEntity, kick);
+        module.sendMessage(ModerationMetadata.<Localization.Command.Kick>builder()
+                .sender(fEntity)
+                .format(module.buildFormat(kick))
+                .moderation(kick)
+                .destination(fileResolver.getCommand().getKick().getDestination())
+                .range(Range.get(Range.Type.SERVER))
+                .sound(module.getModuleSound())
+                .build()
+        );
+
+        module.kick(fModerator, (FPlayer) fEntity, kick);
     }
 
     private void handleTicTacToeCreate(DataInputStream input, FEntity fEntity) throws IOException {
@@ -613,141 +692,104 @@ public class ProxyMessageHandler {
         injector.getInstance(RockpaperscissorsModule.class).sendFinalMessage(id, fPlayer, move);
     }
 
-    private void handleDiscordMessage(DataInputStream input, FEntity fEntity) throws IOException {
-        String nickname = input.readUTF();
-        String string = input.readUTF();
-
-        MessageCreateListener messageCreateListener = injector.getInstance(MessageCreateListener.class);
-        messageCreateListener.builder(fEntity)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getIntegration().getDiscord().getDestination())
-                .tag(MessageType.FROM_DISCORD_TO_MINECRAFT)
-                .format(s -> Strings.CS.replace(s.getForMinecraft(), "<name>", nickname))
-                .message(string)
-                .sound(messageCreateListener.getSound())
-                .sendBuilt();
-    }
-
-    private void handleTwitchMessage(DataInputStream input, FEntity fEntity) throws IOException {
-        String nickname = input.readUTF();
-        String channelName = input.readUTF();
-        String string = input.readUTF();
-
-        ChannelMessageListener channelMessageListener = injector.getInstance(ChannelMessageListener.class);
-        channelMessageListener.builder(fEntity)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getIntegration().getTwitch().getDestination())
-                .tag(MessageType.FROM_TWITCH_TO_MINECRAFT)
-                .format(s -> StringUtils.replaceEach(
-                        s.getForMinecraft(),
-                        new String[]{"<name>", "<channel>"},
-                        new String[]{nickname, channelName}
-                ))
-                .message(string)
-                .sound(channelMessageListener.getSound())
-                .sendBuilt();
-    }
-
-    private void handleTelegramMessage(DataInputStream input, FEntity fEntity) throws IOException {
-        String author = input.readUTF();
-        String chat = input.readUTF();
-        String text = input.readUTF();
-
-        MessageListener messageListener = injector.getInstance(MessageListener.class);
-        messageListener.builder(fEntity)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getIntegration().getTelegram().getDestination())
-                .tag(MessageType.FROM_TELEGRAM_TO_MINECRAFT)
-                .format(s -> StringUtils.replaceEach(
-                        s.getForMinecraft(),
-                        new String[]{"<name>", "<chat>"},
-                        new String[]{author, chat}
-                ))
-                .message(text)
-                .sound(messageListener.getSound())
-                .sendBuilt();
-    }
-
     private void handleAdvancement(DataInputStream input, FEntity fEntity) throws IOException {
-        AdvancementModule advancementModule = injector.getInstance(AdvancementModule.class);
-        if (advancementModule.isModuleDisabledFor(fEntity)) return;
+        AdvancementModule module = injector.getInstance(AdvancementModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
 
-        ChatAdvancement chatAdvancement = gson.fromJson(input.readUTF(), ChatAdvancement.class);
+        ChatAdvancement chatAdvancementMetadata = gson.fromJson(input.readUTF(), ChatAdvancement.class);
 
-        advancementModule.builder(fEntity)
+        module.sendMessage(AdvancementMetadata.<Localization.Message.Advancement>builder()
+                .sender(fEntity)
+                .format(s -> module.convert(s, chatAdvancementMetadata))
+                .advancement(chatAdvancementMetadata)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getMessage().getAdvancement().getDestination())
-                .tag(MessageType.ADVANCEMENT)
-                .format((fResolver, s) -> advancementModule.convert(s, chatAdvancement))
-                .tagResolvers(fResolver -> new TagResolver[]{advancementModule.advancementTag(fEntity, fResolver, chatAdvancement)})
-                .sound(advancementModule.getSound())
-                .sendBuilt();
+                .sound(module.getModuleSound())
+                .tagResolvers(fResolver -> new TagResolver[]{module.advancementTag(fEntity, fResolver, chatAdvancementMetadata)})
+                .build()
+        );
     }
 
     private void handleDeath(DataInputStream input, FEntity fEntity) throws IOException {
-        DeathModule deathModule = injector.getInstance(DeathModule.class);
-        if (deathModule.isModuleDisabledFor(fEntity)) return;
+        DeathModule module = injector.getInstance(DeathModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
 
         Death death = gson.fromJson(input.readUTF(), Death.class);
 
-        deathModule.builder(fEntity)
+        module.sendMessage(DeathMetadata.<Localization.Message.Death>builder()
+                .sender(fEntity)
+                .format(s -> s.getTypes().get(death.getKey()))
+                .death(death)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getMessage().getDeath().getDestination())
-                .tag(MessageType.DEATH)
-                .format((fResolver, s) -> s.getTypes().get(death.getKey()))
-                .tagResolvers(fResolver -> new TagResolver[]{deathModule.killerTag(fResolver, death.getKiller()), deathModule.byItemTag(death.getItem())})
-                .sound(deathModule.getSound())
-                .sendBuilt();
+                .sound(module.getModuleSound())
+                .tagResolvers(fResolver -> new TagResolver[]{
+                        module.killerTag(fResolver, death.getKiller()),
+                        module.byItemTag(death.getItem())
+                })
+                .build()
+        );
     }
 
     private void handleJoin(DataInputStream input, FEntity fEntity) throws IOException {
-        JoinModule joinModule = injector.getInstance(JoinModule.class);
-        if (joinModule.isModuleDisabledFor(fEntity)) return;
+        JoinModule module = injector.getInstance(JoinModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
 
         boolean hasPlayedBefore = input.readBoolean();
+        boolean ignoreVanish = input.readBoolean();
 
         Message.Join message = fileResolver.getMessage().getJoin();
 
-        joinModule.builder(fEntity)
-                .tag(MessageType.JOIN)
+        module.sendMessage(JoinMetadata.<Localization.Message.Join>builder()
+                .sender(fEntity)
+                .format(s -> hasPlayedBefore || !message.isFirst() ? s.getFormat() : s.getFormatFirstTime())
+                .ignoreVanish(ignoreVanish)
+                .playedBefore(hasPlayedBefore)
                 .destination(message.getDestination())
                 .range(Range.get(Range.Type.SERVER))
+                .sound(module.getModuleSound())
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.JOIN))
-                .format(s -> hasPlayedBefore || !message.isFirst() ? s.getFormat() : s.getFormatFirstTime())
-                .sound(joinModule.getSound())
-                .sendBuilt();
+                .build()
+        );
     }
 
     private void handleQuit(DataInputStream input, FEntity fEntity) throws IOException {
-        QuitModule quitModule = injector.getInstance(QuitModule.class);
-        if (quitModule.isModuleDisabledFor(fEntity)) return;
+        QuitModule module = injector.getInstance(QuitModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
 
-        quitModule.builder(fEntity)
-                .tag(MessageType.QUIT)
+        boolean ignoreVanish = input.readBoolean();
+
+        module.sendMessage(QuitMetadata.<Localization.Message.Quit>builder()
+                .sender(fEntity)
+                .format(Localization.Message.Quit::getFormat)
+                .ignoreVanish(ignoreVanish)
                 .destination(fileResolver.getMessage().getQuit().getDestination())
                 .range(Range.get(Range.Type.SERVER))
+                .sound(module.getModuleSound())
                 .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.QUIT))
-                .format(Localization.Message.Quit::getFormat)
-                .sound(quitModule.getSound())
-                .sendBuilt();
+                .build()
+        );
     }
 
     private void handleAfk(DataInputStream input, FEntity fEntity) throws IOException {
-        AfkModule afkModule = injector.getInstance(AfkModule.class);
-        if (afkModule.isModuleDisabledFor(fEntity)) return;
+        AfkModule module = injector.getInstance(AfkModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
 
         boolean isAfk = input.readBoolean();
 
-        afkModule.builder(fEntity)
-                .tag(MessageType.AFK)
-                .destination(fileResolver.getMessage().getAfk().getDestination())
-                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.AFK))
+        module.sendMessage(AFKMetadata.<Localization.Message.Afk>builder()
+                .sender(fEntity)
                 .format(s -> isAfk
                         ? s.getFormatFalse().getGlobal()
                         : s.getFormatTrue().getGlobal()
                 )
-                .sound(afkModule.getSound())
-                .sendBuilt();
+                .newStatus(isAfk)
+                .range(Range.get(Range.Type.SERVER))
+                .destination(fileResolver.getMessage().getAfk().getDestination())
+                .sound(module.getModuleSound())
+                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.AFK))
+                .build()
+        );
     }
 
 }

@@ -1,18 +1,18 @@
 package net.flectone.pulse.module.command.dice;
 
-import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.dice.model.DiceMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.RandomUtil;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 
@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 @Singleton
 public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice> {
@@ -29,20 +28,17 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
     private final Permission.Command.Dice permission;
     private final CommandParserProvider commandParserProvider;
     private final RandomUtil randomUtil;
-    private final Gson gson;
 
     @Inject
     public DiceModule(FileResolver fileResolver,
                       CommandParserProvider commandParserProvider,
-                      RandomUtil randomUtil,
-                      Gson gson) {
-        super(localization -> localization.getCommand().getDice(), Command::getDice, fPlayer -> fPlayer.isSetting(FPlayer.Setting.DICE));
+                      RandomUtil randomUtil) {
+        super(localization -> localization.getCommand().getDice(), Command::getDice, fPlayer -> fPlayer.isSetting(FPlayer.Setting.DICE), MessageType.COMMAND_DICE);
 
         this.command = fileResolver.getCommand().getDice();
         this.permission = fileResolver.getPermission().getCommand().getDice();
         this.commandParserProvider = commandParserProvider;
         this.randomUtil = randomUtil;
-        this.gson = gson;
     }
 
     @Override
@@ -80,54 +76,35 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
             cubes.add(randomUtil.nextInt(min, max + 1));
         }
 
-        builder(fPlayer)
+        sendMessage(DiceMetadata.<Localization.Command.Dice>builder()
+                .sender(fPlayer)
+                .cubes(cubes)
+                .format(dice -> replaceResult(cubes, dice.getSymbols(), dice.getFormat()))
                 .range(command.getRange())
                 .destination(command.getDestination())
-                .tag(MessageType.COMMAND_DICE)
-                .format(replaceResult(cubes))
-                .proxy(output -> output.writeUTF(gson.toJson(cubes)))
-                .integration(s -> {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    int sum = 0;
-
-                    Map<Integer, String> symbols = resolveLocalization().getSymbols();
-
-                    for (Integer integer : cubes) {
-                        sum += integer;
-
-                        stringBuilder
-                                .append(symbols.get(integer))
-                                .append(" ");
-                    }
-
-                    return StringUtils.replaceEach(s,
-                            new String[]{"<sum>", "<message>"},
-                            new String[]{String.valueOf(sum), stringBuilder.toString().trim()}
-                    );
-                })
-                .sound(getSound())
-                .sendBuilt();
+                .sound(getModuleSound())
+                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(cubes))
+                .integration(string -> replaceResult(cubes, resolveLocalization().getSymbols(), string))
+                .build()
+        );
     }
 
-    public Function<Localization.Command.Dice, String> replaceResult(List<Integer> cubes) {
-        return message -> {
-            StringBuilder stringBuilder = new StringBuilder();
-            int sum = 0;
+    public String replaceResult(List<Integer> cubes, Map<Integer, String> symbols, String format) {
+        StringBuilder stringBuilder = new StringBuilder();
+        int sum = 0;
 
-            Map<Integer, String> symbols = message.getSymbols();
+        for (Integer integer : cubes) {
+            sum += integer;
 
-            for (Integer integer : cubes) {
-                sum += integer;
+            stringBuilder
+                    .append(symbols.get(integer))
+                    .append(" ");
+        }
 
-                stringBuilder
-                        .append(symbols.get(integer))
-                        .append(" ");
-            }
-
-            return StringUtils.replaceEach(message.getFormat(),
-                    new String[]{"<sum>", "<message>"},
-                    new String[]{String.valueOf(sum), stringBuilder.toString().trim()}
-            );
-        };
+        return StringUtils.replaceEach(
+                format,
+                new String[]{"<sum>", "<message>"},
+                new String[]{String.valueOf(sum), stringBuilder.toString().trim()}
+        );
     }
 }

@@ -1,23 +1,23 @@
 package net.flectone.pulse.module.command.kick;
 
-import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
-import net.flectone.pulse.util.constant.MessageType;
-import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.Optional;
@@ -33,7 +33,6 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
-    private final Gson gson;
 
     @Inject
     public KickModule(FileResolver fileResolver,
@@ -41,9 +40,8 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
                       ModerationService moderationService,
                       ModerationMessageFormatter moderationMessageFormatter,
                       CommandParserProvider commandParserProvider,
-                      MessagePipeline messagePipeline,
-                      Gson gson) {
-        super(localization -> localization.getCommand().getKick(), Command::getKick, fPlayer -> fPlayer.isSetting(FPlayer.Setting.KICK));
+                      MessagePipeline messagePipeline) {
+        super(localization -> localization.getCommand().getKick(), Command::getKick, fPlayer -> fPlayer.isSetting(FPlayer.Setting.KICK), MessageType.COMMAND_KICK);
 
         this.command = fileResolver.getCommand().getKick();
         this.permission = fileResolver.getPermission().getCommand().getKick();
@@ -52,7 +50,6 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         this.moderationMessageFormatter = moderationMessageFormatter;
         this.commandParserProvider = commandParserProvider;
         this.messagePipeline = messagePipeline;
-        this.gson = gson;
     }
 
     @Override
@@ -85,9 +82,12 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         String playerName = getArgument(commandContext, 0);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
         if (!fTarget.isOnline()) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Kick::getNullPlayer)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -100,18 +100,18 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
 
         kick(fPlayer, fTarget, kick);
 
-        builder(fTarget)
+        sendMessage(ModerationMetadata.<Localization.Command.Kick>builder()
+                .sender(fTarget)
+                .format(buildFormat(kick))
+                .moderation(kick)
                 .destination(command.getDestination())
                 .range(command.getRange())
-                .tag(MessageType.COMMAND_KICK)
-                .format(buildFormat(kick))
-                .proxy(output -> {
-                    output.writeUTF(gson.toJson(fTarget));
-                    output.writeUTF(gson.toJson(kick));
-                })
-                .integration(s -> moderationMessageFormatter.replacePlaceholders(s, FPlayer.UNKNOWN, kick))
-                .sound(getSound())
-                .sendBuilt();
+                .sound(getModuleSound())
+                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(kick))
+                .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, kick))
+                .build()
+        );
+
     }
 
     public BiFunction<FPlayer, Localization.Command.Kick, String> buildFormat(Moderation kick) {

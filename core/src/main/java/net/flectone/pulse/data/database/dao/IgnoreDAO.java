@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.IgnoreSQL;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Ignore;
+import net.flectone.pulse.module.command.ignore.model.Ignore;
 import org.jdbi.v3.core.Handle;
 import org.jetbrains.annotations.Nullable;
 

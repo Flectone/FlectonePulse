@@ -6,16 +6,17 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.util.Destination;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.module.message.tab.footer.listener.FooterPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,7 +38,7 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
                         TaskScheduler taskScheduler,
                         ListenerRegistry listenerRegistry,
                         PacketSender packetSender) {
-        super(module -> module.getMessage().getTab().getFooter());
+        super(module -> module.getMessage().getTab().getFooter(), MessageType.FOOTER);
 
         this.message = fileResolver.getMessage().getTab().getFooter();
         this.permission = fileResolver.getPermission().getMessage().getTab().getFooter();
@@ -74,10 +75,12 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
         String format = getNextMessage(fPlayer, message.isRandom());
         if (StringUtils.isEmpty(format)) return;
 
-        builder(fPlayer)
+        sendMessage(metadataBuilder()
+                .sender(fPlayer)
                 .format(format)
                 .destination(message.getDestination())
-                .sendBuilt();
+                .build()
+        );
     }
 
     @Override

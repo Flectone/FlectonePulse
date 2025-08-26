@@ -1,24 +1,24 @@
 package net.flectone.pulse.module.command.warn;
 
-import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
-import net.flectone.pulse.util.constant.MessageType;
-import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -40,7 +40,6 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
     private final CommandParserProvider commandParserProvider;
     private final PlatformServerAdapter platformServerAdapter;
     private final ProxySender proxySender;
-    private final Gson gson;
 
     @Inject
     public WarnModule(FileResolver fileResolver,
@@ -49,9 +48,8 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
                       ModerationMessageFormatter moderationMessageFormatter,
                       CommandParserProvider commandParserProvider,
                       PlatformServerAdapter platformServerAdapter,
-                      ProxySender proxySender,
-                      Gson gson) {
-        super(localization -> localization.getCommand().getWarn(), Command::getWarn, fPlayer -> fPlayer.isSetting(FPlayer.Setting.WARN));
+                      ProxySender proxySender) {
+        super(localization -> localization.getCommand().getWarn(), Command::getWarn, fPlayer -> fPlayer.isSetting(FPlayer.Setting.WARN), MessageType.COMMAND_WARN);
 
         this.command = fileResolver.getCommand().getWarn();
         this.permission = fileResolver.getPermission().getCommand().getWarn();
@@ -61,7 +59,6 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         this.commandParserProvider = commandParserProvider;
         this.platformServerAdapter = platformServerAdapter;
         this.proxySender = proxySender;
-        this.gson = gson;
     }
 
     @Override
@@ -102,17 +99,23 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         long time = timeReasonPair.first() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.first();
 
         if (time < 1) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Warn::getNullTime)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Warn::getNullPlayer)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -124,18 +127,17 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
         proxySender.send(fTarget, MessageType.SYSTEM_WARN, dataOutputStream -> {});
 
-        builder(fTarget)
+        sendMessage(ModerationMetadata.<Localization.Command.Warn>builder()
+                .sender(fTarget)
+                .format(buildFormat(warn))
+                .moderation(warn)
                 .range(command.getRange())
                 .destination(command.getDestination())
-                .tag(MessageType.COMMAND_WARN)
-                .format(buildFormat(warn))
-                .proxy(output -> {
-                    output.writeUTF(gson.toJson(fPlayer));
-                    output.writeUTF(gson.toJson(warn));
-                })
-                .integration(s -> moderationMessageFormatter.replacePlaceholders(s, FPlayer.UNKNOWN, warn))
-                .sound(getSound())
-                .sendBuilt();
+                .sound(getModuleSound())
+                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(warn))
+                .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, warn))
+                .build()
+        );
 
         send(fPlayer, fTarget, warn);
 
@@ -159,9 +161,10 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
     public void send(FEntity fModerator, FPlayer fReceiver, Moderation warn) {
         if (isModuleDisabledFor(fModerator)) return;
 
-        builder(fReceiver)
+        sendMessage(metadataBuilder()
+                .sender(fReceiver)
                 .format(s -> moderationMessageFormatter.replacePlaceholders(s.getPerson(), fReceiver, warn))
-                .sound(getSound())
-                .sendBuilt();
+                .build()
+        );
     }
 }

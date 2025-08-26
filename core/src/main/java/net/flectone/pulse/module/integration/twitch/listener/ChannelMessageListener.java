@@ -5,6 +5,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.module.integration.twitch.model.TwitchMetadata;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
@@ -42,24 +44,27 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
 
     @Async
     public void sendMessage(String nickname, String channel, String message) {
-        builder(FPlayer.UNKNOWN)
-                .range(Range.get(Range.Type.PROXY))
-                .destination(integration.getDestination())
-                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.TWITCH))
-                .tag(MessageType.FROM_TWITCH_TO_MINECRAFT)
+        sendMessage(TwitchMetadata.<Localization.Integration.Twitch>builder()
+                .sender(FPlayer.UNKNOWN)
                 .format(s -> StringUtils.replaceEach(
                         s.getForMinecraft(),
                         new String[]{"<name>", "<channel>"},
                         new String[]{String.valueOf(nickname), String.valueOf(channel)}
                 ))
+                .nickname(nickname)
+                .channel(channel)
                 .message(message)
-                .proxy(output -> {
-                    output.writeUTF(nickname);
-                    output.writeUTF(channel);
-                    output.writeUTF(message);
-                })
-                .integration()
-                .sendBuilt();
+                .range(Range.get(Range.Type.PROXY))
+                .destination(integration.getDestination())
+                .sound(getModuleSound())
+                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.TWITCH))
+                .integration(string -> StringUtils.replaceEach(
+                        string,
+                        new String[]{"<name>", "<channel>"},
+                        new String[]{nickname, channel}
+                ))
+                .build()
+        );
     }
 
     @Override

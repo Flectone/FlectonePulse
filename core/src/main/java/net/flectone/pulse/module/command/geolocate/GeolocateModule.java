@@ -2,16 +2,18 @@ package net.flectone.pulse.module.command.geolocate;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.geolocate.model.GeolocateMetadata;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -39,7 +41,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
                            FPlayerService fPlayerService,
                            PlatformPlayerAdapter platformPlayerAdapter,
                            CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getGeolocate(), Command::getGeolocate);
+        super(localization -> localization.getCommand().getGeolocate(), Command::getGeolocate, MessageType.COMMAND_GEOLOCATE);
 
         this.command = fileResolver.getCommand().getGeolocate();
         this.permission = fileResolver.getPermission().getCommand().getGeolocate();
@@ -73,31 +75,41 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
 
         if (fTarget.isUnknown()) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Geolocate::getNullPlayer)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
         String ip = platformPlayerAdapter.isOnline(fTarget) ? platformPlayerAdapter.getIp(fTarget) : fTarget.getIp();
 
-        List<String> request = ip == null ? List.of() : readResponse(Strings.CS.replace(apiUrl, "<ip>", ip));
-        if (request.isEmpty() || request.get(0).equals("fail")) {
-            builder(fPlayer)
+        List<String> response = ip == null ? List.of() : readResponse(Strings.CS.replace(apiUrl, "<ip>", ip));
+        if (response.isEmpty() || response.get(0).equals("fail")) {
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Geolocate::getNullOrError)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
-        builder(fTarget)
-                .destination(command.getDestination())
+        sendMessage(GeolocateMetadata.<Localization.Command.Geolocate>builder()
+                .sender(fTarget)
                 .receiver(fPlayer)
-                .format(s -> StringUtils.replaceEach(s.getFormat(),
+                .format(geolocate -> StringUtils.replaceEach(geolocate.getFormat(),
                         new String[]{"<country>", "<region_name>", "<city>", "<timezone>", "<mobile>", "<proxy>", "<hosting>", "<query>"},
-                        new String[]{request.get(1), request.get(2), request.get(3), request.get(4), request.get(5), request.get(6), request.get(7), request.get(8)}
+                        new String[]{response.get(1), response.get(2), response.get(3), response.get(4), response.get(5), response.get(6), response.get(7), response.get(8)}
                 ))
-                .sound(getSound())
-                .sendBuilt();
+                .response(response)
+                .destination(command.getDestination())
+                .sound(getModuleSound())
+                .build()
+        );
+
     }
 
     private List<String> readResponse(String url) {

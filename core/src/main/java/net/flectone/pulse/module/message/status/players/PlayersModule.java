@@ -13,6 +13,7 @@ import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.status.players.listener.PlayersPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class PlayersModule extends AbstractModuleLocalization<Localization.Messa
                          PermissionChecker permissionChecker,
                          PlatformServerAdapter platformServerAdapter,
                          ListenerRegistry listenerRegistry) {
-        super(module -> module.getMessage().getStatus().getPlayers());
+        super(module -> module.getMessage().getStatus().getPlayers(), MessageType.PLAYERS);
 
         this.message = fileResolver.getMessage().getStatus().getPlayers();
         this.permission = fileResolver.getPermission().getMessage().getStatus().getPlayers();

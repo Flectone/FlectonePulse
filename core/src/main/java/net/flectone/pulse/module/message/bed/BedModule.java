@@ -9,8 +9,10 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.bed.listener.BedPulseListener;
+import net.flectone.pulse.module.message.bed.model.BedMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 
 @Singleton
@@ -23,7 +25,7 @@ public class BedModule extends AbstractModuleLocalization<Localization.Message.B
     @Inject
     public BedModule(FileResolver fileResolver,
                      ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getBed());
+        super(localization -> localization.getMessage().getBed(), MessageType.BED);
 
         this.message = fileResolver.getMessage().getBed();
         this.permission = fileResolver.getPermission().getMessage().getBed();
@@ -48,8 +50,8 @@ public class BedModule extends AbstractModuleLocalization<Localization.Message.B
     public void send(FPlayer fPlayer, MinecraftTranslationKey minecraftTranslationKey) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        builder(fPlayer)
-                .destination(message.getDestination())
+        sendMessage(BedMetadata.<Localization.Message.Bed>builder()
+                .sender(fPlayer)
                 .receiver(fPlayer)
                 .format(bed -> switch (minecraftTranslationKey) {
                     case BLOCK_MINECRAFT_BED_NO_SLEEP, TILE_BED_NO_SLEEP -> bed.getNoSleep();
@@ -59,8 +61,11 @@ public class BedModule extends AbstractModuleLocalization<Localization.Message.B
                     case BLOCK_MINECRAFT_BED_TOO_FAR_AWAY -> bed.getTooFarAway();
                     default -> "";
                 })
-                .sound(getSound())
-                .sendBuilt();
+                .translationKey(minecraftTranslationKey)
+                .destination(message.getDestination())
+                .sound(getModuleSound())
+                .build()
+        );
     }
 }
 

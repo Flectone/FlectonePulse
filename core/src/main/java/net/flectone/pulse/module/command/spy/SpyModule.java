@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.spy;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.module.command.spy.model.SpyMetadata;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -18,6 +19,7 @@ import org.incendo.cloud.context.CommandContext;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @Singleton
 public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
@@ -31,7 +33,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
     public SpyModule(FileResolver fileResolver,
                      FPlayerService fPlayerService,
                      PermissionChecker permissionChecker) {
-        super(localization -> localization.getCommand().getSpy(), Command::getSpy);
+        super(localization -> localization.getCommand().getSpy(), Command::getSpy, MessageType.COMMAND_SPY);
 
         this.command = fileResolver.getCommand().getSpy();
         this.permission = fileResolver.getPermission().getCommand().getSpy();
@@ -56,17 +58,22 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
         if (checkCooldown(fPlayer)) return;
         if (isModuleDisabledFor(fPlayer)) return;
 
-        if (fPlayer.isSetting(FPlayer.Setting.SPY)) {
+        boolean turnedBefore = fPlayer.isSetting(FPlayer.Setting.SPY);
+        if (turnedBefore) {
             fPlayerService.deleteSetting(fPlayer, FPlayer.Setting.SPY);
         } else {
             fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.SPY, "");
         }
 
-        builder(fPlayer)
+        sendMessage(SpyMetadata.<Localization.Command.Spy>builder()
+                .sender(fPlayer)
+                .format(s -> !turnedBefore ? s.getFormatTrue() : s.getFormatFalse())
+                .turned(!turnedBefore)
+                .action("turning")
                 .destination(command.getDestination())
-                .format(s -> fPlayer.isSetting(FPlayer.Setting.SPY) ? s.getFormatTrue() : s.getFormatFalse())
-                .sound(getSound())
-                .sendBuilt();
+                .sound(getModuleSound())
+                .build()
+        );
     }
 
     public void checkChat(FPlayer fPlayer, String chat, String message) {
@@ -79,29 +86,36 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
         spy(fPlayer, chat, message);
     }
 
-    public void spy(FPlayer fPlayer, String action, String string) {
+    public void spy(FPlayer fPlayer, String action, String message) {
         if (!isEnable()) return;
 
-        builder(fPlayer)
+        sendMessage(SpyMetadata.<Localization.Command.Spy>builder()
+                .sender(fPlayer)
+                .format(replaceAction(action))
+                .turned(true)
+                .action(action)
                 .range(command.getRange())
                 .destination(command.getDestination())
-                .filter(fReceiver -> !fPlayer.equals(fReceiver))
-                .filter(fReceiver -> permissionChecker.check(fReceiver, getModulePermission()))
-                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.SPY))
-                .filter(FPlayer::isOnline)
-                .tag(MessageType.COMMAND_SPY)
-                .format(replaceAction(action))
-                .message(string)
-                .proxy(output -> {
-                    output.writeUTF(action);
-                    output.writeUTF(string);
+                .message(message)
+                .filter(createFilter(fPlayer))
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeString(action);
+                    dataOutputStream.writeString(message);
                 })
-                .integration(s -> StringUtils.replaceEach(
-                        s,
+                .integration(string -> StringUtils.replaceEach(
+                        string,
                         new String[]{"<action>", "<message>"},
-                        new String[]{action, string}
+                        new String[]{action, message}
                 ))
-                .sendBuilt();
+                .build()
+        );
+    }
+
+    private Predicate<FPlayer> createFilter(FPlayer fPlayer) {
+        return fReceiver -> !fPlayer.equals(fReceiver)
+                && permissionChecker.check(fReceiver, getModulePermission())
+                && fReceiver.isSetting(FPlayer.Setting.SPY)
+                && fPlayer.isOnline();
     }
 
     public Function<Localization.Command.Spy, String> replaceAction(String action) {

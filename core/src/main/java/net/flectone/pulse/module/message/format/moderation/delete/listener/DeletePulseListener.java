@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
@@ -65,10 +66,11 @@ public class DeletePulseListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.MONITOR)
     public void onSenderToReceiverMessageEvent(SenderToReceiverMessageEvent event) {
-        if (event.getDestination().getType() != Destination.Type.CHAT) return;
+        EventMetadata eventMetadata = event.getEventMetadata();
+        if (eventMetadata.getDestination().getType() != Destination.Type.CHAT) return;
 
         FPlayer fReceiver = event.getReceiver();
-        UUID messageUUID = event.getMessageUUID();
+        UUID messageUUID = eventMetadata.getMessageUUID();
         Component component = event.getMessage();
 
         deleteModule.save(fReceiver, messageUUID, component, true);

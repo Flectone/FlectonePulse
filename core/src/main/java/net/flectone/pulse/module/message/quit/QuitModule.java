@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
@@ -26,7 +27,7 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
     public QuitModule(FileResolver fileResolver,
                       IntegrationModule integrationModule,
                       ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getQuit());
+        super(localization -> localization.getMessage().getQuit(), MessageType.QUIT);
 
         this.message = fileResolver.getMessage().getQuit();
         this.permission = fileResolver.getPermission().getMessage().getQuit();
@@ -52,16 +53,19 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
     public void send(FPlayer fPlayer, boolean ignoreVanish) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        builder(fPlayer)
-                .tag(MessageType.QUIT)
+        sendMessage(QuitMetadata.<Localization.Message.Quit>builder()
+                .sender(fPlayer)
+                .format(Localization.Message.Quit::getFormat)
+                .ignoreVanish(ignoreVanish)
                 .destination(message.getDestination())
                 .range(message.getRange())
-                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.QUIT))
-                .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
-                .format(Localization.Message.Quit::getFormat)
+                .sound(getModuleSound())
+                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.QUIT)
+                        && (ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
+                )
                 .integration()
-                .proxy()
-                .sound(getSound())
-                .sendBuilt();
+                .proxy(dataOutputStream -> dataOutputStream.writeBoolean(ignoreVanish))
+                .build()
+        );
     }
 }

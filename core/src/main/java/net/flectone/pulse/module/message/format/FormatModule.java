@@ -25,6 +25,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.AdventureTag;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 
@@ -45,7 +46,7 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
     public FormatModule(FileResolver fileResolver,
                         ListenerRegistry listenerRegistry,
                         PermissionChecker permissionChecker) {
-        super(localization -> localization.getMessage().getFormat());
+        super(localization -> localization.getMessage().getFormat(), MessageType.FORMAT);
 
         this.message = fileResolver.getMessage().getFormat();
         this.permission = fileResolver.getPermission().getMessage().getFormat();

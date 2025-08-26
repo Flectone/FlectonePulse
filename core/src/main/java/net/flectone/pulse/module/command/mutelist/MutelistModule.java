@@ -9,7 +9,6 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
-import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unmute.UnmuteModule;
@@ -49,7 +48,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
                           MessagePipeline messagePipeline,
                           CommandParserProvider commandParserProvider,
                           EventDispatcher eventDispatcher) {
-        super(localization -> localization.getCommand().getMutelist(), Command::getMutelist);
+        super(localization -> localization.getCommand().getMutelist(), Command::getMutelist, MessageType.COMMAND_MUTELIST);
 
         this.command = fileResolver.getCommand().getMutelist();
         this.permission = fileResolver.getPermission().getCommand().getMutelist();
@@ -110,9 +109,12 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
 
                 targetFPlayer = fPlayerService.getFPlayer(playerName);
                 if (targetFPlayer.isUnknown()) {
-                    builder(fPlayer)
+                    sendMessage(metadataBuilder()
+                            .sender(fPlayer)
                             .format(Localization.Command.Mutelist::getNullPlayer)
-                            .sendBuilt();
+                            .build()
+                    );
+
                     return;
                 }
 
@@ -126,9 +128,12 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
                 : moderationService.getValidMutes(targetFPlayer);
 
         if (moderationList.isEmpty()) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Mutelist::getEmpty)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -137,9 +142,12 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Mutelist::getNullPage)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 

@@ -1,7 +1,6 @@
 package net.flectone.pulse.module.message.death;
 
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDeathCombatEvent;
-import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
@@ -13,12 +12,12 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.message.death.model.metadata.DeathMetadata;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.death.listener.DeathPacketListener;
 import net.flectone.pulse.module.message.death.listener.DeathPulseListener;
 import net.flectone.pulse.module.message.death.model.Death;
+import net.flectone.pulse.module.message.death.model.DeathMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.resolver.FileResolver;
@@ -44,7 +43,6 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
-    private final Gson gson;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     @Inject
@@ -53,9 +51,8 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
                        PacketSender packetSender,
                        FPlayerService fPlayerService,
                        ListenerRegistry listenerRegistry,
-                       IntegrationModule integrationModule,
-                       Gson gson) {
-        super(localization -> localization.getMessage().getDeath());
+                       IntegrationModule integrationModule) {
+        super(localization -> localization.getMessage().getDeath(), MessageType.DEATH);
 
         this.message = fileResolver.getMessage().getDeath();
         this.permission = fileResolver.getPermission().getMessage().getDeath();
@@ -64,7 +61,6 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
         this.integrationModule = integrationModule;
-        this.gson = gson;
     }
 
     @Override
@@ -88,35 +84,46 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
         if (fTarget == null) return;
 
         if (!death.isPlayer()) {
-            builder(fTarget)
-                    .tag(MessageType.DEATH)
-                    .destination(message.getDestination())
-                    .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DEATH))
-                    .filter(fPlayer -> integrationModule.canSeeVanished(fTarget, fPlayer))
+            sendMessage(DeathMetadata.<Localization.Message.Death>builder()
+                    .sender(fTarget)
                     .receiver(fReceiver)
                     .format(s -> s.getTypes().get(death.getKey()))
-                    .tagResolvers(fResolver -> new TagResolver[]{killerTag(fResolver, death.getKiller()), byItemTag(death.getItem())})
-                    .sound(getSound())
-                    .metadata(new DeathMetadata(death))
-                    .sendBuilt();
+                    .death(death)
+                    .destination(message.getDestination())
+                    .sound(getModuleSound())
+                    .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DEATH)
+                            && integrationModule.canSeeVanished(fTarget, fPlayer)
+                    )
+                    .tagResolvers(fResolver -> new TagResolver[]{
+                            killerTag(fResolver, death.getKiller()),
+                            byItemTag(death.getItem())
+                    })
+                    .build()
+            );
+
             return;
         }
 
         if (!fTarget.equals(fReceiver)) return;
 
-        builder(fTarget)
-                .tag(MessageType.DEATH)
+        sendMessage(DeathMetadata.<Localization.Message.Death>builder()
+                .sender(fTarget)
+                .format(s -> s.getTypes().get(death.getKey()))
+                .death(death)
                 .range(message.getRange())
                 .destination(message.getDestination())
-                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DEATH))
-                .filter(fPlayer -> integrationModule.canSeeVanished(fTarget, fPlayer))
-                .format(s -> s.getTypes().get(death.getKey()))
-                .tagResolvers(fResolver -> new TagResolver[]{killerTag(fResolver, death.getKiller()), byItemTag(death.getItem())})
-                .proxy(output -> output.writeUTF(gson.toJson(death)))
+                .sound(getModuleSound())
+                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DEATH)
+                        && integrationModule.canSeeVanished(fTarget, fPlayer)
+                )
+                .tagResolvers(fResolver -> new TagResolver[]{
+                        killerTag(fResolver, death.getKiller()),
+                        byItemTag(death.getItem())
+                })
+                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(death))
                 .integration()
-                .sound(getSound())
-                .metadata(new DeathMetadata(death))
-                .sendBuilt();
+                .build()
+        );
 
         if (!death.isPlayer()) return;
         if (fTarget instanceof FPlayer player && !player.isSetting(FPlayer.Setting.DEATH)) return;

@@ -177,7 +177,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         Component component = itemStack.getCustomName() == null
                 || itemStack.getCustomName().getString().isBlank()
                 ? createTranslatableItemName(itemStack, translatable)
-                : Component.text(itemStack.getCustomName().getString()).decorate(TextDecoration.ITALIC);
+                : createItemMetaName(itemStack);
 
         Key key = Key.key(itemStack.getRegistryEntry().getIdAsString());
         return component.hoverEvent(HoverEvent.showItem(key, itemStack.getCount()));
