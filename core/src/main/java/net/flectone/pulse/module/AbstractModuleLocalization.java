@@ -252,8 +252,6 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     public void sendMessage(MessageType messageType, List<FPlayer> receivers, EventMetadata<M> eventMetadata) {
         if (receivers.isEmpty()) return;
 
-        FEntity sender = eventMetadata.getSender();
-
         receivers.forEach(receiver -> {
             // example
             // format: TheFaser > <message>
@@ -272,7 +270,6 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
 
             eventDispatcher.dispatch(new MessageSendEvent(
                     messageType,
-                    sender,
                     receiver,
                     formatComponent,
                     subComponent,

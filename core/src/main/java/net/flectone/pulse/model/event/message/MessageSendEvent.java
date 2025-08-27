@@ -25,13 +25,12 @@ public class MessageSendEvent extends Event {
     private final EventMetadata<?> eventMetadata;
 
     public MessageSendEvent(MessageType messageType,
-                            FEntity sender,
                             FPlayer receiver,
                             Component message,
                             Component submessage,
                             EventMetadata<?> eventMetadata) {
         this.messageType = messageType;
-        this.sender = sender;
+        this.sender = eventMetadata.getSender();
         this.receiver = receiver;
         this.message = message;
         this.submessage = submessage;
@@ -40,23 +39,8 @@ public class MessageSendEvent extends Event {
 
     public MessageSendEvent(MessageType messageType,
                             FPlayer sender,
-                            Component message,
-                            Component submessage,
-                            EventMetadata<?> eventMetadata) {
-        this(messageType, sender, sender, message, submessage, eventMetadata);
-    }
-
-    public MessageSendEvent(MessageType messageType,
-                            FPlayer sender,
-                            Component message,
-                            EventMetadata<?> eventMetadata) {
-        this(messageType, sender, message, Component.empty(), eventMetadata);
-    }
-
-    public MessageSendEvent(MessageType messageType,
-                            FPlayer sender,
                             Component message) {
-        this(messageType, sender, message, EventMetadata.empty());
+        this(messageType, sender, message, Component.empty(), EventMetadata.builder().sender(sender).format("").build());
     }
 
 }
