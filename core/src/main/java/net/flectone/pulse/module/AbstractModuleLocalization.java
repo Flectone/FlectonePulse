@@ -2,6 +2,7 @@ package net.flectone.pulse.module;
 
 import com.google.inject.Inject;
 import lombok.Getter;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
@@ -249,6 +250,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         sendMessage(this.messageType, receivers, eventMetadata);
     }
 
+    @Async
     public void sendMessage(MessageType messageType, List<FPlayer> receivers, EventMetadata<M> eventMetadata) {
         if (receivers.isEmpty()) return;
 
