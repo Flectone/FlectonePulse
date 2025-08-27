@@ -252,28 +252,28 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     public void sendMessage(MessageType messageType, List<FPlayer> receivers, EventMetadata<M> eventMetadata) {
         if (receivers.isEmpty()) return;
 
-        FEntity fPlayer = eventMetadata.getSender();
+        FEntity sender = eventMetadata.getSender();
 
-        receivers.forEach(recipient -> {
+        receivers.forEach(receiver -> {
             // example
             // format: TheFaser > <message>
             // message: hello world!
             // final formatted message: TheFaser > hello world!
-            Component messageComponent = buildMessageComponent(eventMetadata);
-            Component formatComponent = buildFormatComponent(eventMetadata, messageComponent);
+            Component messageComponent = buildMessageComponent(receiver, eventMetadata);
+            Component formatComponent = buildFormatComponent(receiver, eventMetadata, messageComponent);
 
             // destination subtext
             Component subComponent = Component.empty();
             Destination destination = eventMetadata.getDestination();
             if (destination.getType() == Destination.Type.TITLE
                     || destination.getType() == Destination.Type.SUBTITLE) {
-                subComponent = buildSubcomponent(eventMetadata, messageComponent);
+                subComponent = buildSubcomponent(receiver, eventMetadata, messageComponent);
             }
 
             eventDispatcher.dispatch(new MessageSendEvent(
                     messageType,
-                    fPlayer,
-                    recipient,
+                    sender,
+                    receiver,
                     formatComponent,
                     subComponent,
                     eventMetadata
@@ -281,22 +281,21 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         });
     }
 
-    private Component buildSubcomponent(EventMetadata<M> eventMetadata, Component message) {
+    private Component buildSubcomponent(FPlayer receiver, EventMetadata<M> eventMetadata, Component message) {
         Destination destination = eventMetadata.getDestination();
         return destination.getSubtext().isEmpty()
                 ? Component.empty()
-                : messagePipeline.builder(eventMetadata.getSender(), eventMetadata.getReceiver(), destination.getSubtext())
+                : messagePipeline.builder(eventMetadata.getSender(), receiver, destination.getSubtext())
                 .flag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
                 .tagResolvers(messageTag(message))
                 .build();
     }
 
-    private Component buildMessageComponent(EventMetadata<M> eventMetadata) {
+    private Component buildMessageComponent(FPlayer receiver, EventMetadata<M> eventMetadata) {
         String message = eventMetadata.getMessage();
         if (StringUtils.isEmpty(message)) return Component.empty();
 
         FEntity sender = eventMetadata.getSender();
-        FPlayer receiver = eventMetadata.getReceiver();
         boolean senderColorOut = eventMetadata.isSenderColorOut();
 
         MessagePipeline.Builder messageBuilder = messagePipeline.builder(sender, receiver, message)
@@ -307,9 +306,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         return messageBuilder.build();
     }
 
-    private Component buildFormatComponent(EventMetadata<M> eventMetadata, Component message) {
-        FPlayer receiver = eventMetadata.getReceiver();
-
+    private Component buildFormatComponent(FPlayer receiver, EventMetadata<M> eventMetadata, Component message) {
         String formatContent = eventMetadata.resolveFormat(receiver, resolveLocalization(receiver));
         if (StringUtils.isEmpty(formatContent)) return Component.empty();
 
