@@ -5,13 +5,14 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
     public AutoModule(FileResolver fileResolver,
                       TaskScheduler taskScheduler,
                       FPlayerService fPlayerService) {
-        super(localization -> localization.getMessage().getAuto());
+        super(localization -> localization.getMessage().getAuto(), MessageType.AUTO);
 
         this.message = fileResolver.getMessage().getAuto();
         this.permission = fileResolver.getPermission().getMessage().getAuto();
@@ -65,12 +66,14 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
         String format = getNextMessage(fPlayer, type.isRandom(), messages);
         if (StringUtils.isEmpty(format)) return;
 
-        builder(fPlayer)
-                .destination(type.getDestination())
-                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.AUTO))
+        sendMessage(metadataBuilder()
+                .sender(fPlayer)
                 .format(format)
+                .destination(type.getDestination())
                 .sound(sound)
-                .sendBuilt();
+                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.AUTO))
+                .build()
+        );
     }
 
     @Override

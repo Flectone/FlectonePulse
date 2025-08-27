@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.ban.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.model.event.ModerationMetadata;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
@@ -67,14 +68,17 @@ public class BanPulseListener implements PulseListener {
             event.setKickReason(reason);
 
             if (command.isShowConnectionAttempts()) {
-                banModule.builder(fPlayer)
-                        .range(Range.get(Range.Type.SERVER))
-                        .filter(filter -> permissionChecker.check(filter, banModule.getModulePermission()))
+                banModule.sendMessage(ModerationMetadata.<Localization.Command.Ban>builder()
+                        .sender(fPlayer)
                         .format((fReceiver, message) -> {
                             String format = message.getConnectionAttempt();
                             return moderationMessageFormatter.replacePlaceholders(format, fReceiver, ban);
                         })
-                        .sendBuilt();
+                        .moderation(ban)
+                        .range(Range.get(Range.Type.SERVER))
+                        .filter(filter -> permissionChecker.check(filter, banModule.getModulePermission()))
+                        .build()
+                );
             }
         }
     }

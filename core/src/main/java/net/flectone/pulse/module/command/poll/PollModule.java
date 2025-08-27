@@ -1,25 +1,25 @@
 package net.flectone.pulse.module.command.poll;
 
-import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.poll.model.Poll;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.module.command.poll.model.PollMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +45,6 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     private final TaskScheduler taskScheduler;
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
-    private final Gson gson;
 
     @Inject
     public PollModule(FileResolver fileResolver,
@@ -53,9 +52,8 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                       ProxySender proxySender,
                       TaskScheduler taskScheduler,
                       CommandParserProvider commandParserProvider,
-                      MessagePipeline messagePipeline,
-                      Gson gson) {
-        super(localization -> localization.getCommand().getPoll(), Command::getPoll, fPlayer -> fPlayer.isSetting(FPlayer.Setting.POLL));
+                      MessagePipeline messagePipeline) {
+        super(localization -> localization.getCommand().getPoll(), Command::getPoll, fPlayer -> fPlayer.isSetting(FPlayer.Setting.POLL), MessageType.COMMAND_POLL);
 
         this.command = fileResolver.getCommand().getPoll();
         this.permission = fileResolver.getPermission().getCommand().getPoll();
@@ -65,7 +63,6 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         this.taskScheduler = taskScheduler;
         this.commandParserProvider = commandParserProvider;
         this.messagePipeline = messagePipeline;
-        this.gson = gson;
     }
 
     @Override
@@ -117,12 +114,13 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 FPlayer fPlayer = fPlayerService.getFPlayer(poll.getCreator());
                 Range range = command.getRange();
 
-                builder(fPlayer)
-                        .range(range)
-                        .tag(MessageType.COMMAND_POLL_CREATE_MESSAGE)
+                sendMessage(MessageType.COMMAND_POLL, PollMetadata.<Localization.Command.Poll>builder()
                         .format(resolvePollFormat(fPlayer, poll, status))
-                        .message((fResolver, s) -> poll.getTitle())
-                        .sendBuilt();
+                        .poll(poll)
+                        .range(range)
+                        .message(poll.getTitle())
+                        .build()
+                );
             });
 
             toRemove.forEach(pollMap::remove);
@@ -208,14 +206,17 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
         Range range = command.getRange();
 
-        builder(fPlayer)
-                .range(range)
-                .tag(MessageType.COMMAND_POLL_CREATE_MESSAGE)
+        sendMessage(PollMetadata.<Localization.Command.Poll>builder()
+                .sender(fPlayer)
                 .format(resolvePollFormat(fPlayer, poll, Status.START))
-                .message((fResolver, s) -> poll.getTitle())
-                .proxy(output -> output.writeUTF(gson.toJson(poll)))
+                .poll(poll)
+                .range(range)
+                .message(poll.getTitle())
+                .sound(getModuleSound())
+                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(poll))
                 .integration()
-                .sendBuilt();
+                .build()
+        );
     }
 
     public void saveAndUpdateLast(Poll poll) {
@@ -229,35 +230,45 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
         Poll poll = pollMap.get(id);
         if (poll == null) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Poll::getNullPoll)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
         if (poll.isEnded()) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Poll::getExpired)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
         int voteType = poll.vote(fPlayer, numberVote);
 
         if (voteType == -1) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Poll::getAlready)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
         int count = poll.getCountAnswers()[numberVote];
         int pollID = poll.getId();
 
-        builder(fPlayer)
+        sendMessage(MessageType.COMMAND_POLL_VOTE, metadataBuilder()
+                .sender(fPlayer)
                 .format(resolveVote(voteType, numberVote, pollID, count))
-                .sound(getSound())
-                .sendBuilt();
+                .build()
+        );
     }
 
     public Function<Localization.Command.Poll, String> resolveVote(int voteType, int answerID, int pollID, int count) {

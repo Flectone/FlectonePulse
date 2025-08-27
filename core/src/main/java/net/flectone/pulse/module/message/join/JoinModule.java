@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.join;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.module.message.join.model.JoinMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
@@ -29,7 +30,7 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
                       PlatformPlayerAdapter platformPlayerAdapter,
                       IntegrationModule integrationModule,
                       ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getJoin());
+        super(localization -> localization.getMessage().getJoin(), MessageType.JOIN);
 
         this.message = fileResolver.getMessage().getJoin();
         this.permission = fileResolver.getPermission().getMessage().getJoin();
@@ -62,16 +63,23 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
 
         boolean hasPlayedBefore = platformPlayerAdapter.hasPlayedBefore(fPlayer);
 
-        builder(fPlayer)
-                .tag(MessageType.JOIN)
+        sendMessage(JoinMetadata.<Localization.Message.Join>builder()
+                .sender(fPlayer)
+                .format(s -> hasPlayedBefore || !message.isFirst() ? s.getFormat() : s.getFormatFirstTime())
+                .ignoreVanish(ignoreVanish)
+                .playedBefore(hasPlayedBefore)
                 .destination(message.getDestination())
                 .range(message.getRange())
-                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.JOIN))
-                .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
-                .format(s -> hasPlayedBefore || !message.isFirst() ? s.getFormat() : s.getFormatFirstTime())
-                .proxy(dataOutputStream -> dataOutputStream.writeBoolean(hasPlayedBefore))
+                .sound(getModuleSound())
+                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.JOIN)
+                        && (ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
+                )
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeBoolean(hasPlayedBefore);
+                    dataOutputStream.writeBoolean(ignoreVanish);
+                })
                 .integration()
-                .sound(getSound())
-                .sendBuilt();
+                .build()
+        );
     }
 }

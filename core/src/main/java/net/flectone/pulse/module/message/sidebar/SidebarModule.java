@@ -23,6 +23,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 
 import java.util.*;
@@ -49,7 +50,7 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
                          PacketSender packetSender,
                          ListenerRegistry listenerRegistry,
                          PacketProvider packetProvider) {
-        super(localization -> localization.getMessage().getSidebar());
+        super(localization -> localization.getMessage().getSidebar(), MessageType.SIDEBAR);
 
         this.message = fileResolver.getMessage().getSidebar();
         this.permission = fileResolver.getPermission().getMessage().getSidebar();

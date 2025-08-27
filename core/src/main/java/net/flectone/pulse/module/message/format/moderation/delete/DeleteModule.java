@@ -17,6 +17,7 @@ import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.Strings;
@@ -49,7 +50,7 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
                         MessagePipeline messagePipeline,
                         FPlayerService fPlayerService,
                         MessageSender messageSender) {
-        super(localization -> localization.getMessage().getFormat().getModeration().getDelete());
+        super(localization -> localization.getMessage().getFormat().getModeration().getDelete(), MessageType.DELETE);
 
         this.message = fileResolver.getMessage().getFormat().getModeration().getDelete();
         this.permission = fileResolver.getPermission().getMessage().getFormat().getModeration().getDelete();

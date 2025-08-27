@@ -17,6 +17,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -47,7 +48,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
                          MessagePipeline messagePipeline,
                          EventDispatcher eventDispatcher,
                          CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getBanlist(), Command::getBanlist);
+        super(localization -> localization.getCommand().getBanlist(), Command::getBanlist, MessageType.COMMAND_BANLIST);
 
         this.command = fileResolver.getCommand().getBanlist();
         this.permission = fileResolver.getPermission().getCommand().getBanlist();
@@ -108,9 +109,12 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
 
                 targetFPlayer = fPlayerService.getFPlayer(playerName);
                 if (targetFPlayer.isUnknown()) {
-                    builder(fPlayer)
+                    sendMessage(metadataBuilder()
+                            .sender(fPlayer)
                             .format(Localization.Command.Banlist::getNullPlayer)
-                            .sendBuilt();
+                            .build()
+                    );
+
                     return;
                 }
 
@@ -124,9 +128,12 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
                 : moderationService.getValidBans(targetFPlayer);
 
         if (moderationList.isEmpty()) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Banlist::getEmpty)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -135,9 +142,12 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Banlist::getNullPage)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -176,7 +186,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
-        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(fPlayer, component));
+        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(MessageType.COMMAND_BANLIST, fPlayer, component));
 
         playSound(fPlayer);
     }

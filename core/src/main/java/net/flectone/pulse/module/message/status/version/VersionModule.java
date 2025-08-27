@@ -9,6 +9,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
+import net.flectone.pulse.util.constant.MessageType;
 
 @Singleton
 public class VersionModule extends AbstractModuleLocalization<Localization.Message.Status.Version> {
@@ -18,7 +19,7 @@ public class VersionModule extends AbstractModuleLocalization<Localization.Messa
 
     @Inject
     public VersionModule(FileResolver fileResolver) {
-        super(module -> module.getMessage().getStatus().getVersion());
+        super(module -> module.getMessage().getStatus().getVersion(), MessageType.VERSION);
 
         this.message = fileResolver.getMessage().getStatus().getVersion();
         this.permission = fileResolver.getPermission().getMessage().getStatus().getVersion();

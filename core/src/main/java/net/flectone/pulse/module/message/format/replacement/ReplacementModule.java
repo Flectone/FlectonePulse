@@ -23,6 +23,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -77,7 +78,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                              UrlFormatter urlFormatter,
                              PermissionChecker permissionChecker,
                              FLogger fLogger) {
-        super(localization -> localization.getMessage().getFormat().getReplacement());
+        super(localization -> localization.getMessage().getFormat().getReplacement(), MessageType.REPLACEMENT);
 
         this.message = fileResolver.getMessage().getFormat().getReplacement();
         this.permission = fileResolver.getPermission().getMessage().getFormat().getReplacement();

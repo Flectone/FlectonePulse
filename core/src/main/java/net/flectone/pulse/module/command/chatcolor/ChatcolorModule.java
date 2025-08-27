@@ -42,7 +42,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
                            ProxySender proxySender,
                            ColorConverter colorConverter,
                            CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getChatcolor(), Command::getChatcolor);
+        super(localization -> localization.getCommand().getChatcolor(), Command::getChatcolor, MessageType.COMMAND_CHATCOLOR);
 
         this.fColorMessage = fileResolver.getMessage().getFormat().getFcolor();
         this.command = fileResolver.getCommand().getChatcolor();
@@ -101,9 +101,12 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         };
 
         if (fColorType.isEmpty() || !permissionChecker.check(fPlayer, permission.getColors().get(fColorType.get()))) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Chatcolor::getNullType)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -147,9 +150,12 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         }
 
         if (newFColors.isEmpty()) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Chatcolor::getNullColor)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -173,10 +179,12 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
             proxySender.send(fPlayer, MessageType.COMMAND_CHATCOLOR, dataOutputStream -> {});
         }
 
-        builder(fPlayer)
-                .destination(command.getDestination())
+        sendMessage(metadataBuilder()
+                .sender(fPlayer)
                 .format(Localization.Command.Chatcolor::getFormat)
-                .sound(getSound())
-                .sendBuilt();
+                .destination(command.getDestination())
+                .sound(getModuleSound())
+                .build()
+        );
     }
 }

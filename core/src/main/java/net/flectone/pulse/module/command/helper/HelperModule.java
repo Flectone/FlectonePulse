@@ -2,18 +2,18 @@ package net.flectone.pulse.module.command.helper;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
@@ -36,7 +36,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
                         ProxyRegistry proxyRegistry,
                         PermissionChecker permissionChecker,
                         CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getHelper(), Command::getHelper);
+        super(localization -> localization.getCommand().getHelper(), Command::getHelper, MessageType.COMMAND_HELPER);
 
         this.command = fileResolver.getCommand().getHelper();
         this.permission = fileResolver.getPermission().getCommand().getHelper();
@@ -78,31 +78,36 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
                     .noneMatch(online -> permissionChecker.check(online, permission.getSee()));
 
             if (nullHelper) {
-                builder(fPlayer)
+                sendMessage(metadataBuilder()
+                        .sender(fPlayer)
                         .format(Localization.Command.Helper::getNullHelper)
-                        .sendBuilt();
+                        .build()
+                );
+
                 return;
             }
         }
 
         String message = getArgument(commandContext, 0);
 
-        builder(fPlayer)
-                .destination(command.getDestination())
+        sendMessage(metadataBuilder()
+                .sender(fPlayer)
                 .format(Localization.Command.Helper::getPlayer)
-                .sendBuilt();
+                .destination(command.getDestination())
+                .build()
+        );
 
-        builder(fPlayer)
+        sendMessage(metadataBuilder()
+                .sender(fPlayer)
+                .format(Localization.Command.Helper::getGlobal)
                 .destination(command.getDestination())
                 .range(command.getRange())
-                .filter(filter)
-                .tag(MessageType.COMMAND_HELPER)
-                .format(Localization.Command.Helper::getGlobal)
                 .message(message)
-                .proxy(output -> output.writeUTF(message))
-                .integration(s -> Strings.CS.replace(s, "<message>", message))
-                .sound(getSound())
-                .sendBuilt();
+                .filter(filter)
+                .proxy(dataOutputStream -> dataOutputStream.writeString(message))
+                .integration(string -> Strings.CS.replace(string, "<message>", message))
+                .build()
+        );
     }
 
     public Predicate<FPlayer> getFilterSee() {

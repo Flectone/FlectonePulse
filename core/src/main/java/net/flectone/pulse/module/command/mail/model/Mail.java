@@ -1,4 +1,4 @@
-package net.flectone.pulse.model.util;
+package net.flectone.pulse.module.command.mail.model;
 
 import org.jdbi.v3.core.mapper.reflect.ColumnName;
 

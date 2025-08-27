@@ -7,6 +7,7 @@ import lombok.NonNull;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.module.command.translateto.model.TranslatetoMetadata;
 import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -44,7 +45,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
                              CommandParserProvider commandParserProvider,
                              IntegrationModule integrationModule,
                              Provider<TranslateModule> translateModuleProvider) {
-        super(localization -> localization.getCommand().getTranslateto(), Command::getTranslateto, fPlayer -> fPlayer.isSetting(FPlayer.Setting.TRANSLATETO));
+        super(localization -> localization.getCommand().getTranslateto(), Command::getTranslateto, fPlayer -> fPlayer.isSetting(FPlayer.Setting.TRANSLATETO), MessageType.COMMAND_TRANSLATETO);
 
         this.command = fileResolver.getCommand().getTranslateto();
         this.permission = fileResolver.getPermission().getCommand().getTranslateto();
@@ -98,28 +99,36 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
 
         String translatedMessage = translate(fPlayer, mainLang, targetLang, messageToTranslate);
         if (translatedMessage.isEmpty()) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Translateto::getNullOrError)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
-        builder(fPlayer)
+        String finalMessageToTranslate = messageToTranslate;
+        sendMessage(TranslatetoMetadata.<Localization.Command.Translateto>builder()
+                .sender(fPlayer)
+                .format(replaceLanguage(targetLang))
+                .targetLanguage(targetLang)
+                .messageToTranslate(messageToTranslate)
                 .range(command.getRange())
                 .destination(command.getDestination())
-                .tag(MessageType.COMMAND_TRANSLATETO)
-                .format(replaceLanguage(targetLang))
                 .message(translatedMessage)
-                .proxy(output -> {
-                    output.writeUTF(targetLang);
-                    output.writeUTF(translatedMessage);
+                .sound(getModuleSound())
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeString(targetLang);
+                    dataOutputStream.writeString(message);
+                    dataOutputStream.writeString(finalMessageToTranslate);
                 })
-                .integration(s -> StringUtils.replaceEach(s,
+                .integration(string -> StringUtils.replaceEach(string,
                         new String[]{"<message>", "<language>"},
                         new String[]{translatedMessage, targetLang}
                 ))
-                .sound(getSound())
-                .sendBuilt();
+                .build()
+        );
     }
 
     public Function<Localization.Command.Translateto, String> replaceLanguage(String targetLang) {

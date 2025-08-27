@@ -18,6 +18,7 @@ import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -57,7 +58,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
                          PermissionChecker permissionChecker,
                          MessagePipeline messagePipeline,
                          FLogger fLogger) {
-        super(localization -> localization.getMessage().getFormat().getMention());
+        super(localization -> localization.getMessage().getFormat().getMention(), MessageType.MENTION);
 
         this.message = fileResolver.getMessage().getFormat().getMention();
         this.permission = fileResolver.getPermission().getMessage().getFormat().getMention();
@@ -176,12 +177,12 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
         processedMentions.put(processId, true);
 
-        playSound(fPlayer);
-
-        builder(fPlayer)
-                .destination(message.getDestination())
+        sendMessage(metadataBuilder()
+                .sender(fPlayer)
                 .format(Localization.Message.Format.Mention::getPerson)
-                .sound(null)
-                .sendBuilt();
+                .destination(message.getDestination())
+                .sound(getModuleSound())
+                .build()
+        );
     }
 }

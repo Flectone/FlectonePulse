@@ -16,6 +16,7 @@ import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
@@ -49,7 +50,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
                            EventDispatcher eventDispatcher,
                            TimeFormatter timeFormatter,
                            FLogger fLogger) {
-        super(localization -> localization.getCommand().getToponline(), Command::getToponline);
+        super(localization -> localization.getCommand().getToponline(), Command::getToponline, MessageType.COMMAND_TOPONLINE);
 
         this.command = fileResolver.getCommand().getToponline();
         this.permission = fileResolver.getPermission().getCommand().getToponline();
@@ -102,9 +103,12 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Toponline::getNullPage)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -140,7 +144,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
-        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(fPlayer, component));
+        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(MessageType.COMMAND_TOPONLINE, fPlayer, component));
 
         playSound(fPlayer);
     }

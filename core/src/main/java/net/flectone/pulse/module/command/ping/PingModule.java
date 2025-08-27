@@ -2,16 +2,17 @@ package net.flectone.pulse.module.command.ping;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.Optional;
@@ -32,7 +33,7 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
                       CommandParserProvider commandParserProvider,
                       IntegrationModule integrationModule,
                       PlatformPlayerAdapter platformPlayerAdapter) {
-        super(localization -> localization.getCommand().getPing(), Command::getPing);
+        super(localization -> localization.getCommand().getPing(), Command::getPing, MessageType.COMMAND_PING);
 
         this.command = fileResolver.getCommand().getPing();
         this.permission = fileResolver.getPermission().getCommand().getPing();
@@ -68,17 +69,23 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
         FPlayer fTarget = optionalTarget.isPresent() ? fPlayerService.getFPlayer(optionalTarget.get()) : fPlayer;
         if (!platformPlayerAdapter.isOnline(fTarget)
                 || (!integrationModule.canSeeVanished(fTarget, fPlayer) && !fPlayer.equals(fTarget))) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Ping::getNullPlayer)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
-        builder(fTarget)
+        sendMessage(metadataBuilder()
+                .sender(fTarget)
                 .receiver(fPlayer)
-                .destination(command.getDestination())
                 .format(Localization.Command.Ping::getFormat)
-                .sound(getSound())
-                .sendBuilt();
+                .destination(command.getDestination())
+                .sound(getModuleSound())
+                .build()
+        );
+
     }
 }

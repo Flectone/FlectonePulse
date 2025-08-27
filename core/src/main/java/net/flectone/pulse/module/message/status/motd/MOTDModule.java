@@ -13,6 +13,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.util.constant.MessageType;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class MOTDModule extends AbstractModuleListLocalization<Localization.Mess
     public MOTDModule(FileResolver fileResolver,
                       MessagePipeline messagePipeline,
                       PacketProvider packetProvider) {
-        super(localization -> localization.getMessage().getStatus().getMotd());
+        super(localization -> localization.getMessage().getStatus().getMotd(), MessageType.MOTD);
 
         this.message = fileResolver.getMessage().getStatus().getMotd();
         this.permission = fileResolver.getPermission().getMessage().getStatus().getMotd();

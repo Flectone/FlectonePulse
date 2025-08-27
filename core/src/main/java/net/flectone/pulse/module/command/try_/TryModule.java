@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.module.command.try_.model.TryMetadata;
 import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -30,7 +31,7 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
     public TryModule(FileResolver fileResolver,
                      RandomUtil randomUtil,
                      CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getTry(), Command::getTry, fPlayer -> fPlayer.isSetting(FPlayer.Setting.TRY));
+        super(localization -> localization.getCommand().getTry(), Command::getTry, fPlayer -> fPlayer.isSetting(FPlayer.Setting.TRY), MessageType.COMMAND_TRY);
 
         this.command = fileResolver.getCommand().getTry();
         this.permission = fileResolver.getPermission().getCommand().getTry();
@@ -72,22 +73,25 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
 
         String message = getArgument(commandContext, 0);
 
-        builder(fPlayer)
+        sendMessage(TryMetadata.<Localization.Command.Try>builder()
+                .sender(fPlayer)
+                .format(replacePercent(random))
+                .percent(random)
                 .range(command.getRange())
                 .destination(command.getDestination())
-                .tag(MessageType.COMMAND_TRY)
-                .format(replacePercent(random))
-                .message((fResolver, s)  -> message)
-                .proxy(output -> {
-                    output.writeInt(random);
-                    output.writeUTF(message);
+                .message(message)
+                .sound(getModuleSound())
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeInt(random);
+                    dataOutputStream.writeString(message);
                 })
-                .integration(s -> StringUtils.replaceEach(s,
+                .integration(string -> StringUtils.replaceEach(
+                        string,
                         new String[]{"<message>", "<percent>"},
                         new String[]{message, String.valueOf(random)}
                 ))
-                .sound(getSound())
-                .sendBuilt();
+                .build()
+        );
     }
 
     public Function<Localization.Command.Try, String> replacePercent(int value) {

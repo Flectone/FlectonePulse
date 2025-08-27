@@ -9,12 +9,13 @@ import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
-import net.flectone.pulse.model.util.Ignore;
+import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -41,7 +42,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
                             MessagePipeline messagePipeline,
                             CommandParserProvider commandParserProvider,
                             TimeFormatter timeFormatter) {
-        super(localization -> localization.getCommand().getIgnorelist(), Command::getIgnorelist);
+        super(localization -> localization.getCommand().getIgnorelist(), Command::getIgnorelist, MessageType.COMMAND_IGNORELIST);
 
         this.command = fileResolver.getCommand().getIgnorelist();
         this.permission = fileResolver.getPermission().getCommand().getIgnorelist();
@@ -74,9 +75,12 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
 
         List<Ignore> ignoreList = fPlayer.getIgnores();
         if (ignoreList.isEmpty()) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Ignorelist::getEmpty)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -91,9 +95,12 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         Integer page = optionalPage.orElse(1);
 
         if (page > countPage || page < 1) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Ignorelist::getNullPage)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -131,7 +138,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
-        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(fPlayer, component));
+        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(MessageType.COMMAND_IGNORELIST, fPlayer, component));
 
         playSound(fPlayer);
     }

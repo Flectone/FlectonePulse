@@ -5,6 +5,8 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.module.integration.telegram.model.TelegramMetadata;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
@@ -72,25 +74,27 @@ public class MessageListener extends EventListener {
 
     @Async
     public void sendMessage(String author, String chat, String message) {
-        builder(FPlayer.UNKNOWN)
-                .range(Range.get(Range.Type.PROXY))
-                .destination(integration.getDestination())
-                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELEGRAM))
-                .tag(MessageType.FROM_TELEGRAM_TO_MINECRAFT)
+        sendMessage(TelegramMetadata.<Localization.Integration.Telegram>builder()
+                .sender(FPlayer.UNKNOWN)
                 .format(s -> StringUtils.replaceEach(
                         s.getForMinecraft(),
                         new String[]{"<name>", "<chat>"},
                         new String[]{String.valueOf(author), String.valueOf(chat)}
                 ))
+                .author(author)
+                .chat(chat)
                 .message(message)
-                .proxy(output -> {
-                    output.writeUTF(author);
-                    output.writeUTF(chat);
-                    output.writeUTF(message);
-                })
-                .integration()
-                .sound(getSound())
-                .sendBuilt();
+                .range(Range.get(Range.Type.PROXY))
+                .destination(integration.getDestination())
+                .sound(getModuleSound())
+                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELEGRAM))
+                .integration(string -> StringUtils.replaceEach(
+                        string,
+                        new String[]{"<name>", "<chat>"},
+                        new String[]{author, chat}
+                ))
+                .build()
+        );
     }
 
     private void sendInfoMessage(String chatID, Message message) {

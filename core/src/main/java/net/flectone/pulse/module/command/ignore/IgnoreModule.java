@@ -5,13 +5,15 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Ignore;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.ignore.model.Ignore;
+import net.flectone.pulse.module.command.ignore.model.IgnoreMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.Optional;
@@ -28,7 +30,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
     public IgnoreModule(FileResolver fileResolver,
                         FPlayerService fPlayerService,
                         CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getIgnore(), Command::getIgnore);
+        super(localization -> localization.getCommand().getIgnore(), Command::getIgnore, MessageType.COMMAND_IGNORE);
 
         this.command = fileResolver.getCommand().getIgnore();
         this.permission = fileResolver.getPermission().getCommand().getIgnore();
@@ -62,40 +64,54 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
         String targetName = getArgument(commandContext, 0);
 
         if (fPlayer.getName().equalsIgnoreCase(targetName)) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Ignore::getMyself)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
         FPlayer fTarget = fPlayerService.getFPlayer(targetName);
         if (fTarget.isUnknown()) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Ignore::getNullPlayer)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
-        Optional<Ignore> ignore = fPlayer.getIgnores()
+        Optional<Ignore> optionalIgnore = fPlayer.getIgnores()
                 .stream()
                 .filter(i -> i.target() == fTarget.getId())
                 .findFirst();
 
-        if (ignore.isPresent()) {
-            fPlayer.getIgnores().remove(ignore.get());
-            fPlayerService.deleteIgnore(ignore.get());
+        Ignore metadataIgnore;
+
+        if (optionalIgnore.isPresent()) {
+            metadataIgnore = optionalIgnore.get();
+            fPlayer.getIgnores().remove(optionalIgnore.get());
+            fPlayerService.deleteIgnore(optionalIgnore.get());
         } else {
             Ignore newIgnore = fPlayerService.saveAndGetIgnore(fPlayer, fTarget);
             if (newIgnore == null) return;
 
+            metadataIgnore = newIgnore;
             fPlayer.getIgnores().add(newIgnore);
         }
 
-        builder(fTarget)
-                .destination(command.getDestination())
+        sendMessage(IgnoreMetadata.<Localization.Command.Ignore>builder()
+                .sender(fTarget)
                 .receiver(fPlayer)
-                .format(s -> ignore.isEmpty() ? s.getFormatTrue() : s.getFormatFalse())
-                .sound(getSound())
-                .sendBuilt();
+                .format(ignore -> optionalIgnore.isEmpty() ? ignore.getFormatTrue() : ignore.getFormatFalse())
+                .ignore(metadataIgnore)
+                .ignored(optionalIgnore.isEmpty())
+                .destination(command.getDestination())
+                .sound(getModuleSound())
+                .build()
+        );
     }
 }

@@ -11,6 +11,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton
@@ -25,7 +26,7 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
     public ReplyModule(FileResolver fileResolver,
                        TellModule tellModule,
                        CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getReply(), Command::getReply, fPlayer -> fPlayer.isSetting(FPlayer.Setting.REPLY));
+        super(localization -> localization.getCommand().getReply(), Command::getReply, fPlayer -> fPlayer.isSetting(FPlayer.Setting.REPLY), MessageType.COMMAND_REPLY);
 
         this.command = fileResolver.getCommand().getReply();
         this.permission = fileResolver.getPermission().getCommand().getReply();
@@ -57,9 +58,12 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
 
         String receiverName = tellModule.getSenderReceiverMap().get(fPlayer.getUuid());
         if (receiverName == null) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Reply::getNullReceiver)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 

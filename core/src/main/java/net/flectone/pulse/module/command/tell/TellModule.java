@@ -3,21 +3,21 @@ package net.flectone.pulse.module.command.tell;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.HashMap;
@@ -44,7 +44,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                       IntegrationModule integrationModule,
                       CommandParserProvider commandParserProvider,
                       PlatformPlayerAdapter platformPlayerAdapter) {
-        super(localization -> localization.getCommand().getTell(), Command::getTell, fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELL));
+        super(localization -> localization.getCommand().getTell(), Command::getTell, fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELL), MessageType.COMMAND_TELL);
 
         this.command = fileResolver.getCommand().getTell();
         this.permission = fileResolver.getPermission().getCommand().getTell();
@@ -95,10 +95,13 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         if (isModuleDisabledFor(fPlayer)) return;
 
         if (fPlayer.getName().equalsIgnoreCase(playerName)) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Tell::getMyself)
                     .message(message)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -109,9 +112,12 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                 || !fReceiver.isOnline()
                 || !rangeFilter(fPlayer, range).test(fReceiver)
                 || !range.is(Range.Type.PROXY) && !platformPlayerAdapter.isOnline(fReceiver)) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Tell::getNullPlayer)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -134,9 +140,12 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
         FPlayer fNewReceiver = fPlayerService.getFPlayer(fReceiver.getUuid());
         if (!integrationModule.canSeeVanished(fNewReceiver, fPlayer)) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Tell::getNullPlayer)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -149,13 +158,15 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                      BiFunction<FPlayer, Localization.Command.Tell, String> format,
                      String string,
                      boolean senderColorOut) {
-        builder(fPlayer)
-                .destination(command.getDestination())
+        sendMessage(metadataBuilder()
+                .sender(fPlayer)
                 .receiver(fReceiver, senderColorOut)
                 .format(format)
+                .destination(command.getDestination())
                 .message(string)
-                .sound(getSound())
-                .sendBuilt();
+                .sound(senderColorOut ? getModuleSound() : null)
+                .build()
+        );
 
         senderReceiverMap.put(fReceiver.getUuid(), fPlayer.getName());
     }

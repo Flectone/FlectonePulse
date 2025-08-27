@@ -8,10 +8,12 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
+import net.flectone.pulse.module.integration.discord.model.DiscordMetadata;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.Strings;
 import reactor.core.publisher.Mono;
 
@@ -55,27 +57,29 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
             );
         }
 
-        sendMessage(nickname, discordMessage.getContent(), message);
+        sendMessage(nickname, message);
 
         return Mono.empty();
     }
 
     @Async
-    public void sendMessage(String nickname, String rawMessage, String message) {
-        builder(FPlayer.UNKNOWN)
+    public void sendMessage(String nickname, String message) {
+        sendMessage(DiscordMetadata.<Localization.Integration.Discord>builder()
+                .sender(FPlayer.UNKNOWN)
+                .format(s -> Strings.CS.replace(s.getForMinecraft(), "<name>", nickname))
+                .nickname(nickname)
                 .range(Range.get(Range.Type.PROXY))
                 .destination(integration.getDestination())
-                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DISCORD))
-                .tag(MessageType.FROM_DISCORD_TO_MINECRAFT)
-                .format(s -> Strings.CS.replace(s.getForMinecraft(), "<name>", nickname))
                 .message(message)
-                .proxy(output -> {
-                    output.writeUTF(nickname);
-                    output.writeUTF(rawMessage);
-                })
-                .integration()
-                .sound(getSound())
-                .sendBuilt();
+                .sound(getModuleSound())
+                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DISCORD))
+                .integration(string -> Strings.CS.replace(
+                        string,
+                        "<name>",
+                        nickname
+                ))
+                .build()
+        );
     }
 
     @Override

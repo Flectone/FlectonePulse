@@ -2,17 +2,18 @@ package net.flectone.pulse.module.message.rightclick;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.rightclick.listener.RightclickPacketListener;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
 
 import java.util.UUID;
 
@@ -31,7 +32,7 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
                             FPlayerService fPlayerService,
                             PlatformPlayerAdapter platformPlayerAdapter,
                             ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getRightclick());
+        super(localization -> localization.getMessage().getRightclick(), MessageType.RIGHT_CLICK);
 
         this.message = fileResolver.getMessage().getRightclick();
         this.permission = fileResolver.getPermission().getMessage().getRightclick();
@@ -68,11 +69,13 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
         FPlayer fTarget = fPlayerService.getFPlayer(targetUUID);
         if (fTarget.isUnknown()) return;
 
-        builder(fTarget)
+        sendMessage(metadataBuilder()
+                .sender(fTarget)
                 .receiver(fPlayer)
                 .format(Localization.Message.Rightclick::getFormat)
                 .destination(message.getDestination())
-                .sound(getSound())
-                .sendBuilt();
+                .sound(getModuleSound())
+                .build()
+        );
     }
 }

@@ -9,8 +9,8 @@ import net.flectone.pulse.config.Config;
 import net.flectone.pulse.data.repository.FPlayerRepository;
 import net.flectone.pulse.data.repository.SocialRepository;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Ignore;
-import net.flectone.pulse.model.util.Mail;
+import net.flectone.pulse.module.command.ignore.model.Ignore;
+import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
@@ -23,6 +23,22 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * This service manages player storage across the plugin. You can use <code>getFPlayer()</code> to grab players from this service.
+ * <hr>
+ * <p>
+ *     For example, plugins using the Bukkit API can get an instance of the {@link FPlayer} object by simply using
+ *     <a href="https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/Entity.html#getUniqueId()"><code>Entity.getUniqueId()</code></a>
+ *     and using {@link FPlayerService}'s <code>{@link UUID} getFPlayer</code> method.
+ * </p>
+ * <hr>
+ * <p>
+ *     Console senders are automatically different players, which unless manually changed, will always have an ID of <code>-1</code>.
+ *     You can simply grab console senders by using <code lang="java">{@link FPlayerService}.getFPlayer(-1)</code>
+ * </p>
+ *
+ * @see FPlayer
+ */
 @Singleton
 public class FPlayerService {
 

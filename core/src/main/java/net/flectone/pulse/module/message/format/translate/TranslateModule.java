@@ -16,6 +16,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.Strings;
@@ -43,7 +44,7 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
     public TranslateModule(FileResolver fileResolver,
                            ListenerRegistry listenerRegistry,
                            MessagePipeline messagePipeline) {
-        super(localization -> localization.getMessage().getFormat().getTranslate());
+        super(localization -> localization.getMessage().getFormat().getTranslate(), MessageType.TRANSLATE);
 
         this.message = fileResolver.getMessage().getFormat().getTranslate();
         this.permission = fileResolver.getPermission().getMessage().getFormat().getTranslate();

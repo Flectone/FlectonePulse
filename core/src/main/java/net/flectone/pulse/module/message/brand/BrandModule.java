@@ -5,14 +5,15 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.module.message.brand.listener.BrandPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class BrandModule extends AbstractModuleListLocalization<Localization.Mes
                        FPlayerService fPlayerService,
                        TaskScheduler taskScheduler,
                        ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getBrand());
+        super(localization -> localization.getMessage().getBrand(), MessageType.BRAND);
 
         this.message = fileResolver.getMessage().getBrand();
         this.permission = fileResolver.getPermission().getMessage().getBrand();
@@ -63,10 +64,12 @@ public class BrandModule extends AbstractModuleListLocalization<Localization.Mes
         String format = getNextMessage(fPlayer, this.message.isRandom());
         if (StringUtils.isEmpty(format)) return;
 
-        builder(fPlayer)
-                .destination(message.getDestination())
+        sendMessage(metadataBuilder()
+                .sender(fPlayer)
                 .format(format)
-                .sendBuilt();
+                .destination(message.getDestination())
+                .build()
+        );
     }
 
     @Override

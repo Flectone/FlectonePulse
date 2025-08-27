@@ -9,6 +9,7 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Destination;
@@ -24,6 +25,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.ProxyDataConsumer;
+import net.flectone.pulse.util.SafeDataOutputStream;
 import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.DisableSource;
@@ -38,11 +40,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.DataOutputStream;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -51,6 +50,7 @@ import java.util.regex.Pattern;
 public abstract class AbstractModuleLocalization<M extends Localization.Localizable> extends AbstractModule {
 
     private final Function<Localization, M> localizationFunction;
+    private final MessageType messageType;
 
     @Inject private FPlayerService fPlayerService;
     @Inject private ModerationService moderationService;
@@ -67,15 +67,16 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     @Inject private TaskScheduler taskScheduler;
     @Inject private EventDispatcher eventDispatcher;
 
-    @Getter private Cooldown cooldown;
-    @Getter private Sound sound;
+    @Getter private Cooldown moduleCooldown;
+    @Getter private Sound moduleSound;
 
-    protected AbstractModuleLocalization(Function<Localization, M> localizationMFunction) {
+    protected AbstractModuleLocalization(Function<Localization, M> localizationMFunction, MessageType messageType) {
         this.localizationFunction = localizationMFunction;
+        this.messageType = messageType;
     }
 
     public Sound createSound(Sound sound, Permission.IPermission permission) {
-        this.sound = sound;
+        this.moduleSound = sound;
 
         if (permission != null) {
             registerPermission(permission);
@@ -86,20 +87,20 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     }
 
     public void playSound(FPlayer fPlayer) {
-        if (!permissionChecker.check(fPlayer, sound.getPermission())) return;
+        if (!permissionChecker.check(fPlayer, moduleSound.getPermission())) return;
 
-        soundPlayer.play(sound, fPlayer);
+        soundPlayer.play(moduleSound, fPlayer);
     }
 
     public Cooldown createCooldown(Cooldown cooldown, Permission.IPermission permission) {
-        this.cooldown = cooldown;
+        this.moduleCooldown = cooldown;
 
         if (permission != null) {
             registerPermission(permission);
             cooldown.setPermissionBypass(permission.getName());
         }
 
-        return this.cooldown;
+        return this.moduleCooldown;
     }
 
     public String getCooldownMessage(FEntity sender) {
@@ -114,22 +115,20 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         return localizationFunction.apply(fileResolver.getLocalization(sender));
     }
 
-    public Builder builder(FEntity fPlayer) {
-        return new Builder(fPlayer);
-    }
-
     public boolean checkCooldown(FEntity entity) {
-        if (getCooldown() == null) return false;
-        if (!getCooldown().isEnable()) return false;
+        if (getModuleCooldown() == null) return false;
+        if (!getModuleCooldown().isEnable()) return false;
         if (!(entity instanceof FPlayer fPlayer)) return false;
-        if (permissionChecker.check(fPlayer, getCooldown().getPermissionBypass())) return false;
-        if (!getCooldown().isCooldown(fPlayer.getUuid())) return false;
+        if (permissionChecker.check(fPlayer, getModuleCooldown().getPermissionBypass())) return false;
+        if (!getModuleCooldown().isCooldown(fPlayer.getUuid())) return false;
 
-        long timeLeft = getCooldown().getTimeLeft(fPlayer);
+        long timeLeft = getModuleCooldown().getTimeLeft(fPlayer);
 
-        builder(fPlayer)
-                .format(s -> timeFormatter.format(fPlayer, timeLeft, getCooldownMessage(fPlayer)))
-                .sendBuilt();
+        sendMessage(metadataBuilder()
+                .sender(fPlayer)
+                .format(timeFormatter.format(fPlayer, timeLeft, getCooldownMessage(fPlayer)))
+                .build()
+        );
 
         return true;
     }
@@ -140,9 +139,11 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         MuteChecker.Status status = muteChecker.check(fPlayer);
         if (status == MuteChecker.Status.NONE) return false;
 
-        builder(fPlayer)
-                .format(s -> moderationMessageFormatter.buildMuteMessage(fPlayer, status))
-                .sendBuilt();
+        sendMessage(metadataBuilder()
+                .sender(fPlayer)
+                .format(moderationMessageFormatter.buildMuteMessage(fPlayer, status))
+                .build()
+        );
 
         return true;
     }
@@ -154,15 +155,17 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     public boolean sendDisableMessage(FEntity fPlayer, @NotNull FEntity fReceiver, DisableSource action) {
         Localization.Command.Chatsetting.Disable localization = fileResolver.getLocalization(fReceiver).getCommand().getChatsetting().getDisable();
 
-        String string = switch (action) {
+        String format = switch (action) {
             case HE -> localization.getHe();
             case YOU -> localization.getYou();
             case SERVER -> localization.getServer();
         };
 
-        builder(fPlayer)
-                .format(string)
-                .sendBuilt();
+        sendMessage(metadataBuilder()
+                .sender(fPlayer)
+                .format(format)
+                .build()
+        );
 
         return true;
     }
@@ -171,17 +174,21 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         Localization.Command.Ignore localization = fileResolver.getLocalization(fSender).getCommand().getIgnore();
 
         if (fSender.isIgnored(fReceiver)) {
-            builder(fSender)
+            sendMessage(metadataBuilder()
+                    .sender(fSender)
                     .format(localization.getYou())
-                    .sendBuilt();
+                    .build()
+            );
 
             return true;
         }
 
         if (fReceiver.isIgnored(fSender)) {
-            builder(fSender)
+            sendMessage(metadataBuilder()
+                    .sender(fSender)
                     .format(localization.getHe())
-                    .sendBuilt();
+                    .build()
+            );
 
             return true;
         }
@@ -232,304 +239,188 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         return permissionChecker.check(fReceiver, "flectonepulse.world.type." + worldType);
     }
 
-    public class Builder {
+    @SuppressWarnings("unchecked")
+    public EventMetadata.EventMetadataBuilder<M, ?, ?> metadataBuilder() {
+        return (EventMetadata.EventMetadataBuilder<M, ?, ?>) EventMetadata.builder();
+    }
 
-        private static final Pattern finalClearMessagePattern = Pattern.compile("[\\p{C}\\p{So}\\x{E0100}-\\x{E01EF}]+");
+    private static final Pattern finalClearMessagePattern = Pattern.compile("[\\p{C}\\p{So}\\x{E0100}-\\x{E01EF}]+");
 
-        private final FEntity fPlayer;
-        private FPlayer fReceiver = FPlayer.UNKNOWN;
-        private MessageType tag = null;
-        private Range range;
-        private Destination destination = new Destination();
-        private Sound sound = null;
-        private Predicate<FPlayer> builderFilter = player -> true;
-        private ProxyDataConsumer<DataOutputStream> proxyOutput = null;
-        private UnaryOperator<String> integrationString = null;
-        private BiFunction<FPlayer, M, String> format = null;
-        private UnaryOperator<MessagePipeline.Builder> formatComponentBuilder = null;
-        private BiFunction<FPlayer, M, String> message = null;
-        private UnaryOperator<MessagePipeline.Builder> messageComponentBuilder = null;
-        private Function<FPlayer, TagResolver[]> tagResolvers = null;
-        private boolean senderColorOut = true;
+    public List<FPlayer> createReceivers(EventMetadata<M> eventMetadata) {
+        taskScheduler.runAsync(() -> sendToIntegrations(eventMetadata));
 
-        public Builder(FEntity fEntity) {
-            this.fPlayer = fEntity;
-            this.range = Range.get(Range.Type.PLAYER);
+        if (sendToProxy(eventMetadata)) return Collections.emptyList();
 
-            if (fEntity instanceof FPlayer builderFPlayer) {
-                fReceiver = builderFPlayer;
-            }
-        }
+        return fPlayerService.getFPlayersWithConsole().stream()
+                .filter(eventMetadata.getFilter())
+                .filter(rangeFilter(eventMetadata.getReceiver(), eventMetadata.getRange()))
+                .toList();
+    }
 
-        public Builder receiver(FPlayer fPlayer) {
-            return receiver(fPlayer, false);
-        }
+    public void sendMessage(EventMetadata<M> eventMetadata) {
+        sendMessage(this.messageType, eventMetadata);
+    }
 
-        public Builder receiver(FPlayer fPlayer, boolean senderColorOut) {
-            this.fReceiver = fPlayer;
-            this.range = Range.get(Range.Type.PLAYER);
-            this.senderColorOut = senderColorOut;
-            return this;
-        }
+    public void sendMessage(MessageType messageType, EventMetadata<M> eventMetadata) {
+        List<FPlayer> receivers = createReceivers(eventMetadata);
+        sendMessage(messageType, receivers, eventMetadata);
+    }
 
-        public Builder tag(MessageType tag) {
-            this.tag = tag;
-            return this;
-        }
+    public void sendMessage(List<FPlayer> receivers, EventMetadata<M> eventMetadata) {
+        sendMessage(this.messageType, receivers, eventMetadata);
+    }
 
-        public Builder range(Range range) {
-            this.range = range;
-            return this;
-        }
+    public void sendMessage(MessageType messageType, List<FPlayer> receivers, EventMetadata<M> eventMetadata) {
+        if (receivers.isEmpty()) return;
 
-        public Builder destination(Destination destination) {
-            this.destination = destination;
-            return this;
-        }
+        FEntity fPlayer = eventMetadata.getSender();
 
-        public Builder filter(Predicate<FPlayer> filter) {
-            this.builderFilter = this.builderFilter.and(filter);
-            return this;
-        }
+        receivers.forEach(recipient -> {
 
-        public Builder proxy() {
-            this.proxyOutput = dataOutputStream -> {};
-            return this;
-        }
+            // example
+            // format: TheFaser > <message>
+            // message: hello world!
+            // final formatted message: TheFaser > hello world!
+            Component messageComponent = buildMessageComponent(eventMetadata);
+            Component formatComponent = buildFormatComponent(eventMetadata, messageComponent);
 
-        public Builder proxy(ProxyDataConsumer<DataOutputStream> output) {
-            this.proxyOutput = output;
-            return this;
-        }
-
-        public Builder format(String format) {
-            this.format = (fResolver, s) -> format;
-            return this;
-        }
-
-        public Builder format(Function<M, String> format) {
-            this.format = (fResolver, s) -> format.apply(s);
-            return this;
-        }
-
-        public Builder format(BiFunction<FPlayer, M, String> format) {
-            this.format = format;
-            return this;
-        }
-
-        public Builder message(String message) {
-            this.message = (fResolver, s) -> message;
-            return this;
-        }
-
-        public Builder message(Function<M, String> message) {
-            this.message = (fResolver, s) -> message.apply(s);
-            return this;
-        }
-
-        public Builder message(BiFunction<FPlayer, M, String> message) {
-            this.message = message;
-            return this;
-        }
-
-        public Builder integration() {
-            this.integrationString = s -> s;
-            return this;
-        }
-
-        public Builder integration(UnaryOperator<String> integrationString) {
-            this.integrationString = integrationString;
-            return this;
-        }
-
-        public Builder tagResolvers(Function<FPlayer, TagResolver[]> tagResolvers) {
-            this.tagResolvers = tagResolvers;
-            return this;
-        }
-
-        public Builder formatBuilder(UnaryOperator<MessagePipeline.Builder> formatComponentBuilder) {
-            this.formatComponentBuilder = formatComponentBuilder;
-            return this;
-        }
-
-        public Builder messageBuilder(UnaryOperator<MessagePipeline.Builder> messageComponentBuilder) {
-            this.messageComponentBuilder = messageComponentBuilder;
-            return this;
-        }
-
-        public Builder sound(Sound sound) {
-            this.sound = sound;
-            return this;
-        }
-
-        public void sendBuilt() {
-            send(build());
-        }
-
-        public List<FPlayer> build() {
-            taskScheduler.runAsync(this::sendToIntegrations);
-
-            // proxy sent message for all servers
-            if (sendToProxy()) {
-                return new ArrayList<>();
+            // destination subtext
+            Component subComponent = Component.empty();
+            Destination destination = eventMetadata.getDestination();
+            if (destination.getType() == Destination.Type.TITLE
+                    || destination.getType() == Destination.Type.SUBTITLE) {
+                subComponent = buildSubcomponent(eventMetadata, messageComponent);
             }
 
-            return fPlayerService.getFPlayersWithConsole().stream()
-                    .filter(builderFilter)
-                    .filter(rangeFilter(fReceiver, range))
-                    .toList();
-        }
+            eventDispatcher.dispatch(new SenderToReceiverMessageEvent(
+                    messageType,
+                    fPlayer,
+                    recipient,
+                    formatComponent,
+                    subComponent,
+                    eventMetadata
+            ));
 
-        public void send(List<FPlayer> recipients) {
-            UUID messageUUID = UUID.randomUUID();
+            if (eventMetadata.getSound() != null) {
+                Sound sound = eventMetadata.getSound();
+                if (!permissionChecker.check(fPlayer, sound.getPermission())) return;
 
-            recipients.forEach(recipient -> {
-
-                // example
-                // format: TheFaser > <message>
-                // message: hello world!
-                // final formatted message: TheFaser > hello world!
-                Component messageComponent = buildMessageComponent(recipient);
-                Component formatComponent = buildFormatComponent(messageUUID, recipient, messageComponent);
-
-                // destination subtext
-                Component subComponent = Component.empty();
-                if (destination.getType() == Destination.Type.TITLE
-                        || destination.getType() == Destination.Type.SUBTITLE) {
-                    subComponent = buildSubcomponent(recipient, messageComponent);
-                }
-
-                eventDispatcher.dispatch(new SenderToReceiverMessageEvent(messageUUID,
-                        fPlayer,
-                        recipient,
-                        formatComponent,
-                        subComponent,
-                        destination
-                ));
-
-                if (sound != null) {
-                    if (!permissionChecker.check(fPlayer, sound.getPermission())) return;
-
-                    soundPlayer.play(sound, recipient);
-                }
-            });
-        }
-
-        private TagResolver messageTag(Component message) {
-            return TagResolver.resolver("message", (argumentQueue, context) -> Tag.inserting(message));
-        }
-
-        private Component buildSubcomponent(FPlayer fReceiver, Component message) {
-            return destination.getSubtext().isEmpty()
-                    ? Component.empty()
-                    : messagePipeline.builder(fPlayer, fReceiver, destination.getSubtext())
-                    .flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut)
-                    .tagResolvers(messageTag(message))
-                    .build();
-        }
-
-        private Component buildMessageComponent(FPlayer fReceiver) {
-            String messageContent = resolveString(fReceiver, this.message);
-            if (StringUtils.isEmpty(messageContent)) return Component.empty();
-
-            MessagePipeline.Builder messageBuilder = messagePipeline.builder(fPlayer, fReceiver, messageContent)
-                    .flag(MessageFlag.USER_MESSAGE, true)
-                    .flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut)
-                    .flag(MessageFlag.MENTION, !fReceiver.isUnknown());
-
-            if (messageComponentBuilder != null) {
-                messageBuilder = messageComponentBuilder.apply(messageBuilder);
+                soundPlayer.play(sound, recipient);
             }
+        });
+    }
 
-            return messageBuilder.build();
+    private Component buildSubcomponent(EventMetadata<M> eventMetadata, Component message) {
+        Destination destination = eventMetadata.getDestination();
+        return destination.getSubtext().isEmpty()
+                ? Component.empty()
+                : messagePipeline.builder(eventMetadata.getSender(), eventMetadata.getReceiver(), destination.getSubtext())
+                .flag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
+                .tagResolvers(messageTag(message))
+                .build();
+    }
+
+    private Component buildMessageComponent(EventMetadata<M> eventMetadata) {
+        String message = eventMetadata.getMessage();
+        if (StringUtils.isEmpty(message)) return Component.empty();
+
+        FEntity sender = eventMetadata.getSender();
+        FPlayer receiver = eventMetadata.getReceiver();
+        boolean senderColorOut = eventMetadata.isSenderColorOut();
+
+        MessagePipeline.Builder messageBuilder = messagePipeline.builder(sender, receiver, message)
+                .flag(MessageFlag.USER_MESSAGE, true)
+                .flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut)
+                .flag(MessageFlag.MENTION, !receiver.isUnknown());
+
+        return messageBuilder.build();
+    }
+
+    private Component buildFormatComponent(EventMetadata<M> eventMetadata, Component message) {
+        FPlayer receiver = eventMetadata.getReceiver();
+
+        String formatContent = eventMetadata.resolveFormat(receiver, resolveLocalization(receiver));
+        if (StringUtils.isEmpty(formatContent)) return Component.empty();
+
+        FEntity sender = eventMetadata.getSender();
+        boolean senderColorOut = eventMetadata.isSenderColorOut();
+
+        MessagePipeline.Builder formatBuilder = messagePipeline
+                .builder(eventMetadata.getMessageUUID(), sender, receiver, formatContent)
+                .flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut)
+                .tagResolvers(eventMetadata.getTagResolvers(receiver))
+                .tagResolvers(messageTag(message));
+
+        if (!receiver.isUnknown()) {
+            formatBuilder = formatBuilder
+                    .setUserMessage(eventMetadata.getMessage())
+                    .translate(formatContent.contains("<translate")); // support new <translate> and old <translateto>
         }
 
-        private Component buildFormatComponent(UUID messageUUID, FPlayer fReceiver, Component message) {
-            String formatContent = resolveString(fReceiver, this.format);
-            if (StringUtils.isEmpty(formatContent)) return Component.empty();
+        return formatBuilder.build();
+    }
 
-            MessagePipeline.Builder formatBuilder = messagePipeline
-                    .builder(messageUUID, fPlayer, fReceiver, formatContent)
-                    .flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut)
-                    .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(fReceiver))
-                    .tagResolvers(messageTag(message));
+    public void sendToIntegrations(EventMetadata<M> eventMetadata) {
+        UnaryOperator<String> integrationOperator = eventMetadata.getIntegration();
+        if (integrationOperator == null) return;
+        if (!integrationModule.hasMessenger()) return;
 
-            if (!fReceiver.isUnknown()) {
-                formatBuilder = formatBuilder
-                        .setUserMessage(resolveString(fReceiver, this.message))
-                        .translate(formatContent.contains("<translate")); // support new <translate> and old <translateto>
-            }
+        FEntity sender = eventMetadata.getSender();
+        String format = eventMetadata.resolveFormat(FPlayer.UNKNOWN, resolveLocalization());
 
-            if (formatComponentBuilder != null) {
-                formatBuilder = formatComponentBuilder.apply(formatBuilder);
-            }
+        Component componentFormat = messagePipeline.builder(sender, FPlayer.UNKNOWN, format)
+                .flag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
+                .flag(MessageFlag.TRANSLATE, false)
+                .tagResolvers(eventMetadata.getTagResolvers(FPlayer.UNKNOWN))
+                .build();
 
-            return formatBuilder.build();
-        }
+        String messageContent = eventMetadata.getMessage();
+        Component componentMessage = StringUtils.isEmpty(messageContent)
+                ? Component.empty()
+                : messagePipeline
+                .builder(sender, FPlayer.UNKNOWN, messageContent)
+                .flag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
+                .flag(MessageFlag.TRANSLATE, false)
+                .flag(MessageFlag.USER_MESSAGE, true)
+                .flag(MessageFlag.MENTION, false)
+                .flag(MessageFlag.INTERACTIVE_CHAT, false)
+                .flag(MessageFlag.QUESTION, false)
+                .build();
 
-        public void sendToIntegrations() {
-            if (tag == null) return;
-            if (integrationString == null) return;
-            if (!range.is(Range.Type.SERVER) && !range.is(Range.Type.PROXY)) return;
-            if (!integrationModule.hasMessenger()) return;
+        PlainTextComponentSerializer serializer = PlainTextComponentSerializer.plainText();
+        String finalFormattedMessage = Strings.CS.replace(
+                serializer.serialize(componentFormat),
+                "<message>",
+                serializer.serialize(componentMessage)
+        );
 
-            String formatContent = resolveString(FPlayer.UNKNOWN, format);
-            if (formatContent == null) {
-                formatContent = "";
-            }
+        UnaryOperator<String> interfaceReplaceString = s -> {
+            String input = integrationOperator.apply(s);
+            if (StringUtils.isBlank(input)) return StringUtils.EMPTY;
 
-            Component componentFormat = messagePipeline.builder(fPlayer, FPlayer.UNKNOWN, formatContent)
-                    .flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut)
-                    .flag(MessageFlag.TRANSLATE, false)
-                    .tagResolvers(tagResolvers == null ? null : tagResolvers.apply(FPlayer.UNKNOWN))
-                    .build();
-
-            String messageContent = resolveString(FPlayer.UNKNOWN, this.message);
-            Component componentMessage = StringUtils.isEmpty(messageContent)
-                    ? Component.empty()
-                    : messagePipeline
-                    .builder(fPlayer, FPlayer.UNKNOWN, messageContent)
-                    .flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut)
-                    .flag(MessageFlag.TRANSLATE, false)
-                    .flag(MessageFlag.USER_MESSAGE, true)
-                    .flag(MessageFlag.MENTION, false)
-                    .flag(MessageFlag.INTERACTIVE_CHAT, false)
-                    .flag(MessageFlag.QUESTION, false)
-                    .build();
-
-            PlainTextComponentSerializer serializer = PlainTextComponentSerializer.plainText();
-            String finalFormattedMessage = Strings.CS.replace(
-                    serializer.serialize(componentFormat),
-                    "<message>",
-                    serializer.serialize(componentMessage)
+            String clearMessage = RegExUtils.replaceAll((CharSequence) finalFormattedMessage, finalClearMessagePattern, StringUtils.EMPTY);
+            return StringUtils.replaceEach(
+                    input,
+                    new String[]{"<player>", "<final_message>", "<final_clear_message>"},
+                    new String[]{sender.getName(), finalFormattedMessage, clearMessage}
             );
+        };
 
-            UnaryOperator<String> interfaceReplaceString = s -> {
-                String input = integrationString.apply(s);
-                if (StringUtils.isBlank(input)) return StringUtils.EMPTY;
+        integrationModule.sendMessage(sender, messageType, interfaceReplaceString);
+    }
 
-                String clearMessage = RegExUtils.replaceAll((CharSequence) finalFormattedMessage, finalClearMessagePattern, StringUtils.EMPTY);
-                return StringUtils.replaceEach(
-                        input,
-                        new String[]{"<player>", "<final_message>", "<final_clear_message>"},
-                        new String[]{fPlayer.getName(), finalFormattedMessage, clearMessage}
-                );
-            };
+    public boolean sendToProxy(EventMetadata<M> eventMetadata) {
+        ProxyDataConsumer<SafeDataOutputStream> proxyConsumer = eventMetadata.getProxy();
+        if (proxyConsumer == null) return false;
 
-            integrationModule.sendMessage(fPlayer, tag, interfaceReplaceString);
-        }
+        Range range = eventMetadata.getRange();
+        if (!range.is(Range.Type.PROXY)) return false;
 
-        public boolean sendToProxy() {
-            if (tag == null) return false;
-            if (proxyOutput == null) return false;
-            if (!range.is(Range.Type.PROXY)) return false;
+        FEntity sender = eventMetadata.getSender();
+        return proxySender.send(sender, messageType, proxyConsumer);
+    }
 
-            return proxySender.send(fPlayer, tag, proxyOutput);
-        }
-
-        private String resolveString(FPlayer fPlayer, BiFunction<FPlayer, M, String> stringResolver) {
-            if (stringResolver == null) return null;
-            return stringResolver.apply(fPlayer, resolveLocalization(fPlayer));
-        }
+    public TagResolver messageTag(Component message) {
+        return TagResolver.resolver("message", (argumentQueue, context) -> Tag.inserting(message));
     }
 }

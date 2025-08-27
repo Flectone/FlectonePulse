@@ -17,6 +17,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 
 @Singleton
@@ -39,7 +40,7 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
                            ObjectiveModule objectiveModule,
                            ListenerRegistry listenerRegistry,
                            MessagePipeline messagePipeline) {
-        super(localization -> localization.getMessage().getObjective().getBelowname());
+        super(localization -> localization.getMessage().getObjective().getBelowname(), MessageType.OBJECTIVE);
 
         this.config = fileResolver.getMessage().getObjective().getBelowname();
         this.permission = fileResolver.getPermission().getMessage().getObjective().getBelowname();

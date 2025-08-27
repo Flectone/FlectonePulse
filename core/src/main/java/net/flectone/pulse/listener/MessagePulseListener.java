@@ -31,7 +31,8 @@ public class MessagePulseListener implements PulseListener {
 
         FPlayer fReceiver = event.getReceiver();
         Component submessage = event.getSubmessage();
-        Destination destination = event.getDestination();
+
+        Destination destination = event.getEventMetadata().getDestination();
         switch (destination.getType()) {
             case TITLE -> messageSender.sendTitle(fReceiver, message, submessage, destination.getTimes());
             case SUBTITLE -> messageSender.sendTitle(fReceiver, submessage, message, destination.getTimes());

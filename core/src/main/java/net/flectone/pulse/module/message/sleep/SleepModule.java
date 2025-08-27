@@ -10,8 +10,10 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.sleep.listener.SleepPulseListener;
 import net.flectone.pulse.module.message.sleep.model.Sleep;
+import net.flectone.pulse.module.message.sleep.model.SleepMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,7 +27,7 @@ public class SleepModule extends AbstractModuleLocalization<Localization.Message
     @Inject
     public SleepModule(FileResolver fileResolver,
                        ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getSleep());
+        super(localization -> localization.getMessage().getSleep(), MessageType.SLEEP);
 
         this.message = fileResolver.getMessage().getSleep();
         this.permission = fileResolver.getPermission().getMessage().getSleep();
@@ -50,8 +52,8 @@ public class SleepModule extends AbstractModuleLocalization<Localization.Message
     public void send(FPlayer fPlayer, MinecraftTranslationKey key, Sleep sleep) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        builder(fPlayer)
-                .destination(message.getDestination())
+        sendMessage(SleepMetadata.<Localization.Message.Sleep>builder()
+                .sender(fPlayer)
                 .receiver(fPlayer)
                 .format(bed -> switch (key) {
                     case SLEEP_NOT_POSSIBLE -> bed.getNotPossible();
@@ -63,7 +65,9 @@ public class SleepModule extends AbstractModuleLocalization<Localization.Message
                     case SLEEP_SKIPPING_NIGHT -> bed.getSkippingNight();
                     default -> "";
                 })
-                .sound(getSound())
-                .sendBuilt();
+                .sleep(sleep)
+                .sound(getModuleSound())
+                .build()
+        );
     }
 }

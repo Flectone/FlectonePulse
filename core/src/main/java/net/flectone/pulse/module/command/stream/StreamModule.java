@@ -12,6 +12,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.stream.listener.StreamPulseListener;
+import net.flectone.pulse.module.command.stream.model.StreamMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
@@ -51,7 +52,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                         FPlayerService fPlayerService,
                         CommandParserProvider commandParserProvider,
                         ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getCommand().getStream(), Command::getStream);
+        super(localization -> localization.getCommand().getStream(), Command::getStream, MessageType.COMMAND_STREAM);
 
         this.command = fileResolver.getCommand().getStream();
         this.permission = fileResolver.getPermission().getCommand().getStream();
@@ -104,16 +105,22 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         boolean isStream = fPlayer.isSetting(FPlayer.Setting.STREAM);
 
         if (isStream && needStart && !fPlayer.isUnknown()) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Stream::getAlready)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
         if (!isStream && !needStart) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Stream::getNot)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -128,21 +135,26 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                     .filter(this::isUrl)
                     .collect(Collectors.joining(" "));
 
-            builder(fPlayer)
+            sendMessage(StreamMetadata.<Localization.Command.Stream>builder()
+                    .sender(fPlayer)
+                    .format(replaceUrls(urls))
+                    .turned(true)
+                    .urls(urls)
                     .range(command.getRange())
                     .destination(command.getDestination())
-                    .tag(MessageType.COMMAND_STREAM)
-                    .format(replaceUrls(urls))
-                    .proxy(output -> output.writeUTF(urls))
-                    .integration(s -> Strings.CS.replace(s, "<urls>", urls))
-                    .sound(getSound())
-                    .sendBuilt();
-
+                    .sound(getModuleSound())
+                    .proxy(dataOutputStream -> dataOutputStream.writeString(urls))
+                    .integration(string -> Strings.CS.replace(string, "<urls>", StringUtils.defaultString(urls)))
+                    .build()
+            );
         } else {
-            builder(fPlayer)
-                    .destination(command.getDestination())
+            sendMessage(StreamMetadata.<Localization.Command.Stream>builder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Stream::getFormatEnd)
-                    .sendBuilt();
+                    .turned(false)
+                    .destination(command.getDestination())
+                    .build()
+            );
         }
     }
 

@@ -8,20 +8,22 @@ import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.maintenance.listener.MaintenancePacketListener;
 import net.flectone.pulse.module.command.maintenance.listener.MaintenancePulseListener;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.module.command.maintenance.model.MaintenanceMetadata;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.IconUtil;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
 
@@ -53,7 +55,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                              PlatformServerAdapter platformServerAdapter,
                              MessagePipeline messagePipeline,
                              IconUtil iconUtil) {
-        super(module -> module.getCommand().getMaintenance(), Command::getMaintenance);
+        super(module -> module.getCommand().getMaintenance(), Command::getMaintenance, MessageType.COMMAND_MAINTENANCE);
 
         this.command = fileResolver.getCommand().getMaintenance();
         this.permission = fileResolver.getPermission().getCommand().getMaintenance();
@@ -111,10 +113,14 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         command.setTurnedOn(turned);
         fileResolver.save();
 
-        builder(fPlayer)
+        sendMessage(MaintenanceMetadata.<Localization.Command.Maintenance>builder()
+                .sender(fPlayer)
+                .format(maintenance -> turned ? maintenance.getFormatTrue() : maintenance.getFormatFalse())
+                .turned(turned)
                 .destination(command.getDestination())
-                .format(s -> turned ? s.getFormatTrue() : s.getFormatFalse())
-                .sendBuilt();
+                .sound(getModuleSound())
+                .build()
+        );
 
         if (turned) {
             kickOnlinePlayers(fPlayer);

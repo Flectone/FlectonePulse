@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.deletemessage.model.DeletemessageMetadata;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.FileResolver;
@@ -29,7 +30,7 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
     public DeletemessageModule(FileResolver fileResolver,
                                DeleteModule deleteModule,
                                ProxySender proxySender) {
-        super(localization -> localization.getCommand().getDeletemessage(), Command::getDeletemessage);
+        super(localization -> localization.getCommand().getDeletemessage(), Command::getDeletemessage, MessageType.COMMAND_DELETE);
 
         this.command = fileResolver.getCommand().getDeletemessage();
         this.permission = fileResolver.getPermission().getCommand().getDeletemessage();
@@ -61,9 +62,12 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
 
         UUID uuid = getArgument(commandContext, 0);
         if (!deleteModule.remove(fPlayer, uuid)) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Deletemessage::getNullMessage)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -71,12 +75,13 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
                 dataOutputStream.writeUTF(uuid.toString())
         );
 
-        builder(fPlayer)
-                .destination(command.getDestination())
-                .tag(MessageType.COMMAND_BALL)
+        sendMessage(DeletemessageMetadata.<Localization.Command.Deletemessage>builder()
+                .sender(fPlayer)
                 .format(Localization.Command.Deletemessage::getFormat)
-                .proxy(output -> output.writeUTF(uuid.toString()))
-                .sound(getSound())
-                .sendBuilt();
+                .messageUUID(uuid)
+                .destination(command.getDestination())
+                .sound(getModuleSound())
+                .build()
+        );
     }
 }

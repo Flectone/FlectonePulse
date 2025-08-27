@@ -55,9 +55,12 @@ public class ChatsettingHandler {
                                MenuBuilder menuBuilder,
                                @Nullable String id) {
         if (!permissionChecker.check(fPlayer, permission.getSettings().get(FPlayer.Setting.CHAT))) {
-            chatsettingModule.builder(fPlayer)
+            chatsettingModule.sendMessage(chatsettingModule.metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Chatsetting::getNoPermission)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -88,9 +91,12 @@ public class ChatsettingHandler {
                                  MenuBuilder menuBuilder,
                                  @Nullable String id) {
         if (!permissionChecker.check(fPlayer, permission.getFcolors().get(type))) {
-            chatsettingModule.builder(fPlayer)
+            chatsettingModule.sendMessage(chatsettingModule.metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Chatsetting::getNoPermission)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -125,9 +131,12 @@ public class ChatsettingHandler {
 
     public void handleSubMenu(FPlayer fPlayer, SubMenuItem item, Runnable successRunnable) {
         if (item.perm() != null && !permissionChecker.check(fPlayer, item.perm())) {
-            chatsettingModule.builder(fPlayer)
+            chatsettingModule.sendMessage(chatsettingModule.metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Chatsetting::getNoPermission)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -136,9 +145,12 @@ public class ChatsettingHandler {
 
     public Status handleCheckbox(FPlayer fPlayer, FPlayer fTarget, FPlayer.Setting setting) {
         if (!permissionChecker.check(fPlayer, permission.getSettings().get(setting))) {
-            chatsettingModule.builder(fPlayer)
+            chatsettingModule.sendMessage(chatsettingModule.metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Chatsetting::getNoPermission)
-                    .sendBuilt();
+                    .build()
+            );
+
             return Status.DENIED;
         }
 

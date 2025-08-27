@@ -6,11 +6,13 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Mail;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.clearmail.model.ClearmailMetadata;
+import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.SuggestionProvider;
@@ -29,7 +31,7 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
     public ClearmailModule(FileResolver fileResolver,
                            FPlayerService fPlayerService,
                            CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getClearmail(), Command::getClearmail);
+        super(localization -> localization.getCommand().getClearmail(), Command::getClearmail, MessageType.COMMAND_CLEARMAIL);
 
         this.command = fileResolver.getCommand().getClearmail();
         this.permission = fileResolver.getPermission().getCommand().getClearmail();
@@ -72,9 +74,12 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
                 .findAny();
 
         if (optionalMail.isEmpty()) {
-            builder(fPlayer)
+            sendMessage(metadataBuilder()
+                    .sender(fPlayer)
                     .format(Localization.Command.Clearmail::getNullMail)
-                    .sendBuilt();
+                    .build()
+            );
+
             return;
         }
 
@@ -82,12 +87,15 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
 
         fPlayerService.deleteMail(optionalMail.get());
 
-        builder(fReceiver)
-                .destination(command.getDestination())
+        sendMessage(ClearmailMetadata.<Localization.Command.Clearmail>builder()
+                .sender(fReceiver)
                 .receiver(fPlayer)
-                .format(s -> Strings.CS.replaceOnce(s.getFormat(), "<id>", String.valueOf(mailID)))
+                .format(string -> Strings.CS.replaceOnce(string.getFormat(), "<id>", String.valueOf(mailID)))
+                .mail(optionalMail.get())
+                .destination(command.getDestination())
                 .message(optionalMail.get().message())
-                .sound(getSound())
-                .sendBuilt();
+                .sound(getModuleSound())
+                .build()
+        );
     }
 }
