@@ -15,7 +15,7 @@ import net.kyori.adventure.text.Component;
  * @see FPlayer
  */
 @Getter
-public class SenderToReceiverMessageEvent extends Event {
+public class MessageSendEvent extends Event {
 
     private final MessageType messageType;
     private final FEntity sender;
@@ -24,12 +24,12 @@ public class SenderToReceiverMessageEvent extends Event {
     private final Component submessage;
     private final EventMetadata<?> eventMetadata;
 
-    public SenderToReceiverMessageEvent(MessageType messageType,
-                                        FEntity sender,
-                                        FPlayer receiver,
-                                        Component message,
-                                        Component submessage,
-                                        EventMetadata<?> eventMetadata) {
+    public MessageSendEvent(MessageType messageType,
+                            FEntity sender,
+                            FPlayer receiver,
+                            Component message,
+                            Component submessage,
+                            EventMetadata<?> eventMetadata) {
         this.messageType = messageType;
         this.sender = sender;
         this.receiver = receiver;
@@ -38,24 +38,24 @@ public class SenderToReceiverMessageEvent extends Event {
         this.eventMetadata = eventMetadata;
     }
 
-    public SenderToReceiverMessageEvent(MessageType messageType,
-                                        FPlayer sender,
-                                        Component message,
-                                        Component submessage,
-                                        EventMetadata<?> eventMetadata) {
+    public MessageSendEvent(MessageType messageType,
+                            FPlayer sender,
+                            Component message,
+                            Component submessage,
+                            EventMetadata<?> eventMetadata) {
         this(messageType, sender, sender, message, submessage, eventMetadata);
     }
 
-    public SenderToReceiverMessageEvent(MessageType messageType,
-                                        FPlayer sender,
-                                        Component message,
-                                        EventMetadata<?> eventMetadata) {
+    public MessageSendEvent(MessageType messageType,
+                            FPlayer sender,
+                            Component message,
+                            EventMetadata<?> eventMetadata) {
         this(messageType, sender, message, Component.empty(), eventMetadata);
     }
 
-    public SenderToReceiverMessageEvent(MessageType messageType,
-                                        FPlayer sender,
-                                        Component message) {
+    public MessageSendEvent(MessageType messageType,
+                            FPlayer sender,
+                            Component message) {
         this(messageType, sender, message, EventMetadata.empty());
     }
 
