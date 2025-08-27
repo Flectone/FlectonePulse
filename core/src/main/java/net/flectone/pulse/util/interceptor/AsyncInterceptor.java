@@ -32,7 +32,7 @@ public class AsyncInterceptor implements MethodInterceptor {
 
         if (delay > 0) {
             taskScheduler.runAsyncLater(task, delay);
-        } else if (platformServerAdapter.isPrimaryThread() || Thread.currentThread().getName().startsWith("Netty")) {
+        } else if (platformServerAdapter.isPrimaryThread() || isRestrictedAsyncThread()) {
             taskScheduler.runAsync(task);
         } else {
             // already async
@@ -40,6 +40,12 @@ public class AsyncInterceptor implements MethodInterceptor {
         }
 
         return null;
+    }
+
+    private boolean isRestrictedAsyncThread() {
+        String threadName = Thread.currentThread().getName();
+
+        return threadName.startsWith("Netty") || threadName.startsWith("Async Chat");
     }
 
     private void proceedSafely(MethodInvocation invocation) {
