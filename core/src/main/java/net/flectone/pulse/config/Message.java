@@ -4,7 +4,6 @@ import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Tolerate;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.event.Event;
@@ -207,7 +206,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Chat implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
-        private Mode mode = Mode.PACKET;
+        private Mode mode = Mode.BUKKIT;
         private Event.Priority priority = Event.Priority.NORMAL;
         private Map<String, Type> types = new LinkedHashMap<>(){
             {
