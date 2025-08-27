@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
@@ -17,15 +18,18 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
     private final Command.Afk command;
     private final Permission.Command.Afk permission;
     private final net.flectone.pulse.module.message.afk.AfkModule afkMessageModule;
+    private final SoundPlayer soundPlayer;
 
     @Inject
     public AfkModule(FileResolver fileResolver,
-                     net.flectone.pulse.module.message.afk.AfkModule afkMessageModule) {
+                     net.flectone.pulse.module.message.afk.AfkModule afkMessageModule,
+                     SoundPlayer soundPlayer) {
         super(Localization::getCommand, Command::getAfk,fPlayer -> fPlayer.isSetting(FPlayer.Setting.AFK), MessageType.AFK);
 
         this.command = fileResolver.getCommand().getAfk();
         this.permission = fileResolver.getPermission().getCommand().getAfk();
         this.afkMessageModule = afkMessageModule;
+        this.soundPlayer = soundPlayer;
     }
 
     @Override
@@ -53,6 +57,6 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
             afkMessageModule.setAfk(fPlayer);
         }
 
-        playSound(fPlayer);
+        soundPlayer.play(getModuleSound(), fPlayer);
     }
 }

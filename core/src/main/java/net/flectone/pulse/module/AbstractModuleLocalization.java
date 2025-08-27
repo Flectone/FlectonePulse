@@ -18,7 +18,6 @@ import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
-import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.MuteChecker;
@@ -50,7 +49,6 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     @Inject private MessagePipeline messagePipeline;
     @Inject private ModerationMessageFormatter moderationMessageFormatter;
     @Inject private TimeFormatter timeFormatter;
-    @Inject private SoundPlayer soundPlayer;
     @Inject private EventDispatcher eventDispatcher;
 
     @Getter private Cooldown moduleCooldown;
@@ -70,12 +68,6 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         }
 
         return sound;
-    }
-
-    public void playSound(FPlayer fPlayer) {
-        if (!permissionChecker.check(fPlayer, moduleSound.getPermission())) return;
-
-        soundPlayer.play(moduleSound, fPlayer);
     }
 
     public Cooldown createCooldown(Cooldown cooldown, Permission.IPermission permission) {
@@ -263,7 +255,6 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         FEntity fPlayer = eventMetadata.getSender();
 
         receivers.forEach(recipient -> {
-
             // example
             // format: TheFaser > <message>
             // message: hello world!
@@ -287,13 +278,6 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
                     subComponent,
                     eventMetadata
             ));
-
-            if (eventMetadata.getSound() != null) {
-                Sound sound = eventMetadata.getSound();
-                if (!permissionChecker.check(fPlayer, sound.getPermission())) return;
-
-                soundPlayer.play(sound, recipient);
-            }
         });
     }
 

@@ -14,6 +14,7 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
@@ -39,6 +40,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
     private final MessagePipeline messagePipeline;
     private final EventDispatcher eventDispatcher;
     private final TimeFormatter timeFormatter;
+    private final SoundPlayer soundPlayer;
     private final FLogger fLogger;
 
     @Inject
@@ -49,6 +51,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
                            MessagePipeline messagePipeline,
                            EventDispatcher eventDispatcher,
                            TimeFormatter timeFormatter,
+                           SoundPlayer soundPlayer,
                            FLogger fLogger) {
         super(localization -> localization.getCommand().getToponline(), Command::getToponline, MessageType.COMMAND_TOPONLINE);
 
@@ -60,6 +63,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
         this.messagePipeline = messagePipeline;
         this.eventDispatcher = eventDispatcher;
         this.timeFormatter = timeFormatter;
+        this.soundPlayer = soundPlayer;
         this.fLogger = fLogger;
     }
 
@@ -146,6 +150,6 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
 
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_TOPONLINE, fPlayer, component));
 
-        playSound(fPlayer);
+        soundPlayer.play(getModuleSound(), fPlayer);
     }
 }

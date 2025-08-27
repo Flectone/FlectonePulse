@@ -17,6 +17,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -43,6 +44,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     private final ProxyRegistry proxyRegistry;
     private final Provider<DialogMenuBuilder> dialogMenuBuilderProvider;
     private final Provider<InventoryMenuBuilder> inventoryMenuBuilderProvider;
+    private final SoundPlayer soundPlayer;
     private final boolean isNewerThanOrEqualsV_1_21_6;
 
     @Inject
@@ -54,6 +56,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                              ProxyRegistry proxyRegistry,
                              Provider<DialogMenuBuilder> dialogMenuBuilderProvider,
                              Provider<InventoryMenuBuilder> inventoryMenuBuilderProvider,
+                             SoundPlayer soundPlayer,
                              PacketProvider packetProvider) {
         super(localization -> localization.getCommand().getChatsetting(), Command::getChatsetting, MessageType.COMMAND_CHATSETTING);
 
@@ -66,6 +69,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         this.proxyRegistry = proxyRegistry;
         this.dialogMenuBuilderProvider = dialogMenuBuilderProvider;
         this.inventoryMenuBuilderProvider = inventoryMenuBuilderProvider;
+        this.soundPlayer = soundPlayer;
         this.isNewerThanOrEqualsV_1_21_6 = packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6);
     }
 
@@ -117,7 +121,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
 
         open(fPlayer, fPlayer);
 
-        playSound(fPlayer);
+        soundPlayer.play(getModuleSound(), fPlayer);
     }
 
     private void executeOther(FPlayer fPlayer, String target, CommandContext<FPlayer> commandContext) {

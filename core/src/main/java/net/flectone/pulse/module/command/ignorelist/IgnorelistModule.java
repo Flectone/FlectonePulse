@@ -13,6 +13,7 @@ import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
@@ -34,6 +35,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
     private final MessagePipeline messagePipeline;
     private final CommandParserProvider commandParserProvider;
     private final TimeFormatter timeFormatter;
+    private final SoundPlayer soundPlayer;
 
     @Inject
     public IgnorelistModule(FileResolver fileResolver,
@@ -41,7 +43,8 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
                             EventDispatcher eventDispatcher,
                             MessagePipeline messagePipeline,
                             CommandParserProvider commandParserProvider,
-                            TimeFormatter timeFormatter) {
+                            TimeFormatter timeFormatter,
+                            SoundPlayer soundPlayer) {
         super(localization -> localization.getCommand().getIgnorelist(), Command::getIgnorelist, MessageType.COMMAND_IGNORELIST);
 
         this.command = fileResolver.getCommand().getIgnorelist();
@@ -51,6 +54,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         this.messagePipeline = messagePipeline;
         this.commandParserProvider = commandParserProvider;
         this.timeFormatter = timeFormatter;
+        this.soundPlayer = soundPlayer;
     }
 
     @Override
@@ -140,6 +144,6 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
 
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_IGNORELIST, fPlayer, component));
 
-        playSound(fPlayer);
+        soundPlayer.play(getModuleSound(), fPlayer);
     }
 }

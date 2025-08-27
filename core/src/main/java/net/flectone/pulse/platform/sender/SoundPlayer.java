@@ -7,10 +7,12 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSoundEffect;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.checker.PermissionChecker;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -21,18 +23,28 @@ public class SoundPlayer {
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PacketSender packetSender;
+    private final PermissionChecker permissionChecker;
 
     @Inject
     public SoundPlayer(FPlayerService fPlayerService,
                        PlatformPlayerAdapter platformPlayerAdapter,
-                       PacketSender packetSender) {
+                       PacketSender packetSender,
+                       PermissionChecker permissionChecker) {
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.packetSender = packetSender;
+        this.permissionChecker = permissionChecker;
     }
 
-    public void play(Sound sound, FPlayer fPlayer) {
+    public void play(Sound sound, FEntity sender) {
+        if (sender instanceof FPlayer fPlayer) {
+            play(sound, fPlayer, fPlayer);
+        }
+    }
+
+    public void play(Sound sound, FEntity sender, FPlayer receiver) {
         if (!sound.isEnable()) return;
+        if (!permissionChecker.check(sender, sound.getPermission())) return;
 
         Optional<SoundCategory> category = getSoundCategory(sound);
         if (category.isEmpty()) return;
@@ -40,15 +52,16 @@ public class SoundPlayer {
         com.github.retrooper.packetevents.protocol.sound.Sound packetSound = Sounds.getByName(sound.getName());
         if (packetSound == null) return;
 
-        packetSender.send(fPlayer, new WrapperPlayServerEntitySoundEffect(packetSound, category.get(),
-                platformPlayerAdapter.getEntityId(fPlayer.getUuid()),
+        packetSender.send(receiver, new WrapperPlayServerEntitySoundEffect(packetSound, category.get(),
+                platformPlayerAdapter.getEntityId(receiver.getUuid()),
                 sound.getVolume(),
                 sound.getPitch()
         ));
     }
 
-    public void play(Sound sound, FPlayer fPlayer, Vector3i vector3i) {
+    public void play(Sound sound, FPlayer sender, Vector3i vector3i) {
         if (!sound.isEnable()) return;
+        if (!permissionChecker.check(sender, sound.getPermission())) return;
 
         Optional<SoundCategory> category = getSoundCategory(sound);
         if (category.isEmpty()) return;
@@ -58,7 +71,7 @@ public class SoundPlayer {
 
         fPlayerService.getOnlineFPlayers().stream()
                 .filter(fReceiver -> {
-                    double distance = platformPlayerAdapter.distance(fPlayer, fReceiver);
+                    double distance = platformPlayerAdapter.distance(sender, fReceiver);
                     return distance >= 0 && distance <= 16;
                 })
                 .forEach(fReceiver -> packetSender.send(fReceiver, new WrapperPlayServerSoundEffect(packetSound, category.get(),
@@ -68,7 +81,7 @@ public class SoundPlayer {
                 )));
     }
 
-    public Optional<SoundCategory> getSoundCategory(Sound sound) {
+    private Optional<SoundCategory> getSoundCategory(Sound sound) {
         return Arrays.stream(SoundCategory.values())
                 .filter(soundCategory -> soundCategory.name().equalsIgnoreCase(sound.getCategory()))
                 .findAny();

@@ -14,6 +14,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unmute.UnmuteModule;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
@@ -38,6 +39,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
     private final MessagePipeline messagePipeline;
     private final CommandParserProvider commandParserProvider;
     private final EventDispatcher eventDispatcher;
+    private final SoundPlayer soundPlayer;
 
     @Inject
     public MutelistModule(FileResolver fileResolver,
@@ -47,7 +49,8 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
                           UnmuteModule unmuteModule,
                           MessagePipeline messagePipeline,
                           CommandParserProvider commandParserProvider,
-                          EventDispatcher eventDispatcher) {
+                          EventDispatcher eventDispatcher,
+                          SoundPlayer soundPlayer) {
         super(localization -> localization.getCommand().getMutelist(), Command::getMutelist, MessageType.COMMAND_MUTELIST);
 
         this.command = fileResolver.getCommand().getMutelist();
@@ -59,6 +62,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
         this.messagePipeline = messagePipeline;
         this.commandParserProvider = commandParserProvider;
         this.eventDispatcher = eventDispatcher;
+        this.soundPlayer = soundPlayer;
     }
 
     @Override
@@ -183,6 +187,6 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
 
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_MUTELIST, fPlayer, component));
 
-        playSound(fPlayer);
+        soundPlayer.play(getModuleSound(), fPlayer);
     }
 }
