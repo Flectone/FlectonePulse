@@ -120,7 +120,7 @@ public class ListenerRegistry implements Registry {
 
     public void registerDefaultListeners() {
         register(BasePacketListener.class);
-        register(FPlayerPulseListener.class);
+        register(BasePulseListener.class);
         register(MessagePulseListener.class);
 
         register(InventoryPacketListener.class);

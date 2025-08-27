@@ -9,7 +9,7 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
-import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
+import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
@@ -65,7 +65,7 @@ public class DeletePulseListener implements PulseListener {
     }
 
     @Pulse(priority = Event.Priority.MONITOR)
-    public void onSenderToReceiverMessageEvent(SenderToReceiverMessageEvent event) {
+    public void onSenderToReceiverMessageEvent(MessageSendEvent event) {
         EventMetadata eventMetadata = event.getEventMetadata();
         if (eventMetadata.getDestination().getType() != Destination.Type.CHAT) return;
 

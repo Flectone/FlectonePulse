@@ -6,6 +6,8 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.platform.proxy.Proxy;
 import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
@@ -38,6 +40,17 @@ public class ProxySender {
         this.messagePipeline = messagePipeline;
         this.gson = gson;
         this.fLogger = fLogger;
+    }
+
+    public boolean send(MessageType messageType, EventMetadata<?> eventMetadata) {
+        ProxyDataConsumer<SafeDataOutputStream> proxyConsumer = eventMetadata.getProxy();
+        if (proxyConsumer == null) return false;
+
+        Range range = eventMetadata.getRange();
+        if (!range.is(Range.Type.PROXY)) return false;
+
+        FEntity sender = eventMetadata.getSender();
+        return send(sender, messageType, proxyConsumer);
     }
 
     public boolean send(FEntity sender, MessageType tag, ProxyDataConsumer<SafeDataOutputStream> outputConsumer) {

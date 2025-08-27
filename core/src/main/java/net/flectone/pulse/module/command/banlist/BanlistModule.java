@@ -8,7 +8,7 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
+import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.unban.UnbanModule;
@@ -186,7 +186,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
 
         component = component.append(messagePipeline.builder(fPlayer, footer).build());
 
-        eventDispatcher.dispatch(new SenderToReceiverMessageEvent(MessageType.COMMAND_BANLIST, fPlayer, component));
+        eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_BANLIST, fPlayer, component));
 
         playSound(fPlayer);
     }

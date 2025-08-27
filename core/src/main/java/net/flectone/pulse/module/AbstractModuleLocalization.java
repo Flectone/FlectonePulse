@@ -6,26 +6,21 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
+import net.flectone.pulse.model.event.message.MessageSendEvent;
+import net.flectone.pulse.model.event.message.PreMessageSendEvent;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.model.util.Sound;
-import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
-import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.ProxyDataConsumer;
-import net.flectone.pulse.util.SafeDataOutputStream;
 import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.DisableSource;
@@ -34,18 +29,13 @@ import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import java.util.regex.Pattern;
 
 public abstract class AbstractModuleLocalization<M extends Localization.Localizable> extends AbstractModule {
 
@@ -53,7 +43,6 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     private final MessageType messageType;
 
     @Inject private FPlayerService fPlayerService;
-    @Inject private ModerationService moderationService;
     @Inject private PlatformPlayerAdapter platformPlayerAdapter;
     @Inject private PermissionChecker permissionChecker;
     @Inject private MuteChecker muteChecker;
@@ -61,10 +50,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     @Inject private MessagePipeline messagePipeline;
     @Inject private ModerationMessageFormatter moderationMessageFormatter;
     @Inject private TimeFormatter timeFormatter;
-    @Inject private ProxySender proxySender;
-    @Inject private IntegrationModule integrationModule;
     @Inject private SoundPlayer soundPlayer;
-    @Inject private TaskScheduler taskScheduler;
     @Inject private EventDispatcher eventDispatcher;
 
     @Getter private Cooldown moduleCooldown;
@@ -244,12 +230,13 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         return (EventMetadata.EventMetadataBuilder<M, ?, ?>) EventMetadata.builder();
     }
 
-    private static final Pattern finalClearMessagePattern = Pattern.compile("[\\p{C}\\p{So}\\x{E0100}-\\x{E01EF}]+");
-
     public List<FPlayer> createReceivers(EventMetadata<M> eventMetadata) {
-        taskScheduler.runAsync(() -> sendToIntegrations(eventMetadata));
+        String rawFormat = eventMetadata.resolveFormat(FPlayer.UNKNOWN, resolveLocalization());
+        PreMessageSendEvent preMessageSendEvent = new PreMessageSendEvent(messageType, rawFormat, eventMetadata);
 
-        if (sendToProxy(eventMetadata)) return Collections.emptyList();
+        eventDispatcher.dispatch(preMessageSendEvent);
+
+        if (preMessageSendEvent.isCancelled()) return Collections.emptyList();
 
         return fPlayerService.getFPlayersWithConsole().stream()
                 .filter(eventMetadata.getFilter())
@@ -292,7 +279,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
                 subComponent = buildSubcomponent(eventMetadata, messageComponent);
             }
 
-            eventDispatcher.dispatch(new SenderToReceiverMessageEvent(
+            eventDispatcher.dispatch(new MessageSendEvent(
                     messageType,
                     fPlayer,
                     recipient,
@@ -358,66 +345,6 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         }
 
         return formatBuilder.build();
-    }
-
-    public void sendToIntegrations(EventMetadata<M> eventMetadata) {
-        UnaryOperator<String> integrationOperator = eventMetadata.getIntegration();
-        if (integrationOperator == null) return;
-        if (!integrationModule.hasMessenger()) return;
-
-        FEntity sender = eventMetadata.getSender();
-        String format = eventMetadata.resolveFormat(FPlayer.UNKNOWN, resolveLocalization());
-
-        Component componentFormat = messagePipeline.builder(sender, FPlayer.UNKNOWN, format)
-                .flag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
-                .flag(MessageFlag.TRANSLATE, false)
-                .tagResolvers(eventMetadata.getTagResolvers(FPlayer.UNKNOWN))
-                .build();
-
-        String messageContent = eventMetadata.getMessage();
-        Component componentMessage = StringUtils.isEmpty(messageContent)
-                ? Component.empty()
-                : messagePipeline
-                .builder(sender, FPlayer.UNKNOWN, messageContent)
-                .flag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
-                .flag(MessageFlag.TRANSLATE, false)
-                .flag(MessageFlag.USER_MESSAGE, true)
-                .flag(MessageFlag.MENTION, false)
-                .flag(MessageFlag.INTERACTIVE_CHAT, false)
-                .flag(MessageFlag.QUESTION, false)
-                .build();
-
-        PlainTextComponentSerializer serializer = PlainTextComponentSerializer.plainText();
-        String finalFormattedMessage = Strings.CS.replace(
-                serializer.serialize(componentFormat),
-                "<message>",
-                serializer.serialize(componentMessage)
-        );
-
-        UnaryOperator<String> interfaceReplaceString = s -> {
-            String input = integrationOperator.apply(s);
-            if (StringUtils.isBlank(input)) return StringUtils.EMPTY;
-
-            String clearMessage = RegExUtils.replaceAll((CharSequence) finalFormattedMessage, finalClearMessagePattern, StringUtils.EMPTY);
-            return StringUtils.replaceEach(
-                    input,
-                    new String[]{"<player>", "<final_message>", "<final_clear_message>"},
-                    new String[]{sender.getName(), finalFormattedMessage, clearMessage}
-            );
-        };
-
-        integrationModule.sendMessage(sender, messageType, interfaceReplaceString);
-    }
-
-    public boolean sendToProxy(EventMetadata<M> eventMetadata) {
-        ProxyDataConsumer<SafeDataOutputStream> proxyConsumer = eventMetadata.getProxy();
-        if (proxyConsumer == null) return false;
-
-        Range range = eventMetadata.getRange();
-        if (!range.is(Range.Type.PROXY)) return false;
-
-        FEntity sender = eventMetadata.getSender();
-        return proxySender.send(sender, messageType, proxyConsumer);
     }
 
     public TagResolver messageTag(Component message) {

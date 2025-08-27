@@ -5,7 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
-import net.flectone.pulse.model.event.message.SenderToReceiverMessageEvent;
+import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.sender.MessageSender;
@@ -25,7 +25,7 @@ public class MessagePulseListener implements PulseListener {
     }
 
     @Pulse(priority = Event.Priority.HIGHEST)
-    public void onSenderToReceiverMessageEvent(SenderToReceiverMessageEvent event) {
+    public void onSenderToReceiverMessageEvent(MessageSendEvent event) {
         Component message = event.getMessage();
         if (!Component.IS_NOT_EMPTY.test(message)) return;
 
