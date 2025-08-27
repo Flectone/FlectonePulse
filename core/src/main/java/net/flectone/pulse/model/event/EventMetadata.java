@@ -26,11 +26,6 @@ import java.util.function.UnaryOperator;
 @SuperBuilder
 public class EventMetadata<L extends Localization.Localizable> {
 
-    private static final EventMetadata EMPTY = EventMetadata.builder()
-            .sender(FPlayer.UNKNOWN)
-            .format("")
-            .build();
-
     private final UUID messageUUID = UUID.randomUUID();
 
     @NonNull
@@ -117,10 +112,6 @@ public class EventMetadata<L extends Localization.Localizable> {
             this.format = format;
             return self();
         }
-    }
-
-    public static EventMetadata empty() {
-        return EMPTY;
     }
 
     @Nullable
