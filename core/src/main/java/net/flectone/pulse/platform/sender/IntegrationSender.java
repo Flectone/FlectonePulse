@@ -2,6 +2,7 @@ package net.flectone.pulse.platform.sender;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -33,6 +34,7 @@ public class IntegrationSender {
         this.messagePipeline = messagePipeline;
     }
 
+    @Async
     public void send(MessageType messageType, String format, EventMetadata<?> eventMetadata) {
         UnaryOperator<String> integrationOperator = eventMetadata.getIntegration();
         if (integrationOperator == null) return;
