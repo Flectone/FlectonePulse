@@ -675,7 +675,7 @@ public class ProxyMessageHandler {
         String chat = input.readUTF();
         String message = input.readUTF();
 
-        FPlayer fPlayer = fEntity instanceof FPlayer sender ? sender : FPlayer.UNKNOWN;
+        FPlayer fPlayer = fPlayerService.getFPlayer(fEntity.getUuid());
         injector.getInstance(ChatModule.class).send(fPlayer, chat, message);
     }
 
