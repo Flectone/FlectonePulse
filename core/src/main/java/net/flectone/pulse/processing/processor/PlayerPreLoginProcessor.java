@@ -39,6 +39,7 @@ public class PlayerPreLoginProcessor {
         if (fPlayerService.getOnlineFPlayers().isEmpty() && proxyRegistry.hasEnabledProxy()) {
             // clears the cache of players who might have left from other servers
             fPlayerService.clear();
+            fPlayerService.addConsole();
         }
 
         FPlayer fPlayer = fPlayerService.addFPlayer(uuid, name);
