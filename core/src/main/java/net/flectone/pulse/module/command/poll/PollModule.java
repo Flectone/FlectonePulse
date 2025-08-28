@@ -307,16 +307,20 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 k++;
             }
 
-            String messageStatus = switch (status) {
-                case START -> message.getStatus().getStart();
-                case RUN -> message.getStatus().getRun();
-                case END -> message.getStatus().getEnd();
-            };
+            String messageStatus = Strings.CS.replace(
+                    switch (status) {
+                        case START -> message.getStatus().getStart();
+                        case RUN -> message.getStatus().getRun();
+                        case END -> message.getStatus().getEnd();
+                    },
+                    "<id>",
+                    String.valueOf(poll.getId())
+            );
 
             return StringUtils.replaceEach(
                     message.getFormat(),
-                    new String[]{"<status>", "<id>", "<answers>"},
-                    new String[]{messageStatus, String.valueOf(poll.getId()), answersBuilder.toString()}
+                    new String[]{"<status>", "<answers>"},
+                    new String[]{messageStatus, answersBuilder.toString()}
             );
         };
     }
