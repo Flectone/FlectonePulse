@@ -13,6 +13,6 @@ import java.util.UUID;
 public class DeletemessageMetadata<L extends Localization.Localizable> extends EventMetadata<L> {
 
     @NonNull
-    private final UUID messageUUID;
+    private final UUID deletedUUID;
 
 }

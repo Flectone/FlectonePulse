@@ -79,7 +79,7 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
         sendMessage(DeletemessageMetadata.<Localization.Command.Deletemessage>builder()
                 .sender(fPlayer)
                 .format(Localization.Command.Deletemessage::getFormat)
-                .messageUUID(uuid)
+                .deletedUUID(uuid)
                 .destination(command.getDestination())
                 .sound(getModuleSound())
                 .build()
