@@ -74,14 +74,11 @@ public class FileResolver {
         if (!preInitVersion.equals(BuildConfig.PROJECT_VERSION)) {
             // fix update permission name
             if (isVersionOlderThan(preInitVersion, "1.4.3")) {
-                permission.reload();
+                migration_1_4_3();
+            }
 
-                Permission.Message.Update update = permission.getMessage().getUpdate();
-                if (update.getName().equals("flectonepulse.module.message.op")) {
-                    update.setName("flectonepulse.module.message.update");
-                    update.setSound(new Permission.PermissionEntry("flectonepulse.module.message.update.sound", Permission.Type.TRUE));
-                    permission.save();
-                }
+            if (isVersionOlderThan(preInitVersion, "1.5.0")) {
+                migration_1_5_0();
             }
 
             config.setVersion(BuildConfig.PROJECT_VERSION);
@@ -160,5 +157,61 @@ public class FileResolver {
     private String[] parseVersionNumbers(String string) {
         int endIndex = string.indexOf('-');
         return (endIndex == -1 ? string : string.substring(0, endIndex)).split("\\.");
+    }
+
+    private void migration_1_4_3() {
+        permission.reload();
+
+        Permission.Message.Update update = permission.getMessage().getUpdate();
+        if (update.getName().equals("flectonepulse.module.message.op")) {
+            update.setName("flectonepulse.module.message.update");
+            update.setSound(new Permission.PermissionEntry("flectonepulse.module.message.update.sound", Permission.Type.TRUE));
+            permission.save();
+        }
+    }
+
+    private void migration_1_5_0() {
+        String oldChatKey = "CHAT";
+        String newChatKey = "CHAT_GLOBAL";
+
+        integration.reload();
+
+        Integration.Discord discord = integration.getDiscord();
+        if (discord.getMessageChannel().containsKey(oldChatKey)) {
+            discord.getMessageChannel().put(newChatKey, discord.getMessageChannel().remove(oldChatKey));
+        }
+
+        Integration.Telegram telegram = integration.getTelegram();
+        if (telegram.getMessageChannel().containsKey(oldChatKey)) {
+            telegram.getMessageChannel().put(newChatKey, telegram.getMessageChannel().remove(oldChatKey));
+        }
+
+        Integration.Twitch twitch = integration.getTwitch();
+        if (twitch.getMessageChannel().containsKey(oldChatKey)) {
+            twitch.getMessageChannel().put(newChatKey, twitch.getMessageChannel().remove(oldChatKey));
+        }
+
+        integration.save();
+
+        reloadLanguages();
+
+        localizationMap.values().forEach(localization -> {
+            Localization.Integration.Discord localizationDiscord = localization.getIntegration().getDiscord();
+            if (localizationDiscord.getMessageChannel().containsKey(oldChatKey)) {
+                localizationDiscord.getMessageChannel().put(newChatKey, localizationDiscord.getMessageChannel().remove(oldChatKey));
+            }
+
+            Localization.Integration.Twitch localizationTwitch = localization.getIntegration().getTwitch();
+            if (localizationTwitch.getMessageChannel().containsKey(oldChatKey)) {
+                localizationTwitch.getMessageChannel().put(newChatKey, localizationTwitch.getMessageChannel().remove(oldChatKey));
+            }
+
+            Localization.Integration.Telegram localizationTelegram = localization.getIntegration().getTelegram();
+            if (localizationTelegram.getMessageChannel().containsKey(oldChatKey)) {
+                localizationTelegram.getMessageChannel().put(newChatKey, localizationTelegram.getMessageChannel().remove(oldChatKey));
+            }
+
+            localization.save();
+        });
     }
 }
