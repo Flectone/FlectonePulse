@@ -1286,7 +1286,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 private String secondWin = "<color:#98FB98>☒</color:#98FB98>";
             }
 
-            private String field = "<fcolor:1><br>|[#][#][#]| <title> <current_move> <br><fcolor:1>|[#][#][#]| <br>|[#][#][#]| <last_move><br>";
+            private String field = "<fcolor:1><br>|[#][#][#]<fcolor:1>| <title> <current_move> <br><fcolor:1>|[#][#][#]<fcolor:1>| <br>|[#][#][#]<fcolor:1>| <last_move><br>";
             private String currentMove = "<fcolor:2>☐ → <symbol>";
             private String lastMove = "<fcolor:2>Last move (<move>)";
             private String formatMove = "<fcolor:2><display_name>'s move";
