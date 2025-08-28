@@ -53,7 +53,7 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         registerCommand(commandBuilder -> commandBuilder
                 .permission(permission.getName())
-                .optional(promptPlayer, commandParserProvider.playerParser())
+                .optional(promptPlayer, commandParserProvider.platformPlayerParser())
         );
 
         addPredicate(this::checkCooldown);
