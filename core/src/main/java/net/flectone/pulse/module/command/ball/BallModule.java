@@ -66,6 +66,7 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
         String message = getArgument(commandContext, 0);
 
         sendMessage(BallMetadata.<Localization.Command.Ball>builder()
+                .sender(fPlayer)
                 .format(replaceAnswer(answer))
                 .answer(answer)
                 .message(message)
