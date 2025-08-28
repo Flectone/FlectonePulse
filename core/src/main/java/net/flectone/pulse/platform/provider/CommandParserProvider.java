@@ -3,6 +3,7 @@ package net.flectone.pulse.platform.provider;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.leangen.geantyref.TypeToken;
+import net.flectone.pulse.processing.parser.player.PlatformPlayerParser;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -32,6 +33,7 @@ public class CommandParserProvider {
 
     private final PermissionChecker permissionChecker;
     private final PlayerParser playerParser;
+    private final PlatformPlayerParser platformPlayerParser;
     private final OfflinePlayerParser offlinePlayerParser;
     private final DurationReasonParser durationReasonParser;
     private final BanModerationParser banModerationParser;
@@ -49,6 +51,7 @@ public class CommandParserProvider {
     @Inject
     public CommandParserProvider(PermissionChecker permissionChecker,
                                  PlayerParser playerParser,
+                                 PlatformPlayerParser platformPlayerParser,
                                  OfflinePlayerParser offlinePlayerParser,
                                  DurationReasonParser durationReasonParser,
                                  BanModerationParser banModerationParser,
@@ -62,6 +65,7 @@ public class CommandParserProvider {
         this.muteModerationParser = muteModerationParser;
         this.warnModerationParser = warnModerationParser;
         this.playerParser = playerParser;
+        this.platformPlayerParser = platformPlayerParser;
         this.offlinePlayerParser = offlinePlayerParser;
         this.durationReasonParser = durationReasonParser;
         this.colorParser = colorParser;
@@ -79,6 +83,10 @@ public class CommandParserProvider {
 
     public @NonNull ParserDescriptor<FPlayer, String> playerParser() {
         return ParserDescriptor.of(playerParser, String.class);
+    }
+
+    public @NonNull ParserDescriptor<FPlayer, String> platformPlayerParser() {
+        return ParserDescriptor.of(platformPlayerParser, String.class);
     }
 
     public @NonNull ParserDescriptor<FPlayer, Integer> integerParser() {
