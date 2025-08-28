@@ -127,11 +127,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         return true;
     }
 
-    public boolean sendDisableMessage(FEntity fPlayer, DisableSource whoDisableCommand) {
-        return sendDisableMessage(fPlayer, fPlayer, whoDisableCommand);
-    }
-
-    public boolean sendDisableMessage(FEntity fPlayer, @NotNull FEntity fReceiver, DisableSource action) {
+    public void sendDisableMessage(FEntity fPlayer, @NotNull FEntity fReceiver, DisableSource action) {
         Localization.Command.Chatsetting.Disable localization = fileResolver.getLocalization(fReceiver).getCommand().getChatsetting().getDisable();
 
         String format = switch (action) {
@@ -145,8 +141,6 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
                 .format(format)
                 .build()
         );
-
-        return true;
     }
 
     public boolean checkIgnore(FPlayer fSender, FPlayer fReceiver) {

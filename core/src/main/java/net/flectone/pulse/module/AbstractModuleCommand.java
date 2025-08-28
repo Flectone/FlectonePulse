@@ -120,7 +120,9 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
         if (!(receiver instanceof FPlayer fReceiver)) return false;
         if (commandPredicate == null || commandPredicate.test(fReceiver)) return false;
 
-        return super.sendDisableMessage(entity, fReceiver, action);
+        sendDisableMessage(entity, fReceiver, action);
+
+        return true;
     }
 
     @Override
