@@ -66,7 +66,7 @@ public class DeletePulseListener implements PulseListener {
 
     @Pulse(priority = Event.Priority.MONITOR)
     public void onSenderToReceiverMessageEvent(MessageSendEvent event) {
-        EventMetadata eventMetadata = event.getEventMetadata();
+        EventMetadata<?> eventMetadata = event.getEventMetadata();
         if (eventMetadata.getDestination().getType() != Destination.Type.CHAT) return;
 
         FPlayer fReceiver = event.getReceiver();
