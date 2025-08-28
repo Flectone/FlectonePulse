@@ -412,10 +412,10 @@ public class ProxyMessageHandler {
     private void handleMuteCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         MuteModule module = injector.getInstance(MuteModule.class);
 
-        FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
-        if (module.isModuleDisabledFor(fModerator)) return;
-
         Moderation mute = gson.fromJson(input.readUTF(), Moderation.class);
+
+        FPlayer fModerator = fPlayerService.getFPlayer(mute.getModerator());
+        if (module.isModuleDisabledFor(fModerator)) return;
 
         module.sendMessage(ModerationMetadata.<Localization.Command.Mute>builder()
                 .uuid(metadataUUID)
@@ -625,10 +625,10 @@ public class ProxyMessageHandler {
     private void handleWarnCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         WarnModule module = injector.getInstance(WarnModule.class);
 
-        FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
-        if (module.isModuleDisabledFor(fModerator)) return;
-
         Moderation warn = gson.fromJson(input.readUTF(), Moderation.class);
+
+        FPlayer fModerator = fPlayerService.getFPlayer(warn.getModerator());
+        if (module.isModuleDisabledFor(fModerator)) return;
 
         module.sendMessage(ModerationMetadata.<Localization.Command.Warn>builder()
                 .uuid(metadataUUID)
