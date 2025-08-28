@@ -63,6 +63,12 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
                 .range(command.getRange())
                 .destination(command.getDestination())
                 .sound(getModuleSound())
+                .proxy(output -> output.writeInt(percent))
+                .integration(string -> Strings.CS.replace(
+                        string,
+                        "<result>",
+                        replaceResult(percent).apply(resolveLocalization())
+                ))
                 .build()
         );
     }
