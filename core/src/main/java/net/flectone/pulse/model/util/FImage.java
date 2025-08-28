@@ -5,6 +5,7 @@ import lombok.Getter;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +25,10 @@ public class FImage {
     // https://github.com/QuiltServerTools/BlockBot/blob/5d5fa854002de2c12200edbe22f12382350ca7eb/src/main/kotlin/io/github/quiltservertools/blockbotdiscord/extensions/BlockBotApiExtension.kt#L136
     public List<String> convertImageUrl() throws IOException {
         URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestProperty("User-Agent", "Mozilla/5.0");
 
-        BufferedImage bufferedImage = ImageIO.read(url);
+        BufferedImage bufferedImage = ImageIO.read(connection.getInputStream());
         if (bufferedImage == null) return null;
 
         int width = bufferedImage.getWidth();
