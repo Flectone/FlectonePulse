@@ -82,7 +82,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.online.formatTotal = "<fcolor:1>⌛ <display_name> <fcolor:1>всего провёл на сервере <time>";
 
         command.ping.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
-        command.ping.format = "<fcolor:1>🖧 Пинг игрока <display_name>< равен <ping>";
+        command.ping.format = "<fcolor:1>🖧 Пинг игрока <display_name> равен <ping>";
 
         command.coin.head = "орёл";
         command.coin.tail = "решка";
