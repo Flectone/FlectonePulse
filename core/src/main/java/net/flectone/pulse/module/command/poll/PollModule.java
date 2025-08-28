@@ -23,6 +23,7 @@ import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
@@ -115,6 +116,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 Range range = command.getRange();
 
                 sendMessage(MessageType.COMMAND_POLL, PollMetadata.<Localization.Command.Poll>builder()
+                        .sender(fPlayer)
                         .format(resolvePollFormat(fPlayer, poll, status))
                         .poll(poll)
                         .range(range)
