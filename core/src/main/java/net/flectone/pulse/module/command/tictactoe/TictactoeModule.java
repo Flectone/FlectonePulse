@@ -177,6 +177,13 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         if (ticTacToe == null) return;
 
         sendMessage(metadataBuilder()
+                .sender(fReceiver)
+                .filterPlayer(fPlayer, true)
+                .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
+                .build()
+        );
+
+        sendMessage(metadataBuilder()
                 .uuid(metadataUUID)
                 .sender(fReceiver)
                 .filterPlayer(fReceiver)
@@ -243,13 +250,6 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
             typeTitle = 0;
         }
 
-        sendMessage(metadataBuilder()
-                .sender(fReceiver)
-                .filterPlayer(fPlayer, true)
-                .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
-                .build()
-        );
-
         FPlayer finalFReceiver = fReceiver;
         UUID metadataUUID = UUID.randomUUID();
         boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TICTACTOE_MOVE, dataOutputStream -> {
@@ -261,13 +261,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         if (isSent) return;
 
-        sendMessage(metadataBuilder()
-                .uuid(metadataUUID)
-                .sender(fReceiver)
-                .filterPlayer(fReceiver)
-                .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
-                .build()
-        );
+        sendMoveMessage(fPlayer, finalFReceiver, ticTacToe, typeTitle, move, metadataUUID);
     }
 
     public BiFunction<FPlayer, Localization.Command.Tictactoe, String> getMoveMessage(TicTacToe ticTacToe,
