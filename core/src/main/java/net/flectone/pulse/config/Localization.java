@@ -133,8 +133,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.poll.expired = "<color:#ff7171><b>⁉</b> Голосование завершено";
         command.poll.already = "<color:#ff7171><b>⁉</b> Ты уже проголосовал в этом голосовании";
         command.poll.nullPoll = "<color:#ff7171><b>⁉</b> Голосование не найдено";
-        command.poll.voteTrue = "<color:#4eff52>👍 Ты выбрал <answer_id> в голосовании #<id>. Всего таких голосов <count>";
-        command.poll.voteFalse = "<color:#ff4e4e>\uD83D\uDD93 Ты передумал об <answer_id> в голосовании #<id>. Всего таких голосов <count> без тебя";
+        command.poll.voteTrue = "<color:#4eff52>👍 Ты выбрал <answer_id> вариант в голосовании #<id>. Всего таких голосов <count>";
+        command.poll.voteFalse = "<color:#ff4e4e>\uD83D\uDD93 Ты передумал об <answer_id> варианте в голосовании #<id>. Всего таких голосов <count> без тебя";
         command.poll.format = "<br><color:#fce303>│ <status> <br>│ <message><reset> <color:#fce303><br>├─────────────<br><answers>";
         command.poll.status.start = "Создано новое голосование #<b><id></b>";
         command.poll.status.run = "Идёт голосование #<b><id></b>";
@@ -1194,8 +1194,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String nullPoll = "<color:#ff7171><b>⁉</b> Poll not found";
             private String expired = "<color:#ff7171><b>⁉</b> The poll has ended";
             private String already = "<color:#ff7171><b>⁉</b> You have already voted in this poll";
-            private String voteTrue = "<color:#4eff52>👍 You voted for <answer_id> in poll #<id>. There are <count> of you";
-            private String voteFalse = "<color:#ff4e4e>🖓 You rejected <answer_id> in poll #<id>. There are <count> without you";
+            private String voteTrue = "<color:#4eff52>👍 You voted for option <answer_id> in poll #<id>. There are <count> of you";
+            private String voteFalse = "<color:#ff4e4e>🖓 You rejected option <answer_id> in poll #<id>. There are <count> without you";
             private String format = "<br><color:#fce303>│ <status> <br>│ <message><reset> <color:#fce303><br>├─────────────<br><answers>";
             private String answerTemplate = "<color:#fce303>│ <count> → <color:#4eff52><hover:show_text:\"<color:#4eff52>Vote for <bold><answer>\"><click:run_command:\"/pollvote <id> <number>\"><answer> [👍]<br>";
             private Status status = new Status();
