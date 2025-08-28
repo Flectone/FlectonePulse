@@ -326,7 +326,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         if (spoilerText.equals("\\")) return Tag.selfClosingInserting(Component.empty());
 
         // "\\" to have the original context like ||%stats%||
-        Component spoilerComponent = messagePipeline.builder(sender, receiver, "\\" + spoilerText)
+        Component spoilerComponent = messagePipeline.builder(sender, receiver, "." + spoilerText)
                 .flags(new EnumMap<>(flags)) // extend message flags
                 .flag(MessageFlag.TRANSLATE_ITEM, false) // we don't need to double format "|| %item% ||"
                 .build();
