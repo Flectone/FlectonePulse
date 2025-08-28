@@ -19,6 +19,7 @@ import net.flectone.pulse.module.command.ball.BallModule;
 import net.flectone.pulse.module.command.ball.model.BallMetadata;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.broadcast.BroadcastModule;
+import net.flectone.pulse.module.command.chatcolor.ChatcolorModule;
 import net.flectone.pulse.module.command.coin.CoinModule;
 import net.flectone.pulse.module.command.coin.model.CoinMetadata;
 import net.flectone.pulse.module.command.dice.DiceModule;
@@ -306,7 +307,13 @@ public class ProxyMessageHandler {
     }
 
     private void handleChatColorCommand(FEntity fEntity) {
-        fPlayerService.loadColors(fPlayerService.getFPlayer(fEntity.getUuid()));
+        FPlayer fPlayer = fPlayerService.getFPlayer(fEntity.getUuid());
+        fPlayerService.loadColors(fPlayer);
+
+        ChatcolorModule module = injector.getInstance(ChatcolorModule.class);
+        if (!module.isEnable()) return;
+
+        module.sendMessageWithUpdatedColors(fPlayer);
     }
 
     private void handleChatSettingCommand(FEntity fEntity) {

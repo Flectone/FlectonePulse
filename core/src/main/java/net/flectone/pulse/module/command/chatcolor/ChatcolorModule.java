@@ -179,6 +179,10 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
             proxySender.send(fPlayer, MessageType.COMMAND_CHATCOLOR, dataOutputStream -> {});
         }
 
+        sendMessageWithUpdatedColors(fPlayer);
+    }
+
+    public void sendMessageWithUpdatedColors(FPlayer fPlayer) {
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
                 .format(Localization.Command.Chatcolor::getFormat)
