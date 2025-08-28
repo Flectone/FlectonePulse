@@ -17,7 +17,6 @@ import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Singleton
 public class ClearchatModule extends AbstractModuleCommand<Localization.Command.Clearchat> {
@@ -104,7 +103,7 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
     public void clearChat(FPlayer fPlayer, boolean checkProxy) {
         if (checkProxy
                 && !platformPlayerAdapter.isOnline(fPlayer)
-                && proxySender.send(fPlayer, MessageType.COMMAND_CLEARCHAT, dataOutputStream -> {}, UUID.randomUUID())) {
+                && proxySender.send(fPlayer, MessageType.COMMAND_CLEARCHAT)) {
             return;
         }
 

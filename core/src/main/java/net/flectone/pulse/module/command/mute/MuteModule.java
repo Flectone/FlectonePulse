@@ -22,7 +22,6 @@ import org.incendo.cloud.type.tuple.Pair;
 
 import java.time.Duration;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.BiFunction;
 
 @Singleton
@@ -117,7 +116,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         Moderation mute = moderationService.mute(fTarget, databaseTime, reason, fPlayer.getId());
         if (mute == null) return;
 
-        proxySender.send(fTarget, MessageType.SYSTEM_MUTE, dataOutputStream -> {}, UUID.randomUUID());
+        proxySender.send(fTarget, MessageType.SYSTEM_MUTE);
 
         sendMessage(ModerationMetadata.<Localization.Command.Mute>builder()
                 .format(buildFormat(mute))

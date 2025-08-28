@@ -5,23 +5,22 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.event.UnModerationMetadata;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.platform.sender.ProxySender;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Singleton
 public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unban> {
@@ -126,7 +125,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
 
         moderationService.remove(fTarget, bans);
 
-        proxySender.send(fTarget, MessageType.SYSTEM_BAN, dataOutputStream -> {}, UUID.randomUUID());
+        proxySender.send(fTarget, MessageType.SYSTEM_BAN);
 
         sendMessage(UnModerationMetadata.<Localization.Command.Unban>builder()
                 .sender(fTarget)

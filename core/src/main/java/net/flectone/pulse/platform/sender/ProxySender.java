@@ -54,6 +54,10 @@ public class ProxySender {
         return send(sender, messageType, proxyConsumer, eventMetadata.getUuid());
     }
 
+    public boolean send(FEntity sender, MessageType tag) {
+        return send(sender, tag, dataOutputStream -> {}, UUID.randomUUID());
+    }
+
     public boolean send(FEntity sender, MessageType tag, ProxyDataConsumer<SafeDataOutputStream> outputConsumer, UUID metadataUUID) {
         boolean isPlayer = sender instanceof FPlayer;
 

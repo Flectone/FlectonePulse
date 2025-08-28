@@ -165,7 +165,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         fPlayerService.saveSettings(fPlayer);
 
         if (proxyRegistry.hasEnabledProxy()) {
-            proxySender.send(fPlayer, MessageType.COMMAND_CHATSETTING, dataOutputStream -> {}, UUID.randomUUID());
+            proxySender.send(fPlayer, MessageType.COMMAND_CHATSETTING);
         }
     }
 

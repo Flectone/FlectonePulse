@@ -120,7 +120,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
 
         moderationService.remove(fTarget, mutes);
 
-        proxySender.send(fTarget, MessageType.SYSTEM_MUTE, dataOutputStream -> {}, UUID.randomUUID());
+        proxySender.send(fTarget, MessageType.SYSTEM_MUTE);
 
         sendMessage(UnModerationMetadata.<Localization.Command.Unmute>builder()
                 .sender(fTarget)
