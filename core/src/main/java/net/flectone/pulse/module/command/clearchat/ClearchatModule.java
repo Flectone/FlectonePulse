@@ -7,7 +7,9 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
@@ -24,12 +26,16 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final CommandParserProvider commandParserProvider;
+    private final ProxySender proxySender;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
 
     @Inject
     public ClearchatModule(FPlayerService fPlayerService,
                            FileResolver fileResolver,
                            PermissionChecker permissionChecker,
-                           CommandParserProvider commandParserProvider) {
+                           CommandParserProvider commandParserProvider,
+                           ProxySender proxySender,
+                           PlatformPlayerAdapter platformPlayerAdapter) {
         super(localization -> localization.getCommand().getClearchat(), Command::getClearchat, MessageType.COMMAND_CLEARCHAT);
 
         this.command = fileResolver.getCommand().getClearchat();
@@ -37,6 +43,8 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
         this.commandParserProvider = commandParserProvider;
+        this.proxySender = proxySender;
+        this.platformPlayerAdapter = platformPlayerAdapter;
     }
 
     @Override
@@ -88,12 +96,21 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
         clearChat(fTarget);
     }
 
-    private void clearChat(FPlayer fPlayer) {
+    public void clearChat(FPlayer fPlayer) {
+        clearChat(fPlayer, true);
+    }
+
+    public void clearChat(FPlayer fPlayer, boolean checkProxy) {
+        if (checkProxy
+                && !platformPlayerAdapter.isOnline(fPlayer)
+                && proxySender.send(fPlayer, MessageType.COMMAND_CLEARCHAT, dataOutputStream -> {})) {
+            return;
+        }
+
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
                 .format("<br> ".repeat(100))
                 .destination(command.getDestination())
-                .proxy(dataOutputStream -> {})
                 .build()
         );
 

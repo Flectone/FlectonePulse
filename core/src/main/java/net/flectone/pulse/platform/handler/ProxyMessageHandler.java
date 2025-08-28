@@ -20,6 +20,7 @@ import net.flectone.pulse.module.command.ball.model.BallMetadata;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.broadcast.BroadcastModule;
 import net.flectone.pulse.module.command.chatcolor.ChatcolorModule;
+import net.flectone.pulse.module.command.clearchat.ClearchatModule;
 import net.flectone.pulse.module.command.coin.CoinModule;
 import net.flectone.pulse.module.command.coin.model.CoinMetadata;
 import net.flectone.pulse.module.command.dice.DiceModule;
@@ -177,6 +178,7 @@ public class ProxyMessageHandler {
             case COMMAND_TICTACTOE -> handleTicTacToeCreate(input, fEntity);
             case COMMAND_TICTACTOE_MOVE -> handleTicTacToeMove(input, fEntity);
             case CHAT -> handleChatMessage(input, fEntity);
+            case COMMAND_CLEARCHAT -> handleClearchatCommand(input, fEntity);
             case COMMAND_ROCKPAPERSCISSORS -> handleRockPaperScissorsCreate(input, fEntity);
             case COMMAND_ROCKPAPERSCISSORS_MOVE -> handleRockPaperScissorsMove(input, fEntity);
             case COMMAND_ROCKPAPERSCISSORS_FINAL -> handleRockPaperScissorsFinal(input, fEntity);
@@ -677,6 +679,14 @@ public class ProxyMessageHandler {
 
         FPlayer fPlayer = fPlayerService.getFPlayer(fEntity.getUuid());
         injector.getInstance(ChatModule.class).send(fPlayer, chat, message);
+    }
+
+    private void handleClearchatCommand(DataInputStream input, FEntity fEntity) {
+        ClearchatModule module = injector.getInstance(ClearchatModule.class);
+        if (!module.isEnable()) return;
+
+        FPlayer fPlayer = fPlayerService.getFPlayer(fEntity.getUuid());
+        module.clearChat(fPlayer, false);
     }
 
     private void handleRockPaperScissorsCreate(DataInputStream input, FEntity fEntity) throws IOException {
