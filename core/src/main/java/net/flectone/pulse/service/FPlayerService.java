@@ -76,10 +76,7 @@ public class FPlayerService {
 
     public void reload() {
         clear();
-
-        FPlayer console = new FPlayer(config.getConsole());
-        fPlayerRepository.add(console);
-        fPlayerRepository.saveOrIgnore(console);
+        addConsole();
 
         platformPlayerAdapter.getOnlinePlayers().forEach(uuid -> {
             String name = platformPlayerAdapter.getName(uuid);
@@ -87,6 +84,12 @@ public class FPlayerService {
             loadData(fPlayer);
             saveFPlayerData(fPlayer);
         });
+    }
+
+    public void addConsole() {
+        FPlayer console = new FPlayer(config.getConsole());
+        fPlayerRepository.add(console);
+        fPlayerRepository.saveOrIgnore(console);
     }
 
     public FPlayer addFPlayer(UUID uuid, String name) {
