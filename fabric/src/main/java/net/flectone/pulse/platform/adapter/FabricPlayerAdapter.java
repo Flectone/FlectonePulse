@@ -153,9 +153,13 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NotNull Component getPlayerListHeader(@NotNull FPlayer fPlayer) {
-        String header = injector.getInstance(HeaderModule.class).getCurrentMessage(fPlayer);
-        if (header != null) {
-            return injector.getInstance(MessagePipeline.class).builder(fPlayer, header).build();
+        HeaderModule headerModule = injector.getInstance(HeaderModule.class);
+
+        if (!headerModule.isModuleDisabledFor(fPlayer)) {
+            String header = headerModule.getCurrentMessage(fPlayer);
+            if (header != null) {
+                return injector.getInstance(MessagePipeline.class).builder(fPlayer, header).build();
+            }
         }
 
         return Component.empty();
@@ -163,9 +167,13 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NotNull Component getPlayerListFooter(@NotNull FPlayer fPlayer) {
-        String footer = injector.getInstance(FooterModule.class).getCurrentMessage(fPlayer);
-        if (footer != null) {
-            return injector.getInstance(MessagePipeline.class).builder(fPlayer, footer).build();
+        FooterModule footerModule = injector.getInstance(FooterModule.class);
+
+        if (!footerModule.isModuleDisabledFor(fPlayer)) {
+            String footer = footerModule.getCurrentMessage(fPlayer);
+            if (footer != null) {
+                return injector.getInstance(MessagePipeline.class).builder(fPlayer, footer).build();
+            }
         }
 
         return Component.empty();

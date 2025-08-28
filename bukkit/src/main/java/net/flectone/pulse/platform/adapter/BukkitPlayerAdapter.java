@@ -173,9 +173,14 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NotNull Component getPlayerListHeader(@NotNull FPlayer fPlayer) {
-        String header = injector.getInstance(HeaderModule.class).getCurrentMessage(fPlayer);
-        if (header != null) {
-            return injector.getInstance(MessagePipeline.class).builder(fPlayer, header).build();
+        HeaderModule headerModule = injector.getInstance(HeaderModule.class);
+
+        String header;
+        if (!headerModule.isModuleDisabledFor(fPlayer)) {
+            header = headerModule.getCurrentMessage(fPlayer);
+            if (header != null) {
+                return injector.getInstance(MessagePipeline.class).builder(fPlayer, header).build();
+            }
         }
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
@@ -189,9 +194,14 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @NotNull Component getPlayerListFooter(@NotNull FPlayer fPlayer) {
-        String footer = injector.getInstance(FooterModule.class).getCurrentMessage(fPlayer);
-        if (footer != null) {
-            return injector.getInstance(MessagePipeline.class).builder(fPlayer, footer).build();
+        FooterModule footerModule = injector.getInstance(FooterModule.class);
+
+        String footer;
+        if (!footerModule.isModuleDisabledFor(fPlayer)) {
+            footer = footerModule.getCurrentMessage(fPlayer);
+            if (footer != null) {
+                return injector.getInstance(MessagePipeline.class).builder(fPlayer, footer).build();
+            }
         }
 
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
