@@ -13,6 +13,7 @@ import net.flectone.pulse.module.message.format.name.NameModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageFlag;
 
 @Singleton
 public class NamePulseListener implements PulseListener {
@@ -34,7 +35,7 @@ public class NamePulseListener implements PulseListener {
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.getContext();
         FEntity sender = messageContext.getSender();
-        if (isInvisible(sender)) {
+        if (messageContext.isFlag(MessageFlag.INVISIBLE_NAME) && isInvisible(sender)) {
             nameModule.addInvisibleTag(messageContext);
         } else {
             nameModule.addTags(messageContext);

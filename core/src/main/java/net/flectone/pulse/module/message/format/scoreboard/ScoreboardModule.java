@@ -17,6 +17,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -121,12 +122,16 @@ public class ScoreboardModule extends AbstractModule {
 
         Component prefix = Component.empty();
         if (!message.getPrefix().isEmpty()) {
-            prefix = messagePipeline.builder(fPlayer, message.getPrefix()).build();
+            prefix = messagePipeline.builder(fPlayer, message.getPrefix())
+                    .flag(MessageFlag.INVISIBLE_NAME, false)
+                    .build();
         }
 
         Component suffix = Component.empty();
         if (!message.getSuffix().isEmpty()) {
-            suffix = messagePipeline.builder(fPlayer, message.getSuffix()).build();
+            suffix = messagePipeline.builder(fPlayer, message.getSuffix())
+                    .flag(MessageFlag.INVISIBLE_NAME, false)
+                    .build();
         }
 
         WrapperPlayServerTeams.NameTagVisibility nameTagVisibility = message.isNameVisible()

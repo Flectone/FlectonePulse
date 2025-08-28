@@ -17,7 +17,8 @@ public enum MessageFlag {
     ADVENTURE_TAGS(true),
     IMAGE(true),
     LEGACY_COLORS(true),
-    INTERACTIVE_CHAT(true);
+    INTERACTIVE_CHAT(true),
+    INVISIBLE_NAME(true);
 
     private final boolean defaultValue;
 
