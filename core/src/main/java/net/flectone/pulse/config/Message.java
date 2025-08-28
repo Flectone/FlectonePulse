@@ -506,8 +506,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
                     put("item", String.format(BOUNDARY, "%item%"));
 
                     // text formatting
-                    put("image", "(?<!\\\\{2,})(?<=\\s|^)((?:https?)://(?:[a-zA-Z0-9-]{1,63}\\.)*(?:imgur\\.com|discordapp\\.net|cdn\\.discordapp\\.com)/[\\w\\-./?=&%]*\\.(?:jpg|jpeg|png|gif|webp|bmp))(?!\\S)");
-                    put("url", "(?<!\\\\{2,})(?<=\\s|^)((?:https?|ftp)://(?:[\\p{L}a-zA-Z0-9-]{1,63}\\.)+[\\p{L}a-zA-Z]{2,6}(?::\\d{1,5})?(?:/[\\w\\-./?=&%]*)?)(?!\\S)");
+                    put("image", "(?<!\\\\{2,})(?<=\\s|^)((?:https?|HTTPS?)://(?:[a-zA-Z0-9-]{1,63}\\.)*(?:imgur\\.com|discordapp\\.net|cdn\\.discordapp\\.com)/[\\w\\-./?=&%]*\\.(?:jpg|jpeg|png|gif|webp|bmp))(?!\\S)");
+                    put("url", "(?<!\\\\{2,})(?<=\\s|^)((?:https?|ftp|HTTPS?)://(?:[\\p{L}a-zA-Z0-9-]{1,63}\\.)+[\\p{L}a-zA-Z]{2,6}(?::\\d{1,5})?(?:/[\\w\\-./?=&%]*)?)(?!\\S)");
                     put("spoiler", String.format(FORMAT_TEMPLATE, "\\|\\|", "\\|\\|"));
                     put("bold", String.format(FORMAT_TEMPLATE, "\\*\\*", "\\*\\*"));
                     put("italic", String.format(FORMAT_TEMPLATE, "\\*", "\\*"));
