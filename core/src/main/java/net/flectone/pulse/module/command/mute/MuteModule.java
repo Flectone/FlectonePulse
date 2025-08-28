@@ -119,6 +119,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         proxySender.send(fTarget, MessageType.SYSTEM_MUTE);
 
         sendMessage(ModerationMetadata.<Localization.Command.Mute>builder()
+                .sender(fTarget)
                 .format(buildFormat(mute))
                 .moderation(mute)
                 .range(command.getRange())
