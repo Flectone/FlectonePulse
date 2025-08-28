@@ -148,17 +148,17 @@ public abstract class IntegrationModule extends AbstractModule {
         return injector.getInstance(LuckPermsModule.class).getGroupWeight(fPlayer);
     }
 
-    public void sendMessage(FEntity sender, MessageType messageType, UnaryOperator<String> discordString) {
+    public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> discordString) {
         if (getChildren().contains(DiscordModule.class)) {
-            injector.getInstance(DiscordModule.class).sendMessage(sender, messageType, discordString);
+            injector.getInstance(DiscordModule.class).sendMessage(sender, messageName, discordString);
         }
 
         if (getChildren().contains(TwitchModule.class)) {
-            injector.getInstance(TwitchModule.class).sendMessage(sender, messageType, discordString);
+            injector.getInstance(TwitchModule.class).sendMessage(sender, messageName, discordString);
         }
 
         if (getChildren().contains(TelegramModule.class)) {
-            injector.getInstance(TelegramModule.class).sendMessage(sender, messageType, discordString);
+            injector.getInstance(TelegramModule.class).sendMessage(sender, messageName, discordString);
         }
     }
 

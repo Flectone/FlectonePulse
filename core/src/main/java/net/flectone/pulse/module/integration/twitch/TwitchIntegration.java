@@ -7,15 +7,14 @@ import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import feign.Logger;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.twitch.listener.ChannelMessageListener;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.List;
@@ -92,12 +91,12 @@ public class TwitchIntegration implements FIntegration {
         fLogger.info("✔ Twitch integration enabled");
     }
 
-    public void sendMessage(FEntity sender, MessageType messageType, UnaryOperator<String> twitchString) {
-        List<String> channels = integration.getMessageChannel().get(messageType);
+    public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> twitchString) {
+        List<String> channels = integration.getMessageChannel().get(messageName);
         if (channels == null) return;
         if (channels.isEmpty()) return;
 
-        String message = localization.getMessageChannel().get(messageType);
+        String message = localization.getMessageChannel().get(messageName);
         if (message == null) return;
         if (message.isEmpty()) return;
 

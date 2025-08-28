@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
@@ -1473,9 +1472,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
                     put("id", "TPS <tps>");
                 }
             };
-            private Map<MessageType, ChannelEmbed> messageChannel = new LinkedHashMap<>(){
+            private Map<String, ChannelEmbed> messageChannel = new LinkedHashMap<>(){
                 {
-                    put(MessageType.CHAT, new ChannelEmbed());
+                    put("CHAT_GLOBAL", new ChannelEmbed());
                 }
             };
 
@@ -1556,9 +1555,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Telegram implements SubIntegrationConfig, Localizable {
             private String forMinecraft = "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>";
-            private Map<MessageType, String> messageChannel = new LinkedHashMap<>(){
+            private Map<String, String> messageChannel = new LinkedHashMap<>(){
                 {
-                    put(MessageType.CHAT, "<final_message>");
+                    put("CHAT_GLOBAL", "<final_message>");
                 }
             };
         }
@@ -1571,9 +1570,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Twitch implements SubIntegrationConfig, Localizable {
             private String forMinecraft = "<fcolor:2><name> <fcolor:1>» <fcolor:4><message>";
-            private Map<MessageType, String> messageChannel = new LinkedHashMap<>(){
+            private Map<String, String> messageChannel = new LinkedHashMap<>(){
                 {
-                    put(MessageType.CHAT, "<final_message>");
+                    put("CHAT_GLOBAL", "<final_message>");
                 }
             };
         }

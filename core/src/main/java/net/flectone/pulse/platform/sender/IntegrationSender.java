@@ -8,6 +8,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.module.message.chat.model.ChatMetadata;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
@@ -80,7 +81,15 @@ public class IntegrationSender {
             );
         };
 
-        integrationModule.sendMessage(sender, messageType, interfaceReplaceString);
+        String messageName = createMessageName(messageType, eventMetadata);
+        integrationModule.sendMessage(sender, messageName, interfaceReplaceString);
+    }
+
+    private String createMessageName(MessageType messageType, EventMetadata<?> eventMetadata) {
+        if (messageType != MessageType.CHAT) return messageType.name();
+        if (!(eventMetadata instanceof ChatMetadata<?> chatMetadata)) return "UNKNOWN";
+
+        return messageType.name() + "_" + chatMetadata.getChatName().toUpperCase();
     }
 
 }

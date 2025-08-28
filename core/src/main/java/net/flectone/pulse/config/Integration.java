@@ -107,10 +107,10 @@ public final class Integration extends FileSerializable implements ModuleConfig.
         private String token = "";
         private Presence presence = new Presence();
         private ChannelInfo channelInfo = new ChannelInfo();
-        private Map<MessageType, String> messageChannel = new LinkedHashMap<>(){
+        private Map<String, String> messageChannel = new LinkedHashMap<>(){
             {
-                put(MessageType.FROM_DISCORD_TO_MINECRAFT, "");
-                put(MessageType.CHAT, "");
+                put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), "");
+                put("CHAT_GLOBAL", "");
             }
         };
         private Destination destination = new Destination();
@@ -224,10 +224,10 @@ public final class Integration extends FileSerializable implements ModuleConfig.
     public static final class Telegram implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = false;
         private String token = "";
-        private Map<MessageType, List<String>> messageChannel = new LinkedHashMap<>(){
+        private Map<String, List<String>> messageChannel = new LinkedHashMap<>(){
             {
-                put(MessageType.FROM_TELEGRAM_TO_MINECRAFT, List.of("123456"));
-                put(MessageType.CHAT, List.of("123456"));
+                put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), List.of("123456"));
+                put("CHAT_GLOBAL", List.of("123456"));
             }
         };
         private Destination destination = new Destination();
@@ -243,10 +243,10 @@ public final class Integration extends FileSerializable implements ModuleConfig.
         private boolean enable = false;
         private String clientID = "";
         private String token = "";
-        private Map<MessageType, List<String>> messageChannel = new LinkedHashMap<>(){
+        private Map<String, List<String>> messageChannel = new LinkedHashMap<>(){
             {
-                put(MessageType.FROM_TWITCH_TO_MINECRAFT, List.of("faseri4ka"));
-                put(MessageType.CHAT, List.of("faseri4ka"));
+                put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), List.of("faseri4ka"));
+                put("CHAT_GLOBAL", List.of("faseri4ka"));
             }
         };
         private Map<String, List<String>> followChannel = new LinkedHashMap<>(Map.of(

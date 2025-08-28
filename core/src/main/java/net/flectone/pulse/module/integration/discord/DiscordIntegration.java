@@ -19,15 +19,14 @@ import discord4j.rest.util.MultipartRequest;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.discord.listener.MessageCreateListener;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.service.SkinService;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.Strings;
@@ -76,15 +75,15 @@ public class DiscordIntegration implements FIntegration {
         this.fLogger = fLogger;
     }
 
-    public void sendMessage(FEntity sender, MessageType messageType, UnaryOperator<String> discordString) {
+    public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> discordString) {
         if (gateway == null) return;
 
-        String integrationChannel = integration.getMessageChannel().get(messageType);
+        String integrationChannel = integration.getMessageChannel().get(messageName);
         if (integrationChannel == null) return;
         if (integrationChannel.isEmpty()) return;
 
         Localization.Integration.Discord localization = fileResolver.getLocalization().getIntegration().getDiscord();
-        Localization.Integration.Discord.ChannelEmbed messageChannelEmbed = localization.getMessageChannel().get(messageType);
+        Localization.Integration.Discord.ChannelEmbed messageChannelEmbed = localization.getMessageChannel().get(messageName);
         if (messageChannelEmbed == null) return;
 
         String skin = skinService.getSkin(sender);

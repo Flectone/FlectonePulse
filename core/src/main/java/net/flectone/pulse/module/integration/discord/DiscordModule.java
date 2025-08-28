@@ -10,10 +10,9 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.logging.FLogger;
 
 import java.util.function.UnaryOperator;
@@ -90,9 +89,9 @@ public class DiscordModule extends AbstractModule {
         return integration.isEnable();
     }
 
-    public void sendMessage(FEntity sender, MessageType messageType, UnaryOperator<String> discordString) {
+    public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> discordString) {
         if (isModuleDisabledFor(sender)) return;
 
-        injector.getInstance(DiscordIntegration.class).sendMessage(sender, messageType, discordString);
+        injector.getInstance(DiscordIntegration.class).sendMessage(sender, messageName, discordString);
     }
 }

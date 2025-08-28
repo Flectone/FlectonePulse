@@ -340,9 +340,9 @@ public class TwitchModule extends AbstractModule {
         return integration.isEnable();
     }
 
-    public void sendMessage(FEntity sender, MessageType messageType, UnaryOperator<String> twitchString) {
+    public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> twitchString) {
         if (isModuleDisabledFor(sender)) return;
 
-        injector.getInstance(TwitchIntegration.class).sendMessage(sender, messageType, twitchString);
+        injector.getInstance(TwitchIntegration.class).sendMessage(sender, messageName, twitchString);
     }
 }

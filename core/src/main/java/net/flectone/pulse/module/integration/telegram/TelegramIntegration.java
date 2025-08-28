@@ -9,7 +9,6 @@ import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.telegram.listener.MessageListener;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
@@ -62,15 +61,15 @@ public class TelegramIntegration implements FIntegration {
         }
     }
 
-    public void sendMessage(FEntity sender, MessageType messageType, UnaryOperator<String> telegramString) {
+    public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> telegramString) {
         if (botsApplication == null) return;
 
-        List<String> channels = integration.getMessageChannel().get(messageType);
+        List<String> channels = integration.getMessageChannel().get(messageName);
         if (channels == null) return;
         if (channels.isEmpty()) return;
 
         Localization.Integration.Telegram localization = fileResolver.getLocalization().getIntegration().getTelegram();
-        String message = localization.getMessageChannel().get(messageType);
+        String message = localization.getMessageChannel().get(messageName);
         if (message == null) return;
         if (message.isEmpty()) return;
 

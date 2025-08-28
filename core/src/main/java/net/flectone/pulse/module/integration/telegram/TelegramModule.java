@@ -83,9 +83,9 @@ public class TelegramModule extends AbstractModule {
         return integration.isEnable();
     }
 
-    public void sendMessage(FEntity sender, MessageType messageType, UnaryOperator<String> telegramString) {
+    public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> telegramString) {
         if (isModuleDisabledFor(sender)) return;
 
-        injector.getInstance(TelegramIntegration.class).sendMessage(sender, messageType, telegramString);
+        injector.getInstance(TelegramIntegration.class).sendMessage(sender, messageName, telegramString);
     }
 }
