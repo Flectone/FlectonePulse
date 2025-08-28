@@ -667,7 +667,8 @@ public class ProxyMessageHandler {
         String chat = input.readUTF();
         String message = input.readUTF();
 
-        injector.getInstance(ChatModule.class).send(fEntity, chat, message);
+        FPlayer fPlayer = fEntity instanceof FPlayer sender ? sender : FPlayer.UNKNOWN;
+        injector.getInstance(ChatModule.class).send(fPlayer, chat, message);
     }
 
     private void handleRockPaperScissorsCreate(DataInputStream input, FEntity fEntity) throws IOException {

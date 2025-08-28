@@ -7,7 +7,6 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Range;
@@ -232,7 +231,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         }
     }
 
-    public void send(FEntity fPlayer, String proxyChatName, String string) {
+    public void send(FPlayer fPlayer, String proxyChatName, String string) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         var optionalChat = message.getTypes().entrySet().stream()

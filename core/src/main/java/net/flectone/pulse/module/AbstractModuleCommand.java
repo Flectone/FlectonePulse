@@ -124,8 +124,8 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
     }
 
     @Override
-    public Predicate<FPlayer> rangeFilter(FEntity sender, Range range) {
-        Predicate<FPlayer> filter = super.rangeFilter(sender, range);
+    public Predicate<FPlayer> rangeFilter(FPlayer filterPlayer, Range range) {
+        Predicate<FPlayer> filter = super.rangeFilter(filterPlayer, range);
 
         if (range.is(Range.Type.PLAYER)) {
             return filter;

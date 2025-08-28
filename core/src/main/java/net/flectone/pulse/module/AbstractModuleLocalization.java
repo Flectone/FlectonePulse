@@ -175,12 +175,12 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         return false;
     }
 
-    public Predicate<FPlayer> rangeFilter(FEntity sender, Range range) {
+    public Predicate<FPlayer> rangeFilter(FPlayer filterPlayer, Range range) {
         if (range.is(Range.Type.PLAYER)) {
-            return sender::equals;
+            return filterPlayer::equals;
         }
 
-        if (!(sender instanceof FPlayer fPlayer) || fPlayer.isUnknown()) {
+        if (!(filterPlayer instanceof FPlayer fPlayer) || fPlayer.isUnknown()) {
             return player -> true;
         }
 
@@ -231,9 +231,11 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
 
         if (preMessageSendEvent.isCancelled()) return Collections.emptyList();
 
+        FPlayer filterPlayer = eventMetadata.getFilterPlayer();
+
         return fPlayerService.getFPlayersWithConsole().stream()
                 .filter(eventMetadata.getFilter())
-                .filter(rangeFilter(eventMetadata.getReceiver(), eventMetadata.getRange()))
+                .filter(rangeFilter(filterPlayer, eventMetadata.getRange()))
                 .toList();
     }
 
