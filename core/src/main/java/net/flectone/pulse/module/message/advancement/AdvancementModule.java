@@ -103,7 +103,7 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
 
         AdvancementMetadata.AdvancementMetadataBuilder<Localization.Message.Advancement, ?, ?> metadataBuilder = AdvancementMetadata.<Localization.Message.Advancement>builder()
                 .sender(fTarget)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(s -> {
                     Localization.Message.Advancement.Command subcommand = revoke ? s.getRevoke() : s.getGrant();
 

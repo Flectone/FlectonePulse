@@ -68,7 +68,7 @@ public class EnchantModule extends AbstractModuleLocalization<Localization.Messa
 
         sendMessage(EnchantMetadata.<Localization.Message.Enchant>builder()
                 .sender(fTarget)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(s -> StringUtils.replaceEach(
                         isSingle ? s.getSingle() : s.getMultiple(),
                         new String[]{"<count>", "<enchant>", "<level>"},

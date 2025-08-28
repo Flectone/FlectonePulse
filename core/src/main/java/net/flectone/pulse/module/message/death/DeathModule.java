@@ -86,7 +86,7 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
         if (!death.isPlayer()) {
             sendMessage(DeathMetadata.<Localization.Message.Death>builder()
                     .sender(fTarget)
-                    .receiver(fReceiver)
+                    .filterPlayer(fReceiver)
                     .format(s -> s.getTypes().get(death.getKey()))
                     .death(death)
                     .destination(message.getDestination())

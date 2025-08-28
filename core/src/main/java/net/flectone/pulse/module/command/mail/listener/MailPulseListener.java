@@ -40,7 +40,7 @@ public class MailPulseListener implements PulseListener {
 
             mailModule.sendMessage(MailMetadata.<Localization.Command.Mail>builder()
                     .sender(fPlayer)
-                    .receiver(fReceiver, true)
+                    .filterPlayer(fReceiver, true)
                     .format(Localization.Command.Mail::getReceiver)
                     .mail(mail)
                     .message(mail.message())

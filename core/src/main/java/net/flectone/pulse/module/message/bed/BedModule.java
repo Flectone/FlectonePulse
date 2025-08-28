@@ -52,7 +52,7 @@ public class BedModule extends AbstractModuleLocalization<Localization.Message.B
 
         sendMessage(BedMetadata.<Localization.Message.Bed>builder()
                 .sender(fPlayer)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(bed -> switch (minecraftTranslationKey) {
                     case BLOCK_MINECRAFT_BED_NO_SLEEP, TILE_BED_NO_SLEEP -> bed.getNoSleep();
                     case BLOCK_MINECRAFT_BED_NOT_SAFE, TILE_BED_NOT_SAFE -> bed.getNotSafe();

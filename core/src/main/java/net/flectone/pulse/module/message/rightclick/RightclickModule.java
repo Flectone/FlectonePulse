@@ -71,7 +71,7 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
 
         sendMessage(metadataBuilder()
                 .sender(fTarget)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(Localization.Message.Rightclick::getFormat)
                 .destination(message.getDestination())
                 .sound(getModuleSound())

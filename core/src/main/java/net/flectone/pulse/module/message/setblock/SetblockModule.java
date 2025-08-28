@@ -53,7 +53,7 @@ public class SetblockModule extends AbstractModuleLocalization<Localization.Mess
 
         sendMessage(SetblockMetadata.<Localization.Message.Setblock>builder()
                 .sender(fPlayer)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(s -> StringUtils.replaceEach(
                         s.getFormat(),
                         new String[]{"<x>", "<y>", "<z>"},

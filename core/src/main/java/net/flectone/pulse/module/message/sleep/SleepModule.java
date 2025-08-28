@@ -54,7 +54,7 @@ public class SleepModule extends AbstractModuleLocalization<Localization.Message
 
         sendMessage(SleepMetadata.<Localization.Message.Sleep>builder()
                 .sender(fPlayer)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(bed -> switch (key) {
                     case SLEEP_NOT_POSSIBLE -> bed.getNotPossible();
                     case SLEEP_PLAYERS_SLEEPING -> StringUtils.replaceEach(

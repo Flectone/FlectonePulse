@@ -160,7 +160,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                      boolean senderColorOut) {
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
-                .receiver(fReceiver, senderColorOut)
+                .filterPlayer(fReceiver, senderColorOut)
                 .format(format)
                 .destination(command.getDestination())
                 .message(string)

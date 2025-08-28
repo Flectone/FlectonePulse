@@ -93,6 +93,7 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
                 .sender(fPlayer)
                 .format("<br> ".repeat(100))
                 .destination(command.getDestination())
+                .proxy(dataOutputStream -> {})
                 .build()
         );
 

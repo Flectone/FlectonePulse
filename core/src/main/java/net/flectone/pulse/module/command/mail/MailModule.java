@@ -115,7 +115,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
 
         sendMessage(MailMetadata.<Localization.Command.Mail>builder()
                 .sender(fReceiver)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(s -> Strings.CS.replaceOnce(s.getSender(), "<id>", String.valueOf(mail.id())))
                 .mail(mail)
                 .message(message)

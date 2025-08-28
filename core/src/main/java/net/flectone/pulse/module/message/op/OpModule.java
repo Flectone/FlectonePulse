@@ -57,7 +57,7 @@ public class OpModule extends AbstractModuleLocalization<Localization.Message.Op
 
         sendMessage(metadataBuilder()
                 .sender(fTarget)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(Localization.Message.Op::getFormat)
                 .destination(message.getDestination())
                 .sound(getModuleSound())

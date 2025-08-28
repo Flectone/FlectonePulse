@@ -60,7 +60,7 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
 
         sendMessage(SpawnMetadata.<Localization.Message.Spawn>builder()
                 .sender(fPlayer)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(spawn -> key == MinecraftTranslationKey.BLOCK_MINECRAFT_SET_SPAWN
                         ? spawn.getSet() : spawn.getNotValid()
                 )
@@ -87,7 +87,7 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
 
         sendMessage(SpawnMetadata.<Localization.Message.Spawn>builder()
                 .sender(fTarget)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(s -> StringUtils.replaceEach(
                         isSingle ? s.getSingle() : s.getMultiple(),
                         new String[]{"<count>", "<x>", "<y>", "<z>", "<angle>", "<world>"},

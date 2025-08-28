@@ -52,7 +52,7 @@ public class SeedModule extends AbstractModuleLocalization<Localization.Message.
 
         sendMessage(SeedMetadata.<Localization.Message.Seed>builder()
                 .sender(fPlayer)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(s -> Strings.CS.replace(s.getFormat(), "<seed>", seed))
                 .seed(seed)
                 .destination(message.getDestination())

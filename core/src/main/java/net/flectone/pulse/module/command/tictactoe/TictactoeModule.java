@@ -132,7 +132,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         sendMessage(TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
                 .sender(fReceiver)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(Localization.Command.Tictactoe::getSender)
                 .ticTacToe(ticTacToe)
                 .sound(getModuleSound())
@@ -158,7 +158,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         sendMessage(TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
                 .sender(fPlayer)
-                .receiver(fReceiver, true)
+                .filterPlayer(fReceiver, true)
                 .format(message -> String.format(message.getReceiver(), ticTacToe.getId()))
                 .ticTacToe(ticTacToe)
                 .sound(getModuleSound())
@@ -175,7 +175,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         sendMessage(metadataBuilder()
                 .sender(fReceiver)
-                .receiver(fReceiver)
+                .filterPlayer(fReceiver)
                 .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
                 .build()
         );
@@ -241,7 +241,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         sendMessage(metadataBuilder()
                 .sender(fReceiver)
-                .receiver(fPlayer, true)
+                .filterPlayer(fPlayer, true)
                 .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
                 .build()
         );
@@ -258,7 +258,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         sendMessage(metadataBuilder()
                 .sender(fReceiver)
-                .receiver(fReceiver)
+                .filterPlayer(fReceiver)
                 .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
                 .build()
         );

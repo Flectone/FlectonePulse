@@ -163,7 +163,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
 
         sendMessage(QuestionAnswerMetadata.<Localization.Message.Format.QuestionAnswer>builder()
                 .sender(sender)
-                .receiver(fReceiver)
+                .filterPlayer(fReceiver)
                 .format(questionAnswer -> questionAnswer.getQuestions().getOrDefault(question, ""))
                 .question(question)
                 .destination(questionMessage.getDestination())

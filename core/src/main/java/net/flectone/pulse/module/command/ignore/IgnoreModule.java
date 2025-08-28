@@ -105,7 +105,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
 
         sendMessage(IgnoreMetadata.<Localization.Command.Ignore>builder()
                 .sender(fTarget)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(ignore -> optionalIgnore.isEmpty() ? ignore.getFormatTrue() : ignore.getFormatFalse())
                 .ignore(metadataIgnore)
                 .ignored(optionalIgnore.isEmpty())

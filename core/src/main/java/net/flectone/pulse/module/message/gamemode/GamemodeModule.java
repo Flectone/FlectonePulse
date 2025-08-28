@@ -71,7 +71,7 @@ public class GamemodeModule extends AbstractModuleLocalization<Localization.Mess
         // for sender
         sendMessage(GamemodeMetadata.<Localization.Message.Gamemode>builder()
                 .sender(fTarget)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(s -> Strings.CS.replace(
                         isSelf ? s.getFormatSelf() : s.getFormatOther(),
                         "<gamemode>",

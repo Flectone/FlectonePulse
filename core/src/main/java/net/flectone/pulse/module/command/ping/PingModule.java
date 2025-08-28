@@ -80,7 +80,7 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
 
         sendMessage(metadataBuilder()
                 .sender(fTarget)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(Localization.Command.Ping::getFormat)
                 .destination(command.getDestination())
                 .sound(getModuleSound())

@@ -67,7 +67,7 @@ public class ClearModule extends AbstractModuleLocalization<Localization.Message
 
         sendMessage(ClearMetadata.<Localization.Message.Clear>builder()
                 .sender(fTarget)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(s -> StringUtils.replaceEach(
                         isSingle ? s.getSingle() : s.getMultiple(),
                         new String[]{"<count>", "<number>"},

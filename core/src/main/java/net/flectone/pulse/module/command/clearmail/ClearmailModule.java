@@ -89,7 +89,7 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
 
         sendMessage(ClearmailMetadata.<Localization.Command.Clearmail>builder()
                 .sender(fReceiver)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(string -> Strings.CS.replaceOnce(string.getFormat(), "<id>", String.valueOf(mailID)))
                 .mail(optionalMail.get())
                 .destination(command.getDestination())

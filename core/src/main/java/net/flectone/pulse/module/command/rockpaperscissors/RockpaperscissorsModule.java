@@ -196,7 +196,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         sendMessage(metadataBuilder()
                 .sender(fReceiver)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(Localization.Command.Rockpaperscissors::getSender)
                 .build()
         );
@@ -258,7 +258,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
                 .sender(winFPlayer)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(message)
                 .rockPaperScissors(rockPaperScissors)
                 .build()
@@ -266,7 +266,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
                 .sender(winFPlayer)
-                .receiver(fReceiver)
+                .filterPlayer(fReceiver)
                 .format(message)
                 .rockPaperScissors(rockPaperScissors)
                 .build()
@@ -285,7 +285,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
                 .sender(fPlayer)
-                .receiver(fReceiver, true)
+                .filterPlayer(fReceiver, true)
                 .format(Localization.Command.Rockpaperscissors::getReceiver)
                 .rockPaperScissors(rockPaperScissors)
                 .build()
@@ -293,7 +293,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
                 .sender(fPlayer)
-                .receiver(fReceiver, true)
+                .filterPlayer(fReceiver, true)
                 .format(s -> StringUtils.replaceEach(
                         s.getFormatMove(),
                         new String[]{"<target>", "<uuid>"},

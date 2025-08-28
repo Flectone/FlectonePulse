@@ -70,14 +70,13 @@ public class EventMetadata<L extends Localization.Localizable> {
                 C extends EventMetadata<L>,
                 B extends EventMetadataBuilder<L, C, B>> {
 
-        public B proxy() {
-            this.proxy = dataOutputStream -> {};
-            return self();
-        }
-
         public B proxy(ProxyDataConsumer<SafeDataOutputStream> proxy) {
             this.proxy = proxy;
             return self();
+        }
+
+        public B proxy() {
+            return proxy(dataOutputStream -> {});
         }
 
         public B integration(UnaryOperator<String> integrationFunction) {
@@ -86,39 +85,41 @@ public class EventMetadata<L extends Localization.Localizable> {
         }
 
         public B integration() {
-            this.integration = string -> string;
-            return self();
+            return integration(string -> string);
         }
 
         public B sender(FEntity sender) {
             this.sender = sender;
+
+            return filterPlayer(sender);
+        }
+
+        public B filterPlayer(FEntity entity) {
             this.range = Range.get(Range.Type.PLAYER);
-            this.filterPlayer = sender instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN;
+            this.filterPlayer = entity instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN;
+
             return self();
         }
 
-        public B receiver(FPlayer receiver) {
-            this.range = Range.get(Range.Type.PLAYER);
-            this.filterPlayer = receiver;
-            return self();
-        }
-
-        public B receiver(FPlayer receiver, boolean senderColorOut) {
-            return receiver(receiver).senderColorOut(senderColorOut);
+        public B filterPlayer(FPlayer receiver, boolean senderColorOut) {
+            return filterPlayer(receiver).senderColorOut(senderColorOut);
         }
 
         public B format(String format) {
             this.format = (fPlayer, l) -> format;
+
             return self();
         }
 
         public B format(Function<L, String> format) {
             this.format = (fResolver, s) -> format.apply(s);
+
             return self();
         }
 
         public B format(BiFunction<FPlayer, L, String> format) {
             this.format = format;
+
             return self();
         }
     }

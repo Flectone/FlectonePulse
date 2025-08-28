@@ -72,7 +72,7 @@ public class KillModule extends AbstractModuleLocalization<Localization.Message.
 
         sendMessage(KillMetadata.<Localization.Message.Kill>builder()
                 .sender(fTarget)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(s -> key == MinecraftTranslationKey.COMMANDS_KILL_SUCCESS_MULTIPLE
                         ? Strings.CS.replace(s.getMultiple(), "<count>", kill.value())
                         : s.getSingle()

@@ -57,7 +57,7 @@ public class DeopModule extends AbstractModuleLocalization<Localization.Message.
 
         sendMessage(metadataBuilder()
                 .sender(fTarget)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(Localization.Message.Deop::getFormat)
                 .destination(message.getDestination())
                 .sound(getModuleSound())

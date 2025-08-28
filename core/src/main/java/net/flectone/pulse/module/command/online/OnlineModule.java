@@ -113,7 +113,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
 
         sendMessage(OnlineMetadata.<Localization.Command.Online>builder()
                 .sender(targetFPlayer)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(s -> switch (type) {
                     case "first" -> timeFormatter.format(
                             fPlayer,

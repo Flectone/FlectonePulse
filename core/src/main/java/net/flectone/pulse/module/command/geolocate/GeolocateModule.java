@@ -99,7 +99,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
 
         sendMessage(GeolocateMetadata.<Localization.Command.Geolocate>builder()
                 .sender(fTarget)
-                .receiver(fPlayer)
+                .filterPlayer(fPlayer)
                 .format(geolocate -> StringUtils.replaceEach(geolocate.getFormat(),
                         new String[]{"<country>", "<region_name>", "<city>", "<timezone>", "<mobile>", "<proxy>", "<hosting>", "<query>"},
                         new String[]{response.get(1), response.get(2), response.get(3), response.get(4), response.get(5), response.get(6), response.get(7), response.get(8)}
