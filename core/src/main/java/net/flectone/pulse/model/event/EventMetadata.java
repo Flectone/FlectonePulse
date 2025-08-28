@@ -32,7 +32,7 @@ public class EventMetadata<L extends Localization.Localizable> {
     private final FEntity sender;
 
     @Nullable
-    private final FPlayer receiver;
+    private final FPlayer filterPlayer;
 
     @Builder.Default
     private final Predicate<FPlayer> filter = fPlayer -> true;
@@ -83,13 +83,13 @@ public class EventMetadata<L extends Localization.Localizable> {
         public B sender(FEntity sender) {
             this.sender = sender;
             this.range = Range.get(Range.Type.PLAYER);
-            this.receiver = sender instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN;
+            this.filterPlayer = sender instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN;
             return self();
         }
 
         public B receiver(FPlayer receiver) {
-            this.receiver = receiver;
             this.range = Range.get(Range.Type.PLAYER);
+            this.filterPlayer = receiver;
             return self();
         }
 
@@ -106,7 +106,6 @@ public class EventMetadata<L extends Localization.Localizable> {
             this.format = (fResolver, s) -> format.apply(s);
             return self();
         }
-
 
         public B format(BiFunction<FPlayer, L, String> format) {
             this.format = format;
