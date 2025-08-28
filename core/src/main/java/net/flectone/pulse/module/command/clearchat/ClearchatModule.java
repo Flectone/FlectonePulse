@@ -68,7 +68,7 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
 
         if (optionalPlayer.isPresent() && permissionChecker.check(fPlayer, permission.getOther())) {
             String player = optionalPlayer.get();
-            if (player.equals("all") || player.equals("@a")) {
+            if (player.equals("all")) {
                 fPlayerService.findOnlineFPlayers().forEach(this::clearChat);
                 return;
             }
