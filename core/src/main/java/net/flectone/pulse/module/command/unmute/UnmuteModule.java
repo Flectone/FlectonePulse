@@ -21,6 +21,7 @@ import org.incendo.cloud.context.CommandContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unmute> {
@@ -119,7 +120,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
 
         moderationService.remove(fTarget, mutes);
 
-        proxySender.send(fTarget, MessageType.SYSTEM_MUTE, dataOutputStream -> {});
+        proxySender.send(fTarget, MessageType.SYSTEM_MUTE, dataOutputStream -> {}, UUID.randomUUID());
 
         sendMessage(UnModerationMetadata.<Localization.Command.Unmute>builder()
                 .sender(fTarget)

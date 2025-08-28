@@ -21,6 +21,7 @@ import org.incendo.cloud.context.CommandContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unban> {
@@ -125,7 +126,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
 
         moderationService.remove(fTarget, bans);
 
-        proxySender.send(fTarget, MessageType.SYSTEM_BAN, dataOutputStream -> {});
+        proxySender.send(fTarget, MessageType.SYSTEM_BAN, dataOutputStream -> {}, UUID.randomUUID());
 
         sendMessage(UnModerationMetadata.<Localization.Command.Unban>builder()
                 .sender(fTarget)

@@ -309,7 +309,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         boolean senderColorOut = eventMetadata.isSenderColorOut();
 
         MessagePipeline.Builder formatBuilder = messagePipeline
-                .builder(eventMetadata.getMessageUUID(), sender, receiver, formatContent)
+                .builder(eventMetadata.getUuid(), sender, receiver, formatContent)
                 .flag(MessageFlag.SENDER_COLOR_OUT, senderColorOut)
                 .tagResolvers(eventMetadata.getTagResolvers(receiver))
                 .tagResolvers(messageTag(message));

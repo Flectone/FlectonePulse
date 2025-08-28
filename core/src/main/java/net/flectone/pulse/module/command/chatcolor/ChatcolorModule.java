@@ -166,6 +166,8 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         Map<FColor.Type, Set<FColor>> fColors = fPlayer.getFColors();
         Set<FColor> oldFColors = fColors.getOrDefault(type, Collections.emptySet());
 
+        UUID metadataUUID = UUID.randomUUID();
+
         if (!oldFColors.equals(newFColors)) {
             if (newFColors.isEmpty()) {
                 fColors.remove(type);
@@ -176,14 +178,15 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
             fPlayerService.saveColors(fPlayer);
 
             // update proxy players
-            proxySender.send(fPlayer, MessageType.COMMAND_CHATCOLOR, dataOutputStream -> {});
+            proxySender.send(fPlayer, MessageType.COMMAND_CHATCOLOR, dataOutputStream -> {}, metadataUUID);
         }
 
-        sendMessageWithUpdatedColors(fPlayer);
+        sendMessageWithUpdatedColors(fPlayer, metadataUUID);
     }
 
-    public void sendMessageWithUpdatedColors(FPlayer fPlayer) {
+    public void sendMessageWithUpdatedColors(FPlayer fPlayer, UUID metadataUUID) {
         sendMessage(metadataBuilder()
+                .uuid(metadataUUID)
                 .sender(fPlayer)
                 .format(Localization.Command.Chatcolor::getFormat)
                 .destination(command.getDestination())

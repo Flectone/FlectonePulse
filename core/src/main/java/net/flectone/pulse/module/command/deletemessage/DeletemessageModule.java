@@ -71,8 +71,9 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
             return;
         }
 
-        proxySender.send(fPlayer, MessageType.COMMAND_DELETE, dataOutputStream ->
-                dataOutputStream.writeUTF(uuid.toString())
+        proxySender.send(fPlayer, MessageType.COMMAND_DELETE,
+                dataOutputStream -> dataOutputStream.writeUTF(uuid.toString()),
+                UUID.randomUUID()
         );
 
         sendMessage(DeletemessageMetadata.<Localization.Command.Deletemessage>builder()

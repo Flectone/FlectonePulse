@@ -151,14 +151,16 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
         int id = getArgument(commandContext, 4);
         int numberVote = getArgument(commandContext, 5);
+
+        UUID metadataUUID = UUID.randomUUID();
         boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_POLL_VOTE, dataOutputStream -> {
             dataOutputStream.writeInt(id);
             dataOutputStream.writeInt(numberVote);
-        });
+        }, metadataUUID);
 
         if (isSent) return;
 
-        vote(fPlayer, id, numberVote);
+        vote(fPlayer, id, numberVote, metadataUUID);
     }
 
     @Override
@@ -225,7 +227,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         fileResolver.getCommand().save();
     }
 
-    public void vote(FEntity fPlayer, int id, int numberVote) {
+    public void vote(FEntity fPlayer, int id, int numberVote, UUID metadataUUID) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         Poll poll = pollMap.get(id);
@@ -265,6 +267,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         int pollID = poll.getId();
 
         sendMessage(MessageType.COMMAND_POLL_VOTE, metadataBuilder()
+                .uuid(metadataUUID)
                 .sender(fPlayer)
                 .format(resolveVote(voteType, numberVote, pollID, count))
                 .build()

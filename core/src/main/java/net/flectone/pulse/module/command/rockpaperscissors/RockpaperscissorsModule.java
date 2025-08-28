@@ -130,7 +130,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         proxySender.send(fPlayer, MessageType.COMMAND_ROCKPAPERSCISSORS, dataOutputStream -> {
             dataOutputStream.writeUTF(rockPaperScissors.getId().toString());
             dataOutputStream.writeUTF(rockPaperScissors.getReceiver().toString());
-        });
+        }, UUID.randomUUID());
 
         create(rockPaperScissors.getId(), fPlayer, fReceiver.getUuid());
 
@@ -185,11 +185,11 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
             boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_ROCKPAPERSCISSORS_FINAL, dataOutputStream -> {
                 dataOutputStream.writeUTF(rockPaperScissors.getId().toString());
                 dataOutputStream.writeUTF(move);
-            });
+            }, UUID.randomUUID());
 
             if (isSent) return;
 
-            sendFinalMessage(rockPaperScissors.getId(), fPlayer, move);
+            sendFinalMessage(rockPaperScissors.getId(), fPlayer, move, UUID.randomUUID());
 
             return;
         }
@@ -204,14 +204,14 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_ROCKPAPERSCISSORS_MOVE, dataOutputStream -> {
             dataOutputStream.writeUTF(rockPaperScissors.getId().toString());
             dataOutputStream.writeUTF(move);
-        });
+        }, UUID.randomUUID());
 
         if (isSent) return;
 
-        move(rockPaperScissors.getId(), fPlayer, move);
+        move(rockPaperScissors.getId(), fPlayer, move, UUID.randomUUID());
     }
 
-    public void sendFinalMessage(UUID id, FPlayer fPlayer, String move) {
+    public void sendFinalMessage(UUID id, FPlayer fPlayer, String move, UUID metadataUUID) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         RockPaperScissors rockPaperScissors = gameMap.get(id);
@@ -234,12 +234,14 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                     );
 
             sendMessage(metadataBuilder()
+                    .uuid(metadataUUID)
                     .sender(fPlayer)
                     .format(message)
                     .build()
             );
 
             sendMessage(metadataBuilder()
+                    .uuid(metadataUUID)
                     .sender(fReceiver)
                     .format(message)
                     .build()
@@ -257,6 +259,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         FEntity winFPlayer = command.getStrategies().get(move).contains(senderMove) ? fPlayer : fReceiver;
 
         sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
+                .uuid(metadataUUID)
                 .sender(winFPlayer)
                 .filterPlayer(fPlayer)
                 .format(message)
@@ -265,6 +268,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         );
 
         sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
+                .uuid(metadataUUID)
                 .sender(winFPlayer)
                 .filterPlayer(fReceiver)
                 .format(message)
@@ -273,7 +277,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         );
     }
 
-    public void move(UUID id, FEntity fPlayer, String move) {
+    public void move(UUID id, FEntity fPlayer, String move, UUID metadataUUID) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         RockPaperScissors rockPaperScissors = gameMap.get(id);
@@ -292,6 +296,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         );
 
         sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
+                .uuid(metadataUUID)
                 .sender(fPlayer)
                 .filterPlayer(fReceiver, true)
                 .format(s -> StringUtils.replaceEach(

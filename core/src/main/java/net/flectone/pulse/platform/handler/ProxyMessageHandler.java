@@ -133,6 +133,7 @@ public class ProxyMessageHandler {
     }
 
     private void handleTaggedMessage(DataInputStream input, MessageType tag) throws IOException {
+        UUID metadataUUID = UUID.fromString(input.readUTF());
         int clustersCount = input.readInt();
         Set<String> proxyClusters = readClusters(input, clustersCount);
 
@@ -150,43 +151,43 @@ public class ProxyMessageHandler {
         }
 
         switch (tag) {
-            case COMMAND_ANON -> handleAnonCommand(input, fEntity);
-            case COMMAND_ME -> handleMeCommand(input, fEntity);
-            case COMMAND_BALL -> handleBallCommand(input, fEntity);
-            case COMMAND_BAN -> handleBanCommand(input, fEntity);
-            case COMMAND_BROADCAST -> handleBroadcastCommand(input, fEntity);
-            case COMMAND_CHATCOLOR -> handleChatColorCommand(fEntity);
+            case COMMAND_ANON -> handleAnonCommand(input, fEntity, metadataUUID);
+            case COMMAND_ME -> handleMeCommand(input, fEntity, metadataUUID);
+            case COMMAND_BALL -> handleBallCommand(input, fEntity, metadataUUID);
+            case COMMAND_BAN -> handleBanCommand(input, fEntity, metadataUUID);
+            case COMMAND_BROADCAST -> handleBroadcastCommand(input, fEntity, metadataUUID);
+            case COMMAND_CHATCOLOR -> handleChatColorCommand(fEntity, metadataUUID);
             case COMMAND_CHATSETTING -> handleChatSettingCommand(fEntity);
-            case COMMAND_COIN -> handleCoinCommand(input, fEntity);
+            case COMMAND_COIN -> handleCoinCommand(input, fEntity, metadataUUID);
             case COMMAND_DELETE -> handleDeleteCommand(input, fEntity);
-            case COMMAND_DICE -> handleDiceCommand(input, fEntity);
-            case COMMAND_DO -> handleDoCommand(input, fEntity);
-            case COMMAND_HELPER -> handleHelperCommand(input, fEntity);
-            case COMMAND_MUTE -> handleMuteCommand(input, fEntity);
-            case COMMAND_UNBAN -> handleUnbanCommand(input, fEntity);
-            case COMMAND_UNMUTE -> handleUnmuteCommand(input, fEntity);
-            case COMMAND_UNWARN -> handleUnwarnCommand(input, fEntity);
-            case COMMAND_POLL_VOTE -> handlePollVote(input, fEntity);
-            case COMMAND_POLL -> handlePollCreate(input, fEntity);
-            case COMMAND_SPY -> handleSpyCommand(input, fEntity);
-            case COMMAND_STREAM -> handleStreamCommand(input, fEntity);
-            case COMMAND_TELL -> handleTellCommand(input, fEntity);
-            case COMMAND_TRANSLATETO -> handleTranslateToCommand(input, fEntity);
-            case COMMAND_TRY -> handleTryCommand(input, fEntity);
-            case COMMAND_WARN -> handleWarnCommand(input, fEntity);
-            case COMMAND_KICK -> handleKickCommand(input, fEntity);
-            case COMMAND_TICTACTOE -> handleTicTacToeCreate(input, fEntity);
-            case COMMAND_TICTACTOE_MOVE -> handleTicTacToeMove(input, fEntity);
-            case CHAT -> handleChatMessage(input, fEntity);
-            case COMMAND_CLEARCHAT -> handleClearchatCommand(input, fEntity);
+            case COMMAND_DICE -> handleDiceCommand(input, fEntity, metadataUUID);
+            case COMMAND_DO -> handleDoCommand(input, fEntity, metadataUUID);
+            case COMMAND_HELPER -> handleHelperCommand(input, fEntity, metadataUUID);
+            case COMMAND_MUTE -> handleMuteCommand(input, fEntity, metadataUUID);
+            case COMMAND_UNBAN -> handleUnbanCommand(input, fEntity, metadataUUID);
+            case COMMAND_UNMUTE -> handleUnmuteCommand(input, fEntity, metadataUUID);
+            case COMMAND_UNWARN -> handleUnwarnCommand(input, fEntity, metadataUUID);
+            case COMMAND_POLL_VOTE -> handlePollVote(input, fEntity, metadataUUID);
+            case COMMAND_POLL -> handlePollCreate(input, fEntity, metadataUUID);
+            case COMMAND_SPY -> handleSpyCommand(input, fEntity, metadataUUID);
+            case COMMAND_STREAM -> handleStreamCommand(input, fEntity, metadataUUID);
+            case COMMAND_TELL -> handleTellCommand(input, fEntity, metadataUUID);
+            case COMMAND_TRANSLATETO -> handleTranslateToCommand(input, fEntity, metadataUUID);
+            case COMMAND_TRY -> handleTryCommand(input, fEntity, metadataUUID);
+            case COMMAND_WARN -> handleWarnCommand(input, fEntity, metadataUUID);
+            case COMMAND_KICK -> handleKickCommand(input, fEntity, metadataUUID);
+            case COMMAND_TICTACTOE -> handleTicTacToeCreate(input, fEntity, metadataUUID);
+            case COMMAND_TICTACTOE_MOVE -> handleTicTacToeMove(input, fEntity, metadataUUID);
+            case CHAT -> handleChatMessage(input, fEntity, metadataUUID);
+            case COMMAND_CLEARCHAT -> handleClearchatCommand(fEntity);
             case COMMAND_ROCKPAPERSCISSORS -> handleRockPaperScissorsCreate(input, fEntity);
-            case COMMAND_ROCKPAPERSCISSORS_MOVE -> handleRockPaperScissorsMove(input, fEntity);
-            case COMMAND_ROCKPAPERSCISSORS_FINAL -> handleRockPaperScissorsFinal(input, fEntity);
-            case ADVANCEMENT -> handleAdvancement(input, fEntity);
-            case DEATH -> handleDeath(input, fEntity);
-            case JOIN -> handleJoin(input, fEntity);
-            case QUIT -> handleQuit(input, fEntity);
-            case AFK -> handleAfk(input, fEntity);
+            case COMMAND_ROCKPAPERSCISSORS_MOVE -> handleRockPaperScissorsMove(input, fEntity, metadataUUID);
+            case COMMAND_ROCKPAPERSCISSORS_FINAL -> handleRockPaperScissorsFinal(input, fEntity, metadataUUID);
+            case ADVANCEMENT -> handleAdvancement(input, fEntity, metadataUUID);
+            case DEATH -> handleDeath(input, fEntity, metadataUUID);
+            case JOIN -> handleJoin(input, fEntity, metadataUUID);
+            case QUIT -> handleQuit(input, fEntity, metadataUUID);
+            case AFK -> handleAfk(input, fEntity, metadataUUID);
         }
     }
 
@@ -217,13 +218,14 @@ public class ProxyMessageHandler {
         return clusters;
     }
 
-    private void handleAnonCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleAnonCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         AnonModule module = injector.getInstance(AnonModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
         String message = input.readUTF();
 
         module.sendMessage(module.metadataBuilder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(Localization.Command.Anon::getFormat)
                 .range(Range.get(Range.Type.SERVER))
@@ -234,13 +236,14 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleMeCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleMeCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         MeModule module = injector.getInstance(MeModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
         String message = input.readUTF();
 
         module.sendMessage(module.metadataBuilder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(Localization.Command.Me::getFormat)
                 .range(Range.get(Range.Type.SERVER))
@@ -251,7 +254,7 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleBallCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleBallCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         BallModule module = injector.getInstance(BallModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
@@ -259,6 +262,7 @@ public class ProxyMessageHandler {
         String message = input.readUTF();
 
         module.sendMessage(BallMetadata.<Localization.Command.Ball>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(module.replaceAnswer(answer))
                 .answer(answer)
@@ -270,7 +274,7 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleBanCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleBanCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         BanModule module = injector.getInstance(BanModule.class);
 
         Moderation ban = gson.fromJson(input.readUTF(), Moderation.class);
@@ -281,6 +285,7 @@ public class ProxyMessageHandler {
         module.kick(fModerator, (FPlayer) fEntity, ban);
 
         module.sendMessage(ModerationMetadata.<Localization.Command.Ban>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(module.buildFormat(ban))
                 .moderation(ban)
@@ -291,13 +296,14 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleBroadcastCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleBroadcastCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         BroadcastModule module = injector.getInstance(BroadcastModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
         String message = input.readUTF();
 
         module.sendMessage(module.metadataBuilder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(Localization.Command.Broadcast::getFormat)
                 .range(Range.get(Range.Type.SERVER))
@@ -308,27 +314,28 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleChatColorCommand(FEntity fEntity) {
+    private void handleChatColorCommand(FEntity fEntity, UUID metadataUUID) {
         FPlayer fPlayer = fPlayerService.getFPlayer(fEntity.getUuid());
         fPlayerService.loadColors(fPlayer);
 
         ChatcolorModule module = injector.getInstance(ChatcolorModule.class);
         if (!module.isEnable()) return;
 
-        module.sendMessageWithUpdatedColors(fPlayer);
+        module.sendMessageWithUpdatedColors(fPlayer, metadataUUID);
     }
 
     private void handleChatSettingCommand(FEntity fEntity) {
         fPlayerService.loadSettings(fPlayerService.getFPlayer(fEntity.getUuid()));
     }
 
-    private void handleCoinCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleCoinCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         CoinModule module = injector.getInstance(CoinModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
         int percent = input.readInt();
 
         module.sendMessage(CoinMetadata.<Localization.Command.Coin>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(module.replaceResult(percent))
                 .percent(percent)
@@ -343,17 +350,18 @@ public class ProxyMessageHandler {
         // skip delete command checking, only format.moderation.delete module
         DeleteModule module = injector.getInstance(DeleteModule.class);
 
-        UUID messageUUID = UUID.fromString(input.readUTF());
-        module.remove(fEntity, messageUUID);
+        UUID metadataUUID = UUID.fromString(input.readUTF());
+        module.remove(fEntity, metadataUUID);
     }
 
-    private void handleDiceCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleDiceCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         DiceModule module = injector.getInstance(DiceModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
         List<Integer> cubes = gson.fromJson(input.readUTF(), new TypeToken<List<Integer>>() {}.getType());
 
         module.sendMessage(DiceMetadata.<Localization.Command.Dice>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(dice -> module.replaceResult(cubes, dice.getSymbols(), dice.getFormat()))
                 .cubes(cubes)
@@ -364,13 +372,14 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleDoCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleDoCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         DoModule module = injector.getInstance(DoModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
         String message = input.readUTF();
 
         module.sendMessage(module.metadataBuilder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(Localization.Command.Do::getFormat)
                 .message(message)
@@ -381,13 +390,14 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleHelperCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleHelperCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         HelperModule module = injector.getInstance(HelperModule.class);
         if (!module.isEnable()) return;
 
         String message = input.readUTF();
 
         module.sendMessage(module.metadataBuilder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(Localization.Command.Helper::getGlobal)
                 .range(Range.get(Range.Type.SERVER))
@@ -399,7 +409,7 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleMuteCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleMuteCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         MuteModule module = injector.getInstance(MuteModule.class);
 
         FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -408,6 +418,7 @@ public class ProxyMessageHandler {
         Moderation mute = gson.fromJson(input.readUTF(), Moderation.class);
 
         module.sendMessage(ModerationMetadata.<Localization.Command.Mute>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(module.buildFormat(mute))
                 .moderation(mute)
@@ -420,7 +431,7 @@ public class ProxyMessageHandler {
         module.sendForTarget(fModerator, (FPlayer) fEntity, mute);
     }
 
-    private void handleUnbanCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleUnbanCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         UnbanModule module = injector.getInstance(UnbanModule.class);
 
         FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -429,6 +440,7 @@ public class ProxyMessageHandler {
         List<Moderation> bans = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
 
         module.sendMessage(UnModerationMetadata.<Localization.Command.Unban>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(unban -> Strings.CS.replace(unban.getFormat(), "<moderator>", fModerator.getName()))
                 .moderator(fModerator)
@@ -441,7 +453,7 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleUnmuteCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleUnmuteCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         UnmuteModule module = injector.getInstance(UnmuteModule.class);
 
         FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -450,6 +462,7 @@ public class ProxyMessageHandler {
         List<Moderation> mutes = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
 
         module.sendMessage(UnModerationMetadata.<Localization.Command.Unmute>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(unwarn -> Strings.CS.replace(unwarn.getFormat(), "<moderator>", fModerator.getName()))
                 .moderator(fModerator)
@@ -462,7 +475,7 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleUnwarnCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleUnwarnCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         UnwarnModule module = injector.getInstance(UnwarnModule.class);
 
         FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -471,6 +484,7 @@ public class ProxyMessageHandler {
         List<Moderation> warns = gson.fromJson(input.readUTF(), new TypeToken<List<Moderation>>(){}.getType());
 
         module.sendMessage(UnModerationMetadata.<Localization.Command.Unwarn>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(unwarn -> Strings.CS.replace(unwarn.getFormat(), "<moderator>", fModerator.getName()))
                 .moderator(fModerator)
@@ -483,11 +497,11 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handlePollVote(DataInputStream input, FEntity fEntity) throws IOException {
-        injector.getInstance(PollModule.class).vote(fEntity, input.readInt(), input.readInt());
+    private void handlePollVote(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
+        injector.getInstance(PollModule.class).vote(fEntity, input.readInt(), input.readInt(), metadataUUID);
     }
 
-    private void handlePollCreate(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handlePollCreate(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         PollModule module = injector.getInstance(PollModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
@@ -495,6 +509,7 @@ public class ProxyMessageHandler {
         module.saveAndUpdateLast(poll);
 
         module.sendMessage(PollMetadata.<Localization.Command.Poll>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(module.resolvePollFormat(fEntity, poll, PollModule.Status.START))
                 .poll(poll)
@@ -505,7 +520,7 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleSpyCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleSpyCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         SpyModule module = injector.getInstance(SpyModule.class);
         if (!module.isEnable()) return;
 
@@ -513,6 +528,7 @@ public class ProxyMessageHandler {
         String string = input.readUTF();
 
         module.sendMessage(SpyMetadata.<Localization.Command.Spy>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(module.replaceAction(action))
                 .turned(true)
@@ -529,13 +545,14 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleStreamCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleStreamCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         StreamModule module = injector.getInstance(StreamModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
         String message = input.readUTF();
 
         module.sendMessage(StreamMetadata.<Localization.Command.Stream>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(module.replaceUrls(message))
                 .turned(true)
@@ -547,7 +564,7 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleTellCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleTellCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         TellModule module = injector.getInstance(TellModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
@@ -560,10 +577,10 @@ public class ProxyMessageHandler {
         IntegrationModule integrationModule = injector.getInstance(IntegrationModule.class);
         if (!integrationModule.canSeeVanished(fReceiver, fEntity)) return;
 
-        module.send(fEntity, fReceiver, (fResolver, s) -> s.getReceiver(), message, true);
+        module.send(fEntity, fReceiver, Localization.Command.Tell::getReceiver, message, true, metadataUUID);
     }
 
-    private void handleTranslateToCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleTranslateToCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         TranslatetoModule module = injector.getInstance(TranslatetoModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
@@ -572,6 +589,7 @@ public class ProxyMessageHandler {
         String messageToTranslate = input.readUTF();
 
         module.sendMessage(TranslatetoMetadata.<Localization.Command.Translateto>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(module.replaceLanguage(targetLang))
                 .targetLanguage(targetLang)
@@ -584,7 +602,7 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleTryCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleTryCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         TryModule module = injector.getInstance(TryModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
@@ -592,6 +610,7 @@ public class ProxyMessageHandler {
         String message = input.readUTF();
 
         module.sendMessage(TryMetadata.<Localization.Command.Try>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(module.replacePercent(value))
                 .percent(value)
@@ -603,7 +622,7 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleWarnCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleWarnCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         WarnModule module = injector.getInstance(WarnModule.class);
 
         FPlayer fModerator = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -612,6 +631,7 @@ public class ProxyMessageHandler {
         Moderation warn = gson.fromJson(input.readUTF(), Moderation.class);
 
         module.sendMessage(ModerationMetadata.<Localization.Command.Warn>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(module.buildFormat(warn))
                 .moderation(warn)
@@ -624,7 +644,7 @@ public class ProxyMessageHandler {
         module.send(fModerator, (FPlayer) fEntity, warn);
     }
 
-    private void handleKickCommand(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleKickCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         KickModule module = injector.getInstance(KickModule.class);
 
         Moderation kick = gson.fromJson(input.readUTF(), Moderation.class);
@@ -633,6 +653,7 @@ public class ProxyMessageHandler {
         if (module.isModuleDisabledFor(fModerator)) return;
 
         module.sendMessage(ModerationMetadata.<Localization.Command.Kick>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(module.buildFormat(kick))
                 .moderation(kick)
@@ -645,7 +666,7 @@ public class ProxyMessageHandler {
         module.kick(fModerator, (FPlayer) fEntity, kick);
     }
 
-    private void handleTicTacToeCreate(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleTicTacToeCreate(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         if (!(fEntity instanceof FPlayer fPlayer)) return;
 
         FPlayer fReceiver = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -659,10 +680,10 @@ public class ProxyMessageHandler {
             ticTacToe = tictactoeManager.create(ticTacToeId, fPlayer, fReceiver, isHard);
         }
 
-        injector.getInstance(TictactoeModule.class).sendCreateMessage(fPlayer, fReceiver, ticTacToe);
+        injector.getInstance(TictactoeModule.class).sendCreateMessage(fPlayer, fReceiver, ticTacToe, metadataUUID);
     }
 
-    private void handleTicTacToeMove(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleTicTacToeMove(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         if (!(fEntity instanceof FPlayer fPlayer)) return;
 
         FPlayer fReceiver = gson.fromJson(input.readUTF(), FPlayer.class);
@@ -670,18 +691,18 @@ public class ProxyMessageHandler {
         int typeTitle = input.readInt();
         String move = input.readUTF();
 
-        injector.getInstance(TictactoeModule.class).sendMoveMessage(fPlayer, fReceiver, ticTacToe, typeTitle, move);
+        injector.getInstance(TictactoeModule.class).sendMoveMessage(fPlayer, fReceiver, ticTacToe, typeTitle, move, metadataUUID);
     }
 
-    private void handleChatMessage(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleChatMessage(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         String chat = input.readUTF();
         String message = input.readUTF();
 
         FPlayer fPlayer = fPlayerService.getFPlayer(fEntity.getUuid());
-        injector.getInstance(ChatModule.class).send(fPlayer, chat, message);
+        injector.getInstance(ChatModule.class).send(fPlayer, chat, message, metadataUUID);
     }
 
-    private void handleClearchatCommand(DataInputStream input, FEntity fEntity) {
+    private void handleClearchatCommand(FEntity fEntity) {
         ClearchatModule module = injector.getInstance(ClearchatModule.class);
         if (!module.isEnable()) return;
 
@@ -695,29 +716,30 @@ public class ProxyMessageHandler {
         injector.getInstance(RockpaperscissorsModule.class).create(id, fEntity, receiver);
     }
 
-    private void handleRockPaperScissorsMove(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleRockPaperScissorsMove(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         UUID id = UUID.fromString(input.readUTF());
         String move = input.readUTF();
 
-        injector.getInstance(RockpaperscissorsModule.class).move(id, fEntity, move);
+        injector.getInstance(RockpaperscissorsModule.class).move(id, fEntity, move, metadataUUID);
     }
 
-    private void handleRockPaperScissorsFinal(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleRockPaperScissorsFinal(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         if (!(fEntity instanceof FPlayer fPlayer)) return;
 
         UUID id = UUID.fromString(input.readUTF());
         String move = input.readUTF();
 
-        injector.getInstance(RockpaperscissorsModule.class).sendFinalMessage(id, fPlayer, move);
+        injector.getInstance(RockpaperscissorsModule.class).sendFinalMessage(id, fPlayer, move, metadataUUID);
     }
 
-    private void handleAdvancement(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleAdvancement(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         AdvancementModule module = injector.getInstance(AdvancementModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
         ChatAdvancement chatAdvancementMetadata = gson.fromJson(input.readUTF(), ChatAdvancement.class);
 
         module.sendMessage(AdvancementMetadata.<Localization.Message.Advancement>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(s -> module.convert(s, chatAdvancementMetadata))
                 .advancement(chatAdvancementMetadata)
@@ -729,13 +751,14 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleDeath(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleDeath(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         DeathModule module = injector.getInstance(DeathModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
         Death death = gson.fromJson(input.readUTF(), Death.class);
 
         module.sendMessage(DeathMetadata.<Localization.Message.Death>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(s -> s.getTypes().get(death.getKey()))
                 .death(death)
@@ -750,7 +773,7 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleJoin(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleJoin(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         JoinModule module = injector.getInstance(JoinModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
@@ -760,6 +783,7 @@ public class ProxyMessageHandler {
         Message.Join message = fileResolver.getMessage().getJoin();
 
         module.sendMessage(JoinMetadata.<Localization.Message.Join>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(s -> hasPlayedBefore || !message.isFirst() ? s.getFormat() : s.getFormatFirstTime())
                 .ignoreVanish(ignoreVanish)
@@ -772,13 +796,14 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleQuit(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleQuit(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         QuitModule module = injector.getInstance(QuitModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
         boolean ignoreVanish = input.readBoolean();
 
         module.sendMessage(QuitMetadata.<Localization.Message.Quit>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(Localization.Message.Quit::getFormat)
                 .ignoreVanish(ignoreVanish)
@@ -790,13 +815,14 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handleAfk(DataInputStream input, FEntity fEntity) throws IOException {
+    private void handleAfk(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         AfkModule module = injector.getInstance(AfkModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
         boolean isAfk = input.readBoolean();
 
         module.sendMessage(AFKMetadata.<Localization.Message.Afk>builder()
+                .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(s -> isAfk
                         ? s.getFormatFalse().getGlobal()

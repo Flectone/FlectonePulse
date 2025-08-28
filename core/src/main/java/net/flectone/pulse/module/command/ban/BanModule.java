@@ -24,6 +24,7 @@ import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.type.tuple.Pair;
 
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiFunction;
 
 @Singleton
@@ -132,7 +133,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         Moderation ban = moderationService.ban(fTarget, databaseTime, reason, fPlayer.getId());
         if (ban == null) return;
 
-        proxySender.send(fTarget, MessageType.SYSTEM_BAN, dataOutputStream -> {});
+        proxySender.send(fTarget, MessageType.SYSTEM_BAN, dataOutputStream -> {}, UUID.randomUUID());
 
         kick(fPlayer, fTarget, ban);
 

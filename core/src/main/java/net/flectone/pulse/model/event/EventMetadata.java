@@ -26,7 +26,8 @@ import java.util.function.UnaryOperator;
 @SuperBuilder
 public class EventMetadata<L extends Localization.Localizable> {
 
-    private final UUID messageUUID = UUID.randomUUID();
+    @Builder.Default
+    private final UUID uuid = UUID.randomUUID();
 
     @NonNull
     private final FEntity sender;

@@ -21,6 +21,7 @@ import org.incendo.cloud.context.CommandContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unwarn> {
@@ -119,7 +120,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
 
         moderationService.remove(fTarget, warns);
 
-        proxySender.send(fTarget, MessageType.SYSTEM_WARN, dataOutputStream -> {});
+        proxySender.send(fTarget, MessageType.SYSTEM_WARN, dataOutputStream -> {}, UUID.randomUUID());
 
         sendMessage(UnModerationMetadata.<Localization.Command.Unwarn>builder()
                 .sender(fTarget)

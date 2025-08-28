@@ -31,6 +31,7 @@ import org.incendo.cloud.suggestion.Suggestion;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 public class ChatsettingModule extends AbstractModuleCommand<Localization.Command.Chatsetting> {
@@ -164,7 +165,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         fPlayerService.saveSettings(fPlayer);
 
         if (proxyRegistry.hasEnabledProxy()) {
-            proxySender.send(fPlayer, MessageType.COMMAND_CHATSETTING, dataOutputStream -> {});
+            proxySender.send(fPlayer, MessageType.COMMAND_CHATSETTING, dataOutputStream -> {}, UUID.randomUUID());
         }
     }
 

@@ -22,7 +22,7 @@ import org.incendo.cloud.context.CommandContext;
 
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 @Singleton
 public class TellModule extends AbstractModuleCommand<Localization.Command.Tell> {
@@ -128,13 +128,14 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
         String receiverUUID = fReceiver.getUuid().toString();
 
+        UUID metadataUUID = UUID.randomUUID();
         boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TELL, dataOutputStream -> {
             dataOutputStream.writeUTF(receiverUUID);
             dataOutputStream.writeUTF(message);
-        });
+        }, metadataUUID);
 
         if (isSent) {
-            send(fReceiver, fPlayer, (fResolver, s) -> s.getSender(), message, true);
+            send(fReceiver, fPlayer, Localization.Command.Tell::getSender, message, false, metadataUUID);
             return;
         }
 
@@ -149,16 +150,18 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
             return;
         }
 
-        send(fPlayer, fNewReceiver, (fResolver, s) -> s.getReceiver(), message, true);
-        send(fNewReceiver, fPlayer, (fResolver, s) -> s.getSender(), message, false);
+        send(fPlayer, fNewReceiver, Localization.Command.Tell::getReceiver, message, true, UUID.randomUUID());
+        send(fNewReceiver, fPlayer, Localization.Command.Tell::getSender, message, false, UUID.randomUUID());
     }
 
     public void send(FEntity fPlayer,
                      FPlayer fReceiver,
-                     BiFunction<FPlayer, Localization.Command.Tell, String> format,
+                     Function<Localization.Command.Tell, String> format,
                      String string,
-                     boolean senderColorOut) {
+                     boolean senderColorOut,
+                     UUID metadataUUID) {
         sendMessage(metadataBuilder()
+                .uuid(metadataUUID)
                 .sender(fPlayer)
                 .filterPlayer(fReceiver, senderColorOut)
                 .format(format)

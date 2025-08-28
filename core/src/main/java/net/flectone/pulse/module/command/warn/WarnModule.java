@@ -27,6 +27,7 @@ import org.incendo.cloud.type.tuple.Pair;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiFunction;
 
 @Singleton
@@ -125,7 +126,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         Moderation warn = moderationService.warn(fTarget, databaseTime, reason, fPlayer.getId());
         if (warn == null) return;
 
-        proxySender.send(fTarget, MessageType.SYSTEM_WARN, dataOutputStream -> {});
+        proxySender.send(fTarget, MessageType.SYSTEM_WARN, dataOutputStream -> {}, UUID.randomUUID());
 
         sendMessage(ModerationMetadata.<Localization.Command.Warn>builder()
                 .sender(fTarget)

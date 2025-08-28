@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiFunction;
 
 @Singleton
@@ -139,24 +140,26 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 .build()
         );
 
+        UUID metadataUUID = UUID.randomUUID();
         boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TICTACTOE, dataOutputStream -> {
             dataOutputStream.writeUTF(gson.toJson(fReceiver));
             dataOutputStream.writeInt(ticTacToe.getId());
             dataOutputStream.writeBoolean(isHard);
-        });
+        }, metadataUUID);
 
         if (isSent) return;
 
-        sendCreateMessage(fPlayer, fReceiver, ticTacToe);
+        sendCreateMessage(fPlayer, fReceiver, ticTacToe, metadataUUID);
     }
 
     // /tictactoe %d create
-    public void sendCreateMessage(FPlayer fPlayer, FPlayer fReceiver, TicTacToe ticTacToe) {
+    public void sendCreateMessage(FPlayer fPlayer, FPlayer fReceiver, TicTacToe ticTacToe, UUID metadataUUID) {
         if (isModuleDisabledFor(fPlayer)) return;
         if (!integrationModule.canSeeVanished(fPlayer, fReceiver)
                 || !integrationModule.canSeeVanished(fReceiver, fPlayer)) return;
 
         sendMessage(TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
+                .uuid(metadataUUID)
                 .sender(fPlayer)
                 .filterPlayer(fReceiver, true)
                 .format(message -> String.format(message.getReceiver(), ticTacToe.getId()))
@@ -167,13 +170,14 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
     }
 
     // /tictactoe %d <move>
-    public void sendMoveMessage(FPlayer fPlayer, FPlayer fReceiver, TicTacToe ticTacToe, int typeTitle, String move) {
+    public void sendMoveMessage(FPlayer fPlayer, FPlayer fReceiver, TicTacToe ticTacToe, int typeTitle, String move, UUID metadataUUID) {
         if (isModuleDisabledFor(fPlayer)) return;
         if (!integrationModule.canSeeVanished(fPlayer, fReceiver)
                 || !integrationModule.canSeeVanished(fReceiver, fPlayer)) return;
         if (ticTacToe == null) return;
 
         sendMessage(metadataBuilder()
+                .uuid(metadataUUID)
                 .sender(fReceiver)
                 .filterPlayer(fReceiver)
                 .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
@@ -247,16 +251,18 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         );
 
         FPlayer finalFReceiver = fReceiver;
+        UUID metadataUUID = UUID.randomUUID();
         boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TICTACTOE_MOVE, dataOutputStream -> {
             dataOutputStream.writeUTF(gson.toJson(finalFReceiver));
             dataOutputStream.writeUTF(ticTacToe.toString());
             dataOutputStream.writeInt(typeTitle);
             dataOutputStream.writeUTF(move);
-        });
+        }, metadataUUID);
 
         if (isSent) return;
 
         sendMessage(metadataBuilder()
+                .uuid(metadataUUID)
                 .sender(fReceiver)
                 .filterPlayer(fReceiver)
                 .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))

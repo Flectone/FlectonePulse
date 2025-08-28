@@ -33,6 +33,7 @@ import org.incendo.cloud.type.tuple.Pair;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
@@ -231,7 +232,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         }
     }
 
-    public void send(FPlayer fPlayer, String proxyChatName, String string) {
+    public void send(FPlayer fPlayer, String proxyChatName, String string, UUID metadataUUID) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         var optionalChat = message.getTypes().entrySet().stream()
@@ -250,6 +251,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         });
 
         sendMessage(ChatMetadata.<Localization.Message.Chat>builder()
+                .uuid(metadataUUID)
                 .sender(fPlayer)
                 .format(s -> s.getTypes().get(chatName))
                 .chatName(chatName)
