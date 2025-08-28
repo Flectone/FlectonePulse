@@ -70,6 +70,16 @@ public class EventMetadata<L extends Localization.Localizable> {
                 C extends EventMetadata<L>,
                 B extends EventMetadataBuilder<L, C, B>> {
 
+        public B proxy() {
+            this.proxy = dataOutputStream -> {};
+            return self();
+        }
+
+        public B proxy(ProxyDataConsumer<SafeDataOutputStream> proxy) {
+            this.proxy = proxy;
+            return self();
+        }
+
         public B integration(UnaryOperator<String> integrationFunction) {
             this.integration = integrationFunction;
             return self();
