@@ -29,6 +29,7 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, ModInitializer,
 	@Override
 	public void onPreLaunch() {
 		// configure packetevents api
+        System.setProperty("packetevents.nbt.default-max-size", "2097152");
 		PacketEventsServerMod.constructApi(BuildConfig.PROJECT_MOD_ID).init();
 	}
 

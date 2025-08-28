@@ -35,6 +35,7 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
         libraryResolver.loadLibraries();
 
         // configure packetevents api
+        System.setProperty("packetevents.nbt.default-max-size", "2097152");
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
         PacketEvents.getAPI().getSettings()
                 .reEncodeByDefault(false)
