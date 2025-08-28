@@ -374,13 +374,14 @@ public class ProxyMessageHandler {
 
     private void handleHelperCommand(DataInputStream input, FEntity fEntity) throws IOException {
         HelperModule module = injector.getInstance(HelperModule.class);
-        if (module.isModuleDisabledFor(fEntity)) return;
+        if (!module.isEnable()) return;
 
         String message = input.readUTF();
 
         module.sendMessage(module.metadataBuilder()
                 .sender(fEntity)
                 .format(Localization.Command.Helper::getGlobal)
+                .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getCommand().getHelper().getDestination())
                 .message(message)
                 .sound(module.getModuleSound())
