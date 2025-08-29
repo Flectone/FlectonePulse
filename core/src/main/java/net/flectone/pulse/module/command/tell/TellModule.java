@@ -98,6 +98,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
             sendMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tell::getMyself)
+                    .destination(command.getDestination())
                     .message(message)
                     .build()
             );
