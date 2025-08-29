@@ -65,6 +65,7 @@ public class SleepModule extends AbstractModuleLocalization<Localization.Message
                     case SLEEP_SKIPPING_NIGHT -> bed.getSkippingNight();
                     default -> "";
                 })
+                .destination(message.getDestination())
                 .sleep(sleep)
                 .sound(getModuleSound())
                 .build()
