@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.mail.listener;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -10,6 +11,7 @@ import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.module.command.mail.MailModule;
 import net.flectone.pulse.module.command.mail.model.MailMetadata;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 
 import java.util.List;
@@ -17,12 +19,15 @@ import java.util.List;
 @Singleton
 public class MailPulseListener implements PulseListener {
 
+    private final Command.Mail command;
     private final MailModule mailModule;
     private final FPlayerService fPlayerService;
 
     @Inject
-    public MailPulseListener(MailModule mailModule,
+    public MailPulseListener(FileResolver fileResolver,
+                             MailModule mailModule,
                              FPlayerService fPlayerService) {
+        this.command = fileResolver.getCommand().getMail();
         this.mailModule = mailModule;
         this.fPlayerService = fPlayerService;
     }
@@ -42,6 +47,7 @@ public class MailPulseListener implements PulseListener {
                     .sender(fPlayer)
                     .filterPlayer(fReceiver, true)
                     .format(Localization.Command.Mail::getReceiver)
+                    .destination(command.getDestination())
                     .mail(mail)
                     .message(mail.message())
                     .build()
