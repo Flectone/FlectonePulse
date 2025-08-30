@@ -36,7 +36,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
     public Mono<MessageCreateEvent> execute(MessageCreateEvent event) {
         Message discordMessage = event.getMessage();
 
-        String channel = integration.getMessageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT);
+        String channel = integration.getMessageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT.name());
         if (channel == null) return Mono.empty();
         if (!channel.equals(discordMessage.getChannelId().asString())) return Mono.empty();
 

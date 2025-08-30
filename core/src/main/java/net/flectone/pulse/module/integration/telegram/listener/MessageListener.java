@@ -66,7 +66,7 @@ public class MessageListener extends EventListener {
             return;
         }
 
-        List<String> chats = integration.getMessageChannel().get(MessageType.FROM_TELEGRAM_TO_MINECRAFT);
+        List<String> chats = integration.getMessageChannel().get(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name());
         if (chats == null || !chats.contains(chatID)) return;
 
         sendMessage(author, chat, text);

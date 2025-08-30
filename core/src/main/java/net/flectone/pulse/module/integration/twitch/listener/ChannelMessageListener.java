@@ -30,7 +30,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
     }
 
     public void execute(ChannelMessageEvent event) {
-        List<String> channel = integration.getMessageChannel().get(MessageType.FROM_TWITCH_TO_MINECRAFT);
+        List<String> channel = integration.getMessageChannel().get(MessageType.FROM_TWITCH_TO_MINECRAFT.name());
         if (channel == null || channel.isEmpty()) return;
 
         String channelName = event.getChannel().getName();
