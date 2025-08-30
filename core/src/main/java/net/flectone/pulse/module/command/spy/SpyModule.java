@@ -2,17 +2,16 @@ package net.flectone.pulse.module.command.spy;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.module.command.spy.model.SpyMetadata;
-import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.spy.model.SpyMetadata;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import org.apache.commons.lang3.StringUtils;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
@@ -102,11 +101,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
                     dataOutputStream.writeString(action);
                     dataOutputStream.writeString(message);
                 })
-                .integration(string -> StringUtils.replaceEach(
-                        string,
-                        new String[]{"<action>", "<message>"},
-                        new String[]{action, message}
-                ))
+                .integration(string -> Strings.CS.replace(string, "<action>", action))
                 .build()
         );
     }

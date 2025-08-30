@@ -134,11 +134,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
                     dataOutputStream.writeAsJson(fPlayer);
                     dataOutputStream.writeAsJson(warns);
                 })
-                .integration(string -> Strings.CS.replace(
-                        string,
-                        "<moderator>",
-                        fPlayer.getName()
-                ))
+                .integration(string -> Strings.CS.replace(string, "<moderator>", fPlayer.getName()))
                 .build()
         );
     }

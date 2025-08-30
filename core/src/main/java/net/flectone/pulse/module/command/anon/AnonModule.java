@@ -11,7 +11,6 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
-import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton
@@ -63,7 +62,7 @@ public class AnonModule extends AbstractModuleCommand<Localization.Command.Anon>
                 .range(command.getRange())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
-                .integration(string -> Strings.CS.replace(string, "<message>", message))
+                .integration()
                 .build()
         );
     }

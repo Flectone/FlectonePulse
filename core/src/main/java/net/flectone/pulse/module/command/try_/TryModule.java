@@ -5,15 +5,14 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.module.command.try_.model.TryMetadata;
-import net.flectone.pulse.util.constant.DisableSource;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.try_.model.TryMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.RandomUtil;
-import org.apache.commons.lang3.StringUtils;
+import net.flectone.pulse.util.constant.DisableSource;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
@@ -85,11 +84,7 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
                     dataOutputStream.writeInt(random);
                     dataOutputStream.writeString(message);
                 })
-                .integration(string -> StringUtils.replaceEach(
-                        string,
-                        new String[]{"<message>", "<percent>"},
-                        new String[]{message, String.valueOf(random)}
-                ))
+                .integration(string -> Strings.CS.replace(string, "<percent>", String.valueOf(random)))
                 .build()
         );
     }

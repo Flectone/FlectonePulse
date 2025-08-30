@@ -21,7 +21,6 @@ import org.incendo.cloud.context.CommandContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Singleton
 public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unmute> {
@@ -135,11 +134,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
                     dataOutputStream.writeAsJson(fPlayer);
                     dataOutputStream.writeAsJson(mutes);
                 })
-                .integration(string -> Strings.CS.replace(
-                        string,
-                        "<moderator>",
-                        fPlayer.getName()
-                ))
+                .integration(string -> Strings.CS.replace(string, "<moderator>", fPlayer.getName()))
                 .build()
         );
     }

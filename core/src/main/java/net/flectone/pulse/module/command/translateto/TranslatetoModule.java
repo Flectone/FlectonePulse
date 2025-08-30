@@ -123,10 +123,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
                     dataOutputStream.writeString(message);
                     dataOutputStream.writeString(finalMessageToTranslate);
                 })
-                .integration(string -> StringUtils.replaceEach(string,
-                        new String[]{"<message>", "<language>"},
-                        new String[]{translatedMessage, targetLang}
-                ))
+                .integration(string -> Strings.CS.replace(string, "<language>", targetLang))
                 .build()
         );
     }

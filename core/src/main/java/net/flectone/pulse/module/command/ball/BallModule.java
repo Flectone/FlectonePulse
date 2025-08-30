@@ -84,11 +84,7 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
                             ? answers.get(Math.min(answer, answers.size() - 1))
                             : StringUtils.EMPTY;
 
-                    return StringUtils.replaceEach(
-                            string,
-                            new String[]{"<message>", "<answer>"},
-                            new String[]{StringUtils.defaultString(message), answerString}
-                    );
+                    return Strings.CS.replace(string, "<answer>", answerString);
                 })
                 .build()
         );

@@ -14,7 +14,6 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
-import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.List;
@@ -105,7 +104,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
                 .message(message)
                 .filter(filter)
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
-                .integration(string -> Strings.CS.replace(string, "<message>", message))
+                .integration()
                 .build()
         );
     }

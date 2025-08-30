@@ -49,11 +49,11 @@ public class IntegrationSender {
                 .tagResolvers(eventMetadata.getTagResolvers(FPlayer.UNKNOWN))
                 .build();
 
-        String messageContent = eventMetadata.getMessage();
-        Component componentMessage = StringUtils.isEmpty(messageContent)
+        String message = eventMetadata.getMessage();
+        Component componentMessage = StringUtils.isEmpty(message)
                 ? Component.empty()
                 : messagePipeline
-                .builder(sender, FPlayer.UNKNOWN, messageContent)
+                .builder(sender, FPlayer.UNKNOWN, message)
                 .flag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
                 .flag(MessageFlag.TRANSLATE, false)
                 .flag(MessageFlag.USER_MESSAGE, true)
@@ -63,21 +63,28 @@ public class IntegrationSender {
                 .build();
 
         PlainTextComponentSerializer serializer = PlainTextComponentSerializer.plainText();
-        String finalFormattedMessage = Strings.CS.replace(
+        String plainMessage = serializer.serialize(componentMessage);
+
+        String finalMessage = Strings.CS.replace(
                 serializer.serialize(componentFormat),
                 "<message>",
-                serializer.serialize(componentMessage)
+                plainMessage
+        );
+
+        String finalClearMessage = RegExUtils.replaceAll(
+                (CharSequence) finalMessage,
+                finalClearMessagePattern,
+                StringUtils.EMPTY
         );
 
         UnaryOperator<String> interfaceReplaceString = s -> {
             String input = integrationOperator.apply(s);
             if (StringUtils.isBlank(input)) return StringUtils.EMPTY;
 
-            String clearMessage = RegExUtils.replaceAll((CharSequence) finalFormattedMessage, finalClearMessagePattern, StringUtils.EMPTY);
             return StringUtils.replaceEach(
                     input,
-                    new String[]{"<player>", "<final_message>", "<final_clear_message>"},
-                    new String[]{sender.getName(), finalFormattedMessage, clearMessage}
+                    new String[]{"<player>", "<message>", "<plain_message>", "<final_message>", "<final_clear_message>"},
+                    new String[]{sender.getName(), message, plainMessage,  finalMessage, finalClearMessage}
             );
         };
 

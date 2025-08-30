@@ -27,7 +27,6 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.PlatformType;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.type.tuple.Pair;
 
 import java.util.HashMap;
@@ -184,7 +183,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                     dataOutputStream.writeString(chatName);
                     dataOutputStream.writeString(finalMessage);
                 })
-                .integration(string -> Strings.CS.replace(string, "<message>", chatName))
+                .integration()
                 .build();
 
         List<FPlayer> receivers = createReceivers(chatMetadata);

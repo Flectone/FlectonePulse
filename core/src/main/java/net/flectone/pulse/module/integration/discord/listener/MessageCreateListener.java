@@ -73,11 +73,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
                 .message(message)
                 .sound(getModuleSound())
                 .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DISCORD))
-                .integration(string -> Strings.CS.replace(
-                        string,
-                        "<name>",
-                        nickname
-                ))
+                .integration(string -> Strings.CS.replace(string, "<name>", nickname))
                 .build()
         );
     }

@@ -140,11 +140,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
                     dataOutputStream.writeAsJson(fPlayer);
                     dataOutputStream.writeAsJson(bans);
                 })
-                .integration(string -> Strings.CS.replace(
-                        string,
-                        "<moderator>",
-                        fPlayer.getName()
-                ))
+                .integration(string -> Strings.CS.replace(string, "<moderator>", fPlayer.getName()))
                 .build()
         );
     }
