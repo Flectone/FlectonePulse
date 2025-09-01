@@ -26,7 +26,7 @@ public class FabricBaseListener {
         this.eventDispatcher = eventDispatcher;
     }
 
-    @Async
+    @Async(delay = 1)
     public void asyncProcessJoinEvent(ServerPlayNetworkHandler handler, PacketSender packetSender, MinecraftServer minecraftServer) {
         ServerPlayerEntity player = handler.getPlayer();
         FPlayer fPlayer = fPlayerService.getFPlayer(player.getUuid());
