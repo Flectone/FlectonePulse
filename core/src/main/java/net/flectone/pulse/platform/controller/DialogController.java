@@ -3,6 +3,7 @@ package net.flectone.pulse.platform.controller;
 import com.github.retrooper.packetevents.protocol.dialog.MultiActionDialog;
 import com.github.retrooper.packetevents.protocol.dialog.action.DynamicCustomAction;
 import com.github.retrooper.packetevents.protocol.dialog.button.ActionButton;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerClearDialog;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerShowDialog;
 import com.google.inject.Inject;
@@ -61,19 +62,19 @@ public class DialogController {
         packetSender.send(fPlayer, dialog.getWrapperDialog());
     }
 
-    public void click(Dialog dialog, String key) {
+    public void click(Dialog dialog, String key, NBT payload) {
         if (!dialog.getClickConsumerMap().containsKey(key)) return;
 
-        dialog.getClickConsumerMap().get(key).accept(dialog);
+        dialog.getClickConsumerMap().get(key).accept(dialog, payload);
     }
 
 
     @Async
-    public void process(UUID uuid, String key) {
+    public void process(UUID uuid, String key, NBT payload) {
         Dialog dialog = get(uuid);
         if (dialog == null) return;
 
-        click(dialog, key);
+        click(dialog, key, payload);
     }
 
     public void changeButton(FPlayer fPlayer, Dialog dialog, String id, ActionButton actionButton) {

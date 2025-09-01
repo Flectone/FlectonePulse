@@ -41,7 +41,7 @@ public class DialogPacketListener implements PacketListener {
 
             String key = wrapper.getId().getKey();
 
-            dialogController.process(user.getUUID(), key);
+            dialogController.process(user.getUUID(), key, wrapper.getPayload());
         }
     }
 

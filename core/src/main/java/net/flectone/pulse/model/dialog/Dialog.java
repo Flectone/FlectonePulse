@@ -3,6 +3,7 @@ package net.flectone.pulse.model.dialog;
 import com.github.retrooper.packetevents.protocol.dialog.CommonDialogData;
 import com.github.retrooper.packetevents.protocol.dialog.MultiActionDialog;
 import com.github.retrooper.packetevents.protocol.dialog.button.ActionButton;
+import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerShowDialog;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,17 +12,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 @Getter
 public class Dialog {
 
-    private final Map<String, Consumer<Dialog>> clickConsumerMap = new HashMap<>();
+    private final Map<String, BiConsumer<Dialog, NBT>> clickConsumerMap = new HashMap<>();
     private final List<Consumer<Dialog>> closeConsumerList = new ArrayList<>();
 
     @Setter private WrapperPlayServerShowDialog wrapperDialog;
 
-    public Dialog(Map<String, Consumer<Dialog>> clickConsumerMap,
+    public Dialog(Map<String, BiConsumer<Dialog, NBT>> clickConsumerMap,
                   List<Consumer<Dialog>> closeConsumerList,
                   WrapperPlayServerShowDialog wrapperDialog) {
         this.clickConsumerMap.putAll(clickConsumerMap);
@@ -34,7 +36,7 @@ public class Dialog {
         private final CommonDialogData commonDialogData;
         private final int columns;
         private final Map<Integer, ActionButton> buttonMap = new HashMap<>();
-        private final Map<String, Consumer<Dialog>> clickConsumerMap = new HashMap<>();
+        private final Map<String, BiConsumer<Dialog, NBT>> clickConsumerMap = new HashMap<>();
         private final List<Consumer<Dialog>> closeConsumerList = new ArrayList<>();
 
 
@@ -49,6 +51,11 @@ public class Dialog {
         }
 
         public Builder addClickHandler(String id, Consumer<Dialog> consumer) {
+            clickConsumerMap.put(id, (dialog, nbt) -> consumer.accept(dialog));
+            return this;
+        }
+
+        public Builder addClickHandler(String id, BiConsumer<Dialog, NBT> consumer) {
             clickConsumerMap.put(id, consumer);
             return this;
         }
