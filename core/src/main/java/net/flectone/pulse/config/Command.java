@@ -446,6 +446,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Helper implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+        private boolean nullHelper = true;
         private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("helper"));
         private Destination destination = new Destination();

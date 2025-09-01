@@ -72,7 +72,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
         Predicate<FPlayer> filter = getFilterSee();
 
         List<FPlayer> recipients = fPlayerService.getVisibleFPlayersFor(fPlayer).stream().filter(filter).toList();
-        if (recipients.isEmpty()) {
+        if (recipients.isEmpty() && command.isNullHelper()) {
             boolean nullHelper = !proxyRegistry.hasEnabledProxy() || fPlayerService.findOnlineFPlayers().stream()
                     .noneMatch(online -> permissionChecker.check(online, permission.getSee()));
 
