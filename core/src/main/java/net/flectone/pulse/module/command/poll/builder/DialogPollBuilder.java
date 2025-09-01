@@ -101,7 +101,7 @@ public class DialogPollBuilder {
                     messagePipeline.builder(fPlayer, inputAnswerName).build(),
                     true,
                     answers.get(i),
-                    Integer.MAX_VALUE,
+                    1024,
                     new TextInputControl.MultilineOptions(5, 40)
             ));
 
@@ -214,7 +214,7 @@ public class DialogPollBuilder {
         float repeatTime = (float) nbtCompound.getNumberTagValueOrDefault(repeatTimeKey, 1.0f);
 
         List<String> answers = new ArrayList<>();
-        for (int i = 0; i < Integer.MAX_VALUE; i++) {
+        for (int i = 0; i < 10; i++) {
             String answerValue = nbtCompound.getStringTagValueOrNull(answerKey + i);
             if (answerValue == null) break;
 
