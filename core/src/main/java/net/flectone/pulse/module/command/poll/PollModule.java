@@ -97,7 +97,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 .required(promptMessage, commandParserProvider.messageParser(), mapSuggestion())
         );
 
-        if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6)) {
+        if (command.isEnableGui() && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6)) {
             registerCustomCommand(manager ->
                     manager.commandBuilder(getCommandName() + "gui", CommandMeta.empty())
                             .permission(permission.getCreate().getName())

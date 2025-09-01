@@ -556,6 +556,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
     @Getter
     public static final class Poll implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+        private boolean enableGui = true;
         private Range range = Range.get(Range.Type.PROXY);
         @Setter
         private int lastId = 1;
