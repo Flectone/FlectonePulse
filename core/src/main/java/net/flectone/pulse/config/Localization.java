@@ -138,6 +138,17 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.poll.status.start = "Создано новое голосование #<b><id></b>";
         command.poll.status.run = "Идёт голосование #<b><id></b>";
         command.poll.status.end = "Голосование #<b><id></b> завершено";
+        command.poll.modern.header = "Создание голосования";
+        command.poll.modern.inputName = "Название";
+        command.poll.modern.inputInitial = "";
+        command.poll.modern.multipleName = "Разрешить несколько ответов";
+        command.poll.modern.endTimeName = "Длительность (в минутах)";
+        command.poll.modern.repeatTimeName = "Интервал (в минутах)";
+        command.poll.modern.newAnswerButtonName = "Добавить ответ";
+        command.poll.modern.removeAnswerButtonName = "Удалить ответ";
+        command.poll.modern.inputAnswerName = "Ответ <number>";
+        command.poll.modern.inputAnswersInitial = "";
+        command.poll.modern.createButtonName = "Создать голосование";
         command.poll.answerTemplate = "<color:#fce303>│ <count> → <color:#4eff52><hover:show_text:\"<color:#4eff52>Проголосовать за <bold><answer>\"><click:run_command:\"/pollvote <id> <number>\"><answer> [👍]<br>";
 
         command.ignore.myself = "<color:#ff7171><b>⁉</b> Нельзя игнорировать самого себя";
@@ -1198,12 +1209,28 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String format = "<br><color:#fce303>│ <status> <br>│ <message><reset> <color:#fce303><br>├─────────────<br><answers>";
             private String answerTemplate = "<color:#fce303>│ <count> → <color:#4eff52><hover:show_text:\"<color:#4eff52>Vote for <bold><answer>\"><click:run_command:\"/pollvote <id> <number>\"><answer> [👍]<br>";
             private Status status = new Status();
+            private Modern modern = new Modern();
 
             @Getter
             public static final class Status {
                 private String start = "New poll #<b><id></b> has been created";
                 private String run = "Poll #<b><id></b> is in progress";
                 private String end = "Poll #<b><id></b> has ended";
+            }
+
+            @Getter
+            public static final class Modern {
+                private String header = "Poll";
+                private String inputName = "Name";
+                private String inputInitial = "";
+                private String multipleName = "Allow multiple answers";
+                private String endTimeName = "Duration (min)";
+                private String repeatTimeName = "Interval (min)";
+                private String newAnswerButtonName = "Add answer";
+                private String removeAnswerButtonName = "Remove answer";
+                private String inputAnswerName = "Answer <number>";
+                private String inputAnswersInitial = "";
+                private String createButtonName = "Create poll";
             }
         }
 

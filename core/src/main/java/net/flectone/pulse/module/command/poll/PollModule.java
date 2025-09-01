@@ -1,6 +1,8 @@
 package net.flectone.pulse.module.command.poll;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.NonNull;
 import net.flectone.pulse.config.Command;
@@ -12,9 +14,11 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.poll.builder.DialogPollBuilder;
 import net.flectone.pulse.module.command.poll.model.Poll;
 import net.flectone.pulse.module.command.poll.model.PollMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
@@ -46,6 +50,8 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     private final TaskScheduler taskScheduler;
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
+    private final PacketProvider packetProvider;
+    private final Provider<DialogPollBuilder> dialogPollBuilderProvider;
 
     @Inject
     public PollModule(FileResolver fileResolver,
@@ -53,7 +59,9 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                       ProxySender proxySender,
                       TaskScheduler taskScheduler,
                       CommandParserProvider commandParserProvider,
-                      MessagePipeline messagePipeline) {
+                      MessagePipeline messagePipeline,
+                      PacketProvider packetProvider,
+                      Provider<DialogPollBuilder> dialogPollBuilderProvider) {
         super(localization -> localization.getCommand().getPoll(), Command::getPoll, fPlayer -> fPlayer.isSetting(FPlayer.Setting.POLL), MessageType.COMMAND_POLL);
 
         this.command = fileResolver.getCommand().getPoll();
@@ -64,6 +72,8 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         this.taskScheduler = taskScheduler;
         this.commandParserProvider = commandParserProvider;
         this.messagePipeline = messagePipeline;
+        this.packetProvider = packetProvider;
+        this.dialogPollBuilderProvider = dialogPollBuilderProvider;
     }
 
     @Override
@@ -86,6 +96,14 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 .required(promptMultipleVote, commandParserProvider.booleanParser())
                 .required(promptMessage, commandParserProvider.messageParser(), mapSuggestion())
         );
+
+        if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6)) {
+            registerCustomCommand(manager ->
+                    manager.commandBuilder(getCommandName() + "gui", CommandMeta.empty())
+                            .permission(permission.getCreate().getName())
+                            .handler(commandContext -> dialogPollBuilderProvider.get().openDialog(commandContext.sender()))
+            );
+        }
 
         String promptId = addPrompt(4, Localization.Command.Prompt::getId);
         String promptNumber = addPrompt(5, Localization.Command.Prompt::getNumber);
@@ -197,11 +215,15 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 ? List.of(Arrays.copyOfRange(parts, firstAnswerIndex, parts.length))
                 : List.of();
 
+        createPoll(fPlayer, title, multipleVote, time, repeatTime, answers);
+    }
+
+    public void createPoll(FPlayer fPlayer, String title, boolean multipleValue, long endTimeValue, long repeatTimeValue, List<String> answers) {
         Poll poll = new Poll(command.getLastId(),
                 fPlayer.getId(),
-                time + System.currentTimeMillis(),
-                repeatTime,
-                multipleVote,
+                endTimeValue + System.currentTimeMillis(),
+                repeatTimeValue,
+                multipleValue,
                 title,
                 answers
         );
