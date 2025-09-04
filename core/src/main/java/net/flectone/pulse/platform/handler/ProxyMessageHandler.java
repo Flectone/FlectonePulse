@@ -180,9 +180,7 @@ public class ProxyMessageHandler {
             case COMMAND_TICTACTOE_MOVE -> handleTicTacToeMove(input, fEntity, metadataUUID);
             case CHAT -> handleChatMessage(input, fEntity, metadataUUID);
             case COMMAND_CLEARCHAT -> handleClearchatCommand(fEntity);
-            case COMMAND_ROCKPAPERSCISSORS -> handleRockPaperScissorsCreate(input, fEntity);
-            case COMMAND_ROCKPAPERSCISSORS_MOVE -> handleRockPaperScissorsMove(input, fEntity, metadataUUID);
-            case COMMAND_ROCKPAPERSCISSORS_FINAL -> handleRockPaperScissorsFinal(input, fEntity, metadataUUID);
+            case COMMAND_ROCKPAPERSCISSORS -> handleRockPaperScissors(input, fEntity, metadataUUID);
             case ADVANCEMENT -> handleAdvancement(input, fEntity, metadataUUID);
             case DEATH -> handleDeath(input, fEntity, metadataUUID);
             case JOIN -> handleJoin(input, fEntity, metadataUUID);
@@ -703,26 +701,29 @@ public class ProxyMessageHandler {
         module.clearChat(fPlayer, false);
     }
 
-    private void handleRockPaperScissorsCreate(DataInputStream input, FEntity fEntity) throws IOException {
-        UUID id = UUID.fromString(input.readUTF());
-        UUID receiver = UUID.fromString(input.readUTF());
-        injector.getInstance(RockpaperscissorsModule.class).create(id, fEntity, receiver);
-    }
+    private void handleRockPaperScissors(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
+        RockpaperscissorsModule.GamePhase gamePhase = RockpaperscissorsModule.GamePhase.valueOf(input.readUTF());
+        switch (gamePhase) {
+            case CREATE -> {
+                UUID id = UUID.fromString(input.readUTF());
+                UUID receiver = UUID.fromString(input.readUTF());
+                injector.getInstance(RockpaperscissorsModule.class).create(id, fEntity, receiver);
+            }
+            case MOVE -> {
+                UUID id = UUID.fromString(input.readUTF());
+                String move = input.readUTF();
 
-    private void handleRockPaperScissorsMove(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
-        UUID id = UUID.fromString(input.readUTF());
-        String move = input.readUTF();
+                injector.getInstance(RockpaperscissorsModule.class).move(id, fEntity, move, metadataUUID);
+            }
+            case END -> {
+                if (!(fEntity instanceof FPlayer fPlayer)) return;
 
-        injector.getInstance(RockpaperscissorsModule.class).move(id, fEntity, move, metadataUUID);
-    }
+                UUID id = UUID.fromString(input.readUTF());
+                String move = input.readUTF();
 
-    private void handleRockPaperScissorsFinal(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
-        if (!(fEntity instanceof FPlayer fPlayer)) return;
-
-        UUID id = UUID.fromString(input.readUTF());
-        String move = input.readUTF();
-
-        injector.getInstance(RockpaperscissorsModule.class).sendFinalMessage(id, fPlayer, move, metadataUUID);
+                injector.getInstance(RockpaperscissorsModule.class).end(id, fPlayer, move, metadataUUID);
+            }
+        }
     }
 
     private void handleAdvancement(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {

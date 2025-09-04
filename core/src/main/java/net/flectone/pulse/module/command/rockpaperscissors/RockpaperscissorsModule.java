@@ -125,6 +125,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         RockPaperScissors rockPaperScissors = new RockPaperScissors(fPlayer.getUuid(), fReceiver.getUuid());
 
         proxySender.send(fPlayer, MessageType.COMMAND_ROCKPAPERSCISSORS, dataOutputStream -> {
+            dataOutputStream.writeUTF(GamePhase.CREATE.name());
             dataOutputStream.writeUTF(rockPaperScissors.getId().toString());
             dataOutputStream.writeUTF(rockPaperScissors.getReceiver().toString());
         }, UUID.randomUUID());
@@ -138,6 +139,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                         new String[]{fReceiver.getName(), rockPaperScissors.getId().toString()}
                 ))
                 .rockPaperScissors(rockPaperScissors)
+                .gamePhase(GamePhase.CREATE)
                 .sound(getModuleSound())
                 .build()
         );
@@ -179,14 +181,15 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                 return;
             }
 
-            boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_ROCKPAPERSCISSORS_FINAL, dataOutputStream -> {
+            boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_ROCKPAPERSCISSORS, dataOutputStream -> {
+                dataOutputStream.writeUTF(GamePhase.END.name());
                 dataOutputStream.writeUTF(rockPaperScissors.getId().toString());
                 dataOutputStream.writeUTF(move);
             }, UUID.randomUUID());
 
             if (isSent) return;
 
-            sendFinalMessage(rockPaperScissors.getId(), fPlayer, move, UUID.randomUUID());
+            end(rockPaperScissors.getId(), fPlayer, move, UUID.randomUUID());
 
             return;
         }
@@ -198,7 +201,8 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                 .build()
         );
 
-        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_ROCKPAPERSCISSORS_MOVE, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_ROCKPAPERSCISSORS, dataOutputStream -> {
+            dataOutputStream.writeUTF(GamePhase.MOVE.name());
             dataOutputStream.writeUTF(rockPaperScissors.getId().toString());
             dataOutputStream.writeUTF(move);
         }, UUID.randomUUID());
@@ -208,7 +212,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         move(rockPaperScissors.getId(), fPlayer, move, UUID.randomUUID());
     }
 
-    public void sendFinalMessage(UUID id, FPlayer fPlayer, String move, UUID metadataUUID) {
+    public void end(UUID id, FPlayer fPlayer, String move, UUID metadataUUID) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         RockPaperScissors rockPaperScissors = gameMap.get(id);
@@ -261,6 +265,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                 .filterPlayer(fPlayer)
                 .format(message)
                 .rockPaperScissors(rockPaperScissors)
+                .gamePhase(GamePhase.END)
                 .build()
         );
 
@@ -270,6 +275,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                 .filterPlayer(fReceiver)
                 .format(message)
                 .rockPaperScissors(rockPaperScissors)
+                .gamePhase(GamePhase.END)
                 .build()
         );
     }
@@ -289,6 +295,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                 .filterPlayer(fReceiver, true)
                 .format(Localization.Command.Rockpaperscissors::getReceiver)
                 .rockPaperScissors(rockPaperScissors)
+                .gamePhase(GamePhase.MOVE)
                 .build()
         );
 
@@ -302,6 +309,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                         new String[]{fPlayer.getName(), rockPaperScissors.getId().toString()}
                 ))
                 .rockPaperScissors(rockPaperScissors)
+                .gamePhase(GamePhase.MOVE)
                 .build()
         );
     }
@@ -311,5 +319,11 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         RockPaperScissors rockPaperScissors = new RockPaperScissors(id, fPlayer.getUuid(), receiver);
         gameMap.put(id, rockPaperScissors);
+    }
+
+    public enum GamePhase {
+        CREATE,
+        MOVE,
+        END
     }
 }
