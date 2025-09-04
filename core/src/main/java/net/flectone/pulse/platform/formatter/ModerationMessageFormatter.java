@@ -112,7 +112,7 @@ public class ModerationMessageFormatter {
                 List<Moderation> mutes = moderationService.getValidMutes(fPlayer);
                 if (mutes.isEmpty()) yield format;
 
-                yield replacePlaceholders(format, fPlayer, mutes.get(0));
+                yield replacePlaceholders(format, fPlayer, mutes.getFirst());
             }
             case EXTERNAL -> {
                 ExternalModeration mute = integrationModuleProvider.get().getMute(fPlayer);
