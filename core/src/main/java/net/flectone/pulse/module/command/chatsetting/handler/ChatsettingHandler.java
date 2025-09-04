@@ -92,7 +92,7 @@ public class ChatsettingHandler {
                                  Localization.Command.Chatsetting.Menu.SubMenu subMenu,
                                  MenuBuilder menuBuilder,
                                  @Nullable String id) {
-        if (!permissionChecker.check(fPlayer, permission.getFcolors().get(type))) {
+        if (!permissionChecker.check(fPlayer, permission.getSettings().get("FCOLOR_" + type.name()))) {
             chatsettingModule.sendMessage(chatsettingModule.metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatsetting::getNoPermission)

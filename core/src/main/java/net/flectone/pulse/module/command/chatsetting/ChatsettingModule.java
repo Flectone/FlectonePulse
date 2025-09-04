@@ -23,14 +23,15 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
-import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
 
 @Singleton
 public class ChatsettingModule extends AbstractModuleCommand<Localization.Command.Chatsetting> {
@@ -46,7 +47,6 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     private final Provider<InventoryMenuBuilder> inventoryMenuBuilderProvider;
     private final SoundPlayer soundPlayer;
     private final boolean isNewerThanOrEqualsV_1_21_6;
-    private final FLogger fLogger;
 
     @Inject
     public ChatsettingModule(FileResolver fileResolver,
@@ -58,8 +58,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                              Provider<DialogMenuBuilder> dialogMenuBuilderProvider,
                              Provider<InventoryMenuBuilder> inventoryMenuBuilderProvider,
                              SoundPlayer soundPlayer,
-                             PacketProvider packetProvider,
-                             FLogger fLogger) {
+                             PacketProvider packetProvider) {
         super(localization -> localization.getCommand().getChatsetting(), Command::getChatsetting, MessageType.COMMAND_CHATSETTING);
 
         this.command = fileResolver.getCommand().getChatsetting();
@@ -73,7 +72,6 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         this.inventoryMenuBuilderProvider = inventoryMenuBuilderProvider;
         this.soundPlayer = soundPlayer;
         this.isNewerThanOrEqualsV_1_21_6 = packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6);
-        this.fLogger = fLogger;
     }
 
     @Override
@@ -84,7 +82,6 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         createSound(command.getSound(), permission.getSound());
 
         permission.getSettings().values().forEach(this::registerPermission);
-        permission.getFcolors().values().forEach(this::registerPermission);
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         String promptType = addPrompt(1, Localization.Command.Prompt::getType);

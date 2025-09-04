@@ -231,36 +231,30 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
 
             private Map<String, Integer> types = new LinkedHashMap<>() {
                 {
-                    put(MessageType.COMMAND_SPY.name(), 9);
+                    put(MessageType.AFK.name(), 9);
                     put(MessageType.ADVANCEMENT.name(), 10);
-                    put(MessageType.AFK.name(), 11);
+                    put(MessageType.CHAT.name(), 11);
                     put(MessageType.COMMAND_ANON.name(), 12);
-                    put(MessageType.AUTO.name(), 13);
-                    put(MessageType.COMMAND_BALL.name(), 14);
-                    put(MessageType.COMMAND_BAN.name(), 15);
-                    put(MessageType.COMMAND_BROADCAST.name(), 16);
-                    put(MessageType.COMMAND_COIN.name(), 17);
-                    put(MessageType.DEATH.name(), 18);
-                    put(MessageType.COMMAND_DICE.name(), 19);
-                    put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), 20);
-                    put(MessageType.COMMAND_DO.name(), 21);
-                    put(MessageType.GREETING.name(), 22);
-                    put(MessageType.JOIN.name(), 23);
-                    put(MessageType.COMMAND_KICK.name(), 24);
-                    put(MessageType.COMMAND_MAIL.name(), 25);
-                    put(MessageType.COMMAND_ME.name(), 26);
-                    put(MessageType.COMMAND_MUTE.name(), 27);
-                    put(MessageType.COMMAND_POLL.name(), 28);
-                    put(MessageType.QUIT.name(), 29);
-                    put(MessageType.COMMAND_REPLY.name(), 30);
-                    put(MessageType.COMMAND_ROCKPAPERSCISSORS.name(), 31);
-                    put(MessageType.COMMAND_TELL.name(), 32);
-                    put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), 33);
-                    put(MessageType.COMMAND_TICTACTOE.name(), 34);
-                    put(MessageType.COMMAND_TRANSLATETO.name(), 35);
-                    put(MessageType.COMMAND_TRY.name(), 36);
-                    put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), 37);
-                    put(MessageType.COMMAND_WARN.name(), 38);
+                    put(MessageType.COMMAND_BALL.name(), 13);
+                    put(MessageType.COMMAND_BROADCAST.name(), 14);
+                    put(MessageType.COMMAND_COIN.name(), 15);
+                    put(MessageType.COMMAND_DICE.name(), 16);
+                    put(MessageType.COMMAND_DO.name(), 17);
+                    put(MessageType.COMMAND_MAIL.name(), 18);
+                    put(MessageType.COMMAND_ME.name(), 19);
+                    put(MessageType.COMMAND_POLL.name(), 20);
+                    put(MessageType.COMMAND_ROCKPAPERSCISSORS.name(), 21);
+                    put(MessageType.COMMAND_STREAM.name(), 22);
+                    put(MessageType.COMMAND_TELL.name(), 23);
+                    put(MessageType.COMMAND_TICTACTOE.name(), 24);
+                    put(MessageType.COMMAND_TRY.name(), 25);
+                    put(MessageType.DEATH.name(), 26);
+                    put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), 27);
+                    put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), 28);
+                    put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), 29);
+                    put(MessageType.JOIN.name(), 30);
+                    put(MessageType.QUIT.name(), 31);
+                    put(MessageType.SLEEP.name(), 32);
                 }
             };
         }

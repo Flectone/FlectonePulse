@@ -9,6 +9,7 @@ import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.util.constant.AdventureTag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.SettingText;
 
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
@@ -210,44 +211,33 @@ public final class Permission extends FileSerializable implements ModuleConfig {
 
             private Map<String, Chatsetting.SettingItem> settings = new LinkedHashMap<>(){
                 {
-                    put("CHAT_NAME", new SettingItem("flectonepulse.module.command.chatsetting.chat_name", Type.TRUE));
-                    put(MessageType.CHAT.name(), new SettingItem("flectonepulse.module.command.chatsetting.chat", Type.TRUE));
-                    put(MessageType.COMMAND_SPY.name(), new SettingItem("flectonepulse.module.command.chatsetting.spy", Type.OP));
-                    put(MessageType.ADVANCEMENT.name(), new SettingItem("flectonepulse.module.command.chatsetting.advancement", Type.TRUE));
+                    put(SettingText.CHAT_NAME.name(), new SettingItem("flectonepulse.module.command.chatsetting.chat_name", Type.TRUE));
+                    put("FCOLOR_" + FColor.Type.SEE.name(), new SettingItem("flectonepulse.module.command.chatsetting.fcolor.see", Type.TRUE));
+                    put("FCOLOR_" + FColor.Type.OUT.name(), new SettingItem("flectonepulse.module.command.chatsetting.fcolor.out", Type.OP));
                     put(MessageType.AFK.name(), new SettingItem("flectonepulse.module.command.chatsetting.afk", Type.TRUE));
-                    put(MessageType.COMMAND_ANON.name(), new SettingItem("flectonepulse.module.command.chatsetting.anon", Type.TRUE));
-                    put(MessageType.AUTO.name(), new SettingItem("flectonepulse.module.command.chatsetting.auto", Type.TRUE));
-                    put(MessageType.COMMAND_BALL.name(), new SettingItem("flectonepulse.module.command.chatsetting.ball", Type.TRUE));
-                    put(MessageType.COMMAND_BAN.name(), new SettingItem("flectonepulse.module.command.chatsetting.ban", Type.TRUE));
-                    put(MessageType.COMMAND_BROADCAST.name(), new SettingItem("flectonepulse.module.command.chatsetting.broadcast", Type.TRUE));
-                    put(MessageType.COMMAND_COIN.name(), new SettingItem("flectonepulse.module.command.chatsetting.coin", Type.TRUE));
+                    put(MessageType.ADVANCEMENT.name(), new SettingItem("flectonepulse.module.command.chatsetting.advancement", Type.TRUE));
+                    put(MessageType.CHAT.name(), new SettingItem("flectonepulse.module.command.chatsetting.chat", Type.TRUE));
+                    put(MessageType.COMMAND_ANON.name(), new SettingItem("flectonepulse.module.command.chatsetting.command_anon", Type.TRUE));
+                    put(MessageType.COMMAND_BALL.name(), new SettingItem("flectonepulse.module.command.chatsetting.command_ball", Type.TRUE));
+                    put(MessageType.COMMAND_BROADCAST.name(), new SettingItem("flectonepulse.module.command.chatsetting.command_broadcast", Type.TRUE));
+                    put(MessageType.COMMAND_COIN.name(), new SettingItem("flectonepulse.module.command.chatsetting.command_coin", Type.TRUE));
+                    put(MessageType.COMMAND_DICE.name(), new SettingItem("flectonepulse.module.command.chatsetting.command_dice", Type.TRUE));
+                    put(MessageType.COMMAND_DO.name(), new SettingItem("flectonepulse.module.command.chatsetting.command_do", Type.TRUE));
+                    put(MessageType.COMMAND_MAIL.name(), new SettingItem("flectonepulse.module.command.chatsetting.command_mail", Type.TRUE));
+                    put(MessageType.COMMAND_ME.name(), new SettingItem("flectonepulse.module.command.chatsetting.command_me", Type.TRUE));
+                    put(MessageType.COMMAND_POLL.name(), new SettingItem("flectonepulse.module.command.chatsetting.command_poll", Type.TRUE));
+                    put(MessageType.COMMAND_ROCKPAPERSCISSORS.name(), new SettingItem("flectonepulse.module.command.chatsetting.command_rockpaperscissors", Type.TRUE));
+                    put(MessageType.COMMAND_STREAM.name(), new SettingItem("flectonepulse.module.command.chatsetting.command_stream", Type.TRUE));
+                    put(MessageType.COMMAND_TELL.name(), new SettingItem("flectonepulse.module.command.chatsetting.command_tell", Type.TRUE));
+                    put(MessageType.COMMAND_TICTACTOE.name(), new SettingItem("flectonepulse.module.command.chatsetting.command_tictactoe", Type.TRUE));
+                    put(MessageType.COMMAND_TRY.name(), new SettingItem("flectonepulse.module.command.chatsetting.command_try", Type.TRUE));
                     put(MessageType.DEATH.name(), new SettingItem("flectonepulse.module.command.chatsetting.death", Type.TRUE));
-                    put(MessageType.COMMAND_DICE.name(), new SettingItem("flectonepulse.module.command.chatsetting.dice", Type.TRUE));
-                    put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), new SettingItem("flectonepulse.module.command.chatsetting.discord", Type.TRUE));
-                    put(MessageType.COMMAND_DO.name(), new SettingItem("flectonepulse.module.command.chatsetting.do", Type.TRUE));
-                    put(MessageType.GREETING.name(), new SettingItem("flectonepulse.module.command.chatsetting.greeting", Type.TRUE));
+                    put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), new SettingItem("flectonepulse.module.command.chatsetting.from_discord_to_minecraft", Type.TRUE));
+                    put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), new SettingItem("flectonepulse.module.command.chatsetting.from_telegram_to_minecraft", Type.TRUE));
+                    put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), new SettingItem("flectonepulse.module.command.chatsetting.from_twitch_to_minecraft", Type.TRUE));
                     put(MessageType.JOIN.name(), new SettingItem("flectonepulse.module.command.chatsetting.join", Type.TRUE));
-                    put(MessageType.COMMAND_KICK.name(), new SettingItem("flectonepulse.module.command.chatsetting.kick", Type.TRUE));
-                    put(MessageType.COMMAND_MAIL.name(), new SettingItem("flectonepulse.module.command.chatsetting.mail", Type.TRUE));
-                    put(MessageType.COMMAND_ME.name(), new SettingItem("flectonepulse.module.command.chatsetting.me", Type.TRUE));
-                    put(MessageType.COMMAND_MUTE.name(), new SettingItem("flectonepulse.module.command.chatsetting.mute", Type.TRUE));
-                    put(MessageType.COMMAND_POLL.name(), new SettingItem("flectonepulse.module.command.chatsetting.poll", Type.TRUE));
                     put(MessageType.QUIT.name(), new SettingItem("flectonepulse.module.command.chatsetting.quit", Type.TRUE));
-                    put(MessageType.COMMAND_REPLY.name(), new SettingItem("flectonepulse.module.command.chatsetting.reply", Type.TRUE));
-                    put(MessageType.COMMAND_ROCKPAPERSCISSORS.name(), new SettingItem("flectonepulse.module.command.chatsetting.rockpaperscissors", Type.TRUE));
-                    put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), new SettingItem("flectonepulse.module.command.chatsetting.telegram", Type.TRUE));
-                    put(MessageType.COMMAND_TELL.name(), new SettingItem("flectonepulse.module.command.chatsetting.tell", Type.TRUE));
-                    put(MessageType.COMMAND_TICTACTOE.name(), new SettingItem("flectonepulse.module.command.chatsetting.tictactoe", Type.TRUE));
-                    put(MessageType.COMMAND_TRANSLATETO.name(), new SettingItem("flectonepulse.module.command.chatsetting.translateto", Type.TRUE));
-                    put(MessageType.COMMAND_TRY.name(), new SettingItem("flectonepulse.module.command.chatsetting.try", Type.TRUE));
-                    put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), new SettingItem("flectonepulse.module.command.chatsetting.twitch", Type.TRUE));
-                    put(MessageType.COMMAND_WARN.name(), new SettingItem("flectonepulse.module.command.chatsetting.warn", Type.TRUE));
-                }
-            };
-            private Map<FColor.Type, Chatsetting.SettingItem> fcolors = new LinkedHashMap<>() {
-                {
-                    put(FColor.Type.SEE, new SettingItem("flectonepulse.module.command.chatsetting.see", Type.TRUE));
-                    put(FColor.Type.OUT, new SettingItem("flectonepulse.module.command.chatsetting.out", Type.OP));
+                    put(MessageType.SLEEP.name(), new SettingItem("flectonepulse.module.command.chatsetting.sleep", Type.TRUE));
                 }
             };
             private PermissionEntry other = new PermissionEntry("flectonepulse.module.command.chatsetting.other", Type.OP);
