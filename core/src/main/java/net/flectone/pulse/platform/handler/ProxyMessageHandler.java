@@ -167,7 +167,7 @@ public class ProxyMessageHandler {
             case COMMAND_UNBAN -> handleUnbanCommand(input, fEntity, metadataUUID);
             case COMMAND_UNMUTE -> handleUnmuteCommand(input, fEntity, metadataUUID);
             case COMMAND_UNWARN -> handleUnwarnCommand(input, fEntity, metadataUUID);
-            case COMMAND_POLL -> handlePoll(input, fEntity, metadataUUID);
+            case COMMAND_POLL -> handlePollCommand(input, fEntity, metadataUUID);
             case COMMAND_SPY -> handleSpyCommand(input, fEntity, metadataUUID);
             case COMMAND_STREAM -> handleStreamCommand(input, fEntity, metadataUUID);
             case COMMAND_TELL -> handleTellCommand(input, fEntity, metadataUUID);
@@ -175,7 +175,7 @@ public class ProxyMessageHandler {
             case COMMAND_TRY -> handleTryCommand(input, fEntity, metadataUUID);
             case COMMAND_WARN -> handleWarnCommand(input, fEntity, metadataUUID);
             case COMMAND_KICK -> handleKickCommand(input, fEntity, metadataUUID);
-            case COMMAND_TICTACTOE -> handleTicTacToeCreate(input, fEntity, metadataUUID);
+            case COMMAND_TICTACTOE -> handleTicTacToeCommand(input, fEntity, metadataUUID);
             case CHAT -> handleChatMessage(input, fEntity, metadataUUID);
             case COMMAND_CLEARCHAT -> handleClearchatCommand(fEntity);
             case COMMAND_ROCKPAPERSCISSORS -> handleRockPaperScissors(input, fEntity, metadataUUID);
@@ -490,7 +490,7 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handlePoll(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
+    private void handlePollCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         PollModule.Action action = PollModule.Action.valueOf(input.readUTF());
         switch (action) {
             case CREATE -> {
@@ -657,7 +657,7 @@ public class ProxyMessageHandler {
         module.kick(fModerator, (FPlayer) fEntity, kick);
     }
 
-    private void handleTicTacToeCreate(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
+    private void handleTicTacToeCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         if (!(fEntity instanceof FPlayer fPlayer)) return;
 
         TictactoeModule.GamePhase gamePhase = TictactoeModule.GamePhase.valueOf(input.readUTF());
