@@ -132,10 +132,12 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 FPlayer fPlayer = fPlayerService.getFPlayer(poll.getCreator());
                 Range range = command.getRange();
 
-                sendMessage(MessageType.COMMAND_POLL, PollMetadata.<Localization.Command.Poll>builder()
+                sendMessage(PollMetadata.<Localization.Command.Poll>builder()
                         .sender(fPlayer)
                         .format(resolvePollFormat(fPlayer, poll, status))
                         .poll(poll)
+                        .status(status)
+                        .action(Action.REPEAT)
                         .range(range)
                         .message(poll.getTitle())
                         .build()
@@ -172,7 +174,8 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         int numberVote = getArgument(commandContext, 5);
 
         UUID metadataUUID = UUID.randomUUID();
-        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_POLL_VOTE, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_POLL, dataOutputStream -> {
+            dataOutputStream.writeUTF(Action.VOTE.name());
             dataOutputStream.writeInt(id);
             dataOutputStream.writeInt(numberVote);
         }, metadataUUID);
@@ -232,10 +235,15 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 .sender(fPlayer)
                 .format(resolvePollFormat(fPlayer, poll, Status.START))
                 .poll(poll)
+                .status(Status.START)
+                .action(Action.CREATE)
                 .range(range)
                 .message(poll.getTitle())
                 .sound(getModuleSound())
-                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(poll))
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeUTF(Action.CREATE.name());
+                    dataOutputStream.writeAsJson(poll);
+                })
                 .integration()
                 .build()
         );
@@ -286,10 +294,13 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         int count = poll.getCountAnswers()[numberVote];
         int pollID = poll.getId();
 
-        sendMessage(MessageType.COMMAND_POLL_VOTE, metadataBuilder()
+        sendMessage(PollMetadata.<Localization.Command.Poll>builder()
                 .uuid(metadataUUID)
                 .sender(fPlayer)
                 .format(resolveVote(voteType, numberVote, pollID, count))
+                .poll(poll)
+                .status(Status.RUN)
+                .action(Action.VOTE)
                 .build()
         );
     }
@@ -347,5 +358,11 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         START,
         RUN,
         END
+    }
+
+    public enum Action {
+        CREATE,
+        REPEAT,
+        VOTE
     }
 }

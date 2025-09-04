@@ -167,8 +167,7 @@ public class ProxyMessageHandler {
             case COMMAND_UNBAN -> handleUnbanCommand(input, fEntity, metadataUUID);
             case COMMAND_UNMUTE -> handleUnmuteCommand(input, fEntity, metadataUUID);
             case COMMAND_UNWARN -> handleUnwarnCommand(input, fEntity, metadataUUID);
-            case COMMAND_POLL_VOTE -> handlePollVote(input, fEntity, metadataUUID);
-            case COMMAND_POLL -> handlePollCreate(input, fEntity, metadataUUID);
+            case COMMAND_POLL -> handlePoll(input, fEntity, metadataUUID);
             case COMMAND_SPY -> handleSpyCommand(input, fEntity, metadataUUID);
             case COMMAND_STREAM -> handleStreamCommand(input, fEntity, metadataUUID);
             case COMMAND_TELL -> handleTellCommand(input, fEntity, metadataUUID);
@@ -491,27 +490,29 @@ public class ProxyMessageHandler {
         );
     }
 
-    private void handlePollVote(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
-        injector.getInstance(PollModule.class).vote(fEntity, input.readInt(), input.readInt(), metadataUUID);
-    }
+    private void handlePoll(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
+        PollModule.Action action = PollModule.Action.valueOf(input.readUTF());
+        switch (action) {
+            case CREATE -> {
+                PollModule module = injector.getInstance(PollModule.class);
+                if (module.isModuleDisabledFor(fEntity)) return;
 
-    private void handlePollCreate(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
-        PollModule module = injector.getInstance(PollModule.class);
-        if (module.isModuleDisabledFor(fEntity)) return;
+                Poll poll = gson.fromJson(input.readUTF(), Poll.class);
+                module.saveAndUpdateLast(poll);
 
-        Poll poll = gson.fromJson(input.readUTF(), Poll.class);
-        module.saveAndUpdateLast(poll);
-
-        module.sendMessage(PollMetadata.<Localization.Command.Poll>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(module.resolvePollFormat(fEntity, poll, PollModule.Status.START))
-                .poll(poll)
-                .range(Range.get(Range.Type.SERVER))
-                .message(poll.getTitle())
-                .sound(module.getModuleSound())
-                .build()
-        );
+                module.sendMessage(PollMetadata.<Localization.Command.Poll>builder()
+                        .uuid(metadataUUID)
+                        .sender(fEntity)
+                        .format(module.resolvePollFormat(fEntity, poll, PollModule.Status.START))
+                        .poll(poll)
+                        .range(Range.get(Range.Type.SERVER))
+                        .message(poll.getTitle())
+                        .sound(module.getModuleSound())
+                        .build()
+                );
+            }
+            case VOTE -> injector.getInstance(PollModule.class).vote(fEntity, input.readInt(), input.readInt(), metadataUUID);
+        }
     }
 
     private void handleSpyCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
