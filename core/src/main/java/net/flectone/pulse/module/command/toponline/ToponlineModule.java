@@ -16,7 +16,6 @@ import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.logging.FLogger;
@@ -84,14 +83,11 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
                .permission(permission.getName())
                .optional(promptNumber, commandParserProvider.integerParser())
         );
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableSource.YOU));
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String promptNumber = getPrompt(0);
         Optional<Integer> optionalNumber = commandContext.optional(promptNumber);
@@ -107,7 +103,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Toponline::getNullPage)
                     .build()

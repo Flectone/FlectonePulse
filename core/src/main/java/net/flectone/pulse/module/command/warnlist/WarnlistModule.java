@@ -87,8 +87,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
-        if (checkCooldown(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         Localization.Command.Warnlist localization = resolveLocalization(fPlayer);
         Localization.ListTypeMessage localizationType = localization.getGlobal();
@@ -112,7 +111,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
 
                 targetFPlayer = fPlayerService.getFPlayer(playerName);
                 if (targetFPlayer.isUnknown()) {
-                    sendMessage(metadataBuilder()
+                    sendMessage(MessageType.ERROR, metadataBuilder()
                             .sender(fPlayer)
                             .format(Localization.Command.Warnlist::getNullPlayer)
                             .build()
@@ -131,7 +130,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
                 : moderationService.getValidWarns(targetFPlayer);
 
         if (moderationList.isEmpty()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Warnlist::getEmpty)
                     .build()
@@ -145,7 +144,7 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Warnlist::getNullPage)
                     .build()

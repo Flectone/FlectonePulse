@@ -58,13 +58,11 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
                             .toList();
                 }))
         );
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         int mailID = getArgument(commandContext, 0);
 
@@ -74,7 +72,7 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
                 .findAny();
 
         if (optionalMail.isEmpty()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Clearmail::getNullMail)
                     .build()

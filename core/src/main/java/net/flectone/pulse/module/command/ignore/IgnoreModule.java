@@ -12,7 +12,6 @@ import net.flectone.pulse.module.command.ignore.model.IgnoreMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 
@@ -50,21 +49,16 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
                 .permission(permission.getName())
                 .required(promptPlayer, commandParserProvider.playerParser(command.isSuggestOfflinePlayers()))
         );
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableSource.YOU));
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkCooldown(fPlayer)) return;
-        if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String targetName = getArgument(commandContext, 0);
 
         if (fPlayer.getName().equalsIgnoreCase(targetName)) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ignore::getMyself)
                     .build()
@@ -75,7 +69,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
 
         FPlayer fTarget = fPlayerService.getFPlayer(targetName);
         if (fTarget.isUnknown()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ignore::getNullPlayer)
                     .build()

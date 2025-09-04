@@ -5,7 +5,6 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tell.TellModule;
@@ -26,7 +25,7 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
     public ReplyModule(FileResolver fileResolver,
                        TellModule tellModule,
                        CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getReply(), Command::getReply, fPlayer -> fPlayer.isSetting(FPlayer.Setting.REPLY), MessageType.COMMAND_REPLY);
+        super(localization -> localization.getCommand().getReply(), Command::getReply, MessageType.COMMAND_REPLY);
 
         this.command = fileResolver.getCommand().getReply();
         this.permission = fileResolver.getPermission().getCommand().getReply();
@@ -46,19 +45,15 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
                 .permission(permission.getName())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableSource.YOU));
-        addPredicate(this::checkMute);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String receiverName = tellModule.getSenderReceiverMap().get(fPlayer.getUuid());
         if (receiverName == null) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Reply::getNullReceiver)
                     .build()

@@ -71,9 +71,7 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
                 .destination(message.getDestination())
                 .range(message.getRange())
                 .sound(getModuleSound())
-                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.JOIN)
-                        && (ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
-                )
+                .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeBoolean(hasPlayedBefore);
                     dataOutputStream.writeBoolean(ignoreVanish);

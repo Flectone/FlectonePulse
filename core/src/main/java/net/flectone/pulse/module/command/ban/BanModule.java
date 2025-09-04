@@ -48,7 +48,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
                      ProxySender proxySender,
                      ListenerRegistry listenerRegistry,
                      CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getBan(), Command::getBan, fPlayer -> fPlayer.isSetting(FPlayer.Setting.BAN), MessageType.COMMAND_BAN);
+        super(localization -> localization.getCommand().getBan(), Command::getBan, MessageType.COMMAND_BAN);
 
         this.command = fileResolver.getCommand().getBan();
         this.permission = fileResolver.getPermission().getCommand().getBan();
@@ -86,9 +86,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkCooldown(fPlayer)) return;
-        if (checkMute(fPlayer)) return;
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String target = getArgument(commandContext, 0);
         String promptReason = getPrompt(1);
@@ -101,7 +99,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         String reason = timeReasonPair.second();
 
         if (time != -1 && time < 1) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ban::getNullTime)
                     .build()
@@ -118,7 +116,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ban::getNullPlayer)
                     .build()

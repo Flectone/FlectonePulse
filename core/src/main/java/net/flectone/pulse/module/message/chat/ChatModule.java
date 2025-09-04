@@ -19,13 +19,13 @@ import net.flectone.pulse.module.message.chat.listener.ChatPacketListener;
 import net.flectone.pulse.module.message.chat.model.ChatMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
-import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.PlatformType;
+import net.flectone.pulse.util.constant.SettingText;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.type.tuple.Pair;
 
@@ -49,7 +49,6 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
     private final IntegrationModule integrationModule;
-    private final TimeFormatter timeFormatter;
     private final Provider<BubbleModule> bubbleModuleProvider;
     private final Provider<SpyModule> spyModuleProvider;
     private final ListenerRegistry listenerRegistry;
@@ -61,7 +60,6 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                       PlatformServerAdapter platformServerAdapter,
                       PermissionChecker permissionChecker,
                       IntegrationModule integrationModule,
-                      TimeFormatter timeFormatter,
                       Provider<BubbleModule> bubbleModuleProvider,
                       Provider<SpyModule> spyModuleProvider,
                       ListenerRegistry listenerRegistry) {
@@ -74,7 +72,6 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         this.platformServerAdapter = platformServerAdapter;
         this.permissionChecker = permissionChecker;
         this.integrationModule = integrationModule;
-        this.timeFormatter = timeFormatter;
         this.bubbleModuleProvider = bubbleModuleProvider;
         this.spyModuleProvider = spyModuleProvider;
         this.listenerRegistry = listenerRegistry;
@@ -121,7 +118,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         Message.Chat.Type chatType = playerChat.second();
 
         if (chatType == null || !chatType.isEnable()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Message.Chat::getNullChat)
                     .build()
@@ -131,23 +128,9 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
             return;
         }
 
-        if (cooldownMap.containsKey(chatName)) {
-            Cooldown cooldown = cooldownMap.get(chatName);
-            if (cooldown != null
-                    && cooldown.isEnable()
-                    && !permissionChecker.check(fPlayer, cooldown.getPermissionBypass())
-                    && cooldown.isCooldown(fPlayer.getUuid())) {
-                long timeLeft = cooldownMap.get(chatName).getTimeLeft(fPlayer);
-
-                sendMessage(metadataBuilder()
-                        .sender(fPlayer)
-                        .format(timeFormatter.format(fPlayer, timeLeft, getCooldownMessage(fPlayer)))
-                        .build()
-                );
-
-                cancelEvent.run();
-                return;
-            }
+        if (checkCooldown(fPlayer, cooldownMap.get(chatName))) {
+            cancelEvent.run();
+            return;
         }
 
         String trigger = chatType.getTrigger();
@@ -186,7 +169,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                 .integration()
                 .build();
 
-        List<FPlayer> receivers = createReceivers(chatMetadata);
+        List<FPlayer> receivers = createReceivers(MessageType.CHAT, chatMetadata);
 
         sendMessage(receivers, chatMetadata);
 
@@ -222,7 +205,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                 .count();
 
         if (chatRange.is(Range.Type.BLOCKS) || onlinePlayersCount == 0) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Message.Chat::getNullReceiver)
                     .destination(nullReceiver.getDestination())
@@ -265,7 +248,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
     }
 
     private Pair<String, Message.Chat.Type> getPlayerChat(FPlayer fPlayer, String eventMessage) {
-        String returnedChatName = fPlayer.getSettingValue(FPlayer.Setting.CHAT);
+        String returnedChatName = fPlayer.getSetting(SettingText.CHAT_NAME);
         Message.Chat.Type playerChat = message.getTypes().get(returnedChatName);
 
         // if that chat *does* have a trigger, return it

@@ -3,10 +3,7 @@ package net.flectone.pulse.module;
 import com.google.inject.Inject;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.util.constant.DisableSource;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.platform.registry.CommandRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
@@ -15,18 +12,15 @@ import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.execution.CommandExecutionHandler;
 import org.incendo.cloud.meta.CommandMeta;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 public abstract class AbstractModuleCommand<M extends Localization.Localizable> extends AbstractModuleLocalization<M> implements CommandExecutionHandler<FPlayer> {
 
     private final List<String> prompts = new ArrayList<>();
-    private final Predicate<FPlayer> commandPredicate;
     private final Function<Command, Command.ICommandFile> commandFunction;
 
     @Inject private FileResolver fileResolver;
@@ -35,17 +29,9 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
     protected AbstractModuleCommand(Function<Localization, M> messageFunction,
                                     Function<Command, Command.ICommandFile> commandFunction,
                                     MessageType messageType) {
-        this(messageFunction, commandFunction, null, messageType);
-    }
-
-    protected AbstractModuleCommand(Function<Localization, M> messageFunction,
-                                    Function<Command, Command.ICommandFile> commandFunction,
-                                    Predicate<FPlayer> commandPredicate,
-                                    MessageType messageType) {
         super(messageFunction, messageType);
 
         this.commandFunction = commandFunction;
-        this.commandPredicate = commandPredicate;
     }
 
     protected void registerCommand(UnaryOperator<org.incendo.cloud.Command.Builder<FPlayer>> commandBuilderOperator) {
@@ -115,26 +101,6 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
     }
 
     public abstract void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext);
-
-    public boolean checkDisable(FEntity entity, @NotNull FEntity receiver, DisableSource action) {
-        if (!(receiver instanceof FPlayer fReceiver)) return false;
-        if (commandPredicate == null || commandPredicate.test(fReceiver)) return false;
-
-        sendDisableMessage(entity, fReceiver, action);
-
-        return true;
-    }
-
-    @Override
-    public Predicate<FPlayer> rangeFilter(FPlayer filterPlayer, Range range) {
-        Predicate<FPlayer> filter = super.rangeFilter(filterPlayer, range);
-
-        if (range.is(Range.Type.PLAYER)) {
-            return filter;
-        }
-
-        return this.commandPredicate == null ? filter : filter.and(commandPredicate);
-    }
 
     private Command.ICommandFile resolveCommand() {
         return commandFunction.apply(fileResolver.getCommand());

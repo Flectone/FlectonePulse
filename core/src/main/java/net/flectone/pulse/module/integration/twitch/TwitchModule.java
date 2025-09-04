@@ -8,12 +8,10 @@ import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 
 import java.util.function.UnaryOperator;
 
@@ -42,8 +40,6 @@ public class TwitchModule extends AbstractModule {
         reflectionResolver.hasClassOrElse("com.github.twitch4j.TwitchClient", this::loadLibraries);
 
         injector.getInstance(TwitchIntegration.class).hook();
-
-        addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.isSetting(FPlayer.Setting.TWITCH));
     }
 
     @Override

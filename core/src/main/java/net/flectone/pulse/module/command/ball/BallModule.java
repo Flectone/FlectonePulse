@@ -11,7 +11,6 @@ import net.flectone.pulse.module.command.ball.model.BallMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.RandomUtil;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -32,7 +31,7 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
     public BallModule(FileResolver fileResolver,
                       RandomUtil randomUtil,
                       CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getBall(), Command::getBall, fPlayer -> fPlayer.isSetting(FPlayer.Setting.BALL), MessageType.COMMAND_BALL);
+        super(localization -> localization.getCommand().getBall(), Command::getBall, MessageType.COMMAND_BALL);
 
         this.command = fileResolver.getCommand().getBall();
         this.permission = fileResolver.getPermission().getCommand().getBall();
@@ -52,15 +51,11 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
                 .permission(permission.getName())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableSource.YOU));
-        addPredicate(this::checkMute);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         int answer = randomUtil.nextInt(0, resolveLocalization().getAnswers().size());
         String message = getArgument(commandContext, 0);

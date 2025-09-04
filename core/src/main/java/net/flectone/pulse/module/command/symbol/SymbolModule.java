@@ -50,8 +50,6 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
                 .required(promptMessage, commandParserProvider.messageParser(), symbolSuggestion())
                 .permission(permission.getName())
         );
-
-        addPredicate(this::checkCooldown);
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> categorySuggestion() {
@@ -82,7 +80,7 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String message = getArgument(commandContext, 1);
 

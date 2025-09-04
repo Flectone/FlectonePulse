@@ -11,7 +11,6 @@ import net.flectone.pulse.module.command.dice.model.DiceMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.RandomUtil;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
@@ -33,7 +32,7 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
     public DiceModule(FileResolver fileResolver,
                       CommandParserProvider commandParserProvider,
                       RandomUtil randomUtil) {
-        super(localization -> localization.getCommand().getDice(), Command::getDice, fPlayer -> fPlayer.isSetting(FPlayer.Setting.DICE), MessageType.COMMAND_DICE);
+        super(localization -> localization.getCommand().getDice(), Command::getDice, MessageType.COMMAND_DICE);
 
         this.command = fileResolver.getCommand().getDice();
         this.permission = fileResolver.getPermission().getCommand().getDice();
@@ -53,15 +52,11 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
                 .permission(permission.getName())
                 .optional(promptMessage, commandParserProvider.integerParser(command.getMin(), command.getMax()))
         );
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableSource.YOU));
-        addPredicate(this::checkMute);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         int min = command.getMin();
         int max = command.getMax();

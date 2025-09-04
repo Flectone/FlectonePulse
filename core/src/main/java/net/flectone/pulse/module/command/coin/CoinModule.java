@@ -10,7 +10,6 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.coin.model.CoinMetadata;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.RandomUtil;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -27,7 +26,7 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
     @Inject
     public CoinModule(FileResolver fileResolver,
                       RandomUtil randomUtil) {
-        super(localization -> localization.getCommand().getCoin(), Command::getCoin, fPlayer -> fPlayer.isSetting(FPlayer.Setting.COIN), MessageType.COMMAND_COIN);
+        super(localization -> localization.getCommand().getCoin(), Command::getCoin, MessageType.COMMAND_COIN);
 
         this.command = fileResolver.getCommand().getCoin();
         this.permission = fileResolver.getPermission().getCommand().getCoin();
@@ -44,15 +43,11 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
         registerCommand(commandBuilder -> commandBuilder
                 .permission(permission.getName())
         );
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableSource.YOU));
-        addPredicate(this::checkMute);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         int percent = randomUtil.nextInt(command.isDraw() ? 0 : 1, 101);
 

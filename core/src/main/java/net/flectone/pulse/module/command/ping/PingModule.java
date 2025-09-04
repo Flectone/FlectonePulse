@@ -55,13 +55,11 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
                 .permission(permission.getName())
                 .optional(promptPlayer, commandParserProvider.platformPlayerParser())
         );
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String promptPlayer = getPrompt(0);
         Optional<String> optionalTarget = commandContext.optional(promptPlayer);
@@ -69,7 +67,7 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
         FPlayer fTarget = optionalTarget.isPresent() ? fPlayerService.getFPlayer(optionalTarget.get()) : fPlayer;
         if (!platformPlayerAdapter.isOnline(fTarget)
                 || (!integrationModule.canSeeVanished(fTarget, fPlayer) && !fPlayer.equals(fTarget))) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ping::getNullPlayer)
                     .build()

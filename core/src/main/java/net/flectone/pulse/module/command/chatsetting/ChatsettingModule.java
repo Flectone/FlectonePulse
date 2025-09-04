@@ -22,16 +22,15 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Singleton
 public class ChatsettingModule extends AbstractModuleCommand<Localization.Command.Chatsetting> {
@@ -47,6 +46,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
     private final Provider<InventoryMenuBuilder> inventoryMenuBuilderProvider;
     private final SoundPlayer soundPlayer;
     private final boolean isNewerThanOrEqualsV_1_21_6;
+    private final FLogger fLogger;
 
     @Inject
     public ChatsettingModule(FileResolver fileResolver,
@@ -58,7 +58,8 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                              Provider<DialogMenuBuilder> dialogMenuBuilderProvider,
                              Provider<InventoryMenuBuilder> inventoryMenuBuilderProvider,
                              SoundPlayer soundPlayer,
-                             PacketProvider packetProvider) {
+                             PacketProvider packetProvider,
+                             FLogger fLogger) {
         super(localization -> localization.getCommand().getChatsetting(), Command::getChatsetting, MessageType.COMMAND_CHATSETTING);
 
         this.command = fileResolver.getCommand().getChatsetting();
@@ -72,6 +73,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         this.inventoryMenuBuilderProvider = inventoryMenuBuilderProvider;
         this.soundPlayer = soundPlayer;
         this.isNewerThanOrEqualsV_1_21_6 = packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6);
+        this.fLogger = fLogger;
     }
 
     @Override
@@ -93,15 +95,13 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
                 .optional(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
                 .optional(promptValue, commandParserProvider.messageParser())
         );
-
-        addPredicate(this::checkCooldown);
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
         return (context, input) -> {
             if (!permissionChecker.check(context.sender(), permission.getOther())) return Collections.emptyList();
 
-            return Arrays.stream(FPlayer.Setting.values())
+            return Arrays.stream(MessageType.values())
                     .map(setting -> Suggestion.suggestion(setting.name()))
                     .toList();
         };
@@ -109,7 +109,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         if (permissionChecker.check(fPlayer, permission.getOther())) {
             String promptPlayer = getPrompt(0);
@@ -139,19 +139,25 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
             return;
         }
 
-        FPlayer.Setting setting = FPlayer.Setting.fromString(optionalType.get());
-        if (setting == null) return;
+        SettingText settingText = SettingText.fromString(optionalType.get());
+        if (settingText != null) {
+            String promptValue = getPrompt(2);
+            Optional<String> optionalValue = commandContext.optional(promptValue);
 
-        String promptValue = getPrompt(2);
-        Optional<String> optionalValue = commandContext.optional(promptValue);
-
-        if (fTarget.isSetting(setting) && optionalValue.isEmpty()) {
-            fTarget.removeSetting(setting);
-        } else {
-            fTarget.setSetting(setting, optionalValue.orElse(""));
+            fTarget.setSetting(settingText, optionalValue.orElse(null));
+            saveSetting(fPlayer, settingText);
+            return;
         }
 
-        updateSettings(fTarget);
+        MessageType messageType;
+        try {
+            messageType = MessageType.valueOf(optionalType.get());
+        } catch (IllegalArgumentException e) {
+            return;
+        }
+
+        fTarget.setSetting(messageType, !fTarget.isSetting(messageType));
+        saveSetting(fPlayer, messageType);
     }
 
     private void open(FPlayer fPlayer, FPlayer fTarget) {
@@ -161,16 +167,26 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         menuBuilder.open(fPlayer, fTarget);
     }
 
-    public void updateSettings(FPlayer fPlayer) {
-        fPlayerService.saveSettings(fPlayer);
+    public void saveSetting(FPlayer fPlayer, MessageType messageType) {
+        fPlayerService.saveOrUpdateSetting(fPlayer, messageType);
 
         if (proxyRegistry.hasEnabledProxy()) {
             proxySender.send(fPlayer, MessageType.COMMAND_CHATSETTING);
         }
     }
 
+
+    public void saveSetting(FPlayer fPlayer, SettingText settingText) {
+        fPlayerService.saveOrUpdateSetting(fPlayer, settingText);
+
+        if (proxyRegistry.hasEnabledProxy()) {
+            proxySender.send(fPlayer, MessageType.COMMAND_CHATSETTING);
+        }
+    }
+
+
     public String getPlayerChat(FPlayer fTarget) {
-        String currentChat = fTarget.getSettingValue(FPlayer.Setting.CHAT);
+        String currentChat = fTarget.getSetting(SettingText.CHAT_NAME);
         if (StringUtils.isEmpty(currentChat)) return "default";
 
         return currentChat;
@@ -181,7 +197,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         return enabled ? checkbox.getEnabledMaterial() : checkbox.getDisabledMaterial();
     }
 
-    public String getCheckboxTitle(FPlayer fPlayer, FPlayer.Setting setting, boolean enabled) {
+    public String getCheckboxTitle(FPlayer fPlayer, String setting, boolean enabled) {
         Localization.Command.Chatsetting.Checkbox localizationCheckbox = resolveLocalization(fPlayer).getCheckbox();
         String statusColor = enabled ? localizationCheckbox.getEnabledColor() : localizationCheckbox.getDisabledColor();
 

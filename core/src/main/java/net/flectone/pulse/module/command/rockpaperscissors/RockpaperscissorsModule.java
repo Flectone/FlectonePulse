@@ -43,7 +43,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                                    FPlayerService fPlayerService,
                                    CommandParserProvider commandParserProvider,
                                    IntegrationModule integrationModule) {
-        super(localization -> localization.getCommand().getRockpaperscissors(), Command::getRockpaperscissors, fPlayer -> fPlayer.isSetting(FPlayer.Setting.ROCKPAPERSCISSORS), MessageType.COMMAND_ROCKPAPERSCISSORS);
+        super(localization -> localization.getCommand().getRockpaperscissors(), Command::getRockpaperscissors, MessageType.COMMAND_ROCKPAPERSCISSORS);
 
         this.command = fileResolver.getCommand().getRockpaperscissors();
         this.permission = fileResolver.getPermission().getCommand().getRockpaperscissors();
@@ -80,15 +80,12 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
-        if (checkCooldown(fPlayer)) return;
-        if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
-        if (checkMute(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String player = getArgument(commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(player);
         if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::getNullPlayer)
                     .build()
@@ -98,7 +95,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         }
 
         if (fReceiver.equals(fPlayer)) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::getMyself)
                     .build()
@@ -150,7 +147,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         List<String> strategy = command.getStrategies().get(move);
 
         if (strategy == null) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::getWrongMove)
                     .build()
@@ -162,7 +159,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         RockPaperScissors rockPaperScissors = gameMap.get(uuid);
 
         if (rockPaperScissors == null) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::getNullGame)
                     .build()
@@ -173,7 +170,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         if (rockPaperScissors.getSenderMove() != null) {
             if (rockPaperScissors.getSender().equals(fPlayer.getUuid())) {
-                sendMessage(metadataBuilder()
+                sendMessage(MessageType.ERROR, metadataBuilder()
                         .sender(fPlayer)
                         .format(Localization.Command.Rockpaperscissors::getAlready)
                         .build()

@@ -10,6 +10,7 @@ import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.SettingText;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton
@@ -24,7 +25,7 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
     public AfkModule(FileResolver fileResolver,
                      net.flectone.pulse.module.message.afk.AfkModule afkMessageModule,
                      SoundPlayer soundPlayer) {
-        super(Localization::getCommand, Command::getAfk,fPlayer -> fPlayer.isSetting(FPlayer.Setting.AFK), MessageType.AFK);
+        super(Localization::getCommand, Command::getAfk, MessageType.COMMAND_AFK);
 
         this.command = fileResolver.getCommand().getAfk();
         this.permission = fileResolver.getPermission().getCommand().getAfk();
@@ -42,16 +43,13 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
         registerCommand(commandBuilder -> commandBuilder
                 .permission(permission.getName())
         );
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> !afkMessageModule.isEnable());
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
-        if (fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX)) {
+        if (fPlayer.getSetting(SettingText.AFK_SUFFIX) != null) {
             afkMessageModule.remove("afk", fPlayer);
         } else {
             afkMessageModule.setAfk(fPlayer);

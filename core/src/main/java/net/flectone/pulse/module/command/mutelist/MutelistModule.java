@@ -83,13 +83,11 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
                 .optional(promptPlayer, commandParserProvider.mutedParser())
                 .optional(promptNumber, commandParserProvider.integerParser())
         );
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         Localization.Command.Mutelist localization = resolveLocalization(fPlayer);
         Localization.ListTypeMessage localizationType = localization.getGlobal();
@@ -113,7 +111,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
 
                 targetFPlayer = fPlayerService.getFPlayer(playerName);
                 if (targetFPlayer.isUnknown()) {
-                    sendMessage(metadataBuilder()
+                    sendMessage(MessageType.ERROR, metadataBuilder()
                             .sender(fPlayer)
                             .format(Localization.Command.Mutelist::getNullPlayer)
                             .build()
@@ -132,7 +130,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
                 : moderationService.getValidMutes(targetFPlayer);
 
         if (moderationList.isEmpty()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mutelist::getEmpty)
                     .build()
@@ -146,7 +144,7 @@ public class MutelistModule extends AbstractModuleCommand<Localization.Command.M
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mutelist::getNullPage)
                     .build()

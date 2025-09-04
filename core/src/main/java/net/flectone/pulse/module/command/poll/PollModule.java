@@ -22,7 +22,6 @@ import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -62,7 +61,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                       MessagePipeline messagePipeline,
                       PacketProvider packetProvider,
                       Provider<DialogPollBuilder> dialogPollBuilderProvider) {
-        super(localization -> localization.getCommand().getPoll(), Command::getPoll, fPlayer -> fPlayer.isSetting(FPlayer.Setting.POLL), MessageType.COMMAND_POLL);
+        super(localization -> localization.getCommand().getPoll(), Command::getPoll, MessageType.COMMAND_POLL);
 
         this.command = fileResolver.getCommand().getPoll();
         this.permission = fileResolver.getPermission().getCommand().getPoll();
@@ -167,7 +166,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     }
 
     public void executeVote(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         int id = getArgument(commandContext, 4);
         int numberVote = getArgument(commandContext, 5);
@@ -185,10 +184,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (!isEnable()) return;
-        if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
-        if (checkCooldown(fPlayer)) return;
-        if (checkMute(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String promptTime = getPrompt(0);
         long time = ((Duration) commandContext.get(promptTime)).toMillis();
@@ -256,7 +252,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
         Poll poll = pollMap.get(id);
         if (poll == null) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Poll::getNullPoll)
                     .build()
@@ -266,7 +262,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         }
 
         if (poll.isEnded()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Poll::getExpired)
                     .build()
@@ -278,7 +274,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         int voteType = poll.vote(fPlayer, numberVote);
 
         if (voteType == -1) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Poll::getAlready)
                     .build()

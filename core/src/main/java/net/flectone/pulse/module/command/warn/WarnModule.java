@@ -17,7 +17,6 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -49,7 +48,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
                       CommandParserProvider commandParserProvider,
                       PlatformServerAdapter platformServerAdapter,
                       ProxySender proxySender) {
-        super(localization -> localization.getCommand().getWarn(), Command::getWarn, fPlayer -> fPlayer.isSetting(FPlayer.Setting.WARN), MessageType.COMMAND_WARN);
+        super(localization -> localization.getCommand().getWarn(), Command::getWarn, MessageType.COMMAND_WARN);
 
         this.command = fileResolver.getCommand().getWarn();
         this.permission = fileResolver.getPermission().getCommand().getWarn();
@@ -84,10 +83,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
-        if (checkCooldown(fPlayer)) return;
-        if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
-        if (checkMute(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String target = getArgument(commandContext, 0);
         String promptReason = getPrompt(1);
@@ -99,7 +95,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         long time = timeReasonPair.first() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.first();
 
         if (time < 1) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Warn::getNullTime)
                     .build()
@@ -110,7 +106,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Warn::getNullPlayer)
                     .build()

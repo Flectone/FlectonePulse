@@ -1,18 +1,19 @@
 package net.flectone.pulse.data.database.sql;
 
+import org.jdbi.v3.sqlobject.config.KeyColumn;
+import org.jdbi.v3.sqlobject.config.ValueColumn;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
-import java.util.Optional;
+import java.util.Map;
 
 public interface SettingSQL extends SQL {
 
-    @SqlQuery("SELECT `value` FROM `setting` WHERE `player` = :player AND `type` = :type LIMIT 1")
-    Optional<String> getSetting(@Bind("player") int playerId, @Bind("type") String type);
-
-    @SqlUpdate("DELETE FROM `setting` WHERE `player` = :player AND `type` = :type")
-    void deleteSetting(@Bind("player") int playerId, @Bind("type") String type);
+    @KeyColumn("type")
+    @ValueColumn("value")
+    @SqlQuery("SELECT `type`, `value` FROM `setting` WHERE `player` = :player")
+    Map<String, String> getSettings(@Bind("player") int playerId);
 
     @SqlUpdate("INSERT INTO `setting` (`player`, `type`, `value`) VALUES (:player, :type, :value)")
     void insertSetting(@Bind("player") int playerId, @Bind("type") String type, @Bind("value") String value);

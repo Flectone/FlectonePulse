@@ -69,17 +69,15 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
                 .permission(permission.getName())
                 .optional(promptNumber, commandParserProvider.integerParser())
         );
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         List<Ignore> ignoreList = fPlayer.getIgnores();
         if (ignoreList.isEmpty()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ignorelist::getEmpty)
                     .build()
@@ -99,7 +97,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         Integer page = optionalPage.orElse(1);
 
         if (page > countPage || page < 1) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ignorelist::getNullPage)
                     .build()

@@ -3,22 +3,21 @@ package net.flectone.pulse.module.command.online;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
-import net.flectone.pulse.module.command.online.model.OnlineMetadata;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.DisableSource;
-import net.flectone.pulse.util.constant.MessageType;
-import net.flectone.pulse.util.constant.PlatformType;
-import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.online.model.OnlineMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.logging.FLogger;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
@@ -80,9 +79,6 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
                 .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
                 .required(promptPlayer, commandParserProvider.playerParser(command.isSuggestOfflinePlayers()))
         );
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableSource.YOU));
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
@@ -95,14 +91,14 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String type = getArgument(commandContext, 0);
         String target = getArgument(commandContext, 1);
 
         FPlayer targetFPlayer = fPlayerService.getFPlayer(target);
         if (targetFPlayer.isUnknown()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Online::getNullPlayer)
                     .build()

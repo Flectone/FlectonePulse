@@ -31,6 +31,7 @@ import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -58,6 +59,15 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     protected AbstractModuleLocalization(Function<Localization, M> localizationMFunction, MessageType messageType) {
         this.localizationFunction = localizationMFunction;
         this.messageType = messageType;
+    }
+
+    @Override
+    protected void addDefaultPredicates() {
+        super.addDefaultPredicates();
+
+        addPredicate((fPlayer, needBoolean) -> needBoolean && checkDisable(fPlayer, fPlayer, DisableSource.YOU));
+        addPredicate((fPlayer, needBoolean) -> needBoolean && checkCooldown(fPlayer));
+        addPredicate((fPlayer, needBoolean) -> needBoolean && checkMute(fPlayer));
     }
 
     public Sound createSound(Sound sound, Permission.IPermission permission) {
@@ -94,16 +104,31 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         return localizationFunction.apply(fileResolver.getLocalization(sender));
     }
 
+    public boolean checkDisable(FEntity entity, @NotNull FEntity receiver, DisableSource action) {
+        if (!(receiver instanceof FPlayer fReceiver)) return false;
+        if (fReceiver.isUnknown()) return false;
+        if (fReceiver.isSetting(messageType)) return false;
+
+        sendDisableMessage(entity, fReceiver, action);
+
+        return true;
+    }
+
     public boolean checkCooldown(FEntity entity) {
-        if (getModuleCooldown() == null) return false;
-        if (!getModuleCooldown().isEnable()) return false;
+        return checkCooldown(entity, getModuleCooldown());
+    }
+
+    public boolean checkCooldown(FEntity entity, @Nullable Cooldown cooldown) {
+        if (cooldown == null) return false;
+        if (!cooldown.isEnable()) return false;
         if (!(entity instanceof FPlayer fPlayer)) return false;
-        if (permissionChecker.check(fPlayer, getModuleCooldown().getPermissionBypass())) return false;
-        if (!getModuleCooldown().isCooldown(fPlayer.getUuid())) return false;
+        if (fPlayer.isUnknown()) return false;
+        if (permissionChecker.check(fPlayer, cooldown.getPermissionBypass())) return false;
+        if (!cooldown.isCooldown(fPlayer.getUuid())) return false;
 
-        long timeLeft = getModuleCooldown().getTimeLeft(fPlayer);
+        long timeLeft = cooldown.getTimeLeft(fPlayer);
 
-        sendMessage(metadataBuilder()
+        sendMessage(MessageType.ERROR, metadataBuilder()
                 .sender(fPlayer)
                 .format(timeFormatter.format(fPlayer, timeLeft, getCooldownMessage(fPlayer)))
                 .build()
@@ -114,11 +139,12 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
 
     public boolean checkMute(@NotNull FEntity entity) {
         if (!(entity instanceof FPlayer fPlayer)) return false;
+        if (fPlayer.isUnknown()) return false;
 
         MuteChecker.Status status = muteChecker.check(fPlayer);
         if (status == MuteChecker.Status.NONE) return false;
 
-        sendMessage(metadataBuilder()
+        sendMessage(MessageType.ERROR, metadataBuilder()
                 .sender(fPlayer)
                 .format(moderationMessageFormatter.buildMuteMessage(fPlayer, status))
                 .build()
@@ -136,7 +162,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
             case SERVER -> localization.getServer();
         };
 
-        sendMessage(metadataBuilder()
+        sendMessage(MessageType.ERROR, metadataBuilder()
                 .sender(fPlayer)
                 .format(format)
                 .build()
@@ -147,7 +173,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         Localization.Command.Ignore localization = fileResolver.getLocalization(fSender).getCommand().getIgnore();
 
         if (fSender.isIgnored(fReceiver)) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fSender)
                     .format(localization.getYou())
                     .build()
@@ -157,7 +183,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         }
 
         if (fReceiver.isIgnored(fSender)) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fSender)
                     .format(localization.getHe())
                     .build()
@@ -217,7 +243,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         return (EventMetadata.EventMetadataBuilder<M, ?, ?>) EventMetadata.builder();
     }
 
-    public List<FPlayer> createReceivers(EventMetadata<M> eventMetadata) {
+    public List<FPlayer> createReceivers(MessageType messageType, EventMetadata<M> eventMetadata) {
         String rawFormat = eventMetadata.resolveFormat(FPlayer.UNKNOWN, resolveLocalization());
         PreMessageSendEvent preMessageSendEvent = new PreMessageSendEvent(messageType, rawFormat, eventMetadata);
 
@@ -230,6 +256,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         return fPlayerService.getFPlayersWithConsole().stream()
                 .filter(eventMetadata.getFilter())
                 .filter(rangeFilter(filterPlayer, eventMetadata.getRange()))
+                .filter(fReceiver -> fReceiver.isSetting(messageType))
                 .toList();
     }
 
@@ -238,7 +265,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     }
 
     public void sendMessage(MessageType messageType, EventMetadata<M> eventMetadata) {
-        List<FPlayer> receivers = createReceivers(eventMetadata);
+        List<FPlayer> receivers = createReceivers(messageType, eventMetadata);
         sendMessage(messageType, receivers, eventMetadata);
     }
 

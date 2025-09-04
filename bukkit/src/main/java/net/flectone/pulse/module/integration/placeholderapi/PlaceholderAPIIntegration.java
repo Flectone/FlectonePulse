@@ -22,6 +22,8 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
@@ -121,15 +123,19 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             return colorsMap.get(Integer.parseInt(number));
         }
 
-        FPlayer.Setting setting = FPlayer.Setting.fromString(params);
-        if (setting != null) {
-            String value = fPlayer.getSettingValue(setting);
-            if (setting == FPlayer.Setting.CHAT && value == null) return "default";
-            if (setting == FPlayer.Setting.STREAM_PREFIX && value != null && value.isBlank()) return "";
+        SettingText settingText = SettingText.fromString(params);
+        if (settingText != null) {
+            String value = fPlayer.getSetting(settingText);
+            if (settingText == SettingText.CHAT_NAME && value == null) return "default";
 
-            return value == null ? ""
-                    : value.isEmpty() ? "true"
-                    : value;
+            return StringUtils.defaultString(value);
+        }
+
+        try {
+            MessageType messageType = MessageType.valueOf(params.toUpperCase());
+            return String.valueOf(fPlayer.isSetting(messageType));
+        } catch (IllegalArgumentException ignored) {
+            // ignore exception
         }
 
         return switch (params) {

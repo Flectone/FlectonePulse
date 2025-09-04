@@ -17,6 +17,7 @@ import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.InventoryController;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 import org.jetbrains.annotations.Nullable;
@@ -61,47 +62,47 @@ public class InventoryMenuBuilder implements MenuBuilder {
 
         Inventory.Builder inventoryBuilder = new Inventory.Builder()
                 .name(header)
-                .size(54)
-                .addCloseConsumer(inventory -> chatsettingModule.updateSettings(fTarget));
+                .size(54);
 
-        for (FPlayer.Setting setting : FPlayer.Setting.values()) {
-            inventoryBuilder = setting == FPlayer.Setting.CHAT
-                    ? createInventoryChatMenu(fPlayer, fTarget, inventoryBuilder, localization)
-                    : createInventoryCheckbox(fPlayer, fTarget, setting, inventoryBuilder);
-        }
-
+        inventoryBuilder = createInventoryChatMenu(fPlayer, fTarget, inventoryBuilder, localization);
         inventoryBuilder = createInventoryFColorMenu(fPlayer, fTarget, FColor.Type.SEE, inventoryBuilder, command.getMenu().getSee(), localization.getMenu().getSee());
         inventoryBuilder = createInventoryFColorMenu(fPlayer, fTarget, FColor.Type.OUT, inventoryBuilder, command.getMenu().getOut(), localization.getMenu().getOut());
+
+        for (MessageType setting : MessageType.values()) {
+            inventoryBuilder = createInventoryCheckbox(fPlayer, fTarget, setting, inventoryBuilder);
+        }
 
         inventoryController.open(fPlayer, inventoryBuilder.build(isNewerThanOrEqualsV_1_14));
     }
 
-    private Inventory.Builder createInventoryCheckbox(FPlayer fPlayer, FPlayer fTarget, FPlayer.Setting setting, Inventory.Builder inventoryBuilder) {
+    private Inventory.Builder createInventoryCheckbox(FPlayer fPlayer, FPlayer fTarget, MessageType messageType, Inventory.Builder inventoryBuilder) {
         Command.Chatsetting.Checkbox checkbox = command.getCheckbox();
-        if (!checkbox.getTypes().containsKey(setting)) return inventoryBuilder;
+        if (!checkbox.getTypes().containsKey(messageType.name())) return inventoryBuilder;
 
-        int slot = checkbox.getTypes().get(setting);
+        int slot = checkbox.getTypes().get(messageType.name());
         if (slot == -1) return inventoryBuilder;
 
-        boolean enabled = fTarget.isSetting(setting);
+        boolean enabled = fTarget.isSetting(messageType);
 
         String material = chatsettingModule.getCheckboxMaterial(enabled);
-        String title = chatsettingModule.getCheckboxTitle(fPlayer, setting, enabled);
+        String title = chatsettingModule.getCheckboxTitle(fPlayer, messageType.name(), enabled);
         String lore = chatsettingModule.getCheckboxLore(fPlayer, enabled);
 
         return inventoryBuilder
                 .addItem(slot, platformServerAdapter.buildItemStack(fTarget, material, title, lore))
                 .addClickHandler(slot, (itemStack, inventory) -> {
-                    ChatsettingHandler.Status status = chatsettingHandler.handleCheckbox(fPlayer, fTarget, setting);
+                    ChatsettingHandler.Status status = chatsettingHandler.handleCheckbox(fPlayer, fTarget, messageType);
                     if (status == ChatsettingHandler.Status.DENIED) return;
 
                     boolean currentEnabled = status.toBoolean();
                     String invertMaterial = chatsettingModule.getCheckboxMaterial(!currentEnabled);
-                    String invertTitle = chatsettingModule.getCheckboxTitle(fPlayer, setting, !currentEnabled);
+                    String invertTitle = chatsettingModule.getCheckboxTitle(fPlayer, messageType.name(), !currentEnabled);
                     String invertLore = chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled);
 
                     ItemStack newItemStack = platformServerAdapter.buildItemStack(fTarget, invertMaterial, invertTitle, invertLore);
                     inventoryController.changeItem(fPlayer, inventory, slot, newItemStack);
+
+                    chatsettingModule.saveSetting(fPlayer, messageType);
                 });
     }
 

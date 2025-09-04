@@ -9,7 +9,6 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 
@@ -23,7 +22,7 @@ public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
     @Inject
     public MeModule(FileResolver fileResolver,
                     CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getMe(), Command::getMe, fPlayer -> fPlayer.isSetting(FPlayer.Setting.ME), MessageType.COMMAND_ME);
+        super(localization -> localization.getCommand().getMe(), Command::getMe, MessageType.COMMAND_ME);
 
         this.command = fileResolver.getCommand().getMe();
         this.permission = fileResolver.getPermission().getCommand().getMe();
@@ -42,15 +41,11 @@ public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
                 .permission(permission.getName())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableSource.YOU));
-        addPredicate(this::checkMute);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String message = getArgument(commandContext, 0);
 

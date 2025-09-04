@@ -87,7 +87,6 @@ public class MessageListener extends EventListener {
                 .range(Range.get(Range.Type.PROXY))
                 .destination(integration.getDestination())
                 .sound(getModuleSound())
-                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELEGRAM))
                 .integration(string -> StringUtils.replaceEach(
                         string,
                         new String[]{"<name>", "<chat>"},

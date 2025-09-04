@@ -7,31 +7,35 @@ import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
 import net.flectone.pulse.BuildConfig;
-import net.flectone.pulse.model.FColor;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.processing.mapper.FPlayerMapper;
+import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.processing.mapper.FPlayerMapper;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 @Singleton
 public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
@@ -72,7 +76,11 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
     public void unhook() {
         Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, "fcolor"));
 
-        Arrays.stream(FPlayer.Setting.values()).forEach(setting ->
+        Arrays.stream(MessageType.values()).forEach(setting ->
+                Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, setting.name().toLowerCase()))
+        );
+
+        Arrays.stream(SettingText.values()).forEach(setting ->
                 Placeholders.remove(Identifier.of(BuildConfig.PROJECT_MOD_ID, setting.name().toLowerCase()))
         );
 
@@ -99,17 +107,23 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
                 fColorPlaceholder(context, argument, FColor.Type.SEE)
         );
 
-        Arrays.stream(FPlayer.Setting.values()).forEach(setting ->
-            Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, setting.name().toLowerCase()), (context, argument) -> {
+        Arrays.stream(MessageType.values()).forEach(messageType ->
+            Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, messageType.name().toLowerCase()), (context, argument) -> {
                 FPlayer fPlayer = fPlayerMapper.map(context.source());
 
-                String value = fPlayer.getSettingValue(setting);
-                if (setting == FPlayer.Setting.CHAT && value == null) return PlaceholderResult.value("default");
-                if (setting == FPlayer.Setting.STREAM_PREFIX && value != null && value.isBlank()) return PlaceholderResult.value("");
-                if (value == null) return PlaceholderResult.value("");
-
-                return value.isEmpty() ? PlaceholderResult.value("true") : PlaceholderResult.value(value);
+                return PlaceholderResult.value(String.valueOf(fPlayer.isSetting(messageType)));
             })
+        );
+
+        Arrays.stream(SettingText.values()).forEach(settingText ->
+                Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, settingText.name().toLowerCase()), (context, argument) -> {
+                    FPlayer fPlayer = fPlayerMapper.map(context.source());
+
+                    String value = fPlayer.getSetting(settingText);
+                    if (settingText == SettingText.CHAT_NAME && value == null) return PlaceholderResult.value("default");
+
+                    return value == null ? PlaceholderResult.value("") : PlaceholderResult.value(value);
+                })
         );
 
         Placeholders.register(Identifier.of(BuildConfig.PROJECT_MOD_ID, "player"), (context, argument) -> {

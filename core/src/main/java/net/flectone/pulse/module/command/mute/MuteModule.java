@@ -42,7 +42,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
                       ModerationMessageFormatter moderationMessageFormatter,
                       CommandParserProvider commandParserProvider,
                       ProxySender proxySender) {
-        super(localization -> localization.getCommand().getMute(), Command::getMute, fPlayer -> fPlayer.isSetting(FPlayer.Setting.MUTE), MessageType.COMMAND_MUTE);
+        super(localization -> localization.getCommand().getMute(), Command::getMute, MessageType.COMMAND_MUTE);
 
         this.command = fileResolver.getCommand().getMute();
         this.permission = fileResolver.getPermission().getCommand().getMute();
@@ -77,9 +77,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
-        if (checkCooldown(fPlayer)) return;
-        if (checkMute(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String target = getArgument(commandContext, 0);
         String promptReason = getPrompt(1);
@@ -90,7 +88,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
         long time = timeReasonPair.first() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.first();
         if (time < 1) {
-            sendMessage(super.metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mute::getNullTime)
                     .build()
@@ -101,7 +99,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendMessage(super.metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mute::getNullPlayer)
                     .build()

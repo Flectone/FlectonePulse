@@ -91,9 +91,7 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
                     .death(death)
                     .destination(message.getDestination())
                     .sound(getModuleSound())
-                    .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DEATH)
-                            && integrationModule.canSeeVanished(fTarget, fPlayer)
-                    )
+                    .filter(fPlayer -> integrationModule.canSeeVanished(fTarget, fPlayer))
                     .tagResolvers(fResolver -> new TagResolver[]{
                             killerTag(fResolver, death.getKiller()),
                             byItemTag(death.getItem())
@@ -113,9 +111,7 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
                 .range(message.getRange())
                 .destination(message.getDestination())
                 .sound(getModuleSound())
-                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DEATH)
-                        && integrationModule.canSeeVanished(fTarget, fPlayer)
-                )
+                .filter(fPlayer -> integrationModule.canSeeVanished(fTarget, fPlayer))
                 .tagResolvers(fResolver -> new TagResolver[]{
                         killerTag(fResolver, death.getKiller()),
                         byItemTag(death.getItem())
@@ -126,7 +122,7 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
         );
 
         if (!death.isPlayer()) return;
-        if (fTarget instanceof FPlayer player && !player.isSetting(FPlayer.Setting.DEATH)) return;
+        if (fTarget instanceof FPlayer player && !player.isSetting(MessageType.DEATH)) return;
 
         Component component = messagePipeline.builder(fTarget, fReceiver, resolveLocalization(fReceiver).getTypes().get(death.getKey()))
                 .tagResolvers(killerTag(fReceiver, death.getKiller()), byItemTag(death.getItem()))

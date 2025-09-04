@@ -16,7 +16,6 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 
@@ -41,7 +40,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
                       ModerationMessageFormatter moderationMessageFormatter,
                       CommandParserProvider commandParserProvider,
                       MessagePipeline messagePipeline) {
-        super(localization -> localization.getCommand().getKick(), Command::getKick, fPlayer -> fPlayer.isSetting(FPlayer.Setting.KICK), MessageType.COMMAND_KICK);
+        super(localization -> localization.getCommand().getKick(), Command::getKick, MessageType.COMMAND_KICK);
 
         this.command = fileResolver.getCommand().getKick();
         this.permission = fileResolver.getPermission().getCommand().getKick();
@@ -74,15 +73,12 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkCooldown(fPlayer)) return;
-        if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
-        if (checkMute(fPlayer)) return;
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String playerName = getArgument(commandContext, 0);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
         if (!fTarget.isOnline()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Kick::getNullPlayer)
                     .build()

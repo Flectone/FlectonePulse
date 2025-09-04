@@ -81,8 +81,6 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                 .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
         );
 
-        addPredicate(this::checkCooldown);
-
         if (reflectionResolver.hasClass(sparkClass)) {
             enableSpark();
         }
@@ -99,12 +97,12 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String type = getArgument(commandContext, 0);
         if (type.equalsIgnoreCase("editor")) {
             if (config.getHost().isEmpty()) {
-                sendMessage(metadataBuilder()
+                sendMessage(MessageType.ERROR, metadataBuilder()
                         .sender(fPlayer)
                         .format(Localization.Command.Flectonepulse::getNullHostEditor)
                         .build()

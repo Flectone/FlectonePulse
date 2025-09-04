@@ -21,6 +21,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
+import net.flectone.pulse.util.constant.SettingText;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 
@@ -77,7 +78,7 @@ public class WorldModule extends AbstractModule {
         if (!(sender instanceof FPlayer fPlayer)) return;
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.WORLD_PREFIX, (argumentQueue, context) -> {
-            String worldPrefix = fPlayer.getSettingValue(FPlayer.Setting.WORLD_PREFIX);
+            String worldPrefix = fPlayer.getSetting(SettingText.WORLD_PREFIX);
             if (worldPrefix == null) return Tag.selfClosingInserting(Component.empty());
 
             return Tag.preProcessParsed(worldPrefix);
@@ -92,11 +93,12 @@ public class WorldModule extends AbstractModule {
                 ? message.getValues().get(platformPlayerAdapter.getWorldEnvironment(fPlayer))
                 : message.getValues().get(platformPlayerAdapter.getWorldName(fPlayer));
 
-        String fPlayerWorldPrefix = fPlayer.getSettingValue(FPlayer.Setting.WORLD_PREFIX);
+        String fPlayerWorldPrefix = fPlayer.getSetting(SettingText.WORLD_PREFIX);
         if (newWorldPrefix == null && fPlayerWorldPrefix == null) return;
         if (newWorldPrefix != null && newWorldPrefix.equalsIgnoreCase(fPlayerWorldPrefix)) return;
 
-        fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.WORLD_PREFIX, newWorldPrefix);
+        fPlayer.setSetting(SettingText.WORLD_PREFIX, newWorldPrefix);
+        fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.WORLD_PREFIX);
     }
 
     public enum Mode {

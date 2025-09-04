@@ -7,15 +7,14 @@ import lombok.NonNull;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.module.command.translateto.model.TranslatetoMetadata;
-import net.flectone.pulse.util.constant.DisableSource;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
+import net.flectone.pulse.module.command.translateto.model.TranslatetoMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.format.translate.TranslateModule;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -45,7 +44,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
                              CommandParserProvider commandParserProvider,
                              IntegrationModule integrationModule,
                              Provider<TranslateModule> translateModuleProvider) {
-        super(localization -> localization.getCommand().getTranslateto(), Command::getTranslateto, fPlayer -> fPlayer.isSetting(FPlayer.Setting.TRANSLATETO), MessageType.COMMAND_TRANSLATETO);
+        super(localization -> localization.getCommand().getTranslateto(), Command::getTranslateto, MessageType.COMMAND_TRANSLATETO);
 
         this.command = fileResolver.getCommand().getTranslateto();
         this.permission = fileResolver.getPermission().getCommand().getTranslateto();
@@ -69,10 +68,6 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
                 .permission(permission.getName())
         );
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableSource.YOU));
-        addPredicate(this::checkMute);
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> languageSuggestion() {
@@ -84,7 +79,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String promptLanguage = getPrompt(0);
         String mainLang = commandContext.get(promptLanguage + " main");
@@ -99,7 +94,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
 
         String translatedMessage = translate(fPlayer, mainLang, targetLang, messageToTranslate);
         if (translatedMessage.isEmpty()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Translateto::getNullOrError)
                     .build()

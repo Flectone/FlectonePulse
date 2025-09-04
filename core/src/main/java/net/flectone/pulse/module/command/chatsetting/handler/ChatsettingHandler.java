@@ -14,6 +14,8 @@ import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.SettingText;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 import org.jetbrains.annotations.Nullable;
@@ -54,8 +56,8 @@ public class ChatsettingHandler {
                                Localization.Command.Chatsetting localization,
                                MenuBuilder menuBuilder,
                                @Nullable String id) {
-        if (!permissionChecker.check(fPlayer, permission.getSettings().get(FPlayer.Setting.CHAT))) {
-            chatsettingModule.sendMessage(chatsettingModule.metadataBuilder()
+        if (!permissionChecker.check(fPlayer, permission.getSettings().get(SettingText.CHAT_NAME.name()))) {
+            chatsettingModule.sendMessage(MessageType.ERROR, chatsettingModule.metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatsetting::getNoPermission)
                     .build()
@@ -73,12 +75,12 @@ public class ChatsettingHandler {
                 "<chat>", item.name()
         );
 
-        Consumer<SubMenuItem> onSelect = item -> fTarget.setSetting(FPlayer.Setting.CHAT, "default".equalsIgnoreCase(item.name()) ? null : item.name());
+        Consumer<SubMenuItem> onSelect = item -> fTarget.setSetting(SettingText.CHAT_NAME, "default".equalsIgnoreCase(item.name()) ? null : item.name());
 
         String headerStr = localization.getMenu().getChat().getInventory();
         Component header = messagePipeline.builder(fPlayer, fTarget, headerStr).build();
 
-        Runnable closeConsumer = () -> chatsettingModule.updateSettings(fTarget);
+        Runnable closeConsumer = () -> chatsettingModule.saveSetting(fTarget, SettingText.CHAT_NAME);
 
         menuBuilder.openSubMenu(fPlayer, fTarget, header, closeConsumer, items, getItemMessage, onSelect, id);
     }
@@ -143,8 +145,8 @@ public class ChatsettingHandler {
         successRunnable.run();
     }
 
-    public Status handleCheckbox(FPlayer fPlayer, FPlayer fTarget, FPlayer.Setting setting) {
-        if (!permissionChecker.check(fPlayer, permission.getSettings().get(setting))) {
+    public Status handleCheckbox(FPlayer fPlayer, FPlayer fTarget, MessageType messageType) {
+        if (!permissionChecker.check(fPlayer, permission.getSettings().get(messageType.name()))) {
             chatsettingModule.sendMessage(chatsettingModule.metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatsetting::getNoPermission)
@@ -154,13 +156,8 @@ public class ChatsettingHandler {
             return Status.DENIED;
         }
 
-        boolean currentEnabled = fTarget.isSetting(setting);
-
-        if (currentEnabled) {
-            fTarget.removeSetting(setting);
-        } else {
-            fTarget.setSetting(setting, "");
-        }
+        boolean currentEnabled = fTarget.isSetting(messageType);
+        fTarget.setSetting(messageType, !currentEnabled);
 
         return currentEnabled ? Status.ENABLED : Status.DISABLED;
     }

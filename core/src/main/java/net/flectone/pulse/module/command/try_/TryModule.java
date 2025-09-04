@@ -11,7 +11,6 @@ import net.flectone.pulse.module.command.try_.model.TryMetadata;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.RandomUtil;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -30,7 +29,7 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
     public TryModule(FileResolver fileResolver,
                      RandomUtil randomUtil,
                      CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getTry(), Command::getTry, fPlayer -> fPlayer.isSetting(FPlayer.Setting.TRY), MessageType.COMMAND_TRY);
+        super(localization -> localization.getCommand().getTry(), Command::getTry, MessageType.COMMAND_TRY);
 
         this.command = fileResolver.getCommand().getTry();
         this.permission = fileResolver.getPermission().getCommand().getTry();
@@ -56,15 +55,11 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
                 .handler(this)
         );
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableSource.YOU));
-        addPredicate(this::checkMute);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         int min = command.getMin();
         int max = command.getMax();

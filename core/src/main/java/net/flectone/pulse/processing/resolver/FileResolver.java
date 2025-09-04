@@ -10,6 +10,7 @@ import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.*;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.Strings;
 
@@ -62,7 +63,7 @@ public class FileResolver {
         if (!config.isLanguagePlayer()) return defaultLocalization;
         if (!(sender instanceof FPlayer fPlayer)) return defaultLocalization;
 
-        return localizationMap.getOrDefault(fPlayer.getSettingValue(FPlayer.Setting.LOCALE), defaultLocalization);
+        return localizationMap.getOrDefault(fPlayer.getSetting(SettingText.LOCALE), defaultLocalization);
     }
 
     public void reload() {

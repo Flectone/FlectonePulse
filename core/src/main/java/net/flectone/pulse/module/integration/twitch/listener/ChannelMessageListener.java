@@ -57,7 +57,6 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
                 .range(Range.get(Range.Type.PROXY))
                 .destination(integration.getDestination())
                 .sound(getModuleSound())
-                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.TWITCH))
                 .integration(string -> StringUtils.replaceEach(
                         string,
                         new String[]{"<name>", "<channel>"},

@@ -100,13 +100,11 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         registerCommand(commandBuilder -> commandBuilder
                 .permission(permission.getName())
         );
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         boolean turned = !command.isTurnedOn();
 

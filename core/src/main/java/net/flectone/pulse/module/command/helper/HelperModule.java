@@ -12,7 +12,6 @@ import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 
@@ -59,15 +58,11 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
                 .permission(permission.getName())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableSource.YOU));
-        addPredicate(this::checkMute);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         Predicate<FPlayer> filter = getFilterSee();
 
@@ -77,7 +72,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
                     .noneMatch(online -> permissionChecker.check(online, permission.getSee()));
 
             if (nullHelper) {
-                sendMessage(metadataBuilder()
+                sendMessage(MessageType.ERROR, metadataBuilder()
                         .sender(fPlayer)
                         .format(Localization.Command.Helper::getNullHelper)
                         .build()

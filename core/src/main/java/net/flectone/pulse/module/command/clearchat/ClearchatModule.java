@@ -61,13 +61,11 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
                         .permission(permission.getName())
                         .optional(promptPlayer, commandParserProvider.playerParser(), commandParserProvider.playerSuggestionPermission(false, permission.getOther()))
         );
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String promptPlayer = getPrompt(0);
         Optional<String> optionalPlayer = commandContext.optional(promptPlayer);
@@ -83,7 +81,7 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
 
             fTarget = fPlayerService.getFPlayer(player);
             if (fTarget.isUnknown()) {
-                sendMessage(metadataBuilder()
+                sendMessage(MessageType.ERROR, metadataBuilder()
                         .sender(fPlayer)
                         .format(Localization.Command.Clearchat::getNullPlayer)
                         .build()

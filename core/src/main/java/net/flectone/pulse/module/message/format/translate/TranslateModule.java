@@ -17,6 +17,7 @@ import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.SettingText;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.Strings;
@@ -87,7 +88,7 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
 
         messageContext.addReplacementTag(Set.of(MessagePipeline.ReplacementTag.TRANSLATE, MessagePipeline.ReplacementTag.TRANSLATETO), (argumentQueue, context) -> {
             String firstLang = "auto";
-            String secondLang = receiver.getSettingValue(FPlayer.Setting.LOCALE);
+            String secondLang = receiver.getSetting(SettingText.LOCALE);
 
             if (argumentQueue.hasNext()) {
                 Tag.Argument first = argumentQueue.pop();

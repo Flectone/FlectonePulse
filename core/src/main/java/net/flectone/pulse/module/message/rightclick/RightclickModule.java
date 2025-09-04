@@ -49,8 +49,6 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
         createCooldown(message.getCooldown(), permission.getCooldownBypass());
 
         listenerRegistry.register(RightclickPacketListener.class);
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override

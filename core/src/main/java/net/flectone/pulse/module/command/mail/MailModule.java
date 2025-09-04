@@ -40,7 +40,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
                       FPlayerService fPlayerService,
                       CommandParserProvider commandParserProvider,
                       ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getCommand().getMail(), Command::getMail, fPlayer -> fPlayer.isSetting(FPlayer.Setting.MAIL), MessageType.COMMAND_MAIL);
+        super(localization -> localization.getCommand().getMail(), Command::getMail, MessageType.COMMAND_MAIL);
 
         this.command = fileResolver.getCommand().getMail();
         this.permission = fileResolver.getPermission().getCommand().getMail();
@@ -71,15 +71,12 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkCooldown(fPlayer)) return;
-        if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
-        if (checkMute(fPlayer)) return;
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String playerName = getArgument(commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
         if (fReceiver.isUnknown()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mail::getNullPlayer)
                     .build()
@@ -90,7 +87,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
 
         if (fReceiver.isOnline() && integrationModule.canSeeVanished(fReceiver, fPlayer)) {
             if (!tellModule.isEnable()) {
-                sendMessage(metadataBuilder()
+                sendMessage(MessageType.ERROR, metadataBuilder()
                         .sender(fPlayer)
                         .format(Localization.Command.Mail::getOnlinePlayer)
                         .build()

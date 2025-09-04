@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
-import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.model.util.Sound;
+import net.flectone.pulse.util.constant.MessageType;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -229,39 +229,38 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
             private String disabledMaterial = "RED_DYE";
             private String enabledMaterial = "LIME_DYE";
 
-            private Map<FPlayer.Setting, Integer> types = new LinkedHashMap<>() {
+            private Map<String, Integer> types = new LinkedHashMap<>() {
                 {
-                    put(FPlayer.Setting.SPY, 9);
-                    put(FPlayer.Setting.STREAM, 10);
-                    put(FPlayer.Setting.ADVANCEMENT, 18);
-                    put(FPlayer.Setting.AFK, 19);
-                    put(FPlayer.Setting.ANON, 20);
-                    put(FPlayer.Setting.AUTO, 21);
-                    put(FPlayer.Setting.BALL, 22);
-                    put(FPlayer.Setting.BAN, 23);
-                    put(FPlayer.Setting.BROADCAST, 24);
-                    put(FPlayer.Setting.COIN, 25);
-                    put(FPlayer.Setting.DEATH, 26);
-                    put(FPlayer.Setting.DICE, 27);
-                    put(FPlayer.Setting.DISCORD, 28);
-                    put(FPlayer.Setting.DO, 29);
-                    put(FPlayer.Setting.GREETING, 30);
-                    put(FPlayer.Setting.JOIN, 31);
-                    put(FPlayer.Setting.KICK, 32);
-                    put(FPlayer.Setting.MAIL, 33);
-                    put(FPlayer.Setting.ME, 34);
-                    put(FPlayer.Setting.MUTE, 35);
-                    put(FPlayer.Setting.POLL, 36);
-                    put(FPlayer.Setting.QUIT, 37);
-                    put(FPlayer.Setting.REPLY, 38);
-                    put(FPlayer.Setting.ROCKPAPERSCISSORS, 39);
-                    put(FPlayer.Setting.TELL, 40);
-                    put(FPlayer.Setting.TELEGRAM, 41);
-                    put(FPlayer.Setting.TICTACTOE, 42);
-                    put(FPlayer.Setting.TRANSLATETO, 43);
-                    put(FPlayer.Setting.TRY, 44);
-                    put(FPlayer.Setting.TWITCH, 45);
-                    put(FPlayer.Setting.WARN, 46);
+                    put(MessageType.COMMAND_SPY.name(), 9);
+                    put(MessageType.ADVANCEMENT.name(), 10);
+                    put(MessageType.AFK.name(), 11);
+                    put(MessageType.COMMAND_ANON.name(), 12);
+                    put(MessageType.AUTO.name(), 13);
+                    put(MessageType.COMMAND_BALL.name(), 14);
+                    put(MessageType.COMMAND_BAN.name(), 15);
+                    put(MessageType.COMMAND_BROADCAST.name(), 16);
+                    put(MessageType.COMMAND_COIN.name(), 17);
+                    put(MessageType.DEATH.name(), 18);
+                    put(MessageType.COMMAND_DICE.name(), 19);
+                    put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), 20);
+                    put(MessageType.COMMAND_DO.name(), 21);
+                    put(MessageType.GREETING.name(), 22);
+                    put(MessageType.JOIN.name(), 23);
+                    put(MessageType.COMMAND_KICK.name(), 24);
+                    put(MessageType.COMMAND_MAIL.name(), 25);
+                    put(MessageType.COMMAND_ME.name(), 26);
+                    put(MessageType.COMMAND_MUTE.name(), 27);
+                    put(MessageType.COMMAND_POLL.name(), 28);
+                    put(MessageType.QUIT.name(), 29);
+                    put(MessageType.COMMAND_REPLY.name(), 30);
+                    put(MessageType.COMMAND_ROCKPAPERSCISSORS.name(), 31);
+                    put(MessageType.COMMAND_TELL.name(), 32);
+                    put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), 33);
+                    put(MessageType.COMMAND_TICTACTOE.name(), 34);
+                    put(MessageType.COMMAND_TRANSLATETO.name(), 35);
+                    put(MessageType.COMMAND_TRY.name(), 36);
+                    put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), 37);
+                    put(MessageType.COMMAND_WARN.name(), 38);
                 }
             };
         }

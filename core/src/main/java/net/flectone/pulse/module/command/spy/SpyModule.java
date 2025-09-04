@@ -12,6 +12,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.SettingText;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
@@ -54,15 +55,16 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (checkCooldown(fPlayer)) return;
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
-        boolean turnedBefore = fPlayer.isSetting(FPlayer.Setting.SPY);
+        boolean turnedBefore = fPlayer.getSetting(SettingText.SPY_STATUS) != null;
         if (turnedBefore) {
-            fPlayerService.deleteSetting(fPlayer, FPlayer.Setting.SPY);
+            fPlayer.removeSetting(SettingText.SPY_STATUS);
         } else {
-            fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.SPY, "");
+            fPlayer.setSetting(SettingText.SPY_STATUS, "1");
         }
+
+        fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.SPY_STATUS);
 
         sendMessage(SpyMetadata.<Localization.Command.Spy>builder()
                 .sender(fPlayer)
@@ -106,11 +108,11 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
         );
     }
 
-    private Predicate<FPlayer> createFilter(FPlayer fPlayer) {
+    public Predicate<FPlayer> createFilter(FPlayer fPlayer) {
         return fReceiver -> !fPlayer.equals(fReceiver)
                 && permissionChecker.check(fReceiver, getModulePermission())
-                && fReceiver.isSetting(FPlayer.Setting.SPY)
-                && fPlayer.isOnline();
+                && fReceiver.getSetting(SettingText.SPY_STATUS) != null
+                && fReceiver.isOnline();
     }
 
     public Function<Localization.Command.Spy, String> replaceAction(String action) {

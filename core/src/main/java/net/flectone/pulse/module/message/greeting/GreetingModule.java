@@ -78,7 +78,6 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
                     .pixels(pixels)
                     .destination(message.getDestination())
                     .sound(getModuleSound())
-                    .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.GREETING))
                     .build()
             );
 

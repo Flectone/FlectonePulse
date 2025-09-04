@@ -8,7 +8,6 @@ import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
@@ -43,8 +42,6 @@ public class DiscordModule extends AbstractModule {
         registerModulePermission(permission);
 
         reflectionResolver.hasClassOrElse("discord4j.core.DiscordClient", this::loadLibraries);
-
-        addPredicate(fEntity -> fEntity instanceof FPlayer fPlayer && !fPlayer.isSetting(FPlayer.Setting.DISCORD));
 
         try {
             injector.getInstance(DiscordIntegration.class).hook();

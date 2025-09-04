@@ -70,8 +70,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
-        if (checkCooldown(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String target = getArgument(commandContext, 0);
 
@@ -87,7 +86,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unmute::getNullPlayer)
                     .build()
@@ -108,7 +107,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
         }
 
         if (mutes.isEmpty()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unmute::getNotMuted)
                     .build()
@@ -129,7 +128,6 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
                 .destination(command.getDestination())
                 .range(command.getRange())
                 .sound(getModuleSound())
-                .filter(filter -> filter.isSetting(FPlayer.Setting.MUTE))
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeAsJson(fPlayer);
                     dataOutputStream.writeAsJson(mutes);

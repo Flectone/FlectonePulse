@@ -11,7 +11,6 @@ import net.flectone.pulse.module.command.deletemessage.model.DeletemessageMetada
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.parser.standard.UUIDParser;
@@ -50,19 +49,15 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
                 .permission(permission.getName())
                 .required(promptId, UUIDParser.uuidParser())
         );
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableSource.YOU));
-        addPredicate(this::checkMute);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         UUID uuid = getArgument(commandContext, 0);
         if (!deleteModule.remove(fPlayer, uuid)) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Deletemessage::getNullMessage)
                     .build()

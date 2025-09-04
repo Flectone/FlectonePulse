@@ -8,6 +8,7 @@ import com.rexcantor64.triton.api.players.LanguagePlayer;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -42,7 +43,8 @@ public class TritonIntegration implements Listener, FIntegration {
 
         FPlayer fPlayer = fPlayerService.getFPlayer(event.getLanguagePlayer().getUUID());
 
-        fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.LOCALE, event.getNewLanguage().getLanguageId());
+        fPlayer.setSetting(SettingText.LOCALE, event.getNewLanguage().getLanguageId());
+        fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.LOCALE);
     }
 
     @Nullable

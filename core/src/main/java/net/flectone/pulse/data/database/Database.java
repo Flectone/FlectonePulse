@@ -13,12 +13,10 @@ import com.zaxxer.hikari.pool.HikariPool;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
-import net.flectone.pulse.data.database.dao.SettingDAO;
 import net.flectone.pulse.model.FColor;
-import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
-import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
@@ -107,10 +105,6 @@ public class Database {
 
         InputStream sqlFile = platformServerAdapter.getResource("sqls/" + config.getType().name().toLowerCase() + ".sql");
         executeSQLFile(sqlFile);
-
-        if (fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "0.9.0")) {
-            MIGRATION_0_9_0();
-        }
 
         if (fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "1.3.0")) {
             MIGRATION_1_3_0();
@@ -269,18 +263,6 @@ public class Database {
                 builder.setLength(0);
             }
         }
-    }
-
-    private void MIGRATION_0_9_0() {
-        backupDatabase();
-
-        SettingDAO settingDAO = injector.getInstance(SettingDAO.class);
-        injector.getInstance(FPlayerDAO.class).getFPlayers().forEach(fPlayer -> {
-            if (fPlayer.isUnknown()) return;
-
-            fPlayer.setSetting(FPlayer.Setting.ANON);
-            settingDAO.insertOrUpdate(fPlayer, FPlayer.Setting.ANON);
-        });
     }
 
     private void MIGRATION_1_3_0() {

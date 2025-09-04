@@ -16,8 +16,9 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.SettingText;
 import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.Nullable;
 
 import java.net.InetAddress;
 import java.util.List;
@@ -94,7 +95,7 @@ public class FPlayerService {
 
     public FPlayer addFPlayer(UUID uuid, String name) {
         // insert to database
-        boolean isNew = fPlayerRepository.save(uuid, name);
+        fPlayerRepository.save(uuid, name);
 
         moderationService.invalidate(uuid);
 
@@ -103,11 +104,6 @@ public class FPlayerService {
         if (fPlayer.isUnknown()) {
             fPlayerRepository.invalid(uuid);
             fPlayer = fPlayerRepository.get(uuid);
-        }
-
-        if (isNew) {
-            fPlayer.setDefaultSettings();
-            saveSettings(fPlayer);
         }
 
         // most often this is not a real IP (this is server ip) on login,
@@ -299,13 +295,11 @@ public class FPlayerService {
         fPlayerRepository.saveSettings(fPlayer);
     }
 
-    public void deleteSetting(FPlayer fPlayer, FPlayer.Setting setting) {
-        fPlayer.removeSetting(setting);
-        fPlayerRepository.deleteSetting(fPlayer, setting);
+    public void saveOrUpdateSetting(FPlayer fPlayer, MessageType setting) {
+        fPlayerRepository.saveOrUpdateSetting(fPlayer, setting);
     }
 
-    public void saveOrUpdateSetting(FPlayer fPlayer, FPlayer.Setting setting, @Nullable String value) {
-        fPlayer.setSetting(setting, value);
+    public void saveOrUpdateSetting(FPlayer fPlayer, SettingText setting) {
         fPlayerRepository.saveOrUpdateSetting(fPlayer, setting);
     }
 
@@ -321,9 +315,10 @@ public class FPlayerService {
             locale = newLocale;
         }
 
-        if (locale.equals(fPlayer.getSettingValue(FPlayer.Setting.LOCALE))) return;
+        if (locale.equals(fPlayer.getSetting(SettingText.LOCALE))) return;
         if (fPlayer.isUnknown()) return;
 
-        saveOrUpdateSetting(fPlayer, FPlayer.Setting.LOCALE, locale);
+        fPlayer.setSetting(SettingText.LOCALE, locale);
+        saveOrUpdateSetting(fPlayer, SettingText.LOCALE);
     }
 }

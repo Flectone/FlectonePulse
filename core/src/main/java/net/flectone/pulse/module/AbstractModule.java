@@ -10,13 +10,14 @@ import net.flectone.pulse.platform.registry.PermissionRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
 
 import java.util.*;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 @Getter
 public abstract class AbstractModule {
 
     private final Set<Class<? extends AbstractModule>> children = new LinkedHashSet<>();
-    private final Set<Predicate<FEntity>> predicates = new HashSet<>();
+    private final Set<BiPredicate<FEntity, Boolean>> predicates = new HashSet<>();
 
     @Inject private PermissionRegistry permissionRegistry;
     @Inject private PermissionChecker permissionChecker;
@@ -56,12 +57,20 @@ public abstract class AbstractModule {
     }
 
     public void addPredicate(Predicate<FEntity> predicate) {
-        predicates.add(predicate);
+        predicates.add((fEntity, value) -> predicate.test(fEntity));
+    }
+
+    public void addPredicate(BiPredicate<FEntity, Boolean> biPredicate) {
+        predicates.add(biPredicate);
     }
 
     public boolean isModuleDisabledFor(FEntity entity) {
-        for (Predicate<FEntity> predicate : predicates) {
-            if (predicate.test(entity)) {
+        return isModuleDisabledFor(entity, false);
+    }
+
+    public boolean isModuleDisabledFor(FEntity entity, boolean needBoolean) {
+        for (BiPredicate<FEntity, Boolean> predicate : predicates) {
+            if (predicate.test(entity, needBoolean)) {
                 return true;
             }
         }
@@ -125,7 +134,7 @@ public abstract class AbstractModule {
         module.getChildren().forEach(subModule -> enable(subModule, childPredicate));
     }
 
-    private void addDefaultPredicates() {
+    protected void addDefaultPredicates() {
         addPredicate(fPlayer -> !isEnable());
         addPredicate(fPlayer -> !permissionChecker.check(fPlayer, modulePermission));
     }

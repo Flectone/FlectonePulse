@@ -44,7 +44,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                       IntegrationModule integrationModule,
                       CommandParserProvider commandParserProvider,
                       PlatformPlayerAdapter platformPlayerAdapter) {
-        super(localization -> localization.getCommand().getTell(), Command::getTell, fPlayer -> fPlayer.isSetting(FPlayer.Setting.TELL), MessageType.COMMAND_TELL);
+        super(localization -> localization.getCommand().getTell(), Command::getTell, MessageType.COMMAND_TELL);
 
         this.command = fileResolver.getCommand().getTell();
         this.permission = fileResolver.getPermission().getCommand().getTell();
@@ -80,11 +80,6 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
-        if (checkCooldown(fPlayer)) return;
-        if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
-        if (checkMute(fPlayer)) return;
-
         String playerName = getArgument(commandContext, 0);
         String message = getArgument(commandContext, 1);
 
@@ -92,7 +87,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
     }
 
     public void send(FPlayer fPlayer, String playerName, String message) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         if (fPlayer.getName().equalsIgnoreCase(playerName)) {
             sendMessage(metadataBuilder()
@@ -113,7 +108,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                 || !fReceiver.isOnline()
                 || !rangeFilter(fPlayer, range).test(fReceiver)
                 || !range.is(Range.Type.PROXY) && !platformPlayerAdapter.isOnline(fReceiver)) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tell::getNullPlayer)
                     .build()
@@ -142,7 +137,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
         FPlayer fNewReceiver = fPlayerService.getFPlayer(fReceiver.getUuid());
         if (!integrationModule.canSeeVanished(fNewReceiver, fPlayer)) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tell::getNullPlayer)
                     .build()

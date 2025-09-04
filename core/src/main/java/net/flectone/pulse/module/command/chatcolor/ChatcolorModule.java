@@ -78,8 +78,6 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
 
             return commandBuilder.optional(promptPlayer, commandParserProvider.nativeMessageParser(), commandParserProvider.playerSuggestionPermission(true, permission.getOther()));
         });
-
-        addPredicate(this::checkCooldown);
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
@@ -91,7 +89,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String type = getArgument(commandContext, 0);
         Optional<FColor.Type> fColorType = switch (type.toLowerCase()) {
@@ -101,7 +99,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         };
 
         if (fColorType.isEmpty() || !permissionChecker.check(fPlayer, permission.getColors().get(fColorType.get()))) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatcolor::getNullType)
                     .build()
@@ -150,7 +148,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         }
 
         if (newFColors.isEmpty()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatcolor::getNullColor)
                     .build()

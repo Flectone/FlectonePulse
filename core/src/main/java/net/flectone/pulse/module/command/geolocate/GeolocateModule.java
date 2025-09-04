@@ -12,7 +12,6 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -62,20 +61,17 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
                 .permission(permission.getName())
                 .required(promptPlayer, commandParserProvider.playerParser(command.isSuggestOfflinePlayers()))
         );
-
-        addPredicate(this::checkCooldown);
-        addPredicate(fPlayer -> checkDisable(fPlayer, fPlayer, DisableSource.YOU));
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String playerName = getArgument(commandContext, 0);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
 
         if (fTarget.isUnknown()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Geolocate::getNullPlayer)
                     .build()
@@ -88,7 +84,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
 
         List<String> response = ip == null ? List.of() : readResponse(Strings.CS.replace(apiUrl, "<ip>", ip));
         if (response.isEmpty() || response.get(0).equals("fail")) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Geolocate::getNullOrError)
                     .build()

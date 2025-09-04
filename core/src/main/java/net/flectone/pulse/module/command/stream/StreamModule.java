@@ -18,9 +18,9 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.SettingText;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
@@ -88,10 +88,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
-        if (checkCooldown(fPlayer)) return;
-        if (checkDisable(fPlayer, fPlayer, DisableSource.YOU)) return;
-        if (checkMute(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         String type = getArgument(commandContext, 0);
         Boolean needStart = switch (type) {
@@ -102,10 +99,10 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
 
         if (needStart == null) return;
 
-        boolean isStream = fPlayer.isSetting(FPlayer.Setting.STREAM);
+        boolean isStream = fPlayer.getSetting(SettingText.STREAM_PREFIX) != null;
 
         if (isStream && needStart && !fPlayer.isUnknown()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Stream::getAlready)
                     .build()
@@ -115,7 +112,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         }
 
         if (!isStream && !needStart) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Stream::getNot)
                     .build()
@@ -124,7 +121,8 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
             return;
         }
 
-        setStreamPrefix(fPlayer, needStart);
+        fPlayer.setSetting(SettingText.STREAM_PREFIX, needStart ? resolveLocalization().getPrefixTrue() : null);
+        fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.STREAM_PREFIX);
 
         if (needStart) {
             String promptUrl = getPrompt(1);
@@ -166,7 +164,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         if (isModuleDisabledFor(fPlayer)) return;
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.STREAM_PREFIX, (argumentQueue, context) -> {
-            String streamPrefix = fPlayer.getSettingValue(FPlayer.Setting.STREAM_PREFIX);
+            String streamPrefix = fPlayer.getSetting(SettingText.STREAM_PREFIX);
             if (StringUtils.isEmpty(streamPrefix)) return Tag.selfClosingInserting(Component.empty());
 
             return Tag.preProcessParsed(streamPrefix);
@@ -181,20 +179,6 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
 
             return Strings.CS.replace(message.getFormatStart(), "<urls>", String.join("<br>", urls));
         };
-    }
-
-    public void setStreamPrefix(FPlayer fPlayer, boolean isStart) {
-        if (isModuleDisabledFor(fPlayer)) return;
-        if (fPlayer.isUnknown()) return;
-
-        if (isStart) {
-            fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.STREAM, "");
-            fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.STREAM_PREFIX, resolveLocalization().getPrefixTrue());
-            return;
-        }
-
-        fPlayerService.deleteSetting(fPlayer, FPlayer.Setting.STREAM);
-        fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.STREAM_PREFIX, resolveLocalization().getPrefixFalse());
     }
 
     private boolean isUrl(String string) {

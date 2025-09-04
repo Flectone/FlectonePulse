@@ -83,13 +83,11 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
                 .optional(promptPlayer, commandParserProvider.bannedParser())
                 .optional(promptNumber, commandParserProvider.integerParser())
         );
-
-        addPredicate(this::checkCooldown);
     }
 
     @Override
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
-        if (isModuleDisabledFor(fPlayer)) return;
+        if (isModuleDisabledFor(fPlayer, true)) return;
 
         Localization.Command.Banlist localization = resolveLocalization(fPlayer);
         Localization.ListTypeMessage localizationType = localization.getGlobal();
@@ -113,7 +111,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
 
                 targetFPlayer = fPlayerService.getFPlayer(playerName);
                 if (targetFPlayer.isUnknown()) {
-                    sendMessage(metadataBuilder()
+                    sendMessage(MessageType.ERROR, metadataBuilder()
                             .sender(fPlayer)
                             .format(Localization.Command.Banlist::getNullPlayer)
                             .build()
@@ -132,7 +130,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
                 : moderationService.getValidBans(targetFPlayer);
 
         if (moderationList.isEmpty()) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Banlist::getEmpty)
                     .build()
@@ -146,7 +144,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
-            sendMessage(metadataBuilder()
+            sendMessage(MessageType.ERROR, metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Banlist::getNullPage)
                     .build()

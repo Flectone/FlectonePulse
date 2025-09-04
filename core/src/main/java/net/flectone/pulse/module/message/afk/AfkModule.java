@@ -22,6 +22,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.SettingText;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
@@ -92,7 +93,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
         if (!(sender instanceof FPlayer fPlayer)) return;
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.AFK_SUFFIX, (argumentQueue, context) -> {
-            String afkSuffix = fPlayer.getSettingValue(FPlayer.Setting.AFK_SUFFIX);
+            String afkSuffix = fPlayer.getSetting(SettingText.AFK_SUFFIX);
             if (StringUtils.isEmpty(afkSuffix)) return Tag.selfClosingInserting(Component.empty());
 
             return Tag.preProcessParsed(afkSuffix);
@@ -102,9 +103,10 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
     @Async
     public void remove(@NotNull String action, FPlayer fPlayer) {
         if (action.isEmpty()) {
-            fPlayer.removeSetting(FPlayer.Setting.AFK_SUFFIX);
+            fPlayer.removeSetting(SettingText.AFK_SUFFIX);
+            fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.AFK_SUFFIX);
+
             playersCoordinates.remove(fPlayer.getUuid());
-            fPlayerService.deleteSetting(fPlayer, FPlayer.Setting.AFK_SUFFIX);
             return;
         }
 
@@ -117,9 +119,9 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
 
     private void check(@NotNull FPlayer fPlayer) {
         if (!fPlayer.isOnline()) {
-            String afkSuffix = fPlayer.getSettingValue(FPlayer.Setting.AFK_SUFFIX);
+            String afkSuffix = fPlayer.getSetting(SettingText.AFK_SUFFIX);
 
-            fPlayer.removeSetting(FPlayer.Setting.AFK_SUFFIX);
+            fPlayer.removeSetting(SettingText.AFK_SUFFIX);
             playersCoordinates.remove(fPlayer.getUuid());
 
             if (afkSuffix != null) {
@@ -139,10 +141,12 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
         Pair<Integer, PlatformPlayerAdapter.Coordinates> timeVector = playersCoordinates.get(fPlayer.getUuid());
         if (timeVector == null || !timeVector.second().equals(coordinates)) {
 
-            if (fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX)) {
-                fPlayer.removeSetting(FPlayer.Setting.AFK_SUFFIX);
+            if (fPlayer.getSetting(SettingText.AFK_SUFFIX) != null) {
+                fPlayer.removeSetting(SettingText.AFK_SUFFIX);
+                fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.AFK_SUFFIX);
+
                 playersCoordinates.remove(fPlayer.getUuid());
-                fPlayerService.deleteSetting(fPlayer, FPlayer.Setting.AFK_SUFFIX);
+
                 send(fPlayer);
             }
 
@@ -150,7 +154,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
             return;
         }
 
-        if (fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX)) return;
+        if (fPlayer.getSetting(SettingText.AFK_SUFFIX) != null) return;
         if (time - timeVector.first() < message.getDelay()) return;
 
         setAfk(fPlayer);
@@ -159,7 +163,9 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
     public void setAfk(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        fPlayerService.saveOrUpdateSetting(fPlayer, FPlayer.Setting.AFK_SUFFIX, resolveLocalization().getSuffix());
+        fPlayer.setSetting(SettingText.AFK_SUFFIX, resolveLocalization().getSuffix());
+        fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.AFK_SUFFIX);
+
         send(fPlayer);
     }
 
@@ -167,11 +173,9 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
         if (isModuleDisabledFor(fPlayer)) return;
 
         Range range = message.getRange();
-        boolean isAfk = !fPlayer.isSetting(FPlayer.Setting.AFK_SUFFIX);
+        boolean isAfk = fPlayer.getSetting(SettingText.AFK_SUFFIX) == null;
 
         if (range.is(Range.Type.PLAYER)) {
-            if (!fPlayer.isSetting(FPlayer.Setting.AFK)) return;
-
             sendMessage(AFKMetadata.<Localization.Message.Afk>builder()
                     .sender(fPlayer)
                     .format(s -> isAfk
@@ -197,9 +201,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
                 .range(range)
                 .destination(message.getDestination())
                 .sound(getModuleSound())
-                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.AFK)
-                        && integrationModule.canSeeVanished(fPlayer, fReceiver)
-                )
+                .filter(fReceiver -> integrationModule.canSeeVanished(fPlayer, fReceiver))
                 .proxy(dataOutputStream -> dataOutputStream.writeBoolean(isAfk))
                 .integration()
                 .build()

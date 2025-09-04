@@ -72,7 +72,6 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
                 .destination(integration.getDestination())
                 .message(message)
                 .sound(getModuleSound())
-                .filter(fPlayer -> fPlayer.isSetting(FPlayer.Setting.DISCORD))
                 .integration(string -> Strings.CS.replace(string, "<name>", nickname))
                 .build()
         );

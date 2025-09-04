@@ -448,7 +448,6 @@ public class ProxyMessageHandler {
                 .destination(fileResolver.getCommand().getUnban().getDestination())
                 .range(Range.get(Range.Type.SERVER))
                 .sound(module.getModuleSound())
-                .filter(filter -> filter.isSetting(FPlayer.Setting.BAN))
                 .build()
         );
     }
@@ -470,7 +469,6 @@ public class ProxyMessageHandler {
                 .destination(fileResolver.getCommand().getUnmute().getDestination())
                 .range(Range.get(Range.Type.SERVER))
                 .sound(module.getModuleSound())
-                .filter(filter -> filter.isSetting(FPlayer.Setting.MUTE))
                 .build()
         );
     }
@@ -492,7 +490,6 @@ public class ProxyMessageHandler {
                 .destination(fileResolver.getCommand().getUnwarn().getDestination())
                 .range(Range.get(Range.Type.SERVER))
                 .sound(module.getModuleSound())
-                .filter(filter -> filter.isSetting(FPlayer.Setting.WARN))
                 .build()
         );
     }
@@ -536,11 +533,7 @@ public class ProxyMessageHandler {
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getCommand().getSpy().getDestination())
                 .message(string)
-                .filter(fReceiver -> !fEntity.equals(fReceiver)
-                        && !module.isModuleDisabledFor(fReceiver)
-                        && fReceiver.isSetting(FPlayer.Setting.SPY)
-                        && fReceiver.isOnline()
-                )
+                .filter(module.createFilter(fEntity instanceof FPlayer fPlayer ? fPlayer : FPlayer.UNKNOWN))
                 .build()
         );
     }
@@ -791,7 +784,6 @@ public class ProxyMessageHandler {
                 .destination(message.getDestination())
                 .range(Range.get(Range.Type.SERVER))
                 .sound(module.getModuleSound())
-                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.JOIN))
                 .build()
         );
     }
@@ -810,7 +802,6 @@ public class ProxyMessageHandler {
                 .destination(fileResolver.getMessage().getQuit().getDestination())
                 .range(Range.get(Range.Type.SERVER))
                 .sound(module.getModuleSound())
-                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.QUIT))
                 .build()
         );
     }
@@ -832,7 +823,6 @@ public class ProxyMessageHandler {
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getMessage().getAfk().getDestination())
                 .sound(module.getModuleSound())
-                .filter(fReceiver -> fReceiver.isSetting(FPlayer.Setting.AFK))
                 .build()
         );
     }

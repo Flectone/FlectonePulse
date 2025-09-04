@@ -8,6 +8,8 @@ import net.flectone.pulse.data.database.dao.ColorsDAO;
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
 import net.flectone.pulse.data.database.dao.SettingDAO;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.SettingText;
 
 import java.net.InetAddress;
 import java.util.List;
@@ -188,15 +190,15 @@ public class FPlayerRepository {
         settingDAO.save(fPlayer);
     }
 
-    public void deleteSetting(FPlayer fPlayer, FPlayer.Setting setting) {
-        settingDAO.delete(fPlayer, setting);
-    }
-
     public void loadSettings(FPlayer fPlayer) {
         settingDAO.load(fPlayer);
     }
 
-    public void saveOrUpdateSetting(FPlayer fPlayer, FPlayer.Setting setting) {
+    public void saveOrUpdateSetting(FPlayer fPlayer, MessageType setting) {
+        settingDAO.insertOrUpdate(fPlayer, setting);
+    }
+
+    public void saveOrUpdateSetting(FPlayer fPlayer, SettingText setting) {
         settingDAO.insertOrUpdate(fPlayer, setting);
     }
 }
