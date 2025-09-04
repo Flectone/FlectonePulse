@@ -133,12 +133,14 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 .filterPlayer(fPlayer)
                 .format(Localization.Command.Tictactoe::getSender)
                 .ticTacToe(ticTacToe)
+                .gamePhase(GamePhase.CREATE)
                 .sound(getModuleSound())
                 .build()
         );
 
         UUID metadataUUID = UUID.randomUUID();
         boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TICTACTOE, dataOutputStream -> {
+            dataOutputStream.writeUTF(GamePhase.CREATE.name());
             dataOutputStream.writeUTF(gson.toJson(fReceiver));
             dataOutputStream.writeInt(ticTacToe.getId());
             dataOutputStream.writeBoolean(isHard);
@@ -161,6 +163,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 .filterPlayer(fReceiver, true)
                 .format(message -> String.format(message.getReceiver(), ticTacToe.getId()))
                 .ticTacToe(ticTacToe)
+                .gamePhase(GamePhase.CREATE)
                 .sound(getModuleSound())
                 .build()
         );
@@ -173,18 +176,22 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 || !integrationModule.canSeeVanished(fReceiver, fPlayer)) return;
         if (ticTacToe == null) return;
 
-        sendMessage(metadataBuilder()
+        sendMessage(TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
                 .sender(fReceiver)
                 .filterPlayer(fPlayer, true)
                 .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
+                .ticTacToe(ticTacToe)
+                .gamePhase(GamePhase.MOVE)
                 .build()
         );
 
-        sendMessage(metadataBuilder()
+        sendMessage(TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
                 .uuid(metadataUUID)
                 .sender(fReceiver)
                 .filterPlayer(fReceiver)
                 .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
+                .ticTacToe(ticTacToe)
+                .gamePhase(GamePhase.MOVE)
                 .build()
         );
     }
@@ -249,7 +256,8 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         FPlayer finalFReceiver = fReceiver;
         UUID metadataUUID = UUID.randomUUID();
-        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TICTACTOE_MOVE, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TICTACTOE, dataOutputStream -> {
+            dataOutputStream.writeUTF(GamePhase.MOVE.name());
             dataOutputStream.writeUTF(gson.toJson(finalFReceiver));
             dataOutputStream.writeUTF(ticTacToe.toString());
             dataOutputStream.writeInt(typeTitle);
@@ -313,5 +321,10 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                     String.format(symbolEmpty, ticTacToe.getId())
             );
         };
+    }
+
+    public enum GamePhase {
+        CREATE,
+        MOVE
     }
 }

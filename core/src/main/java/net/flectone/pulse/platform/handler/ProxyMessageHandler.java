@@ -177,7 +177,6 @@ public class ProxyMessageHandler {
             case COMMAND_WARN -> handleWarnCommand(input, fEntity, metadataUUID);
             case COMMAND_KICK -> handleKickCommand(input, fEntity, metadataUUID);
             case COMMAND_TICTACTOE -> handleTicTacToeCreate(input, fEntity, metadataUUID);
-            case COMMAND_TICTACTOE_MOVE -> handleTicTacToeMove(input, fEntity, metadataUUID);
             case CHAT -> handleChatMessage(input, fEntity, metadataUUID);
             case COMMAND_CLEARCHAT -> handleClearchatCommand(fEntity);
             case COMMAND_ROCKPAPERSCISSORS -> handleRockPaperScissors(input, fEntity, metadataUUID);
@@ -660,29 +659,31 @@ public class ProxyMessageHandler {
     private void handleTicTacToeCreate(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
         if (!(fEntity instanceof FPlayer fPlayer)) return;
 
-        FPlayer fReceiver = gson.fromJson(input.readUTF(), FPlayer.class);
-        int ticTacToeId = input.readInt();
-        boolean isHard = input.readBoolean();
+        TictactoeModule.GamePhase gamePhase = TictactoeModule.GamePhase.valueOf(input.readUTF());
+        switch (gamePhase) {
+            case CREATE -> {
+                FPlayer fReceiver = gson.fromJson(input.readUTF(), FPlayer.class);
+                int ticTacToeId = input.readInt();
+                boolean isHard = input.readBoolean();
 
-        TictactoeManager tictactoeManager = injector.getInstance(TictactoeManager.class);
+                TictactoeManager tictactoeManager = injector.getInstance(TictactoeManager.class);
 
-        TicTacToe ticTacToe = tictactoeManager.get(ticTacToeId);
-        if (tictactoeManager.get(ticTacToeId) == null) {
-            ticTacToe = tictactoeManager.create(ticTacToeId, fPlayer, fReceiver, isHard);
+                TicTacToe ticTacToe = tictactoeManager.get(ticTacToeId);
+                if (tictactoeManager.get(ticTacToeId) == null) {
+                    ticTacToe = tictactoeManager.create(ticTacToeId, fPlayer, fReceiver, isHard);
+                }
+
+                injector.getInstance(TictactoeModule.class).sendCreateMessage(fPlayer, fReceiver, ticTacToe, metadataUUID);
+            }
+            case MOVE -> {
+                FPlayer fReceiver = gson.fromJson(input.readUTF(), FPlayer.class);
+                TicTacToe ticTacToe = injector.getInstance(TictactoeManager.class).fromString(input.readUTF());
+                int typeTitle = input.readInt();
+                String move = input.readUTF();
+
+                injector.getInstance(TictactoeModule.class).sendMoveMessage(fPlayer, fReceiver, ticTacToe, typeTitle, move, metadataUUID);
+            }
         }
-
-        injector.getInstance(TictactoeModule.class).sendCreateMessage(fPlayer, fReceiver, ticTacToe, metadataUUID);
-    }
-
-    private void handleTicTacToeMove(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
-        if (!(fEntity instanceof FPlayer fPlayer)) return;
-
-        FPlayer fReceiver = gson.fromJson(input.readUTF(), FPlayer.class);
-        TicTacToe ticTacToe = injector.getInstance(TictactoeManager.class).fromString(input.readUTF());
-        int typeTitle = input.readInt();
-        String move = input.readUTF();
-
-        injector.getInstance(TictactoeModule.class).sendMoveMessage(fPlayer, fReceiver, ticTacToe, typeTitle, move, metadataUUID);
     }
 
     private void handleChatMessage(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
