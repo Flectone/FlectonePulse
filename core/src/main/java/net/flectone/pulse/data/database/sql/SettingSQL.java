@@ -13,13 +13,13 @@ public interface SettingSQL extends SQL {
     @KeyColumn("type")
     @ValueColumn("value")
     @SqlQuery("SELECT `type`, `value` FROM `setting` WHERE `player` = :player")
-    Map<String, String> getSettings(@Bind("player") int playerId);
+    Map<String, String> findByPlayer(@Bind("player") int playerId);
 
     @SqlUpdate("INSERT INTO `setting` (`player`, `type`, `value`) VALUES (:player, :type, :value)")
-    void insertSetting(@Bind("player") int playerId, @Bind("type") String type, @Bind("value") String value);
+    void insert(@Bind("player") int playerId, @Bind("type") String type, @Bind("value") String value);
 
     @SqlUpdate("UPDATE `setting` SET `value` = :value WHERE `player` = :player AND `type` = :type")
-    int updateSetting(@Bind("player") int playerId, @Bind("type") String type, @Bind("value") String value);
+    int update(@Bind("player") int playerId, @Bind("type") String type, @Bind("value") String value);
 
 }
 

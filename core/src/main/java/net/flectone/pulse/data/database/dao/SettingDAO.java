@@ -35,9 +35,9 @@ public class SettingDAO extends BaseDAO<SettingSQL> {
     }
 
     private void insertOrUpdate(SettingSQL sql, FPlayer player, String type, String value) {
-        int updated = sql.updateSetting(player.getId(), type, value);
+        int updated = sql.update(player.getId(), type, value);
         if (updated == 0) {
-            sql.insertSetting(player.getId(), type, value);
+            sql.insert(player.getId(), type, value);
         }
     }
 
@@ -45,7 +45,7 @@ public class SettingDAO extends BaseDAO<SettingSQL> {
         player.getSettingsBoolean().clear();
         player.getSettingsText().clear();
 
-        useHandle(sql -> sql.getSettings(player.getId()).forEach((string, value) -> {
+        useHandle(sql -> sql.findByPlayer(player.getId()).forEach((string, value) -> {
             SettingText settingText = SettingText.fromString(string);
             if (settingText == null) {
                 try {
