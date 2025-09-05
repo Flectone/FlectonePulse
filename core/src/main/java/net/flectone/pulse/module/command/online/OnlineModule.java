@@ -98,7 +98,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
 
         FPlayer targetFPlayer = fPlayerService.getFPlayer(target);
         if (targetFPlayer.isUnknown()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Online::getNullPlayer)
                     .build()

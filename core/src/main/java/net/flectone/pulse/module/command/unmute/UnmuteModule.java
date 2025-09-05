@@ -86,7 +86,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unmute::getNullPlayer)
                     .build()
@@ -107,7 +107,7 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
         }
 
         if (mutes.isEmpty()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unmute::getNotMuted)
                     .build()

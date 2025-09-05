@@ -91,7 +91,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unban::getNullPlayer)
                     .build()
@@ -113,7 +113,7 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         }
 
         if (bans.isEmpty()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unban::getNotBanned)
                     .build()

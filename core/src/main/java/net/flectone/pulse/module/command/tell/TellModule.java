@@ -108,7 +108,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                 || !fReceiver.isOnline()
                 || !rangeFilter(fPlayer, range).test(fReceiver)
                 || !range.is(Range.Type.PROXY) && !platformPlayerAdapter.isOnline(fReceiver)) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tell::getNullPlayer)
                     .build()
@@ -137,7 +137,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
         FPlayer fNewReceiver = fPlayerService.getFPlayer(fReceiver.getUuid());
         if (!integrationModule.canSeeVanished(fNewReceiver, fPlayer)) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tell::getNullPlayer)
                     .build()

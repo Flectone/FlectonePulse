@@ -118,7 +118,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         Message.Chat.Type chatType = playerChat.second();
 
         if (chatType == null || !chatType.isEnable()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Message.Chat::getNullChat)
                     .build()
@@ -205,7 +205,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                 .count();
 
         if (chatRange.is(Range.Type.BLOCKS) || onlinePlayersCount == 0) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Message.Chat::getNullReceiver)
                     .destination(nullReceiver.getDestination())

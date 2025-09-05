@@ -88,7 +88,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
         long time = timeReasonPair.first() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.first();
         if (time < 1) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mute::getNullTime)
                     .build()
@@ -99,7 +99,7 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mute::getNullPlayer)
                     .build()

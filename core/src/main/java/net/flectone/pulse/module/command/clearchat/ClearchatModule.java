@@ -81,7 +81,7 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
 
             fTarget = fPlayerService.getFPlayer(player);
             if (fTarget.isUnknown()) {
-                sendMessage(MessageType.ERROR, metadataBuilder()
+                sendErrorMessage(metadataBuilder()
                         .sender(fPlayer)
                         .format(Localization.Command.Clearchat::getNullPlayer)
                         .build()

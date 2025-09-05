@@ -76,7 +76,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         String playerName = getArgument(commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
         if (fReceiver.isUnknown()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Mail::getNullPlayer)
                     .build()
@@ -87,7 +87,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
 
         if (fReceiver.isOnline() && integrationModule.canSeeVanished(fReceiver, fPlayer)) {
             if (!tellModule.isEnable()) {
-                sendMessage(MessageType.ERROR, metadataBuilder()
+                sendErrorMessage(metadataBuilder()
                         .sender(fPlayer)
                         .format(Localization.Command.Mail::getOnlinePlayer)
                         .build()

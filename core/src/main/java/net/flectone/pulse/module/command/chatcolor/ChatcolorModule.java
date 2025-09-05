@@ -99,7 +99,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         };
 
         if (fColorType.isEmpty() || !permissionChecker.check(fPlayer, permission.getColors().get(fColorType.get()))) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatcolor::getNullType)
                     .build()
@@ -148,7 +148,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         }
 
         if (newFColors.isEmpty()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatcolor::getNullColor)
                     .build()

@@ -77,7 +77,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
 
         List<Ignore> ignoreList = fPlayer.getIgnores();
         if (ignoreList.isEmpty()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ignorelist::getEmpty)
                     .build()
@@ -97,7 +97,7 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         Integer page = optionalPage.orElse(1);
 
         if (page > countPage || page < 1) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ignorelist::getNullPage)
                     .build()

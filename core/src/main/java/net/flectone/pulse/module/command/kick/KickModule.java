@@ -78,7 +78,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
         String playerName = getArgument(commandContext, 0);
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
         if (!fTarget.isOnline()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage( metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Kick::getNullPlayer)
                     .build()

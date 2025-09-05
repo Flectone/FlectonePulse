@@ -94,7 +94,7 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
 
         String translatedMessage = translate(fPlayer, mainLang, targetLang, messageToTranslate);
         if (translatedMessage.isEmpty()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Translateto::getNullOrError)
                     .build()

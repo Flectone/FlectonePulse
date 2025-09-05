@@ -72,7 +72,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
                     .noneMatch(online -> permissionChecker.check(online, permission.getSee()));
 
             if (nullHelper) {
-                sendMessage(MessageType.ERROR, metadataBuilder()
+                sendErrorMessage(metadataBuilder()
                         .sender(fPlayer)
                         .format(Localization.Command.Helper::getNullHelper)
                         .build()

@@ -53,7 +53,7 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
 
         String receiverName = tellModule.getSenderReceiverMap().get(fPlayer.getUuid());
         if (receiverName == null) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Reply::getNullReceiver)
                     .build()

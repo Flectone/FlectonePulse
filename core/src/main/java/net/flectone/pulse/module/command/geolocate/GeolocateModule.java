@@ -71,7 +71,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
         FPlayer fTarget = fPlayerService.getFPlayer(playerName);
 
         if (fTarget.isUnknown()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Geolocate::getNullPlayer)
                     .build()
@@ -84,7 +84,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
 
         List<String> response = ip == null ? List.of() : readResponse(Strings.CS.replace(apiUrl, "<ip>", ip));
         if (response.isEmpty() || response.get(0).equals("fail")) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Geolocate::getNullOrError)
                     .build()

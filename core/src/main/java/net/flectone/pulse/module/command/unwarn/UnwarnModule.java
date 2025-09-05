@@ -86,7 +86,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unwarn::getNullPlayer)
                     .build()
@@ -107,7 +107,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
         }
 
         if (warns.isEmpty()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Unwarn::getNotWarned)
                     .build()

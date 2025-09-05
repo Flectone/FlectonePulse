@@ -57,7 +57,7 @@ public class ChatsettingHandler {
                                MenuBuilder menuBuilder,
                                @Nullable String id) {
         if (!permissionChecker.check(fPlayer, permission.getSettings().get(SettingText.CHAT_NAME.name()))) {
-            chatsettingModule.sendMessage(MessageType.ERROR, chatsettingModule.metadataBuilder()
+            chatsettingModule.sendErrorMessage(chatsettingModule.metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatsetting::getNoPermission)
                     .build()

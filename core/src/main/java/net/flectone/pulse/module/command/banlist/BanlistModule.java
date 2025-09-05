@@ -111,7 +111,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
 
                 targetFPlayer = fPlayerService.getFPlayer(playerName);
                 if (targetFPlayer.isUnknown()) {
-                    sendMessage(MessageType.ERROR, metadataBuilder()
+                    sendErrorMessage(metadataBuilder()
                             .sender(fPlayer)
                             .format(Localization.Command.Banlist::getNullPlayer)
                             .build()
@@ -130,7 +130,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
                 : moderationService.getValidBans(targetFPlayer);
 
         if (moderationList.isEmpty()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Banlist::getEmpty)
                     .build()
@@ -144,7 +144,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Banlist::getNullPage)
                     .build()

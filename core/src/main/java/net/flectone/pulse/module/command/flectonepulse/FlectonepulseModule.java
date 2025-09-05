@@ -102,7 +102,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
         String type = getArgument(commandContext, 0);
         if (type.equalsIgnoreCase("editor")) {
             if (config.getHost().isEmpty()) {
-                sendMessage(MessageType.ERROR, metadataBuilder()
+                sendErrorMessage(metadataBuilder()
                         .sender(fPlayer)
                         .format(Localization.Command.Flectonepulse::getNullHostEditor)
                         .build()

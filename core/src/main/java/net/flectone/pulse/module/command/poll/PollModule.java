@@ -260,7 +260,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
         Poll poll = pollMap.get(id);
         if (poll == null) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Poll::getNullPoll)
                     .build()
@@ -270,7 +270,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         }
 
         if (poll.isEnded()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Poll::getExpired)
                     .build()
@@ -282,7 +282,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         int voteType = poll.vote(fPlayer, numberVote);
 
         if (voteType == -1) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Poll::getAlready)
                     .build()

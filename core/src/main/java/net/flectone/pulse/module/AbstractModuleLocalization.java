@@ -128,7 +128,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
 
         long timeLeft = cooldown.getTimeLeft(fPlayer);
 
-        sendMessage(MessageType.ERROR, metadataBuilder()
+        sendErrorMessage(metadataBuilder()
                 .sender(fPlayer)
                 .format(timeFormatter.format(fPlayer, timeLeft, getCooldownMessage(fPlayer)))
                 .build()
@@ -144,7 +144,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         MuteChecker.Status status = muteChecker.check(fPlayer);
         if (status == MuteChecker.Status.NONE) return false;
 
-        sendMessage(MessageType.ERROR, metadataBuilder()
+        sendErrorMessage(metadataBuilder()
                 .sender(fPlayer)
                 .format(moderationMessageFormatter.buildMuteMessage(fPlayer, status))
                 .build()
@@ -162,7 +162,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
             case SERVER -> localization.getServer();
         };
 
-        sendMessage(MessageType.ERROR, metadataBuilder()
+        sendErrorMessage(metadataBuilder()
                 .sender(fPlayer)
                 .format(format)
                 .build()
@@ -173,7 +173,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         Localization.Command.Ignore localization = fileResolver.getLocalization(fSender).getCommand().getIgnore();
 
         if (fSender.isIgnored(fReceiver)) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fSender)
                     .format(localization.getYou())
                     .build()
@@ -183,7 +183,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         }
 
         if (fReceiver.isIgnored(fSender)) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fSender)
                     .format(localization.getHe())
                     .build()
@@ -301,6 +301,10 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
                     eventMetadata
             ));
         });
+    }
+
+    public void sendErrorMessage(EventMetadata<M> eventMetadata) {
+        sendErrorMessage(eventMetadata);
     }
 
     private Component buildSubcomponent(FPlayer receiver, EventMetadata<M> eventMetadata, Component message) {

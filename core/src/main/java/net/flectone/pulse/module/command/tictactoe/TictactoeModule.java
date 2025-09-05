@@ -102,7 +102,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         FPlayer fReceiver = fPlayerService.getFPlayer(receiverName);
         if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tictactoe::getNullPlayer)
                     .build()
@@ -112,7 +112,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         }
 
         if (fReceiver.equals(fPlayer)) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tictactoe::getMyself)
                     .build()
@@ -202,7 +202,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
         TicTacToe ticTacToe = tictactoeManager.get(tictactoeID);
         if (ticTacToe == null || ticTacToe.isEnded() || !ticTacToe.contains(fPlayer) || (move.equals("create") && ticTacToe.isCreated())) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tictactoe::getWrongGame)
                     .build()
@@ -212,7 +212,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         }
 
         if (!ticTacToe.move(fPlayer, move)) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tictactoe::getWrongMove)
                     .build()
@@ -224,7 +224,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         FPlayer fReceiver = fPlayerService.getFPlayer(ticTacToe.getNextPlayer());
         if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
             ticTacToe.setEnded(true);
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tictactoe::getWrongByPlayer)
                     .build()

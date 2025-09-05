@@ -58,7 +58,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
         String targetName = getArgument(commandContext, 0);
 
         if (fPlayer.getName().equalsIgnoreCase(targetName)) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ignore::getMyself)
                     .build()
@@ -69,7 +69,7 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
 
         FPlayer fTarget = fPlayerService.getFPlayer(targetName);
         if (fTarget.isUnknown()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ignore::getNullPlayer)
                     .build()

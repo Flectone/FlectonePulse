@@ -57,7 +57,7 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
 
         UUID uuid = getArgument(commandContext, 0);
         if (!deleteModule.remove(fPlayer, uuid)) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Deletemessage::getNullMessage)
                     .build()

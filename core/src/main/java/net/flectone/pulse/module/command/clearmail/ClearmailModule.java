@@ -72,7 +72,7 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
                 .findAny();
 
         if (optionalMail.isEmpty()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Clearmail::getNullMail)
                     .build()

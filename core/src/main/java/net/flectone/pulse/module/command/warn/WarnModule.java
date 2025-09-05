@@ -95,7 +95,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         long time = timeReasonPair.first() == -1 ? Duration.ofHours(1).toMillis() : timeReasonPair.first();
 
         if (time < 1) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Warn::getNullTime)
                     .build()
@@ -106,7 +106,7 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Warn::getNullPlayer)
                     .build()

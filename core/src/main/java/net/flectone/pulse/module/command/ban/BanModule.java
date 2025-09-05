@@ -99,7 +99,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         String reason = timeReasonPair.second();
 
         if (time != -1 && time < 1) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ban::getNullTime)
                     .build()
@@ -116,7 +116,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
         FPlayer fTarget = fPlayerService.getFPlayer(target);
         if (fTarget.isUnknown()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Ban::getNullPlayer)
                     .build()

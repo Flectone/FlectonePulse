@@ -82,6 +82,10 @@ public class FileResolver {
                 migration_1_5_0();
             }
 
+            if (isVersionOlderThan(preInitVersion, "1.5.2")) {
+
+            }
+
             config.setVersion(BuildConfig.PROJECT_VERSION);
             config.save();
         }
@@ -214,5 +218,9 @@ public class FileResolver {
 
             localization.save();
         });
+    }
+
+    private void migration_1_5_2() {
+
     }
 }

@@ -102,7 +102,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         boolean isStream = fPlayer.getSetting(SettingText.STREAM_PREFIX) != null;
 
         if (isStream && needStart && !fPlayer.isUnknown()) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Stream::getAlready)
                     .build()
@@ -112,7 +112,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
         }
 
         if (!isStream && !needStart) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Stream::getNot)
                     .build()

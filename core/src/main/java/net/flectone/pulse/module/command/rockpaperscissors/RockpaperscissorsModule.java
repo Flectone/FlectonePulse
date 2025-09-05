@@ -85,7 +85,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         String player = getArgument(commandContext, 0);
         FPlayer fReceiver = fPlayerService.getFPlayer(player);
         if (!fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer)) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::getNullPlayer)
                     .build()
@@ -95,7 +95,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         }
 
         if (fReceiver.equals(fPlayer)) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::getMyself)
                     .build()
@@ -149,7 +149,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         List<String> strategy = command.getStrategies().get(move);
 
         if (strategy == null) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::getWrongMove)
                     .build()
@@ -161,7 +161,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         RockPaperScissors rockPaperScissors = gameMap.get(uuid);
 
         if (rockPaperScissors == null) {
-            sendMessage(MessageType.ERROR, metadataBuilder()
+            sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Rockpaperscissors::getNullGame)
                     .build()
@@ -172,7 +172,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         if (rockPaperScissors.getSenderMove() != null) {
             if (rockPaperScissors.getSender().equals(fPlayer.getUuid())) {
-                sendMessage(MessageType.ERROR, metadataBuilder()
+                sendErrorMessage(metadataBuilder()
                         .sender(fPlayer)
                         .format(Localization.Command.Rockpaperscissors::getAlready)
                         .build()
