@@ -34,7 +34,7 @@ public interface FPlayerSQL extends SQL {
     @SqlUpdate("UPDATE `player` SET `online` = 0")
     void updateAllToOffline();
 
-    @SqlQuery("SELECT * FROM `player` WHERE `online` = 1")
+    @SqlQuery("SELECT * FROM `player` WHERE `online` = true")
     List<FPlayerDAO.PlayerInfo> getOnlinePlayers();
 
     @SqlQuery("SELECT * FROM `player`")
