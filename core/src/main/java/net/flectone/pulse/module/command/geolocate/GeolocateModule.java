@@ -20,7 +20,8 @@ import org.incendo.cloud.context.CommandContext;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,14 +112,14 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
     private List<String> readResponse(String url) {
         List<String> arrayList = new ArrayList<>();
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader((new URL(url)).openStream()))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new URI(url).toURL().openStream()))) {
 
             String line;
             while((line = reader.readLine()) != null) {
                 arrayList.add(line);
             }
 
-        } catch (IOException ignored) {
+        } catch (IOException | URISyntaxException ignored) {
             // ignore, return empty list
         }
 

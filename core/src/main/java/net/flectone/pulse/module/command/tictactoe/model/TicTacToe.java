@@ -5,6 +5,8 @@ import lombok.Setter;
 import net.flectone.pulse.model.entity.FPlayer;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.Strings;
+import org.incendo.cloud.type.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -160,11 +162,11 @@ public class TicTacToe {
             return true;
         }
 
-        int[] rowColumn = parseMove(move);
+        Pair<Integer, Integer> rowColumn = parseMove(move);
         if (rowColumn == null) return false;
 
-        int row = rowColumn[0];
-        int column = rowColumn[1];
+        int row = rowColumn.first();
+        int column = rowColumn.second();
 
         if (field[row][column] != 0) {
             return false;
@@ -193,29 +195,27 @@ public class TicTacToe {
         if (moves.size() > 3) {
             String move = moves.poll();
 
-            int[] rowColumn = parseMove(move);
+            Pair<Integer, Integer> rowColumn = parseMove(move);
             if (rowColumn == null) return;
 
-            field[rowColumn[0]][rowColumn[1]] = 0;
+            field[rowColumn.first()][rowColumn.second()] = 0;
         }
 
         String nextRemove = moves.peek();
         if (nextRemove == null) return;
 
-        int[] rowColumn = parseMove(nextRemove);
+        Pair<Integer, Integer> rowColumn = parseMove(nextRemove);
         if (rowColumn == null) return;
 
-        field[rowColumn[0]][rowColumn[1]] = REMOVE_MULTIPLIER * currentPlayerValue;
+        field[rowColumn.first()][rowColumn.second()] = REMOVE_MULTIPLIER * currentPlayerValue;
     }
 
-    private int[] parseMove(String move) {
+    @Nullable
+    private Pair<Integer, Integer> parseMove(String move) {
         try {
             String[] stringMove = move.split("-");
 
-            return new int[]{
-                    Integer.parseInt(stringMove[0]),
-                    Integer.parseInt(stringMove[1])
-            };
+            return Pair.of(Integer.parseInt(stringMove[0]), Integer.parseInt(stringMove[1]));
         } catch (NumberFormatException ignored) {
             return null;
         }

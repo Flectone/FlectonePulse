@@ -7,6 +7,7 @@ import net.flectone.pulse.model.dto.MetricsDTO;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPOutputStream;
@@ -27,7 +28,7 @@ public class MetricsSender {
         try {
             String jsonData = gson.toJson(metrics);
 
-            URL url = new URL(apiUrl);
+            URL url = new URI(apiUrl).toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Length", String.valueOf(jsonData.getBytes(StandardCharsets.UTF_8).length));

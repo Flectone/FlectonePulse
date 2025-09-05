@@ -107,6 +107,7 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
             // send to console
             send(FPlayer.UNKNOWN);
         } catch (IOException | InterruptedException ignored) {
+            // ignore exception
         }
     }
 }

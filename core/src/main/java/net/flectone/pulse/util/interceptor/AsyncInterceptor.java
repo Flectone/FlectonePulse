@@ -53,7 +53,6 @@ public class AsyncInterceptor implements MethodInterceptor {
             invocation.proceed();
         } catch (Throwable e) {
             fLogger.warning(e);
-            e.printStackTrace();
         }
     }
 }

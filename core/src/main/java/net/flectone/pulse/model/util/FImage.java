@@ -6,8 +6,11 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -23,18 +26,18 @@ public class FImage {
 
     // Idea taken from here
     // https://github.com/QuiltServerTools/BlockBot/blob/5d5fa854002de2c12200edbe22f12382350ca7eb/src/main/kotlin/io/github/quiltservertools/blockbotdiscord/extensions/BlockBotApiExtension.kt#L136
-    public List<String> convertImageUrl() throws IOException {
-        URL url = new URL(urlString);
+    public List<String> convertImageUrl() throws IOException, URISyntaxException {
+        URL url = new URI(urlString).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty("User-Agent", "Mozilla/5.0");
 
         BufferedImage bufferedImage = ImageIO.read(connection.getInputStream());
-        if (bufferedImage == null) return null;
+        if (bufferedImage == null) return Collections.emptyList();
 
         int width = bufferedImage.getWidth();
         int height = bufferedImage.getHeight();
 
-        if (height * width >= 8 * 1024 * 1024) return null;
+        if (height * width >= 8 * 1024 * 1024) return Collections.emptyList();
 
         int stepSize = Math.max((int) Math.ceil(bufferedImage.getWidth() / 48.0), 1);
         int stepSquared = stepSize * stepSize;

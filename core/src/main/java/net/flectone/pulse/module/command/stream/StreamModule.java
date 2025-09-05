@@ -30,8 +30,8 @@ import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -183,7 +183,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
 
     private boolean isUrl(String string) {
         try {
-            new URL(string).toURI();
+            new URI(string).toURL();
             return true;
         } catch (MalformedURLException | URISyntaxException e) {
             return false;

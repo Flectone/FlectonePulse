@@ -35,6 +35,7 @@ import org.apache.commons.lang3.Strings;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -535,7 +536,6 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
             try {
                 List<String> pixels = fImage.convertImageUrl();
-                if (pixels == null) return component;
 
                 for (int i = 0; i < pixels.size(); i++) {
                     component = component
@@ -550,7 +550,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
                 imageCache.put(link, component);
 
-            } catch (IOException ignored) {
+            } catch (IOException | URISyntaxException ignored) {
                 // return empty component
             }
 

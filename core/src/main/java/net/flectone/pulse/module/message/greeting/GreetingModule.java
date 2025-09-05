@@ -18,6 +18,7 @@ import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.Strings;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @Singleton
@@ -81,7 +82,7 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
                     .build()
             );
 
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             fLogger.warning(e);
         }
     }

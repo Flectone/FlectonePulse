@@ -53,7 +53,6 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, ModInitializer,
 		} catch (RuntimeException e) {
 			fLogger.warning("FAILED TO ENABLE");
 			fLogger.warning(e);
-			e.printStackTrace();
 			return;
 		}
 

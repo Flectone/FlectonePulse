@@ -129,9 +129,8 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
 
             return getMessage(uuid);
         } catch (IllegalArgumentException ignored) {
+            return null;
         }
-
-        return null;
     }
 
     @Nullable

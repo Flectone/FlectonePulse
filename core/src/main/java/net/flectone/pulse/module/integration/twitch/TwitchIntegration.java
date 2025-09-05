@@ -30,7 +30,6 @@ public class TwitchIntegration implements FIntegration {
     private final SystemVariableResolver systemVariableResolver;
     private final FLogger fLogger;
 
-    private OAuth2Credential oAuth2Credential;
     private TwitchClient twitchClient;
 
     @Inject
@@ -54,7 +53,7 @@ public class TwitchIntegration implements FIntegration {
         String identityProvider = systemVariableResolver.substituteEnvVars(integration.getClientID());
         if (token.isEmpty() || identityProvider.isEmpty()) return;
 
-        oAuth2Credential = new OAuth2Credential(identityProvider, token);
+        OAuth2Credential oAuth2Credential = new OAuth2Credential(identityProvider, token);
         twitchClient = TwitchClientBuilder.builder()
                 .withEnableChat(true)
                 .withEnableEventSocket(true)

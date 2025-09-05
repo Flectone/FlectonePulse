@@ -24,9 +24,7 @@ import org.incendo.cloud.suggestion.Suggestion;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
@@ -138,8 +136,8 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
     public String googleTranslate(String source, String lang, String text) {
         try {
             text = URLEncoder.encode(text, StandardCharsets.UTF_8);
-            URL url = new URL("http://translate.googleapis.com/translate_a/single?client=gtx&sl=" + source + "&tl="
-                    + lang + "&dt=t&q=" + text + "&ie=UTF-8&oe=UTF-8");
+            URL url = new URI("http://translate.googleapis.com/translate_a/single?client=gtx&sl=" + source + "&tl="
+                    + lang + "&dt=t&q=" + text + "&ie=UTF-8&oe=UTF-8").toURL();
 
             URLConnection uc = url.openConnection();
             uc.setRequestProperty("User-Agent", "Mozilla/5.0");
@@ -156,10 +154,10 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
             String jsonResponse = text;
             int startIndex = jsonResponse.indexOf("\"") + 1;
             int endIndex = jsonResponse.indexOf("\"", startIndex);
+
             return jsonResponse.substring(startIndex, endIndex);
-
-        } catch (IOException ignored) {}
-
-        return "";
+        } catch (IOException | URISyntaxException ignored) {
+            return "";
+        }
     }
 }

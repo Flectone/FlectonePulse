@@ -14,7 +14,6 @@ public class FabricProxyRegistry extends ProxyRegistry {
 
     private final FileResolver fileResolver;
     private final Injector injector;
-    private final FLogger fLogger;
 
     @Inject
     public FabricProxyRegistry(FileResolver fileResolver,
@@ -25,7 +24,6 @@ public class FabricProxyRegistry extends ProxyRegistry {
 
         this.fileResolver = fileResolver;
         this.injector = injector;
-        this.fLogger = fLogger;
     }
 
     @Override

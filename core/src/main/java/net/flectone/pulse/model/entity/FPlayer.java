@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Getter
 public class FPlayer extends FEntity {
 
-    public static final FPlayer UNKNOWN = new FPlayer(FEntity.unknownName);
+    public static final FPlayer UNKNOWN = new FPlayer(FEntity.UNKNOWN_NAME);
 
     private final int id;
     private final Map<FColor.Type, Set<FColor>> fColors = new EnumMap<>(FColor.Type.class);
@@ -49,7 +49,7 @@ public class FPlayer extends FEntity {
     }
 
     public FPlayer(String name) {
-        this(-1, name, FEntity.unknownUUID, "unknown");
+        this(-1, name, FEntity.UNKNOWN_UUID, "unknown");
     }
 
     @Override

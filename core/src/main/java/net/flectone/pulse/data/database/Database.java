@@ -4,7 +4,6 @@ package net.flectone.pulse.data.database;
 import com.alessiodp.libby.Library;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.zaxxer.hikari.HikariConfig;
@@ -41,7 +40,6 @@ public class Database {
 
     private final Config.Database config;
 
-    private final Injector injector;
     private final FileResolver fileResolver;
     private final Path projectPath;
     private final SystemVariableResolver systemVariableResolver;
@@ -55,7 +53,6 @@ public class Database {
 
     @Inject
     public Database(FileResolver fileResolver,
-                    Injector injector,
                     @Named("projectPath") Path projectPath,
                     SystemVariableResolver systemVariableResolver,
                     PlatformServerAdapter platformServerAdapter,
@@ -63,7 +60,6 @@ public class Database {
                     PacketProvider packetProvider,
                     ReflectionResolver reflectionResolver) {
         this.config = fileResolver.getConfig().getDatabase();
-        this.injector = injector;
         this.fileResolver = fileResolver;
         this.projectPath = projectPath;
         this.systemVariableResolver = systemVariableResolver;
