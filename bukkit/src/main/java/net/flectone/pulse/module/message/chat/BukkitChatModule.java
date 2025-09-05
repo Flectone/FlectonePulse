@@ -12,6 +12,9 @@ import net.flectone.pulse.module.message.chat.listener.ChatPaperListener;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
+import net.flectone.pulse.platform.sender.CooldownSender;
+import net.flectone.pulse.platform.sender.DisableSender;
+import net.flectone.pulse.platform.sender.MuteSender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
@@ -39,9 +42,13 @@ public class BukkitChatModule extends ChatModule {
                                Provider<SpyModule> spyModuleProvider,
                                BukkitListenerRegistry listenerRegistry,
                                ReflectionResolver reflectionResolver,
+                               MuteSender muteSender,
+                               DisableSender disableSender,
+                               CooldownSender cooldownSender,
                                FLogger fLogger) {
         super(fileResolver, fPlayerService, platformPlayerAdapter, platformServerAdapter, permissionChecker,
-                integrationModule, bubbleModuleProvider, spyModuleProvider, listenerRegistry);
+                integrationModule, bubbleModuleProvider, spyModuleProvider, listenerRegistry, muteSender,
+                disableSender, cooldownSender);
 
         this.message = fileResolver.getMessage().getChat();
         this.fPlayerService = fPlayerService;

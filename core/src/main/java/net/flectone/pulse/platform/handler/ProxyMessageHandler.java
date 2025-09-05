@@ -57,6 +57,7 @@ import net.flectone.pulse.module.message.advancement.model.ChatAdvancement;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.afk.model.AFKMetadata;
 import net.flectone.pulse.module.message.chat.ChatModule;
+import net.flectone.pulse.module.message.chat.model.ChatMetadata;
 import net.flectone.pulse.module.message.death.DeathModule;
 import net.flectone.pulse.module.message.death.model.Death;
 import net.flectone.pulse.module.message.death.model.DeathMetadata;
@@ -76,10 +77,7 @@ import org.apache.commons.lang3.Strings;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Singleton
 public class ProxyMessageHandler {
@@ -688,11 +686,38 @@ public class ProxyMessageHandler {
     }
 
     private void handleChatMessage(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
-        String chat = input.readUTF();
+        String proxyChatName = input.readUTF();
         String message = input.readUTF();
 
         FPlayer fPlayer = fPlayerService.getFPlayer(fEntity.getUuid());
-        injector.getInstance(ChatModule.class).send(fPlayer, chat, message, metadataUUID);
+
+        ChatModule chatModule = injector.getInstance(ChatModule.class);
+        if (chatModule.isModuleDisabledFor(fPlayer)) return;
+
+        Optional<Map.Entry<String, Message.Chat.Type>> optionalChat = fileResolver.getMessage().getChat().getTypes()
+                .entrySet()
+                .stream()
+                .filter(chat -> chat.getKey().equals(proxyChatName))
+                .findAny();
+
+        if (optionalChat.isEmpty()) return;
+
+        String chatName = optionalChat.get().getKey();
+        Message.Chat.Type chatType = optionalChat.get().getValue();
+
+        chatModule.sendMessage(ChatMetadata.<Localization.Message.Chat>builder()
+                .uuid(metadataUUID)
+                .sender(fPlayer)
+                .format(s -> s.getTypes().get(chatName))
+                .chatName(chatName)
+                .chatType(chatType)
+                .range(Range.get(Range.Type.SERVER))
+                .destination(chatType.getDestination())
+                .message(message)
+                .sound(chatModule.getModuleSound())
+                .filter(chatModule.permissionFilter(chatName))
+                .build()
+        );
     }
 
     private void handleClearchatCommand(FEntity fEntity) {
