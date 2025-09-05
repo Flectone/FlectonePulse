@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS `mail` (
 	`sender` INTEGER NOT NULL,
 	`receiver` INTEGER NOT NULL,
 	`message` TEXT NOT NULL,
+    `valid` INTEGER NOT NULL DEFAULT '1',
 FOREIGN KEY(`sender`) REFERENCES `player`(`id`),
 FOREIGN KEY(`receiver`) REFERENCES `player`(`id`)
 );

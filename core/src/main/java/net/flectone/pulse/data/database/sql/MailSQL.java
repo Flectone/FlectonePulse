@@ -10,17 +10,17 @@ import java.util.List;
 
 public interface MailSQL extends SQL {
 
-    @SqlUpdate("INSERT INTO `mail` (`date`, `sender`, `receiver`, `message`) VALUES (:date, :sender, :receiver, :message)")
     @GetGeneratedKeys("id")
+    @SqlUpdate("INSERT INTO `mail` (`date`, `sender`, `receiver`, `message`) VALUES (:date, :sender, :receiver, :message)")
     int insert(@Bind("date") long date, @Bind("sender") int senderId, @Bind("receiver") int receiverId, @Bind("message") String message);
 
-    @SqlUpdate("DELETE FROM `mail` WHERE `id` = :id")
-    void delete(@Bind("id") int id);
+    @SqlUpdate("UPDATE `mail` SET `valid` = false WHERE `id` = :id")
+    void invalidate(@Bind("id") int id);
 
-    @SqlQuery("SELECT * FROM `mail` WHERE `receiver` = :receiver")
+    @SqlQuery("SELECT * FROM `mail` WHERE `receiver` = :receiver AND `valid` = true")
     List<Mail> findByReceiver(@Bind("receiver") int receiverId);
 
-    @SqlQuery("SELECT * FROM `mail` WHERE `sender` = :sender")
+    @SqlQuery("SELECT * FROM `mail` WHERE `sender` = :sender AND `valid` = true")
     List<Mail> findBySender(@Bind("sender") int senderId);
 
 }

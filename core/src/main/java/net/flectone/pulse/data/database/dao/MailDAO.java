@@ -37,7 +37,7 @@ public class MailDAO extends BaseDAO<MailSQL> {
     }
 
     public void delete(Mail mail) {
-        useHandle(sql -> sql.delete(mail.id()));
+        useHandle(sql -> sql.invalidate(mail.id()));
     }
 
     public List<Mail> getReceiver(FPlayer fPlayer) {
