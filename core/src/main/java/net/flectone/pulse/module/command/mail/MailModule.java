@@ -15,6 +15,8 @@ import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.sender.DisableSender;
+import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
@@ -31,6 +33,8 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
     private final ListenerRegistry listenerRegistry;
+    private final IgnoreSender ignoreSender;
+    private final DisableSender disableSender;
 
     @Inject
     public MailModule(FileResolver fileResolver,
@@ -38,7 +42,9 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
                       IntegrationModule integrationModule,
                       FPlayerService fPlayerService,
                       CommandParserProvider commandParserProvider,
-                      ListenerRegistry listenerRegistry) {
+                      ListenerRegistry listenerRegistry,
+                      IgnoreSender ignoreSender,
+                      DisableSender disableSender) {
         super(localization -> localization.getCommand().getMail(), Command::getMail, MessageType.COMMAND_MAIL);
 
         this.command = fileResolver.getCommand().getMail();
@@ -48,6 +54,8 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         this.fPlayerService = fPlayerService;
         this.commandParserProvider = commandParserProvider;
         this.listenerRegistry = listenerRegistry;
+        this.ignoreSender = ignoreSender;
+        this.disableSender = disableSender;
     }
 
     @Override
@@ -99,10 +107,11 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
             return;
         }
 
-        fPlayerService.loadIgnores(fReceiver);
+        fPlayerService.loadIgnoresIfOffline(fReceiver);
+        if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
 
-        if (checkIgnore(fPlayer, fReceiver)) return;
-        if (checkDisable(fPlayer, fReceiver)) return;
+        fPlayerService.loadSettingsIfOffline(fReceiver);
+        if (disableSender.sendIfDisabled(fPlayer, fReceiver, getMessageType())) return;
 
         String message = getArgument(commandContext, 1);
 

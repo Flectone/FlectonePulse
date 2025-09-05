@@ -12,7 +12,10 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.filter.RangeFilter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.sender.DisableSender;
+import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
@@ -35,6 +38,9 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
     private final IntegrationModule integrationModule;
     private final CommandParserProvider commandParserProvider;
     private final PlatformPlayerAdapter platformPlayerAdapter;
+    private final RangeFilter rangeFilter;
+    private final IgnoreSender ignoreSender;
+    private final DisableSender disableSender;
 
     @Inject
     public TellModule(FileResolver fileResolver,
@@ -42,7 +48,10 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                       ProxySender proxySender,
                       IntegrationModule integrationModule,
                       CommandParserProvider commandParserProvider,
-                      PlatformPlayerAdapter platformPlayerAdapter) {
+                      PlatformPlayerAdapter platformPlayerAdapter,
+                      RangeFilter rangeFilter,
+                      IgnoreSender ignoreSender,
+                      DisableSender disableSender) {
         super(localization -> localization.getCommand().getTell(), Command::getTell, MessageType.COMMAND_TELL);
 
         this.command = fileResolver.getCommand().getTell();
@@ -52,6 +61,9 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         this.integrationModule = integrationModule;
         this.commandParserProvider = commandParserProvider;
         this.platformPlayerAdapter = platformPlayerAdapter;
+        this.rangeFilter = rangeFilter;
+        this.ignoreSender = ignoreSender;
+        this.disableSender = disableSender;
     }
 
     @Override
@@ -105,7 +117,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
         if (fReceiver.isUnknown()
                 || !fReceiver.isOnline()
-                || !rangeFilter(fPlayer, range).test(fReceiver)
+                || !rangeFilter.createFilter(fPlayer, range).test(fReceiver)
                 || !range.is(Range.Type.PROXY) && !platformPlayerAdapter.isOnline(fReceiver)) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
@@ -116,15 +128,16 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
             return;
         }
 
-        fPlayerService.loadIgnores(fPlayer);
+        fPlayerService.loadIgnoresIfOffline(fReceiver);
+        if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
 
-        if (checkIgnore(fPlayer, fReceiver)) return;
-        if (checkDisable(fPlayer, fReceiver)) return;
+        fPlayerService.loadSettingsIfOffline(fReceiver);
+        if (disableSender.sendIfDisabled(fPlayer, fReceiver, getMessageType())) return;
 
         String receiverUUID = fReceiver.getUuid().toString();
 
         UUID metadataUUID = UUID.randomUUID();
-        boolean isSent = proxySender.send(fPlayer, MessageType.COMMAND_TELL, dataOutputStream -> {
+        boolean isSent = proxySender.send(fPlayer, getMessageType(), dataOutputStream -> {
             dataOutputStream.writeUTF(receiverUUID);
             dataOutputStream.writeUTF(message);
         }, metadataUUID);

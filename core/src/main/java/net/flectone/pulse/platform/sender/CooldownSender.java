@@ -1,0 +1,59 @@
+package net.flectone.pulse.platform.sender;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.flectone.pulse.execution.dispatcher.EventDispatcher;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.MessageSendEvent;
+import net.flectone.pulse.model.util.Cooldown;
+import net.flectone.pulse.platform.formatter.TimeFormatter;
+import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
+
+@Singleton
+public class CooldownSender {
+
+    private final PermissionChecker permissionChecker;
+    private final MessagePipeline messagePipeline;
+    private final TimeFormatter timeFormatter;
+    private final EventDispatcher eventDispatcher;
+    private final FileResolver fileResolver;
+
+    @Inject
+    public CooldownSender(PermissionChecker permissionChecker,
+                          MessagePipeline messagePipeline,
+                          TimeFormatter timeFormatter,
+                          EventDispatcher eventDispatcher,
+                          FileResolver fileResolver) {
+        this.permissionChecker = permissionChecker;
+        this.messagePipeline = messagePipeline;
+        this.timeFormatter = timeFormatter;
+        this.eventDispatcher = eventDispatcher;
+        this.fileResolver = fileResolver;
+    }
+
+    public boolean sendIfCooldown(FEntity entity, @Nullable Cooldown cooldown) {
+        if (cooldown == null) return false;
+        if (!cooldown.isEnable()) return false;
+
+        // skip message for entities
+        if (!(entity instanceof FPlayer fPlayer)) return false;
+
+        if (permissionChecker.check(fPlayer, cooldown.getPermissionBypass())) return false;
+        if (!cooldown.isCooldown(fPlayer.getUuid())) return false;
+
+        long timeLeft = cooldown.getTimeLeft(fPlayer);
+        String cooldownMessage = timeFormatter.format(fPlayer, timeLeft, fileResolver.getLocalization(entity).getCooldown());
+        Component component = messagePipeline.builder(fPlayer, cooldownMessage).build();
+
+        eventDispatcher.dispatch(new MessageSendEvent(MessageType.ERROR, fPlayer, component));
+
+        return true;
+    }
+
+}

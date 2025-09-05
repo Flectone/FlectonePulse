@@ -14,42 +14,36 @@ import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.PreMessageSendEvent;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Destination;
-import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.model.util.Sound;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.formatter.ModerationMessageFormatter;
-import net.flectone.pulse.platform.formatter.TimeFormatter;
+import net.flectone.pulse.platform.filter.RangeFilter;
+import net.flectone.pulse.platform.sender.CooldownSender;
+import net.flectone.pulse.platform.sender.DisableSender;
+import net.flectone.pulse.platform.sender.MuteSender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.checker.MuteChecker;
-import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public abstract class AbstractModuleLocalization<M extends Localization.Localizable> extends AbstractModule {
 
     private final Function<Localization, M> localizationFunction;
-    private final MessageType messageType;
+    @Getter private final MessageType messageType;
 
     @Inject private FPlayerService fPlayerService;
-    @Inject private PlatformPlayerAdapter platformPlayerAdapter;
-    @Inject private PermissionChecker permissionChecker;
-    @Inject private MuteChecker muteChecker;
+    @Inject private CooldownSender cooldownSender;
+    @Inject private DisableSender disableSender;
+    @Inject private MuteSender muteSender;
     @Inject private FileResolver fileResolver;
+    @Inject private RangeFilter rangeFilter;
     @Inject private MessagePipeline messagePipeline;
-    @Inject private ModerationMessageFormatter moderationMessageFormatter;
-    @Inject private TimeFormatter timeFormatter;
     @Inject private EventDispatcher eventDispatcher;
 
     @Getter private Cooldown moduleCooldown;
@@ -64,9 +58,9 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     protected void addDefaultPredicates() {
         super.addDefaultPredicates();
 
-        addPredicate((fPlayer, needBoolean) -> needBoolean && checkDisable(fPlayer));
-        addPredicate((fPlayer, needBoolean) -> needBoolean && checkCooldown(fPlayer));
-        addPredicate((fPlayer, needBoolean) -> needBoolean && checkMute(fPlayer));
+        addPredicate((fPlayer, needBoolean) -> needBoolean && disableSender.sendIfDisabled(fPlayer, fPlayer, messageType));
+        addPredicate((fPlayer, needBoolean) -> needBoolean && cooldownSender.sendIfCooldown(fPlayer, getModuleCooldown()));
+        addPredicate((fPlayer, needBoolean) -> needBoolean && muteSender.sendIfMuted(fPlayer));
     }
 
     public Sound createSound(Sound sound, Permission.IPermission permission) {
@@ -91,148 +85,12 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         return this.moduleCooldown;
     }
 
-    public String getCooldownMessage(FEntity sender) {
-        return fileResolver.getLocalization(sender).getCooldown();
-    }
-
     public M resolveLocalization() {
         return localizationFunction.apply(fileResolver.getLocalization());
     }
 
     public M resolveLocalization(FEntity sender) {
         return localizationFunction.apply(fileResolver.getLocalization(sender));
-    }
-
-    public boolean checkDisable(FEntity player) {
-        return checkDisable(player, player);
-    }
-
-    public boolean checkDisable(FEntity player, @NotNull FEntity receiver) {
-        if (!(receiver instanceof FPlayer fReceiver)) return false;
-        if (fReceiver.isUnknown()) return false;
-        if (fReceiver.isSetting(messageType)) return false;
-
-        Localization.Command.Chatsetting localization = fileResolver.getLocalization(fReceiver).getCommand().getChatsetting();
-
-        String format = player.equals(fReceiver)
-                ? localization.getDisabledSelf()
-                : localization.getDisabledOther();
-
-        sendErrorMessage(metadataBuilder()
-                .sender(player)
-                .format(format)
-                .build()
-        );
-
-        return true;
-    }
-
-    public boolean checkCooldown(FEntity entity) {
-        return checkCooldown(entity, getModuleCooldown());
-    }
-
-    public boolean checkCooldown(FEntity entity, @Nullable Cooldown cooldown) {
-        if (cooldown == null) return false;
-        if (!cooldown.isEnable()) return false;
-        if (!(entity instanceof FPlayer fPlayer)) return false;
-        if (fPlayer.isUnknown()) return false;
-        if (permissionChecker.check(fPlayer, cooldown.getPermissionBypass())) return false;
-        if (!cooldown.isCooldown(fPlayer.getUuid())) return false;
-
-        long timeLeft = cooldown.getTimeLeft(fPlayer);
-
-        sendErrorMessage(metadataBuilder()
-                .sender(fPlayer)
-                .format(timeFormatter.format(fPlayer, timeLeft, getCooldownMessage(fPlayer)))
-                .build()
-        );
-
-        return true;
-    }
-
-    public boolean checkMute(@NotNull FEntity entity) {
-        if (!(entity instanceof FPlayer fPlayer)) return false;
-        if (fPlayer.isUnknown()) return false;
-
-        MuteChecker.Status status = muteChecker.check(fPlayer);
-        if (status == MuteChecker.Status.NONE) return false;
-
-        sendErrorMessage(metadataBuilder()
-                .sender(fPlayer)
-                .format(moderationMessageFormatter.buildMuteMessage(fPlayer, status))
-                .build()
-        );
-
-        return true;
-    }
-
-    public boolean checkIgnore(FPlayer fSender, FPlayer fReceiver) {
-        Localization.Command.Ignore localization = fileResolver.getLocalization(fSender).getCommand().getIgnore();
-
-        if (fSender.isIgnored(fReceiver)) {
-            sendErrorMessage(metadataBuilder()
-                    .sender(fSender)
-                    .format(localization.getYou())
-                    .build()
-            );
-
-            return true;
-        }
-
-        if (fReceiver.isIgnored(fSender)) {
-            sendErrorMessage(metadataBuilder()
-                    .sender(fSender)
-                    .format(localization.getHe())
-                    .build()
-            );
-
-            return true;
-        }
-
-        return false;
-    }
-
-    public Predicate<FPlayer> rangeFilter(FPlayer filterPlayer, Range range) {
-        if (range.is(Range.Type.PLAYER)) {
-            return filterPlayer::equals;
-        }
-
-        if (!(filterPlayer instanceof FPlayer fPlayer) || fPlayer.isUnknown()) {
-            return player -> true;
-        }
-
-        return createRangePredicate(fPlayer, range);
-    }
-
-    private Predicate<FPlayer> createRangePredicate(FPlayer fPlayer, Range range) {
-        return fReceiver -> {
-            if (fReceiver.isUnknown()) return true;
-            if (fReceiver.isIgnored(fPlayer)) return false;
-
-            return switch (range.getType()) {
-                case BLOCKS -> checkDistance(fPlayer, fReceiver, range.getValue());
-                case WORLD_NAME -> checkWorldNamePermission(fPlayer, fReceiver);
-                case WORLD_TYPE -> checkWorldTypePermission(fPlayer, fReceiver);
-                default -> true;
-            };
-        };
-    }
-
-    private boolean checkDistance(FPlayer fPlayer, FPlayer fReceiver, int range) {
-        double distance = platformPlayerAdapter.distance(fPlayer, fReceiver);
-        return distance != -1.0 && distance <= range;
-    }
-
-    private boolean checkWorldNamePermission(FPlayer fPlayer, FPlayer fReceiver) {
-        String worldName = platformPlayerAdapter.getWorldName(fPlayer);
-        if (worldName.isEmpty()) return true;
-        return permissionChecker.check(fReceiver, "flectonepulse.world.name." + worldName);
-    }
-
-    private boolean checkWorldTypePermission(FPlayer fPlayer, FPlayer fReceiver) {
-        String worldType = platformPlayerAdapter.getWorldEnvironment(fPlayer);
-        if (worldType.isEmpty()) return true;
-        return permissionChecker.check(fReceiver, "flectonepulse.world.type." + worldType);
     }
 
     @SuppressWarnings("unchecked")
@@ -252,7 +110,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
 
         return fPlayerService.getFPlayersWithConsole().stream()
                 .filter(eventMetadata.getFilter())
-                .filter(rangeFilter(filterPlayer, eventMetadata.getRange()))
+                .filter(rangeFilter.createFilter(filterPlayer, eventMetadata.getRange()))
                 .filter(fReceiver -> fReceiver.isSetting(messageType))
                 .toList();
     }

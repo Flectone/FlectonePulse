@@ -12,6 +12,8 @@ import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScisso
 import net.flectone.pulse.module.command.rockpaperscissors.model.RockPaperScissorsMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.sender.DisableSender;
+import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
@@ -35,13 +37,17 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
     private final IntegrationModule integrationModule;
+    private final IgnoreSender ignoreSender;
+    private final DisableSender disableSender;
 
     @Inject
     public RockpaperscissorsModule(FileResolver fileResolver,
                                    ProxySender proxySender,
                                    FPlayerService fPlayerService,
                                    CommandParserProvider commandParserProvider,
-                                   IntegrationModule integrationModule) {
+                                   IntegrationModule integrationModule,
+                                   IgnoreSender ignoreSender,
+                                   DisableSender disableSender) {
         super(localization -> localization.getCommand().getRockpaperscissors(), Command::getRockpaperscissors, MessageType.COMMAND_ROCKPAPERSCISSORS);
 
         this.command = fileResolver.getCommand().getRockpaperscissors();
@@ -50,6 +56,8 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         this.fPlayerService = fPlayerService;
         this.commandParserProvider = commandParserProvider;
         this.integrationModule = integrationModule;
+        this.ignoreSender = ignoreSender;
+        this.disableSender = disableSender;
     }
 
     @Override
@@ -103,10 +111,11 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
             return;
         }
 
-        fPlayerService.loadIgnores(fReceiver);
+        fPlayerService.loadIgnoresIfOffline(fReceiver);
+        if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
 
-        if (checkIgnore(fPlayer, fReceiver)) return;
-        if (checkDisable(fPlayer, fReceiver)) return;
+        fPlayerService.loadSettingsIfOffline(fReceiver);
+        if (disableSender.sendIfDisabled(fPlayer, fReceiver, getMessageType())) return;
 
         String promptMove = getPrompt(1);
         Optional<String> optionalMove = commandContext.optional(promptMove);

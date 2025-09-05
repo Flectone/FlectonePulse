@@ -13,6 +13,8 @@ import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToeMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.sender.DisableSender;
+import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
@@ -35,6 +37,8 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
     private final IntegrationModule integrationModule;
     private final CommandParserProvider commandParserProvider;
     private final Gson gson;
+    private final IgnoreSender ignoreSender;
+    private final DisableSender disableSender;
 
     @Inject
     public TictactoeModule(FileResolver fileResolver,
@@ -43,7 +47,9 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                            ProxySender proxySender,
                            IntegrationModule integrationModule,
                            CommandParserProvider commandParserProvider,
-                           Gson gson) {
+                           Gson gson,
+                           IgnoreSender ignoreSender,
+                           DisableSender disableSender) {
         super(localization -> localization.getCommand().getTictactoe(), Command::getTictactoe, MessageType.COMMAND_TICTACTOE);
 
         this.command = fileResolver.getCommand().getTictactoe();
@@ -54,6 +60,8 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         this.integrationModule = integrationModule;
         this.commandParserProvider = commandParserProvider;
         this.gson = gson;
+        this.ignoreSender = ignoreSender;
+        this.disableSender = disableSender;
     }
 
     @Override
@@ -120,10 +128,11 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
             return;
         }
 
-        fPlayerService.loadIgnores(fPlayer);
+        fPlayerService.loadIgnoresIfOffline(fReceiver);
+        if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
 
-        if (checkIgnore(fPlayer, fReceiver)) return;
-        if (checkDisable(fPlayer, fReceiver)) return;
+        fPlayerService.loadSettingsIfOffline(fReceiver);
+        if (disableSender.sendIfDisabled(fPlayer, fReceiver, getMessageType())) return;
 
         TicTacToe ticTacToe = tictactoeManager.create(fPlayer, fReceiver, isHard);
 
