@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS `ignore` (
 	`date` REAL NOT NULL,
 	`initiator` INTEGER NOT NULL,
 	`target` INTEGER NOT NULL,
+    `valid` INTEGER NOT NULL DEFAULT '1',
 FOREIGN KEY(`initiator`) REFERENCES `player`(`id`),
 FOREIGN KEY(`target`) REFERENCES `player`(`id`)
 );

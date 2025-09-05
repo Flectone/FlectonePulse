@@ -7,17 +7,24 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IgnoreSQL extends SQL {
 
-    @SqlUpdate("INSERT INTO `ignore` (`date`, `initiator`, `target`) VALUES (:date, :initiator, :target)")
     @GetGeneratedKeys("id")
+    @SqlUpdate("INSERT INTO `ignore` (`date`, `initiator`, `target`) VALUES (:date, :initiator, :target)")
     int insert(@Bind("date") long date, @Bind("initiator") int initiatorId, @Bind("target") int targetId);
 
-    @SqlUpdate("DELETE FROM `ignore` WHERE `id` = :id")
-    void delete(@Bind("id") int id);
+    @SqlUpdate("UPDATE `ignore` SET `date` = :date, `valid` = true WHERE `initiator` = :initiator AND `target` = :target")
+    int update(@Bind("date") long date, @Bind("initiator") int initiatorId, @Bind("target") int targetId);
 
-    @SqlQuery("SELECT * FROM `ignore` WHERE `initiator` = :initiator")
+    @SqlUpdate("UPDATE `ignore` SET `valid` = false WHERE `id` = :id")
+    void invalidate(@Bind("id") int id);
+
+    @SqlQuery("SELECT * FROM `ignore` WHERE `initiator` = :initiator AND `valid` = true")
     List<Ignore> findByInitiator(@Bind("initiator") int initiatorId);
+
+    @SqlQuery("SELECT * FROM `ignore` WHERE `initiator` = :initiator AND `target` = :target AND `valid` = true")
+    Optional<Ignore> findByInitiatorAndTarget(@Bind("initiator") int initiatorId, @Bind("target") int targetId);
 
 }

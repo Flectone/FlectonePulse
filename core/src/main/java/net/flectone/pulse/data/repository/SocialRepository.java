@@ -44,7 +44,7 @@ public class SocialRepository {
     }
 
     public void deleteIgnore(Ignore ignore) {
-        ignoreDAO.delete(ignore);
+        ignoreDAO.invalidate(ignore);
     }
 
     public void deleteMail(Mail mail) {

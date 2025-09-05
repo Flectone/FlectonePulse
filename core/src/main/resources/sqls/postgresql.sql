@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS "ignore" (
     "date" BIGINT NOT NULL,
     "initiator" INTEGER NOT NULL,
     "target" INTEGER NOT NULL,
+    "valid" BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY("initiator") REFERENCES "player"("id"),
     FOREIGN KEY("target") REFERENCES "player"("id")
 );

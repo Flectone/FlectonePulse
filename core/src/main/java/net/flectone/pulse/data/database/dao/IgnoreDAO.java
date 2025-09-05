@@ -30,13 +30,19 @@ public class IgnoreDAO extends BaseDAO<IgnoreSQL> {
 
         return inTransaction(sql -> {
             long currentTime = System.currentTimeMillis();
-            int insertedId = sql.insert(currentTime, fSender.getId(), fIgnored.getId());
-            return new Ignore(insertedId, currentTime, fIgnored.getId());
+            int updated = sql.update(currentTime, fSender.getId(), fIgnored.getId());
+
+            if (updated == 0) {
+                int insertedId = sql.insert(currentTime, fSender.getId(), fIgnored.getId());
+                return new Ignore(insertedId, currentTime, fIgnored.getId());
+            } else {
+                return sql.findByInitiatorAndTarget(fSender.getId(), fIgnored.getId()).orElseThrow();
+            }
         });
     }
 
-    public void delete(Ignore ignore) {
-        useHandle(sql -> sql.delete(ignore.id()));
+    public void invalidate(Ignore ignore) {
+        useHandle(sql -> sql.invalidate(ignore.id()));
     }
 
     public void load(FPlayer fPlayer) {
