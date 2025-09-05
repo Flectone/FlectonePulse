@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 public abstract class AbstractModule {
 
     private final Set<Class<? extends AbstractModule>> children = new LinkedHashSet<>();
-    private final Set<BiPredicate<FEntity, Boolean>> predicates = new HashSet<>();
+    private final List<BiPredicate<FEntity, Boolean>> predicates = new ArrayList<>();
 
     @Inject private PermissionRegistry permissionRegistry;
     @Inject private PermissionChecker permissionChecker;
