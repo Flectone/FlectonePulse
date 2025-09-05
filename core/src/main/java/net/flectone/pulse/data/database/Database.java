@@ -114,10 +114,6 @@ public class Database {
             migration("1_5_2");
         }
 
-        if (config.getType() == Type.SQLITE) {
-            injector.getInstance(FPlayerDAO.class).updateAllToOffline();
-        }
-
         init();
     }
 
