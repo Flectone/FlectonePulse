@@ -107,7 +107,11 @@ public class Database {
         executeSQLFile(sqlFile);
 
         if (fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "1.3.0")) {
-            MIGRATION_1_3_0();
+            migration("1_3_0");
+        }
+
+        if (fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "1.5.2")) {
+            migration("1_5_2");
         }
 
         if (config.getType() == Type.SQLITE) {
@@ -265,11 +269,11 @@ public class Database {
         }
     }
 
-    private void MIGRATION_1_3_0() {
+    private void migration(String version) {
         backupDatabase();
 
         try {
-            InputStream sqlFile = platformServerAdapter.getResource("sqls/migrations/1_3_0.sql");
+            InputStream sqlFile = platformServerAdapter.getResource("sqls/migrations/" + version + ".sql");
             executeSQLFile(sqlFile);
         } catch (IOException e) {
             fLogger.warning(e);

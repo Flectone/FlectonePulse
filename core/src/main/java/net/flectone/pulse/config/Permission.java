@@ -212,8 +212,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private Map<String, Chatsetting.SettingItem> settings = new LinkedHashMap<>(){
                 {
                     put(SettingText.CHAT_NAME.name(), new SettingItem("flectonepulse.module.command.chatsetting.chat_name", Type.TRUE));
-                    put("FCOLOR_" + FColor.Type.SEE.name(), new SettingItem("flectonepulse.module.command.chatsetting.fcolor.see", Type.TRUE));
-                    put("FCOLOR_" + FColor.Type.OUT.name(), new SettingItem("flectonepulse.module.command.chatsetting.fcolor.out", Type.OP));
+                    put("FCOLOR_" + FColor.Type.SEE.name(), new SettingItem("flectonepulse.module.command.chatsetting.fcolor_see", Type.TRUE));
+                    put("FCOLOR_" + FColor.Type.OUT.name(), new SettingItem("flectonepulse.module.command.chatsetting.fcolor_out", Type.OP));
                     put(MessageType.AFK.name(), new SettingItem("flectonepulse.module.command.chatsetting.afk", Type.TRUE));
                     put(MessageType.ADVANCEMENT.name(), new SettingItem("flectonepulse.module.command.chatsetting.advancement", Type.TRUE));
                     put(MessageType.CHAT.name(), new SettingItem("flectonepulse.module.command.chatsetting.chat", Type.TRUE));
