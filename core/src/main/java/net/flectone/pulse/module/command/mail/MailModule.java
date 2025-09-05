@@ -17,7 +17,6 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -103,7 +102,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         fPlayerService.loadIgnores(fReceiver);
 
         if (checkIgnore(fPlayer, fReceiver)) return;
-        if (checkDisable(fPlayer, fReceiver, DisableSource.HE)) return;
+        if (checkDisable(fPlayer, fReceiver)) return;
 
         String message = getArgument(commandContext, 1);
 

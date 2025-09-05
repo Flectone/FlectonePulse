@@ -23,7 +23,6 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.DisableSource;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
@@ -65,7 +64,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     protected void addDefaultPredicates() {
         super.addDefaultPredicates();
 
-        addPredicate((fPlayer, needBoolean) -> needBoolean && checkDisable(fPlayer, fPlayer, DisableSource.YOU));
+        addPredicate((fPlayer, needBoolean) -> needBoolean && checkDisable(fPlayer));
         addPredicate((fPlayer, needBoolean) -> needBoolean && checkCooldown(fPlayer));
         addPredicate((fPlayer, needBoolean) -> needBoolean && checkMute(fPlayer));
     }
@@ -104,12 +103,26 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         return localizationFunction.apply(fileResolver.getLocalization(sender));
     }
 
-    public boolean checkDisable(FEntity entity, @NotNull FEntity receiver, DisableSource action) {
+    public boolean checkDisable(FEntity player) {
+        return checkDisable(player, player);
+    }
+
+    public boolean checkDisable(FEntity player, @NotNull FEntity receiver) {
         if (!(receiver instanceof FPlayer fReceiver)) return false;
         if (fReceiver.isUnknown()) return false;
         if (fReceiver.isSetting(messageType)) return false;
 
-        sendDisableMessage(entity, fReceiver, action);
+        Localization.Command.Chatsetting localization = fileResolver.getLocalization(fReceiver).getCommand().getChatsetting();
+
+        String format = player.equals(fReceiver)
+                ? localization.getDisabledSelf()
+                : localization.getDisabledOther();
+
+        sendErrorMessage(metadataBuilder()
+                .sender(player)
+                .format(format)
+                .build()
+        );
 
         return true;
     }
@@ -151,22 +164,6 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         );
 
         return true;
-    }
-
-    public void sendDisableMessage(FEntity fPlayer, @NotNull FEntity fReceiver, DisableSource action) {
-        Localization.Command.Chatsetting.Disable localization = fileResolver.getLocalization(fReceiver).getCommand().getChatsetting().getDisable();
-
-        String format = switch (action) {
-            case HE -> localization.getHe();
-            case YOU -> localization.getYou();
-            case SERVER -> localization.getServer();
-        };
-
-        sendErrorMessage(metadataBuilder()
-                .sender(fPlayer)
-                .format(format)
-                .build()
-        );
     }
 
     public boolean checkIgnore(FPlayer fSender, FPlayer fReceiver) {

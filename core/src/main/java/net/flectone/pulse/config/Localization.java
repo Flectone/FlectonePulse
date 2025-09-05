@@ -244,9 +244,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.chatcolor.nullColor = "<color:#ff7171><b>⁉</b> Цвета введены неверно";
 
         command.chatsetting.noPermission = "<color:#ff7171><b>⁉</b> Нет разрешения на изменение этой настройки";
-        command.chatsetting.disable.you = "<color:#ff7171><b>⁉</b> Команда скрыта, проверь /chatsetting";
-        command.chatsetting.disable.he = "<color:#ff7171><b>⁉</b> Он выключил команду с помощью /chatsetting";
-        command.chatsetting.disable.server = "<color:#ff7171><b>⁉</b> Команда отключена на сервере";
+        command.chatsetting.disabledSelf = "<color:#ff7171><b>⁉</b> Эта функция отключена с помощью /chatsetting";
+        command.chatsetting.disabledOther = "<color:#ff7171><b>⁉</b> Он отключил эту функцию с помощью /chatsetting";
         command.chatsetting.inventory = "Настройки чата";
         command.chatsetting.checkbox.enabledHover = "<color:#98FB98>Отображение включено";
         command.chatsetting.checkbox.disabledHover = "<color:#ff7171>Отображение выключено";
@@ -902,19 +901,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Chatsetting implements SubCommandConfig, Localizable {
             private String noPermission = "<color:#ff7171><b>⁉</b> No permission to change this setting";
-            private Disable disable = new Disable();
+            private String disabledSelf = "<color:#ff7171><b>⁉</b> This feature is disabled via /chatsetting";
+            private String disabledOther = "<color:#ff7171><b>⁉</b> He disabled this feature via /chatsetting";
 
             private String inventory = "Chat Settings";
             private Checkbox checkbox = new Checkbox();
             private Menu menu = new Menu();
-
-            @Getter
-            @NoArgsConstructor
-            public static final class Disable {
-                private String you = "<color:#ff7171><b>⁉</b> Display of this command is disabled, check /chatsetting";
-                private String he = "<color:#ff7171><b>⁉</b> He disabled this option via /chatsetting";
-                private String server = "<color:#ff7171><b>⁉</b> This command disabled on server";
-            }
 
             @Getter
             @NoArgsConstructor
