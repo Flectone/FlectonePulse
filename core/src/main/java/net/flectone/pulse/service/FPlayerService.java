@@ -259,8 +259,20 @@ public class FPlayerService {
         fPlayerRepository.saveColors(fPlayer);
     }
 
+    public void loadIgnoresIfOffline(FPlayer fPlayer) {
+        if (platformPlayerAdapter.isOnline(fPlayer)) return;
+
+        loadIgnores(fPlayer);
+    }
+
     public void loadIgnores(FPlayer fPlayer) {
         socialRepository.loadIgnores(fPlayer);
+    }
+
+    public void loadSettingsIfOffline(FPlayer fPlayer) {
+        if (platformPlayerAdapter.isOnline(fPlayer)) return;
+
+        loadSettings(fPlayer);
     }
 
     public void loadSettings(FPlayer fPlayer) {
