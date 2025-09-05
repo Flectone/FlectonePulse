@@ -18,8 +18,8 @@ public class OpExtractor extends Extractor {
 
     public Optional<String> extract(MessageReceiveEvent event) {
         TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        if (translatableComponent.args().isEmpty()) return Optional.empty();
-        if (!(translatableComponent.args().get(0) instanceof TextComponent targetComponent)) return Optional.empty();
+        if (translatableComponent.arguments().isEmpty()) return Optional.empty();
+        if (!(translatableComponent.arguments().getFirst().asComponent() instanceof TextComponent targetComponent)) return Optional.empty();
 
         String target = extractTarget(targetComponent);
 

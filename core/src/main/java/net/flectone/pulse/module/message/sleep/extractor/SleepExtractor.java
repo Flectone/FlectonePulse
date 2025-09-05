@@ -23,11 +23,11 @@ public class SleepExtractor extends Extractor {
         String allCount = "";
 
         TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        if (event.getTranslationKey() == MinecraftTranslationKey.SLEEP_PLAYERS_SLEEPING && translatableComponent.args().size() == 2) {
-            if ((translatableComponent.args().get(0) instanceof TextComponent sleepComponent)) {
+        if (event.getTranslationKey() == MinecraftTranslationKey.SLEEP_PLAYERS_SLEEPING && translatableComponent.arguments().size() == 2) {
+            if ((translatableComponent.arguments().getFirst().asComponent() instanceof TextComponent sleepComponent)) {
                 sleepCount = sleepComponent.content();
             }
-            if ((translatableComponent.args().get(1) instanceof TextComponent allComponent)) {
+            if ((translatableComponent.arguments().get(1).asComponent() instanceof TextComponent allComponent)) {
                 allCount = allComponent.content();
             }
         }

@@ -27,15 +27,15 @@ public class EnchantExtractor extends Extractor {
         }
 
         TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        if (translatableComponent.args().size() < 2) return Optional.empty();
-        if (!(translatableComponent.args().get(0) instanceof TranslatableComponent enchantComponent)) return Optional.empty();
+        if (translatableComponent.arguments().size() < 2) return Optional.empty();
+        if (!(translatableComponent.arguments().getFirst().asComponent() instanceof TranslatableComponent enchantComponent)) return Optional.empty();
         String enchantKey = enchantComponent.key();
 
         if (enchantComponent.children().size() < 2) return Optional.empty();
         if (!(enchantComponent.children().get(1) instanceof TranslatableComponent levelComponent)) return Optional.empty();
         String levelKey = levelComponent.key();
 
-        if (!(translatableComponent.args().get(1) instanceof TextComponent targetComponent)) return Optional.empty();
+        if (!(translatableComponent.arguments().get(1).asComponent() instanceof TextComponent targetComponent)) return Optional.empty();
 
         String target = extractTarget(targetComponent);
 

@@ -26,16 +26,16 @@ public class DeathExtractor extends Extractor {
     }
 
     public String extractItemName(TranslatableComponent translatableComponent) {
-        if (translatableComponent.args().size() < 3) return null;
+        if (translatableComponent.arguments().size() < 3) return null;
 
-        Component itemComp = translatableComponent.args().get(2);
+        Component itemComp = translatableComponent.arguments().get(2).asComponent();
         String itemName = switch (itemComp) {
             // format "chat.square_brackets"
             case TranslatableComponent transComp when transComp.key().equals("chat.square_brackets")
-                    && !transComp.args().isEmpty() -> extractItemComponent(transComp.args().get(0));
+                    && !transComp.arguments().isEmpty() -> extractItemComponent(transComp.arguments().getFirst().asComponent());
             // legacy format extra
             case TextComponent textComp when textComp.content().equals("[")
-                    && !textComp.children().isEmpty() -> extractItemComponent(textComp.children().get(0));
+                    && !textComp.children().isEmpty() -> extractItemComponent(textComp.children().getFirst().asComponent());
             default -> null;
         };
 
@@ -45,9 +45,9 @@ public class DeathExtractor extends Extractor {
     }
 
     public Death extractDeath(TranslatableComponent translatableComponent, int index) {
-        if (translatableComponent.args().size() < index + 1) return null;
+        if (translatableComponent.arguments().size() < index + 1) return null;
 
-        return switch (translatableComponent.args().get(index)) {
+        return switch (translatableComponent.arguments().get(index).asComponent()) {
             case TranslatableComponent targetComponent -> {
                 Death death = new Death(translatableComponent.key());
                 death.setTargetName(targetComponent.key());
@@ -117,7 +117,7 @@ public class DeathExtractor extends Extractor {
                         death.setTargetType(entityUtil.resolveEntityTranslationKey(showEntity.type().key().value()));
                     }
 
-                    if (!hoverComponent.children().isEmpty() && hoverComponent.children().get(0) instanceof TextComponent) {
+                    if (!hoverComponent.children().isEmpty() && hoverComponent.children().getFirst().asComponent() instanceof TextComponent) {
                         death = new Death(translatableComponent.key());
                         StringBuilder targetNameBuilder = new StringBuilder();
                         for (int i = 0; i < hoverComponent.children().size(); i++) {

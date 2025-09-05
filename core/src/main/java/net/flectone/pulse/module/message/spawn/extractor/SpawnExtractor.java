@@ -9,6 +9,7 @@ import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.TranslationArgument;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +23,7 @@ public class SpawnExtractor extends Extractor {
 
     public Optional<Spawn> extract(MessageReceiveEvent event) {
         TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        List<Component> translationArguments = translatableComponent.args();
+        List<TranslationArgument> translationArguments = translatableComponent.arguments();
         if (translationArguments.size() < 4) return Optional.empty();
 
         Component targetComponent;
@@ -34,23 +35,23 @@ public class SpawnExtractor extends Extractor {
 
         if (event.getTranslationKey() == MinecraftTranslationKey.COMMANDS_SPAWNPOINT_SUCCESS) {
             // legacy format, player first
-            targetComponent = translationArguments.get(0);
-            xComponent = translationArguments.get(1);
-            yComponent = translationArguments.get(2);
-            zComponent = translationArguments.get(3);
+            targetComponent = translationArguments.get(0).asComponent();
+            xComponent = translationArguments.get(1).asComponent();
+            yComponent = translationArguments.get(2).asComponent();
+            zComponent = translationArguments.get(3).asComponent();
         } else {
             // coordinates first, player last
-            xComponent = translationArguments.get(0);
-            yComponent = translationArguments.get(1);
-            zComponent = translationArguments.get(2);
-            targetComponent = translationArguments.getLast();
+            xComponent = translationArguments.get(0).asComponent();
+            yComponent = translationArguments.get(1).asComponent();
+            zComponent = translationArguments.get(2).asComponent();
+            targetComponent = translationArguments.getLast().asComponent();
 
             // check for optional angle and world
-            if (translationArguments.size() >= 5 && translationArguments.get(3) instanceof TextComponent angleComponent) {
+            if (translationArguments.size() >= 5 && translationArguments.get(3).asComponent() instanceof TextComponent angleComponent) {
                 angle = angleComponent.content();
             }
 
-            if (translationArguments.size() >= 6 && translationArguments.get(4) instanceof TextComponent worldComponent) {
+            if (translationArguments.size() >= 6 && translationArguments.get(4).asComponent() instanceof TextComponent worldComponent) {
                 world = worldComponent.content();
             }
         }

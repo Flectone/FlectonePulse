@@ -33,7 +33,7 @@ public class KillExtractor extends Extractor {
 
     public Optional<Kill> extractMultipleKill(MessageReceiveEvent event) {
         TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        if (!(translatableComponent.args().get(0) instanceof TextComponent firstArgument)) return Optional.empty();
+        if (!(translatableComponent.arguments().getFirst().asComponent() instanceof TextComponent firstArgument)) return Optional.empty();
 
         String value = firstArgument.content();
         Kill kill = new Kill(value, null);
@@ -42,9 +42,9 @@ public class KillExtractor extends Extractor {
 
     public Optional<Kill> extractSingleKill(MessageReceiveEvent event) {
         TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        if (translatableComponent.args().isEmpty()) return Optional.empty();
+        if (translatableComponent.arguments().isEmpty()) return Optional.empty();
 
-        Component firstArgument = translatableComponent.args().get(0);
+        Component firstArgument = translatableComponent.arguments().getFirst().asComponent();
         UUID uuid = null;
 
         String content = switch (firstArgument) {

@@ -20,9 +20,9 @@ public class ClearExtractor extends Extractor {
 
     public Optional<Clear> extract(MessageReceiveEvent event) {
         TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        if (translatableComponent.args().size() < 2) return Optional.empty();
-        if (!(translatableComponent.args().get(0) instanceof TextComponent firstArg)) return Optional.empty();
-        if (!(translatableComponent.args().get(1) instanceof TextComponent secondArg)) return Optional.empty();
+        if (translatableComponent.arguments().size() < 2) return Optional.empty();
+        if (!(translatableComponent.arguments().get(0).asComponent() instanceof TextComponent firstArg)) return Optional.empty();
+        if (!(translatableComponent.arguments().get(1).asComponent() instanceof TextComponent secondArg)) return Optional.empty();
 
         String count;
         String value;

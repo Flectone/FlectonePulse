@@ -22,16 +22,16 @@ public class GamemodeExtractor extends Extractor {
         String gamemodeKey = "";
 
         TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        if (translatableComponent.args().isEmpty()) {
+        if (translatableComponent.arguments().isEmpty()) {
             Gamemode gamemode = new Gamemode(gamemodeKey, target);
             return Optional.of(gamemode);
         }
 
-        if (translatableComponent.args().get(0) instanceof TranslatableComponent gamemodeComponent) {
+        if (translatableComponent.arguments().getFirst().asComponent() instanceof TranslatableComponent gamemodeComponent) {
             gamemodeKey = gamemodeComponent.key();
-        } else if (translatableComponent.args().size() > 1
-                && translatableComponent.args().get(0) instanceof TextComponent playerComponent
-                && translatableComponent.args().get(1) instanceof TranslatableComponent gamemodeComponent) {
+        } else if (translatableComponent.arguments().size() > 1
+                && translatableComponent.arguments().get(0).asComponent() instanceof TextComponent playerComponent
+                && translatableComponent.arguments().get(1).asComponent() instanceof TranslatableComponent gamemodeComponent) {
             target = extractTarget(playerComponent);
             gamemodeKey = gamemodeComponent.key();
         }

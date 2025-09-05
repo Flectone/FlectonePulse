@@ -2,15 +2,16 @@ package net.flectone.pulse.module.message.advancement.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.processing.extractor.Extractor;
-import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
 import net.flectone.pulse.module.message.advancement.model.ChatAdvancement;
 import net.flectone.pulse.module.message.advancement.model.CommandAdvancement;
+import net.flectone.pulse.processing.extractor.Extractor;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.TranslationArgument;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.Strings;
@@ -29,20 +30,22 @@ public class AdvancementExtractor extends Extractor {
 
     public Optional<ChatAdvancement> extractFromChat(MessageReceiveEvent event) {
         TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        List<Component> translationArguments = translatableComponent.args();
+        List<TranslationArgument> translationArguments = translatableComponent.arguments();
         if (translationArguments.size() < 2) return Optional.empty();
 
-        if (!(translationArguments.get(0) instanceof TextComponent targetComponent)) return Optional.empty();
+        if (!(translationArguments.getFirst().asComponent() instanceof TextComponent targetComponent)) return Optional.empty();
         String target = extractTarget(targetComponent);
 
-        Component achievementComp = translationArguments.get(1);
+        Component achievementComp = translationArguments.get(1).asComponent();
+
         Pair<String, String> pair = switch (achievementComp) {
-            case TranslatableComponent titleComponent when titleComponent.key().equals("chat.square_brackets") && !titleComponent.args().isEmpty() ->
-                    extractChatAdvancementComponent(titleComponent.args().get(0));
+            case TranslatableComponent titleComponent when titleComponent.key().equals("chat.square_brackets") && !titleComponent.arguments().isEmpty() ->
+                    extractChatAdvancementComponent(titleComponent.arguments().getFirst().asComponent());
             case TextComponent textComp when textComp.content().equals("[") && !textComp.children().isEmpty() ->
-                    extractChatAdvancementComponent(textComp.children().get(0));
+                    extractChatAdvancementComponent(textComp.children().getFirst().asComponent());
             default -> null;
         };
+
         if (pair == null) return Optional.empty();
 
         String title = pair.first();
@@ -58,7 +61,7 @@ public class AdvancementExtractor extends Extractor {
 
     public Optional<CommandAdvancement> extractFromCommand(MessageReceiveEvent event) {
         TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        if (translatableComponent.args().size() < 2) return Optional.empty();
+        if (translatableComponent.arguments().size() < 2) return Optional.empty();
 
         Component argument;
         Component playerArgument;
@@ -67,11 +70,11 @@ public class AdvancementExtractor extends Extractor {
         if (type == MinecraftTranslationKey.COMMANDS_ACHIEVEMENT_GIVE_ONE
                 || type == MinecraftTranslationKey.COMMANDS_ADVANCEMENT_GRANT_EVERYTHING_SUCCESS
                 || type == MinecraftTranslationKey.COMMANDS_ADVANCEMENT_REVOKE_EVERYTHING_SUCCESS) {
-            playerArgument = translatableComponent.args().get(0);
-            argument = translatableComponent.args().get(1);
+            playerArgument = translatableComponent.arguments().get(0).asComponent();
+            argument = translatableComponent.arguments().get(1).asComponent();
         } else {
-            argument = translatableComponent.args().get(0);
-            playerArgument = translatableComponent.args().get(1);
+            argument = translatableComponent.arguments().get(0).asComponent();
+            playerArgument = translatableComponent.arguments().get(1).asComponent();
         }
 
         if (!(playerArgument instanceof TextComponent playerComponent)) return Optional.empty();
@@ -89,14 +92,14 @@ public class AdvancementExtractor extends Extractor {
                 MinecraftTranslationKey advancementType;
 
                 switch (argument) {
-                    case TranslatableComponent argumentIn when argumentIn.key().equals("chat.square_brackets") && !argumentIn.args().isEmpty() -> {
-                        Triplet<String, String, MinecraftTranslationKey> triplet = extractCommandAdvancementComponent(argumentIn.args().get(0));
+                    case TranslatableComponent argumentIn when argumentIn.key().equals("chat.square_brackets") && !argumentIn.arguments().isEmpty() -> {
+                        Triplet<String, String, MinecraftTranslationKey> triplet = extractCommandAdvancementComponent(argumentIn.arguments().getFirst().asComponent());
                         title = triplet.first();
                         description = triplet.second();
                         advancementType = triplet.third();
                     }
                     case TextComponent textComponent when textComponent.content().equals("[") && !textComponent.children().isEmpty() -> {
-                        Triplet<String, String, MinecraftTranslationKey> triplet = extractCommandAdvancementComponent(textComponent.children().get(0));
+                        Triplet<String, String, MinecraftTranslationKey> triplet = extractCommandAdvancementComponent(textComponent.children().getFirst().asComponent());
                         title = triplet.first();
                         description = triplet.second();
                         advancementType = triplet.third();
@@ -116,6 +119,7 @@ public class AdvancementExtractor extends Extractor {
                 relation = AdvancementModule.Relation.ONE_TO_ONE_ADVANCEMENT;
             }
             case COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_MANY_TO_ONE_SUCCESS,
+                 COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_MANY_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_MANY_TO_MANY_SUCCESS,
                  COMMANDS_ACHIEVEMENT_TAKE_MANY, COMMANDS_ACHIEVEMENT_GIVE_MANY,
                  COMMANDS_ADVANCEMENT_GRANT_EVERYTHING_SUCCESS, COMMANDS_ADVANCEMENT_REVOKE_EVERYTHING_SUCCESS,
                  COMMANDS_ADVANCEMENT_REVOKE_ONLY_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_ONLY_SUCCESS -> {
