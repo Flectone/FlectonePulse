@@ -411,8 +411,10 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.advancement.challenge.format = "<color:#834eff>🌠 <fcolor:2><display_name> <fcolor:1>завершил испытание <advancement>";
         message.advancement.challenge.tag = "<color:#834eff>[<hover:show_text:\"<color:#834eff><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]";
         message.advancement.revoke.manyToOne = "<fcolor:1>🌠 Отозвано <fcolor:2><number> <fcolor:1>достижений у игрока <display_name>";
+        message.advancement.revoke.manyToMany = "<fcolor:1>🌠 Отозвано <fcolor:2><number> <fcolor:1>достижений у <fcolor:2><count> <fcolor:1>игроков";
         message.advancement.revoke.oneToOne = "<fcolor:1>🌠 Отозвано достижение <fcolor:2><advancement> <fcolor:1>у игрока <display_name>";
         message.advancement.grant.manyToOne = "<fcolor:1>🌠 Выдано <fcolor:2><number> <fcolor:1>достижений игроку <display_name>";
+        message.advancement.grant.manyToMany = "<fcolor:1>🌠 Выдано <fcolor:2><number> <fcolor:1>достижений <fcolor:2><count> <fcolor:1>игрокам";
         message.advancement.grant.oneToOne = "<fcolor:1>🌠 Достижение <fcolor:2><advancement> <fcolor:1>выдано игроку <display_name>";
 
         message.auto.types.clear();
@@ -1690,11 +1692,13 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
             private Command revoke = new Command(
                     "<fcolor:1>🌠 Revoked <fcolor:2><number> <fcolor:1>advancements from <display_name>",
+                    "<fcolor:1>🌠 Revoked <fcolor:2><number> <fcolor:1>advancements from <fcolor:2><count> <fcolor:1>players",
                     "<fcolor:1>🌠 Revoked the advancement <fcolor:2><advancement> <fcolor:1>from <display_name>"
             );
 
             private Command grant = new Command(
                     "<fcolor:1>🌠 Granted <fcolor:2><number> <fcolor:1>advancements to <display_name>",
+                    "<fcolor:1>🌠 Granted <fcolor:2><number> <fcolor:1>advancements to <fcolor:2><count> <fcolor:1>players",
                     "<fcolor:1>🌠 Granted the advancement <fcolor:2><advancement> <fcolor:1>to <display_name>"
             );
 
@@ -1709,6 +1713,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             @AllArgsConstructor
             public static final class Command {
                 private String manyToOne;
+                private String manyToMany;
                 private String oneToOne;
             }
         }

@@ -26,8 +26,10 @@ public enum MinecraftTranslationKey {
     CHAT_TYPE_ACHIEVEMENT_TAKEN("chat.type.achievement.taken"), // legacy < 1.12
 
     COMMANDS_ADVANCEMENT_GRANT_MANY_TO_ONE_SUCCESS("commands.advancement.grant.many.to.one.success"),
+    COMMANDS_ADVANCEMENT_GRANT_MANY_TO_MANY_SUCCESS("commands.advancement.grant.many.to.many.success"),
     COMMANDS_ADVANCEMENT_GRANT_ONE_TO_ONE_SUCCESS("commands.advancement.grant.one.to.one.success"),
     COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS("commands.advancement.revoke.many.to.one.success"),
+    COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_MANY_SUCCESS("commands.advancement.revoke.many.to.many.success"),
     COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS("commands.advancement.revoke.one.to.one.success"),
     COMMANDS_ADVANCEMENT_GRANT_ONLY_SUCCESS("commands.advancement.grant.only.success"), // legacy, 1.12
     COMMANDS_ADVANCEMENT_GRANT_EVERYTHING_SUCCESS("commands.advancement.grant.everything.success"), // legacy, 1.12

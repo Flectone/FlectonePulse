@@ -122,10 +122,11 @@ public class AdvancementExtractor extends Extractor {
                 if (!(argument instanceof TextComponent textComponent)) return Optional.empty();
 
                 content = textComponent.content();
-                relation = type == MinecraftTranslationKey.COMMANDS_ADVANCEMENT_REVOKE_ONLY_SUCCESS
-                        || type == MinecraftTranslationKey.COMMANDS_ADVANCEMENT_GRANT_ONLY_SUCCESS
-                        ? AdvancementModule.Relation.ONE_TO_ONE_TEXT
-                        : AdvancementModule.Relation.MANY_TO_ONE;
+                relation = switch (type) {
+                    case COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_MANY_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_MANY_TO_MANY_SUCCESS -> AdvancementModule.Relation.MANY_TO_MANY;
+                    case COMMANDS_ADVANCEMENT_REVOKE_ONLY_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_ONLY_SUCCESS -> AdvancementModule.Relation.ONE_TO_ONE_TEXT;
+                    default -> AdvancementModule.Relation.MANY_TO_ONE;
+                };
             }
             default -> {
                 return Optional.empty();

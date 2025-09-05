@@ -96,7 +96,9 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
         if (commandAdvancement.isIncorrect()) return;
         if (isModuleDisabledFor(fPlayer)) return;
 
-        FPlayer fTarget = fPlayerService.getFPlayer(commandAdvancement.owner());
+        FPlayer fTarget = commandAdvancement.relation() == Relation.MANY_TO_MANY
+                ? fPlayer
+                : fPlayerService.getFPlayer(commandAdvancement.owner());
         if (fTarget.isUnknown()) return;
 
         AdvancementMetadata.AdvancementMetadataBuilder<Localization.Message.Advancement, ?, ?> metadataBuilder = AdvancementMetadata.<Localization.Message.Advancement>builder()
@@ -110,6 +112,11 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
                                 subcommand.getManyToOne(),
                                 "<number>",
                                 String.valueOf(commandAdvancement.content())
+                        );
+                        case MANY_TO_MANY -> StringUtils.replaceEach(
+                                subcommand.getManyToMany(),
+                                new String[]{"<number>", "<count>"},
+                                new String[]{String.valueOf(commandAdvancement.content()), commandAdvancement.owner()}
                         );
                         case ONE_TO_ONE_TEXT -> Strings.CS.replace(
                                 subcommand.getOneToOne(),
@@ -171,6 +178,7 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
 
     public enum Relation {
         MANY_TO_ONE,
+        MANY_TO_MANY,
         ONE_TO_ONE_ADVANCEMENT,
         ONE_TO_ONE_TEXT
     }

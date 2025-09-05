@@ -42,6 +42,7 @@ public class AdvancementPulseListener implements PulseListener {
                 advancementModule.send(event.getFPlayer(), advancement.get());
             }
             case COMMANDS_ADVANCEMENT_GRANT_ONE_TO_ONE_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_MANY_TO_ONE_SUCCESS,
+                 COMMANDS_ADVANCEMENT_GRANT_MANY_TO_MANY_SUCCESS,
                  COMMANDS_ACHIEVEMENT_GIVE_ONE, COMMANDS_ACHIEVEMENT_GIVE_MANY,
                  COMMANDS_ADVANCEMENT_GRANT_ONLY_SUCCESS, COMMANDS_ADVANCEMENT_GRANT_EVERYTHING_SUCCESS -> {
                 if (!message.isGrant()) return;
@@ -53,6 +54,7 @@ public class AdvancementPulseListener implements PulseListener {
                 advancementModule.send(false, event.getFPlayer(), commandAdvancement.get());
             }
             case COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS, COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS,
+                 COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_MANY_SUCCESS,
                  COMMANDS_ACHIEVEMENT_TAKE_MANY, COMMANDS_ACHIEVEMENT_TAKE_ONE,
                  COMMANDS_ADVANCEMENT_REVOKE_EVERYTHING_SUCCESS,COMMANDS_ADVANCEMENT_REVOKE_ONLY_SUCCESS -> {
                 if (!message.isRevoke()) return;
