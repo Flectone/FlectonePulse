@@ -304,7 +304,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     }
 
     public void sendErrorMessage(EventMetadata<M> eventMetadata) {
-        sendErrorMessage(eventMetadata);
+        sendMessage(MessageType.ERROR, eventMetadata);
     }
 
     private Component buildSubcomponent(FPlayer receiver, EventMetadata<M> eventMetadata, Component message) {
