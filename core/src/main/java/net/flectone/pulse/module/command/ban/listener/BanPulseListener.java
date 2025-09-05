@@ -58,7 +58,6 @@ public class BanPulseListener implements PulseListener {
 
             FPlayer fModerator = fPlayerService.getFPlayer(ban.getModerator());
 
-            fPlayerService.loadSettings(fPlayer);
             fPlayerService.loadColors(fPlayer);
 
             Localization.Command.Ban localization = banModule.resolveLocalization(fPlayer);

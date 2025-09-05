@@ -34,7 +34,6 @@ public class MaintenancePulseListener implements PulseListener {
 
         event.setAllowed(false);
 
-        fPlayerService.loadSettings(fPlayer);
         fPlayerService.loadColors(fPlayer);
 
         String reasonMessage = maintenanceModule.resolveLocalization(fPlayer).getKick();

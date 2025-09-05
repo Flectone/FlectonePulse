@@ -89,7 +89,6 @@ public class StatusModule extends AbstractModule {
         FPlayer fPlayer = fPlayerService.getFPlayer(inetAddress);
         if (isModuleDisabledFor(fPlayer)) return;
 
-        fPlayerService.loadSettings(fPlayer);
         fPlayerService.loadColors(fPlayer);
 
         JsonObject responseJson = new JsonObject();

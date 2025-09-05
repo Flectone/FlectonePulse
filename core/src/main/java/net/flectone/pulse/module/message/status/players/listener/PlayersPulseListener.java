@@ -34,7 +34,6 @@ public class PlayersPulseListener implements PulseListener {
 
         event.setAllowed(false);
 
-        fPlayerService.loadSettings(fPlayer);
         fPlayerService.loadColors(fPlayer);
 
         String reasonMessage = playersModule.resolveLocalization(fPlayer).getFull();
