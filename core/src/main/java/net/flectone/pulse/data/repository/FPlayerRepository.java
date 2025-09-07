@@ -170,7 +170,7 @@ public class FPlayerRepository {
     }
 
     public List<FPlayer> getOnlineFPlayersWithConsole() {
-        return onlinePlayers.values().stream().filter(fPlayer -> fPlayer.isOnline() || fPlayer.isUnknown()).toList();
+        return onlinePlayers.values().stream().filter(fPlayer -> fPlayer.isOnline() || fPlayer.isConsole()).toList();
     }
 
     public void clearCache() {

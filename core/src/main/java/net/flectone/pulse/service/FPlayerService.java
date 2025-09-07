@@ -88,7 +88,7 @@ public class FPlayerService {
     }
 
     public void addConsole() {
-        FPlayer console = new FPlayer(config.getConsole());
+        FPlayer console = new FPlayer(true, config.getConsole());
         fPlayerRepository.add(console);
         fPlayerRepository.saveOrIgnore(console);
     }

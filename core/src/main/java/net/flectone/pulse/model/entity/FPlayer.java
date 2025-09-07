@@ -29,6 +29,7 @@ public class FPlayer extends FEntity {
     public static final FPlayer UNKNOWN = new FPlayer(FEntity.UNKNOWN_NAME);
 
     private final int id;
+    private final boolean console;
     private final Map<FColor.Type, Set<FColor>> fColors = new EnumMap<>(FColor.Type.class);
     private final Map<MessageType, Boolean> settingsBoolean = new EnumMap<>(MessageType.class);
     private final Map<SettingText, String> settingsText = new EnumMap<>(SettingText.class);
@@ -38,18 +39,27 @@ public class FPlayer extends FEntity {
     private String ip;
     private String constantName;
 
-    public FPlayer(int id, String name, UUID uuid, String type) {
+    public FPlayer(int id, boolean console, String name, UUID uuid, String type) {
         super(name, uuid, type);
 
         this.id = id;
+        this.console = console;
+    }
+
+    public FPlayer(int id, String name, UUID uuid, String type) {
+        this(id, false, name, uuid, type);
     }
 
     public FPlayer(int id, String name, UUID uuid) {
         this(id, name, uuid, "player");
     }
 
+    public FPlayer(boolean console, String name) {
+        this(-1, console, name, FEntity.UNKNOWN_UUID, "unknown");
+    }
+
     public FPlayer(String name) {
-        this(-1, name, FEntity.UNKNOWN_UUID, "unknown");
+        this(-1,  false, name, FEntity.UNKNOWN_UUID, "unknown");
     }
 
     @Override

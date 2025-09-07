@@ -60,7 +60,7 @@ public class MessageSender {
 
 
     public void sendMessage(FPlayer fPlayer, Component component, boolean silent) {
-        if (fPlayer.isUnknown()) {
+        if (fPlayer.isConsole()) {
             fLogger.info(ansiSerializer.serialize(component));
             return;
         }
