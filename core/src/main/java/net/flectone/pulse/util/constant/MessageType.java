@@ -85,6 +85,7 @@ public enum MessageType {
     SETBLOCK,
     SLEEP,
     SPAWN,
+    SUMMON,
     SWEAR,
     TRANSLATE,
     UPDATE,

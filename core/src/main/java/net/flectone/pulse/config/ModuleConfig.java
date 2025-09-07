@@ -112,6 +112,7 @@ public interface ModuleConfig {
         SubMessageConfig getSpawn();
         SubMessageConfig getSign();
         StatusMessageConfig getStatus();
+        SubMessageConfig getSummon();
         TabMessageConfig getTab();
         SubMessageConfig getUpdate();
 

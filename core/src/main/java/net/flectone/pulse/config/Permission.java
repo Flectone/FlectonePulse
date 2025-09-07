@@ -789,6 +789,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Spawn spawn = new Spawn();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/")})
         private Status status = new Status();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/summon/")})
+        private Summon summon = new Summon();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/")})
         private Tab tab = new Tab();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/update/")})
@@ -1321,6 +1323,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                 private String name = "flectonepulse.module.message.status.version";
                 private Type type = Type.TRUE;
             }
+        }
+
+        @Getter
+        public static final class Summon implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.summon";
+            private Type type = Type.TRUE;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.summon.sound", Type.TRUE);
         }
 
         @Getter

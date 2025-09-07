@@ -100,6 +100,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Spawn spawn = new Spawn();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/")})
     private Status status = new Status();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/summon/")})
+    private Summon summon = new Summon();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/")})
     private Tab tab = new Tab();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/update/")})
@@ -719,6 +721,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             private int protocol = -1;
         }
 
+    }
+
+    @Getter
+    public static final class Summon implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Destination destination = new Destination();
+        private Sound sound = new Sound();
     }
 
     @Getter

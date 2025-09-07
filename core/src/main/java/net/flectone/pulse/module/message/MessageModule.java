@@ -34,6 +34,7 @@ import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.module.message.sleep.SleepModule;
 import net.flectone.pulse.module.message.spawn.SpawnModule;
 import net.flectone.pulse.module.message.status.StatusModule;
+import net.flectone.pulse.module.message.summon.SummonModule;
 import net.flectone.pulse.module.message.tab.TabModule;
 import net.flectone.pulse.module.message.update.UpdateModule;
 import net.flectone.pulse.processing.resolver.FileResolver;
@@ -83,6 +84,7 @@ public class MessageModule extends AbstractModule {
         addChildren(SleepModule.class);
         addChildren(SpawnModule.class);
         addChildren(StatusModule.class);
+        addChildren(SummonModule.class);
         addChildren(TabModule.class);
         addChildren(UpdateModule.class);
     }
