@@ -54,7 +54,7 @@ public class DeathExtractor extends Extractor {
                 death.setTargetName(targetComponent.key());
                 death.setPlayer(false);
 
-                parseUUID(targetComponent.insertion()).ifPresent(death::setTargetUUID);
+                extractUUID(targetComponent.insertion()).ifPresent(death::setTargetUUID);
 
                 HoverEvent<?> hoverEvent = targetComponent.hoverEvent();
                 if (hoverEvent != null && hoverEvent.value() instanceof HoverEvent.ShowEntity showEntity) {
@@ -80,7 +80,7 @@ public class DeathExtractor extends Extractor {
                     death.setTargetName(target);
                     death.setPlayer(true);
 
-                    Optional<UUID> optionalUUID = parseUUID(insertion);
+                    Optional<UUID> optionalUUID = extractUUID(insertion);
                     if (optionalUUID.isPresent()) {
                         death.setTargetUUID(optionalUUID.get());
                         death.setPlayer(false);

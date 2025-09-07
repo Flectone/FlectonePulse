@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.enchant.listener.EnchantPulseListener;
@@ -56,14 +57,17 @@ public class EnchantModule extends AbstractModuleLocalization<Localization.Messa
     public void send(FPlayer fPlayer, MinecraftTranslationKey key, Enchant enchant) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        FPlayer fTarget = fPlayer;
+        FEntity fTarget = fPlayer;
 
         boolean isSingle = key == MinecraftTranslationKey.COMMANDS_ENCHANT_SUCCESS_SINGLE
                 || key == MinecraftTranslationKey.COMMANDS_ENCHANT_SUCCESS;
 
-        if (isSingle && !enchant.value().isEmpty()) {
-            fTarget = fPlayerService.getFPlayer(enchant.value());
-            if (fTarget.isUnknown()) return;
+        if (isSingle && enchant.entity() != null) {
+            fTarget = fPlayerService.getFPlayer(enchant.entity().getUuid());
+
+            if (fTarget.isUnknown()) {
+                fTarget = enchant.entity();
+            }
         }
 
         sendMessage(EnchantMetadata.<Localization.Message.Enchant>builder()
@@ -72,7 +76,7 @@ public class EnchantModule extends AbstractModuleLocalization<Localization.Messa
                 .format(s -> StringUtils.replaceEach(
                         isSingle ? s.getSingle() : s.getMultiple(),
                         new String[]{"<count>", "<enchant>", "<level>"},
-                        new String[]{enchant.value(), enchant.name(), enchant.level()}
+                        new String[]{enchant.count(), enchant.name(), enchant.level()}
                 ))
                 .enchant(enchant)
                 .destination(message.getDestination())
