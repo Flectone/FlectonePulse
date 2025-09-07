@@ -199,11 +199,20 @@ public class FPlayerService {
         if (name.isEmpty()) return FPlayer.UNKNOWN;
 
         UUID uuid = platformPlayerAdapter.getUUID(player);
-        if (uuid != null) return this.getFPlayer(uuid);
+        if (uuid == null) {
+            if (platformPlayerAdapter.isConsole(player)) {
+                return getFPlayer(-1);
+            }
 
-        if (platformPlayerAdapter.isConsole(player)) return this.getFPlayer(FPlayer.UNKNOWN.getUuid());
+            return new FPlayer(name);
+        }
 
-        return new FPlayer(name);
+        FPlayer fPlayer = getFPlayer(uuid);
+        if (fPlayer.isUnknown()) {
+            return new FPlayer(name, uuid, platformPlayerAdapter.getEntityTranslationKey(player));
+        }
+
+        return fPlayer;
     }
 
     public Object toPlatformFPlayer(FPlayer fPlayer) {

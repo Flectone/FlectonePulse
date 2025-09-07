@@ -54,6 +54,10 @@ public class FPlayer extends FEntity {
         this(id, name, uuid, "player");
     }
 
+    public FPlayer(String name, UUID uuid, String type) {
+        this(-1, false, name, uuid, type);
+    }
+
     public FPlayer(boolean console, String name) {
         this(-1, console, name, FEntity.UNKNOWN_UUID, "unknown");
     }
