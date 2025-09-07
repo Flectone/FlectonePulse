@@ -99,6 +99,7 @@ public interface ModuleConfig {
         SubMessageConfig getDeath();
         SubMessageConfig getDeop();
         SubMessageConfig getEnchant();
+        SubMessageConfig getFill();
         FormatMessageConfig getFormat();
         SubMessageConfig getGamemode();
         SubMessageConfig getGreeting();

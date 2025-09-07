@@ -60,6 +60,7 @@ public enum MessageType {
     DEOP,
     ENCHANT,
     ERROR,
+    FILL,
     FOOTER,
     FORMAT,
     FROM_DISCORD_TO_MINECRAFT,

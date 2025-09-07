@@ -72,6 +72,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Deop deop = new Deop();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/enchant/")})
     private Enchant enchant = new Enchant();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/fill/")})
+    private Fill fill = new Fill();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/")})
     private Format format = new Format();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/gamemode/")})
@@ -299,6 +301,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
     @Getter
     public static final class Enchant implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Destination destination = new Destination();
+        private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Fill implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
         private Sound sound = new Sound();

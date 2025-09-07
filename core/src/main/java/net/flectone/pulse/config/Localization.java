@@ -562,6 +562,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.enchant.single = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» на предмет <display_name>";
         message.enchant.multiple = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» на предмет <fcolor:2><count><fcolor:1> сущностей";
 
+        message.fill.format = "<fcolor:1>⏹ Успешно заполнено <fcolor:2><amount> <fcolor:1>блоков";
+
         message.format.replacement.values.put("skin", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2><pixels>\"><fcolor:2><u>👨 Скин</u></hover></click>");
         message.format.replacement.values.put("url", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2>Открыть ссылку <br><u><message_1>\"><fcolor:2><u>🗗 Ссылка</u></hover></click>");
         message.format.replacement.values.put("image", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2><pixels>\"><fcolor:2><u>🖃 Картинка</u></hover></click>");
@@ -1637,6 +1639,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Deop deop = new Deop();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/enchant/")})
         private Enchant enchant = new Enchant();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/fill/")})
+        private Fill fill = new Fill();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/")})
         private Format format = new Format();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/gamemode/")})
@@ -1938,6 +1942,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
         public static final class Enchant implements SubMessageConfig, Localizable {
             private String single = "<fcolor:1>📖 Applied enchantment «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» to <display_name>'s item";
             private String multiple = "<fcolor:1>📖 Applied enchantment «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» to <fcolor:2><count><fcolor:1> entities";
+        }
+
+        @Getter
+        public static final class Fill implements SubMessageConfig, Localizable {
+            private String format = "<fcolor:1>⏹ Successfully filled <fcolor:2><amount> <fcolor:1>block(s)";
         }
 
         @Getter

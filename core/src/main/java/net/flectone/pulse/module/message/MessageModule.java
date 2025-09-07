@@ -20,6 +20,7 @@ import net.flectone.pulse.module.message.damage.DamageModule;
 import net.flectone.pulse.module.message.death.DeathModule;
 import net.flectone.pulse.module.message.deop.DeopModule;
 import net.flectone.pulse.module.message.enchant.EnchantModule;
+import net.flectone.pulse.module.message.fill.FillModule;
 import net.flectone.pulse.module.message.format.FormatModule;
 import net.flectone.pulse.module.message.gamemode.GamemodeModule;
 import net.flectone.pulse.module.message.greeting.GreetingModule;
@@ -72,6 +73,7 @@ public class MessageModule extends AbstractModule {
         addChildren(DeathModule.class);
         addChildren(DeopModule.class);
         addChildren(EnchantModule.class);
+        addChildren(FillModule.class);
         addChildren(FormatModule.class);
         addChildren(GamemodeModule.class);
         addChildren(GreetingModule.class);
