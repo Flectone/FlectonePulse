@@ -28,7 +28,9 @@ public class GamemodePulseListener implements PulseListener {
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
         MinecraftTranslationKey key = event.getTranslationKey();
-        if (!key.startsWith("commands.gamemode.success") && key != MinecraftTranslationKey.GAMEMODE_CHANGED) return;
+        if (!key.startsWith("commands.gamemode.success")
+                && key != MinecraftTranslationKey.GAMEMODE_CHANGED
+                && key != MinecraftTranslationKey.COMMANDS_DEFAULTGAMEMODE_SUCCESS) return;
 
         Optional<Gamemode> gamemode = gamemodeExtractor.extract(event);
         if (gamemode.isEmpty()) return;

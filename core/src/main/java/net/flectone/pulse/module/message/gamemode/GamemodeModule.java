@@ -16,6 +16,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import org.apache.commons.lang3.Strings;
 
 @Singleton
@@ -63,6 +64,7 @@ public class GamemodeModule extends AbstractModuleLocalization<Localization.Mess
         if (fTarget.isUnknown()) return;
 
         boolean isSelf = fPlayer.equals(fTarget);
+        boolean isDefaultGamemodeCommand = gamemode.key() == MinecraftTranslationKey.COMMANDS_DEFAULTGAMEMODE_SUCCESS;
 
         String gamemodeType = gamemode.type().isEmpty()
                 ? platformPlayerAdapter.getGamemode(fTarget).name().toLowerCase()
@@ -72,8 +74,7 @@ public class GamemodeModule extends AbstractModuleLocalization<Localization.Mess
         sendMessage(GamemodeMetadata.<Localization.Message.Gamemode>builder()
                 .sender(fTarget)
                 .filterPlayer(fPlayer)
-                .format(s -> Strings.CS.replace(
-                        isSelf ? s.getFormatSelf() : s.getFormatOther(),
+                .format(s -> Strings.CS.replace(isDefaultGamemodeCommand ? s.getFormatDefault() : isSelf ? s.getFormatSelf() : s.getFormatOther(),
                         "<gamemode>",
                         gamemodeType
                 ))

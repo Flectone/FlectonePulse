@@ -23,7 +23,7 @@ public class GamemodeExtractor extends Extractor {
 
         TranslatableComponent translatableComponent = event.getTranslatableComponent();
         if (translatableComponent.arguments().isEmpty()) {
-            Gamemode gamemode = new Gamemode(gamemodeKey, target);
+            Gamemode gamemode = new Gamemode(event.getTranslationKey(), gamemodeKey, target);
             return Optional.of(gamemode);
         }
 
@@ -36,7 +36,7 @@ public class GamemodeExtractor extends Extractor {
             gamemodeKey = gamemodeComponent.key();
         }
 
-        Gamemode gamemode = new Gamemode(gamemodeKey, target);
+        Gamemode gamemode = new Gamemode(event.getTranslationKey(), gamemodeKey, target);
         return Optional.of(gamemode);
     }
 

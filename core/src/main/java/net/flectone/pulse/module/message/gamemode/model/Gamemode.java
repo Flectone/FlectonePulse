@@ -1,4 +1,6 @@
 package net.flectone.pulse.module.message.gamemode.model;
 
-public record Gamemode(String type, String target) {
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+
+public record Gamemode(MinecraftTranslationKey key, String type, String target) {
 }

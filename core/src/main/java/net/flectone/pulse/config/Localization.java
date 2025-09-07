@@ -584,6 +584,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.format.questionAnswer.questions.put("server", "<fcolor:2>[Вопрос-Ответ] @<player><fcolor:1>, это ванильный сервер в Майнкрафте!");
         message.format.questionAnswer.questions.put("flectone", "<fcolor:2>[Вопрос-Ответ] @<player><fcolor:1>, это бренд и проекты созданные TheFaser'ом");
 
+        message.gamemode.formatDefault = "<fcolor:1>\uD83D\uDDD8 Новый режим игры по умолчанию: <fcolor:2><lang:gameMode.<gamemode>>";
         message.gamemode.formatSelf = "<fcolor:1>\uD83D\uDDD8 Твой режим игры изменён на <fcolor:2><lang:gameMode.<gamemode>>";
         message.gamemode.formatOther = "<fcolor:1>\uD83D\uDDD8 Режим игры игрока <display_name> изменён на <fcolor:2><lang:gameMode.<gamemode>>";
 
@@ -2100,6 +2101,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Gamemode implements SubMessageConfig, Localizable {
 
+            private String formatDefault = "<fcolor:1>🗘 The default game mode is now <fcolor:2><lang:gameMode.<gamemode>>";
             private String formatSelf = "<fcolor:1>🗘 Set own game mode to <fcolor:2><lang:gameMode.<gamemode>>";
             private String formatOther = "<fcolor:1>🗘 Set <display_name>'s game mode to <fcolor:2><lang:gameMode.<gamemode>>";
 

@@ -52,9 +52,12 @@ public enum MinecraftTranslationKey {
     COMMANDS_ENCHANT_SUCCESS_MULTIPLE("commands.enchant.success.multiple"),
     COMMANDS_ENCHANT_SUCCESS_SINGLE("commands.enchant.success.single"),
     COMMANDS_ENCHANT_SUCCESS("commands.enchant.success"), // legacy
+
+    COMMANDS_DEFAULTGAMEMODE_SUCCESS("commands.defaultgamemode.success"),
     COMMANDS_GAMEMODE_SUCCESS_OTHER("commands.gamemode.success.other"),
     COMMANDS_GAMEMODE_SUCCESS_SELF("commands.gamemode.success.self"),
     GAMEMODE_CHANGED("gameMode.changed"),
+
     COMMANDS_KILL_SUCCESS_MULTIPLE("commands.kill.success.multiple"),
     COMMANDS_KILL_SUCCESS_SINGLE("commands.kill.success.single"),
     COMMANDS_KILL_SUCCESS("commands.kill.successful"), // legacy
