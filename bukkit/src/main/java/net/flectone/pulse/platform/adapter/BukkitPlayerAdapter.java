@@ -7,12 +7,12 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.provider.AttributesProvider;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.provider.PassengersProvider;
@@ -76,7 +76,7 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     @Override
     public @Nullable UUID getUUID(@NotNull Object player) {
-        return player instanceof Player onlinePlayer ? onlinePlayer.getUniqueId() : null;
+        return player instanceof Entity entity ? entity.getUniqueId() : null;
     }
 
     @Override
@@ -116,10 +116,19 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public @NotNull String getType(@NotNull UUID uuid) {
+    public @NotNull String getEntityTranslationKey(@Nullable Object platformPlayer) {
+        if (platformPlayer instanceof Entity entity) {
+            return entity.getType().getTranslationKey();
+        }
+
+        return "";
+    }
+
+    @Override
+    public @NotNull String getTranslationKey(@NotNull UUID uuid) {
         Entity entity = Bukkit.getEntity(uuid);
 
-        return entity != null ? entity.getType().getTranslationKey() : "";
+        return getEntityTranslationKey(entity);
     }
 
     @Override

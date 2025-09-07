@@ -144,7 +144,16 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
-    public @NotNull String getType(@NotNull UUID uuid) {
+    public @NotNull String getEntityTranslationKey(@Nullable Object platformPlayer) {
+        if (platformPlayer instanceof Entity entity) {
+            return entity.getType().getTranslationKey();
+        }
+
+        return "";
+    }
+
+    @Override
+    public @NotNull String getTranslationKey(@NotNull UUID uuid) {
         MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
         if (minecraftServer == null) return "";
 
@@ -152,7 +161,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
             Entity entity = serverWorld.getEntity(uuid);
             if (entity == null) continue;
 
-            return entity.getType().getTranslationKey();
+            return getEntityTranslationKey(entity);
         }
 
         return "";

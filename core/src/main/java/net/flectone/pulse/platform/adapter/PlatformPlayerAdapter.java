@@ -58,7 +58,8 @@ public interface PlatformPlayerAdapter {
     @NotNull String getWorldName(@NotNull FPlayer fPlayer);
     @NotNull String getWorldEnvironment(@NotNull FPlayer fPlayer);
     @Nullable String getIp(@NotNull FPlayer fPlayer);
-    @NotNull String getType(@NotNull UUID uuid);
+    @NotNull String getEntityTranslationKey(@Nullable Object platformPlayer);
+    @NotNull String getTranslationKey(@NotNull UUID uuid);
     @NotNull GameMode getGamemode(@NotNull FPlayer fPlayer);
 
     // Player list methods
