@@ -447,6 +447,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.clear.single = "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><number> <fcolor:1>предметов у игрока <display_name>";
         message.clear.multiple = "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><number> <fcolor:1>предметов у <fcolor:2><count> <fcolor:1>игроков";
 
+        message.damage.format = "<fcolor:1>\uD83D\uDDE1 Нанесено <fcolor:2><amount> <fcolor:1>урона <display_name>";
+
         message.afk.formatTrue.global = "<gradient:#ffd500:#FFFF00>⌚ <player> отошёл";
         message.afk.formatTrue.local = "<gradient:#ffd500:#FFFF00>⌚ Ты отошёл от игры";
         message.afk.formatFalse.global = "<gradient:#ffd500:#FFFF00>⌚ <player> вернулся";
@@ -1622,6 +1624,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Chat chat = new Chat();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/clear/")})
         private Clear clear = new Clear();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/damage/")})
+        private Damage damage = new Damage();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/death/")})
         private Death death = new Death();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/deop/")})
@@ -1798,6 +1802,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
         public static final class Clear implements SubMessageConfig, Localizable {
             private String single = "<fcolor:1>🌊 Removed <fcolor:2><number> <fcolor:1>item(s) from player <display_name>";
             private String multiple = "<fcolor:1>🌊 Removed <fcolor:2><number> <fcolor:1>item(s) from <fcolor:2><count> <fcolor:1>players";
+        }
+
+        @Getter
+        public static final class Damage implements SubMessageConfig, Localizable {
+            private String format = "<fcolor:1>\uD83D\uDDE1 Applied <fcolor:2><amount> <fcolor:1>damage to <display_name>";
         }
 
         @Getter

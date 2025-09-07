@@ -53,6 +53,7 @@ public enum MessageType {
     COMMAND_UNWARN,
     COMMAND_WARN,
     COMMAND_WARNLIST,
+    DAMAGE,
     DEATH,
     DELETE,
     DEOP,
