@@ -6,7 +6,6 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.enchant.listener.EnchantPulseListener;
@@ -14,7 +13,6 @@ import net.flectone.pulse.module.message.enchant.model.Enchant;
 import net.flectone.pulse.module.message.enchant.model.EnchantMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import org.apache.commons.lang3.StringUtils;
@@ -24,18 +22,15 @@ public class EnchantModule extends AbstractModuleLocalization<Localization.Messa
 
     private final Message.Enchant message;
     private final Permission.Message.Enchant permission;
-    private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public EnchantModule(FileResolver fileResolver,
-                         FPlayerService fPlayerService,
                          ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getEnchant(), MessageType.ENCHANT);
 
         this.message = fileResolver.getMessage().getEnchant();
         this.permission = fileResolver.getPermission().getMessage().getEnchant();
-        this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
     }
 
@@ -57,21 +52,11 @@ public class EnchantModule extends AbstractModuleLocalization<Localization.Messa
     public void send(FPlayer fPlayer, MinecraftTranslationKey key, Enchant enchant) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        FEntity fTarget = fPlayer;
-
         boolean isSingle = key == MinecraftTranslationKey.COMMANDS_ENCHANT_SUCCESS_SINGLE
                 || key == MinecraftTranslationKey.COMMANDS_ENCHANT_SUCCESS;
 
-        if (isSingle && enchant.entity() != null) {
-            fTarget = fPlayerService.getFPlayer(enchant.entity().getUuid());
-
-            if (fTarget.isUnknown()) {
-                fTarget = enchant.entity();
-            }
-        }
-
         sendMessage(EnchantMetadata.<Localization.Message.Enchant>builder()
-                .sender(fTarget)
+                .sender(enchant.entity() == null ? fPlayer : enchant.entity())
                 .filterPlayer(fPlayer)
                 .format(s -> StringUtils.replaceEach(
                         isSingle ? s.getSingle() : s.getMultiple(),

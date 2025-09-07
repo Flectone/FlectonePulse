@@ -6,7 +6,6 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.kill.listener.KillPulseListener;
@@ -14,7 +13,6 @@ import net.flectone.pulse.module.message.kill.model.Kill;
 import net.flectone.pulse.module.message.kill.model.KillMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import org.apache.commons.lang3.Strings;
@@ -24,18 +22,15 @@ public class KillModule extends AbstractModuleLocalization<Localization.Message.
 
     private final Message.Kill message;
     private final Permission.Message.Kill permission;
-    private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public KillModule(FileResolver fileResolver,
-                      FPlayerService fPlayerService,
                       ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getKill(), MessageType.KILL);
 
         this.message = fileResolver.getMessage().getKill();
         this.permission = fileResolver.getPermission().getMessage().getKill();
-        this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
     }
 
@@ -57,21 +52,8 @@ public class KillModule extends AbstractModuleLocalization<Localization.Message.
     public void send(FPlayer fPlayer, MinecraftTranslationKey key, Kill kill) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        FEntity fTarget = fPlayer;
-
-        boolean isSingle = key == MinecraftTranslationKey.COMMANDS_KILL_SUCCESS_SINGLE
-                || key == MinecraftTranslationKey.COMMANDS_KILL_SUCCESS;
-
-        if (isSingle && kill.getEntityUUID() != null) {
-            fTarget = fPlayerService.getFPlayer(kill.getEntityUUID());
-
-            if (fTarget.isUnknown()) {
-                fTarget = kill.fEntity();
-            }
-        }
-
         sendMessage(KillMetadata.<Localization.Message.Kill>builder()
-                .sender(fTarget)
+                .sender(kill.entity() == null ? fPlayer : kill.entity())
                 .filterPlayer(fPlayer)
                 .format(s -> key == MinecraftTranslationKey.COMMANDS_KILL_SUCCESS_MULTIPLE
                         ? Strings.CS.replace(s.getMultiple(), "<count>", kill.value())

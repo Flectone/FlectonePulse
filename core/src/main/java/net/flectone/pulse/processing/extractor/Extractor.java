@@ -2,6 +2,7 @@ package net.flectone.pulse.processing.extractor;
 
 import com.google.inject.Inject;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.EntityUtil;
 import net.kyori.adventure.text.Component;
@@ -60,6 +61,9 @@ public abstract class Extractor {
 
         String type = triplet.second();
         uuid = triplet.third();
+
+        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
+        if (!fPlayer.isUnknown()) return Optional.of(fPlayer);
 
         FEntity entity = new FEntity(name, uuid, type);
         return Optional.of(entity);
