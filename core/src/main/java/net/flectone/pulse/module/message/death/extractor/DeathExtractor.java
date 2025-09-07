@@ -12,6 +12,7 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Singleton
@@ -53,14 +54,7 @@ public class DeathExtractor extends Extractor {
                 death.setTargetName(targetComponent.key());
                 death.setPlayer(false);
 
-                String insertion = targetComponent.insertion();
-                if (StringUtils.isNotEmpty(insertion)) {
-                    try {
-                        death.setTargetUUID(UUID.fromString(insertion));
-                    } catch (IllegalArgumentException e) {
-                        // null
-                    }
-                }
+                parseUUID(targetComponent.insertion()).ifPresent(death::setTargetUUID);
 
                 HoverEvent<?> hoverEvent = targetComponent.hoverEvent();
                 if (hoverEvent != null && hoverEvent.value() instanceof HoverEvent.ShowEntity showEntity) {
@@ -86,16 +80,12 @@ public class DeathExtractor extends Extractor {
                     death.setTargetName(target);
                     death.setPlayer(true);
 
-                    if (StringUtils.isNotEmpty(insertion)) {
-                        try {
-                            UUID uuid = UUID.fromString(insertion);
-                            death.setTargetUUID(uuid);
-                            death.setPlayer(false);
-                            death.setTargetType(target);
-                            yield death;
-                        } catch (IllegalArgumentException e) {
-                            // invalid UUID
-                        }
+                    Optional<UUID> optionalUUID = parseUUID(insertion);
+                    if (optionalUUID.isPresent()) {
+                        death.setTargetUUID(optionalUUID.get());
+                        death.setPlayer(false);
+                        death.setTargetType(target);
+                        yield death;
                     }
                 } else if (!targetComponent.children().isEmpty()
                         && targetComponent.children().getFirst() instanceof TextComponent extraText

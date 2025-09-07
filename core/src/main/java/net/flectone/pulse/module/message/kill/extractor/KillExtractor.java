@@ -12,7 +12,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.HoverEvent;
-import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.type.tuple.Triplet;
 
 import java.util.Optional;
@@ -49,13 +48,9 @@ public class KillExtractor extends Extractor {
 
         String content = switch (firstArgument) {
             case TranslatableComponent translatableArg -> {
-                String insertion = translatableArg.insertion();
-                if (StringUtils.isNotEmpty(insertion)) {
-                    try {
-                        uuid = UUID.fromString(insertion);
-                    } catch (IllegalArgumentException e) {
-                        // invalid UUID
-                    }
+                Optional<UUID> optionalUUID = parseUUID(translatableArg.insertion());
+                if (optionalUUID.isPresent()) {
+                    uuid = optionalUUID.get();
                 }
 
                 yield translatableArg.key();
