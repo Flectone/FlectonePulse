@@ -116,6 +116,13 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
+    public @NotNull String getType(@NotNull UUID uuid) {
+        Entity entity = Bukkit.getEntity(uuid);
+
+        return entity != null ? entity.getType().getTranslationKey() : "";
+    }
+
+    @Override
     public @NotNull GameMode getGamemode(@NotNull FPlayer fPlayer) {
         Player player = Bukkit.getPlayer(fPlayer.getUuid());
         return player != null
