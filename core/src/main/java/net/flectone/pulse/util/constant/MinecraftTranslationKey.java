@@ -44,6 +44,8 @@ public enum MinecraftTranslationKey {
     COMMANDS_CLEAR_SUCCESS_SINGLE("commands.clear.success.single"),
     COMMANDS_CLEAR_SUCCESS("commands.clear.success"), // legacy
 
+    COMMANDS_CLONE_SUCCESS("commands.clone.success"),
+
     COMMANDS_DAMAGE_SUCCESS("commands.damage.success"),
 
     COMMANDS_DEOP_SUCCESS("commands.deop.success"),

@@ -94,6 +94,7 @@ public interface ModuleConfig {
         SubMessageConfig getBubble();
         SubMessageConfig getChat();
         SubMessageConfig getClear();
+        SubMessageConfig getClone();
         SubMessageConfig getDamage();
         SubMessageConfig getDeath();
         SubMessageConfig getDeop();

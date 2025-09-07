@@ -10,6 +10,7 @@ public enum MessageType {
     BRAND,
     CHAT,
     CLEAR,
+    CLONE,
     COMMAND_AFK,
     COMMAND_ANON,
     COMMAND_BALL,

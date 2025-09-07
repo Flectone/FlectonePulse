@@ -62,6 +62,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Chat chat = new Chat();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/clear/")})
     private Clear clear = new Clear();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/clone/")})
+    private Clone clone = new Clone();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/damage/")})
     private Damage damage = new Damage();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/death/")})
@@ -261,6 +263,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
     @Getter
     public static final class Clear implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Sound sound = new Sound();
+        private Destination destination = new Destination();
+    }
+
+    @Getter
+    public static final class Clone implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Sound sound = new Sound();
         private Destination destination = new Destination();
