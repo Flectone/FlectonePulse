@@ -44,11 +44,16 @@ public class SpawnExtractor extends Extractor {
             xComponent = translationArguments.get(0).asComponent();
             yComponent = translationArguments.get(1).asComponent();
             zComponent = translationArguments.get(2).asComponent();
+
             targetComponent = translationArguments.getLast().asComponent();
 
             // check for optional angle and world
             if (translationArguments.size() >= 5 && translationArguments.get(3).asComponent() instanceof TextComponent angleComponent) {
                 angle = angleComponent.content();
+            } else if (event.getTranslationKey() == MinecraftTranslationKey.COMMANDS_SETWORLDSPAWN_SUCCESS
+                    && targetComponent instanceof TextComponent angleComponent) {
+                angle = angleComponent.content();
+                targetComponent = Component.empty();
             }
 
             if (translationArguments.size() >= 6 && translationArguments.get(4).asComponent() instanceof TextComponent worldComponent) {

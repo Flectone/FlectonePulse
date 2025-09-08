@@ -89,7 +89,7 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
                 .sender(fTarget)
                 .filterPlayer(fPlayer)
                 .format(s -> StringUtils.replaceEach(
-                        isSingle ? s.getSingle() : s.getMultiple(),
+                        key == MinecraftTranslationKey.COMMANDS_SETWORLDSPAWN_SUCCESS ? s.getSetWorld() : isSingle ? s.getSingle() : s.getMultiple(),
                         new String[]{"<count>", "<x>", "<y>", "<z>", "<angle>", "<world>"},
                         new String[]{spawn.value(), spawn.x(), spawn.y(), spawn.z(), spawn.angle(), spawn.world()}
                 ))

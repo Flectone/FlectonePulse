@@ -37,7 +37,8 @@ public class SpawnPulseListener implements PulseListener {
             return;
         }
 
-        if (!key.startsWith("commands.spawnpoint.success")) return;
+        if (!key.startsWith("commands.spawnpoint.success")
+                && key != MinecraftTranslationKey.COMMANDS_SETWORLDSPAWN_SUCCESS) return;
 
         Optional<Spawn> spawn = spawnExtractor.extract(event);
         if (spawn.isEmpty()) return;

@@ -73,9 +73,12 @@ public enum MinecraftTranslationKey {
     COMMANDS_OP_SUCCESS("commands.op.success"),
     COMMANDS_SEED_SUCCESS("commands.seed.success"),
     COMMANDS_SETBLOCK_SUCCESS("commands.setblock.success"),
+
     COMMANDS_SPAWNPOINT_SUCCESS_MULTIPLE("commands.spawnpoint.success.multiple"),
     COMMANDS_SPAWNPOINT_SUCCESS_SINGLE("commands.spawnpoint.success.single"),
     COMMANDS_SPAWNPOINT_SUCCESS("commands.spawnpoint.success"), // legacy
+    COMMANDS_SETWORLDSPAWN_SUCCESS("commands.setworldspawn.success"),
+
     COMMANDS_SUMMON_SUCCESS("commands.summon.success"),
 
     COMMANDS_TIME_QUERY("commands.time.query"),
