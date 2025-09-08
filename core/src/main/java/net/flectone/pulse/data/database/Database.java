@@ -4,6 +4,7 @@ package net.flectone.pulse.data.database;
 import com.alessiodp.libby.Library;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.zaxxer.hikari.HikariConfig;
@@ -12,6 +13,7 @@ import com.zaxxer.hikari.pool.HikariPool;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
+import net.flectone.pulse.data.database.dao.VersionDAO;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
@@ -34,6 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 
 @Singleton
 public class Database {
@@ -47,6 +50,7 @@ public class Database {
     private final FLogger fLogger;
     private final PacketProvider packetProvider;
     private final ReflectionResolver reflectionResolver;
+    private final Provider<VersionDAO> versionDAOProvider;
 
     private HikariDataSource dataSource;
     private Jdbi jdbi;
@@ -58,7 +62,8 @@ public class Database {
                     PlatformServerAdapter platformServerAdapter,
                     FLogger fLogger,
                     PacketProvider packetProvider,
-                    ReflectionResolver reflectionResolver) {
+                    ReflectionResolver reflectionResolver,
+                    Provider<VersionDAO> versionDAOProvider) {
         this.config = fileResolver.getConfig().getDatabase();
         this.fileResolver = fileResolver;
         this.projectPath = projectPath;
@@ -67,6 +72,7 @@ public class Database {
         this.fLogger = fLogger;
         this.packetProvider = packetProvider;
         this.reflectionResolver = reflectionResolver;
+        this.versionDAOProvider = versionDAOProvider;
     }
 
     public void connect() throws IOException {
@@ -99,16 +105,9 @@ public class Database {
             throw new RuntimeException(e);
         }
 
-        InputStream sqlFile = platformServerAdapter.getResource("sqls/" + config.getType().name().toLowerCase() + ".sql");
-        executeSQLFile(sqlFile);
+        executeSQLFile(platformServerAdapter.getResource("sqls/" + config.getType().name().toLowerCase() + ".sql"));
 
-        if (fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "1.3.0")) {
-            migration("1_3_0");
-        }
-
-        if (fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "1.5.2")) {
-            migration("1_5_2");
-        }
+        checkMigration();
 
         init();
     }
@@ -259,6 +258,22 @@ public class Database {
                 builder.setLength(0);
             }
         }
+    }
+
+    private void checkMigration() {
+        if (!fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), fileResolver.getConfig().getVersion())) return;
+
+        if (fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "1.3.0")) {
+            migration("1_3_0");
+        }
+
+        VersionDAO versionDAO = versionDAOProvider.get();
+        Optional<String> versionName = versionDAO.find();
+        if (versionName.isEmpty()) {
+            migration("1_5_2");
+        }
+
+        versionDAO.insertOrUpdate(fileResolver.getConfig().getVersion());
     }
 
     private void migration(String version) {

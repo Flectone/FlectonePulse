@@ -63,3 +63,8 @@ CREATE TABLE IF NOT EXISTS `player_fcolor` (
 FOREIGN KEY(`player`) REFERENCES `player`(`id`),
 FOREIGN KEY(`fcolor`) REFERENCES `fcolor`(`id`)
 );
+
+CREATE TABLE IF NOT EXISTS `version` (
+    `id` INTEGER PRIMARY KEY CHECK (id = 1),
+    `name` TEXT NOT NULL
+);
