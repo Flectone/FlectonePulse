@@ -593,6 +593,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.gamemode.formatSelf = "<fcolor:1>\uD83D\uDDD8 Твой режим игры изменён на <fcolor:2><lang:gameMode.<gamemode>>";
         message.gamemode.formatOther = "<fcolor:1>\uD83D\uDDD8 Режим игры игрока <display_name> изменён на <fcolor:2><lang:gameMode.<gamemode>>";
 
+        message.gamerule.formatQuery = "<fcolor:1>\uD83D\uDDD0 Значение игрового правила <fcolor:2><gamerule><fcolor:1>: <fcolor:2><value>";
+        message.gamerule.formatSet = "<fcolor:1>\uD83D\uDDD0 Установлено значение игрового правила <fcolor:2><gamerule><fcolor:1>: <fcolor:2><value>";
+
         message.greeting.format = "<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]  <fcolor:1>Привет,<br>[#][#][#][#][#][#][#][#]  <player><br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>";
 
         message.join.formatFirstTime = "<color:#4eff52>→ <display_name> <fcolor:1>впервые тут!";
@@ -1653,6 +1656,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Format format = new Format();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/gamemode/")})
         private Gamemode gamemode = new Gamemode();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/gamerule/")})
+        private Gamerule gamerule = new Gamerule();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/greeting/")})
         private Greeting greeting = new Greeting();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/join/")})
@@ -2125,11 +2130,15 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Gamemode implements SubMessageConfig, Localizable {
-
             private String formatDefault = "<fcolor:1>🗘 The default game mode is now <fcolor:2><lang:gameMode.<gamemode>>";
             private String formatSelf = "<fcolor:1>🗘 Set own game mode to <fcolor:2><lang:gameMode.<gamemode>>";
             private String formatOther = "<fcolor:1>🗘 Set <display_name>'s game mode to <fcolor:2><lang:gameMode.<gamemode>>";
+        }
 
+        @Getter
+        public static final class Gamerule implements SubMessageConfig, Localizable {
+            private String formatQuery = "<fcolor:1>\uD83D\uDDD0 Gamerule <fcolor:2><gamerule> <fcolor:1>is currently set to: <fcolor:2><value>";
+            private String formatSet = "<fcolor:1>\uD83D\uDDD0 Gamerule <fcolor:2><gamerule> <fcolor:1>is now set to: <fcolor:2><value>";
         }
 
         @Getter

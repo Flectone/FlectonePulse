@@ -64,6 +64,9 @@ public enum MinecraftTranslationKey {
     COMMANDS_GAMEMODE_SUCCESS_SELF("commands.gamemode.success.self"),
     GAMEMODE_CHANGED("gameMode.changed"),
 
+    COMMANDS_GAMERULE_QUERY("commands.gamerule.query"),
+    COMMANDS_GAMERULE_SET("commands.gamerule.set"),
+
     COMMANDS_KILL_SUCCESS_MULTIPLE("commands.kill.success.multiple"),
     COMMANDS_KILL_SUCCESS_SINGLE("commands.kill.success.single"),
     COMMANDS_KILL_SUCCESS("commands.kill.successful"), // legacy

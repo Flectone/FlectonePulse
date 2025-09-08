@@ -68,6 +68,7 @@ public enum MessageType {
     FROM_TELEGRAM_TO_MINECRAFT,
     FROM_TWITCH_TO_MINECRAFT,
     GAMEMODE,
+    GAMERULE,
     GREETING,
     HEADER,
     JOIN,
