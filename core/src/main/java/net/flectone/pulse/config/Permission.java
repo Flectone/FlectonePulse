@@ -807,6 +807,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Time time = new Time();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/update/")})
         private Update update = new Update();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/weather/")})
+        private Weather weather = new Weather();
 
         @Getter
         public static final class Advancement implements SubMessageConfig, IPermission {
@@ -1424,6 +1426,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private String name = "flectonepulse.module.message.update";
             private Type type = Type.OP;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.update.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Weather implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.weather";
+            private Type type = Type.TRUE;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.weather.sound", Type.TRUE);
         }
     }
 

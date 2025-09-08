@@ -676,11 +676,15 @@ public final class Localization extends FileSerializable implements ModuleConfig
             }
         });
 
-        message.time.formatQuery = "<fcolor:1>☀ Время: <fcolor:2><time>";
-        message.time.formatSet = "<fcolor:1>☀ Установлено время: <fcolor:2><time>";
+        message.time.formatQuery = "<fcolor:1>☽ Время: <fcolor:2><time>";
+        message.time.formatSet = "<fcolor:1>☽ Установлено время: <fcolor:2><time>";
 
         message.update.formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse) <fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <url:https://modrinth.com/plugin/flectonepulse>, чтобы получить новые возможности!";
         message.update.formatConsole = "<fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse";
+
+        message.weather.formatClear = "<fcolor:1>☀ Установлена <fcolor:2>ясная <fcolor:1>погода";
+        message.weather.formatRain = "<fcolor:1>☁ Установлена <fcolor:2>дождливая <fcolor:1>погода";
+        message.weather.formatThunder = "<fcolor:1>⛈ Установлена <fcolor:2>грозовая <fcolor:1>погода";
     }
 
 
@@ -1698,6 +1702,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Time time = new Time();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/update/")})
         private Update update = new Update();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/weather/")})
+        private Weather weather = new Weather();
 
         @Getter
         public static final class Advancement implements SubMessageConfig, Localizable {
@@ -2358,14 +2364,21 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Time implements SubMessageConfig, Localizable {
-            private String formatQuery = "<fcolor:1>☀ The time is <fcolor:2><time>";
-            private String formatSet = "<fcolor:1>☀ Set the time to <fcolor:2><time>";
+            private String formatQuery = "<fcolor:1>☽ The time is <fcolor:2><time>";
+            private String formatSet = "<fcolor:1>☽ Set the time to <fcolor:2><time>";
         }
 
         @Getter
         public static final class Update implements SubMessageConfig, Localizable {
             private String formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse)<fcolor:1> Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <url:https://github.com/Flectone/FlectonePulse/releases> for the latest features!";
             private String formatConsole = "<fcolor:1>Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <click:open_url:https://github.com/Flectone/FlectonePulse/releases>https://github.com/Flectone/FlectonePulse/releases";
+        }
+
+        @Getter
+        public static final class Weather implements SubMessageConfig, Localizable {
+            private String formatClear = "<fcolor:1>☀ Set the weather to <fcolor:2>clear";
+            private String formatRain = "<fcolor:1>☁ Set the weather to <fcolor:2>rain";
+            private String formatThunder = "<fcolor:1>⛈ Set the weather to <fcolor:2>rain & thunder";
         }
 
     }

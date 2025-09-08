@@ -118,6 +118,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Time time = new Time();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/update/")})
     private Update update = new Update();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/weather/")})
+    private Weather weather = new Weather();
 
     @Getter
     public static final class Advancement implements SubMessageConfig, Config.IEnable {
@@ -821,6 +823,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
     @Getter
     public static final class Update implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Destination destination = new Destination();
+        private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Weather implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
         private Sound sound = new Sound();

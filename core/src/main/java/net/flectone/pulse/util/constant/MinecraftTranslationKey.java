@@ -191,6 +191,10 @@ public enum MinecraftTranslationKey {
     SLEEP_PLAYERS_SLEEPING("sleep.players_sleeping"),
     SLEEP_SKIPPING_NIGHT("sleep.skipping_night"),
 
+    COMMANDS_WEATHER_SET_CLEAR("commands.weather.set.clear"),
+    COMMANDS_WEATHER_SET_RAIN("commands.weather.set.rain"),
+    COMMANDS_WEATHER_SET_THUNDER("commands.weather.set.thunder"),
+
     UNKNOWN("unknown");
 
     private final String key;

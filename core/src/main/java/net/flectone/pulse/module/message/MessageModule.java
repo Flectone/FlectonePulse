@@ -43,6 +43,7 @@ import net.flectone.pulse.module.message.summon.SummonModule;
 import net.flectone.pulse.module.message.tab.TabModule;
 import net.flectone.pulse.module.message.time.TimeModule;
 import net.flectone.pulse.module.message.update.UpdateModule;
+import net.flectone.pulse.module.message.weather.WeatherModule;
 import net.flectone.pulse.processing.resolver.FileResolver;
 
 @Singleton
@@ -99,6 +100,7 @@ public class MessageModule extends AbstractModule {
         addChildren(TabModule.class);
         addChildren(TimeModule.class);
         addChildren(UpdateModule.class);
+        addChildren(WeatherModule.class);
     }
 
     @Override

@@ -121,6 +121,7 @@ public interface ModuleConfig {
         TabMessageConfig getTab();
         SubMessageConfig getTime();
         SubMessageConfig getUpdate();
+        SubMessageConfig getWeather();
 
         interface SubMessageConfig {}
 

@@ -96,6 +96,7 @@ public enum MessageType {
     TRANSLATE,
     UPDATE,
     VERSION,
+    WEATHER,
 
     // only for invalidation cache
     SYSTEM_ONLINE,
