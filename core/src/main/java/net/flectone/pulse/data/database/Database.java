@@ -263,12 +263,13 @@ public class Database {
     private void checkMigration() {
         if (!fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), fileResolver.getConfig().getVersion())) return;
 
-        if (fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "1.3.0")) {
+        VersionDAO versionDAO = versionDAOProvider.get();
+        Optional<String> versionName = versionDAO.find();
+
+        if (versionName.isEmpty() && fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), "1.3.0")) {
             migration("1_3_0");
         }
 
-        VersionDAO versionDAO = versionDAOProvider.get();
-        Optional<String> versionName = versionDAO.find();
         if (versionName.isEmpty()) {
             migration("1_5_2");
         }
