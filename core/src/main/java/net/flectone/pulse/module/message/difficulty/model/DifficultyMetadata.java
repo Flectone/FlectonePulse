@@ -1,0 +1,20 @@
+package net.flectone.pulse.module.message.difficulty.model;
+
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.experimental.SuperBuilder;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+
+@Getter
+@SuperBuilder
+public class DifficultyMetadata<L extends Localization.Localizable> extends EventMetadata<L> {
+
+    @NonNull
+    private final String difficulty;
+
+    @NonNull
+    private final MinecraftTranslationKey translationKey;
+
+}

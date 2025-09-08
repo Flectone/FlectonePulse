@@ -98,6 +98,7 @@ public interface ModuleConfig {
         SubMessageConfig getDamage();
         SubMessageConfig getDeath();
         SubMessageConfig getDeop();
+        SubMessageConfig getDifficulty();
         SubMessageConfig getEnchant();
         SubMessageConfig getFill();
         FormatMessageConfig getFormat();

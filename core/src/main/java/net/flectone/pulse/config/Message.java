@@ -70,6 +70,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Death death = new Death();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/deop/")})
     private Deop deop = new Deop();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/difficulty/")})
+    private Difficulty difficulty = new Difficulty();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/enchant/")})
     private Enchant enchant = new Enchant();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/fill/")})
@@ -296,6 +298,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
     @Getter
     public static final class Deop implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Destination destination = new Destination();
+        private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Difficulty implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
         private Sound sound = new Sound();

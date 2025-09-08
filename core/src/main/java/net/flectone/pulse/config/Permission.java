@@ -759,6 +759,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Death death = new Death();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/deop/")})
         private Deop deop = new Deop();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/difficulty/")})
+        private Difficulty difficulty = new Difficulty();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/enchant/")})
         private Enchant enchant = new Enchant();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/fill/")})
@@ -923,6 +925,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private String name = "flectonepulse.module.message.deop";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.deop.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Difficulty implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.difficulty";
+            private Type type = Type.TRUE;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.difficulty.sound", Type.TRUE);
         }
 
         @Getter

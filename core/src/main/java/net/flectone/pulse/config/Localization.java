@@ -559,6 +559,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.deop.format = "<fcolor:1>\uD83E\uDD16 <display_name> больше не является оператором сервера";
 
+        message.difficulty.formatQuery = "<fcolor:1>⚔ Сложность игры: <fcolor:2><lang:'<difficulty>'>";
+        message.difficulty.formatSuccess = "<fcolor:1>⚔ Установлена сложность игры: <fcolor:2><lang:'<difficulty>'>";
+
         message.enchant.single = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» на предмет <display_name>";
         message.enchant.multiple = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» на предмет <fcolor:2><count><fcolor:1> сущностей";
 
@@ -1640,6 +1643,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Death death = new Death();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/deop/")})
         private Deop deop = new Deop();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/difficulty/")})
+        private Difficulty difficulty = new Difficulty();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/enchant/")})
         private Enchant enchant = new Enchant();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/fill/")})
@@ -1941,6 +1946,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Deop implements SubMessageConfig, Localizable {
             private String format = "<fcolor:1>🤖 Made <display_name> no longer a server operator";
+        }
+
+        @Getter
+        public static final class Difficulty implements SubMessageConfig, Localizable {
+            private String formatQuery = "<fcolor:1>⚔ The difficulty is <fcolor:2><lang:'<difficulty>'>";
+            private String formatSuccess = "<fcolor:1>⚔ The difficulty has been set to <fcolor:2><lang:'<difficulty>'>";
         }
 
         @Getter

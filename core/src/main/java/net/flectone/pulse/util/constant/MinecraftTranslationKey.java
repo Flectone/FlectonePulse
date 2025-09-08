@@ -49,6 +49,10 @@ public enum MinecraftTranslationKey {
     COMMANDS_DAMAGE_SUCCESS("commands.damage.success"),
 
     COMMANDS_DEOP_SUCCESS("commands.deop.success"),
+
+    COMMANDS_DIFFICULTY_QUERY("commands.difficulty.query"),
+    COMMANDS_DIFFICULTY_SUCCESS("commands.difficulty.success"),
+
     COMMANDS_ENCHANT_SUCCESS_MULTIPLE("commands.enchant.success.multiple"),
     COMMANDS_ENCHANT_SUCCESS_SINGLE("commands.enchant.success.single"),
     COMMANDS_ENCHANT_SUCCESS("commands.enchant.success"), // legacy
