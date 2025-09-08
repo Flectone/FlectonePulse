@@ -11,6 +11,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class MetricsDTO {
 
+    private String serverUUID;
     private String serverCore;
     private String serverVersion;
     private String osName;

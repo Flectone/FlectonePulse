@@ -25,6 +25,7 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -98,6 +99,18 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         if (minecraftServer == null) return "fabric";
 
         return minecraftServer.getServerModName();
+    }
+
+    @Override
+    public @NotNull String getServerUUID() {
+        MinecraftServer minecraftServer = fabricFlectonePulse.getMinecraftServer();
+        if (minecraftServer == null) return "";
+
+        for (ServerWorld serverWorld : minecraftServer.getWorlds()) {
+            return serverWorld.getRegistryKey().getValue().toString();
+        }
+
+        return "";
     }
 
     @Override

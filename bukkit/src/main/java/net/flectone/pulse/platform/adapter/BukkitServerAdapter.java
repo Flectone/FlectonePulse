@@ -29,6 +29,7 @@ import org.apache.commons.lang3.Strings;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -120,6 +121,14 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     @Override
     public @NotNull String getServerCore() {
         return Bukkit.getServer().getName();
+    }
+
+    @Override
+    public @NotNull String getServerUUID() {
+        List<World> worlds = Bukkit.getWorlds();
+        if (worlds.isEmpty()) return "";
+
+        return worlds.getFirst().getUID().toString();
     }
 
     @Override

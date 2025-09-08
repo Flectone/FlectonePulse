@@ -47,6 +47,13 @@ public interface PlatformServerAdapter {
      */
     @NotNull String getServerCore();
 
+    /**
+     * Returns server UUID
+     *
+     * @return A string representing server UUID
+     */
+    @NotNull String getServerUUID();
+
     PlatformType getPlatformType();
 
     /**

@@ -44,12 +44,15 @@ public class MetricsService {
 
     public void send() {
         MetricsDTO metricsDTO = new MetricsDTO();
-        metricsDTO.setServerCore(platformServerAdapter.getServerCore());
 
+        metricsDTO.setServerUUID(platformServerAdapter.getServerUUID());
+        metricsDTO.setServerCore(platformServerAdapter.getServerCore());
         metricsDTO.setServerVersion(packetProvider.getServerVersion().getReleaseName());
+
         metricsDTO.setOsName(getOsName());
         metricsDTO.setOsArchitecture(getOsArch());
         metricsDTO.setOsVersion(getOsVersion());
+
         metricsDTO.setJavaVersion(getJavaVersion());
         metricsDTO.setCpuCores(Runtime.getRuntime().availableProcessors());
         metricsDTO.setTotalRAM(Runtime.getRuntime().maxMemory());
