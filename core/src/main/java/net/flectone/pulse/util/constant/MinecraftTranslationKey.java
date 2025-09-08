@@ -71,6 +71,9 @@ public enum MinecraftTranslationKey {
     COMMANDS_SPAWNPOINT_SUCCESS("commands.spawnpoint.success"), // legacy
     COMMANDS_SUMMON_SUCCESS("commands.summon.success"),
 
+    COMMANDS_TIME_QUERY("commands.time.query"),
+    COMMANDS_TIME_SET("commands.time.set"),
+
     DEATH_ATTACK_ANVIL("death.attack.anvil"),
     DEATH_ATTACK_ANVIL_PLAYER("death.attack.anvil.player"),
     DEATH_ATTACK_ARROW("death.attack.arrow"),

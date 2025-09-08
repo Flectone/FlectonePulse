@@ -799,6 +799,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Summon summon = new Summon();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/")})
         private Tab tab = new Tab();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/time/")})
+        private Time time = new Time();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/update/")})
         private Update update = new Update();
 
@@ -1389,6 +1391,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                 private String name = "flectonepulse.module.message.tab.footer";
                 private Type type = Type.TRUE;
             }
+        }
+
+        @Getter
+        public static final class Time implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.time";
+            private Type type = Type.TRUE;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.time.sound", Type.TRUE);
         }
 
         @Setter

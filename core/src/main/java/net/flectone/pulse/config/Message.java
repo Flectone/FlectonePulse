@@ -110,6 +110,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Summon summon = new Summon();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/")})
     private Tab tab = new Tab();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/time/")})
+    private Time time = new Time();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/update/")})
     private Update update = new Update();
 
@@ -790,6 +792,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
             private boolean enable = true;
             private Ticker ticker = new Ticker(true, 100);
         }
+    }
+
+    @Getter
+    public static final class Time implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Destination destination = new Destination();
+        private Sound sound = new Sound();
     }
 
     @Getter

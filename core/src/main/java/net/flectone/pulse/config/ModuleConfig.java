@@ -117,6 +117,7 @@ public interface ModuleConfig {
         StatusMessageConfig getStatus();
         SubMessageConfig getSummon();
         TabMessageConfig getTab();
+        SubMessageConfig getTime();
         SubMessageConfig getUpdate();
 
         interface SubMessageConfig {}

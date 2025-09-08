@@ -670,6 +670,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
             }
         });
 
+        message.time.formatQuery = "<fcolor:1>☀ Время: <fcolor:2><time>";
+        message.time.formatSet = "<fcolor:1>☀ Установлено время: <fcolor:2><time>";
+
         message.update.formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse) <fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <url:https://modrinth.com/plugin/flectonepulse>, чтобы получить новые возможности!";
         message.update.formatConsole = "<fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse";
     }
@@ -1681,6 +1684,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Summon summon = new Summon();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/")})
         private Tab tab = new Tab();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/time/")})
+        private Time time = new Time();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/update/")})
         private Update update = new Update();
 
@@ -2329,6 +2334,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
             public static final class Playerlistname implements SubTabMessageConfig, Localizable {
                 private String format = "<world_prefix>▋ <reset><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix>";
             }
+        }
+
+        @Getter
+        public static final class Time implements SubMessageConfig, Localizable {
+            private String formatQuery = "<fcolor:1>☀ The time is <fcolor:2><time>";
+            private String formatSet = "<fcolor:1>☀ Set the time to <fcolor:2><time>";
         }
 
         @Getter
