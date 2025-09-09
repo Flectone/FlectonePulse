@@ -101,6 +101,7 @@ public interface ModuleConfig {
         SubMessageConfig getDifficulty();
         SubMessageConfig getEffect();
         SubMessageConfig getEnchant();
+        SubMessageConfig getExecute();
         SubMessageConfig getFill();
         FormatMessageConfig getFormat();
         SubMessageConfig getGamemode();

@@ -76,6 +76,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Effect effect = new Effect();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/enchant/")})
     private Enchant enchant = new Enchant();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/execute/")})
+    private Execute execute = new Execute();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/fill/")})
     private Fill fill = new Fill();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/")})
@@ -325,6 +327,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
     @Getter
     public static final class Enchant implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Destination destination = new Destination();
+        private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Execute implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
         private Sound sound = new Sound();

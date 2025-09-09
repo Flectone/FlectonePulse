@@ -61,6 +61,7 @@ public enum MessageType {
     DIFFICULTY,
     EFFECT,
     ENCHANT,
+    EXECUTE,
     ERROR,
     FILL,
     FOOTER,

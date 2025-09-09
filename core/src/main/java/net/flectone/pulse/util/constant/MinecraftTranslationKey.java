@@ -64,6 +64,9 @@ public enum MinecraftTranslationKey {
     COMMANDS_ENCHANT_SUCCESS_SINGLE("commands.enchant.success.single"),
     COMMANDS_ENCHANT_SUCCESS("commands.enchant.success"), // legacy
 
+    COMMANDS_EXECUTE_CONDITIONAL_PASS("commands.execute.conditional.pass"),
+    COMMANDS_EXECUTE_CONDITIONAL_PASS_COUNT("commands.execute.conditional.pass_count"),
+
     COMMANDS_FILL_SUCCESS("commands.fill.success"),
 
     COMMANDS_DEFAULTGAMEMODE_SUCCESS("commands.defaultgamemode.success"),
