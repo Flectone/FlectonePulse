@@ -347,7 +347,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.toponline.nullPage = "<color:#ff7171><b>⁉</b> Страница не найдена";
         command.toponline.header = "<fcolor:2>▋ Игроков: <count> <br>";
         command.toponline.line = "<fcolor:2><time_player> <fcolor:1>наиграл <fcolor:2><time>";
-        command.toponline.footer = "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
+        command.toponline.footer = "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Страница: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
 
         command.maintenance.kick = "<color:#ff7171>★ На сервере ведутся технические работы";
         command.maintenance.serverDescription = "<color:#ff7171>В настоящее время проводятся технические работы";
@@ -1334,7 +1334,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String nullPage = "<color:#ff7171><b>⁉</b> This page doesn't exist";
             private String header = "<fcolor:2>▋ Players: <count> <br>";
             private String line = "<fcolor:2><time_player> <fcolor:1>played for <fcolor:2><time>";
-            private String footer = "<br>▋ <fcolor:2><click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
+            private String footer = "<br><fcolor:2>▋ <click:run_command:\"<command> <prev_page>\">←</click> <fcolor:1>Page: <current_page>/<last_page> <fcolor:2><click:run_command:\"<command> <next_page>\">→";
         }
 
         @Getter
