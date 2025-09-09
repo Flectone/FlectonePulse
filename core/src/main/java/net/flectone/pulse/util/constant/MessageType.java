@@ -94,6 +94,7 @@ public enum MessageType {
     SPAWN,
     SUMMON,
     SWEAR,
+    TELEPORT,
     TIME,
     TRANSLATE,
     UPDATE,

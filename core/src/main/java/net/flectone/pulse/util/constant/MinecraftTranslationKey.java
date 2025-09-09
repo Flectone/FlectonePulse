@@ -91,6 +91,11 @@ public enum MinecraftTranslationKey {
 
     COMMANDS_SUMMON_SUCCESS("commands.summon.success"),
 
+    COMMANDS_TELEPORT_SUCCESS_ENTITY_MULTIPLE("commands.teleport.success.entity.multiple"),
+    COMMANDS_TELEPORT_SUCCESS_ENTITY_SINGLE("commands.teleport.success.entity.single"),
+    COMMANDS_TELEPORT_SUCCESS_LOCATION_MULTIPLE("commands.teleport.success.location.multiple"),
+    COMMANDS_TELEPORT_SUCCESS_LOCATION_SINGLE("commands.teleport.success.location.single"),
+
     COMMANDS_TIME_QUERY("commands.time.query"),
     COMMANDS_TIME_SET("commands.time.set"),
 

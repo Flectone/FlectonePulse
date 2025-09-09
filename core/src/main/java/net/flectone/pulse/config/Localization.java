@@ -687,6 +687,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
             }
         });
 
+        message.teleport.entity.single = "<fcolor:1>\uD83C\uDF00 <display_name> телепортирован к <destination>";
+        message.teleport.entity.multiple = "<fcolor:1>\uD83C\uDF00 <fcolor:2><count> <fcolor:1>сущностей телепортированы к <display_name>";
+        message.teleport.location.single = "<fcolor:1>\uD83C\uDF00 <display_name> телепортирован в точку <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>";
+        message.teleport.location.multiple = "<fcolor:1>\uD83C\uDF00 <fcolor:2><count> <fcolor:1>сущностей телепортированы в точку <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>";
+
         message.time.formatQuery = "<fcolor:1>☽ Время: <fcolor:2><time>";
         message.time.formatSet = "<fcolor:1>☽ Установлено время: <fcolor:2><time>";
 
@@ -1713,6 +1718,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Summon summon = new Summon();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/")})
         private Tab tab = new Tab();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/teleport/")})
+        private Teleport teleport = new Teleport();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/time/")})
         private Time time = new Time();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/update/")})
@@ -2406,6 +2413,19 @@ public final class Localization extends FileSerializable implements ModuleConfig
             public static final class Playerlistname implements SubTabMessageConfig, Localizable {
                 private String format = "<world_prefix>▋ <reset><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix>";
             }
+        }
+
+        @Getter
+        public static final class Teleport implements SubMessageConfig, Localizable {
+            private SingleMultiple entity = new SingleMultiple(
+                    "<fcolor:1>\uD83C\uDF00 Teleported <display_name> to <destination>",
+                    "<fcolor:1>\uD83C\uDF00 Teleported <fcolor:2><count> <fcolor:1>entities to <display_name>"
+            );
+
+            private SingleMultiple location = new SingleMultiple(
+                    "<fcolor:1>\uD83C\uDF00 Teleported <display_name> to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>",
+                    "<fcolor:1>\uD83C\uDF00 Teleported <fcolor:2><count> <fcolor:1>to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>"
+            );
         }
 
         @Getter

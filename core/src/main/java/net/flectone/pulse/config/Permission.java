@@ -807,6 +807,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Summon summon = new Summon();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/")})
         private Tab tab = new Tab();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/teleport/")})
+        private Teleport teleport = new Teleport();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/time/")})
         private Time time = new Time();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/update/")})
@@ -1429,6 +1431,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
                 private String name = "flectonepulse.module.message.tab.footer";
                 private Type type = Type.TRUE;
             }
+        }
+
+        @Getter
+        public static final class Teleport implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.teleport";
+            private Type type = Type.TRUE;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.teleport.sound", Type.TRUE);
         }
 
         @Getter

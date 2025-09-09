@@ -43,6 +43,7 @@ import net.flectone.pulse.module.message.spawn.SpawnModule;
 import net.flectone.pulse.module.message.status.StatusModule;
 import net.flectone.pulse.module.message.summon.SummonModule;
 import net.flectone.pulse.module.message.tab.TabModule;
+import net.flectone.pulse.module.message.teleport.TeleportModule;
 import net.flectone.pulse.module.message.time.TimeModule;
 import net.flectone.pulse.module.message.update.UpdateModule;
 import net.flectone.pulse.module.message.weather.WeatherModule;
@@ -102,6 +103,7 @@ public class MessageModule extends AbstractModule {
         addChildren(StatusModule.class);
         addChildren(SummonModule.class);
         addChildren(TabModule.class);
+        addChildren(TeleportModule.class);
         addChildren(TimeModule.class);
         addChildren(UpdateModule.class);
         addChildren(WeatherModule.class);
