@@ -562,6 +562,13 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.difficulty.formatQuery = "<fcolor:1>⚔ Сложность игры: <fcolor:2><lang:'<difficulty>'>";
         message.difficulty.formatSuccess = "<fcolor:1>⚔ Установлена сложность игры: <fcolor:2><lang:'<difficulty>'>";
 
+        message.effect.clear.everything.single = "<fcolor:1>⚗ Убраны все эффекты с <display_name>";
+        message.effect.clear.everything.multiple = "<fcolor:1>⚗ Убраны все эффекты с <fcolor:2><count> <fcolor:1>целей";
+        message.effect.clear.specific.single = "<fcolor:1>⚗ Убран эффект «<fcolor:2><lang:'<effect>'><fcolor:1>» с <display_name>";
+        message.effect.clear.specific.multiple = "<fcolor:1>⚗ Убран эффект «<fcolor:2><lang:'<effect>'><fcolor:1>» с <fcolor:2><count> <fcolor:1>целей";
+        message.effect.give.single = "<fcolor:1>⚗ Применён эффект «<fcolor:2><lang:'<effect>'><fcolor:1>» к <display_name>";
+        message.effect.give.multiple = "<fcolor:1>⚗ Применён эффект <fcolor:2><lang:'<effect>'><fcolor:1>» к <fcolor:2><count> <fcolor:1>целям";
+
         message.enchant.single = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» на предмет <display_name>";
         message.enchant.multiple = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» на предмет <fcolor:2><count><fcolor:1> сущностей";
 
@@ -1653,6 +1660,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Deop deop = new Deop();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/difficulty/")})
         private Difficulty difficulty = new Difficulty();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/effect/")})
+        private Effect effect = new Effect();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/enchant/")})
         private Enchant enchant = new Enchant();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/fill/")})
@@ -1964,6 +1973,30 @@ public final class Localization extends FileSerializable implements ModuleConfig
         public static final class Difficulty implements SubMessageConfig, Localizable {
             private String formatQuery = "<fcolor:1>⚔ The difficulty is <fcolor:2><lang:'<difficulty>'>";
             private String formatSuccess = "<fcolor:1>⚔ The difficulty has been set to <fcolor:2><lang:'<difficulty>'>";
+        }
+
+        @Getter
+        public static final class Effect implements SubMessageConfig, Localizable {
+
+            private Clear clear = new Clear();
+            private SingleMultiple give = new SingleMultiple(
+                    "<fcolor:1>⚗ Applied effect <fcolor:2><lang:'<effect>'> <fcolor:1>to <display_name>",
+                    "<fcolor:1>⚗ Applied effect <fcolor:2><lang:'<effect>'> <fcolor:1>to <fcolor:2><count> <fcolor:1>targets"
+            );
+
+            @Getter
+            public static final class Clear {
+                private SingleMultiple everything = new SingleMultiple(
+                        "<fcolor:1>⚗ Removed every effect from <display_name>",
+                        "<fcolor:1>⚗ Removed every effect from <fcolor:2><count> <fcolor:1>targets"
+                );
+
+                private SingleMultiple specific = new SingleMultiple(
+                        "<fcolor:1>⚗ Removed effect <fcolor:2><lang:'<effect>'> <fcolor:1>from <display_name>",
+                        "<fcolor:1>⚗ Removed effect <fcolor:2><lang:'<effect>'> <fcolor:1>from <fcolor:2><count> <fcolor:1>targets"
+                );
+            }
+
         }
 
         @Getter
@@ -2404,6 +2437,14 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
             return super.getOrDefault(reason, reason);
         }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static final class SingleMultiple {
+        private String single = "";
+        private String multiple = "";
     }
 
 }

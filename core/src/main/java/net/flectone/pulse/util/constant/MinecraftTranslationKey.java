@@ -53,6 +53,13 @@ public enum MinecraftTranslationKey {
     COMMANDS_DIFFICULTY_QUERY("commands.difficulty.query"),
     COMMANDS_DIFFICULTY_SUCCESS("commands.difficulty.success"),
 
+    COMMANDS_EFFECT_CLEAR_EVERYTHING_SUCCESS_MULTIPLE("commands.effect.clear.everything.success.multiple"),
+    COMMANDS_EFFECT_CLEAR_EVERYTHING_SUCCESS_SINGLE("commands.effect.clear.everything.success.single"),
+    COMMANDS_EFFECT_CLEAR_SPECIFIC_SUCCESS_MULTIPLE("commands.effect.clear.specific.success.multiple"),
+    COMMANDS_EFFECT_CLEAR_SPECIFIC_SUCCESS_SINGLE("commands.effect.clear.specific.success.single"),
+    COMMANDS_EFFECT_GIVE_SUCCESS_MULTIPLE("commands.effect.give.success.multiple"),
+    COMMANDS_EFFECT_GIVE_SUCCESS_SINGLE("commands.effect.give.success.single"),
+
     COMMANDS_ENCHANT_SUCCESS_MULTIPLE("commands.enchant.success.multiple"),
     COMMANDS_ENCHANT_SUCCESS_SINGLE("commands.enchant.success.single"),
     COMMANDS_ENCHANT_SUCCESS("commands.enchant.success"), // legacy

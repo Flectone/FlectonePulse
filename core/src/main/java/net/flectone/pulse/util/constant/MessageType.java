@@ -59,6 +59,7 @@ public enum MessageType {
     DELETE,
     DEOP,
     DIFFICULTY,
+    EFFECT,
     ENCHANT,
     ERROR,
     FILL,
