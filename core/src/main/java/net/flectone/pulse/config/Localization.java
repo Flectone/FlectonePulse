@@ -650,6 +650,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
             }
         });
 
+        message.save.disabled = "<fcolor:1>\uD83D\uDEC8 Автосохранение отключено";
+        message.save.enabled = "<fcolor:1>\uD83D\uDEC8 Автосохранение включено";
+        message.save.saving = "<fcolor:1>\uD83D\uDEC8 Сохранение мира (может занять некоторое время!)";
+        message.save.success = "<fcolor:1>\uD83D\uDEC8 Игра сохранена";
+
         message.seed.format = "<fcolor:1>\uD83C\uDF10 Ключ генератора: [<fcolor:2><hover:show_text:'<fcolor:2>Нажми, чтобы скопировать в буфер обмена'><click:copy_to_clipboard:<seed>><seed></click>]";
 
         message.setblock.format = "<fcolor:1>⏹ Изменён блок в точке <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>";
@@ -1709,6 +1714,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Quit quit = new Quit();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/rightclick/")})
         private Rightclick rightclick = new Rightclick();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/save/")})
+        private Save save = new Save();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/seed/")})
         private Seed seed = new Seed();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/setblock/")})
@@ -2305,6 +2312,14 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Rightclick implements SubMessageConfig, Localizable {
             private String format = "<fcolor:1>◁ <display_name> ▷";
+        }
+
+        @Getter
+        public static final class Save implements SubMessageConfig, Localizable {
+            private String disabled = "<fcolor:1>\uD83D\uDEC8 Automatic saving is now disabled";
+            private String enabled = "<fcolor:1>\uD83D\uDEC8 Automatic saving is now enabled";
+            private String saving = "<fcolor:1>\uD83D\uDEC8 Saving the game (this may take a moment!)";
+            private String success = "<fcolor:1>\uD83D\uDEC8 Saved the game";
         }
 
         @Getter

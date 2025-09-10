@@ -91,7 +91,14 @@ public enum MinecraftTranslationKey {
     COMMANDS_KILL_SUCCESS_MULTIPLE("commands.kill.success.multiple"),
     COMMANDS_KILL_SUCCESS_SINGLE("commands.kill.success.single"),
     COMMANDS_KILL_SUCCESS("commands.kill.successful"), // legacy
+
     COMMANDS_OP_SUCCESS("commands.op.success"),
+
+    COMMANDS_SAVE_DISABLED("commands.save.disabled"),
+    COMMANDS_SAVE_ENABLED("commands.save.enabled"),
+    COMMANDS_SAVE_SAVING("commands.save.saving"),
+    COMMANDS_SAVE_SUCCESS("commands.save.success"),
+
     COMMANDS_SEED_SUCCESS("commands.seed.success"),
     COMMANDS_SETBLOCK_SUCCESS("commands.setblock.success"),
 

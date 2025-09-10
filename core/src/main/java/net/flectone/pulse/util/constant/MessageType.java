@@ -88,6 +88,7 @@ public enum MessageType {
     QUIT,
     REPLACEMENT,
     RIGHT_CLICK,
+    SAVE,
     SEED,
     SIDEBAR,
     SETBLOCK,

@@ -35,6 +35,7 @@ import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.op.OpModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.rightclick.RightclickModule;
+import net.flectone.pulse.module.message.save.SaveModule;
 import net.flectone.pulse.module.message.seed.SeedModule;
 import net.flectone.pulse.module.message.setblock.SetblockModule;
 import net.flectone.pulse.module.message.sidebar.SidebarModule;
@@ -96,6 +97,7 @@ public class MessageModule extends AbstractModule {
         addChildren(OpModule.class);
         addChildren(QuitModule.class);
         addChildren(RightclickModule.class);
+        addChildren(SaveModule.class);
         addChildren(SidebarModule.class);
         addChildren(SeedModule.class);
         addChildren(SetblockModule.class);
