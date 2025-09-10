@@ -777,6 +777,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Gamemode gamemode = new Gamemode();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/gamerule/")})
         private Gamerule gamerule = new Gamerule();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/give/")})
+        private Give give = new Give();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/greeting/")})
         private Greeting greeting = new Greeting();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/join/")})
@@ -1259,6 +1261,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private String name = "flectonepulse.module.message.gamerule";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.gamerule.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Give implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.give";
+            private Type type = Type.TRUE;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.give.sound", Type.TRUE);
         }
 
         @Getter

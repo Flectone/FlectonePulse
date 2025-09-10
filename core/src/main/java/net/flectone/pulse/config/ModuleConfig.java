@@ -107,6 +107,7 @@ public interface ModuleConfig {
         FormatMessageConfig getFormat();
         SubMessageConfig getGamemode();
         SubMessageConfig getGamerule();
+        SubMessageConfig getGive();
         SubMessageConfig getGreeting();
         SubMessageConfig getJoin();
         SubMessageConfig getKill();

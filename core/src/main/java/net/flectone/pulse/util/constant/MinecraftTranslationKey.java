@@ -88,6 +88,9 @@ public enum MinecraftTranslationKey {
     COMMANDS_GAMERULE_QUERY("commands.gamerule.query"),
     COMMANDS_GAMERULE_SET("commands.gamerule.set"),
 
+    COMMANDS_GIVE_SUCCESS_MULTIPLE("commands.give.success.multiple"),
+    COMMANDS_GIVE_SUCCESS_SINGLE("commands.give.success.single"),
+
     COMMANDS_KILL_SUCCESS_MULTIPLE("commands.kill.success.multiple"),
     COMMANDS_KILL_SUCCESS_SINGLE("commands.kill.success.single"),
     COMMANDS_KILL_SUCCESS("commands.kill.successful"), // legacy

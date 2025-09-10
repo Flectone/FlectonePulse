@@ -72,6 +72,7 @@ public enum MessageType {
     FROM_TWITCH_TO_MINECRAFT,
     GAMEMODE,
     GAMERULE,
+    GIVE,
     GREETING,
     HEADER,
     JOIN,

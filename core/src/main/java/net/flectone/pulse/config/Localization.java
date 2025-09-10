@@ -617,6 +617,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.gamerule.formatQuery = "<fcolor:1>\uD83D\uDDD0 Значение игрового правила <fcolor:2><gamerule><fcolor:1>: <fcolor:2><value>";
         message.gamerule.formatSet = "<fcolor:1>\uD83D\uDDD0 Установлено значение игрового правила <fcolor:2><gamerule><fcolor:1>: <fcolor:2><value>";
 
+        message.give.single = "<fcolor:1>⛏ Выдано <fcolor:2><amount> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<item>'>\"><lang:'<item>'><fcolor:1>] игроку <display_name>";
+        message.give.multiple = "<fcolor:1>⛏ Выдано <fcolor:2><amount> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<item>'>\"><lang:'<item>'><fcolor:1>] <fcolor:2><count> <fcolor:1>игрокам";
+
         message.greeting.format = "<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]  <fcolor:1>Привет,<br>[#][#][#][#][#][#][#][#]  <player><br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>";
 
         message.join.formatFirstTime = "<color:#4eff52>→ <display_name> <fcolor:1>впервые тут!";
@@ -1704,6 +1707,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Gamemode gamemode = new Gamemode();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/gamerule/")})
         private Gamerule gamerule = new Gamerule();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/give/")})
+        private Give give = new Give();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/greeting/")})
         private Greeting greeting = new Greeting();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/join/")})
@@ -2269,6 +2274,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
         public static final class Gamerule implements SubMessageConfig, Localizable {
             private String formatQuery = "<fcolor:1>\uD83D\uDDD0 Gamerule <fcolor:2><gamerule> <fcolor:1>is currently set to: <fcolor:2><value>";
             private String formatSet = "<fcolor:1>\uD83D\uDDD0 Gamerule <fcolor:2><gamerule> <fcolor:1>is now set to: <fcolor:2><value>";
+        }
+
+        @Getter
+        public static final class Give implements SubMessageConfig, Localizable {
+            private String single = "<fcolor:1>⛏ Gave <fcolor:2><amount> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<item>'>\"><lang:'<item>'><fcolor:1>] to <display_name>";
+            private String multiple = "<fcolor:1>⛏ Gave <fcolor:2><amount> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<item>'>\"><lang:'<item>'><fcolor:1>] to <count> players";
         }
 
         @Getter

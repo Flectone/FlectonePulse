@@ -28,6 +28,7 @@ import net.flectone.pulse.module.message.fill.FillModule;
 import net.flectone.pulse.module.message.format.FormatModule;
 import net.flectone.pulse.module.message.gamemode.GamemodeModule;
 import net.flectone.pulse.module.message.gamerule.GameruleModule;
+import net.flectone.pulse.module.message.give.GiveModule;
 import net.flectone.pulse.module.message.greeting.GreetingModule;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.kill.KillModule;
@@ -92,6 +93,7 @@ public class MessageModule extends AbstractModule {
         addChildren(FormatModule.class);
         addChildren(GamemodeModule.class);
         addChildren(GameruleModule.class);
+        addChildren(GiveModule.class);
         addChildren(GreetingModule.class);
         addChildren(JoinModule.class);
         addChildren(KillModule.class);

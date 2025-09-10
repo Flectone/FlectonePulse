@@ -88,6 +88,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Gamemode gamemode = new Gamemode();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/gamerule/")})
     private Gamerule gamerule = new Gamerule();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/give/")})
+    private Give give = new Give();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/greeting/")})
     private Greeting greeting = new Greeting();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/join/")})
@@ -642,6 +644,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
     @Getter
     public static final class Gamerule implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Destination destination = new Destination();
+        private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Give implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
         private Sound sound = new Sound();
