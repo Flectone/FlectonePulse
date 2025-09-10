@@ -113,6 +113,7 @@ public interface ModuleConfig {
         ObjectiveMessageConfig getObjective();
         SubMessageConfig getOp();
         SubMessageConfig getQuit();
+        SubMessageConfig getReload();
         SubMessageConfig getRightclick();
         SubMessageConfig getSave();
         SubMessageConfig getSeed();

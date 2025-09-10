@@ -86,6 +86,7 @@ public enum MessageType {
     PLAYERLISTNAME,
     QUESTION_ANSWER,
     QUIT,
+    RELOAD,
     REPLACEMENT,
     RIGHT_CLICK,
     SAVE,

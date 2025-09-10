@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-@SuppressWarnings({"FieldMayBeFinal", "unused"})
+@SuppressWarnings({"FieldMayBeFinal", "unused", "WriteOnlyObject"})
 @Comment(
         value = {
                 @CommentValue("  ___       ___  __  ___  __        ___ "),
@@ -627,6 +627,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.objective.belowname.format = "<fcolor:1>мс";
 
         message.op.format = "<fcolor:1>\uD83E\uDD16 <display_name> назначен оператором сервера";
+
+        message.reload.format = "<fcolor:1>\uD83D\uDEC8 Перезагрузка!";
 
         message.sidebar.values.clear();
         message.sidebar.values.addAll(new LinkedList<>(){
@@ -1712,6 +1714,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Op op = new Op();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/quit/")})
         private Quit quit = new Quit();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/reload/")})
+        private Reload reload = new Reload();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/rightclick/")})
         private Rightclick rightclick = new Rightclick();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/save/")})
@@ -2307,6 +2311,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Quit implements SubMessageConfig, Localizable {
             private String format = "<color:#ff4e4e>← <display_name>";
+        }
+
+        @Getter
+        public static final class Reload implements SubMessageConfig, Localizable {
+            private String format = "<fcolor:1>\uD83D\uDEC8 Reloading!";
         }
 
         @Getter
