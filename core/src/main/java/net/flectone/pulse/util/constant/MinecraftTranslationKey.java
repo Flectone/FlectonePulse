@@ -67,6 +67,17 @@ public enum MinecraftTranslationKey {
     COMMANDS_EXECUTE_CONDITIONAL_PASS("commands.execute.conditional.pass"),
     COMMANDS_EXECUTE_CONDITIONAL_PASS_COUNT("commands.execute.conditional.pass_count"),
 
+    COMMANDS_EXPERIENCE_ADD_LEVELS_SUCCESS_MULTIPLE("commands.experience.add.levels.success.multiple"),
+    COMMANDS_EXPERIENCE_ADD_LEVELS_SUCCESS_SINGLE("commands.experience.add.levels.success.single"),
+    COMMANDS_EXPERIENCE_ADD_POINTS_SUCCESS_MULTIPLE("commands.experience.add.points.success.multiple"),
+    COMMANDS_EXPERIENCE_ADD_POINTS_SUCCESS_SINGLE("commands.experience.add.points.success.single"),
+    COMMANDS_EXPERIENCE_QUERY_LEVELS("commands.experience.query.levels"),
+    COMMANDS_EXPERIENCE_QUERY_POINTS("commands.experience.query.points"),
+    COMMANDS_EXPERIENCE_SET_LEVELS_SUCCESS_MULTIPLE("commands.experience.set.levels.success.multiple"),
+    COMMANDS_EXPERIENCE_SET_LEVELS_SUCCESS_SINGLE("commands.experience.set.levels.success.single"),
+    COMMANDS_EXPERIENCE_SET_POINTS_SUCCESS_MULTIPLE("commands.experience.set.points.success.multiple"),
+    COMMANDS_EXPERIENCE_SET_POINTS_SUCCESS_SINGLE("commands.experience.set.points.success.single"),
+
     COMMANDS_FILL_SUCCESS("commands.fill.success"),
 
     COMMANDS_DEFAULTGAMEMODE_SUCCESS("commands.defaultgamemode.success"),

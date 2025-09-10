@@ -575,6 +575,17 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.execute.formatPass = "<fcolor:1>⚡ Условие выполнено";
         message.execute.formatPassCount = "<fcolor:1>⚡ Условие выполнено; счётчик: <fcolor:2><count>";
 
+        message.experience.add.levels.single = "<fcolor:1>⏺ Выдано <fcolor:2><amount> <fcolor:1>уровней игроку <display_name>";
+        message.experience.add.levels.multiple = "<fcolor:1>⏺ Выдано <fcolor:2><amount> <fcolor:1>уровней <fcolor:2><count> <fcolor:1>игрокам";
+        message.experience.add.points.single = "<fcolor:1>⏺ Выдано <fcolor:2><amount> <fcolor:1>единиц опыта игроку <display_name>";
+        message.experience.add.points.multiple = "<fcolor:1>⏺ Выдано <fcolor:2><amount> <fcolor:1>единиц опыта <fcolor:2><count> <fcolor:1>игрокам";
+        message.experience.query.levels = "<fcolor:1>⏺ <display_name> имеет <fcolor:2><amount> <fcolor:1>уровней";
+        message.experience.query.points = "<fcolor:1>⏺ <display_name> имеет <fcolor:2><amount> <fcolor:1>ед. опыта";
+        message.experience.set.levels.single = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>уровней игроку <display_name>";
+        message.experience.set.levels.multiple = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>уровней <fcolor:2><count> <fcolor:1>игрокам";
+        message.experience.set.points.single = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>единиц опыта игроку <display_name>";
+        message.experience.set.points.multiple = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>единиц опыта <fcolor:2><count> <fcolor:1>игрокам";
+
         message.fill.format = "<fcolor:1>⏹ Успешно заполнено <fcolor:2><amount> <fcolor:1>блоков";
 
         message.format.replacement.values.put("skin", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2><pixels>\"><fcolor:2><u>👨 Скин</u></hover></click>");
@@ -1674,6 +1685,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Enchant enchant = new Enchant();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/execute/")})
         private Execute execute = new Execute();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/experience/")})
+        private Experience experience = new Experience();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/fill/")})
         private Fill fill = new Fill();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/")})
@@ -2021,6 +2034,50 @@ public final class Localization extends FileSerializable implements ModuleConfig
         public static final class Execute implements SubMessageConfig, Localizable {
             private String formatPass = "<fcolor:1>⚡ Test passed";
             private String formatPassCount = "<fcolor:1>⚡ Test passed, count: <fcolor:2><count>";
+        }
+
+        @Getter
+        public static final class Experience implements SubMessageConfig, Localizable {
+
+            private AddSet add = new AddSet(
+                    new SingleMultiple(
+                            "<fcolor:1>⏺ Gave <fcolor:2><amount> <fcolor:1>experience levels to <display_name>",
+                            "<fcolor:1>⏺ Gave <fcolor:2><amount> <fcolor:1>experience levels to <fcolor:2><count> <fcolor:1>players"
+                    ),
+                    new SingleMultiple(
+                            "<fcolor:1>⏺ Gave <fcolor:2><amount> <fcolor:1>experience points to <display_name>",
+                            "<fcolor:1>⏺ Gave <fcolor:2><amount> <fcolor:1>experience points to <fcolor:2><count> <fcolor:1>players"
+                    )
+            );
+
+            private Query query = new Query();
+
+            private AddSet set = new AddSet(
+                    new SingleMultiple(
+                            "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience levels to <display_name>",
+                            "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience levels to <fcolor:2><count> <fcolor:1>players"
+                    ),
+                    new SingleMultiple(
+                            "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience points to <display_name>",
+                            "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience points to <fcolor:2><count> <fcolor:1>players"
+                    )
+            );
+
+            @Getter
+            public static final class Query {
+                private String levels = "<fcolor:1>⏺ <display_name> has <fcolor:2><amount> <fcolor:1>experience levels";
+                private String points = "<fcolor:1>⏺ <display_name> has <fcolor:2><amount> <fcolor:1>experience points";
+            }
+
+
+            @Getter
+            @AllArgsConstructor
+            @NoArgsConstructor
+            public static final class AddSet {
+                private SingleMultiple levels;
+                private SingleMultiple points;
+            }
+
         }
 
         @Getter

@@ -1,0 +1,46 @@
+package net.flectone.pulse.module.message.experience.listener;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.flectone.pulse.annotation.Pulse;
+import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.event.message.MessageReceiveEvent;
+import net.flectone.pulse.module.message.experience.ExperienceModule;
+import net.flectone.pulse.module.message.experience.extractor.ExperienceExtractor;
+import net.flectone.pulse.module.message.experience.model.Experience;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+
+import java.util.Optional;
+
+@Singleton
+public class ExperiencePulseListener implements PulseListener {
+
+    private final ExperienceModule experienceModule;
+    private final ExperienceExtractor experienceExtractor;
+
+    @Inject
+    public ExperiencePulseListener(ExperienceModule experienceModule,
+                                   ExperienceExtractor experienceExtractor) {
+        this.experienceModule = experienceModule;
+        this.experienceExtractor = experienceExtractor;
+    }
+
+    @Pulse
+    public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
+        MinecraftTranslationKey translationKey = event.getTranslationKey();
+        switch (translationKey) {
+            case COMMANDS_EXPERIENCE_ADD_LEVELS_SUCCESS_SINGLE, COMMANDS_EXPERIENCE_ADD_LEVELS_SUCCESS_MULTIPLE,
+                 COMMANDS_EXPERIENCE_ADD_POINTS_SUCCESS_SINGLE, COMMANDS_EXPERIENCE_ADD_POINTS_SUCCESS_MULTIPLE,
+                 COMMANDS_EXPERIENCE_QUERY_LEVELS, COMMANDS_EXPERIENCE_QUERY_POINTS,
+                 COMMANDS_EXPERIENCE_SET_LEVELS_SUCCESS_SINGLE, COMMANDS_EXPERIENCE_SET_LEVELS_SUCCESS_MULTIPLE,
+                 COMMANDS_EXPERIENCE_SET_POINTS_SUCCESS_SINGLE, COMMANDS_EXPERIENCE_SET_POINTS_SUCCESS_MULTIPLE -> {
+                Optional<Experience> optionalExperience = experienceExtractor.extract(translationKey, event.getTranslatableComponent());
+                if (optionalExperience.isEmpty()) return;
+
+                event.setCancelled(true);
+                experienceModule.send(event.getFPlayer(), translationKey, optionalExperience.get());
+            }
+        }
+    }
+
+}

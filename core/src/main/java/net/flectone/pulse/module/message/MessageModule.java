@@ -23,6 +23,7 @@ import net.flectone.pulse.module.message.difficulty.DifficultyModule;
 import net.flectone.pulse.module.message.effect.EffectModule;
 import net.flectone.pulse.module.message.enchant.EnchantModule;
 import net.flectone.pulse.module.message.execute.ExecuteModule;
+import net.flectone.pulse.module.message.experience.ExperienceModule;
 import net.flectone.pulse.module.message.fill.FillModule;
 import net.flectone.pulse.module.message.format.FormatModule;
 import net.flectone.pulse.module.message.gamemode.GamemodeModule;
@@ -83,6 +84,7 @@ public class MessageModule extends AbstractModule {
         addChildren(EffectModule.class);
         addChildren(EnchantModule.class);
         addChildren(ExecuteModule.class);
+        addChildren(ExperienceModule.class);
         addChildren(FillModule.class);
         addChildren(FormatModule.class);
         addChildren(GamemodeModule.class);

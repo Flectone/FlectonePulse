@@ -767,6 +767,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Enchant enchant = new Enchant();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/execute/")})
         private Execute execute = new Execute();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/experience/")})
+        private Experience experience = new Experience();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/fill/")})
         private Fill fill = new Fill();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/")})
@@ -963,6 +965,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private String name = "flectonepulse.module.message.execute";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.execute.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Experience implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.experience";
+            private Type type = Type.TRUE;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.experience.sound", Type.TRUE);
         }
 
         @Getter
