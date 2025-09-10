@@ -722,7 +722,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.update.formatConsole = "<fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse";
 
         message.weather.formatClear = "<fcolor:1>☀ Установлена <fcolor:2>ясная <fcolor:1>погода";
-        message.weather.formatRain = "<fcolor:1>☁ Установлена <fcolor:2>дождливая <fcolor:1>погода";
+        message.weather.formatRain = "<fcolor:1>\uD83C\uDF27 Установлена <fcolor:2>дождливая <fcolor:1>погода";
         message.weather.formatThunder = "<fcolor:1>⛈ Установлена <fcolor:2>грозовая <fcolor:1>погода";
     }
 
@@ -2544,7 +2544,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Weather implements SubMessageConfig, Localizable {
             private String formatClear = "<fcolor:1>☀ Set the weather to <fcolor:2>clear";
-            private String formatRain = "<fcolor:1>☁ Set the weather to <fcolor:2>rain";
+            private String formatRain = "<fcolor:1>\uD83C\uDF27 Set the weather to <fcolor:2>rain";
             private String formatThunder = "<fcolor:1>⛈ Set the weather to <fcolor:2>rain & thunder";
         }
 
