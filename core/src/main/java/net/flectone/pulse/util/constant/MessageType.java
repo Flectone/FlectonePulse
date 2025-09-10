@@ -95,6 +95,7 @@ public enum MessageType {
     SETBLOCK,
     SLEEP,
     SPAWN,
+    STOP,
     SUMMON,
     SWEAR,
     TELEPORT,

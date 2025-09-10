@@ -109,6 +109,8 @@ public enum MinecraftTranslationKey {
     COMMANDS_SPAWNPOINT_SUCCESS("commands.spawnpoint.success"), // legacy
     COMMANDS_SETWORLDSPAWN_SUCCESS("commands.setworldspawn.success"),
 
+    COMMANDS_STOP_SUCCESS("commands.stop.stopping"),
+
     COMMANDS_SUMMON_SUCCESS("commands.summon.success"),
 
     COMMANDS_TELEPORT_SUCCESS_ENTITY_MULTIPLE("commands.teleport.success.entity.multiple"),

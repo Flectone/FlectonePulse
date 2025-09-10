@@ -683,6 +683,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.status.players.full = "<color:#ff7171>Сервер полон";
 
+        message.stop.format = "<fcolor:1>\uD83D\uDEC8 Выключение сервера";
+
         message.summon.format = "<fcolor:1>\uD83D\uDC3A Сущность «<display_name>» создана";
 
         message.tab.footer.lists.clear();
@@ -1738,6 +1740,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Spawn spawn = new Spawn();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/")})
         private Status status = new Status();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/stop/")})
+        private Stop stop = new Stop();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/summon/")})
         private Summon summon = new Summon();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/tab/")})
@@ -2429,6 +2433,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 private String name = "Minecraft server";
             }
 
+        }
+
+        @Getter
+        public static final class Stop implements SubMessageConfig, Localizable {
+            private String format = "<fcolor:1>\uD83D\uDEC8 Stopping the server";
         }
 
         @Getter
