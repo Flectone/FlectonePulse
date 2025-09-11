@@ -82,6 +82,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Experience experience = new Experience();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/fill/")})
     private Fill fill = new Fill();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/fillbiome/")})
+    private Fillbiome fillbiome = new Fillbiome();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/")})
     private Format format = new Format();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/gamemode/")})
@@ -364,6 +366,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
     @Getter
     public static final class Fill implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Destination destination = new Destination();
+        private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Fillbiome implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
         private Sound sound = new Sound();

@@ -104,6 +104,7 @@ public interface ModuleConfig {
         SubMessageConfig getExecute();
         SubMessageConfig getExperience();
         SubMessageConfig getFill();
+        SubMessageConfig getFillbiome();
         FormatMessageConfig getFormat();
         SubMessageConfig getGamemode();
         SubMessageConfig getGamerule();

@@ -25,6 +25,7 @@ import net.flectone.pulse.module.message.enchant.EnchantModule;
 import net.flectone.pulse.module.message.execute.ExecuteModule;
 import net.flectone.pulse.module.message.experience.ExperienceModule;
 import net.flectone.pulse.module.message.fill.FillModule;
+import net.flectone.pulse.module.message.fillbiome.FillbiomeModule;
 import net.flectone.pulse.module.message.format.FormatModule;
 import net.flectone.pulse.module.message.gamemode.GamemodeModule;
 import net.flectone.pulse.module.message.gamerule.GameruleModule;
@@ -92,6 +93,7 @@ public class MessageModule extends AbstractModule {
         addChildren(ExecuteModule.class);
         addChildren(ExperienceModule.class);
         addChildren(FillModule.class);
+        addChildren(FillbiomeModule.class);
         addChildren(FormatModule.class);
         addChildren(GamemodeModule.class);
         addChildren(GameruleModule.class);

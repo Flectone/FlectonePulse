@@ -65,6 +65,7 @@ public enum MessageType {
     EXPERIENCE,
     ERROR,
     FILL,
+    FILLBIOME,
     FOOTER,
     FORMAT,
     FROM_DISCORD_TO_MINECRAFT,

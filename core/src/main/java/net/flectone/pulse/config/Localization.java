@@ -588,6 +588,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.fill.format = "<fcolor:1>⏹ Успешно заполнено <fcolor:2><amount> <fcolor:1>блоков";
 
+        message.fillbiome.format = "<fcolor:1>⏹ Заменены биомы между точками <fcolor:2><x1><fcolor:1>, <fcolor:2><y1><fcolor:1>, <fcolor:2><z1> <fcolor:1>и <fcolor:2><x2><fcolor:1>, <fcolor:2><y2><fcolor:1>, <fcolor:2><z2>";
+        message.fillbiome.formatCount = "<fcolor:1>⏹ Биом был заменён у <fcolor:2><count> <fcolor:1>блоков между точками <fcolor:2><x1><fcolor:1>, <fcolor:2><y1><fcolor:1>, <fcolor:2><z1> <fcolor:1>и <fcolor:2><x2><fcolor:1>, <fcolor:2><y2><fcolor:1>, <fcolor:2><z2>";
+
         message.format.replacement.values.put("skin", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2><pixels>\"><fcolor:2><u>👨 Скин</u></hover></click>");
         message.format.replacement.values.put("url", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2>Открыть ссылку <br><u><message_1>\"><fcolor:2><u>🗗 Ссылка</u></hover></click>");
         message.format.replacement.values.put("image", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2><pixels>\"><fcolor:2><u>🖃 Картинка</u></hover></click>");
@@ -1705,6 +1708,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Experience experience = new Experience();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/fill/")})
         private Fill fill = new Fill();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/fillbiome/")})
+        private Fillbiome fillbiome = new Fillbiome();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/")})
         private Format format = new Format();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/gamemode/")})
@@ -2111,6 +2116,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Fill implements SubMessageConfig, Localizable {
             private String format = "<fcolor:1>⏹ Successfully filled <fcolor:2><amount> <fcolor:1>block(s)";
+        }
+
+        @Getter
+        public static final class Fillbiome implements SubMessageConfig, Localizable {
+            private String format = "<fcolor:1>⏹ Biomes set between <fcolor:2><x1><fcolor:1>, <fcolor:2><y1><fcolor:1>, <fcolor:2><z1> <fcolor:1>and <fcolor:2><x2><fcolor:1>, <fcolor:2><y2><fcolor:1>, <fcolor:2><z2>";
+            private String formatCount = "<fcolor:1>⏹ <fcolor:2><count> <fcolor:1>biome entry/entries set between <fcolor:2><x1><fcolor:1>, <fcolor:2><y1><fcolor:1>, <fcolor:2><z1> <fcolor:1>and <fcolor:2><x2><fcolor:1>, <fcolor:2><y2><fcolor:1>, <fcolor:2><z2>";
         }
 
         @Getter
