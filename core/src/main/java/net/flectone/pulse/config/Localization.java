@@ -631,6 +631,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.op.format = "<fcolor:1>\uD83E\uDD16 <display_name> назначен оператором сервера";
 
+        message.particle.format = "<fcolor:1>❄ Отображена частица «<fcolor:2><particle><fcolor:1>»";
+
         message.reload.format = "<fcolor:1>\uD83D\uDEC8 Перезагрузка!";
 
         message.sidebar.values.clear();
@@ -1721,6 +1723,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Objective objective = new Objective();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/op/")})
         private Op op = new Op();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/particle/")})
+        private Particle particle = new Particle();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/quit/")})
         private Quit quit = new Quit();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/reload/")})
@@ -2325,6 +2329,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Op implements SubMessageConfig, Localizable {
             private String format = "<fcolor:1>🤖 Made <display_name> a server operator";
+        }
+
+        @Getter
+        public static final class Particle implements SubMessageConfig, Localizable {
+            private String format = "<fcolor:1>❄ Displaying particle <fcolor:2><lang:'<particle>'>";
         }
 
         @Getter

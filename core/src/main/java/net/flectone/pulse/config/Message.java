@@ -100,6 +100,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Objective objective = new Objective();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/op/")})
     private Op op = new Op();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/particle/")})
+    private Particle particle = new Particle();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/quit/")})
     private Quit quit = new Quit();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/reload/")})
@@ -709,6 +711,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
     @Getter
     public static final class Op implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Destination destination = new Destination();
+        private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Particle implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
         private Sound sound = new Sound();

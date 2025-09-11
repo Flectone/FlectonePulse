@@ -83,6 +83,7 @@ public enum MessageType {
     NEWBIE,
     OBJECTIVE,
     OP,
+    PARTICLE,
     PLAYERS,
     PLAYERLISTNAME,
     QUESTION_ANSWER,

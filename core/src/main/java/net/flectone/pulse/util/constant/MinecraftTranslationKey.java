@@ -97,6 +97,8 @@ public enum MinecraftTranslationKey {
 
     COMMANDS_OP_SUCCESS("commands.op.success"),
 
+    COMMANDS_PARTICLE_SUCCESS("commands.particle.success"),
+
     COMMANDS_RELOAD_SUCCESS("commands.reload.success"),
 
     COMMANDS_ROTATE_SUCCESS("commands.rotate.success"),

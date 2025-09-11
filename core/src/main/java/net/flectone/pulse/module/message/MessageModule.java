@@ -34,6 +34,7 @@ import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.kill.KillModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.op.OpModule;
+import net.flectone.pulse.module.message.particle.ParticleModule;
 import net.flectone.pulse.module.message.quit.QuitModule;
 import net.flectone.pulse.module.message.reload.ReloadModule;
 import net.flectone.pulse.module.message.rightclick.RightclickModule;
@@ -100,6 +101,7 @@ public class MessageModule extends AbstractModule {
         addChildren(KillModule.class);
         addChildren(ObjectiveModule.class);
         addChildren(OpModule.class);
+        addChildren(ParticleModule.class);
         addChildren(QuitModule.class);
         addChildren(ReloadModule.class);
         addChildren(RightclickModule.class);
