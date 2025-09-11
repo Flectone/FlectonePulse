@@ -795,6 +795,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Reload reload = new Reload();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/rightclick/")})
         private Rightclick rightclick = new Rightclick();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/rotate/")})
+        private Rotate rotate = new Rotate();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/save/")})
         private Save save = new Save();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/seed/")})
@@ -1343,6 +1345,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.rightclick.cooldown.bypass", Type.OP);
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.rightclick.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Rotate implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.rotate";
+            private Type type = Type.TRUE;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.rotate.sound", Type.TRUE);
         }
 
         @Getter

@@ -90,6 +90,7 @@ public enum MessageType {
     RELOAD,
     REPLACEMENT,
     RIGHT_CLICK,
+    ROTATE,
     SAVE,
     SEED,
     SIDEBAR,

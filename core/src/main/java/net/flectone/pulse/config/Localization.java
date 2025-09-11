@@ -655,6 +655,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
             }
         });
 
+        message.rotate.format = "<fcolor:1>\uD83E\uDD38 <display_name> повёрнут";
+
         message.save.disabled = "<fcolor:1>\uD83D\uDEC8 Автосохранение отключено";
         message.save.enabled = "<fcolor:1>\uD83D\uDEC8 Автосохранение включено";
         message.save.saving = "<fcolor:1>\uD83D\uDEC8 Сохранение мира (может занять некоторое время!)";
@@ -1725,6 +1727,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Reload reload = new Reload();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/rightclick/")})
         private Rightclick rightclick = new Rightclick();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/rotate/")})
+        private Rotate rotate = new Rotate();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/save/")})
         private Save save = new Save();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/seed/")})
@@ -2336,6 +2340,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Rightclick implements SubMessageConfig, Localizable {
             private String format = "<fcolor:1>◁ <display_name> ▷";
+        }
+
+        @Getter
+        public static final class Rotate implements SubMessageConfig, Localizable {
+            private String format = "<fcolor:1>\uD83E\uDD38 Rotated <display_name>";
         }
 
         @Getter

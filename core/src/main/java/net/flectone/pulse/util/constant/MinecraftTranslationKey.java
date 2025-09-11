@@ -99,6 +99,8 @@ public enum MinecraftTranslationKey {
 
     COMMANDS_RELOAD_SUCCESS("commands.reload.success"),
 
+    COMMANDS_ROTATE_SUCCESS("commands.rotate.success"),
+
     COMMANDS_SAVE_DISABLED("commands.save.disabled"),
     COMMANDS_SAVE_ENABLED("commands.save.enabled"),
     COMMANDS_SAVE_SAVING("commands.save.saving"),

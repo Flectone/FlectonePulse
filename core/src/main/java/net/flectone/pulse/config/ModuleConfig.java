@@ -116,6 +116,7 @@ public interface ModuleConfig {
         SubMessageConfig getQuit();
         SubMessageConfig getReload();
         SubMessageConfig getRightclick();
+        SubMessageConfig getRotate();
         SubMessageConfig getSave();
         SubMessageConfig getSeed();
         SubMessageConfig getSetblock();
