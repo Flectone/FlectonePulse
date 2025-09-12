@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 public enum MessageType {
     AFK,
+    ATTRIBUTE,
     ADVANCEMENT,
     AUTO,
     BED,

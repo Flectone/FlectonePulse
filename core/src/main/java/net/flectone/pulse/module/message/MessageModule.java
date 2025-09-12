@@ -8,6 +8,7 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.anvil.AnvilModule;
+import net.flectone.pulse.module.message.attribute.AttributeModule;
 import net.flectone.pulse.module.message.auto.AutoModule;
 import net.flectone.pulse.module.message.bed.BedModule;
 import net.flectone.pulse.module.message.book.BookModule;
@@ -78,6 +79,7 @@ public class MessageModule extends AbstractModule {
         addChildren(AdvancementModule.class);
         addChildren(AfkModule.class);
         addChildren(AnvilModule.class);
+        addChildren(AttributeModule.class);
         addChildren(AutoModule.class);
         addChildren(BedModule.class);
         addChildren(BookModule.class);

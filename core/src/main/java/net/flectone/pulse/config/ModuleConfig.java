@@ -87,6 +87,7 @@ public interface ModuleConfig {
         SubMessageConfig getAdvancement();
         SubMessageConfig getAfk();
         SubMessageConfig getAnvil();
+        SubMessageConfig getAttribute();
         SubMessageConfig getAuto();
         SubMessageConfig getBed();
         SubMessageConfig getBook();

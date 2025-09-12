@@ -737,6 +737,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Afk afk = new Afk();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/anvil/")})
         private Anvil anvil = new Anvil();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/attribute/")})
+        private Attribute attribute = new Attribute();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/auto/")})
         private Auto auto = new Auto();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/bed/")})
@@ -853,6 +855,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         public static final class Anvil implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.anvil";
             private Type type = Type.TRUE;
+        }
+
+        @Getter
+        public static final class Attribute implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.attribute";
+            private Type type = Type.TRUE;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.attribute.sound", Type.TRUE);
         }
 
         @Getter

@@ -459,6 +459,14 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.afk.formatFalse.global = "<gradient:#ffd500:#FFFF00>⌚ <player> вернулся";
         message.afk.formatFalse.local = "<gradient:#ffd500:#FFFF00>⌚ Ты вернулся в игру";
 
+        message.attribute.baseValue.get = "<fcolor:1>❤ Базовое значение атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <display_name> равно <fcolor:2><value>";
+        message.attribute.baseValue.reset = "<fcolor:1>❤ Базовое значение атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <display_name> возвращено к <fcolor:2><value>";
+        message.attribute.baseValue.set = "<fcolor:1>❤ Базовое значение атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <display_name> изменено на <fcolor:2><value>";
+        message.attribute.modifier.add = "<fcolor:1>❤ Добавлен модификатор <fcolor:2><modifier> <fcolor:1>к атрибуту «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <display_name>";
+        message.attribute.modifier.remove = "<fcolor:1>❤ Удалён модификатор <fcolor:2><modifier> <fcolor:1>с атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <display_name>";
+        message.attribute.modifier.valueGet = "<fcolor:1>❤ Значение модификатора <fcolor:2><modifier> <fcolor:1>атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <display_name> равно <fcolor:2><value>";
+        message.attribute.valueGet = "<fcolor:1>❤ Значение атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <display_name> равно <fcolor:2><value>";
+
         message.death.types.put("death.attack.anvil", "<color:#778899>🪦 <fcolor:1><display_name> раздавлен упавшей наковальней");
         message.death.types.put("death.attack.anvil.player", "<color:#778899>🪦 <fcolor:1><display_name> был раздавлен упавшей наковальней, пока боролся с <killer>");
         message.death.types.put("death.attack.arrow", "<color:#778899>🪦 <fcolor:1><display_name> застрелен <killer>");
@@ -1677,6 +1685,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/afk/")})
         private Afk afk = new Afk();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/attribute/")})
+        private Attribute attribute = new Attribute();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/auto/")})
         private Auto auto = new Auto();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/bed/")})
@@ -1852,6 +1862,39 @@ public final class Localization extends FileSerializable implements ModuleConfig
             public static final class Format {
                 private String global;
                 private String local;
+            }
+        }
+
+        @Getter
+        public static final class Attribute implements SubMessageConfig, Localizable {
+            private BaseValue baseValue = new BaseValue(
+                    "<fcolor:1>❤ Base value of attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <display_name> is <fcolor:2><value>",
+                    "<fcolor:1>❤ Base value for attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <display_name> reset to default <fcolor:2><value>",
+                    "<fcolor:1>❤ Base value for attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <display_name> set to <fcolor:2><value>"
+            );
+            private Modifier modifier = new Modifier(
+                    "<fcolor:1>❤ Added modifier <fcolor:2><modifier> <fcolor:1>to attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <display_name>",
+                    "<fcolor:1>❤ Removed modifier <fcolor:2><modifier> <fcolor:1>from attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <display_name>",
+                    "<fcolor:1>❤ Value of modifier <fcolor:2><modifier> <fcolor:1>on attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <display_name> is <fcolor:2><value>"
+            );
+            private String valueGet = "<fcolor:1>❤ Value of attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <display_name> is <fcolor:2><value>";
+
+            @Getter
+            @AllArgsConstructor
+            @NoArgsConstructor
+            public static final class BaseValue {
+                private String get = "";
+                private String reset = "";
+                private String set = "";
+            }
+
+            @Getter
+            @AllArgsConstructor
+            @NoArgsConstructor
+            public static final class Modifier {
+                private String add = "";
+                private String remove = "";
+                private String valueGet = "";
             }
         }
 

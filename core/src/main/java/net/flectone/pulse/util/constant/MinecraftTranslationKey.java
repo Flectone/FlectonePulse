@@ -43,6 +43,14 @@ public enum MinecraftTranslationKey {
     COMMANDS_ACHIEVEMENT_TAKE_ONE("commands.achievement.take.success.one"), // legacy, < 1.12
     COMMANDS_ACHIEVEMENT_TAKE_MANY("commands.achievement.take.success.many"), // legacy, < 1.12
 
+    COMMANDS_ATTRIBUTE_BASE_VALUE_GET_SUCCESS("commands.attribute.base_value.get.success"),
+    COMMANDS_ATTRIBUTE_BASE_VALUE_RESET_SUCCESS("commands.attribute.base_value.reset.success"),
+    COMMANDS_ATTRIBUTE_BASE_VALUE_SET_SUCCESS("commands.attribute.base_value.set.success"),
+    COMMANDS_ATTRIBUTE_MODIFIER_ADD_SUCCESS("commands.attribute.modifier.add.success"),
+    COMMANDS_ATTRIBUTE_MODIFIER_REMOVE_SUCCESS("commands.attribute.modifier.remove.success"),
+    COMMANDS_ATTRIBUTE_MODIFIER_VALUE_GET_SUCCESS("commands.attribute.modifier.value.get.success"),
+    COMMANDS_ATTRIBUTE_VALUE_GET_SUCCESS("commands.attribute.value.get.success"),
+
     COMMANDS_CLEAR_SUCCESS_MULTIPLE("commands.clear.success.multiple"),
     COMMANDS_CLEAR_SUCCESS_SINGLE("commands.clear.success.single"),
     COMMANDS_CLEAR_SUCCESS("commands.clear.success"), // legacy

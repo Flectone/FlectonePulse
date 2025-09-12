@@ -48,6 +48,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Afk afk = new Afk();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/anvil/")})
     private Anvil anvil = new Anvil();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/attribute/")})
+    private Attribute attribute = new Attribute();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/auto/")})
     private Auto auto = new Auto();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/bed/")})
@@ -170,6 +172,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Anvil implements SubMessageConfig, Config.IEnable {
         private boolean enable = false;
+    }
+
+    @Getter
+    public static final class Attribute implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Destination destination = new Destination();
+        private Sound sound = new Sound();
     }
 
     @Getter
