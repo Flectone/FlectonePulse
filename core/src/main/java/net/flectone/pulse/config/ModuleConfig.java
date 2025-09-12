@@ -120,6 +120,7 @@ public interface ModuleConfig {
         SubMessageConfig getParticle();
         SubMessageConfig getQuit();
         SubMessageConfig getReload();
+        SubMessageConfig getRide();
         SubMessageConfig getRightclick();
         SubMessageConfig getRotate();
         SubMessageConfig getSave();

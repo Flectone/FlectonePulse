@@ -115,6 +115,9 @@ public enum MinecraftTranslationKey {
 
     COMMANDS_RELOAD_SUCCESS("commands.reload.success"),
 
+    COMMANDS_RIDE_DISMOUNT_SUCCESS("commands.ride.dismount.success"),
+    COMMANDS_RIDE_MOUNT_SUCCESS("commands.ride.mount.success"),
+
     COMMANDS_ROTATE_SUCCESS("commands.rotate.success"),
 
     COMMANDS_SAVE_DISABLED("commands.save.disabled"),

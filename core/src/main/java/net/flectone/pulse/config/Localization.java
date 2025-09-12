@@ -653,6 +653,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.reload.format = "<fcolor:1>\uD83D\uDEC8 Перезагрузка!";
 
+        message.ride.dismount = "<fcolor:1>\uD83C\uDFC7 <display_name> больше не сидит на <destination>";
+        message.ride.mount = "<fcolor:1>\uD83C\uDFC7 <display_name> теперь сидит на <destination>";
+
         message.sidebar.values.clear();
         message.sidebar.values.addAll(new LinkedList<>(){
             {
@@ -1755,6 +1758,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Quit quit = new Quit();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/reload/")})
         private Reload reload = new Reload();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/ride/")})
+        private Ride ride = new Ride();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/rightclick/")})
         private Rightclick rightclick = new Rightclick();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/rotate/")})
@@ -2422,6 +2427,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Reload implements SubMessageConfig, Localizable {
             private String format = "<fcolor:1>\uD83D\uDEC8 Reloading!";
+        }
+
+        @Getter
+        public static final class Ride implements SubMessageConfig, Localizable {
+            private String dismount = "<fcolor:1>\uD83C\uDFC7 <display_name> stopped riding <destination>";
+            private String mount = "<fcolor:1>\uD83C\uDFC7 <display_name> started riding <destination>";
         }
 
         @Getter

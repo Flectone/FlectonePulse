@@ -114,6 +114,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Quit quit = new Quit();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/reload/")})
     private Reload reload = new Reload();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/ride/")})
+    private Ride ride = new Ride();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/rightclick/")})
     private Rightclick rightclick = new Rightclick();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/rotate/")})
@@ -769,6 +771,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
     @Getter
     public static final class Reload implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Destination destination = new Destination();
+        private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Ride implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
         private Sound sound = new Sound();

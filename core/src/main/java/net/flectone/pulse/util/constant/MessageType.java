@@ -93,6 +93,7 @@ public enum MessageType {
     QUESTION_ANSWER,
     QUIT,
     RELOAD,
+    RIDE,
     REPLACEMENT,
     RIGHT_CLICK,
     ROTATE,
