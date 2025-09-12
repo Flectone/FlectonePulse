@@ -97,6 +97,7 @@ public interface ModuleConfig {
         SubMessageConfig getClone();
         SubMessageConfig getDamage();
         SubMessageConfig getDeath();
+        SubMessageConfig getDebugstick();
         SubMessageConfig getDeop();
         SubMessageConfig getDifficulty();
         SubMessageConfig getEffect();

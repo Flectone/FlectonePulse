@@ -68,6 +68,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Damage damage = new Damage();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/death/")})
     private Death death = new Death();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/debugstick/")})
+    private Debugstick debugstick = new Debugstick();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/deop/")})
     private Deop deop = new Deop();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/difficulty/")})
@@ -319,6 +321,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         private boolean enable = true;
         private Range range = Range.get(Range.Type.SERVER);
         private Destination destination = new Destination();
+        private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Debugstick implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Destination destination = new Destination(Destination.Type.ACTION_BAR, new Times(0, 20, 0));
         private Sound sound = new Sound();
     }
 

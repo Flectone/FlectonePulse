@@ -56,6 +56,7 @@ public enum MessageType {
     COMMAND_WARNLIST,
     DAMAGE,
     DEATH,
+    DEBUG_STICK,
     DELETE,
     DEOP,
     DIFFICULTY,

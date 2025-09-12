@@ -557,6 +557,10 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.death.types.put("death.fell.finish.item", "<color:#778899>🪦 <fcolor:1><display_name> упал с высоты и был добит <killer> с помощью <fcolor:2>[<i><by_item></i>]");
         message.death.types.put("death.fell.killer", "<color:#778899>🪦 <fcolor:1><display_name> был обречён на падение");
 
+        message.debugstick.empty = "<fcolor:1>\uD83D\uDD27 Свойства объекта <fcolor:2><name> <fcolor:1>не заданы";
+        message.debugstick.select = "<fcolor:1>\uD83D\uDD27 выбрано «<fcolor:2><name><fcolor:1>» (<fcolor:2><value><fcolor:1>)";
+        message.debugstick.update = "<fcolor:1>\uD83D\uDD27 «<fcolor:2><name><fcolor:1>»: <fcolor:2><value>";
+
         message.deop.format = "<fcolor:1>\uD83E\uDD16 <display_name> больше не является оператором сервера";
 
         message.difficulty.formatQuery = "<fcolor:1>⚔ Сложность игры: <fcolor:2><lang:'<difficulty>'>";
@@ -1694,6 +1698,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Damage damage = new Damage();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/death/")})
         private Death death = new Death();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/debugstick/")})
+        private Debugstick debugstick = new Debugstick();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/deop/")})
         private Deop deop = new Deop();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/difficulty/")})
@@ -2020,6 +2026,13 @@ public final class Localization extends FileSerializable implements ModuleConfig
                     put("death.fell.killer", "<color:#778899>🪦 <fcolor:1><display_name> was doomed to fall");
                 }
             };
+        }
+
+        @Getter
+        public static final class Debugstick implements SubMessageConfig, Localizable {
+            private String empty = "<fcolor:1>\uD83D\uDD27 <fcolor:2><name> <fcolor:1>has no properties";
+            private String select = "<fcolor:1>\uD83D\uDD27 selected \"<fcolor:2><name><fcolor:1>\" (<fcolor:2><value><fcolor:1>)";
+            private String update = "<fcolor:1>\uD83D\uDD27 \"<fcolor:2><name><fcolor:1>\" to <fcolor:2><value>";
         }
 
         @Getter

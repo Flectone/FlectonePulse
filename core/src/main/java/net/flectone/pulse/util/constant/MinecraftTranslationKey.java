@@ -232,6 +232,10 @@ public enum MinecraftTranslationKey {
     DEATH_FELL_FINISH_ITEM("death.fell.finish.item"),
     DEATH_FELL_KILLER("death.fell.killer"),
 
+    ITEM_MINECRAFT_DEBUG_STICK_EMPTY("item.minecraft.debug_stick.empty"),
+    ITEM_MINECRAFT_DEBUG_STICK_SELECT("item.minecraft.debug_stick.select"),
+    ITEM_MINECRAFT_DEBUG_STICK_UPDATE("item.minecraft.debug_stick.update"),
+
     MULTIPLAYER_PLAYER_JOINED("multiplayer.player.joined"),
     MULTIPLAYER_PLAYER_JOINED_RENAMED("multiplayer.player.joined.renamed"),
     MULTIPLAYER_PLAYER_LEFT("multiplayer.player.left"),
