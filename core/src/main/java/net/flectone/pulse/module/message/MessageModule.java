@@ -61,6 +61,7 @@ import net.flectone.pulse.module.message.teleport.TeleportModule;
 import net.flectone.pulse.module.message.time.TimeModule;
 import net.flectone.pulse.module.message.update.UpdateModule;
 import net.flectone.pulse.module.message.weather.WeatherModule;
+import net.flectone.pulse.module.message.worldborder.WorldborderModule;
 import net.flectone.pulse.processing.resolver.FileResolver;
 
 @Singleton
@@ -135,6 +136,7 @@ public class MessageModule extends AbstractModule {
         addChildren(TimeModule.class);
         addChildren(UpdateModule.class);
         addChildren(WeatherModule.class);
+        addChildren(WorldborderModule.class);
     }
 
     @Override

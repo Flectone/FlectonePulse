@@ -843,6 +843,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Update update = new Update();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/weather/")})
         private Weather weather = new Weather();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/wolrdborder/")})
+        private Worldborder worldborder = new Worldborder();
 
         @Getter
         public static final class Advancement implements SubMessageConfig, IPermission {
@@ -1586,6 +1588,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private String name = "flectonepulse.module.message.weather";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.weather.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Worldborder implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.worldborder";
+            private Type type = Type.TRUE;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.worldborder.sound", Type.TRUE);
         }
     }
 

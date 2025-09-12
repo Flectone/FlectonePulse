@@ -139,6 +139,7 @@ public interface ModuleConfig {
         SubMessageConfig getTime();
         SubMessageConfig getUpdate();
         SubMessageConfig getWeather();
+        SubMessageConfig getWorldborder();
 
         interface SubMessageConfig {}
 

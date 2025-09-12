@@ -114,6 +114,7 @@ public enum MessageType {
     UPDATE,
     VERSION,
     WEATHER,
+    WORLDBORDER,
 
     // only for invalidation cache
     SYSTEM_ONLINE,

@@ -272,6 +272,16 @@ public enum MinecraftTranslationKey {
     COMMANDS_WEATHER_SET_RAIN("commands.weather.set.rain"),
     COMMANDS_WEATHER_SET_THUNDER("commands.weather.set.thunder"),
 
+    COMMANDS_WORLDBORDER_CENTER_SUCCESS("commands.worldborder.center.success"),
+    COMMANDS_WORLDBORDER_DAMAGE_AMOUNT_SUCCESS("commands.worldborder.damage.amount.success"),
+    COMMANDS_WORLDBORDER_DAMAGE_BUFFER_SUCCESS("commands.worldborder.damage.buffer.success"),
+    COMMANDS_WORLDBORDER_GET("commands.worldborder.get"),
+    COMMANDS_WORLDBORDER_SET_GROW("commands.worldborder.set.grow"),
+    COMMANDS_WORLDBORDER_SET_IMMEDIATE("commands.worldborder.set.immediate"),
+    COMMANDS_WORLDBORDER_SET_SHRINK("commands.worldborder.set.shrink"),
+    COMMANDS_WORLDBORDER_WARNING_DISTANCE_SUCCESS("commands.worldborder.warning.distance.success"),
+    COMMANDS_WORLDBORDER_WARNING_TIME_SUCCESS("commands.worldborder.warning.time.success"),
+
     UNKNOWN("unknown");
 
     private final String key;

@@ -758,6 +758,16 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.weather.formatClear = "<fcolor:1>☀ Установлена <fcolor:2>ясная <fcolor:1>погода";
         message.weather.formatRain = "<fcolor:1>\uD83C\uDF27 Установлена <fcolor:2>дождливая <fcolor:1>погода";
         message.weather.formatThunder = "<fcolor:1>⛈ Установлена <fcolor:2>грозовая <fcolor:1>погода";
+
+        message.worldborder.center =  "<fcolor:1>\uD83D\uDEAB Установлен центр границ мира: <fcolor:2><value><fcolor:1>, <fcolor:2><second_value>";
+        message.worldborder.damage.amount = "<fcolor:1>\uD83D\uDEAB Установлено значение урона, ежесекундно наносимого за границами мира: <fcolor:2><value> <fcolor:1>за блок";
+        message.worldborder.damage.buffer = "<fcolor:1>\uD83D\uDEAB Установлен предел нанесения урона за границами мира: <fcolor:2><value> <fcolor:1>блоков";
+        message.worldborder.get = "<fcolor:1>\uD83D\uDEAB Ширина границы мира: <fcolor:2><value> <fcolor:1>блоков";
+        message.worldborder.set.grow = "<fcolor:1>\uD83D\uDEAB Через <fcolor:2><second_value> <fcolor:1>секунд ширина границы мира увеличится до <fcolor:2><value> <fcolor:1>блоков";
+        message.worldborder.set.immediate = "<fcolor:1>\uD83D\uDEAB Установлена граница мира шириной <fcolor:2><value> <fcolor:1>блоков";
+        message.worldborder.set.shrink = "<fcolor:1>\uD83D\uDEAB Через <fcolor:2><second_value> <fcolor:1>секунд ширина границы мира уменьшится до <fcolor:2><value> <fcolor:1>блоков";
+        message.worldborder.warning.distance = "<fcolor:1>\uD83D\uDEAB Установлено расстояние предупреждения о пересечении границы мира: <fcolor:2><value> <fcolor:1>блоков";
+        message.worldborder.warning.time = "<fcolor:1>\uD83D\uDEAB Установлено время предупреждения о столкновении с границей мира: <fcolor:2><value> <fcolor:1>секунд";
     }
 
 
@@ -1811,6 +1821,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Update update = new Update();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/weather/")})
         private Weather weather = new Weather();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/worldborder/")})
+        private Worldborder worldborder = new Worldborder();
 
         @Getter
         public static final class Advancement implements SubMessageConfig, Localizable {
@@ -2685,6 +2697,50 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String formatClear = "<fcolor:1>☀ Set the weather to <fcolor:2>clear";
             private String formatRain = "<fcolor:1>\uD83C\uDF27 Set the weather to <fcolor:2>rain";
             private String formatThunder = "<fcolor:1>⛈ Set the weather to <fcolor:2>rain & thunder";
+        }
+
+        @Getter
+        public static final class Worldborder implements SubMessageConfig, Localizable {
+            private String center = "<fcolor:1>\uD83D\uDEAB Set the center of the world border to <fcolor:2><value><fcolor:1>, <fcolor:2><second_value>";
+            private Damage damage = new Damage(
+                    "<fcolor:1>\uD83D\uDEAB Set the world border damage to <fcolor:2><value> <fcolor:1>per block each second",
+                    "<fcolor:1>\uD83D\uDEAB Set the world border damage buffer to <fcolor:2><value> <fcolor:1>block(s)"
+            );
+            private String get = "<fcolor:1>\uD83D\uDEAB The world border is currently <fcolor:2><value> <fcolor:1>block(s) wide";
+            private Set set = new Set(
+                    "<fcolor:1>\uD83D\uDEAB Growing the world border to <fcolor:2><value> <fcolor:1>blocks wide over <fcolor:2><second_value> <fcolor:1>seconds",
+                    "<fcolor:1>\uD83D\uDEAB Set the world border to <fcolor:2><value> <fcolor:1>block(s) wide",
+                    "<fcolor:1>\uD83D\uDEAB Shrinking the world border to <fcolor:2><value> <fcolor:1>block(s) wide over <fcolor:2><second_value> <fcolor:1>second(s)"
+            );
+            private Warning warning = new Warning(
+                    "<fcolor:1>\uD83D\uDEAB Set the world border warning distance to <fcolor:2><value> <fcolor:1>block(s)",
+                    "<fcolor:1>\uD83D\uDEAB Set the world border warning time to <fcolor:2><value> <fcolor:1>second(s)"
+            );
+
+            @Getter
+            @AllArgsConstructor
+            @NoArgsConstructor
+            public static final class Damage {
+                private String amount = "";
+                private String buffer = "";
+            }
+
+            @Getter
+            @AllArgsConstructor
+            @NoArgsConstructor
+            public static final class Set {
+                private String grow = "";
+                private String immediate = "";
+                private String shrink = "";
+            }
+
+            @Getter
+            @AllArgsConstructor
+            @NoArgsConstructor
+            public static final class Warning {
+                private String distance = "";
+                private String time = "";
+            }
         }
 
     }
