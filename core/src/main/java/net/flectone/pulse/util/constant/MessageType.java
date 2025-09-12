@@ -11,6 +11,7 @@ public enum MessageType {
     CHAT,
     CLEAR,
     CLONE,
+    COMMANDBLOCK,
     COMMAND_AFK,
     COMMAND_ANON,
     COMMAND_BALL,

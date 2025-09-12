@@ -6,6 +6,9 @@ import java.util.Arrays;
 
 public enum MinecraftTranslationKey {
 
+    ADV_MODE_NOT_ENABLED("advMode.notEnabled"),
+    ADV_MODE_SET_COMMAND_SUCCESS("advMode.setCommand.success"),
+
     BLOCK_MINECRAFT_BED_NO_SLEEP("block.minecraft.bed.no_sleep"),
     BLOCK_MINECRAFT_BED_NOT_SAFE("block.minecraft.bed.not_safe"),
     BLOCK_MINECRAFT_BED_OBSTRUCTED("block.minecraft.bed.obstructed"),

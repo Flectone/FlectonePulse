@@ -16,6 +16,7 @@ import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.clear.ClearModule;
 import net.flectone.pulse.module.message.clone.CloneModule;
+import net.flectone.pulse.module.message.commandblock.CommandblockModule;
 import net.flectone.pulse.module.message.damage.DamageModule;
 import net.flectone.pulse.module.message.death.DeathModule;
 import net.flectone.pulse.module.message.debugstick.DebugstickModule;
@@ -85,6 +86,7 @@ public class MessageModule extends AbstractModule {
         addChildren(ChatModule.class);
         addChildren(ClearModule.class);
         addChildren(CloneModule.class);
+        addChildren(CommandblockModule.class);
         addChildren(DamageModule.class);
         addChildren(DeathModule.class);
         addChildren(DebugstickModule.class);

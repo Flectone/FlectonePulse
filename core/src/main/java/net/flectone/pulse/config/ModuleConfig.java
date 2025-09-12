@@ -95,6 +95,7 @@ public interface ModuleConfig {
         SubMessageConfig getChat();
         SubMessageConfig getClear();
         SubMessageConfig getClone();
+        SubMessageConfig getCommandblock();
         SubMessageConfig getDamage();
         SubMessageConfig getDeath();
         SubMessageConfig getDebugstick();

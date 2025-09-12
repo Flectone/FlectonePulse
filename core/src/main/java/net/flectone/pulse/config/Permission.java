@@ -753,6 +753,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Clear clear = new Clear();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/clone/")})
         private Clone clone = new Clone();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/commandblock/")})
+        private Commandblock commandblock = new Commandblock();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/damage/")})
         private Damage damage = new Damage();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/death/")})
@@ -932,6 +934,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private String name = "flectonepulse.module.message.clone";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.clone.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Commandblock implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.commandblock";
+            private Type type = Type.TRUE;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.commandblock.sound", Type.TRUE);
         }
 
         @Getter

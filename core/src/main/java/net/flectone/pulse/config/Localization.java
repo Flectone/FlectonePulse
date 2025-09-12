@@ -449,6 +449,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.clone.format = "<fcolor:1>⏹ Успешно скопировано <fcolor:2><amount> <fcolor:1>блоков";
 
+        message.commandblock.notEnabled = "<fcolor:1>\uD83E\uDD16 На этом сервере командные блоки отключены";
+        message.commandblock.format = "<fcolor:1>\uD83E\uDD16 Команда задана: <fcolor:2><command>";
+
         message.damage.format = "<fcolor:1>\uD83D\uDDE1 Нанесено <fcolor:2><amount> <fcolor:1>урона <display_name>";
 
         message.afk.formatTrue.global = "<gradient:#ffd500:#FFFF00>⌚ <player> отошёл";
@@ -1694,6 +1697,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Clear clear = new Clear();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/clone/")})
         private Clone clone = new Clone();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/commandblock/")})
+        private Commandblock commandblock = new Commandblock();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/damage/")})
         private Damage damage = new Damage();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/death/")})
@@ -1911,6 +1916,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Clone implements SubMessageConfig, Localizable {
             private String format = "<fcolor:1>⏹ Successfully cloned <fcolor:2><amount> <fcolor:1>block(s)";
+        }
+
+        @Getter
+        public static final class Commandblock implements SubMessageConfig, Localizable {
+            private String notEnabled = "<fcolor:1>\uD83E\uDD16 Command blocks are not enabled on this server";
+            private String format = "<fcolor:1>\uD83E\uDD16 Command set: <fcolor:2><command>";
         }
 
         @Getter
