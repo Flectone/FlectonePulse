@@ -61,6 +61,11 @@ public enum MinecraftTranslationKey {
 
     COMMANDS_DEOP_SUCCESS("commands.deop.success"),
 
+    COMMANDS_DIALOG_CLEAR_MULTIPLE("commands.dialog.clear.multiple"),
+    COMMANDS_DIALOG_CLEAR_SINGLE("commands.dialog.clear.single"),
+    COMMANDS_DIALOG_SHOW_MULTIPLE("commands.dialog.show.multiple"),
+    COMMANDS_DIALOG_SHOW_SINGLE("commands.dialog.show.single"),
+
     COMMANDS_DIFFICULTY_QUERY("commands.difficulty.query"),
     COMMANDS_DIFFICULTY_SUCCESS("commands.difficulty.success"),
 

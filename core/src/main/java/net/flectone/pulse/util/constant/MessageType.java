@@ -61,6 +61,7 @@ public enum MessageType {
     DEBUG_STICK,
     DELETE,
     DEOP,
+    DIALOG,
     DIFFICULTY,
     EFFECT,
     ENCHANT,

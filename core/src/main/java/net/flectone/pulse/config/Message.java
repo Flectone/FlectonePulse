@@ -76,6 +76,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Debugstick debugstick = new Debugstick();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/deop/")})
     private Deop deop = new Deop();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/dialog/")})
+    private Dialog dialog = new Dialog();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/difficulty/")})
     private Difficulty difficulty = new Difficulty();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/effect/")})
@@ -355,6 +357,13 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
 
     @Getter
     public static final class Deop implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Destination destination = new Destination();
+        private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Dialog implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Destination destination = new Destination();
         private Sound sound = new Sound();

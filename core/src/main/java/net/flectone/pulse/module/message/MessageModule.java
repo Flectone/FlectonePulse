@@ -22,6 +22,7 @@ import net.flectone.pulse.module.message.damage.DamageModule;
 import net.flectone.pulse.module.message.death.DeathModule;
 import net.flectone.pulse.module.message.debugstick.DebugstickModule;
 import net.flectone.pulse.module.message.deop.DeopModule;
+import net.flectone.pulse.module.message.dialog.DialogModule;
 import net.flectone.pulse.module.message.difficulty.DifficultyModule;
 import net.flectone.pulse.module.message.effect.EffectModule;
 import net.flectone.pulse.module.message.enchant.EnchantModule;
@@ -95,6 +96,7 @@ public class MessageModule extends AbstractModule {
         addChildren(DeathModule.class);
         addChildren(DebugstickModule.class);
         addChildren(DeopModule.class);
+        addChildren(DialogModule.class);
         addChildren(DifficultyModule.class);
         addChildren(EffectModule.class);
         addChildren(EnchantModule.class);

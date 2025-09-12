@@ -765,6 +765,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Debugstick debugstick = new Debugstick();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/deop/")})
         private Deop deop = new Deop();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/dialog/")})
+        private Dialog dialog = new Dialog();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/difficulty/")})
         private Difficulty difficulty = new Difficulty();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/effect/")})
@@ -982,6 +984,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private String name = "flectonepulse.module.message.deop";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.deop.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Dialog implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.dialog";
+            private Type type = Type.TRUE;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.dialog.sound", Type.TRUE);
         }
 
         @Getter

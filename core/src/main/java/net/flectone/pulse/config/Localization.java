@@ -574,6 +574,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.deop.format = "<fcolor:1>\uD83E\uDD16 <display_name> больше не является оператором сервера";
 
+        message.dialog.clear.single = "<fcolor:1>\uD83D\uDDD4 Убран диалог у игрока «<display_name>»";
+        message.dialog.clear.multiple = "<fcolor:1>\uD83D\uDDD4 Убран диалог у <fcolor:2><count> <fcolor:1>игроков";
+        message.dialog.show.single = "<fcolor:1>\uD83D\uDDD4 Отображён диалог игроку «<display_name>»";
+        message.dialog.show.multiple = "<fcolor:1>\uD83D\uDDD4 Отображён диалог <fcolor:2><count> <fcolor:1>игрокам";
+
         message.difficulty.formatQuery = "<fcolor:1>⚔ Сложность игры: <fcolor:2><lang:'<difficulty>'>";
         message.difficulty.formatSuccess = "<fcolor:1>⚔ Установлена сложность игры: <fcolor:2><lang:'<difficulty>'>";
 
@@ -1724,6 +1729,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Debugstick debugstick = new Debugstick();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/deop/")})
         private Deop deop = new Deop();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/dialog/")})
+        private Dialog dialog = new Dialog();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/difficulty/")})
         private Difficulty difficulty = new Difficulty();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/effect/")})
@@ -2103,6 +2110,18 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Deop implements SubMessageConfig, Localizable {
             private String format = "<fcolor:1>🤖 Made <display_name> no longer a server operator";
+        }
+
+        @Getter
+        public static final class Dialog implements SubMessageConfig, Localizable {
+            private SingleMultiple clear = new SingleMultiple(
+                    "<fcolor:1>\uD83D\uDDD4 Cleared dialog for <display_name>",
+                    "<fcolor:1>\uD83D\uDDD4 Cleared dialog for <fcolor:2><count> <fcolor:1>players"
+            );
+            private SingleMultiple show = new SingleMultiple(
+                    "<fcolor:1>\uD83D\uDDD4 Displayed dialog to <display_name>",
+                    "<fcolor:1>\uD83D\uDDD4 Displayed dialog to <fcolor:2><count> <fcolor:1>players"
+            );
         }
 
         @Getter

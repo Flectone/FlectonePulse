@@ -101,6 +101,7 @@ public interface ModuleConfig {
         SubMessageConfig getDeath();
         SubMessageConfig getDebugstick();
         SubMessageConfig getDeop();
+        SubMessageConfig getDialog();
         SubMessageConfig getDifficulty();
         SubMessageConfig getEffect();
         SubMessageConfig getEnchant();
