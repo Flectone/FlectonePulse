@@ -21,10 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 
@@ -224,6 +221,14 @@ public class FileResolver {
 
     private void migration_1_5_2() {
         command.reload();
+
+        List<Command.Chatsetting.Menu.Color.Type> colorTypes = command.getChatsetting().getMenu().getSee().getTypes();
+        for (Command.Chatsetting.Menu.Color.Type colorType : colorTypes) {
+            if (colorType.getName().equals("default")) {
+                colorType.getColors().put(1, "");
+                colorType.getColors().put(2, "");
+            }
+        }
 
         Map<String, Integer> types = command.getChatsetting().getCheckbox().getTypes();
         Map<String, Integer> oldTypes = new HashMap<>(types);

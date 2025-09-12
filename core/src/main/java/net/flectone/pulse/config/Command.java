@@ -269,7 +269,7 @@ public final class Command extends FileSerializable implements ModuleConfig.Comm
                     new Chat.Type("global", "BLACK_DYE")
             ));
             private Color see = new Color(1, List.of(
-                    new Color.Type("default", "ARROW", new LinkedHashMap<>(Map.of(1, "<gradient:#B3E5FC:#75CBF2>", 2, "<gradient:#70C7EF:#37B1F2>", 3, "", 4, ""))),
+                    new Color.Type("default", "ARROW", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "", 4, ""))),
                     new Color.Type("white", "WHITE_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#F5F9FF:#E6F0FF>", 2, "<gradient:#D4E4FF:#B8D2FF>", 3, "", 4, ""))),
                     new Color.Type("light_gray", "LIGHT_GRAY_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#E0E3E6:#C8CCD0>", 2, "<gradient:#B5B9BD:#9DA2A6>", 3, "", 4, ""))),
                     new Color.Type("gray", "GRAY_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#6B7378:#535A5F>", 2, "<gradient:#4A5054:#3A3F42>", 3, "", 4, ""))),
