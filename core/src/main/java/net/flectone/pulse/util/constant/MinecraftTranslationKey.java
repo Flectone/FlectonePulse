@@ -109,6 +109,10 @@ public enum MinecraftTranslationKey {
     COMMANDS_KILL_SUCCESS_SINGLE("commands.kill.success.single"),
     COMMANDS_KILL_SUCCESS("commands.kill.successful"), // legacy
 
+    COMMANDS_LOCATE_BIOME_SUCCESS("commands.locate.biome.success"),
+    COMMANDS_LOCATE_POI_SUCCESS("commands.locate.poi.success"),
+    COMMANDS_LOCATE_STRUCTURE_SUCCESS("commands.locate.structure.success"),
+
     COMMANDS_OP_SUCCESS("commands.op.success"),
 
     COMMANDS_PARTICLE_SUCCESS("commands.particle.success"),

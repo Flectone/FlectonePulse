@@ -645,6 +645,10 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.kill.single = "<color:#778899>🪦 <fcolor:1><display_name> убит";
         message.kill.multiple = "<color:#778899>🪦 <fcolor:1>Уничтожено <fcolor:2><count> <fcolor:1>сущностей";
 
+        message.locate.biome = "<fcolor:1>\uD83D\uDDFA Ближайший биом с типом <fcolor:2><name> <fcolor:1>находится по координатам <fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
+        message.locate.poi = "<fcolor:1>\uD83D\uDDFA Ближайшая точка интереса с типом <fcolor:2><name> <fcolor:1>находится по координатам <fcolor:2><fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
+        message.locate.structure = "<fcolor:1>\uD83D\uDDFA Ближайшее строение типа <fcolor:2><name> <fcolor:1>находится по координатам <fcolor:2><fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
+
         message.objective.belowname.format = "<fcolor:1>мс";
 
         message.op.format = "<fcolor:1>\uD83E\uDD16 <display_name> назначен оператором сервера";
@@ -1748,6 +1752,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Join join = new Join();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/kill/")})
         private Kill kill = new Kill();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/locate/")})
+        private Locate locate = new Locate();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/objective/")})
         private Objective objective = new Objective();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/op/")})
@@ -2388,6 +2394,13 @@ public final class Localization extends FileSerializable implements ModuleConfig
         public static final class Kill implements SubMessageConfig, Localizable {
             private String single = "<color:#778899>🪦 <fcolor:1>Killed <display_name>";
             private String multiple = "<color:#778899>🪦 <fcolor:1>Killed <fcolor:2><count> <fcolor:1>entities";
+        }
+
+        @Getter
+        public static final class Locate implements SubMessageConfig, Localizable {
+            private String biome = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><name> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
+            private String poi = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><name> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
+            private String structure = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><name> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
         }
 
         @Getter

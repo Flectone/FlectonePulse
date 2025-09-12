@@ -115,6 +115,7 @@ public interface ModuleConfig {
         SubMessageConfig getGreeting();
         SubMessageConfig getJoin();
         SubMessageConfig getKill();
+        SubMessageConfig getLocate();
         ObjectiveMessageConfig getObjective();
         SubMessageConfig getOp();
         SubMessageConfig getParticle();

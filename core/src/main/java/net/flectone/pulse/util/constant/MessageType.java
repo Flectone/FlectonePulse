@@ -81,6 +81,7 @@ public enum MessageType {
     HEADER,
     JOIN,
     KILL,
+    LOCATE,
     MENTION,
     MOTD,
     NAME,
