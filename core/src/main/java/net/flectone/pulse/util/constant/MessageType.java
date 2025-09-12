@@ -1,6 +1,8 @@
 package net.flectone.pulse.util.constant;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public enum MessageType {
     AFK,
@@ -123,6 +125,12 @@ public enum MessageType {
     SYSTEM_MUTE,
     SYSTEM_WARN;
 
+    private static final Map<String, MessageType> ENUM_BY_PROXY_KEY = Arrays.stream(MessageType.values())
+            .collect(Collectors.toUnmodifiableMap(
+                    MessageType::toProxyTag,
+                    messageType -> messageType
+            ));
+
     public String toProxyTag() {
         return "FlectonePulse:" + this.name();
     }
@@ -130,9 +138,6 @@ public enum MessageType {
     public static MessageType fromProxyString(String string) {
         if (string == null || string.isEmpty()) return null;
 
-        return Arrays.stream(MessageType.values())
-                .filter(tag -> string.equals("FlectonePulse:" + tag.name()))
-                .findAny()
-                .orElse(null);
+        return ENUM_BY_PROXY_KEY.get(string);
     }
 }

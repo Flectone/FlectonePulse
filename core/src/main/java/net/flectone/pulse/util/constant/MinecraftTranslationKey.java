@@ -3,6 +3,8 @@ package net.flectone.pulse.util.constant;
 import net.kyori.adventure.text.TranslatableComponent;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public enum MinecraftTranslationKey {
 
@@ -284,6 +286,12 @@ public enum MinecraftTranslationKey {
 
     UNKNOWN("unknown");
 
+    private static final Map<String, MinecraftTranslationKey> ENUM_BY_KEY = Arrays.stream(MinecraftTranslationKey.values())
+            .collect(Collectors.toUnmodifiableMap(
+                    translationKey -> translationKey.key,
+                    translationKey -> translationKey
+            ));
+
     private final String key;
 
     MinecraftTranslationKey(String key) {
@@ -295,10 +303,9 @@ public enum MinecraftTranslationKey {
     }
 
     public static MinecraftTranslationKey fromString(String string) {
-        return Arrays.stream(MinecraftTranslationKey.values())
-                .filter(type -> type.key.equalsIgnoreCase(string))
-                .findAny()
-                .orElse(UNKNOWN);
+        if (string == null || string.isEmpty()) return UNKNOWN;
+
+        return ENUM_BY_KEY.getOrDefault(string, UNKNOWN);
     }
 
     @Override
