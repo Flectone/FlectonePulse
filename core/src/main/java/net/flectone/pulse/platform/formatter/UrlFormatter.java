@@ -29,7 +29,7 @@ public class UrlFormatter {
         if (StringUtils.isEmpty(url)) return "";
 
         try {
-            return new URI(unescapeAmpersand(url)).toASCIIString();
+            return new URI(url).toASCIIString();
         } catch (URISyntaxException e) {
             return "";
         }

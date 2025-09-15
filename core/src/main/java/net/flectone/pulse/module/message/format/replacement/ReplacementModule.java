@@ -485,7 +485,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     }
 
     private Tag urlTag(FEntity sender, FPlayer receiver, String url) {
-        url = urlFormatter.toASCII(url);
+        url = urlFormatter.toASCII(urlFormatter.unescapeAmpersand(url));
         if (url.isEmpty()) return Tag.selfClosingInserting(Component.empty());
 
         String string = Strings.CS.replace(
@@ -496,13 +496,14 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
         Component component = messagePipeline.builder(sender, receiver, string)
                 .flag(MessageFlag.REPLACEMENT, false)
+                .flag(MessageFlag.LEGACY_COLORS, false)
                 .build();
 
         return Tag.selfClosingInserting(component);
     }
 
     private Tag imageTag(FEntity sender, FPlayer receiver, String url) {
-        url = urlFormatter.toASCII(url);
+        url = urlFormatter.toASCII(urlFormatter.unescapeAmpersand(url));
         if (url.isEmpty()) return Tag.selfClosingInserting(Component.empty());
 
         Component componentPixels;
@@ -520,6 +521,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
         Component component = messagePipeline.builder(sender, receiver, string)
                 .flag(MessageFlag.REPLACEMENT, false)
+                .flag(MessageFlag.LEGACY_COLORS, false)
                 .tagResolvers(TagResolver.resolver("pixels", (argumentQueue, context) ->
                         Tag.inserting(componentPixels))
                 )
