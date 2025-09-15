@@ -5,13 +5,10 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.message.give.model.Give;
 import net.flectone.pulse.processing.extractor.Extractor;
-import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.kyori.adventure.text.TranslationArgument;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -21,40 +18,36 @@ public class GiveExtractor extends Extractor {
     public GiveExtractor() {
     }
 
-    public Optional<Give> extract(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
-        List<TranslationArgument> translationArguments = translatableComponent.arguments();
-        if (translationArguments.size() < 3) return Optional.empty();
-        if (!(translationArguments.get(0).asComponent() instanceof TextComponent amountComponent)) return Optional.empty();
-        if (!(translationArguments.get(1).asComponent() instanceof TranslatableComponent emptyItemComponent)) return Optional.empty();
-        if (emptyItemComponent.arguments().isEmpty()) return Optional.empty();
-        if (!(emptyItemComponent.arguments().getFirst().asComponent() instanceof TextComponent itemComponent)) return Optional.empty();
-        if (itemComponent.children().isEmpty()) return Optional.empty();
+    // Gave %s %s to %s players
+    // Gave %s %s to %s
+    public Optional<Give> extract(TranslatableComponent translatableComponent) {
+        Optional<String> items = extractTextContent(translatableComponent, 0);
+        if (items.isEmpty()) return Optional.empty();
 
-        String itemName;
-        if (itemComponent.children().getFirst().asComponent() instanceof TextComponent textComponent) {
-            itemName = textComponent.content();
-        } else if (itemComponent.children().getFirst().asComponent() instanceof TranslatableComponent translatableComponent1) {
-            itemName = translatableComponent1.key();
-        } else {
-            return Optional.empty();
-        }
+        Optional<Component> item = getValueComponent(translatableComponent, 1);
+        if (item.isEmpty()) return Optional.empty();
 
-        String amount = amountComponent.content();
+        // idk why but "commands.give.success.multiple" not called
+        Optional<String> players = extractTextContent(translatableComponent, 2);
+        if (players.isPresent() && StringUtils.isNumeric(players.get())) {
+            Give give = Give.builder()
+                    .items(items.get())
+                    .item(item.get())
+                    .players(players.get())
+                    .build();
 
-        Component component = translationArguments.get(2).asComponent();
-
-        if (translationKey == MinecraftTranslationKey.COMMANDS_EFFECT_GIVE_SUCCESS_MULTIPLE) {
-            if (!(component instanceof TextComponent countComponent)) return Optional.empty();
-
-            String count = countComponent.content();
-            Give give = new Give(amount, itemName, null, count);
             return Optional.of(give);
         }
 
-        Optional<FEntity> optionalFEntity = extractFEntity(component);
-        if (optionalFEntity.isEmpty()) return Optional.empty();
+        Optional<FEntity> target = extractFEntity(translatableComponent, 2);
+        if (target.isEmpty()) return Optional.empty();
 
-        Give give = new Give(amount, itemName, optionalFEntity.get(), null);
+        Give give = Give.builder()
+                .items(items.get())
+                .item(item.get())
+                .target(target.get())
+                .build();
+
         return Optional.of(give);
     }
 }

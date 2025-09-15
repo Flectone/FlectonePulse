@@ -15,6 +15,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 
 @Singleton
@@ -51,11 +52,9 @@ public class EffectModule extends AbstractModuleLocalization<Localization.Messag
     @Async
     public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey, Effect effect) {
         if (isModuleDisabledFor(fPlayer)) return;
-        if (effect.isIncorrect()) return;
 
         sendMessage(EffectMetadata.<Localization.Message.Effect>builder()
-                .sender(effect.target() == null ? fPlayer : effect.target())
-                .filterPlayer(fPlayer)
+                .sender(fPlayer)
                 .format(string -> StringUtils.replaceEach(
                         switch (translationKey) {
                             case COMMANDS_EFFECT_CLEAR_EVERYTHING_SUCCESS_SINGLE -> string.getClear().getEverything().getSingle();
@@ -66,13 +65,15 @@ public class EffectModule extends AbstractModuleLocalization<Localization.Messag
                             case COMMANDS_EFFECT_GIVE_SUCCESS_MULTIPLE -> string.getGive().getMultiple();
                             default -> "";
                         },
-                        new String[]{"<effect>", "<count>"},
-                        new String[]{StringUtils.defaultString(effect.name()), StringUtils.defaultString(effect.count())}
+                        new String[]{"<effect>", "<players>"},
+                        new String[]{StringUtils.defaultString(effect.getName()), StringUtils.defaultString(effect.getPlayers())}
                 ))
+                .range(message.getRange())
                 .destination(message.getDestination())
                 .sound(getModuleSound())
                 .effect(effect)
                 .translationKey(translationKey)
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, effect.getTarget())})
                 .build()
         );
     }

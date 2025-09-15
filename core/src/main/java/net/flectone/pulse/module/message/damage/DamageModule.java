@@ -14,6 +14,8 @@ import net.flectone.pulse.module.message.damage.model.DamageMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.Strings;
 
 @Singleton
@@ -48,20 +50,18 @@ public class DamageModule extends AbstractModuleLocalization<Localization.Messag
     }
 
     @Async
-    public void send(FPlayer fPlayer, Damage damage) {
+    public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey, Damage damage) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         sendMessage(DamageMetadata.<Localization.Message.Damage>builder()
-                .sender(damage.entity())
-                .filterPlayer(fPlayer)
-                .format(s -> Strings.CS.replace(
-                        s.getFormat(),
-                        "<amount>",
-                        damage.amount()
-                ))
+                .sender(fPlayer)
+                .format(localization -> Strings.CS.replace(localization.getFormat(), "<amount>", damage.amount()))
                 .damage(damage)
+                .translationKey(translationKey)
+                .range(message.getRange())
                 .destination(message.getDestination())
                 .sound(getModuleSound())
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, damage.target())})
                 .build()
         );
     }

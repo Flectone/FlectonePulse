@@ -25,12 +25,16 @@ import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.TagPattern;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+
+import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.empty;
 
 public abstract class AbstractModuleLocalization<M extends Localization.Localizable> extends AbstractModule {
 
@@ -211,5 +215,19 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
 
     public TagResolver messageTag(Component message) {
         return TagResolver.resolver("message", (argumentQueue, context) -> Tag.inserting(message));
+    }
+
+    public TagResolver targetTag(@TagPattern String tag, FPlayer receiver, @Nullable FEntity target) {
+        if (!isEnable() || target == null) return empty(tag);
+
+        return TagResolver.resolver(tag, (argumentQueue, context) -> {
+            Component component = messagePipeline.builder(target, receiver, "<display_name>").build();
+
+            return Tag.selfClosingInserting(component);
+        });
+    }
+
+    public TagResolver targetTag(FPlayer receiver, @Nullable FEntity target) {
+        return targetTag("target", receiver, target);
     }
 }

@@ -14,11 +14,10 @@ public class DifficultyExtractor extends Extractor {
     public DifficultyExtractor() {
     }
 
+    // The difficulty is %s
+    // The difficulty has been set to %s
     public Optional<String> extract(TranslatableComponent translatableComponent) {
-        if (translatableComponent.arguments().isEmpty()) return Optional.empty();
-        if (!(translatableComponent.arguments().getFirst().asComponent() instanceof TranslatableComponent difficultyComponent)) return Optional.empty();
-
-        return Optional.of(difficultyComponent.key());
+        return extractTranslatableKey(translatableComponent, 0);
     }
 
 }

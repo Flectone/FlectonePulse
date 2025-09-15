@@ -54,17 +54,17 @@ public class DebugstickModule extends AbstractModuleLocalization<Localization.Me
 
         sendMessage(DebugStickMetadata.<Localization.Message.Debugstick>builder()
                 .sender(fPlayer)
-                .filterPlayer(fPlayer)
-                .format(s -> StringUtils.replaceEach(
+                .format(localization -> StringUtils.replaceEach(
                         switch (translationKey) {
-                            case ITEM_MINECRAFT_DEBUG_STICK_EMPTY -> s.getEmpty();
-                            case ITEM_MINECRAFT_DEBUG_STICK_SELECT -> s.getSelect();
-                            case ITEM_MINECRAFT_DEBUG_STICK_UPDATE -> s.getUpdate();
+                            case ITEM_MINECRAFT_DEBUG_STICK_EMPTY -> localization.getEmpty();
+                            case ITEM_MINECRAFT_DEBUG_STICK_SELECT -> localization.getSelect();
+                            case ITEM_MINECRAFT_DEBUG_STICK_UPDATE -> localization.getUpdate();
                             default -> "";
                         },
-                        new String[]{"<name>", "<value>"},
-                        new String[]{debugStick.name(), StringUtils.defaultString(debugStick.value())}
+                        new String[]{"<property>", "<value>"},
+                        new String[]{debugStick.getProperty(), StringUtils.defaultString(debugStick.getValue())}
                 ))
+                .range(message.getRange())
                 .debugStick(debugStick)
                 .translationKey(translationKey)
                 .destination(message.getDestination())

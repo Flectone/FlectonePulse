@@ -27,13 +27,14 @@ public class RotatePulseListener implements PulseListener {
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
-        if (event.getTranslationKey() != MinecraftTranslationKey.COMMANDS_ROTATE_SUCCESS) return;
+        MinecraftTranslationKey translationKey = event.getTranslationKey();
+        if (translationKey != MinecraftTranslationKey.COMMANDS_ROTATE_SUCCESS) return;
 
-        Optional<FEntity> target = rotateExtractor.extract(event);
+        Optional<FEntity> target = rotateExtractor.extract(event.getTranslatableComponent());
         if (target.isEmpty()) return;
 
         event.setCancelled(true);
-        rotateModule.send(event.getFPlayer(), target.get());
+        rotateModule.send(event.getFPlayer(), translationKey, target.get());
     }
 
 }

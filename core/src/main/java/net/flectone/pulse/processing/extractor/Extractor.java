@@ -5,14 +5,12 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.EntityUtil;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.*;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.lang3.StringUtils;
-import org.incendo.cloud.type.tuple.Triplet;
-import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,69 +19,106 @@ public abstract class Extractor {
     @Inject private EntityUtil entityUtil;
     @Inject private FPlayerService fPlayerService;
 
-    public String extractTarget(TextComponent targetComponent) {
-        String target = targetComponent.content();
-        if (target.isEmpty()) {
-            target = targetComponent.insertion();
-        }
+    public Optional<FEntity> extractFEntity(TranslatableComponent translatableComponent, int index) {
+        Optional<Component> component = getComponent(translatableComponent, index, Component.class);
+        if (component.isEmpty()) return Optional.empty();
 
-        return target == null ? "" : target;
-    }
-
-    public Optional<UUID> extractUUID(@Nullable String uuid) {
-        if (StringUtils.isEmpty(uuid)) return Optional.empty();
-
-        try {
-            return Optional.of(UUID.fromString(uuid));
-        } catch (IllegalArgumentException ignored) {
-            return Optional.empty();
-        }
+        return extractFEntity(component.get());
     }
 
     public Optional<FEntity> extractFEntity(Component component) {
-        UUID uuid = null;
-        String content;
-
-        if (component instanceof TranslatableComponent translatableComponent) {
-            Optional<UUID> optionalUUID = extractUUID(translatableComponent.insertion());
-            if (optionalUUID.isPresent()) {
-                uuid = optionalUUID.get();
-            }
-
-            content = translatableComponent.key();
-        } else if (component instanceof TextComponent textComponent) {
-            content = textComponent.content();
-        } else return Optional.empty();
-
-        Triplet<String, String, UUID> triplet = extractHoverComponent(content, content, uuid, component.hoverEvent());
-        String name = triplet.first();
-        if (name.isEmpty()) return Optional.empty();
-
-        String type = triplet.second();
-        uuid = triplet.third();
-
-        FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
-        if (!fPlayer.isUnknown()) return Optional.of(fPlayer);
-
-        FEntity entity = new FEntity(name, uuid, type);
-        return Optional.of(entity);
-    }
-
-    public Triplet<String, String, UUID> extractHoverComponent(String name, String type, @Nullable UUID uuid, HoverEvent<?> hoverEvent) {
+        HoverEvent<?> hoverEvent = component.hoverEvent();
         if (hoverEvent != null && hoverEvent.action() == HoverEvent.Action.SHOW_ENTITY) {
             HoverEvent.ShowEntity showEntity = (HoverEvent.ShowEntity) hoverEvent.value();
-            uuid = showEntity.id();
-            type = entityUtil.resolveEntityTranslationKey(showEntity.type().key().value());
-            if (showEntity.name() instanceof TextComponent hoverText) {
-                name = hoverText.content();
-            } else if (showEntity.name() instanceof TranslatableComponent hoverTranslatable) {
-                name = hoverTranslatable.key();
+
+            UUID uuid = showEntity.id();
+
+            String rawType = showEntity.type().key().value();
+            if (rawType.equals("player")) {
+                return Optional.of(fPlayerService.getFPlayer(uuid));
             }
-        } else if (uuid == null) {
-            uuid = fPlayerService.getFPlayer(name).getUuid();
+
+            String type = entityUtil.resolveEntityTranslationKey(rawType);
+
+            FEntity fEntity = new FEntity(null, uuid, type);
+            fEntity.setShowEntityName(showEntity.name());
+
+            return Optional.of(fEntity);
         }
 
-        return Triplet.of(name, type, uuid);
+        Optional<String> optionalName = extractTextContentOrTranslatableKey(component);
+        if (optionalName.isEmpty()) return Optional.empty();
+
+        FPlayer fPlayer = fPlayerService.getFPlayer(optionalName.get());
+        return Optional.of(fPlayer);
     }
 
+    protected <T extends ComponentLike> Optional<T> parseComponent(Component component, Class<T> clazz) {
+        if (clazz.isInstance(component)) {
+            return Optional.of(clazz.cast(component));
+        }
+
+        return Optional.empty();
+    }
+
+    protected <T extends ComponentLike> Optional<T> getComponent(TranslatableComponent translatableComponent, int index, Class<T> clazz) {
+        List<TranslationArgument> translationArguments = translatableComponent.arguments();
+        if (index < translationArguments.size()) {
+            return parseComponent(translationArguments.get(index).asComponent(), clazz);
+        }
+
+        return Optional.empty();
+    }
+
+    protected Optional<Component> getComponent(TranslatableComponent translatableComponent, int index) {
+        return getComponent(translatableComponent, index, Component.class);
+    }
+
+    protected Optional<TextComponent> getTextComponent(TranslatableComponent translatableComponent, int index) {
+        return getComponent(translatableComponent, index, TextComponent.class);
+    }
+
+    protected Optional<TranslatableComponent> getTranslatableComponent(TranslatableComponent translatableComponent, int index) {
+        return getComponent(translatableComponent, index, TranslatableComponent.class);
+    }
+
+    protected Optional<Component> getValueComponent(TranslatableComponent translatableComponent, int index) {
+        Optional<Component> component = getComponent(translatableComponent, index);
+        return component.flatMap(value -> switch (value) {
+            case TranslatableComponent valueTranslatableComponent when !valueTranslatableComponent.arguments().isEmpty() ->
+                    Optional.of(valueTranslatableComponent.arguments().getFirst().asComponent());
+
+            case TextComponent valueTextComponent when valueTextComponent.content().equals("[") && !valueTextComponent.children().isEmpty() ->
+                    Optional.of(valueTextComponent.children().getFirst().asComponent());
+
+            case TextComponent valueTextComponent -> Optional.of(valueTextComponent);
+
+            default -> Optional.empty();
+        });
+    }
+
+    protected Optional<String> extractTextContent(TranslatableComponent translatableComponent, int index) {
+        return getTextComponent(translatableComponent, index).map(TextComponent::content);
+    }
+
+    protected Optional<String> extractTranslatableKey(TranslatableComponent translatableComponent, int index) {
+        return getTranslatableComponent(translatableComponent, index).map(TranslatableComponent::key);
+    }
+
+    protected Optional<String> extractTextContentOrTranslatableKey(Component component) {
+        if (component instanceof TextComponent textComponent) {
+            String content = textComponent.content();
+            if (!StringUtils.isEmpty(content)) return Optional.of(content);
+
+            String insertion = textComponent.insertion();
+            return insertion == null ? Optional.of("") : Optional.of(insertion);
+        }
+
+        if (component instanceof TranslatableComponent translatableComponent) {
+            String key = translatableComponent.key();
+            return Optional.of(key);
+        }
+
+        return Optional.empty();
+    }
 }

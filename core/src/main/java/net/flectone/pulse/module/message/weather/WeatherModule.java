@@ -52,13 +52,13 @@ public class WeatherModule extends AbstractModuleLocalization<Localization.Messa
 
         sendMessage(WeatherMetadata.<Localization.Message.Weather>builder()
                 .sender(fPlayer)
-                .format(s -> switch (translationKey) {
-                    case COMMANDS_WEATHER_SET_CLEAR -> s.getFormatClear();
-                    case COMMANDS_WEATHER_SET_RAIN -> s.getFormatRain();
-                    case COMMANDS_WEATHER_SET_THUNDER -> s.getFormatThunder();
+                .range(message.getRange())
+                .format(localization -> switch (translationKey) {
+                    case COMMANDS_WEATHER_SET_CLEAR -> localization.getFormatClear();
+                    case COMMANDS_WEATHER_SET_RAIN -> localization.getFormatRain();
+                    case COMMANDS_WEATHER_SET_THUNDER -> localization.getFormatThunder();
                     default -> "";
                 })
-                .translationKey(translationKey)
                 .translationKey(translationKey)
                 .destination(message.getDestination())
                 .sound(getModuleSound())

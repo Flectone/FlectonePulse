@@ -52,13 +52,13 @@ public class BedModule extends AbstractModuleLocalization<Localization.Message.B
 
         sendMessage(BedMetadata.<Localization.Message.Bed>builder()
                 .sender(fPlayer)
-                .filterPlayer(fPlayer)
-                .format(bed -> switch (minecraftTranslationKey) {
-                    case BLOCK_MINECRAFT_BED_NO_SLEEP, TILE_BED_NO_SLEEP -> bed.getNoSleep();
-                    case BLOCK_MINECRAFT_BED_NOT_SAFE, TILE_BED_NOT_SAFE -> bed.getNotSafe();
-                    case BLOCK_MINECRAFT_BED_OBSTRUCTED, BLOCK_MINECRAFT_SPAWN_NOT_VALID -> bed.getObstructed();
-                    case BLOCK_MINECRAFT_BED_OCCUPIED, TILE_BED_OCCUPIED -> bed.getOccupied();
-                    case BLOCK_MINECRAFT_BED_TOO_FAR_AWAY -> bed.getTooFarAway();
+                .range(message.getRange())
+                .format(localization -> switch (minecraftTranslationKey) {
+                    case BLOCK_MINECRAFT_BED_NO_SLEEP, TILE_BED_NO_SLEEP -> localization.getNoSleep();
+                    case BLOCK_MINECRAFT_BED_NOT_SAFE, TILE_BED_NOT_SAFE -> localization.getNotSafe();
+                    case BLOCK_MINECRAFT_BED_OBSTRUCTED, BLOCK_MINECRAFT_SPAWN_NOT_VALID -> localization.getObstructed();
+                    case BLOCK_MINECRAFT_BED_OCCUPIED, TILE_BED_OCCUPIED -> localization.getOccupied();
+                    case BLOCK_MINECRAFT_BED_TOO_FAR_AWAY -> localization.getTooFarAway();
                     default -> "";
                 })
                 .translationKey(minecraftTranslationKey)

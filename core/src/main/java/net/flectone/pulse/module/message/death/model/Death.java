@@ -1,26 +1,23 @@
 package net.flectone.pulse.module.message.death.model;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
-
-import java.util.UUID;
+import lombok.NonNull;
+import net.flectone.pulse.model.entity.FEntity;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
-@Setter
+@Builder
 public class Death {
 
-    private final String key;
+    @NonNull
+    private final FEntity target;
 
-    private boolean isPlayer;
+    @Nullable
+    private final FEntity killer;
 
-    private String targetName;
-    private String targetType;
-    private UUID targetUUID;
+    @Nullable
+    private final Component killerItem;
 
-    private Death killer;
-    private String item;
-
-    public Death(String key) {
-        this.key = key;
-    }
 }

@@ -2,10 +2,10 @@ package net.flectone.pulse.module.message.gamemode.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.model.event.message.MessageReceiveEvent;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.message.gamemode.model.Gamemode;
 import net.flectone.pulse.processing.extractor.Extractor;
-import net.kyori.adventure.text.TextComponent;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.TranslatableComponent;
 
 import java.util.Optional;
@@ -17,27 +17,41 @@ public class GamemodeExtractor extends Extractor {
     public GamemodeExtractor() {
     }
 
-    public Optional<Gamemode> extract(MessageReceiveEvent event) {
-        String target = event.getFPlayer().getName();
-        String gamemodeKey = "";
+    public Optional<Gamemode> extract(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
+        return switch (translationKey) {
+            case GAMEMODE_CHANGED -> {
+                Gamemode gamemode = Gamemode.builder().build();
+                yield Optional.of(gamemode);
+            }
+            // Set %s's game mode to %s
+            case COMMANDS_GAMEMODE_SUCCESS_OTHER -> {
+                Optional<FEntity> target = extractFEntity(translatableComponent, 0);
+                if (target.isEmpty()) yield Optional.empty();
 
-        TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        if (translatableComponent.arguments().isEmpty()) {
-            Gamemode gamemode = new Gamemode(event.getTranslationKey(), gamemodeKey, target);
-            return Optional.of(gamemode);
-        }
+                Optional<String> name = extractTranslatableKey(translatableComponent, 1);
+                if (name.isEmpty()) yield Optional.empty();
 
-        if (translatableComponent.arguments().getFirst().asComponent() instanceof TranslatableComponent gamemodeComponent) {
-            gamemodeKey = gamemodeComponent.key();
-        } else if (translatableComponent.arguments().size() > 1
-                && translatableComponent.arguments().get(0).asComponent() instanceof TextComponent playerComponent
-                && translatableComponent.arguments().get(1).asComponent() instanceof TranslatableComponent gamemodeComponent) {
-            target = extractTarget(playerComponent);
-            gamemodeKey = gamemodeComponent.key();
-        }
+                Gamemode gamemode = Gamemode.builder()
+                        .target(target.get())
+                        .name(name.get())
+                        .build();
 
-        Gamemode gamemode = new Gamemode(event.getTranslationKey(), gamemodeKey, target);
-        return Optional.of(gamemode);
+                yield Optional.of(gamemode);
+            }
+            // Set own game mode to %s
+            // The default game mode is now %s
+            case COMMANDS_GAMEMODE_SUCCESS_SELF, COMMANDS_DEFAULTGAMEMODE_SUCCESS -> {
+                Optional<String> name = extractTranslatableKey(translatableComponent, 0);
+                if (name.isEmpty()) yield Optional.empty();
+
+                Gamemode gamemode = Gamemode.builder()
+                        .name(name.get())
+                        .build();
+
+                yield Optional.of(gamemode);
+            }
+            default -> Optional.empty();
+        };
     }
 
 }

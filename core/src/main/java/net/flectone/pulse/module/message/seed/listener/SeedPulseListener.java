@@ -26,13 +26,14 @@ public class SeedPulseListener implements PulseListener {
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
-        if (event.getTranslationKey() != MinecraftTranslationKey.COMMANDS_SEED_SUCCESS) return;
+        MinecraftTranslationKey translationKey = event.getTranslationKey();
+        if (translationKey != MinecraftTranslationKey.COMMANDS_SEED_SUCCESS) return;
 
-        Optional<String> seed = seedExtractor.extract(event);
+        Optional<String> seed = seedExtractor.extract(event.getTranslatableComponent());
         if (seed.isEmpty()) return;
 
         event.setCancelled(true);
-        seedModule.send(event.getFPlayer(), seed.get());
+        seedModule.send(event.getFPlayer(), translationKey, seed.get());
     }
 
 }

@@ -26,13 +26,14 @@ public class ClonePulseListener implements PulseListener {
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
-        if (event.getTranslationKey() != MinecraftTranslationKey.COMMANDS_CLONE_SUCCESS) return;
+        MinecraftTranslationKey translationKey = event.getTranslationKey();
+        if (translationKey != MinecraftTranslationKey.COMMANDS_CLONE_SUCCESS) return;
 
         Optional<String> optionalAmount = clearExtractor.extract(event.getTranslatableComponent());
         if (optionalAmount.isEmpty()) return;
 
         event.setCancelled(true);
-        cloneModule.send(event.getFPlayer(), optionalAmount.get());
+        cloneModule.send(event.getFPlayer(), translationKey, optionalAmount.get());
     }
 
 }

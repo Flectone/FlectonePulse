@@ -1,6 +1,18 @@
 package net.flectone.pulse.module.message.gamemode.model;
 
-import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+import lombok.Builder;
+import lombok.Getter;
+import net.flectone.pulse.model.entity.FEntity;
+import org.jetbrains.annotations.Nullable;
 
-public record Gamemode(MinecraftTranslationKey key, String type, String target) {
+@Getter
+@Builder
+public class Gamemode {
+
+    @Nullable
+    private final String name;
+
+    @Nullable
+    private final FEntity target;
+
 }

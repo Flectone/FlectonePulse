@@ -1,4 +1,4 @@
 package net.flectone.pulse.module.message.sleep.model;
 
-public record Sleep(String sleepCount, String allCount) {
+public record Sleep(String playersSleeping, String players) {
 }

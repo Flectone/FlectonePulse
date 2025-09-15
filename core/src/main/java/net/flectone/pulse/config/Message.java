@@ -2,6 +2,7 @@ package net.flectone.pulse.config;
 
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.elytrium.serializer.annotations.Comment;
@@ -160,11 +161,20 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Advancement implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
-        private boolean grant = true;
-        private boolean revoke = true;
         private Range range = Range.get(Range.Type.SERVER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
+
+        private Command command = new Command();
+
+        @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static final class Command {
+            private boolean enable = true;
+            private Range range = new Range(Range.Type.PLAYER);
+            private Destination destination = new Destination();
+        }
     }
 
     @Getter
@@ -185,6 +195,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Attribute implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -211,6 +222,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Bed implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination(Destination.Type.ACTION_BAR);
         private Sound sound = new Sound();
     }
@@ -317,6 +329,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Clear implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Sound sound = new Sound();
         private Destination destination = new Destination();
     }
@@ -324,6 +337,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Clone implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Sound sound = new Sound();
         private Destination destination = new Destination();
     }
@@ -331,6 +345,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Commandblock implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Sound sound = new Sound();
         private Destination destination = new Destination();
     }
@@ -338,6 +353,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Damage implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Sound sound = new Sound();
         private Destination destination = new Destination();
     }
@@ -353,6 +369,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Debugstick implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination(Destination.Type.ACTION_BAR, new Times(0, 20, 0));
         private Sound sound = new Sound();
     }
@@ -360,6 +377,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Deop implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -367,6 +385,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Dialog implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -374,6 +393,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Difficulty implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -381,6 +401,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Effect implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -388,6 +409,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Enchant implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -395,6 +417,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Execute implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -402,6 +425,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Experience implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -409,6 +433,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Fill implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -416,6 +441,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Fillbiome implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -693,6 +719,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Gamemode implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -700,6 +727,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Gamerule implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -707,6 +735,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Give implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -730,6 +759,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Kill implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Sound sound = new Sound();
         private Destination destination = new Destination();
     }
@@ -737,6 +767,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Locate implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Sound sound = new Sound();
         private Destination destination = new Destination();
     }
@@ -770,6 +801,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Op implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -777,6 +809,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Particle implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -792,6 +825,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Reload implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -799,6 +833,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Ride implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -806,6 +841,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Rightclick implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination(Destination.Type.ACTION_BAR, new Times(0, 60, 0));
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -814,6 +850,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Rotate implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -821,6 +858,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Save implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -828,6 +866,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Seed implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -835,6 +874,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Setblock implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -854,6 +894,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Sleep implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination(Destination.Type.ACTION_BAR);
         private Sound sound = new Sound();
     }
@@ -861,6 +902,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Spawn implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -916,6 +958,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Stop implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -923,6 +966,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Summon implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -965,6 +1009,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Teleport implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -972,6 +1017,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Time implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -986,6 +1032,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Weather implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -993,6 +1040,7 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     @Getter
     public static final class Worldborder implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }

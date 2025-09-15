@@ -54,16 +54,16 @@ public class LocateModule extends AbstractModuleLocalization<Localization.Messag
 
         sendMessage(LocateMetadata.<Localization.Message.Locate>builder()
                 .sender(fPlayer)
-                .filterPlayer(fPlayer)
-                .format(s -> StringUtils.replaceEach(
+                .range(message.getRange())
+                .format(localization -> StringUtils.replaceEach(
                         switch (translationKey) {
-                            case COMMANDS_LOCATE_BIOME_SUCCESS -> s.getBiome();
-                            case COMMANDS_LOCATE_POI_SUCCESS -> s.getPoi();
-                            case COMMANDS_LOCATE_STRUCTURE_SUCCESS -> s.getStructure();
+                            case COMMANDS_LOCATE_BIOME_SUCCESS -> localization.getBiome();
+                            case COMMANDS_LOCATE_POI_SUCCESS -> localization.getPoi();
+                            case COMMANDS_LOCATE_STRUCTURE_SUCCESS -> localization.getStructure();
                             default -> "";
                         },
-                        new String[]{"<name>", "<x>", "<y>", "<z>", "<blocks>"},
-                        new String[]{locate.name(), locate.x(), locate.y(), locate.z(), locate.blocks()}
+                        new String[]{"<value>", "<x>", "<y>", "<z>", "<blocks>"},
+                        new String[]{locate.value(), locate.x(), locate.y(), locate.z(), locate.blocks()}
                 ))
                 .locate(locate)
                 .translationKey(translationKey)

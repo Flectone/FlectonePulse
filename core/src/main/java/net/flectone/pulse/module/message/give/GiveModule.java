@@ -15,7 +15,12 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
+
+import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.empty;
 
 @Singleton
 public class GiveModule extends AbstractModuleLocalization<Localization.Message.Give> {
@@ -51,21 +56,30 @@ public class GiveModule extends AbstractModuleLocalization<Localization.Message.
     @Async
     public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey, Give give) {
         if (isModuleDisabledFor(fPlayer)) return;
-        if (give.isIncorrect()) return;
 
         sendMessage(GiveMetadata.<Localization.Message.Give>builder()
-                .sender(give.target() == null ? fPlayer : give.target())
-                .filterPlayer(fPlayer)
-                .format(s -> StringUtils.replaceEach(
-                        translationKey == MinecraftTranslationKey.COMMANDS_GIVE_SUCCESS_MULTIPLE ? s.getMultiple() : s.getSingle(),
-                        new String[]{"<amount>", "<item>", "<count>"},
-                        new String[]{give.amount(), give.item(), StringUtils.defaultString(give.count())}
+                .sender(fPlayer)
+                .format(localization -> StringUtils.replaceEach(
+                        translationKey == MinecraftTranslationKey.COMMANDS_GIVE_SUCCESS_MULTIPLE ? localization.getMultiple() : localization.getSingle(),
+                        new String[]{"<items>", "<players>"},
+                        new String[]{give.getItems(), StringUtils.defaultString(give.getPlayers())}
                 ))
                 .give(give)
                 .translationKey(translationKey)
+                .range(message.getRange())
                 .destination(message.getDestination())
                 .sound(getModuleSound())
+                .tagResolvers(fResolver -> new TagResolver[]{giveItemTag(give.getItem()), targetTag(fResolver, give.getTarget())})
                 .build()
+        );
+    }
+
+    public TagResolver giveItemTag(Component itemName) {
+        String tag = "give_item";
+        if (!isEnable() || itemName == null) return empty(tag);
+
+        return TagResolver.resolver(tag, (argumentQueue, context) ->
+                Tag.selfClosingInserting(itemName)
         );
     }
 

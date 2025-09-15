@@ -1,12 +1,22 @@
 package net.flectone.pulse.module.message.experience.model;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
 import net.flectone.pulse.model.entity.FEntity;
 import org.jetbrains.annotations.Nullable;
 
-public record Experience(String amount, @Nullable String count, @Nullable FEntity target) {
+@Getter
+@Builder
+public class Experience {
 
-    public boolean isIncorrect() {
-        return count == null && target == null;
-    }
+    @NonNull
+    private final String amount;
+
+    @Nullable
+    private final String players;
+
+    @Nullable
+    private final FEntity target;
 
 }

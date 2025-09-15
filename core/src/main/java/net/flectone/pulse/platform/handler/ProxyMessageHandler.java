@@ -52,8 +52,8 @@ import net.flectone.pulse.module.command.unwarn.UnwarnModule;
 import net.flectone.pulse.module.command.warn.WarnModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.advancement.AdvancementModule;
+import net.flectone.pulse.module.message.advancement.model.Advancement;
 import net.flectone.pulse.module.message.advancement.model.AdvancementMetadata;
-import net.flectone.pulse.module.message.advancement.model.ChatAdvancement;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.afk.model.AFKMetadata;
 import net.flectone.pulse.module.message.chat.ChatModule;
@@ -70,6 +70,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.Strings;
@@ -757,17 +758,25 @@ public class ProxyMessageHandler {
         AdvancementModule module = injector.getInstance(AdvancementModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
-        ChatAdvancement chatAdvancementMetadata = gson.fromJson(input.readUTF(), ChatAdvancement.class);
+        MinecraftTranslationKey translationKey = MinecraftTranslationKey.fromString(input.readUTF());
+        Advancement advancement = gson.fromJson(input.readUTF(), Advancement.class);
 
         module.sendMessage(AdvancementMetadata.<Localization.Message.Advancement>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
-                .format(s -> module.convert(s, chatAdvancementMetadata))
-                .advancement(chatAdvancementMetadata)
+                .format(localization -> switch (translationKey) {
+                    case CHAT_TYPE_ADVANCEMENT_TASK -> localization.getTask();
+                    case CHAT_TYPE_ADVANCEMENT_GOAL -> localization.getGoal();
+                    case CHAT_TYPE_ADVANCEMENT_CHALLENGE -> localization.getChallenge();
+                    case CHAT_TYPE_ACHIEVEMENT_TAKEN -> localization.getTaken();
+                    default -> "";
+                })
+                .advancement(advancement)
+                .translationKey(translationKey)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getMessage().getAdvancement().getDestination())
                 .sound(module.getModuleSound())
-                .tagResolvers(fResolver -> new TagResolver[]{module.advancementTag(fEntity, fResolver, chatAdvancementMetadata)})
+                .tagResolvers(fResolver -> new TagResolver[]{module.advancementTag(fEntity, fResolver, advancement.getAdvancementComponent())})
                 .build()
         );
     }
@@ -776,19 +785,22 @@ public class ProxyMessageHandler {
         DeathModule module = injector.getInstance(DeathModule.class);
         if (module.isModuleDisabledFor(fEntity)) return;
 
+        MinecraftTranslationKey translationKey = MinecraftTranslationKey.fromString(input.readUTF());
         Death death = gson.fromJson(input.readUTF(), Death.class);
 
         module.sendMessage(DeathMetadata.<Localization.Message.Death>builder()
                 .uuid(metadataUUID)
                 .sender(fEntity)
-                .format(s -> s.getTypes().get(death.getKey()))
+                .format(s -> s.getTypes().get(translationKey.toString()))
                 .death(death)
+                .translationKey(translationKey)
                 .range(Range.get(Range.Type.SERVER))
                 .destination(fileResolver.getMessage().getDeath().getDestination())
                 .sound(module.getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{
-                        module.killerTag(fResolver, death.getKiller()),
-                        module.byItemTag(death.getItem())
+                        module.targetTag(fResolver, death.getTarget()),
+                        module.targetTag("killer", fResolver, death.getKiller()),
+                        module.killerItemTag(death.getKillerItem())
                 })
                 .build()
         );

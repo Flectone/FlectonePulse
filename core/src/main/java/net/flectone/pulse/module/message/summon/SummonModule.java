@@ -11,9 +11,12 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.summon.listener.SummonPulseListener;
+import net.flectone.pulse.module.message.summon.model.SummonMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 @Singleton
 public class SummonModule extends AbstractModuleLocalization<Localization.Message.Summon> {
@@ -47,15 +50,18 @@ public class SummonModule extends AbstractModuleLocalization<Localization.Messag
     }
 
     @Async
-    public void send(FPlayer fPlayer, FEntity entity) {
+    public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey, FEntity target) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        sendMessage(metadataBuilder()
-                .sender(entity)
-                .filterPlayer(fPlayer)
+        sendMessage(SummonMetadata.<Localization.Message.Summon>builder()
+                .sender(fPlayer)
+                .range(message.getRange())
                 .format(Localization.Message.Summon::getFormat)
                 .destination(message.getDestination())
                 .sound(getModuleSound())
+                .target(target)
+                .translationKey(translationKey)
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, target)})
                 .build()
         );
     }

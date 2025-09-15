@@ -6,8 +6,6 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.message.effect.model.Effect;
 import net.flectone.pulse.processing.extractor.Extractor;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 
 import java.util.Optional;
@@ -19,45 +17,63 @@ public class EffectExtractor extends Extractor {
     public EffectExtractor() {
     }
 
-    public Optional<Effect> extractTarget(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
-        if (translatableComponent.arguments().isEmpty()) return Optional.empty();
+    public Optional<Effect> extract(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
+        return switch (translationKey) {
+            // Removed every effect from %s targets
+            case COMMANDS_EFFECT_CLEAR_EVERYTHING_SUCCESS_MULTIPLE -> {
+                Optional<String> players = extractTextContent(translatableComponent, 0);
+                if (players.isEmpty()) yield Optional.empty();
 
-        Component component = translatableComponent.arguments().getFirst().asComponent();
+                Effect effect = Effect.builder()
+                        .players(players.get())
+                        .build();
 
-        if (translationKey == MinecraftTranslationKey.COMMANDS_EFFECT_CLEAR_EVERYTHING_SUCCESS_MULTIPLE) {
-            if (!(component instanceof TextComponent countComponent)) return Optional.empty();
+                yield Optional.of(effect);
+            }
+            // Removed every effect from %s
+            case COMMANDS_EFFECT_CLEAR_EVERYTHING_SUCCESS_SINGLE -> {
+                Optional<FEntity> target = extractFEntity(translatableComponent, 0);
+                if (target.isEmpty()) yield Optional.empty();
 
-            Effect effect = new Effect(null, null, countComponent.content());
-            return Optional.of(effect);
-        }
+                Effect effect = Effect.builder()
+                        .target(target.get())
+                        .build();
 
-        Optional<FEntity> optionalFEntity = extractFEntity(component);
-        if (optionalFEntity.isEmpty()) return Optional.empty();
+                yield Optional.of(effect);
+            }
+            // Applied effect %s to %s targets
+            // Removed effect %s from %s targets
+            case COMMANDS_EFFECT_GIVE_SUCCESS_MULTIPLE, COMMANDS_EFFECT_CLEAR_SPECIFIC_SUCCESS_MULTIPLE -> {
+                Optional<String> name = extractTranslatableKey(translatableComponent, 0);
+                if (name.isEmpty()) yield Optional.empty();
 
-        Effect effect = new Effect(null, optionalFEntity.get(), null);
-        return Optional.of(effect);
-    }
+                Optional<String> players = extractTextContent(translatableComponent, 1);
+                if (players.isEmpty()) yield Optional.empty();
 
-    public Optional<Effect> extractNameAndTarget(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
-        if (translatableComponent.arguments().size() < 2) return Optional.empty();
-        if (!(translatableComponent.arguments().get(0).asComponent() instanceof TranslatableComponent effectComponent)) return Optional.empty();
+                Effect effect = Effect.builder()
+                        .name(name.get())
+                        .players(players.get())
+                        .build();
 
-        String name = effectComponent.key();
+                yield Optional.of(effect);
+            }
+            // Applied effect %s to %s
+            // Removed effect %s from %s
+            case COMMANDS_EFFECT_GIVE_SUCCESS_SINGLE, COMMANDS_EFFECT_CLEAR_SPECIFIC_SUCCESS_SINGLE -> {
+                Optional<String> name = extractTranslatableKey(translatableComponent, 0);
+                if (name.isEmpty()) yield Optional.empty();
 
-        Component secondComponent = translatableComponent.arguments().get(1).asComponent();
+                Optional<FEntity> target = extractFEntity(translatableComponent, 1);
+                if (target.isEmpty()) yield Optional.empty();
 
-        if (translationKey == MinecraftTranslationKey.COMMANDS_EFFECT_GIVE_SUCCESS_MULTIPLE
-                || translationKey == MinecraftTranslationKey.COMMANDS_EFFECT_CLEAR_SPECIFIC_SUCCESS_MULTIPLE) {
-            if (!(secondComponent instanceof TextComponent countComponent)) return Optional.empty();
+                Effect effect = Effect.builder()
+                        .name(name.get())
+                        .target(target.get())
+                        .build();
 
-            Effect effect = new Effect(name, null, countComponent.content());
-            return Optional.of(effect);
-        }
-
-        Optional<FEntity> optionalFEntity = extractFEntity(secondComponent);
-        if (optionalFEntity.isEmpty()) return Optional.empty();
-
-        Effect effect = new Effect(name, optionalFEntity.get(), null);
-        return Optional.of(effect);
+                yield Optional.of(effect);
+            }
+            default -> Optional.empty();
+        };
     }
 }

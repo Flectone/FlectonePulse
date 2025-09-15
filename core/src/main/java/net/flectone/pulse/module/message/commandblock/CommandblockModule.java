@@ -50,17 +50,18 @@ public class CommandblockModule extends AbstractModuleLocalization<Localization.
     }
 
     @Async
-    public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey,  @Nullable String command) {
+    public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey, @Nullable String command) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         sendMessage(CommandBlockMetadata.<Localization.Message.Commandblock>builder()
                 .sender(fPlayer)
-                .format(s -> translationKey == MinecraftTranslationKey.ADV_MODE_NOT_ENABLED
-                        ? s.getNotEnabled()
-                        : Strings.CS.replace(s.getFormat(), "<command>", StringUtils.defaultString(command))
+                .format(localization -> translationKey == MinecraftTranslationKey.ADV_MODE_NOT_ENABLED
+                        ? localization.getNotEnabled()
+                        : Strings.CS.replace(localization.getFormat(), "<command>", StringUtils.defaultString(command))
                 )
                 .command(command)
                 .translationKey(translationKey)
+                .range(message.getRange())
                 .destination(message.getDestination())
                 .sound(getModuleSound())
                 .build()

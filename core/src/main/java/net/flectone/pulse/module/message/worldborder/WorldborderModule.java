@@ -54,17 +54,17 @@ public class WorldborderModule extends AbstractModuleLocalization<Localization.M
 
         sendMessage(WorldborderMetadata.<Localization.Message.Worldborder>builder()
                 .sender(fPlayer)
-                .format(s -> StringUtils.replaceEach(
+                .format(localization -> StringUtils.replaceEach(
                         switch (translationKey) {
-                            case COMMANDS_WORLDBORDER_CENTER_SUCCESS -> s.getCenter();
-                            case COMMANDS_WORLDBORDER_DAMAGE_AMOUNT_SUCCESS -> s.getDamage().getAmount();
-                            case COMMANDS_WORLDBORDER_DAMAGE_BUFFER_SUCCESS -> s.getDamage().getBuffer();
-                            case COMMANDS_WORLDBORDER_GET -> s.getGet();
-                            case COMMANDS_WORLDBORDER_SET_GROW -> s.getSet().getGrow();
-                            case COMMANDS_WORLDBORDER_SET_IMMEDIATE -> s.getSet().getImmediate();
-                            case COMMANDS_WORLDBORDER_SET_SHRINK -> s.getSet().getShrink();
-                            case COMMANDS_WORLDBORDER_WARNING_DISTANCE_SUCCESS -> s.getWarning().getDistance();
-                            case COMMANDS_WORLDBORDER_WARNING_TIME_SUCCESS -> s.getWarning().getTime();
+                            case COMMANDS_WORLDBORDER_CENTER_SUCCESS -> localization.getCenter();
+                            case COMMANDS_WORLDBORDER_DAMAGE_AMOUNT_SUCCESS -> localization.getDamage().getAmount();
+                            case COMMANDS_WORLDBORDER_DAMAGE_BUFFER_SUCCESS -> localization.getDamage().getBuffer();
+                            case COMMANDS_WORLDBORDER_GET -> localization.getGet();
+                            case COMMANDS_WORLDBORDER_SET_GROW -> localization.getSet().getGrow();
+                            case COMMANDS_WORLDBORDER_SET_IMMEDIATE -> localization.getSet().getImmediate();
+                            case COMMANDS_WORLDBORDER_SET_SHRINK -> localization.getSet().getShrink();
+                            case COMMANDS_WORLDBORDER_WARNING_DISTANCE_SUCCESS -> localization.getWarning().getDistance();
+                            case COMMANDS_WORLDBORDER_WARNING_TIME_SUCCESS -> localization.getWarning().getTime();
                             default -> "";
                         },
                         new String[]{"<value>", "<second_value>"},

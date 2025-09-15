@@ -10,7 +10,6 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
-import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -23,13 +22,11 @@ import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.apache.commons.lang3.StringUtils;
 
 import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.empty;
 
@@ -43,7 +40,6 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
-    private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     @Inject
     public DeathModule(FileResolver fileResolver,
@@ -79,22 +75,21 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
     }
 
     @Async
-    public void send(FPlayer fReceiver, Death death) {
-        FEntity fTarget = convertDeath(death);
-        if (fTarget == null) return;
-
-        if (!death.isPlayer()) {
+    public void send(FPlayer fReceiver, MinecraftTranslationKey translationKey, Death death) {
+        if (!(death.getTarget() instanceof FPlayer fTarget)) {
             sendMessage(DeathMetadata.<Localization.Message.Death>builder()
-                    .sender(fTarget)
+                    .sender(death.getTarget())
                     .filterPlayer(fReceiver)
-                    .format(s -> s.getTypes().get(death.getKey()))
+                    .format(localization -> localization.getTypes().get(translationKey.toString()))
                     .death(death)
+                    .translationKey(translationKey)
                     .destination(message.getDestination())
                     .sound(getModuleSound())
-                    .filter(fPlayer -> integrationModule.canSeeVanished(fTarget, fPlayer))
+                    .filter(fPlayer -> integrationModule.canSeeVanished(death.getTarget(), fPlayer))
                     .tagResolvers(fResolver -> new TagResolver[]{
-                            killerTag(fResolver, death.getKiller()),
-                            byItemTag(death.getItem())
+                            targetTag(fReceiver, death.getTarget()),
+                            targetTag("killer", fResolver, death.getKiller()),
+                            killerItemTag(death.getKillerItem())
                     })
                     .build()
             );
@@ -102,33 +97,45 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
             return;
         }
 
+        // send message only when fTarget is fReceiver
+        // because death message is sent to each player and they will be duplicated if it is not checked
         if (!fTarget.equals(fReceiver)) return;
 
         sendMessage(DeathMetadata.<Localization.Message.Death>builder()
-                .sender(fTarget)
-                .format(s -> s.getTypes().get(death.getKey()))
+                .sender(fReceiver)
+                .format(localization -> localization.getTypes().get(translationKey.toString()))
                 .death(death)
+                .translationKey(translationKey)
                 .range(message.getRange())
                 .destination(message.getDestination())
                 .sound(getModuleSound())
                 .filter(fPlayer -> integrationModule.canSeeVanished(fTarget, fPlayer))
                 .tagResolvers(fResolver -> new TagResolver[]{
-                        killerTag(fResolver, death.getKiller()),
-                        byItemTag(death.getItem())
+                        targetTag(fReceiver, death.getTarget()),
+                        targetTag("killer", fResolver, death.getKiller()),
+                        killerItemTag(death.getKillerItem())
                 })
-                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(death))
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeUTF(translationKey.toString());
+                    dataOutputStream.writeAsJson(death);
+                })
                 .integration()
                 .build()
         );
 
-        if (!death.isPlayer()) return;
-        if (fTarget instanceof FPlayer player && !player.isSetting(MessageType.DEATH)) return;
+        // personal death screen message
+        if (fTarget.isSetting(MessageType.DEATH)) {
+            String format = resolveLocalization(fReceiver).getTypes().get(translationKey.toString());
+            Component component = messagePipeline.builder(fReceiver, format)
+                    .tagResolvers(
+                            targetTag(fReceiver, death.getTarget()),
+                            targetTag("killer", fReceiver, death.getKiller()),
+                            killerItemTag(death.getKillerItem())
+                    )
+                    .build();
 
-        Component component = messagePipeline.builder(fTarget, fReceiver, resolveLocalization(fReceiver).getTypes().get(death.getKey()))
-                .tagResolvers(killerTag(fReceiver, death.getKiller()), byItemTag(death.getItem()))
-                .build();
-
-        sendPersonalDeath(fReceiver, component);
+            sendPersonalDeath(fReceiver, component);
+        }
     }
 
     @Sync
@@ -136,57 +143,14 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
         packetSender.send(fPlayer, new WrapperPlayServerDeathCombatEvent(fPlayerService.getEntityId(fPlayer), null, component));
     }
 
-    private FEntity convertDeath(Death death) {
-        if (death == null) return null;
-        if (!death.isPlayer()) {
-            return new FEntity(death.getTargetName(), death.getTargetUUID(), death.getTargetType() == null ? death.getTargetName() : death.getTargetType());
-        }
+    public TagResolver killerItemTag(Component itemName) {
+        String tag = "killer_item";
+        if (!isEnable() || itemName == null) return empty(tag);
 
-        FPlayer fTarget = fPlayerService.getFPlayer(death.getTargetName());
-        if (fTarget.isUnknown()) return null;
-        if (isModuleDisabledFor(fTarget)) return null;
-
-        return fTarget;
-    }
-
-    public TagResolver byItemTag(String itemName) {
-        String tag = "by_item";
-        if (!isEnable()) return empty(tag);
-        if (StringUtils.isEmpty(itemName)) return empty(tag);
-
-        Component itemComponent;
-        try {
-            itemComponent = miniMessage.deserialize(itemName);
-        } catch (Exception ignored) {
-            itemComponent = Component.text(itemName);
-        }
-
-        Component itemComponentWithHover = itemComponent.hoverEvent(HoverEvent.showText(
-                itemComponent.decorate(TextDecoration.ITALIC))
-        );
+        Component itemComponentWithHover = itemName.hoverEvent(HoverEvent.showText(itemName));
 
         return TagResolver.resolver(tag, (argumentQueue, context) ->
                 Tag.selfClosingInserting(itemComponentWithHover)
         );
-    }
-
-    public TagResolver killerTag(FPlayer receiver, Death killer) {
-        String tag = "killer";
-        if (!isEnable()) return empty(tag);
-
-        FEntity entity = convertDeath(killer);
-        if (entity == null) return empty(tag);
-
-        return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            Localization.Message.Death message = resolveLocalization(receiver);
-
-            Component component = messagePipeline.builder(entity, receiver, killer.isPlayer()
-                            ? message.getKillerPlayer()
-                            : message.getKillerEntity()
-                    )
-                    .build();
-
-            return Tag.selfClosingInserting(component);
-        });
     }
 }

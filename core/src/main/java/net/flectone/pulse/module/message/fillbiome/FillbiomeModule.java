@@ -54,9 +54,10 @@ public class FillbiomeModule extends AbstractModuleLocalization<Localization.Mes
 
         sendMessage(FillbiomeMetadata.<Localization.Message.Fillbiome>builder()
                 .sender(fPlayer)
+                .range(message.getRange())
                 .format(s -> StringUtils.replaceEach(
                         translationKey == MinecraftTranslationKey.COMMANDS_FILLBIOME_SUCCESS ? s.getFormat() : s.getFormatCount(),
-                        new String[]{"<count>", "<x1>", "<y1>", "<z1>", "<x2>", "<y2>", "<z2>"},
+                        new String[]{"<blocks>", "<x1>", "<y1>", "<z1>", "<x2>", "<y2>", "<z2>"},
                         new String[]{StringUtils.defaultString(fillbiome.count()), fillbiome.x1(), fillbiome.y1(), fillbiome.z1(), fillbiome.x2(), fillbiome.y2(), fillbiome.z2()}
                 ))
                 .fillbiome(fillbiome)

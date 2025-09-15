@@ -3,11 +3,10 @@ package net.flectone.pulse.module.message.enchant.extractor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.enchant.model.Enchant;
 import net.flectone.pulse.processing.extractor.Extractor;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 
 import java.util.Optional;
@@ -19,37 +18,46 @@ public class EnchantExtractor extends Extractor {
     public EnchantExtractor() {
     }
 
-    public Optional<Enchant> extract(MessageReceiveEvent event) {
-        MinecraftTranslationKey translationKey = event.getTranslationKey();
-        if (!translationKey.startsWith("commands.enchant.success")) return Optional.empty();
+    public Optional<Enchant> extract(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
         if (translationKey == MinecraftTranslationKey.COMMANDS_ENCHANT_SUCCESS) {
-            Enchant enchant = new Enchant("", "",  "", null);
+            Enchant enchant = Enchant.builder()
+                    .name(Component.empty())
+                    .players("")
+                    .build();
+
             return Optional.of(enchant);
         }
 
-        TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        if (translatableComponent.arguments().size() < 2) return Optional.empty();
-        if (!(translatableComponent.arguments().getFirst().asComponent() instanceof TranslatableComponent enchantComponent)) return Optional.empty();
-        String enchantKey = enchantComponent.key();
+        Optional<TranslatableComponent> name = getTranslatableComponent(translatableComponent, 0);
+        if (name.isEmpty()) return Optional.empty();
 
-        if (enchantComponent.children().size() < 2) return Optional.empty();
-        if (!(enchantComponent.children().get(1) instanceof TranslatableComponent levelComponent)) return Optional.empty();
-        String levelKey = levelComponent.key();
+        return switch (translationKey) {
+            // Applied enchantment %s to %s entities
+            case COMMANDS_ENCHANT_SUCCESS_MULTIPLE -> {
+                Optional<String> players = extractTextContent(translatableComponent, 1);
+                if (players.isEmpty()) yield Optional.empty();
 
-        if (translationKey == MinecraftTranslationKey.COMMANDS_ENCHANT_SUCCESS_MULTIPLE) {
-            if (translatableComponent.arguments().get(1).asComponent() instanceof TextComponent targetComponent) {
-                Enchant enchant = new Enchant(enchantKey, levelKey, targetComponent.content(), null);
-                return Optional.of(enchant);
+                Enchant enchant = Enchant.builder()
+                        .name(name.get())
+                        .players(players.get())
+                        .build();
+
+                yield Optional.of(enchant);
             }
+            // Applied enchantment %s to %s's item
+            case COMMANDS_ENCHANT_SUCCESS_SINGLE -> {
+                Optional<FEntity> target = extractFEntity(translatableComponent, 1);
+                if (target.isEmpty()) yield Optional.empty();
 
-            return Optional.empty();
-        }
+                Enchant enchant = Enchant.builder()
+                        .name(name.get())
+                        .target(target.get())
+                        .build();
 
-        Optional<FEntity> optionalFEntity = extractFEntity(translatableComponent.arguments().get(1).asComponent());
-        if (optionalFEntity.isEmpty()) return Optional.empty();
-
-        Enchant enchant = new Enchant(enchantKey, levelKey, "", optionalFEntity.get());
-        return Optional.of(enchant);
+                yield Optional.of(enchant);
+            }
+            default -> Optional.empty();
+        };
     }
 
 }

@@ -9,7 +9,8 @@ import net.flectone.pulse.module.message.death.DeathModule;
 import net.flectone.pulse.module.message.death.extractor.DeathExtractor;
 import net.flectone.pulse.module.message.death.model.Death;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
-import net.kyori.adventure.text.TranslatableComponent;
+
+import java.util.Optional;
 
 @Singleton
 public class DeathPulseListener implements PulseListener {
@@ -29,17 +30,10 @@ public class DeathPulseListener implements PulseListener {
         MinecraftTranslationKey translationKey = event.getTranslationKey();
         if (!translationKey.startsWith("death.")) return;
 
-        TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        Death death = deathExtractor.extractDeath(translatableComponent, 0);
-        if (death == null) return;
-
-        Death killer = deathExtractor.extractDeath(translatableComponent, 1);
-        death.setKiller(killer);
-
-        String itemName = deathExtractor.extractItemName(translatableComponent);
-        death.setItem(itemName);
+        Optional<Death> death = deathExtractor.extract(event.getTranslatableComponent());
+        if (death.isEmpty()) return;
 
         event.setCancelled(true);
-        deathModule.send(event.getFPlayer(), death);
+        deathModule.send(event.getFPlayer(), translationKey, death.get());
     }
 }

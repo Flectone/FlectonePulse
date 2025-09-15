@@ -1,12 +1,21 @@
 package net.flectone.pulse.module.message.effect.model;
 
+import lombok.Builder;
+import lombok.Getter;
 import net.flectone.pulse.model.entity.FEntity;
 import org.jetbrains.annotations.Nullable;
 
-public record Effect(@Nullable String name, @Nullable FEntity target, @Nullable String count) {
+@Getter
+@Builder
+public class Effect {
 
-    public boolean isIncorrect() {
-        return target == null && count == null;
-    }
+    @Nullable
+    private final String name;
+
+    @Nullable
+    private final FEntity target;
+
+    @Nullable
+    private final String players;
 
 }

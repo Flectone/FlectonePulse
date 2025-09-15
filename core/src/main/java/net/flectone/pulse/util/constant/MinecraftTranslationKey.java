@@ -30,12 +30,18 @@ public enum MinecraftTranslationKey {
     CHAT_TYPE_ACHIEVEMENT("chat.type.achievement"), // legacy, < 1.12
     CHAT_TYPE_ACHIEVEMENT_TAKEN("chat.type.achievement.taken"), // legacy < 1.12
 
+    COMMANDS_ADVANCEMENT_GRANT_CRITERION_TO_MANY_SUCCESS("commands.advancement.grant.criterion.to.many.success"),
+    COMMANDS_ADVANCEMENT_GRANT_CRITERION_TO_ONE_SUCCESS("commands.advancement.grant.criterion.to.one.success"),
     COMMANDS_ADVANCEMENT_GRANT_MANY_TO_ONE_SUCCESS("commands.advancement.grant.many.to.one.success"),
+    COMMANDS_ADVANCEMENT_GRANT_ONE_TO_MANY_SUCCESS("commands.advancement.grant.one.to.many.success"),
     COMMANDS_ADVANCEMENT_GRANT_MANY_TO_MANY_SUCCESS("commands.advancement.grant.many.to.many.success"),
     COMMANDS_ADVANCEMENT_GRANT_ONE_TO_ONE_SUCCESS("commands.advancement.grant.one.to.one.success"),
     COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS("commands.advancement.revoke.many.to.one.success"),
+    COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_MANY_SUCCESS("commands.advancement.revoke.one.to.many.success"),
     COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_MANY_SUCCESS("commands.advancement.revoke.many.to.many.success"),
     COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS("commands.advancement.revoke.one.to.one.success"),
+    COMMANDS_ADVANCEMENT_REVOKE_CRITERION_TO_MANY_SUCCESS("commands.advancement.revoke.criterion.to.many.success"),
+    COMMANDS_ADVANCEMENT_REVOKE_CRITERION_TO_ONE_SUCCESS("commands.advancement.revoke.criterion.to.one.success"),
     COMMANDS_ADVANCEMENT_GRANT_ONLY_SUCCESS("commands.advancement.grant.only.success"), // legacy, 1.12
     COMMANDS_ADVANCEMENT_GRANT_EVERYTHING_SUCCESS("commands.advancement.grant.everything.success"), // legacy, 1.12
     COMMANDS_ADVANCEMENT_REVOKE_ONLY_SUCCESS("commands.advancement.revoke.only.success"), // legacy, 1.12
@@ -114,7 +120,7 @@ public enum MinecraftTranslationKey {
 
     COMMANDS_KILL_SUCCESS_MULTIPLE("commands.kill.success.multiple"),
     COMMANDS_KILL_SUCCESS_SINGLE("commands.kill.success.single"),
-    COMMANDS_KILL_SUCCESS("commands.kill.successful"), // legacy
+    COMMANDS_KILL_SUCCESSFUL("commands.kill.successful"), // legacy
 
     COMMANDS_LOCATE_BIOME_SUCCESS("commands.locate.biome.success"),
     COMMANDS_LOCATE_POI_SUCCESS("commands.locate.poi.success"),

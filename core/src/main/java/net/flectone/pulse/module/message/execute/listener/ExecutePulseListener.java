@@ -29,7 +29,7 @@ public class ExecutePulseListener implements PulseListener {
         MinecraftTranslationKey translationKey = event.getTranslationKey();
         if (!translationKey.startsWith("commands.execute.conditional.pass")) return;
 
-        Optional<String> optionalCount = executeExtractor.extract(translationKey, event.getTranslatableComponent());
+        Optional<String> optionalCount = executeExtractor.extract(event.getTranslatableComponent());
 
         event.setCancelled(true);
         executeModule.send(event.getFPlayer(), translationKey, optionalCount.orElse(null));

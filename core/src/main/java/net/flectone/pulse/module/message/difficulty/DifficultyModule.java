@@ -53,13 +53,14 @@ public class DifficultyModule extends AbstractModuleLocalization<Localization.Me
 
         sendMessage(DifficultyMetadata.<Localization.Message.Difficulty>builder()
                 .sender(fPlayer)
-                .format(s -> Strings.CS.replace(
-                        translationKey == MinecraftTranslationKey.COMMANDS_DIFFICULTY_QUERY ? s.getFormatQuery() : s.getFormatSuccess(),
+                .format(localization -> Strings.CS.replace(
+                        translationKey == MinecraftTranslationKey.COMMANDS_DIFFICULTY_QUERY ? localization.getQuery() : localization.getSuccess(),
                         "<difficulty>",
                         difficulty
                 ))
                 .difficulty(difficulty)
                 .translationKey(translationKey)
+                .range(message.getRange())
                 .destination(message.getDestination())
                 .sound(getModuleSound())
                 .build()

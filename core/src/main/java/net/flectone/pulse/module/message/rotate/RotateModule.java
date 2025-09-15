@@ -10,9 +10,12 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.rotate.listener.RotatePulseListener;
+import net.flectone.pulse.module.message.rotate.model.RotateMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 @Singleton
 public class RotateModule extends AbstractModuleLocalization<Localization.Message.Rotate> {
@@ -46,15 +49,18 @@ public class RotateModule extends AbstractModuleLocalization<Localization.Messag
     }
 
     @Async
-    public void send(FPlayer fPlayer, FEntity target) {
+    public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey, FEntity target) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        sendMessage(metadataBuilder()
-                .sender(target)
-                .filterPlayer(fPlayer)
+        sendMessage(RotateMetadata.<Localization.Message.Rotate>builder()
+                .sender(fPlayer)
+                .range(message.getRange())
+                .target(target)
+                .translationKey(translationKey)
                 .format(Localization.Message.Rotate::getFormat)
                 .destination(message.getDestination())
                 .sound(getModuleSound())
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, target)})
                 .build()
         );
     }

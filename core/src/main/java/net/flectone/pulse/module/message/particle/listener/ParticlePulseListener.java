@@ -26,13 +26,14 @@ public class ParticlePulseListener implements PulseListener {
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
-        if (event.getTranslationKey() != MinecraftTranslationKey.COMMANDS_PARTICLE_SUCCESS) return;
+        MinecraftTranslationKey translationKey = event.getTranslationKey();
+        if (translationKey != MinecraftTranslationKey.COMMANDS_PARTICLE_SUCCESS) return;
 
-        Optional<String> optionalParticle = particleExtractor.extract(event.getTranslatableComponent());
-        if (optionalParticle.isEmpty()) return;
+        Optional<String> particle = particleExtractor.extract(event.getTranslatableComponent());
+        if (particle.isEmpty()) return;
 
         event.setCancelled(true);
-        particleModule.send(event.getFPlayer(), optionalParticle.get());
+        particleModule.send(event.getFPlayer(), translationKey, particle.get());
     }
 
 }

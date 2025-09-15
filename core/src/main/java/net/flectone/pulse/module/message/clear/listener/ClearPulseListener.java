@@ -30,7 +30,7 @@ public class ClearPulseListener implements PulseListener {
         MinecraftTranslationKey translationKey = event.getTranslationKey();
         if (!translationKey.startsWith("commands.clear.success")) return;
 
-        Optional<Clear> clear = clearExtractor.extract(event);
+        Optional<Clear> clear = clearExtractor.extract(translationKey, event.getTranslatableComponent());
         if (clear.isEmpty()) return;
 
         event.setCancelled(true);

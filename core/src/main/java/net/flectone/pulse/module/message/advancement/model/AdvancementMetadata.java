@@ -5,6 +5,7 @@ import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.event.EventMetadata;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 
 @Getter
 @SuperBuilder
@@ -12,5 +13,8 @@ public class AdvancementMetadata<L extends Localization.Localizable> extends Eve
 
     @NonNull
     private final Advancement advancement;
+
+    @NonNull
+    private final MinecraftTranslationKey translationKey;
 
 }

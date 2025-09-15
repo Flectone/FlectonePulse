@@ -27,12 +27,13 @@ public class DamagePulseListener implements PulseListener {
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
-        if (event.getTranslationKey() != MinecraftTranslationKey.COMMANDS_DAMAGE_SUCCESS) return;
+        MinecraftTranslationKey translationKey = event.getTranslationKey();
+        if (translationKey != MinecraftTranslationKey.COMMANDS_DAMAGE_SUCCESS) return;
 
         Optional<Damage> optionalDamage = summonExtractor.extract(event.getTranslatableComponent());
         if (optionalDamage.isEmpty()) return;
 
         event.setCancelled(true);
-        damageModule.send(event.getFPlayer(), optionalDamage.get());
+        damageModule.send(event.getFPlayer(), translationKey, optionalDamage.get());
     }
 }

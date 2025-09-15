@@ -13,6 +13,7 @@ import net.flectone.pulse.module.message.fill.model.FillMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import org.apache.commons.lang3.Strings;
 
 @Singleton
@@ -47,17 +48,15 @@ public class FillModule extends AbstractModuleLocalization<Localization.Message.
     }
 
     @Async
-    public void send(FPlayer fPlayer, String amount) {
+    public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey, String blocks) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         sendMessage(FillMetadata.<Localization.Message.Fill>builder()
                 .sender(fPlayer)
-                .format(s -> Strings.CS.replace(
-                        s.getFormat(),
-                        "<amount>",
-                        amount
-                ))
-                .amount(amount)
+                .range(message.getRange())
+                .format(localization -> Strings.CS.replace(localization.getFormat(), "<blocks>", blocks))
+                .blocks(blocks)
+                .translationKey(translationKey)
                 .destination(message.getDestination())
                 .sound(getModuleSound())
                 .build()

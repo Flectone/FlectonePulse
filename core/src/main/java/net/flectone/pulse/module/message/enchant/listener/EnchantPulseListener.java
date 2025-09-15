@@ -8,6 +8,7 @@ import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.enchant.EnchantModule;
 import net.flectone.pulse.module.message.enchant.extractor.EnchantExtractor;
 import net.flectone.pulse.module.message.enchant.model.Enchant;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 
 import java.util.Optional;
 
@@ -26,7 +27,10 @@ public class EnchantPulseListener implements PulseListener {
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
-        Optional<Enchant> enchant = enchantExtractor.extract(event);
+        MinecraftTranslationKey translationKey = event.getTranslationKey();
+        if (!translationKey.startsWith("commands.enchant.success")) return;
+
+        Optional<Enchant> enchant = enchantExtractor.extract(translationKey, event.getTranslatableComponent());
         if (enchant.isEmpty()) return;
 
         event.setCancelled(true);

@@ -7,12 +7,8 @@ import net.flectone.pulse.module.message.teleport.model.TeleportEntity;
 import net.flectone.pulse.module.message.teleport.model.TeleportLocation;
 import net.flectone.pulse.processing.extractor.Extractor;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.kyori.adventure.text.TranslationArgument;
 
-import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -23,54 +19,78 @@ public class TeleportExtractor extends Extractor {
     }
 
     public Optional<TeleportEntity> extractEntity(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
-        if (translatableComponent.arguments().size() < 2) return Optional.empty();
+        Optional<FEntity> secondTarget = extractFEntity(translatableComponent, 1);
+        if (secondTarget.isEmpty()) return Optional.empty();
 
-        Component destinationComponent = translatableComponent.arguments().get(1).asComponent();
-        Optional<FEntity> optionalDestination = extractFEntity(destinationComponent);
-        if (optionalDestination.isEmpty()) return Optional.empty();
+        return switch (translationKey) {
+            // Teleported %s entities to %s
+            case COMMANDS_TELEPORT_SUCCESS_ENTITY_MULTIPLE -> {
+                Optional<String> entities = extractTextContent(translatableComponent, 0);
+                if (entities.isEmpty()) yield Optional.empty();
 
-        Component component = translatableComponent.arguments().getFirst().asComponent();
+                TeleportEntity teleportEntity = TeleportEntity.builder()
+                        .secondTarget(secondTarget.get())
+                        .entities(entities.get())
+                        .build();
 
-        if (translationKey == MinecraftTranslationKey.COMMANDS_TELEPORT_SUCCESS_ENTITY_MULTIPLE) {
-            if (!(component instanceof TextComponent countComponent)) return Optional.empty();
+                yield Optional.of(teleportEntity);
+            }
+            // Teleported %s to %s
+            case COMMANDS_TELEPORT_SUCCESS_ENTITY_SINGLE -> {
+                Optional<FEntity> target = extractFEntity(translatableComponent, 0);
+                if (target.isEmpty()) yield Optional.empty();
 
-            String count = countComponent.content();
-            TeleportEntity teleportEntity = new TeleportEntity(null, count, optionalDestination.get());
-            return Optional.of(teleportEntity);
-        }
+                TeleportEntity teleportEntity = TeleportEntity.builder()
+                        .secondTarget(secondTarget.get())
+                        .target(target.get())
+                        .build();
 
-        Optional<FEntity> optionalTarget = extractFEntity(component);
-        if (optionalTarget.isEmpty()) return Optional.empty();
-
-        TeleportEntity teleportEntity = new TeleportEntity(optionalTarget.get(), null, optionalDestination.get());
-        return Optional.of(teleportEntity);
+                yield Optional.of(teleportEntity);
+            }
+            default -> Optional.empty();
+        };
     }
 
     public Optional<TeleportLocation> extractLocation(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
-        List<TranslationArgument> translationArguments = translatableComponent.arguments();
-        if (translationArguments.size() < 4) return Optional.empty();
-        if (!(translationArguments.get(1).asComponent() instanceof TextComponent xComponent)) return Optional.empty();
-        if (!(translationArguments.get(2).asComponent() instanceof TextComponent yComponent)) return Optional.empty();
-        if (!(translationArguments.get(3).asComponent() instanceof TextComponent zComponent)) return Optional.empty();
+        Optional<String> x = extractTextContent(translatableComponent, 1);
+        if (x.isEmpty()) return Optional.empty();
 
-        String x = xComponent.content();
-        String y = yComponent.content();
-        String z = zComponent.content();
+        Optional<String> y = extractTextContent(translatableComponent, 2);
+        if (y.isEmpty()) return Optional.empty();
 
-        Component component = translatableComponent.arguments().getFirst().asComponent();
+        Optional<String> z = extractTextContent(translatableComponent, 3);
+        if (z.isEmpty()) return Optional.empty();
 
-        if (translationKey == MinecraftTranslationKey.COMMANDS_TELEPORT_SUCCESS_LOCATION_MULTIPLE) {
-            if (!(component instanceof TextComponent countComponent)) return Optional.empty();
+        return switch (translationKey) {
+            // Teleported %s entities to %s, %s, %s
+            case COMMANDS_TELEPORT_SUCCESS_LOCATION_MULTIPLE -> {
+                Optional<String> entities = extractTextContent(translatableComponent, 0);
+                if (entities.isEmpty()) yield Optional.empty();
 
-            String count = countComponent.content();
-            TeleportLocation teleportLocation = new TeleportLocation(null, count, x, y, z);
-            return Optional.of(teleportLocation);
-        }
+                TeleportLocation teleportLocation = TeleportLocation.builder()
+                        .x(x.get())
+                        .y(y.get())
+                        .z(z.get())
+                        .entities(entities.get())
+                        .build();
 
-        Optional<FEntity> optionalTarget = extractFEntity(component);
-        if (optionalTarget.isEmpty()) return Optional.empty();
+                yield Optional.of(teleportLocation);
+            }
+            // Teleported %s to %s, %s, %s
+            case COMMANDS_TELEPORT_SUCCESS_LOCATION_SINGLE -> {
+                Optional<FEntity> target = extractFEntity(translatableComponent, 0);
+                if (target.isEmpty()) yield Optional.empty();
 
-        TeleportLocation teleportLocation = new TeleportLocation(optionalTarget.get(), null, x, y, z);
-        return Optional.of(teleportLocation);
+                TeleportLocation teleportLocation = TeleportLocation.builder()
+                        .x(x.get())
+                        .y(y.get())
+                        .z(z.get())
+                        .target(target.get())
+                        .build();
+
+                yield Optional.of(teleportLocation);
+            }
+            default -> Optional.empty();
+        };
     }
 }

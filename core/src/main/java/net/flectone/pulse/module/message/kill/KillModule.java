@@ -15,6 +15,8 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
 @Singleton
@@ -49,19 +51,21 @@ public class KillModule extends AbstractModuleLocalization<Localization.Message.
     }
 
     @Async
-    public void send(FPlayer fPlayer, MinecraftTranslationKey key, Kill kill) {
+    public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey, Kill kill) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         sendMessage(KillMetadata.<Localization.Message.Kill>builder()
-                .sender(kill.entity() == null ? fPlayer : kill.entity())
-                .filterPlayer(fPlayer)
-                .format(s -> key == MinecraftTranslationKey.COMMANDS_KILL_SUCCESS_MULTIPLE
-                        ? Strings.CS.replace(s.getMultiple(), "<count>", kill.value())
-                        : s.getSingle()
+                .sender(fPlayer)
+                .range(message.getRange())
+                .format(localization -> translationKey == MinecraftTranslationKey.COMMANDS_KILL_SUCCESS_MULTIPLE
+                        ? Strings.CS.replace(localization.getMultiple(), "<entities>", StringUtils.defaultString(kill.getEntities()))
+                        : localization.getSingle()
                 )
                 .kill(kill)
+                .translationKey(translationKey)
                 .destination(message.getDestination())
                 .sound(getModuleSound())
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, kill.getTarget())})
                 .build()
         );
     }

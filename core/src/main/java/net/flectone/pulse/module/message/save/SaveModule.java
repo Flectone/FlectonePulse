@@ -53,11 +53,11 @@ public class SaveModule extends AbstractModuleLocalization<Localization.Message.
         sendMessage(SaveMetadata.<Localization.Message.Save>builder()
                 .sender(fPlayer)
                 .filterPlayer(fPlayer)
-                .format(string -> switch (translationKey) {
-                    case COMMANDS_SAVE_DISABLED -> string.getDisabled();
-                    case COMMANDS_SAVE_ENABLED -> string.getEnabled();
-                    case COMMANDS_SAVE_SAVING -> string.getSaving();
-                    case COMMANDS_SAVE_SUCCESS -> string.getSuccess();
+                .format(localization -> switch (translationKey) {
+                    case COMMANDS_SAVE_DISABLED -> localization.getDisabled();
+                    case COMMANDS_SAVE_ENABLED -> localization.getEnabled();
+                    case COMMANDS_SAVE_SAVING -> localization.getSaving();
+                    case COMMANDS_SAVE_SUCCESS -> localization.getSuccess();
                     default -> "";
                 })
                 .destination(message.getDestination())

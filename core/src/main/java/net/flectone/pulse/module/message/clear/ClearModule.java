@@ -13,9 +13,9 @@ import net.flectone.pulse.module.message.clear.model.Clear;
 import net.flectone.pulse.module.message.clear.model.ClearMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 
 @Singleton
@@ -23,18 +23,15 @@ public class ClearModule extends AbstractModuleLocalization<Localization.Message
 
     private final Message.Clear message;
     private final Permission.Message.Clear permission;
-    private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public ClearModule(FileResolver fileResolver,
-                       FPlayerService fPlayerService,
                        ListenerRegistry listenerRegistry) {
         super(localization -> localization.getMessage().getClear(), MessageType.CLEAR);
 
         this.message = fileResolver.getMessage().getClear();
         this.permission = fileResolver.getPermission().getMessage().getClear();
-        this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
     }
 
@@ -53,29 +50,26 @@ public class ClearModule extends AbstractModuleLocalization<Localization.Message
     }
 
     @Async
-    public void send(FPlayer fPlayer, MinecraftTranslationKey key, Clear clear) {
+    public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey, Clear clear) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        FPlayer fTarget = fPlayer;
-        boolean isSingle = key == MinecraftTranslationKey.COMMANDS_CLEAR_SUCCESS_SINGLE
-                || key == MinecraftTranslationKey.COMMANDS_CLEAR_SUCCESS;
-
-        if (isSingle) {
-            fTarget = fPlayerService.getFPlayer(clear.value());
-            if (fTarget.isUnknown()) return;
-        }
-
         sendMessage(ClearMetadata.<Localization.Message.Clear>builder()
-                .sender(fTarget)
-                .filterPlayer(fPlayer)
-                .format(s -> StringUtils.replaceEach(
-                        isSingle ? s.getSingle() : s.getMultiple(),
-                        new String[]{"<count>", "<number>"},
-                        new String[]{clear.value(), clear.count()}
+                .sender(fPlayer)
+                .range(message.getRange())
+                .format(localization -> StringUtils.replaceEach(
+                        switch (translationKey) {
+                            case COMMANDS_CLEAR_SUCCESS_MULTIPLE -> localization.getMultiple();
+                            case COMMANDS_CLEAR_SUCCESS_SINGLE, COMMANDS_CLEAR_SUCCESS -> localization.getSingle();
+                            default -> "";
+                        },
+                        new String[]{"<items>", "<players>"},
+                        new String[]{clear.getItems(), StringUtils.defaultString(clear.getPlayers())}
                 ))
                 .clear(clear)
+                .translationKey(translationKey)
                 .destination(message.getDestination())
                 .sound(getModuleSound())
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, clear.getTarget())})
                 .build()
         );
     }

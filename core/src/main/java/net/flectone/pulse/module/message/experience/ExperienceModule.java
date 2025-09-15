@@ -15,6 +15,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 
 @Singleton
@@ -51,32 +52,32 @@ public class ExperienceModule extends AbstractModuleLocalization<Localization.Me
     @Async
     public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey, Experience experience) {
         if (isModuleDisabledFor(fPlayer)) return;
-        if (experience.isIncorrect()) return;
 
         sendMessage(ExperienceMetadata.<Localization.Message.Experience>builder()
-                .sender(experience.target() == null ? fPlayer : experience.target())
-                .filterPlayer(fPlayer)
-                .format(string -> StringUtils.replaceEach(
+                .sender(fPlayer)
+                .range(message.getRange())
+                .format(localization -> StringUtils.replaceEach(
                         switch (translationKey) {
-                            case COMMANDS_EXPERIENCE_ADD_LEVELS_SUCCESS_SINGLE -> string.getAdd().getLevels().getSingle();
-                            case COMMANDS_EXPERIENCE_ADD_LEVELS_SUCCESS_MULTIPLE -> string.getAdd().getLevels().getMultiple();
-                            case COMMANDS_EXPERIENCE_ADD_POINTS_SUCCESS_SINGLE -> string.getAdd().getPoints().getSingle();
-                            case COMMANDS_EXPERIENCE_ADD_POINTS_SUCCESS_MULTIPLE -> string.getAdd().getPoints().getMultiple();
-                            case COMMANDS_EXPERIENCE_QUERY_LEVELS -> string.getQuery().getLevels();
-                            case COMMANDS_EXPERIENCE_QUERY_POINTS -> string.getQuery().getPoints();
-                            case COMMANDS_EXPERIENCE_SET_LEVELS_SUCCESS_SINGLE -> string.getSet().getLevels().getSingle();
-                            case COMMANDS_EXPERIENCE_SET_LEVELS_SUCCESS_MULTIPLE -> string.getSet().getLevels().getMultiple();
-                            case COMMANDS_EXPERIENCE_SET_POINTS_SUCCESS_SINGLE -> string.getSet().getPoints().getSingle();
-                            case COMMANDS_EXPERIENCE_SET_POINTS_SUCCESS_MULTIPLE -> string.getSet().getPoints().getMultiple();
+                            case COMMANDS_EXPERIENCE_ADD_LEVELS_SUCCESS_SINGLE -> localization.getAdd().getLevels().getSingle();
+                            case COMMANDS_EXPERIENCE_ADD_LEVELS_SUCCESS_MULTIPLE -> localization.getAdd().getLevels().getMultiple();
+                            case COMMANDS_EXPERIENCE_ADD_POINTS_SUCCESS_SINGLE -> localization.getAdd().getPoints().getSingle();
+                            case COMMANDS_EXPERIENCE_ADD_POINTS_SUCCESS_MULTIPLE -> localization.getAdd().getPoints().getMultiple();
+                            case COMMANDS_EXPERIENCE_QUERY_LEVELS -> localization.getQuery().getLevels();
+                            case COMMANDS_EXPERIENCE_QUERY_POINTS -> localization.getQuery().getPoints();
+                            case COMMANDS_EXPERIENCE_SET_LEVELS_SUCCESS_SINGLE -> localization.getSet().getLevels().getSingle();
+                            case COMMANDS_EXPERIENCE_SET_LEVELS_SUCCESS_MULTIPLE -> localization.getSet().getLevels().getMultiple();
+                            case COMMANDS_EXPERIENCE_SET_POINTS_SUCCESS_SINGLE -> localization.getSet().getPoints().getSingle();
+                            case COMMANDS_EXPERIENCE_SET_POINTS_SUCCESS_MULTIPLE -> localization.getSet().getPoints().getMultiple();
                             default -> "";
                         },
-                        new String[]{"<amount>", "<count>"},
-                        new String[]{experience.amount(), StringUtils.defaultString(experience.count())}
+                        new String[]{"<amount>", "<players>"},
+                        new String[]{experience.getAmount(), StringUtils.defaultString(experience.getPlayers())}
                 ))
                 .destination(message.getDestination())
                 .sound(getModuleSound())
                 .experience(experience)
                 .translationKey(translationKey)
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, experience.getTarget())})
                 .build()
         );
     }

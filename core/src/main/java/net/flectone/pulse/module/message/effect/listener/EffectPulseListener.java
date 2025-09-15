@@ -28,19 +28,17 @@ public class EffectPulseListener implements PulseListener {
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
         MinecraftTranslationKey translationKey = event.getTranslationKey();
-        Optional<Effect> effect = switch (translationKey) {
-            case COMMANDS_EFFECT_CLEAR_EVERYTHING_SUCCESS_MULTIPLE, COMMANDS_EFFECT_CLEAR_EVERYTHING_SUCCESS_SINGLE ->
-                    effectExtractor.extractTarget(translationKey, event.getTranslatableComponent());
-            case COMMANDS_EFFECT_CLEAR_SPECIFIC_SUCCESS_MULTIPLE, COMMANDS_EFFECT_CLEAR_SPECIFIC_SUCCESS_SINGLE,
-                 COMMANDS_EFFECT_GIVE_SUCCESS_MULTIPLE, COMMANDS_EFFECT_GIVE_SUCCESS_SINGLE ->
-                    effectExtractor.extractNameAndTarget(translationKey, event.getTranslatableComponent());
-            default -> Optional.empty();
-        };
+        switch (translationKey) {
+            case COMMANDS_EFFECT_CLEAR_EVERYTHING_SUCCESS_MULTIPLE, COMMANDS_EFFECT_CLEAR_EVERYTHING_SUCCESS_SINGLE,
+                 COMMANDS_EFFECT_CLEAR_SPECIFIC_SUCCESS_MULTIPLE, COMMANDS_EFFECT_CLEAR_SPECIFIC_SUCCESS_SINGLE,
+                 COMMANDS_EFFECT_GIVE_SUCCESS_MULTIPLE, COMMANDS_EFFECT_GIVE_SUCCESS_SINGLE -> {
+                Optional<Effect> effect = effectExtractor.extract(translationKey, event.getTranslatableComponent());
+                if (effect.isEmpty()) return;
 
-        if (effect.isEmpty()) return;
-
-        event.setCancelled(true);
-        effectModule.send(event.getFPlayer(), translationKey, effect.get());
+                event.setCancelled(true);
+                effectModule.send(event.getFPlayer(), translationKey, effect.get());
+            }
+        }
     }
 
 }

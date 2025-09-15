@@ -53,8 +53,9 @@ public class TimeModule extends AbstractModuleLocalization<Localization.Message.
 
         sendMessage(TimeMetadata.<Localization.Message.Time>builder()
                 .sender(fPlayer)
-                .format(s -> Strings.CS.replace(
-                        translationKey == MinecraftTranslationKey.COMMANDS_TIME_QUERY ? s.getFormatQuery() : s.getFormatSet(),
+                .range(message.getRange())
+                .format(localization -> Strings.CS.replace(
+                        translationKey == MinecraftTranslationKey.COMMANDS_TIME_QUERY ? localization.getQuery() : localization.getSet(),
                         "<time>",
                         time
                 ))

@@ -2,14 +2,10 @@ package net.flectone.pulse.module.message.setblock.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.setblock.model.Setblock;
 import net.flectone.pulse.processing.extractor.Extractor;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.kyori.adventure.text.TranslationArgument;
 
-import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -19,24 +15,14 @@ public class SetblockExtractor extends Extractor {
     public SetblockExtractor() {
     }
 
-    public Optional<Setblock> extract(MessageReceiveEvent event) {
-        TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        List<TranslationArgument> translationArguments = translatableComponent.arguments();
+    // Changed the block at %s, %s, %s
+    // Changed the block
+    public Optional<Setblock> extract(TranslatableComponent translatableComponent) {
+        Optional<String> x = extractTextContent(translatableComponent, 0);
+        Optional<String> y = extractTextContent(translatableComponent, 1);
+        Optional<String> z = extractTextContent(translatableComponent, 2);
 
-        String x = "";
-        String y = "";
-        String z = "";
-        if (translationArguments.size() > 2) {
-            if (!(translationArguments.get(0).asComponent() instanceof TextComponent xComponent)) return Optional.empty();
-            if (!(translationArguments.get(1).asComponent() instanceof TextComponent yComponent)) return Optional.empty();
-            if (!(translationArguments.get(2).asComponent() instanceof TextComponent zComponent)) return Optional.empty();
-
-            x = xComponent.content();
-            y = yComponent.content();
-            z = zComponent.content();
-        }
-
-        Setblock setblock = new Setblock(x, y, z);
+        Setblock setblock = new Setblock(x.orElse(null), y.orElse(null), z.orElse(null));
         return Optional.of(setblock);
     }
 

@@ -13,6 +13,7 @@ import net.flectone.pulse.module.message.seed.model.SeedMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import org.apache.commons.lang3.Strings;
 
 @Singleton
@@ -47,14 +48,15 @@ public class SeedModule extends AbstractModuleLocalization<Localization.Message.
     }
 
     @Async
-    public void send(FPlayer fPlayer, String seed) {
+    public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey, String seed) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         sendMessage(SeedMetadata.<Localization.Message.Seed>builder()
                 .sender(fPlayer)
-                .filterPlayer(fPlayer)
-                .format(s -> Strings.CS.replace(s.getFormat(), "<seed>", seed))
+                .range(message.getRange())
+                .format(localization -> Strings.CS.replace(localization.getFormat(), "<seed>", seed))
                 .seed(seed)
+                .translationKey(translationKey)
                 .destination(message.getDestination())
                 .sound(getModuleSound())
                 .build()

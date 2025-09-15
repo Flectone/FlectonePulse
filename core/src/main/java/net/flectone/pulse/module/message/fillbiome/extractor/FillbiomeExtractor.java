@@ -5,11 +5,8 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.module.message.fillbiome.model.Fillbiome;
 import net.flectone.pulse.processing.extractor.Extractor;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.kyori.adventure.text.TranslationArgument;
 
-import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -20,32 +17,32 @@ public class FillbiomeExtractor extends Extractor {
     }
 
     public Optional<Fillbiome> extract(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
-        List<TranslationArgument> translationArguments = translatableComponent.arguments();
-        if (translationArguments.size() < 6) return Optional.empty();
-        if (!(translationArguments.getFirst().asComponent() instanceof TextComponent amountComponent)) return Optional.empty();
-
+        Optional<String> blocks = Optional.empty();
         int i = 0;
-        String count = null;
         if (translationKey == MinecraftTranslationKey.COMMANDS_FILLBIOME_SUCCESS_COUNT) {
+            blocks = extractTextContent(translatableComponent, 0);
             i = 1;
-            count = amountComponent.content();
         }
 
-        if (!(translationArguments.get(i).asComponent() instanceof TextComponent x1Component)) return Optional.empty();
-        if (!(translationArguments.get(i + 1).asComponent() instanceof TextComponent y1Component)) return Optional.empty();
-        if (!(translationArguments.get(i + 2).asComponent() instanceof TextComponent z1Component)) return Optional.empty();
-        if (!(translationArguments.get(i + 3).asComponent() instanceof TextComponent x2Component)) return Optional.empty();
-        if (!(translationArguments.get(i + 4).asComponent() instanceof TextComponent y2Component)) return Optional.empty();
-        if (!(translationArguments.get(i + 5).asComponent() instanceof TextComponent z2Component)) return Optional.empty();
+        Optional<String> x1 = extractTextContent(translatableComponent, i);
+        if (x1.isEmpty()) return Optional.empty();
 
-        String x1 = x1Component.content();
-        String y1 = y1Component.content();
-        String z1 = z1Component.content();
-        String x2 = x2Component.content();
-        String y2 = y2Component.content();
-        String z2 = z2Component.content();
+        Optional<String> y1 = extractTextContent(translatableComponent, i + 1);
+        if (y1.isEmpty()) return Optional.empty();
 
-        Fillbiome fillbiome = new Fillbiome(count, x1, y1, z1, x2, y2, z2);
+        Optional<String> z1 = extractTextContent(translatableComponent, i + 2);
+        if (z1.isEmpty()) return Optional.empty();
+
+        Optional<String> x2 = extractTextContent(translatableComponent, i + 3);
+        if (x2.isEmpty()) return Optional.empty();
+
+        Optional<String> y2 = extractTextContent(translatableComponent, i + 4);
+        if (y2.isEmpty()) return Optional.empty();
+
+        Optional<String> z2 = extractTextContent(translatableComponent, i + 5);
+        if (z2.isEmpty()) return Optional.empty();
+
+        Fillbiome fillbiome = new Fillbiome(blocks.orElse(null), x1.get(), y1.get(), z1.get(), x2.get(), y2.get(), z2.get());
         return Optional.of(fillbiome);
     }
 

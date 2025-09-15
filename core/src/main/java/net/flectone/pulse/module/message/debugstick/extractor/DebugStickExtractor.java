@@ -5,11 +5,8 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.module.message.debugstick.model.DebugStick;
 import net.flectone.pulse.processing.extractor.Extractor;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.kyori.adventure.text.TranslationArgument;
 
-import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -20,20 +17,23 @@ public class DebugStickExtractor extends Extractor {
     }
 
     public Optional<DebugStick> extract(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
-        List<TranslationArgument> translationArguments = translatableComponent.arguments();
-        if (translationArguments.isEmpty()) return Optional.empty();
-        if (!(translationArguments.get(0).asComponent() instanceof TextComponent nameComponent)) return Optional.empty();
+        Optional<String> property = extractTextContent(translatableComponent, 0);
+        if (property.isEmpty()) return Optional.empty();
 
-        String value = null;
+        // %s has no properties
+        Optional<String> value = Optional.empty();
+
+        // selected \"%s\" (%s)
+        // \"%s\" to %s
         if (translationKey != MinecraftTranslationKey.ITEM_MINECRAFT_DEBUG_STICK_EMPTY) {
-            if (translationArguments.size() < 2) return Optional.empty();
-            if (!(translationArguments.get(1).asComponent() instanceof TextComponent valueComponent)) return Optional.empty();
-
-            value = valueComponent.content();
+            value = extractTextContent(translatableComponent, 1);
         }
 
-        String name = nameComponent.content();
-        DebugStick debugStick = new DebugStick(name, value);
+        DebugStick debugStick = DebugStick.builder()
+                .property(property.get())
+                .value(value.orElse(null))
+                .build();
+
         return Optional.of(debugStick);
     }
 

@@ -28,16 +28,15 @@ public class KillPulseListener implements PulseListener {
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
         MinecraftTranslationKey translationKey = event.getTranslationKey();
-        Optional<Kill> kill = switch (translationKey) {
-            case COMMANDS_KILL_SUCCESS_MULTIPLE -> killExtractor.extractMultipleKill(event);
-            case COMMANDS_KILL_SUCCESS_SINGLE, COMMANDS_KILL_SUCCESS -> killExtractor.extractSingleKill(event);
-            default -> Optional.empty();
-        };
+        switch (translationKey) {
+            case COMMANDS_KILL_SUCCESS_MULTIPLE, COMMANDS_KILL_SUCCESS_SINGLE, COMMANDS_KILL_SUCCESSFUL -> {
+                Optional<Kill> kill = killExtractor.extract(translationKey, event.getTranslatableComponent());
+                if (kill.isEmpty()) return;
 
-        if (kill.isEmpty()) return;
-
-        event.setCancelled(true);
-        killModule.send(event.getFPlayer(), translationKey, kill.get());
+                event.setCancelled(true);
+                killModule.send(event.getFPlayer(), translationKey, kill.get());
+            }
+        }
     }
 
 }

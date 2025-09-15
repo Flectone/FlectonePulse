@@ -27,12 +27,13 @@ public class SetblockPulseListener implements PulseListener {
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
-        if (event.getTranslationKey() != MinecraftTranslationKey.COMMANDS_SETBLOCK_SUCCESS) return;
+        MinecraftTranslationKey translationKey = event.getTranslationKey();
+        if (translationKey != MinecraftTranslationKey.COMMANDS_SETBLOCK_SUCCESS) return;
 
-        Optional<Setblock> setblock = setblockExtractor.extract(event);
+        Optional<Setblock> setblock = setblockExtractor.extract(event.getTranslatableComponent());
         if (setblock.isEmpty()) return;
 
         event.setCancelled(true);
-        setblockModule.send(event.getFPlayer(), setblock.get());
+        setblockModule.send(event.getFPlayer(), translationKey, setblock.get());
     }
 }

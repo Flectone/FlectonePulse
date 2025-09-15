@@ -13,6 +13,7 @@ import net.flectone.pulse.module.message.particle.model.ParticleMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import org.apache.commons.lang3.Strings;
 
 @Singleton
@@ -47,18 +48,15 @@ public class ParticleModule extends AbstractModuleLocalization<Localization.Mess
     }
 
     @Async
-    public void send(FPlayer fPlayer, String particle) {
+    public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey, String particle) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         sendMessage(ParticleMetadata.<Localization.Message.Particle>builder()
                 .sender(fPlayer)
-                .filterPlayer(fPlayer)
-                .format(string -> Strings.CS.replace(
-                        string.getFormat(),
-                        "<particle>",
-                        particle
-                ))
+                .range(message.getRange())
+                .format(localization -> Strings.CS.replace(localization.getFormat(), "<particle>", particle))
                 .particle(particle)
+                .translationKey(translationKey)
                 .destination(message.getDestination())
                 .sound(getModuleSound())
                 .build()

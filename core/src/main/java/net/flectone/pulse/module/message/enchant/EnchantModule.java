@@ -15,7 +15,14 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+
+import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.empty;
 
 @Singleton
 public class EnchantModule extends AbstractModuleLocalization<Localization.Message.Enchant> {
@@ -49,24 +56,34 @@ public class EnchantModule extends AbstractModuleLocalization<Localization.Messa
     }
 
     @Async
-    public void send(FPlayer fPlayer, MinecraftTranslationKey key, Enchant enchant) {
+    public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey, Enchant enchant) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        boolean isSingle = key == MinecraftTranslationKey.COMMANDS_ENCHANT_SUCCESS_SINGLE
-                || key == MinecraftTranslationKey.COMMANDS_ENCHANT_SUCCESS;
-
         sendMessage(EnchantMetadata.<Localization.Message.Enchant>builder()
-                .sender(enchant.entity() == null ? fPlayer : enchant.entity())
-                .filterPlayer(fPlayer)
-                .format(s -> StringUtils.replaceEach(
-                        isSingle ? s.getSingle() : s.getMultiple(),
-                        new String[]{"<count>", "<enchant>", "<level>"},
-                        new String[]{enchant.count(), enchant.name(), enchant.level()}
-                ))
+                .sender(fPlayer)
+                .range(message.getRange())
+                .format(localization -> switch (translationKey) {
+                    case COMMANDS_ENCHANT_SUCCESS_SINGLE, COMMANDS_ENCHANT_SUCCESS -> localization.getSingle();
+                    case COMMANDS_ENCHANT_SUCCESS_MULTIPLE -> Strings.CS.replace(localization.getMultiple(), "<players>", StringUtils.defaultString(enchant.getPlayers()));
+                    default -> "";
+                })
                 .enchant(enchant)
+                .translationKey(translationKey)
                 .destination(message.getDestination())
                 .sound(getModuleSound())
+                .tagResolvers(fResolver -> new TagResolver[]{enchantmentRag(enchant.getName()), targetTag(fResolver, enchant.getTarget())})
                 .build()
+        );
+    }
+
+    public TagResolver enchantmentRag(Component name) {
+        String tag = "enchantment";
+        if (!isEnable() || name == null) return empty(tag);
+
+        Component enchant = NamedTextColor.GRAY.equals(name.color()) ? name.color(null) : name;
+
+        return TagResolver.resolver(tag, (argumentQueue, context) ->
+                Tag.selfClosingInserting(enchant)
         );
     }
 

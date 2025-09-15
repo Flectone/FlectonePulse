@@ -27,14 +27,16 @@ public class GamerulePulseListener implements PulseListener {
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
-        if (event.getTranslationKey() != MinecraftTranslationKey.COMMANDS_GAMERULE_QUERY
-                && event.getTranslationKey() != MinecraftTranslationKey.COMMANDS_GAMERULE_SET) return;
+        MinecraftTranslationKey translationKey = event.getTranslationKey();
+        switch (translationKey) {
+            case COMMANDS_GAMERULE_QUERY, COMMANDS_GAMERULE_SET -> {
+                Optional<Gamerule> gamerule = gameruleExtractor.extract(event.getTranslatableComponent());
+                if (gamerule.isEmpty()) return;
 
-        Optional<Gamerule> optionalGamerule = gameruleExtractor.extract(event.getTranslatableComponent());
-        if (optionalGamerule.isEmpty()) return;
-
-        event.setCancelled(true);
-        gameruleModule.send(event.getFPlayer(), event.getTranslationKey(), optionalGamerule.get());
+                event.setCancelled(true);
+                gameruleModule.send(event.getFPlayer(), event.getTranslationKey(), gamerule.get());
+            }
+        }
     }
 
 }

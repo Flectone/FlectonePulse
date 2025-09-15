@@ -15,6 +15,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 
 @Singleton
@@ -53,26 +54,27 @@ public class AttributeModule extends AbstractModuleLocalization<Localization.Mes
         if (isModuleDisabledFor(fPlayer)) return;
 
         sendMessage(AttributeMetadata.<Localization.Message.Attribute>builder()
-                .sender(attribute.target())
-                .filterPlayer(fPlayer)
-                .format(s -> StringUtils.replaceEach(
+                .sender(fPlayer)
+                .range(message.getRange())
+                .format(localization -> StringUtils.replaceEach(
                         switch (translationKey) {
-                            case COMMANDS_ATTRIBUTE_BASE_VALUE_GET_SUCCESS -> s.getBaseValue().getGet();
-                            case COMMANDS_ATTRIBUTE_BASE_VALUE_RESET_SUCCESS -> s.getBaseValue().getReset();
-                            case COMMANDS_ATTRIBUTE_BASE_VALUE_SET_SUCCESS -> s.getBaseValue().getSet();
-                            case COMMANDS_ATTRIBUTE_MODIFIER_ADD_SUCCESS -> s.getModifier().getAdd();
-                            case COMMANDS_ATTRIBUTE_MODIFIER_REMOVE_SUCCESS -> s.getModifier().getRemove();
-                            case COMMANDS_ATTRIBUTE_MODIFIER_VALUE_GET_SUCCESS -> s.getModifier().getValueGet();
-                            case COMMANDS_ATTRIBUTE_VALUE_GET_SUCCESS -> s.getValueGet();
+                            case COMMANDS_ATTRIBUTE_BASE_VALUE_GET_SUCCESS -> localization.getBaseValue().getGet();
+                            case COMMANDS_ATTRIBUTE_BASE_VALUE_RESET_SUCCESS -> localization.getBaseValue().getReset();
+                            case COMMANDS_ATTRIBUTE_BASE_VALUE_SET_SUCCESS -> localization.getBaseValue().getSet();
+                            case COMMANDS_ATTRIBUTE_MODIFIER_ADD_SUCCESS -> localization.getModifier().getAdd();
+                            case COMMANDS_ATTRIBUTE_MODIFIER_REMOVE_SUCCESS -> localization.getModifier().getRemove();
+                            case COMMANDS_ATTRIBUTE_MODIFIER_VALUE_GET_SUCCESS -> localization.getModifier().getValueGet();
+                            case COMMANDS_ATTRIBUTE_VALUE_GET_SUCCESS -> localization.getValueGet();
                             default -> "";
                         },
                         new String[]{"<modifier>", "<attribute>", "<value>"},
-                        new String[]{StringUtils.defaultString(attribute.modifier()), attribute.name(), StringUtils.defaultString(attribute.value())}
+                        new String[]{StringUtils.defaultString(attribute.getModifier()), attribute.getName(), StringUtils.defaultString(attribute.getValue())}
                 ))
                 .attribute(attribute)
                 .translationKey(translationKey)
                 .destination(message.getDestination())
                 .sound(getModuleSound())
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, attribute.getTarget())})
                 .build()
         );
     }

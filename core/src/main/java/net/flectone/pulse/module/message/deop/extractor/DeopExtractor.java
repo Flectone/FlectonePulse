@@ -2,9 +2,8 @@ package net.flectone.pulse.module.message.deop.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.model.event.message.MessageReceiveEvent;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.processing.extractor.Extractor;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 
 import java.util.Optional;
@@ -16,13 +15,8 @@ public class DeopExtractor extends Extractor {
     public DeopExtractor() {
     }
 
-    public Optional<String> extract(MessageReceiveEvent event) {
-        TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        if (translatableComponent.arguments().isEmpty()) return Optional.empty();
-        if (!(translatableComponent.arguments().getFirst().asComponent() instanceof TextComponent targetComponent)) return Optional.empty();
-
-        String target = extractTarget(targetComponent);
-
-        return Optional.of(target);
+    // Made %s no longer a server operator
+    public Optional<FEntity> extract(TranslatableComponent translatableComponent) {
+        return extractFEntity(translatableComponent, 0);
     }
 }

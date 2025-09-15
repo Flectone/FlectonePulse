@@ -3,11 +3,9 @@ package net.flectone.pulse.module.message.kill.extractor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.kill.model.Kill;
 import net.flectone.pulse.processing.extractor.Extractor;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.TranslatableComponent;
 
 import java.util.Optional;
@@ -19,25 +17,31 @@ public class KillExtractor extends Extractor {
     public KillExtractor() {
     }
 
-    public Optional<Kill> extractMultipleKill(MessageReceiveEvent event) {
-        TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        if (!(translatableComponent.arguments().getFirst().asComponent() instanceof TextComponent firstArgument)) return Optional.empty();
+    public Optional<Kill> extract(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
+        return switch (translationKey) {
+            // Killed %s entities
+            case COMMANDS_KILL_SUCCESS_MULTIPLE -> {
+                Optional<String> entities = extractTextContent(translatableComponent, 0);
+                if (entities.isEmpty()) yield Optional.empty();
 
-        String value = firstArgument.content();
-        Kill kill = new Kill(value, null);
-        return Optional.of(kill);
+                Kill kill = Kill.builder()
+                        .entities(entities.get())
+                        .build();
+
+                yield Optional.of(kill);
+            }
+            // Killed %s
+            case COMMANDS_KILL_SUCCESS_SINGLE, COMMANDS_KILL_SUCCESSFUL -> {
+                Optional<FEntity> target = extractFEntity(translatableComponent, 0);
+                if (target.isEmpty()) yield Optional.empty();
+
+                Kill kill = Kill.builder()
+                        .target(target.get())
+                        .build();
+
+                yield Optional.of(kill);
+            }
+            default -> Optional.empty();
+        };
     }
-
-    public Optional<Kill> extractSingleKill(MessageReceiveEvent event) {
-        TranslatableComponent translatableComponent = event.getTranslatableComponent();
-        if (translatableComponent.arguments().isEmpty()) return Optional.empty();
-
-        Component firstArgument = translatableComponent.arguments().getFirst().asComponent();
-        Optional<FEntity> optionalFEntity = extractFEntity(firstArgument);
-        if (optionalFEntity.isEmpty()) return Optional.empty();
-
-        Kill kill = new Kill("", optionalFEntity.get());
-        return Optional.of(kill);
-    }
-
 }

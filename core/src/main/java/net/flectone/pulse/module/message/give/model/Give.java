@@ -1,12 +1,26 @@
 package net.flectone.pulse.module.message.give.model;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
 import net.flectone.pulse.model.entity.FEntity;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
-public record Give(String amount, String item, @Nullable FEntity target, @Nullable String count) {
+@Getter
+@Builder
+public class Give {
 
-    public boolean isIncorrect() {
-        return target == null && count == null;
-    }
+    @NonNull
+    private final String items;
+
+    @NonNull
+    private final Component item;
+
+    @Nullable
+    private final FEntity target;
+
+    @Nullable
+    private final String players;
 
 }

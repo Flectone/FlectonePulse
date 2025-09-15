@@ -15,6 +15,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
@@ -54,19 +55,20 @@ public class DialogModule extends AbstractModuleLocalization<Localization.Messag
         if (isModuleDisabledFor(fPlayer)) return;
 
         sendMessage(DialogMetadata.<Localization.Message.Dialog>builder()
-                .sender(dialog.target() == null ? fPlayer : dialog.target())
-                .filterPlayer(fPlayer)
-                .format(s -> switch (translationKey) {
-                    case COMMANDS_DIALOG_CLEAR_MULTIPLE -> Strings.CS.replace(s.getClear().getMultiple(), "<count>", StringUtils.defaultString(dialog.count()));
-                    case COMMANDS_DIALOG_CLEAR_SINGLE -> s.getClear().getSingle();
-                    case COMMANDS_DIALOG_SHOW_MULTIPLE -> Strings.CS.replace(s.getShow().getMultiple(), "<count>", StringUtils.defaultString(dialog.count()));
-                    case COMMANDS_DIALOG_SHOW_SINGLE -> s.getShow().getSingle();
+                .sender(fPlayer)
+                .range(message.getRange())
+                .format(localization -> switch (translationKey) {
+                    case COMMANDS_DIALOG_CLEAR_MULTIPLE -> Strings.CS.replace(localization.getClear().getMultiple(), "<players>", StringUtils.defaultString(dialog.getPlayers()));
+                    case COMMANDS_DIALOG_CLEAR_SINGLE -> localization.getClear().getSingle();
+                    case COMMANDS_DIALOG_SHOW_MULTIPLE -> Strings.CS.replace(localization.getShow().getMultiple(), "<players>", StringUtils.defaultString(dialog.getPlayers()));
+                    case COMMANDS_DIALOG_SHOW_SINGLE -> localization.getShow().getSingle();
                     default -> "";
                 })
                 .dialog(dialog)
                 .translationKey(translationKey)
                 .destination(message.getDestination())
                 .sound(getModuleSound())
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, dialog.getTarget())})
                 .build()
         );
     }

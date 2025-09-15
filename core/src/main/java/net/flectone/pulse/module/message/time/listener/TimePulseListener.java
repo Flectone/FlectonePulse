@@ -29,11 +29,11 @@ public class TimePulseListener implements PulseListener {
         if (event.getTranslationKey() != MinecraftTranslationKey.COMMANDS_TIME_QUERY
                 && event.getTranslationKey() != MinecraftTranslationKey.COMMANDS_TIME_SET) return;
 
-        Optional<String> optionalTime = timeExtractor.extract(event.getTranslatableComponent());
-        if (optionalTime.isEmpty()) return;
+        Optional<String> time = timeExtractor.extract(event.getTranslatableComponent());
+        if (time.isEmpty()) return;
 
         event.setCancelled(true);
-        timeModule.send(event.getFPlayer(), event.getTranslationKey(), optionalTime.get());
+        timeModule.send(event.getFPlayer(), event.getTranslationKey(), time.get());
     }
 
 }

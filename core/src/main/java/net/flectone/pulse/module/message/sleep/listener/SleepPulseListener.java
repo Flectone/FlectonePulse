@@ -8,6 +8,7 @@ import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.sleep.SleepModule;
 import net.flectone.pulse.module.message.sleep.extractor.SleepExtractor;
 import net.flectone.pulse.module.message.sleep.model.Sleep;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 
 import java.util.Optional;
 
@@ -26,9 +27,10 @@ public class SleepPulseListener implements PulseListener {
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
-        if (!event.getTranslationKey().startsWith("sleep.")) return;
+        MinecraftTranslationKey translationKey = event.getTranslationKey();
+        if (!translationKey.startsWith("sleep.")) return;
 
-        Optional<Sleep> sleep = sleepExtractor.extract(event);
+        Optional<Sleep> sleep = sleepExtractor.extract(translationKey, event.getTranslatableComponent());
         if (sleep.isEmpty()) return;
 
         event.setCancelled(true);

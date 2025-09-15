@@ -30,21 +30,21 @@ public class SpawnPulseListener implements PulseListener {
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
         FPlayer fPlayer = event.getFPlayer();
-        MinecraftTranslationKey key = event.getTranslationKey();
-        if (key == MinecraftTranslationKey.BLOCK_MINECRAFT_SET_SPAWN) {
+        MinecraftTranslationKey translationKey = event.getTranslationKey();
+        if (translationKey == MinecraftTranslationKey.BLOCK_MINECRAFT_SET_SPAWN) {
             event.setCancelled(true);
             spawnModule.send(fPlayer, MinecraftTranslationKey.BLOCK_MINECRAFT_SET_SPAWN);
             return;
         }
 
-        if (!key.startsWith("commands.spawnpoint.success")
-                && key != MinecraftTranslationKey.COMMANDS_SETWORLDSPAWN_SUCCESS) return;
+        if (!translationKey.startsWith("commands.spawnpoint.success")
+                && translationKey != MinecraftTranslationKey.COMMANDS_SETWORLDSPAWN_SUCCESS) return;
 
-        Optional<Spawn> spawn = spawnExtractor.extract(event);
+        Optional<Spawn> spawn = spawnExtractor.extract(translationKey, event.getTranslatableComponent());
         if (spawn.isEmpty()) return;
 
         event.setCancelled(true);
-        spawnModule.send(fPlayer, key, spawn.get());
+        spawnModule.send(fPlayer, translationKey, spawn.get());
     }
 
 }

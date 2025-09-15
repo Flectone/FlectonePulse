@@ -55,9 +55,9 @@ public class ExecuteModule extends AbstractModuleLocalization<Localization.Messa
 
         sendMessage(ExecuteMetadata.<Localization.Message.Execute>builder()
                 .sender(fPlayer)
-                .filterPlayer(fPlayer)
-                .format(string -> Strings.CS.replace(
-                        translationKey == MinecraftTranslationKey.COMMANDS_EXECUTE_CONDITIONAL_PASS ? string.getFormatPass() : string.getFormatPassCount(),
+                .range(message.getRange())
+                .format(localization -> Strings.CS.replace(
+                        translationKey == MinecraftTranslationKey.COMMANDS_EXECUTE_CONDITIONAL_PASS ? localization.getPass() : localization.getPassCount(),
                         "<count>",
                         StringUtils.defaultString(count)
                 ))

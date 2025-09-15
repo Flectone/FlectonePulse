@@ -6,11 +6,8 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.message.attribute.model.Attribute;
 import net.flectone.pulse.processing.extractor.Extractor;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.kyori.adventure.text.TranslationArgument;
 
-import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -20,43 +17,55 @@ public class AttributeExtractor extends Extractor {
     public AttributeExtractor() {
     }
 
+    // Base value of attribute %s for entity %s is %s
+    // Base value for attribute %s for entity %s reset to default %s
+    // Base value for attribute %s for entity %s set to %s
+    // Value of attribute %s for entity %s is %s
     public Optional<Attribute> extractBaseValue(TranslatableComponent translatableComponent) {
-        List<TranslationArgument> translationArguments = translatableComponent.arguments();
-        if (translationArguments.size() < 3) return Optional.empty();
-        if (!(translationArguments.get(0).asComponent() instanceof TranslatableComponent attributeComponent)) return Optional.empty();
+        Optional<String> attributeName = extractTranslatableKey(translatableComponent, 0);
+        if (attributeName.isEmpty()) return Optional.empty();
 
-        Optional<FEntity> optionalFEntity = extractFEntity(translationArguments.get(1).asComponent());
-        if (optionalFEntity.isEmpty()) return Optional.empty();
+        Optional<FEntity> target = extractFEntity(translatableComponent, 1);
+        if (target.isEmpty()) return Optional.empty();
 
-        if (!(translationArguments.get(2).asComponent() instanceof TextComponent valueComponent)) return Optional.empty();
+        Optional<String> value = extractTextContent(translatableComponent, 2);
+        if (value.isEmpty()) return Optional.empty();
 
-        String name = attributeComponent.key();
-        String value = valueComponent.content();
-        Attribute attribute = new Attribute(optionalFEntity.get(), name, null, value);
+        Attribute attribute = Attribute.builder()
+                .name(attributeName.get())
+                .target(target.get())
+                .value(value.get())
+                .build();
+
         return Optional.of(attribute);
     }
 
+    // Added modifier %s to attribute %s for entity %s
+    // Removed modifier %s from attribute %s for entity %s
     public Optional<Attribute> extractModifier(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
-        List<TranslationArgument> translationArguments = translatableComponent.arguments();
-        if (translationArguments.size() < 3) return Optional.empty();
-        if (!(translationArguments.get(0).asComponent() instanceof TextComponent modifierComponent)) return Optional.empty();
-        if (!(translationArguments.get(1).asComponent() instanceof TranslatableComponent attributeComponent)) return Optional.empty();
+        Optional<String> modifier = extractTextContent(translatableComponent, 0);
+        if (modifier.isEmpty()) return Optional.empty();
 
-        Optional<FEntity> optionalFEntity = extractFEntity(translationArguments.get(2).asComponent());
-        if (optionalFEntity.isEmpty()) return Optional.empty();
+        Optional<String> attributeName = extractTranslatableKey(translatableComponent, 1);
+        if (attributeName.isEmpty()) return Optional.empty();
 
-        String value = null;
+        Optional<FEntity> target = extractFEntity(translatableComponent, 2);
+        if (target.isEmpty()) return Optional.empty();
+
+        Optional<String> value = Optional.empty();
+
+        // Value of modifier %s on attribute %s for entity %s is %s
         if (translationKey == MinecraftTranslationKey.COMMANDS_ATTRIBUTE_MODIFIER_VALUE_GET_SUCCESS) {
-            if (translationArguments.size() < 4) return Optional.empty();
-            if (!(translationArguments.get(3).asComponent() instanceof TextComponent valueComponent)) return Optional.empty();
-
-            value = valueComponent.content();
+            value = extractTextContent(translatableComponent, 3);
         }
 
-        String name = attributeComponent.key();
-        String modifier = modifierComponent.content();
+        Attribute attribute = Attribute.builder()
+                .modifier(modifier.get())
+                .name(attributeName.get())
+                .target(target.get())
+                .value(value.orElse(null))
+                .build();
 
-        Attribute attribute = new Attribute(optionalFEntity.get(), name, modifier, value);
         return Optional.of(attribute);
     }
 

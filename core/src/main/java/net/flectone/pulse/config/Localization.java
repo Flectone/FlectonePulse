@@ -402,20 +402,24 @@ public final class Localization extends FileSerializable implements ModuleConfig
         integration.discord.infoChannel.clear();
         integration.discord.infoChannel.put("айди", "ТПС <tps>");
 
-        message.advancement.task.format = "<color:#4eff52>🌠 <fcolor:2><display_name> <fcolor:1>получил достижение <advancement>";
-        message.advancement.task.tag = "<color:#4eff52>[<hover:show_text:\"<color:#4eff52><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]";
-        message.advancement.taken.format = "<color:#4eff52>🌠 <fcolor:2><display_name> <fcolor:1>потерял достижение <advancement>";
-        message.advancement.taken.tag = "<color:#4eff52>[<hover:show_text:\"<color:#4eff52><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]";
-        message.advancement.goal.format = "<color:#FFFF00>🌠 <fcolor:2><display_name> <fcolor:1>выполнил цель <advancement>";
-        message.advancement.goal.tag = "<color:#FFFF00>[<hover:show_text:\"<color:#FFFF00><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]";
-        message.advancement.challenge.format = "<color:#834eff>🌠 <fcolor:2><display_name> <fcolor:1>завершил испытание <advancement>";
-        message.advancement.challenge.tag = "<color:#834eff>[<hover:show_text:\"<color:#834eff><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]";
-        message.advancement.revoke.manyToOne = "<fcolor:1>🌠 Отозвано <fcolor:2><number> <fcolor:1>достижений у игрока <display_name>";
-        message.advancement.revoke.manyToMany = "<fcolor:1>🌠 Отозвано <fcolor:2><number> <fcolor:1>достижений у <fcolor:2><count> <fcolor:1>игроков";
-        message.advancement.revoke.oneToOne = "<fcolor:1>🌠 Отозвано достижение <fcolor:2><advancement> <fcolor:1>у игрока <display_name>";
-        message.advancement.grant.manyToOne = "<fcolor:1>🌠 Выдано <fcolor:2><number> <fcolor:1>достижений игроку <display_name>";
-        message.advancement.grant.manyToMany = "<fcolor:1>🌠 Выдано <fcolor:2><number> <fcolor:1>достижений <fcolor:2><count> <fcolor:1>игрокам";
-        message.advancement.grant.oneToOne = "<fcolor:1>🌠 Достижение <fcolor:2><advancement> <fcolor:1>выдано игроку <display_name>";
+        message.advancement.task = "<fcolor:1>🌠 <display_name> получил достижение «<advancement>»";
+        message.advancement.goal = "<fcolor:1>🌠 <display_name> достиг цели «<advancement>»";
+        message.advancement.challenge = "<fcolor:1>🌠 <display_name> завершил испытание «<advancement>»";
+        message.advancement.taken = "<fcolor:1>🌠 <display_name> потерял достижение «<advancement>»";
+        message.advancement.tag.task = "<color:#4eff52>[<hover:show_text:\"<color:#4eff52><advancement>\"><advancement></hover>]";
+        message.advancement.tag.challenge = "<color:#834eff>[<hover:show_text:\"<color:#834eff><advancement>\"><advancement></hover>]";
+        message.advancement.revoke.manyToOne = "<fcolor:1>🌠 Отозвано <fcolor:2><advancements> <fcolor:1>достижений у игрока <target>";
+        message.advancement.revoke.oneToMany = "<fcolor:1>🌠 Достижение «<advancement>» отозвано у <fcolor:2><players> <fcolor:1>игрокам";
+        message.advancement.revoke.manyToMany = "<fcolor:1>🌠 Отозвано <fcolor:2><advancements> <fcolor:1>достижений у <fcolor:2><players> <fcolor:1>игроков";
+        message.advancement.revoke.oneToOne = "<fcolor:1>🌠 Отозвано достижение «<advancement>» у игрока <target>";
+        message.advancement.revoke.criterionToMany = "<fcolor:1>🌠 Отозвано условие «<fcolor:2><criterion><fcolor:1>» достижения <advancement> у <fcolor:2><players> <fcolor:1>игроков";
+        message.advancement.revoke.criterionToOne = "<fcolor:1>🌠 Отозвано условие «<fcolor:2><criterion><fcolor:1>» достижения <advancement> у игрока <target>";
+        message.advancement.grant.manyToOne = "<fcolor:1>🌠 Выдано <fcolor:2><advancements> <fcolor:1>достижений игроку <target>";
+        message.advancement.grant.oneToMany = "<fcolor:1>🌠 Достижение «<advancement>» выдано <fcolor:2><players> <fcolor:1>игрокам";
+        message.advancement.grant.manyToMany = "<fcolor:1>🌠 Выдано <fcolor:2><advancements> <fcolor:1>достижений <fcolor:2><players> <fcolor:1>игрокам";
+        message.advancement.grant.oneToOne = "<fcolor:1>🌠 Достижение «<advancement>» выдано игроку <target>";
+        message.advancement.grant.criterionToMany = "<fcolor:1>🌠 Условие «<fcolor:2><criterion><fcolor:1>» достижения <advancement> зачтено <fcolor:2><players> <fcolor:1>игрокам";
+        message.advancement.grant.criterionToOne = "<fcolor:1>🌠 Условие «<fcolor:2><criterion><fcolor:1>» достижения <advancement> зачтено игроку <target>";
 
         message.auto.types.clear();
         message.auto.types.put("announcement", new LinkedList<>(){
@@ -444,172 +448,172 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.chat.nullChat = "<color:#ff7171><b>⁉</b> На сервер выключен чат";
         message.chat.nullReceiver = "<color:#ff7171><b>⁉</b> Тебя никто не услышал";
 
-        message.clear.single = "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><number> <fcolor:1>предметов у игрока <display_name>";
-        message.clear.multiple = "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><number> <fcolor:1>предметов у <fcolor:2><count> <fcolor:1>игроков";
+        message.clear.single = "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><items> <fcolor:1>предметов у игрока <target>";
+        message.clear.multiple = "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><items> <fcolor:1>предметов у <fcolor:2><players> <fcolor:1>игроков";
 
-        message.clone.format = "<fcolor:1>⏹ Успешно скопировано <fcolor:2><amount> <fcolor:1>блоков";
+        message.clone.format = "<fcolor:1>⏹ Успешно скопировано <fcolor:2><blocks> <fcolor:1>блоков";
 
         message.commandblock.notEnabled = "<fcolor:1>\uD83E\uDD16 На этом сервере командные блоки отключены";
         message.commandblock.format = "<fcolor:1>\uD83E\uDD16 Команда задана: <fcolor:2><command>";
 
-        message.damage.format = "<fcolor:1>\uD83D\uDDE1 Нанесено <fcolor:2><amount> <fcolor:1>урона <display_name>";
+        message.damage.format = "<fcolor:1>\uD83D\uDDE1 Нанесено <fcolor:2><amount> <fcolor:1>урона <target>";
 
         message.afk.formatTrue.global = "<gradient:#ffd500:#FFFF00>⌚ <player> отошёл";
         message.afk.formatTrue.local = "<gradient:#ffd500:#FFFF00>⌚ Ты отошёл от игры";
         message.afk.formatFalse.global = "<gradient:#ffd500:#FFFF00>⌚ <player> вернулся";
         message.afk.formatFalse.local = "<gradient:#ffd500:#FFFF00>⌚ Ты вернулся в игру";
 
-        message.attribute.baseValue.get = "<fcolor:1>❤ Базовое значение атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <display_name> равно <fcolor:2><value>";
-        message.attribute.baseValue.reset = "<fcolor:1>❤ Базовое значение атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <display_name> возвращено к <fcolor:2><value>";
-        message.attribute.baseValue.set = "<fcolor:1>❤ Базовое значение атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <display_name> изменено на <fcolor:2><value>";
-        message.attribute.modifier.add = "<fcolor:1>❤ Добавлен модификатор <fcolor:2><modifier> <fcolor:1>к атрибуту «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <display_name>";
-        message.attribute.modifier.remove = "<fcolor:1>❤ Удалён модификатор <fcolor:2><modifier> <fcolor:1>с атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <display_name>";
-        message.attribute.modifier.valueGet = "<fcolor:1>❤ Значение модификатора <fcolor:2><modifier> <fcolor:1>атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <display_name> равно <fcolor:2><value>";
-        message.attribute.valueGet = "<fcolor:1>❤ Значение атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <display_name> равно <fcolor:2><value>";
+        message.attribute.baseValue.get = "<fcolor:1>❤ Базовое значение атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <target> равно <fcolor:2><value>";
+        message.attribute.baseValue.reset = "<fcolor:1>❤ Базовое значение атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <target> возвращено к <fcolor:2><value>";
+        message.attribute.baseValue.set = "<fcolor:1>❤ Базовое значение атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <target> изменено на <fcolor:2><value>";
+        message.attribute.modifier.add = "<fcolor:1>❤ Добавлен модификатор <fcolor:2><modifier> <fcolor:1>к атрибуту «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <target>";
+        message.attribute.modifier.remove = "<fcolor:1>❤ Удалён модификатор <fcolor:2><modifier> <fcolor:1>с атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <target>";
+        message.attribute.modifier.valueGet = "<fcolor:1>❤ Значение модификатора <fcolor:2><modifier> <fcolor:1>атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <target> равно <fcolor:2><value>";
+        message.attribute.valueGet = "<fcolor:1>❤ Значение атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <target> равно <fcolor:2><value>";
 
-        message.death.types.put("death.attack.anvil", "<color:#778899>🪦 <fcolor:1><display_name> раздавлен упавшей наковальней");
-        message.death.types.put("death.attack.anvil.player", "<color:#778899>🪦 <fcolor:1><display_name> был раздавлен упавшей наковальней, пока боролся с <killer>");
-        message.death.types.put("death.attack.arrow", "<color:#778899>🪦 <fcolor:1><display_name> застрелен <killer>");
-        message.death.types.put("death.attack.arrow.item", "<color:#778899>🪦 <fcolor:1><display_name> застрелен <killer> с помощью <fcolor:2>[<i><by_item></i>]");
-        message.death.types.put("death.attack.badRespawnPoint.message", "<color:#778899>🪦 <fcolor:1><display_name> стал жертвой <fcolor:2>[<click:open_url:\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"><hover:show_text:\"<fcolor:2>MCPE-28723\">жестоких правил игры</hover></click>]");
-        message.death.types.put("death.attack.cactus", "<color:#778899>🪦 <fcolor:1><display_name> исколот до смерти");
-        message.death.types.put("death.attack.cactus.player", "<color:#778899>🪦 <fcolor:1><display_name> наткнулся на кактус, спасаясь от <killer>");
-        message.death.types.put("death.attack.cramming", "<color:#778899>🪦 <fcolor:1><display_name> расплющен в лепёшку");
-        message.death.types.put("death.attack.cramming.player", "<color:#778899>🪦 <fcolor:1><display_name> расплющен <killer>");
-        message.death.types.put("death.attack.dragonBreath", "<color:#778899>🪦 <fcolor:1><display_name> испепелён дыханием дракона");
-        message.death.types.put("death.attack.dragonBreath.player", "<color:#778899>🪦 <fcolor:1><display_name> сварился заживо в драконьем дыхании из-за <killer>");
-        message.death.types.put("death.attack.drown", "<color:#778899>🪦 <fcolor:1><display_name> утонул");
-        message.death.types.put("death.attack.drown.player", "<color:#778899>🪦 <fcolor:1><display_name> утонул, спасаясь от <killer>");
-        message.death.types.put("death.attack.dryout", "<color:#778899>🪦 <fcolor:1><display_name> умер от обезвоживания");
-        message.death.types.put("death.attack.dryout.player", "<color:#778899>🪦 <fcolor:1><display_name> умер от обезвоживания, спасаясь от <killer>");
-        message.death.types.put("death.attack.even_more_magic", "<color:#778899>🪦 <fcolor:1><display_name> был убит неизведанной магией");
-        message.death.types.put("death.attack.explosion", "<color:#778899>🪦 <fcolor:1><display_name> взорвался");
-        message.death.types.put("death.attack.explosion.player", "<color:#778899>🪦 <fcolor:1><display_name> был взорван <killer>");
-        message.death.types.put("death.attack.explosion.item", "<color:#778899>🪦 <fcolor:1><display_name> был взорван <killer> с помощью <fcolor:2>[<i><by_item></i>]");
-        message.death.types.put("death.attack.explosion.player.item", "<color:#778899>🪦 <fcolor:1><display_name> был взорван <killer> с помощью <fcolor:2>[<i><by_item></i>]");
-        message.death.types.put("death.attack.fall", "<color:#778899>🪦 <fcolor:1><display_name> разбился вдребезги");
-        message.death.types.put("death.attack.fall.player", "<color:#778899>🪦 <fcolor:1><display_name> разбился вдребезги, спасаясь от <killer>");
-        message.death.types.put("death.attack.fallingBlock", "<color:#778899>🪦 <fcolor:1><display_name> раздавлен упавшим блоком");
-        message.death.types.put("death.attack.fallingBlock.player", "<color:#778899>🪦 <fcolor:1><display_name> был раздавлен упавшим блоком, пока боролся с <killer>");
-        message.death.types.put("death.attack.fallingStalactite", "<color:#778899>🪦 <fcolor:1><display_name> был пронзён обрушившимся сталактитом");
-        message.death.types.put("death.attack.fallingStalactite.player", "<color:#778899>🪦 <fcolor:1><display_name> был пронзён обрушившимся сталактитом, пока боролся с <killer>");
-        message.death.types.put("death.attack.fireball", "<color:#778899>🪦 <fcolor:1><display_name> убит файерболом <killer>");
-        message.death.types.put("death.attack.fireball.item", "<color:#778899>🪦 <fcolor:1><display_name> убит файерболом <killer> с помощью <fcolor:2>[<i><by_item></i>]");
-        message.death.types.put("death.attack.fireworks", "<color:#778899>🪦 <fcolor:1><display_name> с треском разлетелся");
-        message.death.types.put("death.attack.fireworks.item", "<color:#778899>🪦 <fcolor:1><display_name> с треском разлетелся из-за фейерверка <killer>, выпущенного из <fcolor:2>[<i><by_item></i>]");
-        message.death.types.put("death.attack.fireworks.player", "<color:#778899>🪦 <fcolor:1><display_name> с треском разлетелся, пока боролся с <killer>");
-        message.death.types.put("death.attack.flyIntoWall", "<color:#778899>🪦 <fcolor:1><display_name> преобразовал кинетическую энергию во внутреннюю");
-        message.death.types.put("death.attack.flyIntoWall.player", "<color:#778899>🪦 <fcolor:1><display_name> преобразовал кинетическую энергию во внутреннюю, спасаясь от <killer>");
-        message.death.types.put("death.attack.freeze", "<color:#778899>🪦 <fcolor:1><display_name> замёрз насмерть");
-        message.death.types.put("death.attack.freeze.player", "<color:#778899>🪦 <fcolor:1><display_name> замёрз насмерть благодаря <killer>");
-        message.death.types.put("death.attack.generic", "<color:#778899>🪦 <fcolor:1><display_name> умер");
-        message.death.types.put("death.attack.generic.player", "<color:#778899>🪦 <fcolor:1><display_name> умер из-за <killer>");
-        message.death.types.put("death.attack.genericKill", "<color:#778899>🪦 <fcolor:1><display_name> убит");
-        message.death.types.put("death.attack.genericKill.player", "<color:#778899>🪦 <fcolor:1><display_name> был убит, сражаясь с <killer>");
-        message.death.types.put("death.attack.hotFloor", "<color:#778899>🪦 <fcolor:1><display_name> обнаружил, что пол — это лава");
-        message.death.types.put("death.attack.hotFloor.player", "<color:#778899>🪦 <fcolor:1><display_name> зашёл в опасную зону из-за <killer>");
-        message.death.types.put("death.attack.inFire", "<color:#778899>🪦 <fcolor:1><display_name> умер в огне");
-        message.death.types.put("death.attack.inFire.player", "<color:#778899>🪦 <fcolor:1><display_name> сгорел в огне, пока боролся с <killer>");
-        message.death.types.put("death.attack.inWall", "<color:#778899>🪦 <fcolor:1><display_name> погребён заживо");
-        message.death.types.put("death.attack.inWall.player", "<color:#778899>🪦 <fcolor:1><display_name> был погребён заживо, пока боролся с <killer>");
-        message.death.types.put("death.attack.indirectMagic", "<color:#778899>🪦 <fcolor:1><display_name> был убит <killer> с помощью магии");
-        message.death.types.put("death.attack.indirectMagic.item", "<color:#778899>🪦 <fcolor:1><display_name> был убит <killer> с помощью <fcolor:2>[<i><by_item></i>]");
-        message.death.types.put("death.attack.lava", "<color:#778899>🪦 <fcolor:1><display_name> решил поплавать в лаве");
-        message.death.types.put("death.attack.lava.player", "<color:#778899>🪦 <fcolor:1><display_name> упал в лаву, убегая от <killer>");
-        message.death.types.put("death.attack.lightningBolt", "<color:#778899>🪦 <fcolor:1><display_name> был поражён молнией");
-        message.death.types.put("death.attack.lightningBolt.player", "<color:#778899>🪦 <fcolor:1><display_name> был поражён молнией, пока боролся с <killer>");
-        message.death.types.put("death.attack.mace_smash", "<color:#778899>🪦 <fcolor:1><display_name> был сокрушён <killer>");
-        message.death.types.put("death.attack.mace_smash.item", "<color:#778899>🪦 <fcolor:1><display_name> был сокрушён <killer> с помощью <fcolor:2>[<i><by_item></i>]");
-        message.death.types.put("death.attack.magic", "<color:#778899>🪦 <fcolor:1><display_name> был убит магией");
-        message.death.types.put("death.attack.magic.player", "<color:#778899>🪦 <fcolor:1><display_name> был убит магией, убегая от <killer>");
-        message.death.types.put("death.attack.mob", "<color:#778899>🪦 <fcolor:1><display_name> был убит <killer>");
-        message.death.types.put("death.attack.mob.item", "<color:#778899>🪦 <fcolor:1><display_name> был убит <killer> с помощью <fcolor:2>[<i><by_item></i>]");
-        message.death.types.put("death.attack.onFire", "<color:#778899>🪦 <fcolor:1><display_name> сгорел заживо");
-        message.death.types.put("death.attack.onFire.item", "<color:#778899>🪦 <fcolor:1><display_name> был сожжён дотла, пока боролся с <killer>, держащим <fcolor:2>[<i><by_item></i>]");
-        message.death.types.put("death.attack.onFire.player", "<color:#778899>🪦 <fcolor:1><display_name> был сожжён дотла, пока боролся с <killer>");
-        message.death.types.put("death.attack.outOfWorld", "<color:#778899>🪦 <fcolor:1><display_name> выпал из мира");
-        message.death.types.put("death.attack.outOfWorld.player", "<color:#778899>🪦 <fcolor:1><display_name> не захотел жить в том же мире, что и <killer>");
-        message.death.types.put("death.attack.outsideBorder", "<color:#778899>🪦 <fcolor:1><display_name> покинул пределы этого мира");
-        message.death.types.put("death.attack.outsideBorder.player", "<color:#778899>🪦 <fcolor:1><display_name> покинул пределы этого мира, пока боролся с <killer>");
-        message.death.types.put("death.attack.player", "<color:#778899>🪦 <fcolor:1><display_name> был убит <killer>");
-        message.death.types.put("death.attack.player.item", "<color:#778899>🪦 <fcolor:1><display_name> был убит <killer> с помощью <fcolor:2>[<i><by_item></i>]");
-        message.death.types.put("death.attack.sonic_boom", "<color:#778899>🪦 <fcolor:1><display_name> был уничтожен звуковым зарядом");
-        message.death.types.put("death.attack.sonic_boom.item", "<color:#778899>🪦 <fcolor:1><display_name> был уничтожен звуковым зарядом, спасаясь от <killer>, держащего <fcolor:2>[<i><by_item></i>]");
-        message.death.types.put("death.attack.sonic_boom.player", "<color:#778899>🪦 <fcolor:1><display_name> был уничтожен звуковым зарядом, спасаясь от <killer>");
-        message.death.types.put("death.attack.stalagmite", "<color:#778899>🪦 <fcolor:1><display_name> пронзён сталагмитом");
-        message.death.types.put("death.attack.stalagmite.player", "<color:#778899>🪦 <fcolor:1><display_name> был пронзён сталагмитом, пока боролся с <killer>");
-        message.death.types.put("death.attack.starve", "<color:#778899>🪦 <fcolor:1><display_name> умер от голода");
-        message.death.types.put("death.attack.starve.player", "<color:#778899>🪦 <fcolor:1><display_name> умер от голода, пока боролся с <killer>");
-        message.death.types.put("death.attack.sting", "<color:#778899>🪦 <fcolor:1><display_name> изжален до смерти");
-        message.death.types.put("death.attack.sting.item", "<color:#778899>🪦 <fcolor:1><display_name> был изжален до смерти <killer> с помощью <fcolor:2>[<i><by_item></i>]");
-        message.death.types.put("death.attack.sting.player", "<color:#778899>🪦 <fcolor:1><display_name> изжален до смерти <killer>");
-        message.death.types.put("death.attack.sweetBerryBush", "<color:#778899>🪦 <fcolor:1><display_name> искололся до смерти в кустах сладких ягод");
-        message.death.types.put("death.attack.sweetBerryBush.player", "<color:#778899>🪦 <fcolor:1><display_name> искололся до смерти в кустах сладких ягод, спасаясь от <killer>");
-        message.death.types.put("death.attack.thorns", "<color:#778899>🪦 <fcolor:1><display_name> был убит, пытаясь навредить <killer>");
-        message.death.types.put("death.attack.thorns.item", "<color:#778899>🪦 <fcolor:1><display_name> был убит <fcolor:2>[<i><by_item></i>]<fcolor:1>, пытаясь навредить <killer>");
-        message.death.types.put("death.attack.thrown", "<color:#778899>🪦 <fcolor:1><display_name> был избит <killer>");
-        message.death.types.put("death.attack.thrown.item", "<color:#778899>🪦 <fcolor:1><display_name> был избит <killer> с помощью <fcolor:2>[<i><by_item></i>]");
-        message.death.types.put("death.attack.trident", "<color:#778899>🪦 <fcolor:1><display_name> был пронзён <killer>");
-        message.death.types.put("death.attack.trident.item", "<color:#778899>🪦 <fcolor:1><display_name> пронзён <killer> с помощью <fcolor:2>[<i><by_item></i>]");
-        message.death.types.put("death.attack.wither", "<color:#778899>🪦 <fcolor:1><display_name> иссушён");
-        message.death.types.put("death.attack.wither.player", "<color:#778899>🪦 <fcolor:1><display_name> был иссушён, пока боролся с <killer>");
-        message.death.types.put("death.attack.witherSkull", "<color:#778899>🪦 <fcolor:1><display_name> был поражён черепом из <killer>");
-        message.death.types.put("death.attack.witherSkull.item", "<color:#778899>🪦 <fcolor:1><display_name> был поражён черепом из <killer> с помощью <fcolor:2>[<i><by_item></i>]");
-        message.death.types.put("death.fell.accident.generic", "<color:#778899>🪦 <fcolor:1><display_name> разбился насмерть");
-        message.death.types.put("death.fell.accident.ladder", "<color:#778899>🪦 <fcolor:1><display_name> свалился с лестницы");
-        message.death.types.put("death.fell.accident.other_climbable", "<color:#778899>🪦 <fcolor:1><display_name> сорвался");
-        message.death.types.put("death.fell.accident.scaffolding", "<color:#778899>🪦 <fcolor:1><display_name> сорвался с подмосток");
-        message.death.types.put("death.fell.accident.twisting_vines", "<color:#778899>🪦 <fcolor:1><display_name> сорвался с вьющейся лозы");
-        message.death.types.put("death.fell.accident.vines", "<color:#778899>🪦 <fcolor:1><display_name> сорвался с лианы");
-        message.death.types.put("death.fell.accident.weeping_vines", "<color:#778899>🪦 <fcolor:1><display_name> сорвался с плакучей лозы");
-        message.death.types.put("death.fell.assist", "<color:#778899>🪦 <fcolor:1><display_name> свалился благодаря <killer>");
-        message.death.types.put("death.fell.assist.item", "<color:#778899>🪦 <fcolor:1><display_name> был обречён на падение <killer> с помощью <fcolor:2>[<i><by_item></i>]");
-        message.death.types.put("death.fell.finish", "<color:#778899>🪦 <fcolor:1><display_name> упал с высоты и был добит <killer>");
-        message.death.types.put("death.fell.finish.item", "<color:#778899>🪦 <fcolor:1><display_name> упал с высоты и был добит <killer> с помощью <fcolor:2>[<i><by_item></i>]");
-        message.death.types.put("death.fell.killer", "<color:#778899>🪦 <fcolor:1><display_name> был обречён на падение");
+        message.death.types.put("death.attack.anvil", "<fcolor:1>☠ <target> раздавлен упавшей наковальней");
+        message.death.types.put("death.attack.anvil.player", "<fcolor:1>☠ <target> был раздавлен упавшей наковальней, пока боролся с <killer>");
+        message.death.types.put("death.attack.arrow", "<fcolor:1>☠ <target> застрелен <killer>");
+        message.death.types.put("death.attack.arrow.item", "<fcolor:1>☠ <target> застрелен <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
+        message.death.types.put("death.attack.badRespawnPoint.message", "<fcolor:1>☠ <target> стал жертвой <fcolor:2>[<click:open_url:\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"><hover:show_text:\"<fcolor:2>MCPE-28723\">жестоких правил игры</hover></click>]");
+        message.death.types.put("death.attack.cactus", "<fcolor:1>☠ <target> исколот до смерти");
+        message.death.types.put("death.attack.cactus.player", "<fcolor:1>☠ <target> наткнулся на кактус, спасаясь от <killer>");
+        message.death.types.put("death.attack.cramming", "<fcolor:1>☠ <target> расплющен в лепёшку");
+        message.death.types.put("death.attack.cramming.player", "<fcolor:1>☠ <target> расплющен <killer>");
+        message.death.types.put("death.attack.dragonBreath", "<fcolor:1>☠ <target> испепелён дыханием дракона");
+        message.death.types.put("death.attack.dragonBreath.player", "<fcolor:1>☠ <target> сварился заживо в драконьем дыхании из-за <killer>");
+        message.death.types.put("death.attack.drown", "<fcolor:1>☠ <target> утонул");
+        message.death.types.put("death.attack.drown.player", "<fcolor:1>☠ <target> утонул, спасаясь от <killer>");
+        message.death.types.put("death.attack.dryout", "<fcolor:1>☠ <target> умер от обезвоживания");
+        message.death.types.put("death.attack.dryout.player", "<fcolor:1>☠ <target> умер от обезвоживания, спасаясь от <killer>");
+        message.death.types.put("death.attack.even_more_magic", "<fcolor:1>☠ <target> был убит неизведанной магией");
+        message.death.types.put("death.attack.explosion", "<fcolor:1>☠ <target> взорвался");
+        message.death.types.put("death.attack.explosion.player", "<fcolor:1>☠ <target> был взорван <killer>");
+        message.death.types.put("death.attack.explosion.item", "<fcolor:1>☠ <target> был взорван <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
+        message.death.types.put("death.attack.explosion.player.item", "<fcolor:1>☠ <target> был взорван <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
+        message.death.types.put("death.attack.fall", "<fcolor:1>☠ <target> разбился вдребезги");
+        message.death.types.put("death.attack.fall.player", "<fcolor:1>☠ <target> разбился вдребезги, спасаясь от <killer>");
+        message.death.types.put("death.attack.fallingBlock", "<fcolor:1>☠ <target> раздавлен упавшим блоком");
+        message.death.types.put("death.attack.fallingBlock.player", "<fcolor:1>☠ <target> был раздавлен упавшим блоком, пока боролся с <killer>");
+        message.death.types.put("death.attack.fallingStalactite", "<fcolor:1>☠ <target> был пронзён обрушившимся сталактитом");
+        message.death.types.put("death.attack.fallingStalactite.player", "<fcolor:1>☠ <target> был пронзён обрушившимся сталактитом, пока боролся с <killer>");
+        message.death.types.put("death.attack.fireball", "<fcolor:1>☠ <target> убит файерболом <killer>");
+        message.death.types.put("death.attack.fireball.item", "<fcolor:1>☠ <target> убит файерболом <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
+        message.death.types.put("death.attack.fireworks", "<fcolor:1>☠ <target> с треском разлетелся");
+        message.death.types.put("death.attack.fireworks.item", "<fcolor:1>☠ <target> с треском разлетелся из-за фейерверка <killer>, выпущенного из <fcolor:2>[<killer_item>]<fcolor:1>");
+        message.death.types.put("death.attack.fireworks.player", "<fcolor:1>☠ <target> с треском разлетелся, пока боролся с <killer>");
+        message.death.types.put("death.attack.flyIntoWall", "<fcolor:1>☠ <target> преобразовал кинетическую энергию во внутреннюю");
+        message.death.types.put("death.attack.flyIntoWall.player", "<fcolor:1>☠ <target> преобразовал кинетическую энергию во внутреннюю, спасаясь от <killer>");
+        message.death.types.put("death.attack.freeze", "<fcolor:1>☠ <target> замёрз насмерть");
+        message.death.types.put("death.attack.freeze.player", "<fcolor:1>☠ <target> замёрз насмерть благодаря <killer>");
+        message.death.types.put("death.attack.generic", "<fcolor:1>☠ <target> умер");
+        message.death.types.put("death.attack.generic.player", "<fcolor:1>☠ <target> умер из-за <killer>");
+        message.death.types.put("death.attack.genericKill", "<fcolor:1>☠ <target> убит");
+        message.death.types.put("death.attack.genericKill.player", "<fcolor:1>☠ <target> был убит, сражаясь с <killer>");
+        message.death.types.put("death.attack.hotFloor", "<fcolor:1>☠ <target> обнаружил, что пол — это лава");
+        message.death.types.put("death.attack.hotFloor.player", "<fcolor:1>☠ <target> зашёл в опасную зону из-за <killer>");
+        message.death.types.put("death.attack.inFire", "<fcolor:1>☠ <target> умер в огне");
+        message.death.types.put("death.attack.inFire.player", "<fcolor:1>☠ <target> сгорел в огне, пока боролся с <killer>");
+        message.death.types.put("death.attack.inWall", "<fcolor:1>☠ <target> погребён заживо");
+        message.death.types.put("death.attack.inWall.player", "<fcolor:1>☠ <target> был погребён заживо, пока боролся с <killer>");
+        message.death.types.put("death.attack.indirectMagic", "<fcolor:1>☠ <target> был убит <killer> с помощью магии");
+        message.death.types.put("death.attack.indirectMagic.item", "<fcolor:1>☠ <target> был убит <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
+        message.death.types.put("death.attack.lava", "<fcolor:1>☠ <target> решил поплавать в лаве");
+        message.death.types.put("death.attack.lava.player", "<fcolor:1>☠ <target> упал в лаву, убегая от <killer>");
+        message.death.types.put("death.attack.lightningBolt", "<fcolor:1>☠ <target> был поражён молнией");
+        message.death.types.put("death.attack.lightningBolt.player", "<fcolor:1>☠ <target> был поражён молнией, пока боролся с <killer>");
+        message.death.types.put("death.attack.mace_smash", "<fcolor:1>☠ <target> был сокрушён <killer>");
+        message.death.types.put("death.attack.mace_smash.item", "<fcolor:1>☠ <target> был сокрушён <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
+        message.death.types.put("death.attack.magic", "<fcolor:1>☠ <target> был убит магией");
+        message.death.types.put("death.attack.magic.player", "<fcolor:1>☠ <target> был убит магией, убегая от <killer>");
+        message.death.types.put("death.attack.mob", "<fcolor:1>☠ <target> был убит <killer>");
+        message.death.types.put("death.attack.mob.item", "<fcolor:1>☠ <target> был убит <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
+        message.death.types.put("death.attack.onFire", "<fcolor:1>☠ <target> сгорел заживо");
+        message.death.types.put("death.attack.onFire.item", "<fcolor:1>☠ <target> был сожжён дотла, пока боролся с <killer>, держащим <fcolor:2>[<killer_item>]<fcolor:1>");
+        message.death.types.put("death.attack.onFire.player", "<fcolor:1>☠ <target> был сожжён дотла, пока боролся с <killer>");
+        message.death.types.put("death.attack.outOfWorld", "<fcolor:1>☠ <target> выпал из мира");
+        message.death.types.put("death.attack.outOfWorld.player", "<fcolor:1>☠ <target> не захотел жить в том же мире, что и <killer>");
+        message.death.types.put("death.attack.outsideBorder", "<fcolor:1>☠ <target> покинул пределы этого мира");
+        message.death.types.put("death.attack.outsideBorder.player", "<fcolor:1>☠ <target> покинул пределы этого мира, пока боролся с <killer>");
+        message.death.types.put("death.attack.player", "<fcolor:1>☠ <target> был убит <killer>");
+        message.death.types.put("death.attack.player.item", "<fcolor:1>☠ <target> был убит <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
+        message.death.types.put("death.attack.sonic_boom", "<fcolor:1>☠ <target> был уничтожен звуковым зарядом");
+        message.death.types.put("death.attack.sonic_boom.item", "<fcolor:1>☠ <target> был уничтожен звуковым зарядом, спасаясь от <killer>, держащего <fcolor:2>[<killer_item>]<fcolor:1>");
+        message.death.types.put("death.attack.sonic_boom.player", "<fcolor:1>☠ <target> был уничтожен звуковым зарядом, спасаясь от <killer>");
+        message.death.types.put("death.attack.stalagmite", "<fcolor:1>☠ <target> пронзён сталагмитом");
+        message.death.types.put("death.attack.stalagmite.player", "<fcolor:1>☠ <target> был пронзён сталагмитом, пока боролся с <killer>");
+        message.death.types.put("death.attack.starve", "<fcolor:1>☠ <target> умер от голода");
+        message.death.types.put("death.attack.starve.player", "<fcolor:1>☠ <target> умер от голода, пока боролся с <killer>");
+        message.death.types.put("death.attack.sting", "<fcolor:1>☠ <target> изжален до смерти");
+        message.death.types.put("death.attack.sting.item", "<fcolor:1>☠ <target> был изжален до смерти <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
+        message.death.types.put("death.attack.sting.player", "<fcolor:1>☠ <target> изжален до смерти <killer>");
+        message.death.types.put("death.attack.sweetBerryBush", "<fcolor:1>☠ <target> искололся до смерти в кустах сладких ягод");
+        message.death.types.put("death.attack.sweetBerryBush.player", "<fcolor:1>☠ <target> искололся до смерти в кустах сладких ягод, спасаясь от <killer>");
+        message.death.types.put("death.attack.thorns", "<fcolor:1>☠ <target> был убит, пытаясь навредить <killer>");
+        message.death.types.put("death.attack.thorns.item", "<fcolor:1>☠ <target> был убит <fcolor:2>[<killer_item>]<fcolor:1>, пытаясь навредить <killer>");
+        message.death.types.put("death.attack.thrown", "<fcolor:1>☠ <target> был избит <killer>");
+        message.death.types.put("death.attack.thrown.item", "<fcolor:1>☠ <target> был избит <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
+        message.death.types.put("death.attack.trident", "<fcolor:1>☠ <target> был пронзён <killer>");
+        message.death.types.put("death.attack.trident.item", "<fcolor:1>☠ <target> пронзён <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
+        message.death.types.put("death.attack.wither", "<fcolor:1>☠ <target> иссушён");
+        message.death.types.put("death.attack.wither.player", "<fcolor:1>☠ <target> был иссушён, пока боролся с <killer>");
+        message.death.types.put("death.attack.witherSkull", "<fcolor:1>☠ <target> был поражён черепом из <killer>");
+        message.death.types.put("death.attack.witherSkull.item", "<fcolor:1>☠ <target> был поражён черепом из <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
+        message.death.types.put("death.fell.accident.generic", "<fcolor:1>☠ <target> разбился насмерть");
+        message.death.types.put("death.fell.accident.ladder", "<fcolor:1>☠ <target> свалился с лестницы");
+        message.death.types.put("death.fell.accident.other_climbable", "<fcolor:1>☠ <target> сорвался");
+        message.death.types.put("death.fell.accident.scaffolding", "<fcolor:1>☠ <target> сорвался с подмосток");
+        message.death.types.put("death.fell.accident.twisting_vines", "<fcolor:1>☠ <target> сорвался с вьющейся лозы");
+        message.death.types.put("death.fell.accident.vines", "<fcolor:1>☠ <target> сорвался с лианы");
+        message.death.types.put("death.fell.accident.weeping_vines", "<fcolor:1>☠ <target> сорвался с плакучей лозы");
+        message.death.types.put("death.fell.assist", "<fcolor:1>☠ <target> свалился благодаря <killer>");
+        message.death.types.put("death.fell.assist.item", "<fcolor:1>☠ <target> был обречён на падение <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
+        message.death.types.put("death.fell.finish", "<fcolor:1>☠ <target> упал с высоты и был добит <killer>");
+        message.death.types.put("death.fell.finish.item", "<fcolor:1>☠ <target> упал с высоты и был добит <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
+        message.death.types.put("death.fell.killer", "<fcolor:1>☠ <target> был обречён на падение");
 
-        message.debugstick.empty = "<fcolor:1>\uD83D\uDD27 Свойства объекта <fcolor:2><name> <fcolor:1>не заданы";
-        message.debugstick.select = "<fcolor:1>\uD83D\uDD27 выбрано «<fcolor:2><name><fcolor:1>» (<fcolor:2><value><fcolor:1>)";
-        message.debugstick.update = "<fcolor:1>\uD83D\uDD27 «<fcolor:2><name><fcolor:1>»: <fcolor:2><value>";
+        message.debugstick.empty = "<fcolor:1>\uD83D\uDD27 Свойства объекта <fcolor:2><property> <fcolor:1>не заданы";
+        message.debugstick.select = "<fcolor:1>\uD83D\uDD27 выбрано «<fcolor:2><property><fcolor:1>» (<fcolor:2><value><fcolor:1>)";
+        message.debugstick.update = "<fcolor:1>\uD83D\uDD27 «<fcolor:2><property><fcolor:1>»: <fcolor:2><value>";
 
-        message.deop.format = "<fcolor:1>\uD83E\uDD16 <display_name> больше не является оператором сервера";
+        message.deop.format = "<fcolor:1>\uD83E\uDD16 <target> больше не является оператором сервера";
 
-        message.dialog.clear.single = "<fcolor:1>\uD83D\uDDD4 Убран диалог у игрока «<display_name>»";
-        message.dialog.clear.multiple = "<fcolor:1>\uD83D\uDDD4 Убран диалог у <fcolor:2><count> <fcolor:1>игроков";
-        message.dialog.show.single = "<fcolor:1>\uD83D\uDDD4 Отображён диалог игроку «<display_name>»";
-        message.dialog.show.multiple = "<fcolor:1>\uD83D\uDDD4 Отображён диалог <fcolor:2><count> <fcolor:1>игрокам";
+        message.dialog.clear.single = "<fcolor:1>\uD83D\uDDD4 Убран диалог у игрока «<target>»";
+        message.dialog.clear.multiple = "<fcolor:1>\uD83D\uDDD4 Убран диалог у <fcolor:2><players> <fcolor:1>игроков";
+        message.dialog.show.single = "<fcolor:1>\uD83D\uDDD4 Отображён диалог игроку «<target>»";
+        message.dialog.show.multiple = "<fcolor:1>\uD83D\uDDD4 Отображён диалог <fcolor:2><players> <fcolor:1>игрокам";
 
-        message.difficulty.formatQuery = "<fcolor:1>⚔ Сложность игры: <fcolor:2><lang:'<difficulty>'>";
-        message.difficulty.formatSuccess = "<fcolor:1>⚔ Установлена сложность игры: <fcolor:2><lang:'<difficulty>'>";
+        message.difficulty.query = "<fcolor:1>⚔ Сложность игры: <fcolor:2><lang:'<difficulty>'>";
+        message.difficulty.success = "<fcolor:1>⚔ Установлена сложность игры: <fcolor:2><lang:'<difficulty>'>";
 
-        message.effect.clear.everything.single = "<fcolor:1>⚗ Убраны все эффекты с <display_name>";
-        message.effect.clear.everything.multiple = "<fcolor:1>⚗ Убраны все эффекты с <fcolor:2><count> <fcolor:1>целей";
-        message.effect.clear.specific.single = "<fcolor:1>⚗ Убран эффект «<fcolor:2><lang:'<effect>'><fcolor:1>» с <display_name>";
-        message.effect.clear.specific.multiple = "<fcolor:1>⚗ Убран эффект «<fcolor:2><lang:'<effect>'><fcolor:1>» с <fcolor:2><count> <fcolor:1>целей";
-        message.effect.give.single = "<fcolor:1>⚗ Применён эффект «<fcolor:2><lang:'<effect>'><fcolor:1>» к <display_name>";
-        message.effect.give.multiple = "<fcolor:1>⚗ Применён эффект <fcolor:2><lang:'<effect>'><fcolor:1>» к <fcolor:2><count> <fcolor:1>целям";
+        message.effect.clear.everything.single = "<fcolor:1>⚗ Убраны все эффекты с <target>";
+        message.effect.clear.everything.multiple = "<fcolor:1>⚗ Убраны все эффекты с <fcolor:2><players> <fcolor:1>целей";
+        message.effect.clear.specific.single = "<fcolor:1>⚗ Убран эффект «<fcolor:2><lang:'<effect>'><fcolor:1>» с <target>";
+        message.effect.clear.specific.multiple = "<fcolor:1>⚗ Убран эффект «<fcolor:2><lang:'<effect>'><fcolor:1>» с <fcolor:2><players> <fcolor:1>целей";
+        message.effect.give.single = "<fcolor:1>⚗ Применён эффект «<fcolor:2><lang:'<effect>'><fcolor:1>» к <target>";
+        message.effect.give.multiple = "<fcolor:1>⚗ Применён эффект <fcolor:2><lang:'<effect>'><fcolor:1>» к <fcolor:2><players> <fcolor:1>целям";
 
-        message.enchant.single = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» на предмет <display_name>";
-        message.enchant.multiple = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» на предмет <fcolor:2><count><fcolor:1> сущностей";
+        message.enchant.single = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><enchantment><fcolor:1>» на предмет <target>";
+        message.enchant.multiple = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><enchantment><fcolor:1>» на предмет <fcolor:2><players><fcolor:1> сущностей";
 
-        message.execute.formatPass = "<fcolor:1>⚡ Условие выполнено";
-        message.execute.formatPassCount = "<fcolor:1>⚡ Условие выполнено; счётчик: <fcolor:2><count>";
+        message.execute.pass = "<fcolor:1>⚡ Условие выполнено";
+        message.execute.passCount = "<fcolor:1>⚡ Условие выполнено; счётчик: <fcolor:2><count>";
 
-        message.experience.add.levels.single = "<fcolor:1>⏺ Выдано <fcolor:2><amount> <fcolor:1>уровней игроку <display_name>";
-        message.experience.add.levels.multiple = "<fcolor:1>⏺ Выдано <fcolor:2><amount> <fcolor:1>уровней <fcolor:2><count> <fcolor:1>игрокам";
-        message.experience.add.points.single = "<fcolor:1>⏺ Выдано <fcolor:2><amount> <fcolor:1>единиц опыта игроку <display_name>";
-        message.experience.add.points.multiple = "<fcolor:1>⏺ Выдано <fcolor:2><amount> <fcolor:1>единиц опыта <fcolor:2><count> <fcolor:1>игрокам";
-        message.experience.query.levels = "<fcolor:1>⏺ <display_name> имеет <fcolor:2><amount> <fcolor:1>уровней";
-        message.experience.query.points = "<fcolor:1>⏺ <display_name> имеет <fcolor:2><amount> <fcolor:1>ед. опыта";
-        message.experience.set.levels.single = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>уровней игроку <display_name>";
-        message.experience.set.levels.multiple = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>уровней <fcolor:2><count> <fcolor:1>игрокам";
-        message.experience.set.points.single = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>единиц опыта игроку <display_name>";
-        message.experience.set.points.multiple = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>единиц опыта <fcolor:2><count> <fcolor:1>игрокам";
+        message.experience.add.levels.single = "<fcolor:1>⏺ Выдано <fcolor:2><amount> <fcolor:1>уровней игроку <target>";
+        message.experience.add.levels.multiple = "<fcolor:1>⏺ Выдано <fcolor:2><amount> <fcolor:1>уровней <fcolor:2><players> <fcolor:1>игрокам";
+        message.experience.add.points.single = "<fcolor:1>⏺ Выдано <fcolor:2><amount> <fcolor:1>единиц опыта игроку <target>";
+        message.experience.add.points.multiple = "<fcolor:1>⏺ Выдано <fcolor:2><amount> <fcolor:1>единиц опыта <fcolor:2><players> <fcolor:1>игрокам";
+        message.experience.query.levels = "<fcolor:1>⏺ <target> имеет <fcolor:2><amount> <fcolor:1>уровней";
+        message.experience.query.points = "<fcolor:1>⏺ <target> имеет <fcolor:2><amount> <fcolor:1>ед. опыта";
+        message.experience.set.levels.single = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>уровней игроку <target>";
+        message.experience.set.levels.multiple = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>уровней <fcolor:2><players> <fcolor:1>игрокам";
+        message.experience.set.points.single = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>единиц опыта игроку <target>";
+        message.experience.set.points.multiple = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>единиц опыта <fcolor:2><players> <fcolor:1>игрокам";
 
-        message.fill.format = "<fcolor:1>⏹ Успешно заполнено <fcolor:2><amount> <fcolor:1>блоков";
+        message.fill.format = "<fcolor:1>⏹ Успешно заполнено <fcolor:2><blocks> <fcolor:1>блоков";
 
         message.fillbiome.format = "<fcolor:1>⏹ Заменены биомы между точками <fcolor:2><x1><fcolor:1>, <fcolor:2><y1><fcolor:1>, <fcolor:2><z1> <fcolor:1>и <fcolor:2><x2><fcolor:1>, <fcolor:2><y2><fcolor:1>, <fcolor:2><z2>";
-        message.fillbiome.formatCount = "<fcolor:1>⏹ Биом был заменён у <fcolor:2><count> <fcolor:1>блоков между точками <fcolor:2><x1><fcolor:1>, <fcolor:2><y1><fcolor:1>, <fcolor:2><z1> <fcolor:1>и <fcolor:2><x2><fcolor:1>, <fcolor:2><y2><fcolor:1>, <fcolor:2><z2>";
+        message.fillbiome.formatCount = "<fcolor:1>⏹ Биом был заменён у <fcolor:2><blocks> <fcolor:1>блоков между точками <fcolor:2><x1><fcolor:1>, <fcolor:2><y1><fcolor:1>, <fcolor:2><z1> <fcolor:1>и <fcolor:2><x2><fcolor:1>, <fcolor:2><y2><fcolor:1>, <fcolor:2><z2>";
 
         message.format.replacement.values.put("skin", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2><pixels>\"><fcolor:2><u>👨 Скин</u></hover></click>");
         message.format.replacement.values.put("url", "<click:open_url:\"<message_1>\"><hover:show_text:\"<fcolor:2>Открыть ссылку <br><u><message_1>\"><fcolor:2><u>🗗 Ссылка</u></hover></click>");
@@ -623,7 +627,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.format.moderation.newbie.reason = "Ты ещё слишком новичок";
 
         message.format.name_.display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <player>\"><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>";
-        message.format.name_.entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<name>'> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><lang:'<name>'></hover>";
+        message.format.name_.entity = "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><name></hover>";
         message.format.name_.unknown = "<fcolor:2><name>";
         message.format.name_.invisible = "<fcolor:2>\uD83D\uDC7B Невидимка";
 
@@ -633,37 +637,37 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.format.questionAnswer.questions.put("server", "<fcolor:2>[Вопрос-Ответ] @<player><fcolor:1>, это ванильный сервер в Майнкрафте!");
         message.format.questionAnswer.questions.put("flectone", "<fcolor:2>[Вопрос-Ответ] @<player><fcolor:1>, это бренд и проекты созданные TheFaser'ом");
 
-        message.gamemode.formatDefault = "<fcolor:1>\uD83D\uDDD8 Новый режим игры по умолчанию: <fcolor:2><lang:gameMode.<gamemode>>";
-        message.gamemode.formatSelf = "<fcolor:1>\uD83D\uDDD8 Твой режим игры изменён на <fcolor:2><lang:gameMode.<gamemode>>";
-        message.gamemode.formatOther = "<fcolor:1>\uD83D\uDDD8 Режим игры игрока <display_name> изменён на <fcolor:2><lang:gameMode.<gamemode>>";
+        message.gamemode.setDefault = "<fcolor:1>\uD83D\uDDD8 Новый режим игры по умолчанию: <fcolor:2><lang:'<gamemode>'>";
+        message.gamemode.self = "<fcolor:1>\uD83D\uDDD8 Твой режим игры изменён на <fcolor:2><lang:'<gamemode>'>";
+        message.gamemode.other = "<fcolor:1>\uD83D\uDDD8 Режим игры игрока <target> изменён на <fcolor:2><lang:'<gamemode>'>";
 
         message.gamerule.formatQuery = "<fcolor:1>\uD83D\uDDD0 Значение игрового правила <fcolor:2><gamerule><fcolor:1>: <fcolor:2><value>";
         message.gamerule.formatSet = "<fcolor:1>\uD83D\uDDD0 Установлено значение игрового правила <fcolor:2><gamerule><fcolor:1>: <fcolor:2><value>";
 
-        message.give.single = "<fcolor:1>⛏ Выдано <fcolor:2><amount> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<item>'>\"><lang:'<item>'><fcolor:1>] игроку <display_name>";
-        message.give.multiple = "<fcolor:1>⛏ Выдано <fcolor:2><amount> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<item>'>\"><lang:'<item>'><fcolor:1>] <fcolor:2><count> <fcolor:1>игрокам";
+        message.give.single = "<fcolor:1>⛏ Выдано <fcolor:2><items> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><give_item>\"><give_item></hover><fcolor:1>] игроку <target>";
+        message.give.multiple = "<fcolor:1>⛏ Выдано <fcolor:2><items> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><give_item>\"><give_item></hover><fcolor:1>] <fcolor:2><players> <fcolor:1>игрокам";
 
         message.greeting.format = "<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]  <fcolor:1>Привет,<br>[#][#][#][#][#][#][#][#]  <player><br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>";
 
         message.join.formatFirstTime = "<color:#4eff52>→ <display_name> <fcolor:1>впервые тут!";
 
-        message.kill.single = "<color:#778899>🪦 <fcolor:1><display_name> убит";
-        message.kill.multiple = "<color:#778899>🪦 <fcolor:1>Уничтожено <fcolor:2><count> <fcolor:1>сущностей";
+        message.kill.single = "<fcolor:1>☠ <fcolor:1><target> был убит";
+        message.kill.multiple = "<fcolor:1>☠ <fcolor:1>Уничтожено <fcolor:2><entities> <fcolor:1>сущностей";
 
-        message.locate.biome = "<fcolor:1>\uD83D\uDDFA Ближайший биом с типом <fcolor:2><name> <fcolor:1>находится по координатам <fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
-        message.locate.poi = "<fcolor:1>\uD83D\uDDFA Ближайшая точка интереса с типом <fcolor:2><name> <fcolor:1>находится по координатам <fcolor:2><fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
-        message.locate.structure = "<fcolor:1>\uD83D\uDDFA Ближайшее строение типа <fcolor:2><name> <fcolor:1>находится по координатам <fcolor:2><fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
+        message.locate.biome = "<fcolor:1>\uD83D\uDDFA Ближайший биом с типом <fcolor:2><value> <fcolor:1>находится по координатам <fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
+        message.locate.poi = "<fcolor:1>\uD83D\uDDFA Ближайшая точка интереса с типом <fcolor:2><value> <fcolor:1>находится по координатам <fcolor:2><fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
+        message.locate.structure = "<fcolor:1>\uD83D\uDDFA Ближайшее строение типа <fcolor:2><value> <fcolor:1>находится по координатам <fcolor:2><fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
 
         message.objective.belowname.format = "<fcolor:1>мс";
 
-        message.op.format = "<fcolor:1>\uD83E\uDD16 <display_name> назначен оператором сервера";
+        message.op.format = "<fcolor:1>\uD83E\uDD16 <target> назначен оператором сервера";
 
         message.particle.format = "<fcolor:1>❄ Отображена частица «<fcolor:2><particle><fcolor:1>»";
 
         message.reload.format = "<fcolor:1>\uD83D\uDEC8 Перезагрузка!";
 
-        message.ride.dismount = "<fcolor:1>\uD83C\uDFC7 <display_name> больше не сидит на <destination>";
-        message.ride.mount = "<fcolor:1>\uD83C\uDFC7 <display_name> теперь сидит на <destination>";
+        message.ride.dismount = "<fcolor:1>\uD83C\uDFC7 <target> больше не сидит на <second_target>";
+        message.ride.mount = "<fcolor:1>\uD83C\uDFC7 <target> теперь сидит на <second_target>";
 
         message.sidebar.values.clear();
         message.sidebar.values.addAll(new LinkedList<>(){
@@ -687,26 +691,26 @@ public final class Localization extends FileSerializable implements ModuleConfig
             }
         });
 
-        message.rotate.format = "<fcolor:1>\uD83E\uDD38 <display_name> повёрнут";
+        message.rotate.format = "<fcolor:1>\uD83E\uDD38 <target> повёрнут";
 
         message.save.disabled = "<fcolor:1>\uD83D\uDEC8 Автосохранение отключено";
         message.save.enabled = "<fcolor:1>\uD83D\uDEC8 Автосохранение включено";
         message.save.saving = "<fcolor:1>\uD83D\uDEC8 Сохранение мира (может занять некоторое время!)";
         message.save.success = "<fcolor:1>\uD83D\uDEC8 Игра сохранена";
 
-        message.seed.format = "<fcolor:1>\uD83C\uDF10 Ключ генератора: [<fcolor:2><hover:show_text:'<fcolor:2>Нажми, чтобы скопировать в буфер обмена'><click:copy_to_clipboard:<seed>><seed></click>]";
+        message.seed.format = "<fcolor:1>\uD83D\uDD11 Ключ генератора: [<fcolor:2><hover:show_text:'<fcolor:2>Нажми, чтобы скопировать в буфер обмена'><click:copy_to_clipboard:<seed>><seed></click></hover><fcolor:1>]";
 
         message.setblock.format = "<fcolor:1>⏹ Изменён блок в точке <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>";
 
         message.sleep.notPossible = "<fcolor:1>\uD83D\uDECC Никакой отдых не поможет пропустить эту ночь";
-        message.sleep.playersSleeping = "<fcolor:1>\uD83D\uDECC <fcolor:2><sleep_count> <fcolor:1>из <fcolor:2><all_count> <fcolor:1>игроков спят";
+        message.sleep.playersSleeping = "<fcolor:1>\uD83D\uDECC <fcolor:2><players_sleeping> <fcolor:1>из <fcolor:2><players> <fcolor:1>игроков спят";
         message.sleep.skippingNight = "<fcolor:1>\uD83D\uDECC Вы проспите всю ночь";
 
         message.spawn.notValid = "<fcolor:1>\uD83D\uDECC У вас нет кровати или заряженного якоря возрождения, либо доступ к ним затруднён";
         message.spawn.set = "<fcolor:1>\uD83D\uDECC Точка возрождения установлена";
         message.spawn.setWorld = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения мира <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>]";
-        message.spawn.single = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>] в <fcolor:2><world> <fcolor:1>для <display_name>";
-        message.spawn.multiple = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>] в <fcolor:2><world> <fcolor:1>для <fcolor:2><count><fcolor:1> игроков";
+        message.spawn.single = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>] в <fcolor:2><world> <fcolor:1>для <target>";
+        message.spawn.multiple = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>] в <fcolor:2><world> <fcolor:1>для <fcolor:2><players><fcolor:1> игроков";
 
         message.status.motd.values.clear();
         message.status.motd.values.addAll(List.of(
@@ -722,7 +726,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.stop.format = "<fcolor:1>\uD83D\uDEC8 Выключение сервера";
 
-        message.summon.format = "<fcolor:1>\uD83D\uDC3A Сущность «<display_name>» создана";
+        message.summon.format = "<fcolor:1>\uD83D\uDC3A Сущность «<target>» создана";
 
         message.tab.footer.lists.clear();
         message.tab.footer.lists.addAll(new LinkedList<>(){
@@ -744,13 +748,13 @@ public final class Localization extends FileSerializable implements ModuleConfig
             }
         });
 
-        message.teleport.entity.single = "<fcolor:1>\uD83C\uDF00 <display_name> телепортирован к <destination>";
-        message.teleport.entity.multiple = "<fcolor:1>\uD83C\uDF00 <fcolor:2><count> <fcolor:1>сущностей телепортированы к <display_name>";
-        message.teleport.location.single = "<fcolor:1>\uD83C\uDF00 <display_name> телепортирован в точку <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>";
-        message.teleport.location.multiple = "<fcolor:1>\uD83C\uDF00 <fcolor:2><count> <fcolor:1>сущностей телепортированы в точку <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>";
+        message.teleport.entity.single = "<fcolor:1>\uD83C\uDF00 <target> телепортирован к <second_target>";
+        message.teleport.entity.multiple = "<fcolor:1>\uD83C\uDF00 <fcolor:2><entities> <fcolor:1>сущностей телепортированы к <second_target>";
+        message.teleport.location.single = "<fcolor:1>\uD83C\uDF00 <target> телепортирован в точку <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>";
+        message.teleport.location.multiple = "<fcolor:1>\uD83C\uDF00 <fcolor:2><entities> <fcolor:1>сущностей телепортированы в точку <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>";
 
-        message.time.formatQuery = "<fcolor:1>☽ Время: <fcolor:2><time>";
-        message.time.formatSet = "<fcolor:1>☽ Установлено время: <fcolor:2><time>";
+        message.time.query = "<fcolor:1>☽ Время: <fcolor:2><time>";
+        message.time.set = "<fcolor:1>☽ Установлено время: <fcolor:2><time>";
 
         message.update.formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse) <fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <url:https://modrinth.com/plugin/flectonepulse>, чтобы получить новые возможности!";
         message.update.formatConsole = "<fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse";
@@ -1827,51 +1831,51 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Advancement implements SubMessageConfig, Localizable {
 
-            private Type task = new Type(
-                    "<color:#4eff52>🌠 <fcolor:2><display_name> <fcolor:1>has completed the task <advancement>",
-                    "<color:#4eff52>[<hover:show_text:\"<color:#4eff52><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]"
-            );
+            private String task = "<fcolor:1>🌠 <display_name> has made the advancement <advancement>";
+            private String goal = "<fcolor:1>🌠 <display_name> has reached the goal <advancement>";
+            private String challenge = "<fcolor:1>🌠 <display_name> has completed the challenge <advancement>";
 
-            private Type taken = new Type(
-                    "<color:#4eff52>🌠 <fcolor:2><display_name> <fcolor:1>has lost the achievement <advancement>",
-                    "<color:#4eff52>[<hover:show_text:\"<color:#4eff52><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]"
-            );
+            private String taken = "<fcolor:1>🌠 <display_name> has lost the achievement <advancement>";
 
-            private Type goal = new Type(
-                    "<color:#FFFF00>🌠 <fcolor:2><display_name> <fcolor:1>has completed the goal <advancement>",
-                    "<color:#FFFF00>[<hover:show_text:\"<color:#FFFF00><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]"
-            );
-
-            private Type challenge = new Type(
-                    "<color:#834eff>🌠 <fcolor:2><display_name> <fcolor:1>has completed the challenge <color:#834eff><advancement>",
-                    "<color:#834eff>[<hover:show_text:\"<color:#834eff><lang:'<title>'> <br><lang:'<description>'>\"><lang:'<title>'></hover>]"
+            private Tag tag = new Tag(
+                    "<color:#4eff52>[<hover:show_text:\"<color:#4eff52><advancement>\"><advancement></hover>]",
+                    "<color:#834eff>[<hover:show_text:\"<color:#834eff><advancement>\"><advancement></hover>]"
             );
 
             private Command revoke = new Command(
-                    "<fcolor:1>🌠 Revoked <fcolor:2><number> <fcolor:1>advancements from <display_name>",
-                    "<fcolor:1>🌠 Revoked <fcolor:2><number> <fcolor:1>advancements from <fcolor:2><count> <fcolor:1>players",
-                    "<fcolor:1>🌠 Revoked the advancement <fcolor:2><advancement> <fcolor:1>from <display_name>"
+                    "<fcolor:1>🌠 Revoked <fcolor:2><advancements> <fcolor:1>advancements from <target>",
+                    "<fcolor:1>🌠 Revoked the advancement <advancement> from <fcolor:2><players> <fcolor:1>players",
+                    "<fcolor:1>🌠 Revoked <fcolor:2><advancements> <fcolor:1>advancements from <fcolor:2><players> <fcolor:1>players",
+                    "<fcolor:1>🌠 Revoked the advancement <advancement> <fcolor:1>from <target>",
+                    "<fcolor:1>🌠 Revoked criterion '<fcolor:2><criterion><fcolor:1>' of advancement <advancement> from <fcolor:2><players> <fcolor:1>players",
+                    "<fcolor:1>🌠 Revoked criterion '<fcolor:2><criterion><fcolor:1>' of advancement <advancement> from <target>"
             );
 
             private Command grant = new Command(
-                    "<fcolor:1>🌠 Granted <fcolor:2><number> <fcolor:1>advancements to <display_name>",
-                    "<fcolor:1>🌠 Granted <fcolor:2><number> <fcolor:1>advancements to <fcolor:2><count> <fcolor:1>players",
-                    "<fcolor:1>🌠 Granted the advancement <fcolor:2><advancement> <fcolor:1>to <display_name>"
+                    "<fcolor:1>🌠 Granted <fcolor:2><advancements> <fcolor:1>advancements to <target>",
+                    "<fcolor:1>🌠 Granted the advancement <advancement> to <fcolor:2><players> <fcolor:1>players",
+                    "<fcolor:1>🌠 Granted <fcolor:2><advancements> <fcolor:1>advancements to <fcolor:2><players> <fcolor:1>players",
+                    "<fcolor:1>🌠 Granted the advancement <advancement> to <target>",
+                    "<fcolor:1>🌠 Granted criterion '<fcolor:2><criterion><fcolor:1>' of advancement <advancement> to <fcolor:2><players> <fcolor:1>players",
+                    "<fcolor:1>🌠 Granted criterion '<fcolor:2><criterion><fcolor:1>' of advancement <advancement> to <target>"
             );
 
             @Getter
             @AllArgsConstructor
-            public static final class Type {
-                private String format;
-                private String tag;
+            public static final class Tag {
+                private String task;
+                private String challenge;
             }
 
             @Getter
             @AllArgsConstructor
             public static final class Command {
                 private String manyToOne;
+                private String oneToMany;
                 private String manyToMany;
                 private String oneToOne;
+                private String criterionToMany;
+                private String criterionToOne;
             }
         }
 
@@ -1898,16 +1902,16 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Attribute implements SubMessageConfig, Localizable {
             private BaseValue baseValue = new BaseValue(
-                    "<fcolor:1>❤ Base value of attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <display_name> is <fcolor:2><value>",
-                    "<fcolor:1>❤ Base value for attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <display_name> reset to default <fcolor:2><value>",
-                    "<fcolor:1>❤ Base value for attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <display_name> set to <fcolor:2><value>"
+                    "<fcolor:1>❤ Base value of attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <target> is <fcolor:2><value>",
+                    "<fcolor:1>❤ Base value for attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <target> reset to default <fcolor:2><value>",
+                    "<fcolor:1>❤ Base value for attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <target> set to <fcolor:2><value>"
             );
             private Modifier modifier = new Modifier(
-                    "<fcolor:1>❤ Added modifier <fcolor:2><modifier> <fcolor:1>to attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <display_name>",
-                    "<fcolor:1>❤ Removed modifier <fcolor:2><modifier> <fcolor:1>from attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <display_name>",
-                    "<fcolor:1>❤ Value of modifier <fcolor:2><modifier> <fcolor:1>on attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <display_name> is <fcolor:2><value>"
+                    "<fcolor:1>❤ Added modifier <fcolor:2><modifier> <fcolor:1>to attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <target>",
+                    "<fcolor:1>❤ Removed modifier <fcolor:2><modifier> <fcolor:1>from attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <target>",
+                    "<fcolor:1>❤ Value of modifier <fcolor:2><modifier> <fcolor:1>on attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <target> is <fcolor:2><value>"
             );
-            private String valueGet = "<fcolor:1>❤ Value of attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <display_name> is <fcolor:2><value>";
+            private String valueGet = "<fcolor:1>❤ Value of attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <target> is <fcolor:2><value>";
 
             @Getter
             @AllArgsConstructor
@@ -1982,13 +1986,13 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Clear implements SubMessageConfig, Localizable {
-            private String single = "<fcolor:1>🌊 Removed <fcolor:2><number> <fcolor:1>item(s) from player <display_name>";
-            private String multiple = "<fcolor:1>🌊 Removed <fcolor:2><number> <fcolor:1>item(s) from <fcolor:2><count> <fcolor:1>players";
+            private String single = "<fcolor:1>🌊 Removed <fcolor:2><items> <fcolor:1>item(s) from player <target>";
+            private String multiple = "<fcolor:1>🌊 Removed <fcolor:2><items> <fcolor:1>item(s) from <fcolor:2><players> <fcolor:1>players";
         }
 
         @Getter
         public static final class Clone implements SubMessageConfig, Localizable {
-            private String format = "<fcolor:1>⏹ Successfully cloned <fcolor:2><amount> <fcolor:1>block(s)";
+            private String format = "<fcolor:1>⏹ Successfully cloned <fcolor:2><blocks> <fcolor:1>block(s)";
         }
 
         @Getter
@@ -1999,147 +2003,145 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Damage implements SubMessageConfig, Localizable {
-            private String format = "<fcolor:1>\uD83D\uDDE1 Applied <fcolor:2><amount> <fcolor:1>damage to <display_name>";
+            private String format = "<fcolor:1>\uD83D\uDDE1 Applied <fcolor:2><amount> <fcolor:1>damage to <target>";
         }
 
         @Getter
         public static final class Death implements SubMessageConfig, Localizable {
-            private String killerPlayer = "<display_name>";
-            private String killerEntity = "<display_name>";
             private Map<String, String> types = new LinkedHashMap<>(){
                 {
-                    put("death.attack.anvil", "<color:#778899>🪦 <fcolor:1><display_name> was squashed by a falling anvil");
-                    put("death.attack.anvil.player", "<color:#778899>🪦 <fcolor:1><color:#778899>🪦 <fcolor:1> <display_name> was squashed by a falling anvil while fighting <killer>");
-                    put("death.attack.arrow", "<color:#778899>🪦 <fcolor:1><display_name> was shot by <killer>");
-                    put("death.attack.arrow.item", "<color:#778899>🪦 <fcolor:1><display_name> was shot by <killer> using <fcolor:2>[<i><by_item></i>]");
-                    put("death.attack.badRespawnPoint.message", "<color:#778899>🪦 <fcolor:1><display_name> was killed by <fcolor:2>[<click:open_url:\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"><hover:show_text:\"<fcolor:2>MCPE-28723\">Intentional Game Design</hover></click>]");
-                    put("death.attack.cactus", "<color:#778899>🪦 <fcolor:1><display_name> was pricked to death");
-                    put("death.attack.cactus.player", "<color:#778899>🪦 <fcolor:1><display_name> walked into a cactus while trying to escape <killer>");
-                    put("death.attack.cramming", "<color:#778899>🪦 <fcolor:1><display_name> was squished too much");
-                    put("death.attack.cramming.player", "<color:#778899>🪦 <fcolor:1><display_name> was squashed by <killer>");
-                    put("death.attack.dragonBreath", "<color:#778899>🪦 <fcolor:1><display_name> was roasted in dragon's breath");
-                    put("death.attack.dragonBreath.player", "<color:#778899>🪦 <fcolor:1><display_name> was roasted in dragon's breath by <killer>");
-                    put("death.attack.drown", "<color:#778899>🪦 <fcolor:1><display_name> drowned");
-                    put("death.attack.drown.player", "<color:#778899>🪦 <fcolor:1><display_name> drowned while trying to escape <killer>");
-                    put("death.attack.dryout", "<color:#778899>🪦 <fcolor:1><display_name> died from dehydration");
-                    put("death.attack.dryout.player", "<color:#778899>🪦 <fcolor:1><display_name> died from dehydration while trying to escape <killer>");
-                    put("death.attack.even_more_magic", "<color:#778899>🪦 <fcolor:1><display_name> was killed by even more magic");
-                    put("death.attack.explosion", "<color:#778899>🪦 <fcolor:1><display_name> blew up");
-                    put("death.attack.explosion.player", "<color:#778899>🪦 <fcolor:1><display_name> was blown up by <killer>");
-                    put("death.attack.explosion.item", "<color:#778899>🪦 <fcolor:1><display_name> was blown up by <killer> using <fcolor:2>[<i><by_item></i>]");
-                    put("death.attack.explosion.player.item", "<color:#778899>🪦 <fcolor:1><display_name> was blown up by <killer> using <fcolor:2>[<i><by_item></i>]");
-                    put("death.attack.fall", "<color:#778899>🪦 <fcolor:1><display_name> hit the ground too hard");
-                    put("death.attack.fall.player", "<color:#778899>🪦 <fcolor:1><display_name> hit the ground too hard while trying to escape <killer>");
-                    put("death.attack.fallingBlock", "<color:#778899>🪦 <fcolor:1><display_name> was squashed by a falling block");
-                    put("death.attack.fallingBlock.player", "<color:#778899>🪦 <fcolor:1><display_name> was squashed by a falling block while fighting <killer>");
-                    put("death.attack.fallingStalactite", "<color:#778899>🪦 <fcolor:1><display_name> was skewered by a falling stalactite");
-                    put("death.attack.fallingStalactite.player", "<color:#778899>🪦 <fcolor:1><display_name> was skewered by a falling stalactite while fighting <killer>");
-                    put("death.attack.fireball", "<color:#778899>🪦 <fcolor:1><display_name> was fireballed by <killer>");
-                    put("death.attack.fireball.item", "<color:#778899>🪦 <fcolor:1><display_name> was fireballed by <killer> using <fcolor:2>[<i><by_item></i>]");
-                    put("death.attack.fireworks", "<color:#778899>🪦 <fcolor:1><display_name> went off with a bang");
-                    put("death.attack.fireworks.item", "<color:#778899>🪦 <fcolor:1><display_name> went off with a bang due to a firework fired from <fcolor:2>[<i><by_item></i>] by <killer>");
-                    put("death.attack.fireworks.player", "<color:#778899>🪦 <fcolor:1><display_name> went off with a bang while fighting <killer>");
-                    put("death.attack.flyIntoWall", "<color:#778899>🪦 <fcolor:1><display_name> experienced kinetic energy");
-                    put("death.attack.flyIntoWall.player", "<color:#778899>🪦 <fcolor:1><display_name> experienced kinetic energy while trying to escape <killer>");
-                    put("death.attack.freeze", "<color:#778899>🪦 <fcolor:1><display_name> froze to death");
-                    put("death.attack.freeze.player", "<color:#778899>🪦 <fcolor:1><display_name> was frozen to death by <killer>");
-                    put("death.attack.generic", "<color:#778899>🪦 <fcolor:1><display_name> died");
-                    put("death.attack.generic.player", "<color:#778899>🪦 <fcolor:1><display_name> died because of <killer>");
-                    put("death.attack.genericKill", "<color:#778899>🪦 <fcolor:1><display_name> was killed");
-                    put("death.attack.genericKill.player", "<color:#778899>🪦 <fcolor:1><display_name> was killed while fighting <killer>");
-                    put("death.attack.hotFloor", "<color:#778899>🪦 <fcolor:1><display_name> discovered the floor was lava");
-                    put("death.attack.hotFloor.player", "<color:#778899>🪦 <fcolor:1><display_name> walked into the danger zone due to <killer>");
-                    put("death.attack.indirectMagic", "<color:#778899>🪦 <fcolor:1><display_name> was killed by <killer> using magic");
-                    put("death.attack.indirectMagic.item", "<color:#778899>🪦 <fcolor:1><display_name> was killed by <killer> using <fcolor:2>[<i><by_item></i>]");
-                    put("death.attack.inFire", "<color:#778899>🪦 <fcolor:1><display_name> went up in flames");
-                    put("death.attack.inFire.player", "<color:#778899>🪦 <fcolor:1><display_name> walked into fire while fighting <killer>");
-                    put("death.attack.inWall", "<color:#778899>🪦 <fcolor:1><display_name> suffocated in a wall");
-                    put("death.attack.inWall.player", "<color:#778899>🪦 <fcolor:1><display_name> suffocated in a wall while fighting <killer>");
-                    put("death.attack.lava", "<color:#778899>🪦 <fcolor:1><display_name> tried to swim in lava");
-                    put("death.attack.lava.player", "<color:#778899>🪦 <fcolor:1><display_name> tried to swim in lava to escape <killer>");
-                    put("death.attack.lightningBolt", "<color:#778899>🪦 <fcolor:1><display_name> was struck by lightning");
-                    put("death.attack.lightningBolt.player", "<color:#778899>🪦<fcolor:1> <display_name> was struck by lightning while fighting <killer>");
-                    put("death.attack.mace_smash", "<color:#778899>🪦 <fcolor:1><display_name> was smashed by <killer>");
-                    put("death.attack.mace_smash.item", "<color:#778899>🪦 <fcolor:1><display_name> was smashed by <killer> with <fcolor:2>[<i><by_item></i>]");
-                    put("death.attack.magic", "<color:#778899>🪦 <fcolor:1><display_name> was killed by magic");
-                    put("death.attack.magic.player", "<color:#778899>🪦 <fcolor:1><display_name> was killed by magic while trying to escape <killer>");
-                    put("death.attack.mob", "<color:#778899>🪦 <fcolor:1><display_name> was slain by <killer>");
-                    put("death.attack.mob.item", "<color:#778899>🪦 <fcolor:1><display_name> was slain by <killer> using <fcolor:2>[<i><by_item></i>]");
-                    put("death.attack.onFire", "<color:#778899>🪦 <fcolor:1><display_name> burned to death");
-                    put("death.attack.onFire.item", "<color:#778899>🪦 <fcolor:1><display_name> was burned to a crisp while fighting <killer> wielding <fcolor:2>[<i><by_item></i>]");
-                    put("death.attack.onFire.player", "<color:#778899>🪦 <fcolor:1><display_name> was burned to a crisp while fighting <killer>");
-                    put("death.attack.outOfWorld", "<color:#778899>🪦 <fcolor:1><display_name> fell out of the world");
-                    put("death.attack.outOfWorld.player", "<color:#778899>🪦 <fcolor:1><display_name> didn't want to live in the same world as <killer>");
-                    put("death.attack.outsideBorder", "<color:#778899>🪦 <fcolor:1><display_name> left the confines of this world");
-                    put("death.attack.outsideBorder.player", "<color:#778899>🪦 <fcolor:1><display_name> left the confines of this world while fighting <killer>");
-                    put("death.attack.player", "<color:#778899>🪦 <fcolor:1><display_name> was slain by <killer>");
-                    put("death.attack.player.item", "<color:#778899>🪦 <fcolor:1><display_name> was slain by <killer> using <fcolor:2>[<i><by_item></i>]");
-                    put("death.attack.sonic_boom", "<color:#778899>🪦 <fcolor:1><display_name> was obliterated by a sonically-charged shriek");
-                    put("death.attack.sonic_boom.item", "<color:#778899>🪦 <fcolor:1><display_name> was obliterated by a sonically-charged shriek while trying to escape <killer> wielding <fcolor:2>[<i><by_item></i>]");
-                    put("death.attack.sonic_boom.player", "<color:#778899>🪦 <fcolor:1><display_name> was obliterated by a sonically-charged shriek while trying to escape <killer>");
-                    put("death.attack.stalagmite", "<color:#778899>🪦 <fcolor:1><display_name> was impaled on a stalagmite");
-                    put("death.attack.stalagmite.player", "<color:#778899>🪦 <fcolor:1><display_name> was impaled on a stalagmite while fighting <killer>");
-                    put("death.attack.starve", "<color:#778899>🪦 <fcolor:1><display_name> starved to death");
-                    put("death.attack.starve.player", "<color:#778899>🪦 <fcolor:1><display_name> starved to death while fighting <killer>");
-                    put("death.attack.sting", "<color:#778899>🪦 <fcolor:1><display_name> was stung to death");
-                    put("death.attack.sting.item", "<color:#778899>🪦 <fcolor:1><display_name> was stung to death by <killer> using <fcolor:2>[<i><by_item></i>]");
-                    put("death.attack.sting.player", "<color:#778899>🪦 <fcolor:1><display_name> was stung to death by <killer>");
-                    put("death.attack.sweetBerryBush", "<color:#778899>🪦 <fcolor:1><display_name> was poked to death by a sweet berry bush");
-                    put("death.attack.sweetBerryBush.player", "<color:#778899>🪦 <fcolor:1><display_name> was poked to death by a sweet berry bush while trying to escape <killer>");
-                    put("death.attack.thorns", "<color:#778899>🪦 <fcolor:1><display_name> was killed while trying to hurt <killer>");
-                    put("death.attack.thorns.item", "<color:#778899>🪦 <fcolor:1><display_name> was killed by <fcolor:2>[<i><by_item></i>] <fcolor:1>while trying to hurt <killer>");
-                    put("death.attack.thrown", "<color:#778899>🪦 <fcolor:1><display_name> was pummeled by <killer>");
-                    put("death.attack.thrown.item", "<color:#778899>🪦 <fcolor:1><display_name> was pummeled by <killer> using <fcolor:2>[<i><by_item></i>]");
-                    put("death.attack.trident", "<color:#778899>🪦 <fcolor:1><display_name> was impaled by <killer>");
-                    put("death.attack.trident.item", "<color:#778899>🪦 <fcolor:1><display_name> was impaled by <killer> with <fcolor:2>[<i><by_item></i>]");
-                    put("death.attack.wither", "<color:#778899>🪦 <fcolor:1><display_name> withered away");
-                    put("death.attack.wither.player", "<color:#778899>🪦 <fcolor:1><display_name> withered away while fighting <killer>");
-                    put("death.attack.witherSkull", "<color:#778899>🪦 <fcolor:1><display_name> was shot by a skull from <killer>");
-                    put("death.attack.witherSkull.item", "<color:#778899>🪦 <fcolor:1><display_name> was shot by a skull from <killer> using <fcolor:2>[<i><by_item></i>]");
-                    put("death.fell.accident.generic", "<color:#778899>🪦 <fcolor:1><display_name> fell from a high place");
-                    put("death.fell.accident.ladder", "<color:#778899>🪦 <fcolor:1><display_name> fell off a ladder");
-                    put("death.fell.accident.other_climbable", "<color:#778899>🪦 <fcolor:1><display_name> fell while climbing");
-                    put("death.fell.accident.scaffolding", "<color:#778899>🪦 <fcolor:1><display_name> fell off scaffolding");
-                    put("death.fell.accident.twisting_vines", "<color:#778899>🪦 <fcolor:1><display_name> fell off some twisting vines");
-                    put("death.fell.accident.vines", "<color:#778899>🪦 <fcolor:1><display_name> fell off some vines");
-                    put("death.fell.accident.weeping_vines", "<color:#778899>🪦 <fcolor:1><display_name> fell off some weeping vines");
-                    put("death.fell.assist", "<color:#778899>🪦 <fcolor:1><display_name> was doomed to fall by <killer>");
-                    put("death.fell.assist.item", "<color:#778899>🪦 <fcolor:1><display_name> was doomed to fall by <killer> using <fcolor:2>[<i><by_item></i>]");
-                    put("death.fell.finish", "<color:#778899>🪦 <fcolor:1><display_name> fell too far and was finished by <killer>");
-                    put("death.fell.finish.item", "<color:#778899>🪦 <fcolor:1><display_name> fell too far and was finished by <killer> using <fcolor:2>[<i><by_item></i>]");
-                    put("death.fell.killer", "<color:#778899>🪦 <fcolor:1><display_name> was doomed to fall");
+                    put("death.attack.anvil", "<fcolor:1>☠ <target> was squashed by a falling anvil");
+                    put("death.attack.anvil.player", "<fcolor:1>☠ <target> was squashed by a falling anvil while fighting <killer>");
+                    put("death.attack.arrow", "<fcolor:1>☠ <fcolor:1><target> was shot by <killer>");
+                    put("death.attack.arrow.item", "<fcolor:1>☠ <target> was shot by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
+                    put("death.attack.badRespawnPoint.message", "<fcolor:1>☠ <target> was killed by <fcolor:2>[<click:open_url:\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"><hover:show_text:\"<fcolor:2>MCPE-28723\">Intentional Game Design</hover></click>]");
+                    put("death.attack.cactus", "<fcolor:1>☠ <target> was pricked to death");
+                    put("death.attack.cactus.player", "<fcolor:1>☠ <target> walked into a cactus while trying to escape <killer>");
+                    put("death.attack.cramming", "<fcolor:1>☠ <target> was squished too much");
+                    put("death.attack.cramming.player", "<fcolor:1>☠ <target> was squashed by <killer>");
+                    put("death.attack.dragonBreath", "<fcolor:1>☠ <target> was roasted in dragon's breath");
+                    put("death.attack.dragonBreath.player", "<fcolor:1>☠ <target> was roasted in dragon's breath by <killer>");
+                    put("death.attack.drown", "<fcolor:1>☠ <target> drowned");
+                    put("death.attack.drown.player", "<fcolor:1>☠ <target> drowned while trying to escape <killer>");
+                    put("death.attack.dryout", "<fcolor:1>☠ <target> died from dehydration");
+                    put("death.attack.dryout.player", "<fcolor:1>☠ <target> died from dehydration while trying to escape <killer>");
+                    put("death.attack.even_more_magic", "<fcolor:1>☠ <target> was killed by even more magic");
+                    put("death.attack.explosion", "<fcolor:1>☠ <target> blew up");
+                    put("death.attack.explosion.player", "<fcolor:1>☠ <target> was blown up by <killer>");
+                    put("death.attack.explosion.item", "<fcolor:1>☠ <target> was blown up by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
+                    put("death.attack.explosion.player.item", "<fcolor:1>☠ <target> was blown up by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
+                    put("death.attack.fall", "<fcolor:1>☠ <target> hit the ground too hard");
+                    put("death.attack.fall.player", "<fcolor:1>☠ <target> hit the ground too hard while trying to escape <killer>");
+                    put("death.attack.fallingBlock", "<fcolor:1>☠ <target> was squashed by a falling block");
+                    put("death.attack.fallingBlock.player", "<fcolor:1>☠ <target> was squashed by a falling block while fighting <killer>");
+                    put("death.attack.fallingStalactite", "<fcolor:1>☠ <target> was skewered by a falling stalactite");
+                    put("death.attack.fallingStalactite.player", "<fcolor:1>☠ <target> was skewered by a falling stalactite while fighting <killer>");
+                    put("death.attack.fireball", "<fcolor:1>☠ <target> was fireballed by <killer>");
+                    put("death.attack.fireball.item", "<fcolor:1>☠ <target> was fireballed by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
+                    put("death.attack.fireworks", "<fcolor:1>☠ <target> went off with a bang");
+                    put("death.attack.fireworks.item", "<fcolor:1>☠ <target> went off with a bang due to a firework fired from <fcolor:2>[<killer_item>]<fcolor:1> by <killer>");
+                    put("death.attack.fireworks.player", "<fcolor:1>☠ <target> went off with a bang while fighting <killer>");
+                    put("death.attack.flyIntoWall", "<fcolor:1>☠ <target> experienced kinetic energy");
+                    put("death.attack.flyIntoWall.player", "<fcolor:1>☠ <target> experienced kinetic energy while trying to escape <killer>");
+                    put("death.attack.freeze", "<fcolor:1>☠ <target> froze to death");
+                    put("death.attack.freeze.player", "<fcolor:1>☠ <target> was frozen to death by <killer>");
+                    put("death.attack.generic", "<fcolor:1>☠ <target> died");
+                    put("death.attack.generic.player", "<fcolor:1>☠ <target> died because of <killer>");
+                    put("death.attack.genericKill", "<fcolor:1>☠ <target> was killed");
+                    put("death.attack.genericKill.player", "<fcolor:1>☠ <target> was killed while fighting <killer>");
+                    put("death.attack.hotFloor", "<fcolor:1>☠ <target> discovered the floor was lava");
+                    put("death.attack.hotFloor.player", "<fcolor:1>☠ <target> walked into the danger zone due to <killer>");
+                    put("death.attack.indirectMagic", "<fcolor:1>☠ <target> was killed by <killer> using magic");
+                    put("death.attack.indirectMagic.item", "<fcolor:1>☠ <target> was killed by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
+                    put("death.attack.inFire", "<fcolor:1>☠ <target> went up in flames");
+                    put("death.attack.inFire.player", "<fcolor:1>☠ <target> walked into fire while fighting <killer>");
+                    put("death.attack.inWall", "<fcolor:1>☠ <target> suffocated in a wall");
+                    put("death.attack.inWall.player", "<fcolor:1>☠ <target> suffocated in a wall while fighting <killer>");
+                    put("death.attack.lava", "<fcolor:1>☠ <target> tried to swim in lava");
+                    put("death.attack.lava.player", "<fcolor:1>☠ <target> tried to swim in lava to escape <killer>");
+                    put("death.attack.lightningBolt", "<fcolor:1>☠ <target> was struck by lightning");
+                    put("death.attack.lightningBolt.player", "<fcolor:1☠ <target> was struck by lightning while fighting <killer>");
+                    put("death.attack.mace_smash", "<fcolor:1>☠ <target> was smashed by <killer>");
+                    put("death.attack.mace_smash.item", "<fcolor:1>☠ <target> was smashed by <killer> with <fcolor:2>[<killer_item>]<fcolor:1>");
+                    put("death.attack.magic", "<fcolor:1>☠ <target> was killed by magic");
+                    put("death.attack.magic.player", "<fcolor:1>☠ <target> was killed by magic while trying to escape <killer>");
+                    put("death.attack.mob", "<fcolor:1>☠ <target> was slain by <killer>");
+                    put("death.attack.mob.item", "<fcolor:1>☠ <target> was slain by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
+                    put("death.attack.onFire", "<fcolor:1>☠ <target> burned to death");
+                    put("death.attack.onFire.item", "<fcolor:1>☠ <target> was burned to a crisp while fighting <killer> wielding <fcolor:2>[<killer_item>]<fcolor:1>");
+                    put("death.attack.onFire.player", "<fcolor:1>☠ <target> was burned to a crisp while fighting <killer>");
+                    put("death.attack.outOfWorld", "<fcolor:1>☠ <target> fell out of the world");
+                    put("death.attack.outOfWorld.player", "<fcolor:1>☠ <target> didn't want to live in the same world as <killer>");
+                    put("death.attack.outsideBorder", "<fcolor:1>☠ <target> left the confines of this world");
+                    put("death.attack.outsideBorder.player", "<fcolor:1>☠ <target> left the confines of this world while fighting <killer>");
+                    put("death.attack.player", "<fcolor:1>☠ <target> was slain by <killer>");
+                    put("death.attack.player.item", "<fcolor:1>☠ <target> was slain by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
+                    put("death.attack.sonic_boom", "<fcolor:1>☠ <target> was obliterated by a sonically-charged shriek");
+                    put("death.attack.sonic_boom.item", "<fcolor:1>☠ <target> was obliterated by a sonically-charged shriek while trying to escape <killer> wielding <fcolor:2>[<killer_item>]<fcolor:1>");
+                    put("death.attack.sonic_boom.player", "<fcolor:1>☠ <target> was obliterated by a sonically-charged shriek while trying to escape <killer>");
+                    put("death.attack.stalagmite", "<fcolor:1>☠ <target> was impaled on a stalagmite");
+                    put("death.attack.stalagmite.player", "<fcolor:1>☠ <target> was impaled on a stalagmite while fighting <killer>");
+                    put("death.attack.starve", "<fcolor:1>☠ <target> starved to death");
+                    put("death.attack.starve.player", "<fcolor:1>☠ <target> starved to death while fighting <killer>");
+                    put("death.attack.sting", "<fcolor:1>☠ <target> was stung to death");
+                    put("death.attack.sting.item", "<fcolor:1>☠ <target> was stung to death by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
+                    put("death.attack.sting.player", "<fcolor:1>☠ <target> was stung to death by <killer>");
+                    put("death.attack.sweetBerryBush", "<fcolor:1>☠ <target> was poked to death by a sweet berry bush");
+                    put("death.attack.sweetBerryBush.player", "<fcolor:1>☠ <target> was poked to death by a sweet berry bush while trying to escape <killer>");
+                    put("death.attack.thorns", "<fcolor:1>☠ <target> was killed while trying to hurt <killer>");
+                    put("death.attack.thorns.item", "<fcolor:1>☠ <target> was killed by <fcolor:2>[<killer_item>]<fcolor:1> while trying to hurt <killer>");
+                    put("death.attack.thrown", "<fcolor:1>☠ <target> was pummeled by <killer>");
+                    put("death.attack.thrown.item", "<fcolor:1>☠ <target> was pummeled by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
+                    put("death.attack.trident", "<fcolor:1>☠ <target> was impaled by <killer>");
+                    put("death.attack.trident.item", "<fcolor:1>☠ <target> was impaled by <killer> with <fcolor:2>[<killer_item>]<fcolor:1>");
+                    put("death.attack.wither", "<fcolor:1>☠ <target> withered away");
+                    put("death.attack.wither.player", "<fcolor:1>☠ <target> withered away while fighting <killer>");
+                    put("death.attack.witherSkull", "<fcolor:1>☠ <target> was shot by a skull from <killer>");
+                    put("death.attack.witherSkull.item", "<fcolor:1>☠ <target> was shot by a skull from <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
+                    put("death.fell.accident.generic", "<fcolor:1>☠ <target> fell from a high place");
+                    put("death.fell.accident.ladder", "<fcolor:1>☠ <target> fell off a ladder");
+                    put("death.fell.accident.other_climbable", "<fcolor:1>☠ <target> fell while climbing");
+                    put("death.fell.accident.scaffolding", "<fcolor:1>☠ <target> fell off scaffolding");
+                    put("death.fell.accident.twisting_vines", "<fcolor:1>☠ <target> fell off some twisting vines");
+                    put("death.fell.accident.vines", "<fcolor:1>☠ <target> fell off some vines");
+                    put("death.fell.accident.weeping_vines", "<fcolor:1>☠ <target> fell off some weeping vines");
+                    put("death.fell.assist", "<fcolor:1>☠ <target> was doomed to fall by <killer>");
+                    put("death.fell.assist.item", "<fcolor:1>☠ <target> was doomed to fall by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
+                    put("death.fell.finish", "<fcolor:1>☠ <target> fell too far and was finished by <killer>");
+                    put("death.fell.finish.item", "<fcolor:1>☠ <target> fell too far and was finished by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
+                    put("death.fell.killer", "<fcolor:1>☠ <target> was doomed to fall");
                 }
             };
         }
 
         @Getter
         public static final class Debugstick implements SubMessageConfig, Localizable {
-            private String empty = "<fcolor:1>\uD83D\uDD27 <fcolor:2><name> <fcolor:1>has no properties";
-            private String select = "<fcolor:1>\uD83D\uDD27 selected \"<fcolor:2><name><fcolor:1>\" (<fcolor:2><value><fcolor:1>)";
-            private String update = "<fcolor:1>\uD83D\uDD27 \"<fcolor:2><name><fcolor:1>\" to <fcolor:2><value>";
+            private String empty = "<fcolor:1>\uD83D\uDD27 <fcolor:2><property> <fcolor:1>has no properties";
+            private String select = "<fcolor:1>\uD83D\uDD27 selected \"<fcolor:2><property><fcolor:1>\" (<fcolor:2><value><fcolor:1>)";
+            private String update = "<fcolor:1>\uD83D\uDD27 \"<fcolor:2><property><fcolor:1>\" to <fcolor:2><value>";
         }
 
         @Getter
         public static final class Deop implements SubMessageConfig, Localizable {
-            private String format = "<fcolor:1>🤖 Made <display_name> no longer a server operator";
+            private String format = "<fcolor:1>🤖 Made <target> no longer a server operator";
         }
 
         @Getter
         public static final class Dialog implements SubMessageConfig, Localizable {
             private SingleMultiple clear = new SingleMultiple(
-                    "<fcolor:1>\uD83D\uDDD4 Cleared dialog for <display_name>",
-                    "<fcolor:1>\uD83D\uDDD4 Cleared dialog for <fcolor:2><count> <fcolor:1>players"
+                    "<fcolor:1>\uD83D\uDDD4 Cleared dialog for <target>",
+                    "<fcolor:1>\uD83D\uDDD4 Cleared dialog for <fcolor:2><players> <fcolor:1>players"
             );
             private SingleMultiple show = new SingleMultiple(
-                    "<fcolor:1>\uD83D\uDDD4 Displayed dialog to <display_name>",
-                    "<fcolor:1>\uD83D\uDDD4 Displayed dialog to <fcolor:2><count> <fcolor:1>players"
+                    "<fcolor:1>\uD83D\uDDD4 Displayed dialog to <target",
+                    "<fcolor:1>\uD83D\uDDD4 Displayed dialog to <fcolor:2><players> <fcolor:1>players"
             );
         }
 
         @Getter
         public static final class Difficulty implements SubMessageConfig, Localizable {
-            private String formatQuery = "<fcolor:1>⚔ The difficulty is <fcolor:2><lang:'<difficulty>'>";
-            private String formatSuccess = "<fcolor:1>⚔ The difficulty has been set to <fcolor:2><lang:'<difficulty>'>";
+            private String query = "<fcolor:1>⚔ The difficulty is <fcolor:2><lang:'<difficulty>'>";
+            private String success = "<fcolor:1>⚔ The difficulty has been set to <fcolor:2><lang:'<difficulty>'>";
         }
 
         @Getter
@@ -2147,20 +2149,20 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
             private Clear clear = new Clear();
             private SingleMultiple give = new SingleMultiple(
-                    "<fcolor:1>⚗ Applied effect <fcolor:2><lang:'<effect>'> <fcolor:1>to <display_name>",
-                    "<fcolor:1>⚗ Applied effect <fcolor:2><lang:'<effect>'> <fcolor:1>to <fcolor:2><count> <fcolor:1>targets"
+                    "<fcolor:1>⚗ Applied effect <fcolor:2><lang:'<effect>'> <fcolor:1>to <target>",
+                    "<fcolor:1>⚗ Applied effect <fcolor:2><lang:'<effect>'> <fcolor:1>to <fcolor:2><players> <fcolor:1>targets"
             );
 
             @Getter
             public static final class Clear {
                 private SingleMultiple everything = new SingleMultiple(
-                        "<fcolor:1>⚗ Removed every effect from <display_name>",
-                        "<fcolor:1>⚗ Removed every effect from <fcolor:2><count> <fcolor:1>targets"
+                        "<fcolor:1>⚗ Removed every effect from <target>",
+                        "<fcolor:1>⚗ Removed every effect from <fcolor:2><players> <fcolor:1>targets"
                 );
 
                 private SingleMultiple specific = new SingleMultiple(
-                        "<fcolor:1>⚗ Removed effect <fcolor:2><lang:'<effect>'> <fcolor:1>from <display_name>",
-                        "<fcolor:1>⚗ Removed effect <fcolor:2><lang:'<effect>'> <fcolor:1>from <fcolor:2><count> <fcolor:1>targets"
+                        "<fcolor:1>⚗ Removed effect <fcolor:2><lang:'<effect>'> <fcolor:1>from <target>",
+                        "<fcolor:1>⚗ Removed effect <fcolor:2><lang:'<effect>'> <fcolor:1>from <fcolor:2><players> <fcolor:1>targets"
                 );
             }
 
@@ -2168,14 +2170,14 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Enchant implements SubMessageConfig, Localizable {
-            private String single = "<fcolor:1>📖 Applied enchantment «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» to <display_name>'s item";
-            private String multiple = "<fcolor:1>📖 Applied enchantment «<fcolor:2><lang:'<enchant>'> <lang:'<level>'><fcolor:1>» to <fcolor:2><count><fcolor:1> entities";
+            private String single = "<fcolor:1>📖 Applied enchantment <fcolor:2><enchantment><fcolor:1> to <target>'s item";
+            private String multiple = "<fcolor:1>📖 Applied enchantment <fcolor:2><enchantment><fcolor:1> to <fcolor:2><players><fcolor:1> entities";
         }
 
         @Getter
         public static final class Execute implements SubMessageConfig, Localizable {
-            private String formatPass = "<fcolor:1>⚡ Test passed";
-            private String formatPassCount = "<fcolor:1>⚡ Test passed, count: <fcolor:2><count>";
+            private String pass = "<fcolor:1>⚡ Test passed";
+            private String passCount = "<fcolor:1>⚡ Test passed, count: <fcolor:2><count>";
         }
 
         @Getter
@@ -2183,12 +2185,12 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
             private AddSet add = new AddSet(
                     new SingleMultiple(
-                            "<fcolor:1>⏺ Gave <fcolor:2><amount> <fcolor:1>experience levels to <display_name>",
-                            "<fcolor:1>⏺ Gave <fcolor:2><amount> <fcolor:1>experience levels to <fcolor:2><count> <fcolor:1>players"
+                            "<fcolor:1>⏺ Gave <fcolor:2><amount> <fcolor:1>experience levels to <target>",
+                            "<fcolor:1>⏺ Gave <fcolor:2><amount> <fcolor:1>experience levels to <fcolor:2><players> <fcolor:1>players"
                     ),
                     new SingleMultiple(
-                            "<fcolor:1>⏺ Gave <fcolor:2><amount> <fcolor:1>experience points to <display_name>",
-                            "<fcolor:1>⏺ Gave <fcolor:2><amount> <fcolor:1>experience points to <fcolor:2><count> <fcolor:1>players"
+                            "<fcolor:1>⏺ Gave <fcolor:2><amount> <fcolor:1>experience points to <target>",
+                            "<fcolor:1>⏺ Gave <fcolor:2><amount> <fcolor:1>experience points to <fcolor:2><players> <fcolor:1>players"
                     )
             );
 
@@ -2196,19 +2198,19 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
             private AddSet set = new AddSet(
                     new SingleMultiple(
-                            "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience levels to <display_name>",
-                            "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience levels to <fcolor:2><count> <fcolor:1>players"
+                            "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience levels to <target>",
+                            "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience levels to <fcolor:2><players> <fcolor:1>players"
                     ),
                     new SingleMultiple(
-                            "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience points to <display_name>",
-                            "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience points to <fcolor:2><count> <fcolor:1>players"
+                            "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience points to <target>",
+                            "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience points to <fcolor:2><players> <fcolor:1>players"
                     )
             );
 
             @Getter
             public static final class Query {
-                private String levels = "<fcolor:1>⏺ <display_name> has <fcolor:2><amount> <fcolor:1>experience levels";
-                private String points = "<fcolor:1>⏺ <display_name> has <fcolor:2><amount> <fcolor:1>experience points";
+                private String levels = "<fcolor:1>⏺ <target> has <fcolor:2><amount> <fcolor:1>experience levels";
+                private String points = "<fcolor:1>⏺ <target> has <fcolor:2><amount> <fcolor:1>experience points";
             }
 
 
@@ -2224,13 +2226,13 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Fill implements SubMessageConfig, Localizable {
-            private String format = "<fcolor:1>⏹ Successfully filled <fcolor:2><amount> <fcolor:1>block(s)";
+            private String format = "<fcolor:1>⏹ Successfully filled <fcolor:2><blocks> <fcolor:1>block(s)";
         }
 
         @Getter
         public static final class Fillbiome implements SubMessageConfig, Localizable {
             private String format = "<fcolor:1>⏹ Biomes set between <fcolor:2><x1><fcolor:1>, <fcolor:2><y1><fcolor:1>, <fcolor:2><z1> <fcolor:1>and <fcolor:2><x2><fcolor:1>, <fcolor:2><y2><fcolor:1>, <fcolor:2><z2>";
-            private String formatCount = "<fcolor:1>⏹ <fcolor:2><count> <fcolor:1>biome entry/entries set between <fcolor:2><x1><fcolor:1>, <fcolor:2><y1><fcolor:1>, <fcolor:2><z1> <fcolor:1>and <fcolor:2><x2><fcolor:1>, <fcolor:2><y2><fcolor:1>, <fcolor:2><z2>";
+            private String formatCount = "<fcolor:1>⏹ <fcolor:2><blocks> <fcolor:1>biome entry/entries set between <fcolor:2><x1><fcolor:1>, <fcolor:2><y1><fcolor:1>, <fcolor:2><z1> <fcolor:1>and <fcolor:2><x2><fcolor:1>, <fcolor:2><y2><fcolor:1>, <fcolor:2><z2>";
         }
 
         @Getter
@@ -2370,7 +2372,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             public static final class Name implements SubFormatMessageConfig, Localizable {
                 private String constant = "";
                 private String display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <player>\"><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>";
-                private String entity = "<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<name>'> <br><fcolor:1>Type <fcolor:2><lang:'<type>'> <br><fcolor:1>ID <fcolor:2><uuid>\"><lang:'<name>'></hover>";
+                private String entity = "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Type <fcolor:2><lang:'<type>'> <br><fcolor:1>ID <fcolor:2><uuid>\"><name></hover>";
                 private String unknown = "<fcolor:2><name>";
                 private String invisible = "<fcolor:2>\uD83D\uDC7B Invisible";
             }
@@ -2393,9 +2395,9 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Gamemode implements SubMessageConfig, Localizable {
-            private String formatDefault = "<fcolor:1>🗘 The default game mode is now <fcolor:2><lang:gameMode.<gamemode>>";
-            private String formatSelf = "<fcolor:1>🗘 Set own game mode to <fcolor:2><lang:gameMode.<gamemode>>";
-            private String formatOther = "<fcolor:1>🗘 Set <display_name>'s game mode to <fcolor:2><lang:gameMode.<gamemode>>";
+            private String setDefault = "<fcolor:1>🗘 The default game mode is now <fcolor:2><lang:'<gamemode>'>";
+            private String self = "<fcolor:1>🗘 Set own game mode to <fcolor:2><lang:'<gamemode>'>";
+            private String other = "<fcolor:1>🗘 Set <target>'s game mode to <fcolor:2><lang:'<gamemode>'>";
         }
 
         @Getter
@@ -2406,8 +2408,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Give implements SubMessageConfig, Localizable {
-            private String single = "<fcolor:1>⛏ Gave <fcolor:2><amount> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<item>'>\"><lang:'<item>'><fcolor:1>] to <display_name>";
-            private String multiple = "<fcolor:1>⛏ Gave <fcolor:2><amount> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><lang:'<item>'>\"><lang:'<item>'><fcolor:1>] to <count> players";
+            private String single = "<fcolor:1>⛏ Gave <fcolor:2><items> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><give_item>\"><give_item></hover><fcolor:1>] to <target>";
+            private String multiple = "<fcolor:1>⛏ Gave <fcolor:2><items> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><give_item>\"><give_item></hover><fcolor:1>] to <players> players";
         }
 
         @Getter
@@ -2423,15 +2425,15 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Kill implements SubMessageConfig, Localizable {
-            private String single = "<color:#778899>🪦 <fcolor:1>Killed <display_name>";
-            private String multiple = "<color:#778899>🪦 <fcolor:1>Killed <fcolor:2><count> <fcolor:1>entities";
+            private String single = "<color:#778899>☠ <fcolor:1>Killed <target>";
+            private String multiple = "<color:#778899>☠ <fcolor:1>Killed <fcolor:2><entities> <fcolor:1>entities";
         }
 
         @Getter
         public static final class Locate implements SubMessageConfig, Localizable {
-            private String biome = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><name> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
-            private String poi = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><name> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
-            private String structure = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><name> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
+            private String biome = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><value> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
+            private String poi = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><value> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
+            private String structure = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><value> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
         }
 
         @Getter
@@ -2455,7 +2457,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Op implements SubMessageConfig, Localizable {
-            private String format = "<fcolor:1>🤖 Made <display_name> a server operator";
+            private String format = "<fcolor:1>🤖 Made <target> a server operator";
         }
 
         @Getter
@@ -2475,8 +2477,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Ride implements SubMessageConfig, Localizable {
-            private String dismount = "<fcolor:1>\uD83C\uDFC7 <display_name> stopped riding <destination>";
-            private String mount = "<fcolor:1>\uD83C\uDFC7 <display_name> started riding <destination>";
+            private String dismount = "<fcolor:1>\uD83C\uDFC7 <target> stopped riding <second_target>";
+            private String mount = "<fcolor:1>\uD83C\uDFC7 <target> started riding <second_target>";
         }
 
         @Getter
@@ -2486,7 +2488,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Rotate implements SubMessageConfig, Localizable {
-            private String format = "<fcolor:1>\uD83E\uDD38 Rotated <display_name>";
+            private String format = "<fcolor:1>\uD83E\uDD38 Rotated <target>";
         }
 
         @Getter
@@ -2499,7 +2501,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Seed implements SubMessageConfig, Localizable {
-            private String format = "<fcolor:1>🌐 Seed: [<fcolor:2><hover:show_text:'<fcolor:2>Click to Copy to Clipboard'><click:copy_to_clipboard:<seed>><seed></click><fcolor:1>]";
+            private String format = "<fcolor:1>\uD83D\uDD11 Seed: [<fcolor:2><hover:show_text:'<fcolor:2>Click to Copy to Clipboard'><click:copy_to_clipboard:<seed>><seed></click></hover><fcolor:1>]";
         }
 
         @Getter
@@ -2534,7 +2536,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Sleep implements SubMessageConfig, Localizable {
             private String notPossible = "<fcolor:1>\uD83D\uDECC No amount of rest can pass this night";
-            private String playersSleeping = "<fcolor:1>\uD83D\uDECC <fcolor:2><sleep_count><fcolor:1>/<fcolor:2><all_count><fcolor:1> players sleeping";
+            private String playersSleeping = "<fcolor:1>\uD83D\uDECC <fcolor:2><players_sleeping><fcolor:1>/<fcolor:2><players><fcolor:1> players sleeping";
             private String skippingNight = "<fcolor:1>\uD83D\uDECC Sleeping through this night";
         }
 
@@ -2543,8 +2545,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String notValid = "<fcolor:1>\uD83D\uDECC You have no home bed or charged respawn anchor, or it was obstructed";
             private String set = "<fcolor:1>\uD83D\uDECC Respawn point set";
             private String setWorld = "<fcolor:1>\uD83D\uDECC Set the world spawn point to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>]";
-            private String single = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>] in <fcolor:2><world><fcolor:1> for <display_name>";
-            private String multiple = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>] in <fcolor:2><world><fcolor:1> for <fcolor:2><count><fcolor:1> players";
+            private String single = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>] in <fcolor:2><world><fcolor:1> for <target>";
+            private String multiple = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>] in <fcolor:2><world><fcolor:1> for <fcolor:2><players><fcolor:1> players";
         }
 
         @Getter
@@ -2604,7 +2606,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Getter
         public static final class Summon implements SubMessageConfig, Localizable {
-            private String format = "<fcolor:1>\uD83D\uDC3A Summoned new «<display_name>»";
+            private String format = "<fcolor:1>\uD83D\uDC3A Summoned new <target>";
         }
 
         @Getter
@@ -2670,20 +2672,20 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Teleport implements SubMessageConfig, Localizable {
             private SingleMultiple entity = new SingleMultiple(
-                    "<fcolor:1>\uD83C\uDF00 Teleported <display_name> to <destination>",
-                    "<fcolor:1>\uD83C\uDF00 Teleported <fcolor:2><count> <fcolor:1>entities to <display_name>"
+                    "<fcolor:1>\uD83C\uDF00 Teleported <target> to <second_target>",
+                    "<fcolor:1>\uD83C\uDF00 Teleported <fcolor:2><entities> <fcolor:1>entities to <second_target>"
             );
 
             private SingleMultiple location = new SingleMultiple(
-                    "<fcolor:1>\uD83C\uDF00 Teleported <display_name> to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>",
-                    "<fcolor:1>\uD83C\uDF00 Teleported <fcolor:2><count> <fcolor:1>to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>"
+                    "<fcolor:1>\uD83C\uDF00 Teleported <target> to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>",
+                    "<fcolor:1>\uD83C\uDF00 Teleported <fcolor:2><entities> <fcolor:1>to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>"
             );
         }
 
         @Getter
         public static final class Time implements SubMessageConfig, Localizable {
-            private String formatQuery = "<fcolor:1>☽ The time is <fcolor:2><time>";
-            private String formatSet = "<fcolor:1>☽ Set the time to <fcolor:2><time>";
+            private String query = "<fcolor:1>☽ The time is <fcolor:2><time>";
+            private String set = "<fcolor:1>☽ Set the time to <fcolor:2><time>";
         }
 
         @Getter

@@ -5,11 +5,8 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.message.dialog.model.Dialog;
 import net.flectone.pulse.processing.extractor.Extractor;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
-import net.kyori.adventure.text.TranslationArgument;
 
-import java.util.List;
 import java.util.Optional;
 
 @Singleton
@@ -19,24 +16,29 @@ public class DialogExtractor extends Extractor {
     public DialogExtractor() {
     }
 
+    // Cleared dialog for %s
+    // Displayed dialog to %s
     public Optional<Dialog> extractSingle(TranslatableComponent translatableComponent) {
-        List<TranslationArgument> translationArguments = translatableComponent.arguments();
-        if (translationArguments.isEmpty()) return Optional.empty();
+        Optional<FEntity> target = extractFEntity(translatableComponent, 0);
+        if (target.isEmpty()) return Optional.empty();
 
-        Optional<FEntity> optionalFEntity = extractFEntity(translationArguments.getFirst().asComponent());
-        if (optionalFEntity.isEmpty()) return Optional.empty();
+        Dialog dialog = Dialog.builder()
+                .target(target.get())
+                .build();
 
-        Dialog dialog = new Dialog(optionalFEntity.get(), null);
         return Optional.of(dialog);
     }
 
+    // Cleared dialog for %s players
+    // Displayed dialog to %s players
     public Optional<Dialog> extractMultiple(TranslatableComponent translatableComponent) {
-        List<TranslationArgument> translationArguments = translatableComponent.arguments();
-        if (translationArguments.isEmpty()) return Optional.empty();
-        if (!(translationArguments.getFirst().asComponent() instanceof TextComponent countComponent)) return Optional.empty();
+        Optional<String> players = extractTextContent(translatableComponent, 0);
+        if (players.isEmpty()) return Optional.empty();
 
-        String count = extractTarget(countComponent);
-        Dialog dialog = new Dialog(null, count);
+        Dialog dialog = Dialog.builder()
+                .players(players.get())
+                .build();
+
         return Optional.of(dialog);
     }
 }

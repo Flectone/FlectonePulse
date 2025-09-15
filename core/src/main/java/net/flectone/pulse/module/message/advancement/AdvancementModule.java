@@ -12,19 +12,19 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.advancement.listener.AdvancementPulseListener;
+import net.flectone.pulse.module.message.advancement.model.Advancement;
 import net.flectone.pulse.module.message.advancement.model.AdvancementMetadata;
-import net.flectone.pulse.module.message.advancement.model.ChatAdvancement;
-import net.flectone.pulse.module.message.advancement.model.CommandAdvancement;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
-import org.jetbrains.annotations.NotNull;
 
 import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.empty;
 
@@ -33,14 +33,12 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
 
     private final Message.Advancement message;
     private final Permission.Message.Advancement permission;
-    private final FPlayerService fPlayerService;
     private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public AdvancementModule(FileResolver fileResolver,
-                             FPlayerService fPlayerService,
                              IntegrationModule integrationModule,
                              MessagePipeline messagePipeline,
                              ListenerRegistry listenerRegistry) {
@@ -48,7 +46,6 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
 
         this.message = fileResolver.getMessage().getAdvancement();
         this.permission = fileResolver.getPermission().getMessage().getAdvancement();
-        this.fPlayerService = fPlayerService;
         this.integrationModule = integrationModule;
         this.messagePipeline = messagePipeline;
         this.listenerRegistry = listenerRegistry;
@@ -69,121 +66,102 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
     }
 
     @Async
-    public void send(FPlayer fReceiver, ChatAdvancement chatAdvancement) {
-        FPlayer fTarget = fPlayerService.getFPlayer(chatAdvancement.owner());
-        if (fTarget.isUnknown()) return;
-
+    public void sendChatAdvancement(FPlayer fReceiver, MinecraftTranslationKey translationKey, Advancement advancement) {
+        if (!(advancement.getTarget() instanceof FPlayer fTarget)) return;
         if (isModuleDisabledFor(fTarget)) return;
         if (!fTarget.equals(fReceiver)) return;
 
         sendMessage(AdvancementMetadata.<Localization.Message.Advancement>builder()
                 .sender(fTarget)
-                .format(s -> convert(s, chatAdvancement))
-                .advancement(chatAdvancement)
+                .format(localization -> switch (translationKey) {
+                    case CHAT_TYPE_ADVANCEMENT_TASK -> localization.getTask();
+                    case CHAT_TYPE_ADVANCEMENT_GOAL -> localization.getGoal();
+                    case CHAT_TYPE_ADVANCEMENT_CHALLENGE -> localization.getChallenge();
+                    case CHAT_TYPE_ACHIEVEMENT_TAKEN -> localization.getTaken();
+                    default -> "";
+                })
+                .advancement(advancement)
+                .translationKey(translationKey)
                 .range(message.getRange())
                 .destination(message.getDestination())
                 .sound(getModuleSound())
                 .filter(fPlayer -> integrationModule.canSeeVanished(fTarget, fPlayer))
-                .tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fResolver, chatAdvancement)})
-                .proxy(dataOutputStream -> dataOutputStream.writeAsJson(chatAdvancement))
+                .tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fResolver, advancement.getAdvancementComponent())})
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeUTF(translationKey.name());
+                    dataOutputStream.writeAsJson(advancement);
+                })
                 .integration()
                 .build()
         );
     }
 
     @Async
-    public void send(boolean revoke, FPlayer fPlayer, CommandAdvancement commandAdvancement) {
-        if (commandAdvancement.isIncorrect()) return;
+    public void sendCommandAdvancement(FPlayer fPlayer, MinecraftTranslationKey translationKey, Advancement advancement) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        FPlayer fTarget = commandAdvancement.relation() == Relation.MANY_TO_MANY
-                ? fPlayer
-                : fPlayerService.getFPlayer(commandAdvancement.owner());
-        if (fTarget.isUnknown()) return;
+        Message.Advancement.Command command = message.getCommand();
+        if (!command.isEnable()) return;
 
-        AdvancementMetadata.AdvancementMetadataBuilder<Localization.Message.Advancement, ?, ?> metadataBuilder = AdvancementMetadata.<Localization.Message.Advancement>builder()
-                .sender(fTarget)
-                .filterPlayer(fPlayer)
-                .format(s -> {
-                    Localization.Message.Advancement.Command subcommand = revoke ? s.getRevoke() : s.getGrant();
-
-                    return switch (commandAdvancement.relation()) {
-                        case MANY_TO_ONE -> Strings.CS.replace(
-                                subcommand.getManyToOne(),
-                                "<number>",
-                                String.valueOf(commandAdvancement.content())
-                        );
-                        case MANY_TO_MANY -> StringUtils.replaceEach(
-                                subcommand.getManyToMany(),
-                                new String[]{"<number>", "<count>"},
-                                new String[]{String.valueOf(commandAdvancement.content()), commandAdvancement.owner()}
-                        );
-                        case ONE_TO_ONE_TEXT -> Strings.CS.replace(
-                                subcommand.getOneToOne(),
-                                "<advancement>",
-                                stripSingleQuotes(commandAdvancement.content())
-                        );
-                        case ONE_TO_ONE_ADVANCEMENT -> subcommand.getOneToOne();
-                    };
+        sendMessage(AdvancementMetadata.<Localization.Message.Advancement>builder()
+                .sender(fPlayer)
+                .range(command.getRange())
+                .destination(command.getDestination())
+                .format(localization -> StringUtils.replaceEach(
+                        switch (translationKey) {
+                            case COMMANDS_ADVANCEMENT_GRANT_MANY_TO_MANY_SUCCESS -> localization.getGrant().getManyToMany();
+                            case COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_MANY_SUCCESS -> localization.getRevoke().getManyToMany();
+                            case COMMANDS_ADVANCEMENT_GRANT_MANY_TO_ONE_SUCCESS -> localization.getGrant().getManyToOne();
+                            case COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS -> localization.getRevoke().getManyToOne();
+                            case COMMANDS_ADVANCEMENT_GRANT_ONE_TO_MANY_SUCCESS -> localization.getGrant().getOneToMany();
+                            case COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_MANY_SUCCESS -> localization.getRevoke().getOneToMany();
+                            case COMMANDS_ADVANCEMENT_GRANT_ONE_TO_ONE_SUCCESS -> localization.getGrant().getOneToOne();
+                            case COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS -> localization.getRevoke().getOneToOne();
+                            case COMMANDS_ADVANCEMENT_GRANT_CRITERION_TO_MANY_SUCCESS -> localization.getGrant().getCriterionToMany();
+                            case COMMANDS_ADVANCEMENT_GRANT_CRITERION_TO_ONE_SUCCESS -> localization.getGrant().getCriterionToOne();
+                            case COMMANDS_ADVANCEMENT_REVOKE_CRITERION_TO_MANY_SUCCESS -> localization.getRevoke().getCriterionToMany();
+                            case COMMANDS_ADVANCEMENT_REVOKE_CRITERION_TO_ONE_SUCCESS -> localization.getRevoke().getCriterionToOne();
+                            default -> "";
+                        },
+                        new String[]{"<advancements>", "<players>", "<criterion>"},
+                        new String[]{StringUtils.defaultString(advancement.getAdvancements()), StringUtils.defaultString(advancement.getPlayers()), StringUtils.defaultString(advancement.getCriterion())}
+                ))
+                .advancement(advancement)
+                .translationKey(translationKey)
+                .tagResolvers(fResolver -> new TagResolver[]{
+                        advancementTag(fPlayer, fResolver, advancement.getAdvancementComponent()),
+                        targetTag(fResolver, advancement.getTarget())
                 })
-                .advancement(commandAdvancement)
-                .sound(getModuleSound());
-
-        if (commandAdvancement.relation() == Relation.ONE_TO_ONE_ADVANCEMENT && commandAdvancement.chatAdvancement() != null) {
-            metadataBuilder = metadataBuilder.tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fPlayer, commandAdvancement.chatAdvancement())});
-        }
-
-        sendMessage(metadataBuilder.build());
-    }
-
-    public String convert(Localization.Message.Advancement message, ChatAdvancement chatAdvancement) {
-        String string = switch (chatAdvancement.type()) {
-            case CHAT_TYPE_ACHIEVEMENT_TAKEN -> message.getTaken().getFormat();
-            case CHAT_TYPE_ADVANCEMENT_GOAL -> message.getGoal().getFormat();
-            case CHAT_TYPE_ADVANCEMENT_CHALLENGE -> message.getChallenge().getFormat();
-            default -> message.getTask().getFormat();
-        };
-
-        return StringUtils.replaceEach(
-                string,
-                new String[]{"<title>", "<description>"},
-                new String[]{stripSingleQuotes(chatAdvancement.title()), stripSingleQuotes(chatAdvancement.description())}
+                .sound(getModuleSound())
+                .build()
         );
     }
 
-    public TagResolver advancementTag(FEntity sender, FPlayer receiver, @NotNull ChatAdvancement chatAdvancement) {
+    public TagResolver advancementTag(FEntity sender, FPlayer receiver, Component advancementComponent) {
         String tag = "advancement";
         if (!isEnable()) return empty(tag);
+
+        HoverEvent<?> hoverEvent = advancementComponent.hoverEvent();
+        if (hoverEvent == null || !(hoverEvent.value() instanceof Component hoverEventComponent)) return empty(tag);
+
+        boolean isChallenge = NamedTextColor.DARK_PURPLE.equals(hoverEventComponent.color());
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
             Localization.Message.Advancement localization = resolveLocalization(receiver);
 
-            String title = switch (chatAdvancement.type()) {
-                case CHAT_TYPE_ACHIEVEMENT_TAKEN -> localization.getTaken().getTag();
-                case CHAT_TYPE_ADVANCEMENT_GOAL -> localization.getGoal().getTag();
-                case CHAT_TYPE_ADVANCEMENT_CHALLENGE -> localization.getChallenge().getTag();
-                default -> localization.getTask().getTag();
-            };
+            String title = isChallenge
+                    ? localization.getTag().getChallenge()
+                    : localization.getTag().getTask();
 
-            title = StringUtils.replaceEach(
-                    title,
-                    new String[]{"<title>", "<description>"},
-                    new String[]{stripSingleQuotes(chatAdvancement.title()), stripSingleQuotes(chatAdvancement.description())}
-            );
+            Component componentTag = messagePipeline
+                    .builder(sender, receiver, title)
+                    .build();
 
-            Component component = messagePipeline.builder(sender, receiver, title).build();
-            return Tag.inserting(component);
+            return Tag.selfClosingInserting(componentTag.replaceText(TextReplacementConfig.builder()
+                    .match("<advancement>")
+                    .replacement(advancementComponent.hoverEvent(HoverEvent.showText(hoverEventComponent.color(componentTag.color()))))
+                    .build()
+            ));
         });
-    }
-
-    public enum Relation {
-        MANY_TO_ONE,
-        MANY_TO_MANY,
-        ONE_TO_ONE_ADVANCEMENT,
-        ONE_TO_ONE_TEXT
-    }
-
-    private String stripSingleQuotes(String string) {
-        return Strings.CS.replace(string, "'", "");
     }
 }

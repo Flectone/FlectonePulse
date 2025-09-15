@@ -49,24 +49,25 @@ public class SleepModule extends AbstractModuleLocalization<Localization.Message
     }
 
     @Async
-    public void send(FPlayer fPlayer, MinecraftTranslationKey key, Sleep sleep) {
+    public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey, Sleep sleep) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         sendMessage(SleepMetadata.<Localization.Message.Sleep>builder()
                 .sender(fPlayer)
-                .filterPlayer(fPlayer)
-                .format(bed -> switch (key) {
-                    case SLEEP_NOT_POSSIBLE -> bed.getNotPossible();
+                .range(message.getRange())
+                .format(localization -> switch (translationKey) {
+                    case SLEEP_NOT_POSSIBLE -> localization.getNotPossible();
                     case SLEEP_PLAYERS_SLEEPING -> StringUtils.replaceEach(
-                            bed.getPlayersSleeping(),
-                            new String[]{"<sleep_count>", "<all_count>"},
-                            new String[]{String.valueOf(sleep.sleepCount()), String.valueOf(sleep.allCount())}
+                            localization.getPlayersSleeping(),
+                            new String[]{"<players_sleeping>", "<players>"},
+                            new String[]{StringUtils.defaultString(sleep.playersSleeping()), String.valueOf(sleep.players())}
                     );
-                    case SLEEP_SKIPPING_NIGHT -> bed.getSkippingNight();
+                    case SLEEP_SKIPPING_NIGHT -> localization.getSkippingNight();
                     default -> "";
                 })
                 .destination(message.getDestination())
                 .sleep(sleep)
+                .translationKey(translationKey)
                 .sound(getModuleSound())
                 .build()
         );

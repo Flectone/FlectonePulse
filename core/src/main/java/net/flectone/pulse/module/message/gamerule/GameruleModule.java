@@ -54,8 +54,9 @@ public class GameruleModule extends AbstractModuleLocalization<Localization.Mess
 
         sendMessage(GameruleMetadata.<Localization.Message.Gamerule>builder()
                 .sender(fPlayer)
-                .format(s -> StringUtils.replaceEach(
-                        translationKey == MinecraftTranslationKey.COMMANDS_GAMERULE_QUERY ? s.getFormatQuery() : s.getFormatSet(),
+                .range(message.getRange())
+                .format(localization -> StringUtils.replaceEach(
+                        translationKey == MinecraftTranslationKey.COMMANDS_GAMERULE_QUERY ? localization.getFormatQuery() : localization.getFormatSet(),
                         new String[]{"<gamerule>", "<value>"},
                         new String[]{gamerule.name(), gamerule.value()}
                 ))

@@ -30,10 +30,10 @@ public class CommandBlockPulseListener implements PulseListener {
         if (translationKey != MinecraftTranslationKey.ADV_MODE_NOT_ENABLED
                 && translationKey != MinecraftTranslationKey.ADV_MODE_SET_COMMAND_SUCCESS) return;
 
-        Optional<String> optionalAmount = clearExtractor.extract(event.getTranslatableComponent());
+        Optional<String> command = clearExtractor.extract(event.getTranslatableComponent());
 
         event.setCancelled(true);
-        cloneModule.send(event.getFPlayer(), translationKey, optionalAmount.orElse(null));
+        cloneModule.send(event.getFPlayer(), translationKey, command.orElse(null));
     }
 
 }

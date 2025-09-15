@@ -26,13 +26,14 @@ public class FillPulseListener implements PulseListener {
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
-        if (event.getTranslationKey() != MinecraftTranslationKey.COMMANDS_FILL_SUCCESS) return;
+        MinecraftTranslationKey translationKey = event.getTranslationKey();
+        if (translationKey != MinecraftTranslationKey.COMMANDS_FILL_SUCCESS) return;
 
-        Optional<String> optionalAmount = fillExtractor.extract(event.getTranslatableComponent());
-        if (optionalAmount.isEmpty()) return;
+        Optional<String> blocks = fillExtractor.extract(event.getTranslatableComponent());
+        if (blocks.isEmpty()) return;
 
         event.setCancelled(true);
-        fillModule.send(event.getFPlayer(), optionalAmount.get());
+        fillModule.send(event.getFPlayer(), translationKey, blocks.get());
     }
 
 }

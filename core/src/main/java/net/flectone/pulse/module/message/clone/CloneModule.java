@@ -13,6 +13,7 @@ import net.flectone.pulse.module.message.clone.model.CloneMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import org.apache.commons.lang3.Strings;
 
 @Singleton
@@ -47,17 +48,15 @@ public class CloneModule extends AbstractModuleLocalization<Localization.Message
     }
 
     @Async
-    public void send(FPlayer fPlayer, String amount) {
+    public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey, String blocks) {
         if (isModuleDisabledFor(fPlayer)) return;
 
         sendMessage(CloneMetadata.<Localization.Message.Clone>builder()
                 .sender(fPlayer)
-                .format(s -> Strings.CS.replace(
-                        s.getFormat(),
-                        "<amount>",
-                        amount
-                ))
-                .amount(amount)
+                .format(localization -> Strings.CS.replace(localization.getFormat(), "<blocks>", blocks))
+                .blocks(blocks)
+                .translationKey(translationKey)
+                .range(message.getRange())
                 .destination(message.getDestination())
                 .sound(getModuleSound())
                 .build()
