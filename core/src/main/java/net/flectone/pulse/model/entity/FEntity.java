@@ -1,6 +1,9 @@
 package net.flectone.pulse.model.entity;
 
 import lombok.Getter;
+import lombok.Setter;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -11,6 +14,11 @@ public class FEntity {
     public static final String UNKNOWN_NAME = "UNKNOWN_FLECTONEPULSE";
 
     private final String name;
+
+    @Nullable
+    @Setter
+    private Component showEntityName;
+
     private final UUID uuid;
     private final String type;
 

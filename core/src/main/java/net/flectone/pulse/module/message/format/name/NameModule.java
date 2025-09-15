@@ -17,7 +17,9 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
@@ -31,6 +33,8 @@ public class NameModule extends AbstractModuleLocalization<Localization.Message.
     private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
+
+    private final MiniMessage defaultMiniMessage = MiniMessage.miniMessage();
 
     @Inject
     public NameModule(FileResolver fileResolver,
@@ -67,16 +71,27 @@ public class NameModule extends AbstractModuleLocalization<Localization.Message.
 
         if (!(sender instanceof FPlayer fPlayer)) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) -> {
-                String formatEntity = StringUtils.replaceEach(
-                        resolveLocalization(receiver).getEntity(),
-                        new String[]{"<name>", "<type>", "<uuid>"},
-                        new String[]{sender.getName(), sender.getType(), sender.getUuid().toString()}
-                );
+                Component showEntityName = sender.getShowEntityName();
+                if (showEntityName == null) {
+                    Component displayName = messagePipeline.builder(sender, receiver, StringUtils.replaceEach(
+                                    resolveLocalization(receiver).getEntity(),
+                                    new String[]{"<name>", "<type>", "<uuid>"},
+                                    new String[]{"<lang:'" + sender.getType() + "'>", sender.getType(), sender.getUuid().toString()}
+                            ))
+                            .build();
 
-                Component name = messagePipeline.builder(sender, receiver, formatEntity)
+                    return Tag.selfClosingInserting(displayName);
+                }
+
+                Component displayName = messagePipeline.builder(sender, receiver, StringUtils.replaceEach(
+                                resolveLocalization(receiver).getEntity(),
+                                new String[]{"<type>", "<uuid>"},
+                                new String[]{sender.getType(), sender.getUuid().toString()}
+                        ))
+                        .tagResolvers(TagResolver.resolver("name", (args, ctx) -> Tag.selfClosingInserting(showEntityName)))
                         .build();
 
-                return Tag.selfClosingInserting(name);
+                return Tag.selfClosingInserting(displayName);
             });
             return;
         }
