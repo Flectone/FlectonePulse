@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
+import net.elytrium.serializer.annotations.Transient;
 import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,6 +34,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
     public static final String FOLDER_NAME = "localizations";
 
+    @Transient
     private final String language;
 
     public Localization(Path projectPath, String language) {
