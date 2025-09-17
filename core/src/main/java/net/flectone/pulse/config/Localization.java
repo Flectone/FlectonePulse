@@ -127,8 +127,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         command.helper.player = "<fcolor:2>👤 Запрос отправлен, ожидай ответа";
 
         command.tell.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
-        command.tell.sender = "<fcolor:2>✉ Ты → <display_name> » <fcolor:1><message>";
-        command.tell.receiver = "<fcolor:2>✉ <display_name> → Тебе » <fcolor:1><message>";
+        command.tell.sender = "<fcolor:2>✉ <display_name> → <target> » <fcolor:1><message>";
+        command.tell.receiver = "<fcolor:2>✉ <display_name> → <target> » <fcolor:1><message>";
         command.tell.myself = "<fcolor:2>✉ [Заметка] <fcolor:1><message>";
 
         command.reply.nullReceiver = "<color:#ff7171><b>⁉</b> Некому отвечать";
@@ -325,22 +325,22 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         command.mail.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.mail.onlinePlayer = "<color:#ff7171><b>⁉</b> Игрок в сети";
-        command.mail.sender = "<fcolor:2>✉ Письмо #<id> для <display_name> » <fcolor:1><message>";
+        command.mail.sender = "<fcolor:2>✉ Письмо #<id> для <target> » <fcolor:1><message>";
         command.mail.receiver = "<fcolor:2>✉ Письмо от <display_name> » <fcolor:1><message>";
 
         command.clearmail.nullMail = "<color:#ff7171><b>⁉</b> Письма не найдено";
-        command.clearmail.format = "<fcolor:2>✉ [УДАЛЕНО] Письмо #<id> для <display_name> » <fcolor:1><message>";
+        command.clearmail.format = "<fcolor:2>✉ [УДАЛЕНО] Письмо #<id> для <target> » <fcolor:1><message>";
 
         command.tictactoe.nullPlayer = "<color:#ff7171><b>⁉</b> Игрок не найден";
         command.tictactoe.myself = "<color:#ff7171><b>⁉</b> Ты не можешь играть с самим собой";
-        command.tictactoe.sender = "<fcolor:1>☐ Предложение сыграть в крестики-нолики отправлено для <display_name>";
+        command.tictactoe.sender = "<fcolor:1>☐ Предложение сыграть в крестики-нолики отправлено для <target>";
         command.tictactoe.receiver = "<click:run_command:\"/tictactoemove %d create\"><fcolor:1>☐ Есть предложение сыграть в крестики-нолики от <display_name>, принять? [+]";
         command.tictactoe.wrongGame = "<color:#ff7171><b>⁉</b> Этой игры не существует";
         command.tictactoe.wrongByPlayer = "<color:#ff7171><b>⁉</b> Игра закончена, потому что один из игроков не в сети";
         command.tictactoe.wrongMove = "<color:#ff7171><b>⁉</b> Такой ход невозможен";
-        command.tictactoe.formatMove = "<fcolor:2>Ход <display_name> ";
+        command.tictactoe.formatMove = "<fcolor:2>Ход <target> ";
         command.tictactoe.lastMove = "<fcolor:2>Последний ход (<move>)";
-        command.tictactoe.formatWin = "<color:#98FB98><display_name> выиграл</color:#98FB98>";
+        command.tictactoe.formatWin = "<color:#98FB98><target> выиграл</color:#98FB98>";
         command.tictactoe.formatDraw = "<color:#98FB98>Ничья \uD83D\uDC6C</color:#98FB98>";
         command.tictactoe.symbol.blank = "<fcolor:1><hover:show_text:\"<fcolor:1>Ход <move>\"><click:run_command:\"/tictactoemove %d <move>\">☐</click></hover>";
 
@@ -1132,7 +1132,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Clearmail implements SubCommandConfig, Localizable {
             private String nullMail = "<color:#ff7171><b>⁉</b> This mail does not exist";
-            private String format = "<fcolor:2>✉ [REMOVED] Mail #<id> for <display_name> » <fcolor:1><message>";
+            private String format = "<fcolor:2>✉ [REMOVED] Mail #<id> for <target> » <fcolor:1><message>";
         }
 
         @Getter
@@ -1228,7 +1228,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
         public static final class Mail implements SubCommandConfig, Localizable {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
             private String onlinePlayer = "<color:#ff7171><b>⁉</b> This player is online";
-            private String sender = "<fcolor:2>✉ Mail #<id> for <display_name> » <fcolor:1><message>";
+            private String sender = "<fcolor:2>✉ Mail #<id> for <target> » <fcolor:1><message>";
             private String receiver = "<fcolor:2>✉ Mail from <display_name> » <fcolor:1><message>";
         }
 
@@ -1339,7 +1339,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String wrongMove = "<color:#ff7171><b>⁉</b> This move is not possible";
             private String already = "<color:#ff7171><b>⁉</b> You've already made your move";
             private String myself = "<color:#ff7171><b>⁉</b> You can't play with yourself";
-            private String sender = "<fcolor:1>Now goes <display_name>";
+            private String sender = "<fcolor:1>Now goes <target>";
             private String receiver = "<fcolor:2>✂ <display_name> <fcolor:1>suggested a game of rock-paper-scissors";
             private String formatMove = "<fcolor:2>✂ <fcolor:1>Choose your move <fcolor:2><click:run_command:\"/rps <target> rock <uuid>\">[🪨 rock]</click> <click:run_command:\"/rps <target> scissors <uuid>\">[✂ scissors]</click> <click:run_command:\"/rps <target> paper <uuid>\">[🧻 paper]</click>";
             private String formatWin = "<color:#98FB98>✂ Winning <display_name>! <b><sender_move></b> on <b><receiver_move></b>";
@@ -1379,8 +1379,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Tell implements SubCommandConfig, Localizable {
             private String nullPlayer = "<color:#ff7171><b>⁉</b> This player does not exist";
-            private String sender = "<fcolor:2>✉ You → <display_name> » <fcolor:1><message>";
-            private String receiver = "<fcolor:2>✉ <display_name> → You » <fcolor:1><message>";
+            private String sender = "<fcolor:2>✉ <display_name> → <target> » <fcolor:1><message>";
+            private String receiver = "<fcolor:2>✉ <display_name> → <target> » <fcolor:1><message>";
             private String myself = "<fcolor:2>✉ [Note] <fcolor:1><message>";
         }
 
@@ -1408,10 +1408,10 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String field = "<fcolor:1><br>|[#][#][#]<fcolor:1>| <title> <current_move> <br><fcolor:1>|[#][#][#]<fcolor:1>| <br>|[#][#][#]<fcolor:1>| <last_move><br>";
             private String currentMove = "<fcolor:2>☐ → <symbol>";
             private String lastMove = "<fcolor:2>Last move (<move>)";
-            private String formatMove = "<fcolor:2><display_name>'s move";
-            private String formatWin = "<color:#98FB98><display_name> won this game</color:#98FB98>";
+            private String formatMove = "<fcolor:2><target>'s move";
+            private String formatWin = "<color:#98FB98><target> won this game</color:#98FB98>";
             private String formatDraw = "<color:#98FB98>The game ended in a draw 👬</color:#98FB98>";
-            private String sender = "<fcolor:1>☐ An offer to play was sent to <display_name>";
+            private String sender = "<fcolor:1>☐ An offer to play was sent to <target>";
             private String receiver = "<click:run_command:\"/tictactoemove %d create\"><fcolor:1>☐ Received an invite to play tic-tac-toe with <display_name>, accept? [+]";
         }
 

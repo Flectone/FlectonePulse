@@ -13,6 +13,7 @@ import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.SuggestionProvider;
@@ -86,13 +87,13 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
         fPlayerService.deleteMail(optionalMail.get());
 
         sendMessage(ClearmailMetadata.<Localization.Command.Clearmail>builder()
-                .sender(fReceiver)
-                .filterPlayer(fPlayer)
+                .sender(fPlayer)
                 .format(string -> Strings.CS.replaceOnce(string.getFormat(), "<id>", String.valueOf(mailID)))
                 .mail(optionalMail.get())
                 .destination(command.getDestination())
                 .message(optionalMail.get().message())
                 .sound(getModuleSound())
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );
     }

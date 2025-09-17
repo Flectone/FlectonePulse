@@ -567,7 +567,7 @@ public class ProxyMessageHandler {
         IntegrationModule integrationModule = injector.getInstance(IntegrationModule.class);
         if (!integrationModule.canSeeVanished(fReceiver, fEntity)) return;
 
-        module.send(fEntity, fReceiver, Localization.Command.Tell::getReceiver, message, true, metadataUUID);
+        module.send(fEntity, fReceiver, fReceiver, Localization.Command.Tell::getReceiver, message, metadataUUID);
     }
 
     private void handleTranslateToCommand(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {

@@ -19,6 +19,7 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.context.CommandContext;
 
@@ -137,12 +138,12 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         TicTacToe ticTacToe = tictactoeManager.create(fPlayer, fReceiver, isHard);
 
         sendMessage(TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
-                .sender(fReceiver)
-                .filterPlayer(fPlayer)
+                .sender(fPlayer)
                 .format(Localization.Command.Tictactoe::getSender)
                 .ticTacToe(ticTacToe)
                 .gamePhase(GamePhase.CREATE)
                 .sound(getModuleSound())
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );
 
@@ -168,7 +169,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         sendMessage(TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
                 .uuid(metadataUUID)
                 .sender(fPlayer)
-                .filterPlayer(fReceiver, true)
+                .filterPlayer(fReceiver, false)
                 .format(message -> String.format(message.getReceiver(), ticTacToe.getId()))
                 .ticTacToe(ticTacToe)
                 .gamePhase(GamePhase.CREATE)
@@ -185,21 +186,22 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         if (ticTacToe == null) return;
 
         sendMessage(TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
-                .sender(fReceiver)
-                .filterPlayer(fPlayer, true)
+                .sender(fPlayer)
                 .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
                 .ticTacToe(ticTacToe)
                 .gamePhase(GamePhase.MOVE)
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );
 
         sendMessage(TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
                 .uuid(metadataUUID)
-                .sender(fReceiver)
-                .filterPlayer(fReceiver)
+                .sender(fPlayer)
+                .filterPlayer(fReceiver, false)
                 .format(getMoveMessage(ticTacToe, fReceiver, typeTitle, move))
                 .ticTacToe(ticTacToe)
                 .gamePhase(GamePhase.MOVE)
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );
     }

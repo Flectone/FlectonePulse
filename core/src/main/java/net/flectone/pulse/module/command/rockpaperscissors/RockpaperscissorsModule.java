@@ -18,6 +18,7 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
@@ -203,9 +204,9 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         }
 
         sendMessage(metadataBuilder()
-                .sender(fReceiver)
-                .filterPlayer(fPlayer)
+                .sender(fPlayer)
                 .format(Localization.Command.Rockpaperscissors::getSender)
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );
 
@@ -300,7 +301,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
         sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
                 .sender(fPlayer)
-                .filterPlayer(fReceiver, true)
+                .filterPlayer(fReceiver, false)
                 .format(Localization.Command.Rockpaperscissors::getReceiver)
                 .rockPaperScissors(rockPaperScissors)
                 .gamePhase(GamePhase.MOVE)
@@ -310,7 +311,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
                 .uuid(metadataUUID)
                 .sender(fPlayer)
-                .filterPlayer(fReceiver, true)
+                .filterPlayer(fReceiver, false)
                 .format(s -> StringUtils.replaceEach(
                         s.getFormatMove(),
                         new String[]{"<target>", "<uuid>"},

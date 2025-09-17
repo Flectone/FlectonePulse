@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 
 @Getter
@@ -12,5 +13,8 @@ public class MailMetadata<L extends Localization.Localizable> extends EventMetad
 
     @NonNull
     private final Mail mail;
+
+    @NonNull
+    private final FPlayer target;
 
 }

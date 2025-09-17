@@ -20,6 +20,7 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.incendo.cloud.context.CommandContext;
 
 import java.util.HashMap;
@@ -115,10 +116,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         Range range = command.getRange();
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
 
-        if (fReceiver.isUnknown()
-                || !fReceiver.isOnline()
-                || !rangeFilter.createFilter(fPlayer, range).test(fReceiver)
-                || !range.is(Range.Type.PROXY) && !platformPlayerAdapter.isOnline(fReceiver)) {
+        if (!fReceiver.isConsole() && (fReceiver.isUnknown() || !fReceiver.isOnline() || !rangeFilter.createFilter(fPlayer, range).test(fReceiver) || !range.is(Range.Type.PROXY) && !platformPlayerAdapter.isOnline(fReceiver))) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tell::getNullPlayer)
@@ -134,19 +132,6 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         fPlayerService.loadSettingsIfOffline(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, getMessageType())) return;
 
-        String receiverUUID = fReceiver.getUuid().toString();
-
-        UUID metadataUUID = UUID.randomUUID();
-        boolean isSent = proxySender.send(fPlayer, getMessageType(), dataOutputStream -> {
-            dataOutputStream.writeUTF(receiverUUID);
-            dataOutputStream.writeUTF(message);
-        }, metadataUUID);
-
-        if (isSent) {
-            send(fReceiver, fPlayer, Localization.Command.Tell::getSender, message, false, metadataUUID);
-            return;
-        }
-
         FPlayer fNewReceiver = fPlayerService.getFPlayer(fReceiver.getUuid());
         if (!integrationModule.canSeeVanished(fNewReceiver, fPlayer)) {
             sendErrorMessage(metadataBuilder()
@@ -158,27 +143,50 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
             return;
         }
 
-        send(fPlayer, fNewReceiver, Localization.Command.Tell::getReceiver, message, true, UUID.randomUUID());
-        send(fNewReceiver, fPlayer, Localization.Command.Tell::getSender, message, false, UUID.randomUUID());
+        // save for sender
+        senderReceiverMap.put(fPlayer.getUuid(), fReceiver.getName());
+
+        if (!fPlayer.isConsole() && !fReceiver.isConsole()) {
+            String receiverUUID = fReceiver.getUuid().toString();
+
+            UUID metadataUUID = UUID.randomUUID();
+            boolean isSent = proxySender.send(fPlayer, getMessageType(), dataOutputStream -> {
+                dataOutputStream.writeUTF(receiverUUID);
+                dataOutputStream.writeUTF(message);
+            }, metadataUUID);
+
+            if (isSent) {
+                send(fPlayer, fReceiver, fPlayer, Localization.Command.Tell::getSender, message, metadataUUID);
+                return;
+            }
+        }
+
+        send(fPlayer, fNewReceiver, fPlayer, Localization.Command.Tell::getSender, message, UUID.randomUUID());
+        send(fPlayer, fNewReceiver, fNewReceiver, Localization.Command.Tell::getReceiver, message, UUID.randomUUID());
     }
 
-    public void send(FEntity fPlayer,
+    public void send(FEntity sender,
+                     FPlayer target,
                      FPlayer fReceiver,
                      Function<Localization.Command.Tell, String> format,
                      String string,
-                     boolean senderColorOut,
                      UUID metadataUUID) {
+        boolean isSenderToSender = sender.equals(fReceiver);
+
         sendMessage(metadataBuilder()
                 .uuid(metadataUUID)
-                .sender(fPlayer)
-                .filterPlayer(fReceiver, senderColorOut)
+                .sender(sender)
+                .filterPlayer(fReceiver)
                 .format(format)
                 .destination(command.getDestination())
                 .message(string)
-                .sound(senderColorOut ? getModuleSound() : null)
+                .sound(isSenderToSender ? null : getModuleSound())
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, target)})
                 .build()
         );
 
-        senderReceiverMap.put(fReceiver.getUuid(), fPlayer.getName());
+        if (!isSenderToSender) {
+            senderReceiverMap.put(fReceiver.getUuid(), sender.getName());
+        }
     }
 }

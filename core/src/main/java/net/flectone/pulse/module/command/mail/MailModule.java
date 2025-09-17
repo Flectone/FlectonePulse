@@ -20,6 +20,7 @@ import net.flectone.pulse.platform.sender.IgnoreSender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
@@ -119,13 +120,14 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         if (mail == null) return;
 
         sendMessage(MailMetadata.<Localization.Command.Mail>builder()
-                .sender(fReceiver)
-                .filterPlayer(fPlayer)
+                .sender(fPlayer)
                 .format(s -> Strings.CS.replaceOnce(s.getSender(), "<id>", String.valueOf(mail.id())))
                 .mail(mail)
+                .target(fReceiver)
                 .message(message)
                 .destination(command.getDestination())
                 .sound(getModuleSound())
+                .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );
     }
