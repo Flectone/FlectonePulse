@@ -271,7 +271,7 @@ public class Database {
         }
 
         if (versionName.isEmpty()) {
-            migration("1_5_2");
+            migration("1_6_0");
         }
 
         versionDAO.insertOrUpdate(fileResolver.getConfig().getVersion());

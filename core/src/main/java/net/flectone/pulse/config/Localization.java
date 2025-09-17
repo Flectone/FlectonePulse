@@ -3,6 +3,7 @@ package net.flectone.pulse.config;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import net.elytrium.serializer.annotations.Comment;
 import net.elytrium.serializer.annotations.CommentValue;
 import net.elytrium.serializer.annotations.Transient;
@@ -798,6 +799,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
     }
 
     @Getter
+    @Setter
     public static final class Command implements CommandConfig, Localizable {
 
         private Exception exception = new Exception();
@@ -1701,6 +1703,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
     }
 
     @Getter
+    @Setter
     public static final class Message implements MessageConfig, Localizable {
 
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/advancement/")})
@@ -2371,6 +2374,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             }
 
             @Getter
+            @Setter
             public static final class Name implements SubFormatMessageConfig, Localizable {
                 private String constant = "";
                 private String display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <player>\"><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>";

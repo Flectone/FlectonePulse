@@ -81,8 +81,8 @@ public class FileResolver {
                 migration_1_5_0();
             }
 
-            if (isVersionOlderThan(preInitVersion, "1.5.2")) {
-                migration_1_5_2();
+            if (isVersionOlderThan(preInitVersion, "1.6.0")) {
+                migration_1_6_0();
             }
 
             config.setVersion(BuildConfig.PROJECT_VERSION);
@@ -219,7 +219,7 @@ public class FileResolver {
         });
     }
 
-    private void migration_1_5_2() {
+    private void migration_1_6_0() {
         command.reload();
 
         List<Command.Chatsetting.Menu.Color.Type> colorTypes = command.getChatsetting().getMenu().getSee().getTypes();
@@ -367,7 +367,9 @@ public class FileResolver {
             Map<String, String> localizationTypes = localization.getCommand().getChatsetting().getCheckbox().getTypes();
             localizationTypes.clear();
 
-            if (localization.getLanguage().equals("ru_ru")) {
+            boolean isRussian = localization.getLanguage().toLowerCase().contains("ru");
+
+            if (isRussian) {
                 localizationTypes.put(MessageType.AFK.name(), "<status_color>Афк");
                 localizationTypes.put(MessageType.ADVANCEMENT.name(), "<status_color>Достижения");
                 localizationTypes.put(MessageType.CHAT.name(), "<status_color>Сообщения чата");
@@ -392,6 +394,26 @@ public class FileResolver {
                 localizationTypes.put(MessageType.JOIN.name(), "<status_color>Вход на сервер");
                 localizationTypes.put(MessageType.QUIT.name(), "<status_color>Выход с сервера");
                 localizationTypes.put(MessageType.SLEEP.name(), "<status_color>Сон");
+
+                Localization defaultRussianLocalization = new Localization(projectPath, "ru_ru");
+
+                localization.getCommand().setClearmail(defaultRussianLocalization.getCommand().getClearmail());
+                localization.getCommand().setMail(defaultRussianLocalization.getCommand().getMail());
+                localization.getCommand().setTell(defaultRussianLocalization.getCommand().getTell());
+                localization.getCommand().setTictactoe(defaultRussianLocalization.getCommand().getTictactoe());
+                localization.getCommand().setToponline(defaultRussianLocalization.getCommand().getToponline());
+                localization.getMessage().setAdvancement(defaultRussianLocalization.getMessage().getAdvancement());
+                localization.getMessage().setClear(defaultRussianLocalization.getMessage().getClear());
+                localization.getMessage().setDeath(defaultRussianLocalization.getMessage().getDeath());
+                localization.getMessage().setDeop(defaultRussianLocalization.getMessage().getDeop());
+                localization.getMessage().setEnchant(defaultRussianLocalization.getMessage().getEnchant());
+                localization.getMessage().getFormat().getName_().setEntity(defaultRussianLocalization.getMessage().getFormat().getName_().getEntity().replace("<lang:'<name>'>", "<name>"));
+                localization.getMessage().setGamemode(defaultRussianLocalization.getMessage().getGamemode());
+                localization.getMessage().setKill(defaultRussianLocalization.getMessage().getKill());
+                localization.getMessage().setOp(defaultRussianLocalization.getMessage().getOp());
+                localization.getMessage().setSeed(defaultRussianLocalization.getMessage().getSeed());
+                localization.getMessage().setSleep(defaultRussianLocalization.getMessage().getSleep());
+                localization.getMessage().setSpawn(defaultRussianLocalization.getMessage().getSpawn());
             } else {
                 localizationTypes.put(MessageType.AFK.name(), "<status_color>Afk");
                 localizationTypes.put(MessageType.ADVANCEMENT.name(), "<status_color>Advancement");
@@ -417,6 +439,24 @@ public class FileResolver {
                 localizationTypes.put(MessageType.JOIN.name(), "<status_color>Join");
                 localizationTypes.put(MessageType.QUIT.name(), "<status_color>Quit");
                 localizationTypes.put(MessageType.SLEEP.name(), "<status_color>Sleep");
+
+                localization.getCommand().setClearmail(new Localization.Command.Clearmail());
+                localization.getCommand().setMail(new Localization.Command.Mail());
+                localization.getCommand().setTell(new Localization.Command.Tell());
+                localization.getCommand().setTictactoe(new Localization.Command.Tictactoe());
+                localization.getCommand().setToponline(new Localization.Command.Toponline());
+                localization.getMessage().setAdvancement(new Localization.Message.Advancement());
+                localization.getMessage().setClear(new Localization.Message.Clear());
+                localization.getMessage().setDeath(new Localization.Message.Death());
+                localization.getMessage().setDeop(new Localization.Message.Deop());
+                localization.getMessage().setEnchant(new Localization.Message.Enchant());
+                localization.getMessage().getFormat().getName_().setEntity(localization.getMessage().getFormat().getName_().getEntity().replace("<lang:'<name>'>", "<name>"));
+                localization.getMessage().setGamemode(new Localization.Message.Gamemode());
+                localization.getMessage().setKill(new Localization.Message.Kill());
+                localization.getMessage().setOp(new Localization.Message.Op());
+                localization.getMessage().setSeed(new Localization.Message.Seed());
+                localization.getMessage().setSleep(new Localization.Message.Sleep());
+                localization.getMessage().setSpawn(new Localization.Message.Spawn());
             }
 
             localization.save();
