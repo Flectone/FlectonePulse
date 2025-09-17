@@ -72,7 +72,7 @@ public class MessageSender {
         if (user == null) return;
 
         // PacketEvents realization
-        ClientVersion version = user.getClientVersion();
+        ClientVersion version = user.getPacketVersion();
         PacketWrapper<?> chatPacket;
         if (version.isNewerThanOrEquals(ClientVersion.V_1_19)) {
             chatPacket = new WrapperPlayServerSystemChatMessage(false, component);
