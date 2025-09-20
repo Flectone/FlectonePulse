@@ -9,4 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Async {
     long delay() default 0;
+    boolean independent() default false;
 }

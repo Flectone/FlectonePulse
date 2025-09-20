@@ -27,12 +27,14 @@ public class AsyncInterceptor implements MethodInterceptor {
             throw new IllegalStateException("@Async can only be applied to void methods");
         }
 
-        long delay = method.getAnnotation(Async.class).delay();
+        Async async = method.getAnnotation(Async.class);
+        long delay = async.delay();
+        boolean independent = async.independent();
         SchedulerRunnable task = () -> proceedSafely(invocation);
 
         if (delay > 0) {
             taskScheduler.runAsyncLater(task, delay);
-        } else if (platformServerAdapter.isPrimaryThread() || isRestrictedAsyncThread()) {
+        } else if (independent || platformServerAdapter.isPrimaryThread() || isRestrictedAsyncThread()) {
             taskScheduler.runAsync(task);
         } else {
             // already async

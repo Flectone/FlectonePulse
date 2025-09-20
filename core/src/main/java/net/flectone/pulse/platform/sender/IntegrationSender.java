@@ -35,7 +35,7 @@ public class IntegrationSender {
         this.messagePipeline = messagePipeline;
     }
 
-    @Async
+    @Async(independent = true)
     public void send(MessageType messageType, String format, EventMetadata<?> eventMetadata) {
         UnaryOperator<String> integrationOperator = eventMetadata.getIntegration();
         if (integrationOperator == null) return;
