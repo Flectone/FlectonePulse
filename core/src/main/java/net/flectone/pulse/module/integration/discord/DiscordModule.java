@@ -63,22 +63,6 @@ public class DiscordModule extends AbstractModule {
                 .resolveTransitiveDependencies(true)
                 .build()
         );
-
-        libraryResolver.loadLibrary(Library.builder()
-                .groupId("io{}netty")
-                .artifactId("netty-resolver-dns")
-                .version("5.0.0.Alpha2")
-                .resolveTransitiveDependencies(true)
-                .build()
-        );
-
-        libraryResolver.loadLibrary(Library.builder()
-                .groupId("com{}discord4j")
-                .artifactId("discord4j-common")
-                .version("3.3.0-RC1")
-                .resolveTransitiveDependencies(true)
-                .build()
-        );
     }
 
     @Override
