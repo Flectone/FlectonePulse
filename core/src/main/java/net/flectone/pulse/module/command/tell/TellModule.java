@@ -39,7 +39,6 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
     private final IntegrationModule integrationModule;
     private final CommandParserProvider commandParserProvider;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-    private final RangeFilter rangeFilter;
     private final IgnoreSender ignoreSender;
     private final DisableSender disableSender;
 
@@ -50,7 +49,6 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                       IntegrationModule integrationModule,
                       CommandParserProvider commandParserProvider,
                       PlatformPlayerAdapter platformPlayerAdapter,
-                      RangeFilter rangeFilter,
                       IgnoreSender ignoreSender,
                       DisableSender disableSender) {
         super(localization -> localization.getCommand().getTell(), Command::getTell, MessageType.COMMAND_TELL);
@@ -62,7 +60,6 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         this.integrationModule = integrationModule;
         this.commandParserProvider = commandParserProvider;
         this.platformPlayerAdapter = platformPlayerAdapter;
-        this.rangeFilter = rangeFilter;
         this.ignoreSender = ignoreSender;
         this.disableSender = disableSender;
     }
@@ -116,7 +113,8 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         Range range = command.getRange();
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
 
-        if (!fReceiver.isConsole() && (fReceiver.isUnknown() || !fReceiver.isOnline() || !rangeFilter.createFilter(fPlayer, range).test(fReceiver) || !range.is(Range.Type.PROXY) && !platformPlayerAdapter.isOnline(fReceiver))) {
+        if (!fReceiver.isConsole()
+                && (fReceiver.isUnknown() || !fReceiver.isOnline() || !integrationModule.canSeeVanished(fReceiver, fPlayer) || !range.is(Range.Type.PROXY) && !platformPlayerAdapter.isOnline(fReceiver))) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tell::getNullPlayer)
@@ -131,17 +129,6 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
         fPlayerService.loadSettingsIfOffline(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, getMessageType())) return;
-
-        FPlayer fNewReceiver = fPlayerService.getFPlayer(fReceiver.getUuid());
-        if (!integrationModule.canSeeVanished(fNewReceiver, fPlayer)) {
-            sendErrorMessage(metadataBuilder()
-                    .sender(fPlayer)
-                    .format(Localization.Command.Tell::getNullPlayer)
-                    .build()
-            );
-
-            return;
-        }
 
         // save for sender
         senderReceiverMap.put(fPlayer.getUuid(), fReceiver.getName());
@@ -161,8 +148,8 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
             }
         }
 
-        send(fPlayer, fNewReceiver, fPlayer, Localization.Command.Tell::getSender, message, UUID.randomUUID());
-        send(fPlayer, fNewReceiver, fNewReceiver, Localization.Command.Tell::getReceiver, message, UUID.randomUUID());
+        send(fPlayer, fReceiver, fPlayer, Localization.Command.Tell::getSender, message, UUID.randomUUID());
+        send(fPlayer, fReceiver, fReceiver, Localization.Command.Tell::getReceiver, message, UUID.randomUUID());
     }
 
     public void send(FEntity sender,
