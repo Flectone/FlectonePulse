@@ -16,7 +16,7 @@ import discord4j.core.spec.WebhookCreateSpec;
 import discord4j.discordjson.json.*;
 import discord4j.rest.util.AllowedMentions;
 import discord4j.rest.util.MultipartRequest;
-import net.flectone.pulse.annotation.Async;
+import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -34,15 +34,17 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import java.awt.*;
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 @Singleton
 public class DiscordIntegration implements FIntegration {
 
-    private final List<Long> webhooks = new ArrayList<>();
+    private final Map<Long, WebhookData> channelWebhooks = new HashMap<>();
 
     private final Integration.Discord integration;
     private final FileResolver fileResolver;
@@ -94,46 +96,40 @@ public class DiscordIntegration implements FIntegration {
         );
 
         EmbedCreateSpec embed = null;
-
         if (messageChannelEmbed.getEmbed().isEnable()) {
             embed = createEmbed(messageChannelEmbed, replaceString);
         }
 
         Localization.Integration.Discord.Webhook messageWebhook = messageChannelEmbed.getWebhook();
-        if (messageChannelEmbed.getWebhook().isEnable()) {
-
+        if (messageWebhook.isEnable()) {
             long channelID = Snowflake.of(integrationChannel).asLong();
 
-            WebhookData webhookPlayerData = discordClient.getWebhookService().getChannelWebhooks(channelID)
-                    .filter(webhookData -> webhookData.name().isPresent() && webhookData.name().get().equals(sender.getName()))
-                    .blockFirst();
+            WebhookData webhookData = channelWebhooks.get(channelID);
 
-            if (webhookPlayerData == null) {
-                String avatarURL = replaceString.apply(messageWebhook.getAvatar());
-                webhookPlayerData = createWebhook(avatarURL, sender.getName(), channelID);
+            if (webhookData == null) {
+                webhookData = createWebhook(channelID);
+                if (webhookData == null) return;
+
+                channelWebhooks.put(channelID, webhookData);
             }
 
-            if (webhookPlayerData == null) return;
-
-            long webhookID = webhookPlayerData.id().asLong();
-
-            if (!webhooks.contains(webhookID)
-                    && webhookPlayerData.applicationId().isPresent()
-                    && webhookPlayerData.applicationId().get().asLong() == clientID) {
-                webhooks.add(webhookID);
-                deleteWebhookLater(webhookID);
-            }
+            String avatarURL = replaceString.apply(messageWebhook.getAvatar());
+            String username = sender.getName();
 
             ImmutableWebhookExecuteRequest.Builder webhookBuilder = WebhookExecuteRequest.builder()
-                    .allowedMentions(AllowedMentionsData.builder().build());
+                    .allowedMentions(AllowedMentionsData.builder().build())
+                    .username(username)
+                    .avatarUrl(avatarURL)
+                    .content(replaceString.apply(messageWebhook.getContent()));
 
             if (embed != null) {
                 webhookBuilder.addEmbed(embed.asRequest());
             }
 
-            webhookBuilder.content(replaceString.apply(messageWebhook.getContent()));
-
-            discordClient.getWebhookService().executeWebhook(webhookPlayerData.id().asLong(), webhookPlayerData.token().get(), false,
+            discordClient.getWebhookService().executeWebhook(
+                    webhookData.id().asLong(),
+                    webhookData.token().get(),
+                    false,
                     MultipartRequest.ofRequest(webhookBuilder.build())
             ).subscribe();
 
@@ -155,18 +151,11 @@ public class DiscordIntegration implements FIntegration {
                 .subscribe();
     }
 
-    @Async(delay = 1200L)
-    public void deleteWebhookLater(long webhookID) {
-        discordClient.getWebhookService().deleteWebhook(webhookID, null)
-                .subscribe();
-        webhooks.remove(webhookID);
-    }
+    private WebhookData createWebhook(long channelID) {
+        WebhookCreateSpec.Builder builder = WebhookCreateSpec.builder()
+                .name(BuildConfig.PROJECT_NAME + "Webhook");
 
-    private WebhookData createWebhook(String avatarURL, String fPlayerName, long channelID) {
-        WebhookCreateSpec webhook = WebhookCreateSpec.builder()
-                .avatarOrNull(discord4j.rest.util.Image.ofUrl(avatarURL).block())
-                .name(fPlayerName)
-                .build();
+        WebhookCreateSpec webhook = builder.build();
 
         return discordClient.getWebhookService().createWebhook(channelID, webhook.asRequest(), null)
                 .block();
@@ -270,6 +259,27 @@ public class DiscordIntegration implements FIntegration {
 
         clientID = applicationInfo.getId().asLong();
 
+        Set<Long> uniqueChannels = integration.getMessageChannel().values().stream()
+                .filter(id -> !id.isEmpty())
+                .map(id -> Snowflake.of(id).asLong())
+                .collect(Collectors.toSet());
+
+        for (long channelID : uniqueChannels) {
+            List<WebhookData> botWebhooks = discordClient.getWebhookService().getChannelWebhooks(channelID)
+                    .filter(data -> data.applicationId().isPresent() && data.applicationId().get().asLong() == clientID)
+                    .collectList()
+                    .block();
+
+            if (botWebhooks != null && !botWebhooks.isEmpty()) {
+                WebhookData kept = botWebhooks.getFirst();
+                for (int i = 1; i < botWebhooks.size(); i++) {
+                    discordClient.getWebhookService().deleteWebhook(botWebhooks.get(i).id().asLong(), null).block();
+                }
+
+                channelWebhooks.put(channelID, kept);
+            }
+        }
+
         fLogger.info("Discord integration enabled");
     }
 
@@ -278,7 +288,7 @@ public class DiscordIntegration implements FIntegration {
         if (gateway == null) return;
 
         gateway.logout().block();
-        webhooks.clear();
+        channelWebhooks.clear();
 
         fLogger.info("Discord integration disabled");
     }
