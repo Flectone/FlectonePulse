@@ -33,7 +33,7 @@ public class SkinsRestorerIntegration implements FIntegration {
             skinsRestorer = SkinsRestorerProvider.get();
 
             fLogger.info("✔ SkinsRestorer hooked");
-        } catch (IllegalStateException e) {
+        } catch (Exception e) {
             fLogger.warning("SkinsRestorer hook is failed, check https://skinsrestorer.net/docs/installation");
         }
     }
