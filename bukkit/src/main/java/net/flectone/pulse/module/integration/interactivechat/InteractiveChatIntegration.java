@@ -108,8 +108,8 @@ public class InteractiveChatIntegration implements FIntegration, PulseListener {
                     .deserialize(serializedMessage);
 
             InteractiveChatAPI.sendMessage(receiver, deserializedMessage);
-        } catch (Exception e) {
-            fLogger.warning(e);
+        } catch (Exception ignored) {
+            fLogger.warning("An error occurred when sending messages via InteractiveChat, message will be sent via Flectonepulse");
             return false;
         }
 
