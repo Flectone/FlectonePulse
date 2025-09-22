@@ -2,12 +2,10 @@ package net.flectone.pulse.processing.extractor;
 
 import com.google.inject.Inject;
 import net.flectone.pulse.model.entity.FEntity;
-import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.EntityUtil;
 import net.kyori.adventure.text.*;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -40,7 +38,7 @@ public abstract class Extractor {
 
             String type = entityUtil.resolveEntityTranslationKey(rawType);
 
-            FEntity fEntity = new FEntity(null, uuid, type);
+            FEntity fEntity = new FEntity(FEntity.UNKNOWN_NAME, uuid, type);
             fEntity.setShowEntityName(showEntity.name());
 
             return Optional.of(fEntity);
@@ -49,7 +47,14 @@ public abstract class Extractor {
         Optional<String> optionalName = extractTextContentOrTranslatableKey(component);
         if (optionalName.isEmpty()) return Optional.empty();
 
-        FPlayer fPlayer = fPlayerService.getFPlayer(optionalName.get());
+        FEntity fPlayer = fPlayerService.getFPlayer(optionalName.get());
+
+        // minecraft does not send information about Entity and displays only his name
+        if (fPlayer.isUnknown()) {
+            fPlayer = new FEntity(FEntity.UNKNOWN_NAME, FEntity.UNKNOWN_UUID, FEntity.UNKNOWN_TYPE);
+            fPlayer.setShowEntityName(component);
+        }
+
         return Optional.of(fPlayer);
     }
 

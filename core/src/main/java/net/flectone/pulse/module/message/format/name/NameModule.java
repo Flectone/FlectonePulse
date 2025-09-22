@@ -71,10 +71,12 @@ public class NameModule extends AbstractModuleLocalization<Localization.Message.
 
         if (!(sender instanceof FPlayer fPlayer)) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) -> {
+                Localization.Message.Format.Name localizationName = resolveLocalization(receiver);
+
                 Component showEntityName = sender.getShowEntityName();
                 if (showEntityName == null) {
                     Component displayName = messagePipeline.builder(sender, receiver, StringUtils.replaceEach(
-                                    resolveLocalization(receiver).getEntity(),
+                                    sender.getType().equals(FEntity.UNKNOWN_TYPE) ? localizationName.getUnknown() : localizationName.getEntity(),
                                     new String[]{"<name>", "<type>", "<uuid>"},
                                     new String[]{"<lang:'" + sender.getType() + "'>", sender.getType(), sender.getUuid().toString()}
                             ))
@@ -83,11 +85,14 @@ public class NameModule extends AbstractModuleLocalization<Localization.Message.
                     return Tag.selfClosingInserting(displayName);
                 }
 
-                Component displayName = messagePipeline.builder(sender, receiver, StringUtils.replaceEach(
-                                resolveLocalization(receiver).getEntity(),
-                                new String[]{"<type>", "<uuid>"},
-                                new String[]{sender.getType(), sender.getUuid().toString()}
-                        ))
+                Component displayName = messagePipeline.builder(sender, receiver, sender.getType().equals(FEntity.UNKNOWN_TYPE)
+                                ? localizationName.getUnknown()
+                                : StringUtils.replaceEach(
+                                        localizationName.getEntity(),
+                                        new String[]{"<type>", "<uuid>"},
+                                        new String[]{sender.getType(), sender.getUuid().toString()}
+                                )
+                        )
                         .tagResolvers(TagResolver.resolver("name", (args, ctx) -> Tag.selfClosingInserting(showEntityName)))
                         .build();
 
