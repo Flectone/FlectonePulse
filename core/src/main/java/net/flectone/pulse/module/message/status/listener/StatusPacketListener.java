@@ -6,7 +6,6 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.status.StatusModule;
 import net.flectone.pulse.processing.resolver.FileResolver;
 
@@ -28,7 +27,6 @@ public class StatusPacketListener implements PacketListener {
         if (event.isCancelled()) return;
         if (event.getPacketType() != PacketType.Status.Server.RESPONSE) return;
         if (maintenance.isTurnedOn()) return;
-        if (statusModule.isModuleDisabledFor(FPlayer.UNKNOWN)) return;
 
         statusModule.update(event);
     }

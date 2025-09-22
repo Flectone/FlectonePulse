@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.registry.PermissionRegistry;
 import net.flectone.pulse.util.checker.PermissionChecker;
 
@@ -124,7 +125,9 @@ public abstract class AbstractModule {
         boolean isEnabled = enablePredicate.test(module);
         module.setEnable(isEnabled);
 
-        if (isEnabled) {
+        // if FPlayer.UNKNOWN (all-permissions) fails check (isModuleDisabledFor() will return true),
+        // then another plugin/module disables this module
+        if (isEnabled && !module.isModuleDisabledFor(FPlayer.UNKNOWN)) {
             module.onEnable();
         }
 
