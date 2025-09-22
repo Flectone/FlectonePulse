@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 public class FPlayer extends FEntity {
 
     public static final FPlayer UNKNOWN = new FPlayer(FEntity.UNKNOWN_NAME);
+    public static final String TYPE = "PLAYER";
 
     private final int id;
     private final boolean console;
@@ -51,7 +52,7 @@ public class FPlayer extends FEntity {
     }
 
     public FPlayer(int id, String name, UUID uuid) {
-        this(id, name, uuid, "player");
+        this(id, name, uuid, FPlayer.TYPE);
     }
 
     public FPlayer(String name, UUID uuid, String type) {
