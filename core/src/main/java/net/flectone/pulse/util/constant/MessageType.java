@@ -96,6 +96,7 @@ public enum MessageType {
     PLAYERLISTNAME,
     QUESTION_ANSWER,
     QUIT,
+    RECIPE,
     RELOAD,
     RIDE,
     REPLACEMENT,

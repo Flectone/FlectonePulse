@@ -805,6 +805,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Particle particle = new Particle();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/quit/")})
         private Quit quit = new Quit();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/recipe/")})
+        private Recipe recipe = new Recipe();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/reload/")})
         private Reload reload = new Reload();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/ride/")})
@@ -1399,6 +1401,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private String name = "flectonepulse.module.message.quit";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.quit.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Recipe implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.recipe";
+            private Type type = Type.TRUE;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.recipe.sound", Type.TRUE);
         }
 
         @Getter

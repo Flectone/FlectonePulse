@@ -130,6 +130,11 @@ public enum MinecraftTranslationKey {
 
     COMMANDS_PARTICLE_SUCCESS("commands.particle.success"),
 
+    COMMANDS_RECIPE_GIVE_SUCCESS_MULTIPLE("commands.recipe.give.success.multiple"),
+    COMMANDS_RECIPE_GIVE_SUCCESS_SINGLE("commands.recipe.give.success.single"),
+    COMMANDS_RECIPE_TAKE_SUCCESS_MULTIPLE("commands.recipe.take.success.multiple"),
+    COMMANDS_RECIPE_TAKE_SUCCESS_SINGLE("commands.recipe.take.success.single"),
+
     COMMANDS_RELOAD_SUCCESS("commands.reload.success"),
 
     COMMANDS_RIDE_DISMOUNT_SUCCESS("commands.ride.dismount.success"),

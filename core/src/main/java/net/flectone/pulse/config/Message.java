@@ -117,6 +117,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Particle particle = new Particle();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/quit/")})
     private Quit quit = new Quit();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/recipe/")})
+    private Recipe recipe = new Recipe();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/reload/")})
     private Reload reload = new Reload();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/ride/")})
@@ -820,6 +822,14 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     public static final class Quit implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private Range range = Range.get(Range.Type.SERVER);
+        private Destination destination = new Destination();
+        private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class Recipe implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }

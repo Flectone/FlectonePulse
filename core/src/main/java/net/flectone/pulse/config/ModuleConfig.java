@@ -121,6 +121,7 @@ public interface ModuleConfig {
         SubMessageConfig getOp();
         SubMessageConfig getParticle();
         SubMessageConfig getQuit();
+        SubMessageConfig getRecipe();
         SubMessageConfig getReload();
         SubMessageConfig getRide();
         SubMessageConfig getRightclick();

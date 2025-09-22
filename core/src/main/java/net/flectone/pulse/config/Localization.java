@@ -667,6 +667,11 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         message.particle.format = "<fcolor:1>❄ Отображена частица «<fcolor:2><particle><fcolor:1>»";
 
+        message.recipe.give.single = "<fcolor:1>\uD83D\uDCA1 Выдано <fcolor:2><recipes> <fcolor:1>рецептов игроку <target>";
+        message.recipe.give.multiple = "<fcolor:1>\uD83D\uDCA1 Выдан(о) <fcolor:2><recipes> <fcolor:1>рецепт(ов) <fcolor:2><players> <fcolor:1>игрокам";
+        message.recipe.take.single = "<fcolor:1>\uD83D\uDCA1 Изъято <fcolor:2><recipes> <fcolor:1>рецептов у игрока <target>";
+        message.recipe.take.multiple = "<fcolor:1>\uD83D\uDCA1 Изъято <fcolor:2><recipes> <fcolor:1>рецептов у <fcolor:2><players> <fcolor:1>игроков";
+
         message.reload.format = "<fcolor:1>\uD83D\uDEC8 Перезагрузка!";
 
         message.ride.dismount = "<fcolor:1>\uD83C\uDFC7 <target> больше не сидит на <second_target>";
@@ -1793,6 +1798,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
         private Particle particle = new Particle();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/quit/")})
         private Quit quit = new Quit();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/recipe/")})
+        private Recipe recipe = new Recipe();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/reload/")})
         private Reload reload = new Reload();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/ride/")})
@@ -2481,6 +2488,18 @@ public final class Localization extends FileSerializable implements ModuleConfig
         @Getter
         public static final class Quit implements SubMessageConfig, Localizable {
             private String format = "<color:#ff4e4e>← <display_name>";
+        }
+
+        @Getter
+        public static final class Recipe implements SubMessageConfig, Localizable {
+            private SingleMultiple give = new SingleMultiple(
+                    "<fcolor:1>\uD83D\uDCA1 Unlocked <fcolor:2><recipes> <fcolor:1>recipe(s) for <target>",
+                    "<fcolor:1>\uD83D\uDCA1 Unlocked <fcolor:2><recipes> <fcolor:1>recipe(s) for <fcolor:2><players> <fcolor:1>players"
+            );
+            private SingleMultiple take = new SingleMultiple(
+                    "<fcolor:1>\uD83D\uDCA1 Took <fcolor:2><recipes> <fcolor:1>recipe(s) from <target>",
+                    "<fcolor:1>\uD83D\uDCA1 Took <fcolor:2><recipes> <fcolor:1>recipe(s) from <fcolor:2><players> <fcolor:1>players"
+            );
         }
 
         @Getter
