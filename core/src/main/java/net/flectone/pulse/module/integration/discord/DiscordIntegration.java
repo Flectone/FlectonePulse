@@ -214,6 +214,12 @@ public class DiscordIntegration implements FIntegration {
             );
         }
 
+        for (Localization.Integration.Discord.Embed.Field field : embed.getFields()) {
+            if (field.getName().isEmpty() && field.getValue().isEmpty() && !field.isInline()) continue;
+
+            embedBuilder.addField(field.getName(), field.getValue(), field.isInline());
+        }
+
         return embedBuilder.build();
     }
 

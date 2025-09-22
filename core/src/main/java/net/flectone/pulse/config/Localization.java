@@ -1619,6 +1619,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
                         new Embed.Author("", "", "https://mc-heads.net/avatar/<skin>/16.png"),
                         "",
                         "",
+                        new ArrayList<>(List.of(new Embed.Field("", "", false))),
                         "",
                         true,
                         new Embed.Footer("", "https://mc-heads.net/avatar/<skin>/16.png")
@@ -1634,6 +1635,7 @@ public final class Localization extends FileSerializable implements ModuleConfig
             }
 
             @Getter
+            @AllArgsConstructor
             public static final class Embed {
                 private boolean enable;
                 private String color;
@@ -1642,22 +1644,10 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 private Author author;
                 private String description;
                 private String thumbnail;
+                private List<Field> fields;
                 private String image;
                 private boolean timestamp;
                 private Footer footer;
-
-                public Embed(boolean enable, String color, String title, String url, Author author, String description, String thumbnail, String image, boolean timestamp, Footer footer) {
-                    this.enable = enable;
-                    this.color = color;
-                    this.title = title;
-                    this.url = url;
-                    this.author = author;
-                    this.description = description;
-                    this.thumbnail = thumbnail;
-                    this.image = image;
-                    this.timestamp = timestamp;
-                    this.footer = footer;
-                }
 
                 @Getter
                 @AllArgsConstructor
@@ -1672,6 +1662,14 @@ public final class Localization extends FileSerializable implements ModuleConfig
                 public static final class Footer {
                     private String text;
                     private String iconUrl;
+                }
+
+                @Getter
+                @AllArgsConstructor
+                public static final class Field {
+                    private String name;
+                    private String value;
+                    private boolean inline;
                 }
             }
         }
