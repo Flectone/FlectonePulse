@@ -106,6 +106,7 @@ public enum MessageType {
     SIDEBAR,
     SETBLOCK,
     SLEEP,
+    SOUND,
     SPAWN,
     STOP,
     SUMMON,

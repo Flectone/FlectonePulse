@@ -825,6 +825,8 @@ public final class Permission extends FileSerializable implements ModuleConfig {
         private Sign sign = new Sign();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/sleep/")})
         private Sleep sleep = new Sleep();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/sound/")})
+        private Sound sound = new Sound();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/spawn/")})
         private Spawn spawn = new Spawn();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/")})
@@ -1466,6 +1468,13 @@ public final class Permission extends FileSerializable implements ModuleConfig {
             private String name = "flectonepulse.module.message.sleep";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.sleep.sound", Type.TRUE);
+        }
+
+        @Getter
+        public static final class Sound implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.sound";
+            private Type type = Type.TRUE;
+            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.sound.sound", Type.TRUE);
         }
 
         @Getter

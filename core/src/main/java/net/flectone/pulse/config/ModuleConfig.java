@@ -129,8 +129,10 @@ public interface ModuleConfig {
         SubMessageConfig getSeed();
         SubMessageConfig getSetblock();
         SubMessageConfig getSidebar();
-        SubMessageConfig getSpawn();
         SubMessageConfig getSign();
+        SubMessageConfig getSleep();
+        SubMessageConfig getSound();
+        SubMessageConfig getSpawn();
         StatusMessageConfig getStatus();
         SubMessageConfig getStop();
         SubMessageConfig getSummon();

@@ -145,6 +145,13 @@ public enum MinecraftTranslationKey {
     COMMANDS_SEED_SUCCESS("commands.seed.success"),
     COMMANDS_SETBLOCK_SUCCESS("commands.setblock.success"),
 
+    COMMANDS_PLAYSOUND_SUCCESS_MULTIPLE("commands.playsound.success.multiple"),
+    COMMANDS_PLAYSOUND_SUCCESS_SINGLE("commands.playsound.success.single"),
+    COMMANDS_STOPSOUND_SUCCESS_SOURCE_ANY("commands.stopsound.success.source.any"),
+    COMMANDS_STOPSOUND_SUCCESS_SOURCE_SOUND("commands.stopsound.success.source.sound"),
+    COMMANDS_STOPSOUND_SUCCESS_SOURCELESS_ANY("commands.stopsound.success.sourceless.any"),
+    COMMANDS_STOPSOUND_SUCCESS_SOURCELESS_SOUND("commands.stopsound.success.sourceless.sound"),
+
     COMMANDS_SPAWNPOINT_SUCCESS_MULTIPLE("commands.spawnpoint.success.multiple"),
     COMMANDS_SPAWNPOINT_SUCCESS_SINGLE("commands.spawnpoint.success.single"),
     COMMANDS_SPAWNPOINT_SUCCESS("commands.spawnpoint.success"), // legacy

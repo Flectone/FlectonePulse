@@ -137,6 +137,8 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
     private Sign sign = new Sign();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/sleep/")})
     private Sleep sleep = new Sleep();
+    @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/sound/")})
+    private CommandSound sound = new CommandSound();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/spawn/")})
     private Spawn spawn = new Spawn();
     @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/")})
@@ -896,6 +898,14 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         private boolean enable = true;
         private Range range = Range.get(Range.Type.PLAYER);
         private Destination destination = new Destination(Destination.Type.ACTION_BAR);
+        private Sound sound = new Sound();
+    }
+
+    @Getter
+    public static final class CommandSound implements SubMessageConfig, Config.IEnable {
+        private boolean enable = true;
+        private Range range = Range.get(Range.Type.PLAYER);
+        private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
 

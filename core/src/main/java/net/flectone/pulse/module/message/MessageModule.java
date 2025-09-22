@@ -52,6 +52,7 @@ import net.flectone.pulse.module.message.setblock.SetblockModule;
 import net.flectone.pulse.module.message.sidebar.SidebarModule;
 import net.flectone.pulse.module.message.sign.SignModule;
 import net.flectone.pulse.module.message.sleep.SleepModule;
+import net.flectone.pulse.module.message.sound.SoundModule;
 import net.flectone.pulse.module.message.spawn.SpawnModule;
 import net.flectone.pulse.module.message.status.StatusModule;
 import net.flectone.pulse.module.message.stop.StopModule;
@@ -127,6 +128,7 @@ public class MessageModule extends AbstractModule {
         addChildren(SetblockModule.class);
         addChildren(SignModule.class);
         addChildren(SleepModule.class);
+        addChildren(SoundModule.class);
         addChildren(SpawnModule.class);
         addChildren(StatusModule.class);
         addChildren(StopModule.class);

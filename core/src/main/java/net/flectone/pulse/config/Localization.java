@@ -709,6 +709,13 @@ public final class Localization extends FileSerializable implements ModuleConfig
         message.sleep.playersSleeping = "<fcolor:1>\uD83D\uDECC <fcolor:2><players_sleeping> <fcolor:1>из <fcolor:2><players> <fcolor:1>игроков спят";
         message.sleep.skippingNight = "<fcolor:1>\uD83D\uDECC Вы проспите всю ночь";
 
+        message.sound.play.multiple =  "<fcolor:1>\uD83D\uDD0A Воспроизведён звук «<fcolor:2><sound><fcolor:1>» <fcolor:2><players> <fcolor:1>игрокам";
+        message.sound.play.single = "<fcolor:1>\uD83D\uDD0A Воспроизведён звук «<fcolor:2><sound><fcolor:1>» игроку <target>";
+        message.sound.stop.sourceAny = "<fcolor:1>\uD83D\uDD07 Отключены все звуки от источника «<fcolor:2><source><fcolor:1>»";
+        message.sound.stop.sourceSound = "<fcolor:1>\uD83D\uDD07 Отключён звук «<fcolor:2><sound><fcolor:1>» от источника «<fcolor:2><source><fcolor:1>»";
+        message.sound.stop.sourcelessAny = "<fcolor:1>\uD83D\uDD07 Отключены все звуки";
+        message.sound.stop.sourcelessSound = "<fcolor:1>\uD83D\uDD07 Отключён звук «<fcolor:2><sound><fcolor:1>»";
+
         message.spawn.notValid = "<fcolor:1>\uD83D\uDECC У вас нет кровати или заряженного якоря возрождения, либо доступ к ним затруднён";
         message.spawn.set = "<fcolor:1>\uD83D\uDECC Точка возрождения установлена";
         message.spawn.setWorld = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения мира <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>]";
@@ -1810,6 +1817,8 @@ public final class Localization extends FileSerializable implements ModuleConfig
 
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/sleep/")})
         private Sleep sleep = new Sleep();
+        @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/sound/")})
+        private Sound sound = new Sound();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/spawn/")})
         private Spawn spawn = new Spawn();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/status/")})
@@ -2542,6 +2551,30 @@ public final class Localization extends FileSerializable implements ModuleConfig
             private String notPossible = "<fcolor:1>\uD83D\uDECC No amount of rest can pass this night";
             private String playersSleeping = "<fcolor:1>\uD83D\uDECC <fcolor:2><players_sleeping><fcolor:1>/<fcolor:2><players><fcolor:1> players sleeping";
             private String skippingNight = "<fcolor:1>\uD83D\uDECC Sleeping through this night";
+        }
+
+        @Getter
+        public static final class Sound implements SubMessageConfig, Localizable {
+            private Play play = new Play();
+            private Stop stop = new Stop();
+
+            @Getter
+            @NoArgsConstructor
+            @AllArgsConstructor
+            public static final class Play {
+                private String multiple = "<fcolor:1>\uD83D\uDD0A Played sound <fcolor:2><sound> <fcolor:1>to <fcolor:2><players> <fcolor:1>players";
+                private String single = "<fcolor:1>\uD83D\uDD0A Played sound <fcolor:2><sound> <fcolor:1>to <target>";
+            }
+
+            @Getter
+            @NoArgsConstructor
+            @AllArgsConstructor
+            public static final class Stop {
+                private String sourceAny = "<fcolor:1>\uD83D\uDD07 Stopped all '<fcolor:2><source><fcolor:1>' sounds";
+                private String sourceSound = "<fcolor:1>\uD83D\uDD07 Stopped sound '<fcolor:2><sound><fcolor:1>' on source '<fcolor:2><source><fcolor:1>'";
+                private String sourcelessAny = "<fcolor:1>\uD83D\uDD07 Stopped all sounds";
+                private String sourcelessSound = "<fcolor:1>\uD83D\uDD07 Stopped sound '<fcolor:2><sound><fcolor:1>'";
+            }
         }
 
         @Getter
