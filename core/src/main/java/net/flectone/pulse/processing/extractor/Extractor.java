@@ -6,6 +6,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.EntityUtil;
 import net.kyori.adventure.text.*;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -26,6 +27,12 @@ public abstract class Extractor {
 
     public Optional<FEntity> extractFEntity(Component component) {
         HoverEvent<?> hoverEvent = component.hoverEvent();
+
+        // support legacy and InteractiveChat components
+        if (hoverEvent == null && !component.children().isEmpty()) {
+            hoverEvent = component.children().getFirst().hoverEvent();
+        }
+
         if (hoverEvent != null && hoverEvent.action() == HoverEvent.Action.SHOW_ENTITY) {
             HoverEvent.ShowEntity showEntity = (HoverEvent.ShowEntity) hoverEvent.value();
 
@@ -93,13 +100,32 @@ public abstract class Extractor {
             case TranslatableComponent valueTranslatableComponent when !valueTranslatableComponent.arguments().isEmpty() ->
                     Optional.of(valueTranslatableComponent.arguments().getFirst().asComponent());
 
-            case TextComponent valueTextComponent when valueTextComponent.content().equals("[") && !valueTextComponent.children().isEmpty() ->
+            case TextComponent valueTextComponent when !valueTextComponent.children().isEmpty() ->
                     Optional.of(valueTextComponent.children().getFirst().asComponent());
 
             case TextComponent valueTextComponent -> Optional.of(valueTextComponent);
 
             default -> Optional.empty();
-        });
+        }).map(this::recursiveExtractValueComponent);
+    }
+
+    // support legacy and InteractiveChat components
+    private Component recursiveExtractValueComponent(Component valueComponent) {
+        if (!valueComponent.style().hasDecoration(TextDecoration.ITALIC)
+                && valueComponent instanceof TextComponent valueTextComponent
+                && valueTextComponent.content().isEmpty()
+                && !valueTextComponent.children().isEmpty()) {
+            return recursiveExtractValueComponent(valueTextComponent.children().getFirst());
+        }
+
+        if (valueComponent instanceof TranslatableComponent valueTranslatableComponent
+                && valueTranslatableComponent.key().equals("chat.square_brackets")
+                && !valueTranslatableComponent.arguments().isEmpty()) {
+
+            return recursiveExtractValueComponent(valueTranslatableComponent.arguments().getFirst().asComponent());
+        }
+
+        return valueComponent;
     }
 
     protected Optional<String> extractTextContent(TranslatableComponent translatableComponent, int index) {
