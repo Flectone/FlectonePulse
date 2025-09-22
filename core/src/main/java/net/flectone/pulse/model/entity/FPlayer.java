@@ -59,11 +59,11 @@ public class FPlayer extends FEntity {
     }
 
     public FPlayer(boolean console, String name) {
-        this(-1, console, name, FEntity.UNKNOWN_UUID, "unknown");
+        this(-1, console, name, FEntity.UNKNOWN_UUID, FEntity.UNKNOWN_TYPE);
     }
 
     public FPlayer(String name) {
-        this(-1,  false, name, FEntity.UNKNOWN_UUID, "unknown");
+        this(-1,  false, name, FEntity.UNKNOWN_UUID, FEntity.UNKNOWN_TYPE);
     }
 
     @Override
