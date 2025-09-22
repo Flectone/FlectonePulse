@@ -49,6 +49,7 @@ public class MailPulseListener implements PulseListener {
                     .format(Localization.Command.Mail::getReceiver)
                     .destination(command.getDestination())
                     .mail(mail)
+                    .target(fReceiver)
                     .message(mail.message())
                     .build()
             );
