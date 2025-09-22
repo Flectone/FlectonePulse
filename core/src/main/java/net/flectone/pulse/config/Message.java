@@ -461,9 +461,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fcolor/")})
         private FColor fcolor = new FColor();
 
-        @Deprecated(forRemoval = true)
-        private Emoji emoji = new Emoji();
-
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/fixation/")})
         private Fixation fixation = new Fixation();
         @Comment({@CommentValue(" https://flectone.net/pulse/docs/message/format/mention/")})
@@ -505,12 +502,6 @@ public final class Message extends FileSerializable implements ModuleConfig.Mess
                     put(4, "#FFFAFA");
                 }
             };
-        }
-
-        @Getter
-        public static final class Emoji implements SubFormatMessageConfig, Config.IEnable {
-            private boolean enable = false;
-            private Map<String, String> values = new LinkedHashMap<>();
         }
 
         @Getter

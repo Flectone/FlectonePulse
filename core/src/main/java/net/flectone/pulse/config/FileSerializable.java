@@ -51,20 +51,6 @@ public abstract class FileSerializable extends YamlSerializable {
             .registerSerializer(new EnumSerializer<>(Event.Priority.class))
             .setLogMissingFields(false)
             .setSafeMode(true)
-
-            // fix Elytrium issue with Map
-            // upgrade from 1.2.2 and older
-            .registerSerializer(new ClassSerializer<Message.Format.Emoji, String>() {
-                @Override
-                public String serialize(Message.Format.Emoji emoji) {
-                    return "";
-                }
-
-                @Override
-                public Message.Format.Emoji deserialize(String string) {
-                    return new Message.Format.Emoji();
-                }
-            })
             .registerSerializer(new ClassSerializer<Range, Object>() {
 
                 @Override
