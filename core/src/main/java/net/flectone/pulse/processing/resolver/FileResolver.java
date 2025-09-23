@@ -25,21 +25,21 @@ import java.util.*;
 import java.util.stream.Stream;
 
 
+@Getter
 @Singleton
 public class FileResolver {
 
-    @Getter private final Map<String, Localization> localizationMap = new HashMap<>();
+    private final Map<String, Localization> localizationMap = new HashMap<>();
 
-    @Getter private final Path projectPath;
-    @Getter private final Command command;
-    @Getter private final Config config;
-    @Getter private final Integration integration;
-    @Getter private final Message message;
-    @Getter private final Permission permission;
+    private final Path projectPath;
+    private final Command command;
+    private final Config config;
+    private final Integration integration;
+    private final Message message;
+    private final Permission permission;
     private final FLogger fLogger;
 
-    @Getter private String preInitVersion;
-
+    private String preInitVersion;
     private Localization defaultLocalization;
 
     @Inject
