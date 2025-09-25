@@ -1,13 +1,12 @@
 package net.flectone.pulse.config;
 
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.elytrium.serializer.annotations.Comment;
-import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Range;
@@ -18,116 +17,101 @@ import java.nio.file.Path;
 import java.util.*;
 
 @SuppressWarnings({"FieldMayBeFinal", "unused"})
-@Comment(
-        value = {
-                @CommentValue("  ___       ___  __  ___  __        ___ "),
-                @CommentValue(" |__  |    |__  /  `  |  /  \\ |\\ | |__"),
-                @CommentValue(" |    |___ |___ \\__,  |  \\__/ | \\| |___"),
-                @CommentValue("  __             __   ___ "),
-                @CommentValue(" |__) |  | |    /__` |__  "),
-                @CommentValue(" |    \\__/ |___ .__/ |___   /\\"),
-                @CommentValue("                           /  \\"),
-                @CommentValue(" __/\\___  ____/\\_____  ___/    \\______"),
-                @CommentValue("        \\/           \\/  "),
-                @CommentValue(" "),
-        },
-        at = Comment.At.PREPEND
-)
 @Getter
-public final class Command extends FileSerializable implements ModuleConfig.CommandConfig {
+public final class Command extends YamlFile implements ModuleConfig.CommandConfig {
 
     public Command(Path projectPath) {
         super(projectPath.resolve("command.yml"));
     }
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/")
     private boolean enable = true;
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/afk/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/afk/")
     private Afk afk = new Afk();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/anon/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/anon/")
     private Anon anon = new Anon();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ball/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ball/")
     private Ball ball = new Ball();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ban/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ban/")
     private Ban ban = new Ban();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/banlist/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/banlist/")
     private Banlist banlist = new Banlist();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/broadcast/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/broadcast/")
     private Broadcast broadcast = new Broadcast();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatcolor/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/chatcolor/")
     private Chatcolor chatcolor = new Chatcolor();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/chatsetting/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/chatsetting/")
     private Chatsetting chatsetting = new Chatsetting();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearchat/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/clearchat/")
     private Clearchat clearchat = new Clearchat();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/clearmail/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/clearmail/")
     private Clearmail clearmail = new Clearmail();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/coin/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/coin/")
     private Coin coin = new Coin();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/deletemessage/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/deletemessage/")
     private Deletemessage deletemessage = new Deletemessage();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/dice/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/dice/")
     private Dice dice = new Dice();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/do/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/do/")
     private Do Do = new Do();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/flectonepulse/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/flectonepulse/")
     private Flectonepulse flectonepulse = new Flectonepulse();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/geolocate/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/geolocate/")
     private Geolocate geolocate = new Geolocate();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/helper/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/helper/")
     private Helper helper = new Helper();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ignore/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ignore/")
     private Ignore ignore = new Ignore();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ignorelist/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ignorelist/")
     private Ignorelist ignorelist = new Ignorelist();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/kick/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/kick/")
     private Kick kick = new Kick();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/mail/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mail/")
     private Mail mail = new Mail();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/maintenance/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/maintenance/")
     private Maintenance maintenance = new Maintenance();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/me/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/me/")
     private Me me = new Me();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/mute/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mute/")
     private Mute mute = new Mute();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/mutelist/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mutelist/")
     private Mutelist mutelist = new Mutelist();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/online/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/online/")
     private Online online = new Online();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/ping/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ping/")
     private Ping ping = new Ping();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/poll/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/poll/")
     private Poll poll = new Poll();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/reply/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/reply/")
     private Reply reply = new Reply();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/rockpaperscissors/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/rockpaperscissors/")
     private Rockpaperscissors rockpaperscissors = new Rockpaperscissors();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/spy/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/spy/")
     private Spy spy = new Spy();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/stream/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/stream/")
     private Stream stream = new Stream();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/symbol/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/symbol/")
     private Symbol symbol = new Symbol();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/tell/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/tell/")
     private Tell tell = new Tell();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/tictactoe/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/tictactoe/")
     private Tictactoe tictactoe = new Tictactoe();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/toponline/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/toponline/")
     private Toponline toponline = new Toponline();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/translateto/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/translateto/")
     private Translateto translateto = new Translateto();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/try/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/try/")
     private Try Try = new Try();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/unban/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/unban/")
     private Unban unban = new Unban();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/unmute/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/unmute/")
     private Unmute unmute = new Unmute();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/unwarn/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/unwarn/")
     private Unwarn unwarn = new Unwarn();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/warn/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/warn/")
     private Warn warn = new Warn();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/command/warnlist/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/warnlist/")
     private Warnlist warnlist = new Warnlist();
 
     @Getter

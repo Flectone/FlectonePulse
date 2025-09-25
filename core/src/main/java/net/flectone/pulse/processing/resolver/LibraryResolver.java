@@ -69,13 +69,13 @@ public abstract class LibraryResolver {
         );
 
         addLibrary(Library.builder()
-                .groupId("net{}elytrium")
-                .artifactId("serializer")
-                .version(BuildConfig.ELYTRIUM_SERIALIZER_VERSION)
+                .groupId("com{}fasterxml{}jackson{}dataformat")
+                .artifactId("jackson-dataformat-yaml")
+                .version(BuildConfig.JACKSON_DATAFORMAT_VERSION)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
-                        .pattern("net{}elytrium{}serializer")
-                        .relocatedPattern("net.flectone.pulse.library.elytrium")
+                        .pattern("com{}fasterxml{}jackson")
+                        .relocatedPattern("net.flectone.pulse.library.jackson")
                         .build()
                 )
                 .build()

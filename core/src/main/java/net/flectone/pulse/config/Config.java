@@ -1,9 +1,8 @@
 package net.flectone.pulse.config;
 
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Getter;
 import lombok.Setter;
-import net.elytrium.serializer.annotations.Comment;
-import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.BuildConfig;
 
 import java.nio.file.Path;
@@ -13,29 +12,14 @@ import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings({"FieldMayBeFinal", "unused"})
-@Comment(
-        value = {
-                @CommentValue("  ___       ___  __  ___  __        ___ "),
-                @CommentValue(" |__  |    |__  /  `  |  /  \\ |\\ | |__"),
-                @CommentValue(" |    |___ |___ \\__,  |  \\__/ | \\| |___"),
-                @CommentValue("  __             __   ___ "),
-                @CommentValue(" |__) |  | |    /__` |__  "),
-                @CommentValue(" |    \\__/ |___ .__/ |___   /\\"),
-                @CommentValue("                           /  \\"),
-                @CommentValue(" __/\\___  ____/\\_____  ___/    \\______"),
-                @CommentValue("        \\/           \\/  "),
-                @CommentValue(" "),
-        },
-        at = Comment.At.PREPEND
-)
 @Getter
-public final class Config extends FileSerializable {
+public final class Config extends YamlFile {
 
     public Config(Path projectPath) {
         super(projectPath.resolve("config.yml"));
     }
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/config/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/")
     private String console = "Console";
 
     @Setter
@@ -69,16 +53,16 @@ public final class Config extends FileSerializable {
             "FlectonePulseDatabase - "
     ));
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/config/#database")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/#database")
     private Database database = new Database();
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/config/#module")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/#module")
     private Module module = new Module();
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/config/#redis")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/#redis")
     private Redis redis = new Redis();
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/config/#editor")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/#editor")
     private Editor editor = new Editor();
 
     @Getter

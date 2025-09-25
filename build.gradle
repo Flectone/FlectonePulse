@@ -55,7 +55,7 @@ subprojects {
         compileOnly "org.projectlombok:lombok:$lombok_version"
         compileOnly "org.jetbrains:annotations:$jetbrains_annotations_version"
         compileOnly "com.google.inject:guice:$guice_version"
-        compileOnly "net.elytrium:serializer:$elytrium_serializer_version"
+        compileOnly "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jackson_dataformat_version"
         compileOnly "net.kyori:adventure-api:$adventure_api"
         compileOnly "net.kyori:adventure-text-serializer-legacy:$adventure_api"
         compileOnly "net.kyori:adventure-text-minimessage:$adventure_api"
@@ -92,6 +92,7 @@ subprojects {
         relocate("net.elytrium.serializer", "net.flectone.pulse.library.elytrium")
         relocate("spark.", "net.flectone.pulse.library.spark.")
         relocate("org.apache.commons", "net.flectone.pulse.library.apache")
+        relocate("com.fasterxml.jackson", "net.flectone.pulse.library.jackson")
 
         from(rootProject.file('LICENSE')) {
             into('/')

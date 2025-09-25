@@ -1,8 +1,7 @@
 package net.flectone.pulse.config;
 
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Getter;
-import net.elytrium.serializer.annotations.Comment;
-import net.elytrium.serializer.annotations.CommentValue;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.util.constant.MessageType;
@@ -13,77 +12,62 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings({"FieldMayBeFinal", "unused"})
-@Comment(
-        value = {
-                @CommentValue("  ___       ___  __  ___  __        ___ "),
-                @CommentValue(" |__  |    |__  /  `  |  /  \\ |\\ | |__"),
-                @CommentValue(" |    |___ |___ \\__,  |  \\__/ | \\| |___"),
-                @CommentValue("  __             __   ___ "),
-                @CommentValue(" |__) |  | |    /__` |__  "),
-                @CommentValue(" |    \\__/ |___ .__/ |___   /\\"),
-                @CommentValue("                           /  \\"),
-                @CommentValue(" __/\\___  ____/\\_____  ___/    \\______"),
-                @CommentValue("        \\/           \\/  "),
-                @CommentValue(" "),
-        },
-        at = Comment.At.PREPEND
-)
 @Getter
-public final class Integration extends FileSerializable implements ModuleConfig.IntegrationConfig {
+public final class Integration extends YamlFile implements ModuleConfig.IntegrationConfig {
 
     public Integration(Path projectPath) {
         super(projectPath.resolve("integration.yml"));
     }
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/")
     private boolean enable = true;
 
     private String avatarApiUrl = "https://mc-heads.net/avatar/<skin>/8.png";
     private String bodyApiUrl = "https://mc-heads.net/player/<skin>/16.png";
 
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/advancedban/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/advancedban/")
     private Advancedban advancedban = new Advancedban();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/deepl/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/deepl/")
     private Deepl deepl = new Deepl();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/discord/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/discord/")
     private Discord discord = new Discord();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/interactivechat/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/interactivechat/")
     private Interactivechat interactivechat = new Interactivechat();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/itemsadder/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/itemsadder/")
     private Itemsadder itemsadder = new Itemsadder();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/litebans/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/litebans/")
     private Litebans litebans = new Litebans();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/luckperms/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/luckperms/")
     private Luckperms luckperms = new Luckperms();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/maintenance/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/maintenance/")
     private Maintenance maintenance = new Maintenance();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/minimotd/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/minimotd/")
     private MiniMOTD minimotd = new MiniMOTD();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/miniplaceholders/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/miniplaceholders/")
     private MiniPlaceholders miniplaceholders = new MiniPlaceholders();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/motd/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/motd/")
     private MOTD motd = new MOTD();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/placeholderapi/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/placeholderapi/")
     private Placeholderapi placeholderapi = new Placeholderapi();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/plasmovoice/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/plasmovoice/")
     private Plasmovoice plasmovoice = new Plasmovoice();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/simplevoice/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/simplevoice/")
     private Simplevoice simplevoice = new Simplevoice();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/skinsrestorer/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/skinsrestorer/")
     private Skinsrestorer skinsrestorer = new Skinsrestorer();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/supervanish/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/supervanish/")
     private Supervanish supervanish = new Supervanish();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/tab/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/tab/")
     private TAB TAB = new TAB();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/telegram/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/telegram/")
     private Telegram telegram = new Telegram();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/triton/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/triton/")
     private Triton triton = new Triton();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/twitch/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/twitch/")
     private Twitch twitch = new Twitch();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/vault/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/vault/")
     private Vault vault = new Vault();
-    @Comment({@CommentValue(" https://flectone.net/pulse/docs/integration/yandex/")})
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/yandex/")
     private Yandex yandex = new Yandex();
 
     @Getter

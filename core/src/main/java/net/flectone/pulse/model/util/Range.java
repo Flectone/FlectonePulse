@@ -1,5 +1,7 @@
 package net.flectone.pulse.model.util;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -46,6 +48,33 @@ public class Range {
         }
 
         return DEFAULT_RANGES.get(type);
+    }
+
+    @JsonValue
+    public Object toJson() {
+        if (this.type == Type.BLOCKS) {
+            return this.value;
+        }
+
+        return this.type.name();
+    }
+
+    @JsonCreator
+    public static Range fromJson(Object object) {
+        String string = String.valueOf(object);
+
+        try {
+            int value = Integer.parseInt(string);
+            Range.Type type = Range.Type.fromInt(value);
+            if (type == Range.Type.BLOCKS) {
+                return new Range(value);
+            }
+
+            return new Range(type);
+        } catch (NumberFormatException e) {
+            Range.Type type = Range.Type.fromString(string);
+            return new Range(type);
+        }
     }
 
     public enum Type {

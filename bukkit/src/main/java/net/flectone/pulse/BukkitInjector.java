@@ -8,6 +8,7 @@ import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
+import net.flectone.pulse.processing.processor.YamlFileProcessor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.execution.scheduler.BukkitTaskScheduler;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
@@ -80,8 +81,11 @@ public class BukkitInjector extends AbstractModule {
         Path projectPath = plugin.getDataFolder().toPath();
         bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
 
+        YamlFileProcessor yamlFileProcessor = new YamlFileProcessor(fLogger);
+        bind(YamlFileProcessor.class).toInstance(yamlFileProcessor);
+
         // Initialize and bind FileManager
-        FileResolver fileResolver = new FileResolver(projectPath, fLogger);
+        FileResolver fileResolver = new FileResolver(projectPath, fLogger, yamlFileProcessor);
         fileResolver.reload();
 
         bind(FileResolver.class).toInstance(fileResolver);

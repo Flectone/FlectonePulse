@@ -9,6 +9,7 @@ import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentS
 import net.fabricmc.loader.api.FabricLoader;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
+import net.flectone.pulse.processing.processor.YamlFileProcessor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.execution.scheduler.FabricTaskScheduler;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
@@ -59,8 +60,11 @@ public class FabricInjector extends AbstractModule {
         Path projectPath = FabricLoader.getInstance().getConfigDir().resolve(BuildConfig.PROJECT_MOD_ID);
         bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
 
+        YamlFileProcessor yamlFileProcessor = new YamlFileProcessor(fLogger);
+        bind(YamlFileProcessor.class).toInstance(yamlFileProcessor);
+
         // Initialize and bind FileManager
-        FileResolver fileResolver = new FileResolver(projectPath, fLogger);
+        FileResolver fileResolver = new FileResolver(projectPath, fLogger, yamlFileProcessor);
         fileResolver.reload();
 
         bind(FileResolver.class).toInstance(fileResolver);

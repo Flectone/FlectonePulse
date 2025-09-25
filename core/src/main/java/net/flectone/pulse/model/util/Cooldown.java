@@ -1,11 +1,15 @@
 package net.flectone.pulse.model.util;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.Setter;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.model.entity.FPlayer;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Getter
@@ -44,5 +48,28 @@ public class Cooldown {
 
     public long getTimeLeft(FPlayer fPlayer) {
         return playerDuration.getOrDefault(fPlayer.getUuid(), 0L) - System.currentTimeMillis();
+    }
+
+    @JsonValue
+    public Map<String, Object> toJson() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("enable", this.enable);
+
+        if (this.enable) {
+            map.put("duration", this.duration);
+        }
+
+        return map;
+    }
+
+    @JsonCreator
+    public static Cooldown fromJson(Map<String, Object> map) {
+        boolean isEnable = Boolean.parseBoolean(String.valueOf(map.get("enable")));
+        if (!isEnable) return new Cooldown();
+
+        Object duration = map.get("duration");
+        long longDuration = duration == null ? 60L : Long.parseLong(String.valueOf(duration));
+
+        return new Cooldown(true, longDuration);
     }
 }

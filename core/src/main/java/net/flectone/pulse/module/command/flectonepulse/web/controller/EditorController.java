@@ -2,8 +2,9 @@ package net.flectone.pulse.module.command.flectonepulse.web.controller;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.FileSerializable;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.YamlFile;
+import net.flectone.pulse.processing.processor.YamlFileProcessor;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import org.apache.commons.lang3.StringUtils;
@@ -21,14 +22,17 @@ public class EditorController {
 
     private final UrlService urlService;
     private final FileResolver fileResolver;
-    private final Map<String, FileSerializable> configFiles = new LinkedHashMap<>();
+    private final Map<String, YamlFile> configFiles = new LinkedHashMap<>();
     private final Map<String, List<LocalizationFile>> localizationFiles = new HashMap<>();
+    private final YamlFileProcessor yamlFileProcessor;
 
     @Inject
     public EditorController(UrlService urlService,
-                            FileResolver fileResolver) {
+                            FileResolver fileResolver,
+                            YamlFileProcessor yamlFileProcessor) {
         this.urlService = urlService;
         this.fileResolver = fileResolver;
+        this.yamlFileProcessor = yamlFileProcessor;
         initConfigFiles();
     }
 
@@ -132,16 +136,16 @@ public class EditorController {
 
     private String getFileContent(String fileType, String fileName) throws IOException {
         if ("main".equals(fileType)) {
-            FileSerializable config = configFiles.get(fileName);
+            YamlFile config = configFiles.get(fileName);
             if (config != null) {
-                return Files.readString(config.getPath());
+                return Files.readString(config.getPathToFile());
             }
 
         } else if ("localizations".equals(fileType)) {
             List<LocalizationFile> files = localizationFiles.get(fileType);
             for (LocalizationFile file : files) {
                 if (file.fileName.equals(fileName)) {
-                    return Files.readString(file.localization.getPath());
+                    return Files.readString(file.localization.getPathToFile());
                 }
             }
         }
@@ -151,10 +155,10 @@ public class EditorController {
 
     private void saveFileContent(String fileType, String fileName, String content) throws IOException {
         if ("main".equals(fileType)) {
-            FileSerializable config = configFiles.get(fileName);
+            YamlFile config = configFiles.get(fileName);
             if (config != null) {
-                Files.writeString(config.getPath(), content);
-                config.reload(config.getPath());
+                Files.writeString(config.getPathToFile(), content);
+                yamlFileProcessor.reload(config);
                 return;
             }
 
@@ -162,8 +166,8 @@ public class EditorController {
             List<LocalizationFile> files = localizationFiles.get(fileType);
             for (LocalizationFile file : files) {
                 if (file.fileName.equals(fileName)) {
-                    Files.writeString(file.localization.getPath(), content);
-                    file.localization.reload(file.localization.getPath());
+                    Files.writeString(file.localization.getPathToFile(), content);
+                    yamlFileProcessor.reload(file.localization);
                     return;
                 }
             }

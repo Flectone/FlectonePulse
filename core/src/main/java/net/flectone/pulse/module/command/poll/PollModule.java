@@ -8,6 +8,7 @@ import lombok.NonNull;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.processing.processor.YamlFileProcessor;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
@@ -51,6 +52,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     private final MessagePipeline messagePipeline;
     private final PacketProvider packetProvider;
     private final Provider<DialogPollBuilder> dialogPollBuilderProvider;
+    private final YamlFileProcessor yamlFileProcessor;
 
     @Inject
     public PollModule(FileResolver fileResolver,
@@ -60,7 +62,8 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                       CommandParserProvider commandParserProvider,
                       MessagePipeline messagePipeline,
                       PacketProvider packetProvider,
-                      Provider<DialogPollBuilder> dialogPollBuilderProvider) {
+                      Provider<DialogPollBuilder> dialogPollBuilderProvider,
+                      YamlFileProcessor yamlFileProcessor) {
         super(localization -> localization.getCommand().getPoll(), Command::getPoll, MessageType.COMMAND_POLL);
 
         this.command = fileResolver.getCommand().getPoll();
@@ -73,6 +76,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         this.messagePipeline = messagePipeline;
         this.packetProvider = packetProvider;
         this.dialogPollBuilderProvider = dialogPollBuilderProvider;
+        this.yamlFileProcessor = yamlFileProcessor;
     }
 
     @Override
@@ -252,7 +256,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     public void saveAndUpdateLast(Poll poll) {
         pollMap.put(poll.getId(), poll);
         command.setLastId(poll.getId() + 1);
-        fileResolver.getCommand().save();
+        yamlFileProcessor.save(fileResolver.getCommand());
     }
 
     public void vote(FEntity fPlayer, int id, int numberVote, UUID metadataUUID) {

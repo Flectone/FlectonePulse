@@ -5,12 +5,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import lombok.Getter;
-import net.elytrium.serializer.language.object.AbstractSerializable;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.*;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.processing.processor.YamlFileProcessor;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
@@ -33,18 +33,20 @@ public class FileResolver {
 
     private final Path projectPath;
     private final Command command;
-    private final Config config;
+    private Config config;
     private final Integration integration;
     private final Message message;
     private final Permission permission;
     private final FLogger fLogger;
+    private final YamlFileProcessor yamlFileProcessor;
 
     private String preInitVersion;
     private Localization defaultLocalization;
 
     @Inject
     public FileResolver(@Named("projectPath") Path projectPath,
-                        FLogger fLogger) {
+                        FLogger fLogger,
+                        YamlFileProcessor yamlFileProcessor) {
         this.projectPath = projectPath;
         this.command = new Command(projectPath);
         this.config = new Config(projectPath);
@@ -52,6 +54,7 @@ public class FileResolver {
         this.message = new Message(projectPath);
         this.permission = new Permission(projectPath);
         this.fLogger = fLogger;
+        this.yamlFileProcessor = yamlFileProcessor;
     }
 
     public Localization getLocalization() {
@@ -66,7 +69,7 @@ public class FileResolver {
     }
 
     public void reload() {
-        config.reload();
+        yamlFileProcessor.reload(config);
         config.setLanguage(config.getLanguage());
 
         preInitVersion = config.getVersion();
@@ -86,13 +89,13 @@ public class FileResolver {
             }
 
             config.setVersion(BuildConfig.PROJECT_VERSION);
-            config.save();
+            yamlFileProcessor.save(config);
         }
 
-        command.reload();
-        integration.reload();
-        message.reload();
-        permission.reload();
+        yamlFileProcessor.reload(command);
+        yamlFileProcessor.reload(integration);
+        yamlFileProcessor.reload(message);
+        yamlFileProcessor.reload(permission);
 
         reloadLanguages();
 
@@ -100,12 +103,12 @@ public class FileResolver {
     }
 
     public void save() {
-        command.save();
-        config.save();
-        integration.save();
-        message.save();
-        permission.save();
-        localizationMap.values().forEach(AbstractSerializable::save);
+        yamlFileProcessor.save(command);
+        yamlFileProcessor.save(config);
+        yamlFileProcessor.save(integration);
+        yamlFileProcessor.save(message);
+        yamlFileProcessor.save(permission);
+        localizationMap.values().forEach(yamlFileProcessor::save);
     }
 
     private void reloadLanguages() {
@@ -131,7 +134,7 @@ public class FileResolver {
 
     private void loadLanguage(String language) {
         Localization localization = new Localization(projectPath, language);
-        localization.reload(localization.getPath());
+        yamlFileProcessor.reload(localization);
         localizationMap.put(language, localization);
     }
 
@@ -164,13 +167,13 @@ public class FileResolver {
     }
 
     private void migration_1_4_3() {
-        permission.reload();
+        yamlFileProcessor.reload(permission);
 
         Permission.Message.Update update = permission.getMessage().getUpdate();
         if (update.getName().equals("flectonepulse.module.message.op")) {
             update.setName("flectonepulse.module.message.update");
             update.setSound(new Permission.PermissionEntry("flectonepulse.module.message.update.sound", Permission.Type.TRUE));
-            permission.save();
+            yamlFileProcessor.save(permission);
         }
     }
 
@@ -178,7 +181,7 @@ public class FileResolver {
         String oldChatKey = "CHAT";
         String newChatKey = "CHAT_GLOBAL";
 
-        integration.reload();
+        yamlFileProcessor.reload(integration);
 
         Integration.Discord discord = integration.getDiscord();
         if (discord.getMessageChannel().containsKey(oldChatKey)) {
@@ -195,7 +198,7 @@ public class FileResolver {
             twitch.getMessageChannel().put(newChatKey, twitch.getMessageChannel().remove(oldChatKey));
         }
 
-        integration.save();
+        yamlFileProcessor.save(integration);
 
         reloadLanguages();
 
@@ -215,12 +218,12 @@ public class FileResolver {
                 localizationTelegram.getMessageChannel().put(newChatKey, localizationTelegram.getMessageChannel().remove(oldChatKey));
             }
 
-            localization.save();
+            yamlFileProcessor.save(localization);
         });
     }
 
     private void migration_1_6_0() {
-        command.reload();
+        yamlFileProcessor.reload(command);
 
         List<Command.Chatsetting.Menu.Color.Type> colorTypes = command.getChatsetting().getMenu().getSee().getTypes();
         for (Command.Chatsetting.Menu.Color.Type colorType : colorTypes) {
@@ -324,9 +327,9 @@ public class FileResolver {
 
         types.put(MessageType.SLEEP.name(), 32);
 
-        command.save();
+        yamlFileProcessor.save(command);
 
-        permission.reload();
+        yamlFileProcessor.reload(permission);
 
         Map<String, Permission.Command.Chatsetting.SettingItem> settings = permission.getCommand().getChatsetting().getSettings();
         settings.clear();
@@ -359,7 +362,7 @@ public class FileResolver {
         settings.put(MessageType.QUIT.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.quit", Permission.Type.TRUE));
         settings.put(MessageType.SLEEP.name(), new Permission.Command.Chatsetting.SettingItem("flectonepulse.module.command.chatsetting.sleep", Permission.Type.TRUE));
 
-        permission.save();
+        yamlFileProcessor.save(permission);
 
         reloadLanguages();
 
@@ -459,7 +462,7 @@ public class FileResolver {
                 localization.getMessage().setSpawn(new Localization.Message.Spawn());
             }
 
-            localization.save();
+            yamlFileProcessor.save(localization);
         });
     }
 }
