@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ball.model.BallMetadata;
@@ -22,8 +23,7 @@ import java.util.function.Function;
 @Singleton
 public class BallModule extends AbstractModuleCommand<Localization.Command.Ball> {
 
-    private final Command.Ball command;
-    private final Permission.Command.Ball permission;
+    private final FileResolver fileResolver;
     private final RandomUtil randomUtil;
     private final CommandParserProvider commandParserProvider;
 
@@ -31,24 +31,23 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
     public BallModule(FileResolver fileResolver,
                       RandomUtil randomUtil,
                       CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getBall(), Command::getBall, MessageType.COMMAND_BALL);
+        super(MessageType.COMMAND_BALL);
 
-        this.command = fileResolver.getCommand().getBall();
-        this.permission = fileResolver.getPermission().getCommand().getBall();
+        this.fileResolver = fileResolver;
         this.randomUtil = randomUtil;
         this.commandParserProvider = commandParserProvider;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptMessage = addPrompt(0, Localization.Command.Prompt::getMessage);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
     }
@@ -57,7 +56,7 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (isModuleDisabledFor(fPlayer, true)) return;
 
-        int answer = randomUtil.nextInt(0, resolveLocalization().getAnswers().size());
+        int answer = randomUtil.nextInt(0, localization().getAnswers().size());
         String message = getArgument(commandContext, 0);
 
         sendMessage(BallMetadata.<Localization.Command.Ball>builder()
@@ -65,15 +64,15 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
                 .format(replaceAnswer(answer))
                 .answer(answer)
                 .message(message)
-                .destination(command.getDestination())
-                .range(command.getRange())
+                .destination(config().getDestination())
+                .range(config().getRange())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeInt(answer);
                     dataOutputStream.writeString(message);
                 })
                 .integration(string -> {
-                    List<String> answers = resolveLocalization().getAnswers();
+                    List<String> answers = localization().getAnswers();
 
                     String answerString = !answers.isEmpty()
                             ? answers.get(Math.min(answer, answers.size() - 1))
@@ -83,6 +82,21 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
                 })
                 .build()
         );
+    }
+
+    @Override
+    public Command.Ball config() {
+        return fileResolver.getCommand().getBall();
+    }
+
+    @Override
+    public Permission.Command.Ball permission() {
+        return fileResolver.getPermission().getCommand().getBall();
+    }
+
+    @Override
+    public Localization.Command.Ball localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getBall();
     }
 
     public Function<Localization.Command.Ball, String> replaceAnswer(int answer) {

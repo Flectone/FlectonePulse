@@ -54,12 +54,12 @@ public class DialogPollBuilder {
 
 
     public void openDialog(FPlayer fPlayer) {
-        Localization.Command.Poll.Modern poll = pollModule.resolveLocalization(fPlayer).getModern();
+        Localization.Command.Poll.Modern poll = pollModule.localization(fPlayer).getModern();
         openDialog(fPlayer, poll.getInputInitial(), false, 5.0f, 1.0f, Collections.emptyList());
     }
 
     public void openDialog(FPlayer fPlayer, String inputValue, boolean multipleValue, float endTimeValue, float repeatTimeValue, List<String> answers) {
-        Localization.Command.Poll.Modern poll = pollModule.resolveLocalization(fPlayer).getModern();
+        Localization.Command.Poll.Modern poll = pollModule.localization(fPlayer).getModern();
 
         Component headerName = messagePipeline.builder(fPlayer, poll.getHeader()).build();
         DialogBody dialogBody = new PlainMessageDialogBody(new PlainMessage(Component.empty(), 10));
@@ -128,7 +128,7 @@ public class DialogPollBuilder {
     }
 
     private Dialog.Builder addNewAnswerButton(FPlayer fPlayer, Dialog.Builder builder) {
-        Localization.Command.Poll.Modern poll = pollModule.resolveLocalization(fPlayer).getModern();
+        Localization.Command.Poll.Modern poll = pollModule.localization(fPlayer).getModern();
 
         String newAnswerButtonId = "fp_new_answer";
         ActionButton button = new ActionButton(
@@ -157,7 +157,7 @@ public class DialogPollBuilder {
     }
 
     private Dialog.Builder addRemoveAnswerButton(FPlayer fPlayer, Dialog.Builder builder) {
-        Localization.Command.Poll.Modern poll = pollModule.resolveLocalization(fPlayer).getModern();
+        Localization.Command.Poll.Modern poll = pollModule.localization(fPlayer).getModern();
 
         String newAnswerButtonId = "fp_remove_answer";
         ActionButton button = new ActionButton(
@@ -189,7 +189,7 @@ public class DialogPollBuilder {
         String createId = "fp_create";
         ActionButton button = new ActionButton(
                 new CommonButtonData(
-                        messagePipeline.builder(fPlayer, pollModule.resolveLocalization(fPlayer).getModern().getCreateButtonName()).build(),
+                        messagePipeline.builder(fPlayer, pollModule.localization(fPlayer).getModern().getCreateButtonName()).build(),
                         Component.empty(),
                         200
                 ),
@@ -208,7 +208,7 @@ public class DialogPollBuilder {
     }
 
     private NBTPoll readPoll(FPlayer fPlayer, NBTCompound nbtCompound) {
-        String inputName = nbtCompound.getStringTagValueOrDefault(inputKey, pollModule.resolveLocalization(fPlayer).getModern().getInputInitial());
+        String inputName = nbtCompound.getStringTagValueOrDefault(inputKey, pollModule.localization(fPlayer).getModern().getInputInitial());
         boolean multiple = nbtCompound.getBooleanOr(multipleKey, false);
         float endTime = (float) nbtCompound.getNumberTagValueOrDefault(endTimeKey, 5.0f);
         float repeatTime = (float) nbtCompound.getNumberTagValueOrDefault(repeatTimeKey, 1.0f);

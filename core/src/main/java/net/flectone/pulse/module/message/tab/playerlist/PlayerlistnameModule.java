@@ -12,6 +12,7 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleLocalization;
@@ -28,8 +29,7 @@ import net.kyori.adventure.text.Component;
 @Singleton
 public class PlayerlistnameModule extends AbstractModuleLocalization<Localization.Message.Tab.Playerlistname> {
 
-    private final Message.Tab.Playerlistname message;
-    private final Permission.Message.Tab.Playerlistname permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final MessagePipeline messagePipeline;
@@ -47,10 +47,9 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
                                 PacketProvider packetProvider,
                                 TaskScheduler taskScheduler,
                                 ListenerRegistry listenerRegistry) {
-        super(module -> module.getMessage().getTab().getPlayerlistname(), MessageType.PLAYERLISTNAME);
+        super(MessageType.PLAYERLISTNAME);
 
-        this.message = fileResolver.getMessage().getTab().getPlayerlistname();
-        this.permission = fileResolver.getPermission().getMessage().getTab().getPlayerlistname();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.messagePipeline = messagePipeline;
@@ -62,16 +61,31 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         fPlayerService.getPlatformFPlayers().forEach(this::send);
 
-        Ticker ticker = message.getTicker();
+        Ticker ticker = config().getTicker();
         if (ticker.isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::send), ticker.getPeriod());
         }
 
         listenerRegistry.register(PlayerlistnamePulseListener.class);
+    }
+
+    @Override
+    public Message.Tab.Playerlistname config() {
+        return fileResolver.getMessage().getTab().getPlayerlistname();
+    }
+
+    @Override
+    public Permission.Message.Tab.Playerlistname permission() {
+        return fileResolver.getPermission().getMessage().getTab().getPlayerlistname();
+    }
+
+    @Override
+    public Localization.Message.Tab.Playerlistname localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getTab().getPlayerlistname();
     }
 
     @Async
@@ -89,16 +103,11 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
                 .forEach(fReceiver -> updatePlayerlistname(fPlayer, fReceiver));
     }
 
-    @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
-    }
-
     private void updatePlayerlistname(FPlayer fPlayer, FPlayer fReceiver) {
         User user = packetProvider.getUser(fPlayer);
         if (user == null) return;
 
-        Component name = messagePipeline.builder(fPlayer, fReceiver, resolveLocalization(fReceiver).getFormat())
+        Component name = messagePipeline.builder(fPlayer, fReceiver, localization(fReceiver).getFormat())
                 .build();
 
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)) {

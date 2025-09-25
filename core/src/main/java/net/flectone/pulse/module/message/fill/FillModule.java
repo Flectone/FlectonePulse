@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.fill.listener.FillPulseListener;
@@ -19,32 +20,40 @@ import org.apache.commons.lang3.Strings;
 @Singleton
 public class FillModule extends AbstractModuleLocalization<Localization.Message.Fill> {
 
-    private final Message.Fill message;
-    private final Permission.Message.Fill permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public FillModule(FileResolver fileResolver,
                       ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getFill(), MessageType.FILL);
+        super(MessageType.FILL);
 
-        this.message = fileResolver.getMessage().getFill();
-        this.permission = fileResolver.getPermission().getMessage().getFill();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(FillPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Fill config() {
+        return fileResolver.getMessage().getFill();
+    }
+
+    @Override
+    public Permission.Message.Fill permission() {
+        return fileResolver.getPermission().getMessage().getFill();
+    }
+
+    @Override
+    public Localization.Message.Fill localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getFill();
     }
 
     @Async
@@ -53,14 +62,13 @@ public class FillModule extends AbstractModuleLocalization<Localization.Message.
 
         sendMessage(FillMetadata.<Localization.Message.Fill>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> Strings.CS.replace(localization.getFormat(), "<blocks>", blocks))
                 .blocks(blocks)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
     }
-
 }

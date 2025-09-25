@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.sleep.listener.SleepPulseListener;
@@ -20,32 +21,40 @@ import org.apache.commons.lang3.StringUtils;
 @Singleton
 public class SleepModule extends AbstractModuleLocalization<Localization.Message.Sleep> {
 
-    private final Message.Sleep message;
-    private final Permission.Message.Sleep permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public SleepModule(FileResolver fileResolver,
                        ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getSleep(), MessageType.SLEEP);
+        super(MessageType.SLEEP);
 
-        this.message = fileResolver.getMessage().getSleep();
-        this.permission = fileResolver.getPermission().getMessage().getSleep();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(SleepPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Sleep config() {
+        return fileResolver.getMessage().getSleep();
+    }
+
+    @Override
+    public Permission.Message.Sleep permission() {
+        return fileResolver.getPermission().getMessage().getSleep();
+    }
+
+    @Override
+    public Localization.Message.Sleep localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getSleep();
     }
 
     @Async
@@ -54,7 +63,7 @@ public class SleepModule extends AbstractModuleLocalization<Localization.Message
 
         sendMessage(SleepMetadata.<Localization.Message.Sleep>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> switch (translationKey) {
                     case SLEEP_NOT_POSSIBLE -> localization.getNotPossible();
                     case SLEEP_PLAYERS_SLEEPING -> StringUtils.replaceEach(
@@ -65,7 +74,7 @@ public class SleepModule extends AbstractModuleLocalization<Localization.Message
                     case SLEEP_SKIPPING_NIGHT -> localization.getSkippingNight();
                     default -> "";
                 })
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sleep(sleep)
                 .translationKey(translationKey)
                 .sound(getModuleSound())

@@ -25,7 +25,6 @@ import org.bukkit.event.EventPriority;
 @Singleton
 public class BukkitChatModule extends ChatModule {
 
-    private final Message.Chat message;
     private final FPlayerService fPlayerService;
     private final BukkitListenerRegistry listenerRegistry;
     private final ReflectionResolver reflectionResolver;
@@ -50,7 +49,6 @@ public class BukkitChatModule extends ChatModule {
                 integrationModule, bubbleModuleProvider, spyModuleProvider, listenerRegistry, muteSender,
                 disableSender, cooldownSender);
 
-        this.message = fileResolver.getMessage().getChat();
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
         this.reflectionResolver = reflectionResolver;
@@ -61,18 +59,18 @@ public class BukkitChatModule extends ChatModule {
     public void onEnable() {
         super.onEnable();
 
-        Message.Chat.Mode mode = message.getMode();
+        Message.Chat.Mode mode = config().getMode();
         if (mode == Message.Chat.Mode.PACKET) return; // already registered in super class
         if (mode == Message.Chat.Mode.PAPER) {
             if (reflectionResolver.hasClass("io.papermc.paper.event.player.AsyncChatEvent")) {
                 ChatPaperListener chatPaperListener = new ChatPaperListener(fPlayerService, this);
-                listenerRegistry.register(chatPaperListener, EventPriority.valueOf(message.getPriority().name()));
+                listenerRegistry.register(chatPaperListener, EventPriority.valueOf(config().getPriority().name()));
                 return;
             }
 
             fLogger.warning("It is not possible to use chat in PAPER mode on your server. BUKKIT mode is currently in use.");
         }
 
-        listenerRegistry.register(ChatBukkitListener.class, message.getPriority());
+        listenerRegistry.register(ChatBukkitListener.class, config().getPriority());
     }
 }

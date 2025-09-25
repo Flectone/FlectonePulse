@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.gamemode.listener.GamemodePulseListener;
@@ -22,8 +23,7 @@ import org.apache.commons.lang3.Strings;
 @Singleton
 public class GamemodeModule extends AbstractModuleLocalization<Localization.Message.Gamemode> {
 
-    private final Message.Gamemode message;
-    private final Permission.Message.Gamemode permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
     private final PlatformPlayerAdapter platformPlayerAdapter;
 
@@ -31,26 +31,35 @@ public class GamemodeModule extends AbstractModuleLocalization<Localization.Mess
     public GamemodeModule(FileResolver fileResolver,
                           ListenerRegistry listenerRegistry,
                           PlatformPlayerAdapter platformPlayerAdapter) {
-        super(localization -> localization.getMessage().getGamemode(), MessageType.GAMEMODE);
+        super(MessageType.GAMEMODE);
 
-        this.message = fileResolver.getMessage().getGamemode();
-        this.permission = fileResolver.getPermission().getMessage().getGamemode();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
         this.platformPlayerAdapter = platformPlayerAdapter;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(GamemodePulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Gamemode config() {
+        return fileResolver.getMessage().getGamemode();
+    }
+
+    @Override
+    public Permission.Message.Gamemode permission() {
+        return fileResolver.getPermission().getMessage().getGamemode();
+    }
+
+    @Override
+    public Localization.Message.Gamemode localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getGamemode();
     }
 
     @Async
@@ -67,14 +76,14 @@ public class GamemodeModule extends AbstractModuleLocalization<Localization.Mess
 
         sendMessage(GamemodeMetadata.<Localization.Message.Gamemode>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> Strings.CS.replace(isDefaultGamemodeCommand ? localization.getSetDefault() : isSelf ? localization.getSelf() : localization.getOther(),
                         "<gamemode>",
                         gamememodeName
                 ))
                 .gamemode(gamemode)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fTarget)})
                 .build()

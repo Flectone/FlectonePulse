@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.damage.listener.DamagePulseListener;
@@ -21,32 +22,40 @@ import org.apache.commons.lang3.Strings;
 @Singleton
 public class DamageModule extends AbstractModuleLocalization<Localization.Message.Damage> {
 
-    private final Message.Damage message;
-    private final Permission.Message.Damage permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public DamageModule(FileResolver fileResolver,
                         ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getDamage(), MessageType.DAMAGE);
+        super(MessageType.DAMAGE);
 
-        this.message = fileResolver.getMessage().getDamage();
-        this.permission = fileResolver.getPermission().getMessage().getDamage();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(DamagePulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Damage config() {
+        return fileResolver.getMessage().getDamage();
+    }
+
+    @Override
+    public Permission.Message.Damage permission() {
+        return fileResolver.getPermission().getMessage().getDamage();
+    }
+
+    @Override
+    public Localization.Message.Damage localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getDamage();
     }
 
     @Async
@@ -58,12 +67,11 @@ public class DamageModule extends AbstractModuleLocalization<Localization.Messag
                 .format(localization -> Strings.CS.replace(localization.getFormat(), "<amount>", damage.amount()))
                 .damage(damage)
                 .translationKey(translationKey)
-                .range(message.getRange())
-                .destination(message.getDestination())
+                .range(config().getRange())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, damage.target())})
                 .build()
         );
     }
-
 }

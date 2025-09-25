@@ -18,7 +18,7 @@ import java.util.*;
 
 @SuppressWarnings({"FieldMayBeFinal", "unused"})
 @Getter
-public final class Command extends YamlFile implements ModuleConfig.CommandConfig {
+public final class Command extends YamlFile implements ModuleConfig.CommandConfig, Config.IEnable {
 
     public Command(Path projectPath) {
         super(projectPath.resolve("command.yml"));

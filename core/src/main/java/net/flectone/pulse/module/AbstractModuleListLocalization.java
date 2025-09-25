@@ -9,7 +9,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Function;
 
 public abstract class AbstractModuleListLocalization<M extends Localization.Localizable> extends AbstractModuleLocalization<M> {
 
@@ -17,8 +16,8 @@ public abstract class AbstractModuleListLocalization<M extends Localization.Loca
 
     @Inject private RandomUtil randomUtil;
 
-    protected AbstractModuleListLocalization(Function<Localization, M> messageFunction, MessageType messageType) {
-        super(messageFunction, messageType);
+    protected AbstractModuleListLocalization(MessageType messageType) {
+        super(messageType);
     }
 
     public abstract List<String> getAvailableMessages(FPlayer fPlayer);

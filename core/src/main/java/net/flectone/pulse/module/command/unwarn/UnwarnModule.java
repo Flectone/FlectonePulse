@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
@@ -25,8 +26,7 @@ import java.util.Optional;
 @Singleton
 public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unwarn> {
 
-    private final Command.Unwarn command;
-    private final Permission.Command.Unwarn permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final CommandParserProvider commandParserProvider;
@@ -38,10 +38,9 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
                         ModerationService moderationService,
                         CommandParserProvider commandParserProvider,
                         ProxySender proxySender) {
-        super(localization -> localization.getCommand().getUnwarn(), Command::getUnwarn, MessageType.COMMAND_UNWARN);
+        super(MessageType.COMMAND_UNWARN);
 
-        this.command = fileResolver.getCommand().getUnwarn();
-        this.permission = fileResolver.getPermission().getCommand().getUnwarn();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.commandParserProvider = commandParserProvider;
@@ -50,15 +49,15 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         String promptId = addPrompt(1, Localization.Command.Prompt::getId);
         registerCommand(manager -> manager
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .required(promptPlayer, commandParserProvider.warnedParser())
                 .optional(promptId, commandParserProvider.integerParser())
         );
@@ -75,6 +74,21 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
         int id = optionalId.orElse(-1);
 
         unwarn(fPlayer, target, id);
+    }
+
+    @Override
+    public Command.Unwarn config() {
+        return fileResolver.getCommand().getUnwarn();
+    }
+
+    @Override
+    public Permission.Command.Unwarn permission() {
+        return fileResolver.getPermission().getCommand().getUnwarn();
+    }
+
+    @Override
+    public Localization.Command.Unwarn localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getUnwarn();
     }
 
     public void unwarn(FPlayer fPlayer, String target, int id) {
@@ -121,8 +135,8 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
                 .format(unwarn -> Strings.CS.replace(unwarn.getFormat(), "<moderator>", fPlayer.getName()))
                 .moderator(fPlayer)
                 .moderations(warns)
-                .destination(command.getDestination())
-                .range(command.getRange())
+                .destination(config().getDestination())
+                .range(config().getRange())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeAsJson(fPlayer);

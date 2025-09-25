@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.spawn.listener.SpawnPacketListener;
@@ -22,33 +23,41 @@ import org.apache.commons.lang3.StringUtils;
 @Singleton
 public class SpawnModule extends AbstractModuleLocalization<Localization.Message.Spawn> {
 
-    private final Message.Spawn message;
-    private final Permission.Message.Spawn permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public SpawnModule(FileResolver fileResolver,
                        ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getSpawn(), MessageType.SPAWN);
+        super(MessageType.SPAWN);
 
-        this.message = fileResolver.getMessage().getSpawn();
-        this.permission = fileResolver.getPermission().getMessage().getSpawn();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(SpawnPacketListener.class);
         listenerRegistry.register(SpawnPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Spawn config() {
+        return fileResolver.getMessage().getSpawn();
+    }
+
+    @Override
+    public Permission.Message.Spawn permission() {
+        return fileResolver.getPermission().getMessage().getSpawn();
+    }
+
+    @Override
+    public Localization.Message.Spawn localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getSpawn();
     }
 
     @Async
@@ -61,7 +70,7 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
                 .format(localization -> translationKey == MinecraftTranslationKey.BLOCK_MINECRAFT_SET_SPAWN
                         ? localization.getSet() : localization.getNotValid()
                 )
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .translationKey(translationKey)
                 .sound(getModuleSound())
                 .build()
@@ -77,7 +86,7 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
 
         sendMessage(SpawnMetadata.<Localization.Message.Spawn>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> StringUtils.replaceEach(
                         translationKey == MinecraftTranslationKey.COMMANDS_SETWORLDSPAWN_SUCCESS ? localization.getSetWorld() : isSingle ? localization.getSingle() : localization.getMultiple(),
                         new String[]{"<players>", "<x>", "<y>", "<z>", "<angle>", "<world>"},
@@ -85,7 +94,7 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
                 ))
                 .spawn(spawn)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, spawn.getTarget())})
                 .build()

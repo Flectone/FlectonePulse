@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -15,30 +16,28 @@ import org.incendo.cloud.context.CommandContext;
 @Singleton
 public class AnonModule extends AbstractModuleCommand<Localization.Command.Anon> {
 
-    private final Command.Anon command;
-    private final Permission.Command.Anon permission;
+    private final FileResolver fileResolver;
     private final CommandParserProvider commandParserProvider;
 
     @Inject
     public AnonModule(FileResolver fileResolver,
                       CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getAnon(), Command::getAnon, MessageType.COMMAND_ANON);
+        super(MessageType.COMMAND_ANON);
 
-        this.command = fileResolver.getCommand().getAnon();
-        this.permission = fileResolver.getPermission().getCommand().getAnon();
+        this.fileResolver = fileResolver;
         this.commandParserProvider = commandParserProvider;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptMessage = addPrompt(0, Localization.Command.Prompt::getMessage);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
     }
@@ -53,13 +52,28 @@ public class AnonModule extends AbstractModuleCommand<Localization.Command.Anon>
                 .sender(fPlayer)
                 .format(Localization.Command.Anon::getFormat)
                 .message(message)
-                .destination(command.getDestination())
-                .range(command.getRange())
+                .destination(config().getDestination())
+                .range(config().getRange())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
                 .integration()
                 .build()
         );
+    }
+
+    @Override
+    public Command.Anon config() {
+        return fileResolver.getCommand().getAnon();
+    }
+
+    @Override
+    public Permission.Command.Anon permission() {
+        return fileResolver.getPermission().getCommand().getAnon();
+    }
+
+    @Override
+    public Localization.Command.Anon localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getAnon();
     }
 }
 

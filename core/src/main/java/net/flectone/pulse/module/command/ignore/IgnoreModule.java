@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
@@ -20,8 +21,7 @@ import java.util.Optional;
 @Singleton
 public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ignore> {
 
-    private final Command.Ignore command;
-    private final Permission.Command.Ignore permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
 
@@ -29,25 +29,24 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
     public IgnoreModule(FileResolver fileResolver,
                         FPlayerService fPlayerService,
                         CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getIgnore(), Command::getIgnore, MessageType.COMMAND_IGNORE);
+        super(MessageType.COMMAND_IGNORE);
 
-        this.command = fileResolver.getCommand().getIgnore();
-        this.permission = fileResolver.getPermission().getCommand().getIgnore();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.commandParserProvider = commandParserProvider;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         registerCommand(manager -> manager
-                .permission(permission.getName())
-                .required(promptPlayer, commandParserProvider.playerParser(command.isSuggestOfflinePlayers()))
+                .permission(permission().getName())
+                .required(promptPlayer, commandParserProvider.playerParser(config().isSuggestOfflinePlayers()))
         );
     }
 
@@ -103,9 +102,24 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
                 .format(ignore -> optionalIgnore.isEmpty() ? ignore.getFormatTrue() : ignore.getFormatFalse())
                 .ignore(metadataIgnore)
                 .ignored(optionalIgnore.isEmpty())
-                .destination(command.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
+    }
+
+    @Override
+    public Command.Ignore config() {
+        return fileResolver.getCommand().getIgnore();
+    }
+
+    @Override
+    public Permission.Command.Ignore permission() {
+        return fileResolver.getPermission().getCommand().getIgnore();
+    }
+
+    @Override
+    public Localization.Command.Ignore localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getIgnore();
     }
 }

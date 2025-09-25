@@ -11,8 +11,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 @Singleton
 public class PlaceholderAPIModule extends AbstractModule {
 
-    private final Integration.Placeholderapi integration;
-    private final Permission.Integration.Placeholderapi permission;
+    private final FileResolver fileResolver;
     private final PlaceholderAPIIntegration placeholderAPIIntegration;
     private final ListenerRegistry listenerRegistry;
 
@@ -20,16 +19,15 @@ public class PlaceholderAPIModule extends AbstractModule {
     public PlaceholderAPIModule(FileResolver fileResolver,
                                 PlaceholderAPIIntegration placeholderAPIIntegration,
                                 ListenerRegistry listenerRegistry) {
-        this.integration = fileResolver.getIntegration().getPlaceholderapi();
-        this.permission = fileResolver.getPermission().getIntegration().getPlaceholderapi();
+        this.fileResolver = fileResolver;
         this.placeholderAPIIntegration = placeholderAPIIntegration;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
-        registerPermission(permission.getUse());
+        registerModulePermission(permission());
+        registerPermission(permission().getUse());
 
         placeholderAPIIntegration.hook();
 
@@ -42,7 +40,12 @@ public class PlaceholderAPIModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
+    public Integration.Placeholderapi config() {
+        return fileResolver.getIntegration().getPlaceholderapi();
+    }
+
+    @Override
+    public Permission.Integration.Placeholderapi permission() {
+        return fileResolver.getPermission().getIntegration().getPlaceholderapi();
     }
 }

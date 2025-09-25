@@ -69,18 +69,16 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 @Singleton
 public class MessageModule extends AbstractModule {
 
-    private final Message message;
-    private final Permission.Message permission;
+    private final FileResolver fileResolver;
 
     @Inject
     public MessageModule(FileResolver fileResolver) {
-        this.message = fileResolver.getMessage();
-        this.permission = fileResolver.getPermission().getMessage();
+        this.fileResolver = fileResolver;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         addChildren(AdvancementModule.class);
         addChildren(AfkModule.class);
@@ -144,8 +142,13 @@ public class MessageModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message config() {
+        return fileResolver.getMessage();
+    }
+
+    @Override
+    public Permission.Message permission() {
+        return fileResolver.getPermission().getMessage();
     }
 
 }

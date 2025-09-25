@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.coin.model.CoinMetadata;
@@ -19,29 +20,27 @@ import java.util.function.Function;
 @Singleton
 public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin> {
 
-    private final Command.Coin command;
-    private final Permission.Command.Coin permission;
+    private final FileResolver fileResolver;
     private final RandomUtil randomUtil;
 
     @Inject
     public CoinModule(FileResolver fileResolver,
                       RandomUtil randomUtil) {
-        super(localization -> localization.getCommand().getCoin(), Command::getCoin, MessageType.COMMAND_COIN);
+        super(MessageType.COMMAND_COIN);
 
-        this.command = fileResolver.getCommand().getCoin();
-        this.permission = fileResolver.getPermission().getCommand().getCoin();
+        this.fileResolver = fileResolver;
         this.randomUtil = randomUtil;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
+                .permission(permission().getName())
         );
     }
 
@@ -49,23 +48,38 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (isModuleDisabledFor(fPlayer, true)) return;
 
-        int percent = randomUtil.nextInt(command.isDraw() ? 0 : 1, 101);
+        int percent = randomUtil.nextInt(config().isDraw() ? 0 : 1, 101);
 
         sendMessage(CoinMetadata.<Localization.Command.Coin>builder()
                 .sender(fPlayer)
                 .format(replaceResult(percent))
                 .percent(percent)
-                .range(command.getRange())
-                .destination(command.getDestination())
+                .range(config().getRange())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .proxy(output -> output.writeInt(percent))
                 .integration(string -> Strings.CS.replace(
                         string,
                         "<result>",
-                        replaceResult(percent).apply(resolveLocalization())
+                        replaceResult(percent).apply(localization())
                 ))
                 .build()
         );
+    }
+
+    @Override
+    public Command.Coin config() {
+        return fileResolver.getCommand().getCoin();
+    }
+
+    @Override
+    public Permission.Command.Coin permission() {
+        return fileResolver.getPermission().getCommand().getCoin();
+    }
+
+    @Override
+    public Localization.Command.Coin localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getCoin();
     }
 
     public Function<Localization.Command.Coin, String> replaceResult(int percent) {

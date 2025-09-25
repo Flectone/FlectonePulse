@@ -17,8 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 @Singleton
 public class FloodModule extends AbstractModule {
 
-    private final Message.Format.Moderation.Flood message;
-    private final Permission.Message.Format.Moderation.Flood permission;
+    private final FileResolver fileResolver;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
 
@@ -26,22 +25,26 @@ public class FloodModule extends AbstractModule {
     public FloodModule(FileResolver fileResolver,
                        PermissionChecker permissionChecker,
                        ListenerRegistry listenerRegistry) {
-        this.message = fileResolver.getMessage().getFormat().getModeration().getFlood();
-        this.permission = fileResolver.getPermission().getMessage().getFormat().getModeration().getFlood();
+        this.fileResolver = fileResolver;
         this.permissionChecker = permissionChecker;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         listenerRegistry.register(FloodPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Format.Moderation.Flood config() {
+        return fileResolver.getMessage().getFormat().getModeration().getFlood();
+    }
+
+    @Override
+    public Permission.Message.Format.Moderation.Flood permission() {
+        return fileResolver.getPermission().getMessage().getFormat().getModeration().getFlood();
     }
 
     public void format(MessageContext messageContext) {
@@ -49,7 +52,7 @@ public class FloodModule extends AbstractModule {
 
         FEntity sender = messageContext.getSender();
         if (isModuleDisabledFor(sender)) return;
-        if (permissionChecker.check(sender, permission.getBypass())) return;
+        if (permissionChecker.check(sender, permission().getBypass())) return;
 
         String contextMessage = messageContext.getMessage();
         if (StringUtils.isEmpty(contextMessage)) return;
@@ -85,8 +88,8 @@ public class FloodModule extends AbstractModule {
     }
 
     private void appendSymbol(StringBuilder stringBuilder, char symbol, int count) {
-        int counts = count > message.getMaxRepeatedSymbols()
-                ? message.isTrimToSingle() ? 1 : message.getMaxRepeatedSymbols()
+        int counts = count > config().getMaxRepeatedSymbols()
+                ? config().isTrimToSingle() ? 1 : config().getMaxRepeatedSymbols()
                 : count;
 
         stringBuilder.append(String.valueOf(symbol).repeat(counts));
@@ -119,8 +122,8 @@ public class FloodModule extends AbstractModule {
     }
 
     private void appendWord(StringBuilder stringBuilder, String word, int count) {
-        int counts = count > message.getMaxRepeatedWords()
-                ? message.isTrimToSingle() ? 1 : message.getMaxRepeatedWords()
+        int counts = count > config().getMaxRepeatedWords()
+                ? config().isTrimToSingle() ? 1 : config().getMaxRepeatedWords()
                 : count;
 
         while (counts > 0) {

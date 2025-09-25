@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
@@ -28,8 +29,7 @@ import java.util.Optional;
 @Singleton
 public class IgnorelistModule extends AbstractModuleCommand<Localization.Command.Ignorelist> {
 
-    private final Command.Ignorelist command;
-    private final Permission.Command.Ignorelist permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final EventDispatcher eventDispatcher;
     private final MessagePipeline messagePipeline;
@@ -45,10 +45,9 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
                             CommandParserProvider commandParserProvider,
                             TimeFormatter timeFormatter,
                             SoundPlayer soundPlayer) {
-        super(localization -> localization.getCommand().getIgnorelist(), Command::getIgnorelist, MessageType.COMMAND_IGNORELIST);
+        super(MessageType.COMMAND_IGNORELIST);
 
-        this.command = fileResolver.getCommand().getIgnorelist();
-        this.permission = fileResolver.getPermission().getCommand().getIgnorelist();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.eventDispatcher = eventDispatcher;
         this.messagePipeline = messagePipeline;
@@ -59,14 +58,14 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptNumber = addPrompt(0, Localization.Command.Prompt::getNumber);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .optional(promptNumber, commandParserProvider.integerParser())
         );
     }
@@ -86,10 +85,10 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
             return;
         }
 
-        Localization.Command.Ignorelist localization = resolveLocalization(fPlayer);
+        Localization.Command.Ignorelist localization = localization(fPlayer);
 
         int size = ignoreList.size();
-        int perPage = command.getPerPage();
+        int perPage = config().getPerPage();
         int countPage = (int) Math.ceil((double) size / perPage);
 
         String prompt = getPrompt(0);
@@ -143,5 +142,20 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_IGNORELIST, fPlayer, component));
 
         soundPlayer.play(getModuleSound(), fPlayer);
+    }
+
+    @Override
+    public Command.Ignorelist config() {
+        return fileResolver.getCommand().getIgnorelist();
+    }
+
+    @Override
+    public Permission.Command.Ignorelist permission() {
+        return fileResolver.getPermission().getCommand().getIgnorelist();
+    }
+
+    @Override
+    public Localization.Command.Ignorelist localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getIgnorelist();
     }
 }

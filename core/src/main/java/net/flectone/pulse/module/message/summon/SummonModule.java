@@ -21,32 +21,40 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 @Singleton
 public class SummonModule extends AbstractModuleLocalization<Localization.Message.Summon> {
 
-    private final Message.Summon message;
-    private final Permission.Message.Summon permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public SummonModule(FileResolver fileResolver,
                         ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getSummon(), MessageType.SUMMON);
+        super(MessageType.SUMMON);
 
-        this.message = fileResolver.getMessage().getSummon();
-        this.permission = fileResolver.getPermission().getMessage().getSummon();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(SummonPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Summon config() {
+        return fileResolver.getMessage().getSummon();
+    }
+
+    @Override
+    public Permission.Message.Summon permission() {
+        return fileResolver.getPermission().getMessage().getSummon();
+    }
+
+    @Override
+    public Localization.Message.Summon localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getSummon();
     }
 
     @Async
@@ -55,9 +63,9 @@ public class SummonModule extends AbstractModuleLocalization<Localization.Messag
 
         sendMessage(SummonMetadata.<Localization.Message.Summon>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(Localization.Message.Summon::getFormat)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .target(target)
                 .translationKey(translationKey)
@@ -65,5 +73,4 @@ public class SummonModule extends AbstractModuleLocalization<Localization.Messag
                 .build()
         );
     }
-
 }

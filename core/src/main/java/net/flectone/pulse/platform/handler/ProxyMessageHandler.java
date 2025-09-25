@@ -40,7 +40,7 @@ import net.flectone.pulse.module.command.stream.StreamModule;
 import net.flectone.pulse.module.command.stream.model.StreamMetadata;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.module.command.tictactoe.TictactoeModule;
-import net.flectone.pulse.module.command.tictactoe.manager.TictactoeManager;
+import net.flectone.pulse.module.command.tictactoe.service.TictactoeService;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.module.command.translateto.TranslatetoModule;
 import net.flectone.pulse.module.command.translateto.model.TranslatetoMetadata;
@@ -666,18 +666,18 @@ public class ProxyMessageHandler {
                 int ticTacToeId = input.readInt();
                 boolean isHard = input.readBoolean();
 
-                TictactoeManager tictactoeManager = injector.getInstance(TictactoeManager.class);
+                TictactoeService tictactoeService = injector.getInstance(TictactoeService.class);
 
-                TicTacToe ticTacToe = tictactoeManager.get(ticTacToeId);
-                if (tictactoeManager.get(ticTacToeId) == null) {
-                    ticTacToe = tictactoeManager.create(ticTacToeId, fPlayer, fReceiver, isHard);
+                TicTacToe ticTacToe = tictactoeService.get(ticTacToeId);
+                if (tictactoeService.get(ticTacToeId) == null) {
+                    ticTacToe = tictactoeService.create(ticTacToeId, fPlayer, fReceiver, isHard);
                 }
 
                 injector.getInstance(TictactoeModule.class).sendCreateMessage(fPlayer, fReceiver, ticTacToe, metadataUUID);
             }
             case MOVE -> {
                 FPlayer fReceiver = gson.fromJson(input.readUTF(), FPlayer.class);
-                TicTacToe ticTacToe = injector.getInstance(TictactoeManager.class).fromString(input.readUTF());
+                TicTacToe ticTacToe = injector.getInstance(TictactoeService.class).fromString(input.readUTF());
                 int typeTitle = input.readInt();
                 String move = input.readUTF();
 

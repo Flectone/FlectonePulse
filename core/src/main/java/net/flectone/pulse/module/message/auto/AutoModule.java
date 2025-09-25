@@ -6,6 +6,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.model.util.Ticker;
@@ -15,13 +16,13 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 @Singleton
 public class AutoModule extends AbstractModuleListLocalization<Localization.Message.Auto> {
 
-    private final Message.Auto message;
-    private final Permission.Message.Auto permission;
+    private final FileResolver fileResolver;
     private final TaskScheduler taskScheduler;
     private final FPlayerService fPlayerService;
 
@@ -29,20 +30,19 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
     public AutoModule(FileResolver fileResolver,
                       TaskScheduler taskScheduler,
                       FPlayerService fPlayerService) {
-        super(localization -> localization.getMessage().getAuto(), MessageType.AUTO);
+        super(MessageType.AUTO);
 
-        this.message = fileResolver.getMessage().getAuto();
-        this.permission = fileResolver.getPermission().getMessage().getAuto();
+        this.fileResolver = fileResolver;
         this.taskScheduler = taskScheduler;
         this.fPlayerService = fPlayerService;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        message.getTypes().forEach((key, value) -> {
-            Sound sound = createSound(value.getSound(), permission.getTypes().get(key));
+        config().getTypes().forEach((key, value) -> {
+            Sound sound = createSound(value.getSound(), permission().getTypes().get(key));
 
             Ticker ticker = value.getTicker();
             if (ticker.isEnable()) {
@@ -52,14 +52,29 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Auto config() {
+        return fileResolver.getMessage().getAuto();
+    }
+
+    @Override
+    public Permission.Message.Auto permission() {
+        return fileResolver.getPermission().getMessage().getAuto();
+    }
+
+    @Override
+    public Localization.Message.Auto localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getAuto();
+    }
+
+    @Override
+    public List<String> getAvailableMessages(FPlayer fPlayer) {
+        return Collections.emptyList();
     }
 
     public void send(FPlayer fPlayer, String name, Message.Auto.Type type, Sound sound) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        List<String> messages = resolveLocalization(fPlayer).getTypes().get(name);
+        List<String> messages = localization(fPlayer).getTypes().get(name);
         if (messages == null) return;
 
         String format = getNextMessage(fPlayer, type.isRandom(), messages);
@@ -72,10 +87,5 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
                 .sound(sound)
                 .build()
         );
-    }
-
-    @Override
-    public List<String> getAvailableMessages(FPlayer fPlayer) {
-        return List.of();
     }
 }

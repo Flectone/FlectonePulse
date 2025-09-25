@@ -36,8 +36,7 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
             .expireAfterWrite(1, TimeUnit.HOURS)
             .build();
 
-    private final Message.Format.Translate message;
-    private final Permission.Message.Format.Translate permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
 
@@ -45,17 +44,16 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
     public TranslateModule(FileResolver fileResolver,
                            ListenerRegistry listenerRegistry,
                            MessagePipeline messagePipeline) {
-        super(localization -> localization.getMessage().getFormat().getTranslate(), MessageType.TRANSLATE);
+        super(MessageType.TRANSLATE);
 
-        this.message = fileResolver.getMessage().getFormat().getTranslate();
-        this.permission = fileResolver.getPermission().getMessage().getFormat().getTranslate();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
         this.messagePipeline = messagePipeline;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         listenerRegistry.register(TranslatePulseListener.class);
     }
@@ -66,8 +64,18 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Format.Translate config() {
+        return fileResolver.getMessage().getFormat().getTranslate();
+    }
+
+    @Override
+    public Permission.Message.Format.Translate permission() {
+        return fileResolver.getPermission().getMessage().getFormat().getTranslate();
+    }
+
+    @Override
+    public Localization.Message.Format.Translate localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getFormat().getTranslate();
     }
 
     public UUID saveMessage(String message) {
@@ -107,7 +115,7 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
                 }
             }
 
-            String action = resolveLocalization(receiver).getAction();
+            String action = localization(receiver).getAction();
             action = Strings.CS.replaceOnce(action, "<language>", firstLang);
             action = Strings.CS.replaceOnce(action, "<language>", secondLang == null ? "ru_ru" : secondLang);
             action = Strings.CS.replace(action, "<message>", key.toString());

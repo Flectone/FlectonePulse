@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.particle.listener.ParticlePulseListener;
@@ -19,32 +20,40 @@ import org.apache.commons.lang3.Strings;
 @Singleton
 public class ParticleModule extends AbstractModuleLocalization<Localization.Message.Particle> {
 
-    private final Message.Particle message;
-    private final Permission.Message.Particle permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public ParticleModule(FileResolver fileResolver,
                           ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getParticle(), MessageType.PARTICLE);
+        super(MessageType.PARTICLE);
 
-        this.message = fileResolver.getMessage().getParticle();
-        this.permission = fileResolver.getPermission().getMessage().getParticle();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(ParticlePulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Particle config() {
+        return fileResolver.getMessage().getParticle();
+    }
+
+    @Override
+    public Permission.Message.Particle permission() {
+        return fileResolver.getPermission().getMessage().getParticle();
+    }
+
+    @Override
+    public Localization.Message.Particle localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getParticle();
     }
 
     @Async
@@ -53,14 +62,13 @@ public class ParticleModule extends AbstractModuleLocalization<Localization.Mess
 
         sendMessage(ParticleMetadata.<Localization.Message.Particle>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> Strings.CS.replace(localization.getFormat(), "<particle>", particle))
                 .particle(particle)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
     }
-
 }

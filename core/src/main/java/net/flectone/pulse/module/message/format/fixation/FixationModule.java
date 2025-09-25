@@ -15,28 +15,31 @@ import net.flectone.pulse.util.constant.MessageFlag;
 @Singleton
 public class FixationModule extends AbstractModule {
 
-    private final Message.Format.Fixation message;
-    private final Permission.Message.Format.Fixation permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public FixationModule(FileResolver fileResolver,
                           ListenerRegistry listenerRegistry) {
-        this.message = fileResolver.getMessage().getFormat().getFixation();
-        this.permission = fileResolver.getPermission().getMessage().getFormat().getFixation();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         listenerRegistry.register(FixationPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Format.Fixation config() {
+        return fileResolver.getMessage().getFormat().getFixation();
+    }
+
+    @Override
+    public Permission.Message.Format.Fixation permission() {
+        return fileResolver.getPermission().getMessage().getFormat().getFixation();
     }
 
     public void format(MessageContext messageContext) {
@@ -48,11 +51,11 @@ public class FixationModule extends AbstractModule {
         String contextMessage = messageContext.getMessage();
         if (contextMessage.isBlank()) return;
 
-        if (message.isEndDot() && message.getNonDotSymbols().stream().noneMatch(contextMessage::endsWith)) {
+        if (config().isEndDot() && config().getNonDotSymbols().stream().noneMatch(contextMessage::endsWith)) {
             contextMessage = contextMessage + ".";
         }
 
-        if (message.isFirstLetterUppercase()) {
+        if (config().isFirstLetterUppercase()) {
             contextMessage = Character.toUpperCase(contextMessage.charAt(0)) + contextMessage.substring(1);
         }
 

@@ -19,8 +19,7 @@ import java.util.function.UnaryOperator;
 @Singleton
 public class DiscordModule extends AbstractModule {
 
-    private final Integration.Discord integration;
-    private final Permission.Integration.Discord permission;
+    private final FileResolver fileResolver;
     private final ReflectionResolver reflectionResolver;
     private final Injector injector;
     private final FLogger fLogger;
@@ -30,8 +29,7 @@ public class DiscordModule extends AbstractModule {
                          ReflectionResolver reflectionResolver,
                          Injector injector,
                          FLogger fLogger) {
-        this.integration = fileResolver.getIntegration().getDiscord();
-        this.permission = fileResolver.getPermission().getIntegration().getDiscord();
+        this.fileResolver = fileResolver;
         this.reflectionResolver = reflectionResolver;
         this.injector = injector;
         this.fLogger = fLogger;
@@ -39,7 +37,7 @@ public class DiscordModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         reflectionResolver.hasClassOrElse("discord4j.core.DiscordClient", this::loadLibraries);
 
@@ -55,6 +53,16 @@ public class DiscordModule extends AbstractModule {
         injector.getInstance(DiscordIntegration.class).unhook();
     }
 
+    @Override
+    public Integration.Discord config() {
+        return fileResolver.getIntegration().getDiscord();
+    }
+
+    @Override
+    public Permission.Integration.Discord permission() {
+        return fileResolver.getPermission().getIntegration().getDiscord();
+    }
+
     private void loadLibraries(LibraryResolver libraryResolver) {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("com{}discord4j")
@@ -63,11 +71,6 @@ public class DiscordModule extends AbstractModule {
                 .resolveTransitiveDependencies(true)
                 .build()
         );
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
     }
 
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> discordString) {

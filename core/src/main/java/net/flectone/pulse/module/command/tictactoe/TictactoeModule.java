@@ -6,9 +6,10 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
-import net.flectone.pulse.module.command.tictactoe.manager.TictactoeManager;
+import net.flectone.pulse.module.command.tictactoe.service.TictactoeService;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToeMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -30,10 +31,9 @@ import java.util.function.BiFunction;
 @Singleton
 public class TictactoeModule extends AbstractModuleCommand<Localization.Command.Tictactoe> {
 
-    private final Command.Tictactoe command;
-    private final Permission.Command.Tictactoe permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
-    private final TictactoeManager tictactoeManager;
+    private final TictactoeService tictactoeService;
     private final ProxySender proxySender;
     private final IntegrationModule integrationModule;
     private final CommandParserProvider commandParserProvider;
@@ -44,19 +44,18 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
     @Inject
     public TictactoeModule(FileResolver fileResolver,
                            FPlayerService fPlayerService,
-                           TictactoeManager tictactoeManager,
+                           TictactoeService tictactoeService,
                            ProxySender proxySender,
                            IntegrationModule integrationModule,
                            CommandParserProvider commandParserProvider,
                            Gson gson,
                            IgnoreSender ignoreSender,
                            DisableSender disableSender) {
-        super(localization -> localization.getCommand().getTictactoe(), Command::getTictactoe, MessageType.COMMAND_TICTACTOE);
+        super(MessageType.COMMAND_TICTACTOE);
 
-        this.command = fileResolver.getCommand().getTictactoe();
-        this.permission = fileResolver.getPermission().getCommand().getTictactoe();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
-        this.tictactoeManager = tictactoeManager;
+        this.tictactoeService = tictactoeService;
         this.proxySender = proxySender;
         this.integrationModule = integrationModule;
         this.commandParserProvider = commandParserProvider;
@@ -67,17 +66,17 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         String promptHard = addPrompt(1, Localization.Command.Prompt::getHard);
         registerCommand(manager -> manager
                .required(promptPlayer, commandParserProvider.playerParser())
                .optional(promptHard, commandParserProvider.booleanParser())
-               .permission(permission.getName())
+               .permission(permission().getName())
         );
 
         String promptId = addPrompt(2, Localization.Command.Prompt::getId);
@@ -86,7 +85,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
                 manager.commandBuilder(getCommandName() + "move")
                         .required(promptId, commandParserProvider.integerParser())
                         .required(promptMove, commandParserProvider.singleMessageParser())
-                        .permission(permission.getName())
+                        .permission(permission().getName())
                         .handler(commandContext -> executeMove(commandContext.sender(), commandContext))
         );
     }
@@ -95,7 +94,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
     public void onDisable() {
         super.onDisable();
 
-        tictactoeManager.clear();
+        tictactoeService.clear();
     }
 
     @Override
@@ -135,7 +134,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         fPlayerService.loadSettingsIfOffline(fReceiver);
         if (disableSender.sendIfDisabled(fPlayer, fReceiver, getMessageType())) return;
 
-        TicTacToe ticTacToe = tictactoeManager.create(fPlayer, fReceiver, isHard);
+        TicTacToe ticTacToe = tictactoeService.create(fPlayer, fReceiver, isHard);
 
         sendMessage(TicTacToeMetadata.<Localization.Command.Tictactoe>builder()
                 .sender(fPlayer)
@@ -158,6 +157,21 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         if (isSent) return;
 
         sendCreateMessage(fPlayer, fReceiver, ticTacToe, metadataUUID);
+    }
+
+    @Override
+    public Command.Tictactoe config() {
+        return fileResolver.getCommand().getTictactoe();
+    }
+
+    @Override
+    public Permission.Command.Tictactoe permission() {
+        return fileResolver.getPermission().getCommand().getTictactoe();
+    }
+
+    @Override
+    public Localization.Command.Tictactoe localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getTictactoe();
     }
 
     // /tictactoe %d create
@@ -210,7 +224,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         int tictactoeID = getArgument(commandContext, 2);
         String move = getArgument(commandContext, 3);
 
-        TicTacToe ticTacToe = tictactoeManager.get(tictactoeID);
+        TicTacToe ticTacToe = tictactoeService.get(tictactoeID);
         if (ticTacToe == null || ticTacToe.isEnded() || !ticTacToe.contains(fPlayer) || (move.equals("create") && ticTacToe.isCreated())) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)

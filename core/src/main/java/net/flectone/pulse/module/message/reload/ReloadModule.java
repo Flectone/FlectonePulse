@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.reload.listener.ReloadPulseListener;
@@ -16,32 +17,40 @@ import net.flectone.pulse.util.constant.MessageType;
 @Singleton
 public class ReloadModule extends AbstractModuleLocalization<Localization.Message.Reload> {
 
-    private final Message.Reload message;
-    private final Permission.Message.Reload permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public ReloadModule(FileResolver fileResolver,
                         ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getReload(), MessageType.RELOAD);
+        super(MessageType.RELOAD);
 
-        this.message = fileResolver.getMessage().getReload();
-        this.permission = fileResolver.getPermission().getMessage().getReload();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(ReloadPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Reload config() {
+        return fileResolver.getMessage().getReload();
+    }
+
+    @Override
+    public Permission.Message.Reload permission() {
+        return fileResolver.getPermission().getMessage().getReload();
+    }
+
+    @Override
+    public Localization.Message.Reload localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getReload();
     }
 
     @Async
@@ -52,10 +61,9 @@ public class ReloadModule extends AbstractModuleLocalization<Localization.Messag
                 .sender(fPlayer)
                 .filterPlayer(fPlayer)
                 .format(Localization.Message.Reload::getFormat)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
     }
-
 }

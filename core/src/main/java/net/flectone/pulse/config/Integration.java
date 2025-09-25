@@ -13,7 +13,7 @@ import java.util.Map;
 
 @SuppressWarnings({"FieldMayBeFinal", "unused"})
 @Getter
-public final class Integration extends YamlFile implements ModuleConfig.IntegrationConfig {
+public final class Integration extends YamlFile implements ModuleConfig.IntegrationConfig, Config.IEnable {
 
     public Integration(Path projectPath) {
         super(projectPath.resolve("integration.yml"));

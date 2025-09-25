@@ -41,8 +41,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
     private final Map<String, Cooldown> cooldownMap = new HashMap<>();
     private final Map<String, Pattern> patternMap = new HashMap<>();
 
-    private final Message.Format.QuestionAnswer message;
-    private final Permission.Message.Format.QuestionAnswer permission;
+    private final FileResolver fileResolver;
     private final FLogger fLogger;
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
@@ -52,10 +51,9 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
                                 FLogger fLogger,
                                 ListenerRegistry listenerRegistry,
                                 PermissionChecker permissionChecker) {
-        super(localization -> localization.getMessage().getFormat().getQuestionAnswer(), MessageType.QUESTION_ANSWER);
+        super(MessageType.QUESTION_ANSWER);
 
-        this.message = fileResolver.getMessage().getFormat().getQuestionAnswer();
-        this.permission = fileResolver.getPermission().getMessage().getFormat().getQuestionAnswer();
+        this.fileResolver = fileResolver;
         this.fLogger = fLogger;
         this.listenerRegistry = listenerRegistry;
         this.permissionChecker = permissionChecker;
@@ -63,9 +61,9 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        message.getQuestions().forEach((key, questionMessage) -> {
+        config().getQuestions().forEach((key, questionMessage) -> {
 
             try {
                 patternMap.put(key, Pattern.compile(questionMessage.getTarget()));
@@ -73,7 +71,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
                 fLogger.warning(e);
             }
 
-            Permission.Message.Format.QuestionAnswer.Question questionPermission = permission.getQuestions().get(key);
+            Permission.Message.Format.QuestionAnswer.Question questionPermission = permission().getQuestions().get(key);
             if (questionPermission == null) return;
 
             registerPermission(questionPermission.getAsk());
@@ -93,8 +91,18 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Format.QuestionAnswer config() {
+        return fileResolver.getMessage().getFormat().getQuestionAnswer();
+    }
+
+    @Override
+    public Permission.Message.Format.QuestionAnswer permission() {
+        return fileResolver.getPermission().getMessage().getFormat().getQuestionAnswer();
+    }
+
+    @Override
+    public Localization.Message.Format.QuestionAnswer localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getFormat().getQuestionAnswer();
     }
 
     public void format(MessageContext messageContext) {
@@ -107,7 +115,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
         StringBuilder result = new StringBuilder(contextMessage);
 
         for (Map.Entry<String, Pattern> entry : patternMap.entrySet()) {
-            Permission.Message.Format.QuestionAnswer.Question questionPermission = permission.getQuestions().get(entry.getKey());
+            Permission.Message.Format.QuestionAnswer.Question questionPermission = permission().getQuestions().get(entry.getKey());
             if (questionPermission != null && !permissionChecker.check(sender, questionPermission.getAsk())) continue;
 
             Matcher matcher = entry.getValue().matcher(contextMessage);
@@ -154,7 +162,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
 
     @Async(delay = 1L)
     private void sendAnswerLater(FEntity sender, FEntity receiver, String question) {
-        Message.Format.QuestionAnswer.Question questionMessage = message.getQuestions().get(question);
+        Message.Format.QuestionAnswer.Question questionMessage = config().getQuestions().get(question);
         if (questionMessage == null) return;
 
         Range range = questionMessage.getRange();

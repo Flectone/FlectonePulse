@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.spy.model.SpyMetadata;
@@ -24,8 +25,7 @@ import java.util.function.Predicate;
 @Singleton
 public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
-    private final Command.Spy command;
-    private final Permission.Command.Spy permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
 
@@ -33,23 +33,22 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
     public SpyModule(FileResolver fileResolver,
                      FPlayerService fPlayerService,
                      PermissionChecker permissionChecker) {
-        super(localization -> localization.getCommand().getSpy(), Command::getSpy, MessageType.COMMAND_SPY);
+        super(MessageType.COMMAND_SPY);
 
-        this.command = fileResolver.getCommand().getSpy();
-        this.permission = fileResolver.getPermission().getCommand().getSpy();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         registerCommand(manager -> manager
-                .permission(permission.getName())
+                .permission(permission().getName())
         );
     }
 
@@ -71,16 +70,31 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
                 .format(s -> !turnedBefore ? s.getFormatTrue() : s.getFormatFalse())
                 .turned(!turnedBefore)
                 .action("turning")
-                .destination(command.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
     }
 
+    @Override
+    public Command.Spy config() {
+        return fileResolver.getCommand().getSpy();
+    }
+
+    @Override
+    public Permission.Command.Spy permission() {
+        return fileResolver.getPermission().getCommand().getSpy();
+    }
+
+    @Override
+    public Localization.Command.Spy localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getSpy();
+    }
+
     public void checkChat(FPlayer fPlayer, String chat, String message) {
         if (!isEnable()) return;
 
-        Map<String, List<String>> categories = command.getCategories();
+        Map<String, List<String>> categories = config().getCategories();
         if (categories.get("action") == null) return;
         if (!categories.get("action").contains(chat)) return;
 
@@ -95,8 +109,8 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
                 .format(replaceAction(action))
                 .turned(true)
                 .action(action)
-                .range(command.getRange())
-                .destination(command.getDestination())
+                .range(config().getRange())
+                .destination(config().getDestination())
                 .message(message)
                 .filter(createFilter(fPlayer))
                 .proxy(dataOutputStream -> {

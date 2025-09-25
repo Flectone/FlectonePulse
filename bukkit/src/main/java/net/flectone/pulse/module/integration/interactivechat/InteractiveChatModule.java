@@ -3,7 +3,6 @@ package net.flectone.pulse.module.integration.interactivechat;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Integration;
-import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModule;
@@ -16,9 +15,7 @@ import net.kyori.adventure.text.Component;
 @Singleton
 public class InteractiveChatModule extends AbstractModule {
 
-    private final Message.Format.Moderation.Delete deleteMessage;
-    private final Integration.Interactivechat integration;
-    private final Permission.Integration.Interactivechat permission;
+    private final FileResolver fileResolver;
     private final InteractiveChatIntegration interactiveChatIntegration;
     private final ListenerRegistry listenerRegistry;
     private final DeleteModule deleteModule;
@@ -30,9 +27,7 @@ public class InteractiveChatModule extends AbstractModule {
                                  ListenerRegistry listenerRegistry,
                                  DeleteModule deleteModule,
                                  FLogger fLogger) {
-        this.deleteMessage = fileResolver.getMessage().getFormat().getModeration().getDelete();
-        this.integration = fileResolver.getIntegration().getInteractivechat();
-        this.permission = fileResolver.getPermission().getIntegration().getInteractivechat();
+        this.fileResolver = fileResolver;
         this.interactiveChatIntegration = interactiveChatIntegration;
         this.listenerRegistry = listenerRegistry;
         this.deleteModule = deleteModule;
@@ -41,12 +36,12 @@ public class InteractiveChatModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        if (deleteMessage.isEnable()) {
+        if (fileResolver.getMessage().getFormat().getModeration().getDelete().isEnable()) {
             fLogger.warning("InteractiveChat and Delete module incompatible");
             deleteModule.addPredicate(fEntity -> false);
         }
 
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         interactiveChatIntegration.hook();
 
@@ -59,8 +54,13 @@ public class InteractiveChatModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
+    public Integration.Interactivechat config() {
+        return fileResolver.getIntegration().getInteractivechat();
+    }
+
+    @Override
+    public Permission.Integration.Interactivechat permission() {
+        return fileResolver.getPermission().getIntegration().getInteractivechat();
     }
 
     public String checkMention(FEntity fSender, String message) {

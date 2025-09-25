@@ -39,8 +39,7 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
             .maximumSize(100000)
             .build();
 
-    private final Message.Format.Moderation.Swear message;
-    private final Permission.Message.Format.Moderation.Swear permission;
+    private final FileResolver fileResolver;
     private final FLogger fLogger;
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
@@ -54,10 +53,9 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
                        ListenerRegistry listenerRegistry,
                        PermissionChecker permissionChecker,
                        MessagePipeline messagePipeline) {
-        super(localization -> localization.getMessage().getFormat().getModeration().getSwear(), MessageType.SWEAR);
+        super(MessageType.SWEAR);
 
-        this.message = fileResolver.getMessage().getFormat().getModeration().getSwear();
-        this.permission = fileResolver.getPermission().getMessage().getFormat().getModeration().getSwear();
+        this.fileResolver = fileResolver;
         this.fLogger = fLogger;
         this.listenerRegistry = listenerRegistry;
         this.permissionChecker = permissionChecker;
@@ -66,13 +64,13 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        registerPermission(permission.getBypass());
-        registerPermission(permission.getSee());
+        registerPermission(permission().getBypass());
+        registerPermission(permission().getSee());
 
         try {
-            combinedPattern = Pattern.compile(String.join("|", this.message.getTrigger()));
+            combinedPattern = Pattern.compile(String.join("|", config().getTrigger()));
         } catch (PatternSyntaxException e) {
             fLogger.warning(e);
         }
@@ -86,8 +84,18 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Format.Moderation.Swear config() {
+        return fileResolver.getMessage().getFormat().getModeration().getSwear();
+    }
+
+    @Override
+    public Permission.Message.Format.Moderation.Swear permission() {
+        return fileResolver.getPermission().getMessage().getFormat().getModeration().getSwear();
+    }
+
+    @Override
+    public Localization.Message.Format.Moderation.Swear localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getFormat().getModeration().getSwear();
     }
 
     public void format(MessageContext messageContext) {
@@ -122,11 +130,11 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
             String swear = swearTag.value();
             if (swear.isBlank()) return Tag.selfClosingInserting(Component.empty());
 
-            String symbols = resolveLocalization(receiver).getSymbol().repeat(swear.length());
+            String symbols = localization(receiver).getSymbol().repeat(swear.length());
 
             Component component = messagePipeline.builder(sender, receiver, symbols).build();
 
-            if (permissionChecker.check(receiver, permission.getSee())) {
+            if (permissionChecker.check(receiver, permission().getSee())) {
                 component = component.hoverEvent(HoverEvent.showText(Component.text(swear)));
             }
 
@@ -135,14 +143,14 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
     }
 
     private String replace(FEntity sender, String string) {
-        if (permissionChecker.check(sender, permission.getBypass())) return string;
+        if (permissionChecker.check(sender, permission().getBypass())) return string;
         if (combinedPattern == null) return string;
 
         StringBuilder result = new StringBuilder();
         Matcher matcher = combinedPattern.matcher(string);
         while (matcher.find()) {
             String word = matcher.group(0);
-            if (word != null && message.getIgnore().contains(word.trim().toLowerCase())) continue;
+            if (word != null && config().getIgnore().contains(word.trim().toLowerCase())) continue;
 
             matcher.appendReplacement(result, "<swear:'" + word + "'>");
         }

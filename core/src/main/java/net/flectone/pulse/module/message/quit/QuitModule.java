@@ -6,20 +6,20 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.module.message.quit.model.QuitMetadata;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.quit.listener.QuitPulseListener;
+import net.flectone.pulse.module.message.quit.model.QuitMetadata;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
 
 @Singleton
 public class QuitModule extends AbstractModuleLocalization<Localization.Message.Quit> {
 
-    private final Message.Quit message;
-    private final Permission.Message.Quit permission;
+    private final FileResolver fileResolver;
     private final IntegrationModule integrationModule;
     private final ListenerRegistry listenerRegistry;
 
@@ -27,26 +27,35 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
     public QuitModule(FileResolver fileResolver,
                       IntegrationModule integrationModule,
                       ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getQuit(), MessageType.QUIT);
+        super(MessageType.QUIT);
 
-        this.message = fileResolver.getMessage().getQuit();
-        this.permission = fileResolver.getPermission().getMessage().getQuit();
+        this.fileResolver = fileResolver;
         this.integrationModule = integrationModule;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(QuitPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Quit config() {
+        return fileResolver.getMessage().getQuit();
+    }
+
+    @Override
+    public Permission.Message.Quit permission() {
+        return fileResolver.getPermission().getMessage().getQuit();
+    }
+
+    @Override
+    public Localization.Message.Quit localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getQuit();
     }
 
     @Async
@@ -57,8 +66,8 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
                 .sender(fPlayer)
                 .format(Localization.Message.Quit::getFormat)
                 .ignoreVanish(ignoreVanish)
-                .destination(message.getDestination())
-                .range(message.getRange())
+                .destination(config().getDestination())
+                .range(config().getRange())
                 .sound(getModuleSound())
                 .filter(fReceiver -> ignoreVanish || integrationModule.canSeeVanished(fPlayer, fReceiver))
                 .integration()

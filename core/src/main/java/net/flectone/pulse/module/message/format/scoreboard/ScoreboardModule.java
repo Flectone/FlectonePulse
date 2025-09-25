@@ -32,8 +32,7 @@ public class ScoreboardModule extends AbstractModule {
 
     private final Map<UUID, Team> uuidTeamMap = new ConcurrentHashMap<>();
 
-    private final Message.Format.Scoreboard message;
-    private final Permission.Message.Format.Scoreboard permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
@@ -47,8 +46,7 @@ public class ScoreboardModule extends AbstractModule {
                             MessagePipeline messagePipeline,
                             PacketSender packetSender,
                             ListenerRegistry listenerRegistry) {
-        this.message = fileResolver.getMessage().getFormat().getScoreboard();
-        this.permission = fileResolver.getPermission().getMessage().getFormat().getScoreboard();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
@@ -57,15 +55,10 @@ public class ScoreboardModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
-    }
-
-    @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        Ticker ticker = message.getTicker();
+        Ticker ticker = config().getTicker();
         if (ticker.isEnable()) {
             taskScheduler.runAsyncTimer(() -> uuidTeamMap.keySet().forEach(uuid -> {
                 FPlayer fPlayer = fPlayerService.getFPlayer(uuid);
@@ -87,6 +80,16 @@ public class ScoreboardModule extends AbstractModule {
     public void onDisable() {
         uuidTeamMap.values().forEach(team -> sendPacket(team, WrapperPlayServerTeams.TeamMode.REMOVE));
         uuidTeamMap.clear();
+    }
+
+    @Override
+    public Message.Format.Scoreboard config() {
+        return fileResolver.getMessage().getFormat().getScoreboard();
+    }
+
+    @Override
+    public Permission.Message.Format.Scoreboard permission() {
+        return fileResolver.getPermission().getMessage().getFormat().getScoreboard();
     }
 
     @Async
@@ -121,24 +124,24 @@ public class ScoreboardModule extends AbstractModule {
         Component displayName = Component.text(teamName);
 
         Component prefix = Component.empty();
-        if (!message.getPrefix().isEmpty()) {
-            prefix = messagePipeline.builder(fPlayer, message.getPrefix())
+        if (!config().getPrefix().isEmpty()) {
+            prefix = messagePipeline.builder(fPlayer, config().getPrefix())
                     .flag(MessageFlag.INVISIBLE_NAME, false)
                     .build();
         }
 
         Component suffix = Component.empty();
-        if (!message.getSuffix().isEmpty()) {
-            suffix = messagePipeline.builder(fPlayer, message.getSuffix())
+        if (!config().getSuffix().isEmpty()) {
+            suffix = messagePipeline.builder(fPlayer, config().getSuffix())
                     .flag(MessageFlag.INVISIBLE_NAME, false)
                     .build();
         }
 
-        WrapperPlayServerTeams.NameTagVisibility nameTagVisibility = message.isNameVisible()
+        WrapperPlayServerTeams.NameTagVisibility nameTagVisibility = config().isNameVisible()
                 ? WrapperPlayServerTeams.NameTagVisibility.ALWAYS
                 : WrapperPlayServerTeams.NameTagVisibility.HIDE_FOR_OTHER_TEAMS;
         WrapperPlayServerTeams.CollisionRule collisionRule = WrapperPlayServerTeams.CollisionRule.ALWAYS;
-        TextColor color = messagePipeline.builder(fPlayer, message.getColor()).build().color();
+        TextColor color = messagePipeline.builder(fPlayer, config().getColor()).build().color();
         WrapperPlayServerTeams.OptionData optionData = WrapperPlayServerTeams.OptionData.NONE;
 
         WrapperPlayServerTeams.ScoreBoardTeamInfo info = new WrapperPlayServerTeams.ScoreBoardTeamInfo(

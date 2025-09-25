@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.sender.SoundPlayer;
@@ -16,8 +17,7 @@ import org.incendo.cloud.context.CommandContext;
 @Singleton
 public class AfkModule extends AbstractModuleCommand<Localization.Command> {
 
-    private final Command.Afk command;
-    private final Permission.Command.Afk permission;
+    private final FileResolver fileResolver;
     private final net.flectone.pulse.module.message.afk.AfkModule afkMessageModule;
     private final SoundPlayer soundPlayer;
 
@@ -25,24 +25,38 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
     public AfkModule(FileResolver fileResolver,
                      net.flectone.pulse.module.message.afk.AfkModule afkMessageModule,
                      SoundPlayer soundPlayer) {
-        super(Localization::getCommand, Command::getAfk, MessageType.COMMAND_AFK);
+        super(MessageType.COMMAND_AFK);
 
-        this.command = fileResolver.getCommand().getAfk();
-        this.permission = fileResolver.getPermission().getCommand().getAfk();
+        this.fileResolver = fileResolver;
         this.afkMessageModule = afkMessageModule;
         this.soundPlayer = soundPlayer;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
+                .permission(permission().getName())
         );
+    }
+
+    @Override
+    public Command.Afk config() {
+        return fileResolver.getCommand().getAfk();
+    }
+
+    @Override
+    public Permission.Command.Afk permission() {
+        return fileResolver.getPermission().getCommand().getAfk();
+    }
+
+    @Override
+    public Localization.Command localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand();
     }
 
     @Override

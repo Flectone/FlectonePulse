@@ -6,6 +6,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
@@ -21,8 +22,7 @@ import java.util.List;
 @Singleton
 public class BrandModule extends AbstractModuleListLocalization<Localization.Message.Brand> {
 
-    private final Message.Brand message;
-    private final Permission.Message.Brand permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final ListenerRegistry listenerRegistry;
@@ -32,10 +32,9 @@ public class BrandModule extends AbstractModuleListLocalization<Localization.Mes
                        FPlayerService fPlayerService,
                        TaskScheduler taskScheduler,
                        ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getBrand(), MessageType.BRAND);
+        super(MessageType.BRAND);
 
-        this.message = fileResolver.getMessage().getBrand();
-        this.permission = fileResolver.getPermission().getMessage().getBrand();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.listenerRegistry = listenerRegistry;
@@ -43,9 +42,9 @@ public class BrandModule extends AbstractModuleListLocalization<Localization.Mes
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        Ticker ticker = message.getTicker();
+        Ticker ticker = config().getTicker();
         if (ticker.isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::send), ticker.getPeriod());
         }
@@ -54,26 +53,36 @@ public class BrandModule extends AbstractModuleListLocalization<Localization.Mes
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Brand config() {
+        return fileResolver.getMessage().getBrand();
+    }
+
+    @Override
+    public Permission.Message.Brand permission() {
+        return fileResolver.getPermission().getMessage().getBrand();
+    }
+
+    @Override
+    public Localization.Message.Brand localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getBrand();
+    }
+
+    @Override
+    public List<String> getAvailableMessages(FPlayer fPlayer) {
+        return localization(fPlayer).getValues();
     }
 
     public void send(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        String format = getNextMessage(fPlayer, this.message.isRandom());
+        String format = getNextMessage(fPlayer, config().isRandom());
         if (StringUtils.isEmpty(format)) return;
 
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
                 .format(format)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .build()
         );
-    }
-
-    @Override
-    public List<String> getAvailableMessages(FPlayer fPlayer) {
-        return resolveLocalization(fPlayer).getValues();
     }
 }

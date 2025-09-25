@@ -37,8 +37,7 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
 
     private final Map<AdventureTag, TagResolver> tagResolverMap = new EnumMap<>(AdventureTag.class);
 
-    private final Message.Format message;
-    private final Permission.Message.Format permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
 
@@ -46,21 +45,20 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
     public FormatModule(FileResolver fileResolver,
                         ListenerRegistry listenerRegistry,
                         PermissionChecker permissionChecker) {
-        super(localization -> localization.getMessage().getFormat(), MessageType.FORMAT);
+        super(MessageType.FORMAT);
 
-        this.message = fileResolver.getMessage().getFormat();
-        this.permission = fileResolver.getPermission().getMessage().getFormat();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
         this.permissionChecker = permissionChecker;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        registerPermission(permission.getLegacyColors());
+        registerPermission(permission().getLegacyColors());
 
-        message.getAdventureTags().forEach(adventureTag -> registerPermission(permission.getAdventureTags().get(adventureTag)));
+        config().getAdventureTags().forEach(adventureTag -> registerPermission(permission().getAdventureTags().get(adventureTag)));
 
         putAdventureTag(AdventureTag.HOVER, StandardTags.hoverEvent());
         putAdventureTag(AdventureTag.CLICK, StandardTags.clickEvent());
@@ -95,7 +93,7 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
 
         listenerRegistry.register(FormatPulseListener.class);
 
-        if (message.isConvertLegacyColor()) {
+        if (config().isConvertLegacyColor()) {
             listenerRegistry.register(LegacyColorPulseListener.class);
         }
     }
@@ -106,8 +104,18 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Format config() {
+        return fileResolver.getMessage().getFormat();
+    }
+
+    @Override
+    public Permission.Message.Format permission() {
+        return fileResolver.getPermission().getMessage().getFormat();
+    }
+
+    @Override
+    public Localization.Message.Format localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getFormat();
     }
 
     public void addTags(MessageContext messageContext) {
@@ -124,14 +132,14 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
     }
 
     public boolean isCorrectTag(AdventureTag adventureTag, FEntity sender, boolean needPermission) {
-        if (!message.getAdventureTags().contains(adventureTag)) return false;
+        if (!config().getAdventureTags().contains(adventureTag)) return false;
         if (!tagResolverMap.containsKey(adventureTag)) return false;
 
-        return !needPermission || permissionChecker.check(sender, permission.getAdventureTags().get(adventureTag));
+        return !needPermission || permissionChecker.check(sender, permission().getAdventureTags().get(adventureTag));
     }
 
     private void putAdventureTag(AdventureTag adventureTag, TagResolver tagResolver) {
-        if (message.getAdventureTags().contains(adventureTag)) {
+        if (config().getAdventureTags().contains(adventureTag)) {
             tagResolverMap.put(adventureTag, tagResolver);
         }
     }

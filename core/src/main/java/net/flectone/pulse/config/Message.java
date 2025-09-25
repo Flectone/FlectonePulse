@@ -18,7 +18,7 @@ import java.util.*;
 
 @SuppressWarnings({"FieldMayBeFinal", "unused"})
 @Getter
-public final class Message extends YamlFile implements ModuleConfig.MessageConfig {
+public final class Message extends YamlFile implements ModuleConfig.MessageConfig, Config.IEnable {
 
     public Message(Path projectPath) {
         super(projectPath.resolve("message.yml"));
@@ -762,14 +762,14 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         private Tabname tabname = new Tabname();
 
         @Getter
-        public static final class Belowname implements SubObjectiveMessageConfig {
+        public static final class Belowname implements SubObjectiveMessageConfig, Config.IEnable {
             private boolean enable = false;
             private ObjectiveModule.Mode mode = ObjectiveModule.Mode.PING;
             private Ticker ticker = new Ticker(true, 100);
         }
 
         @Getter
-        public static final class Tabname implements SubObjectiveMessageConfig {
+        public static final class Tabname implements SubObjectiveMessageConfig, Config.IEnable {
             private boolean enable = false;
             private ObjectiveModule.Mode mode = ObjectiveModule.Mode.PING;
             private Ticker ticker = new Ticker(true, 100);

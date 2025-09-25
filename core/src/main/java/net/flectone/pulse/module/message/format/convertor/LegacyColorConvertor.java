@@ -28,7 +28,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
@@ -65,7 +64,7 @@ public class LegacyColorConvertor {
 
     private final Pattern hexColorPattern = Pattern.compile("[\\da-fA-F]{6}");
 
-    private final Permission.Message.Format formatPermission;
+    private final FileResolver fileResolver;
     private final PermissionChecker permissionChecker;
     private final FLogger fLogger;
 
@@ -73,7 +72,7 @@ public class LegacyColorConvertor {
     public LegacyColorConvertor(FileResolver fileResolver,
                                 PermissionChecker permissionChecker,
                                 FLogger fLogger) {
-        this.formatPermission = fileResolver.getPermission().getMessage().getFormat();
+        this.fileResolver = fileResolver;
         this.permissionChecker = permissionChecker;
         this.fLogger = fLogger;
     }
@@ -81,7 +80,7 @@ public class LegacyColorConvertor {
     public void convert(MessageContext messageContext) {
         FEntity sender = messageContext.getSender();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)
-                && !permissionChecker.check(sender, formatPermission.getLegacyColors())) return;
+                && !permissionChecker.check(sender, fileResolver.getPermission().getMessage().getFormat().getLegacyColors())) return;
 
         String contextMessage = messageContext.getMessage();
         if (StringUtils.isEmpty(contextMessage)) return;

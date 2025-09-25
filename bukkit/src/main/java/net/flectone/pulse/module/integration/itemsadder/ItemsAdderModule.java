@@ -11,8 +11,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 @Singleton
 public class ItemsAdderModule extends AbstractModule {
 
-    private final Integration.Itemsadder integration;
-    private final Permission.Integration.Itemsadder permission;
+    private final FileResolver fileResolver;
     private final ItemsAdderIntegration itemsAdderIntegration;
     private final ListenerRegistry listenerRegistry;
 
@@ -20,15 +19,14 @@ public class ItemsAdderModule extends AbstractModule {
     public ItemsAdderModule(FileResolver fileResolver,
                             ItemsAdderIntegration itemsAdderIntegration,
                             ListenerRegistry listenerRegistry) {
-        this.integration = fileResolver.getIntegration().getItemsadder();
-        this.permission = fileResolver.getPermission().getIntegration().getItemsadder();
+        this.fileResolver = fileResolver;
         this.itemsAdderIntegration = itemsAdderIntegration;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         itemsAdderIntegration.hook();
 
@@ -41,8 +39,13 @@ public class ItemsAdderModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
+    public Integration.Itemsadder config() {
+        return fileResolver.getIntegration().getItemsadder();
+    }
+
+    @Override
+    public Permission.Integration.Itemsadder permission() {
+        return fileResolver.getPermission().getIntegration().getItemsadder();
     }
 
     public boolean isHooked() {

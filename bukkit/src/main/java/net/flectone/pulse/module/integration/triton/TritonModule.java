@@ -13,8 +13,7 @@ import org.jetbrains.annotations.Nullable;
 @Singleton
 public class TritonModule extends AbstractModule {
 
-    private final Integration.Triton config;
-    private final Permission.Integration.Triton permission;
+    private final FileResolver fileResolver;
     private final TritonIntegration tritonIntegration;
     private final ListenerRegistry listenerRegistry;
 
@@ -22,15 +21,14 @@ public class TritonModule extends AbstractModule {
     public TritonModule(FileResolver fileResolver,
                         TritonIntegration tritonIntegration,
                         ListenerRegistry listenerRegistry) {
-        this.config = fileResolver.getIntegration().getTriton();
-        this.permission = fileResolver.getPermission().getIntegration().getTriton();
+        this.fileResolver = fileResolver;
         this.tritonIntegration = tritonIntegration;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         listenerRegistry.register(TritonIntegration.class);
 
@@ -43,8 +41,13 @@ public class TritonModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return config.isEnable();
+    public Integration.Triton config() {
+        return fileResolver.getIntegration().getTriton();
+    }
+
+    @Override
+    public Permission.Integration.Triton permission() {
+        return fileResolver.getPermission().getIntegration().getTriton();
     }
 
     @Nullable

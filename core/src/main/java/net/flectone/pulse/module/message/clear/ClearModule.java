@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.clear.listener.ClearPulseListener;
@@ -21,32 +22,40 @@ import org.apache.commons.lang3.StringUtils;
 @Singleton
 public class ClearModule extends AbstractModuleLocalization<Localization.Message.Clear> {
 
-    private final Message.Clear message;
-    private final Permission.Message.Clear permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public ClearModule(FileResolver fileResolver,
                        ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getClear(), MessageType.CLEAR);
+        super(MessageType.CLEAR);
 
-        this.message = fileResolver.getMessage().getClear();
-        this.permission = fileResolver.getPermission().getMessage().getClear();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(ClearPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Clear config() {
+        return fileResolver.getMessage().getClear();
+    }
+
+    @Override
+    public Permission.Message.Clear permission() {
+        return fileResolver.getPermission().getMessage().getClear();
+    }
+
+    @Override
+    public Localization.Message.Clear localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getClear();
     }
 
     @Async
@@ -55,7 +64,7 @@ public class ClearModule extends AbstractModuleLocalization<Localization.Message
 
         sendMessage(ClearMetadata.<Localization.Message.Clear>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> StringUtils.replaceEach(
                         switch (translationKey) {
                             case COMMANDS_CLEAR_SUCCESS_MULTIPLE -> localization.getMultiple();
@@ -67,11 +76,10 @@ public class ClearModule extends AbstractModuleLocalization<Localization.Message
                 ))
                 .clear(clear)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, clear.getTarget())})
                 .build()
         );
     }
-
 }

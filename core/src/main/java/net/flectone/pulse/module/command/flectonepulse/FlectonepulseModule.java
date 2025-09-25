@@ -9,9 +9,9 @@ import lombok.NonNull;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.FlectonePulse;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.Config;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.flectonepulse.web.SparkServer;
@@ -37,9 +37,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
     private final String sparkClass = "net.flectone.pulse.library.spark.Service";
 
-    private final Config.Editor config;
-    private final Command.Flectonepulse command;
-    private final Permission.Command.Flectonepulse permission;
+    private final FileResolver fileResolver;
     private final FlectonePulse flectonePulse;
     private final CommandParserProvider commandParserProvider;
     private final TimeFormatter timeFormatter;
@@ -55,11 +53,9 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                                FLogger fLogger,
                                ReflectionResolver reflectionResolver,
                                Injector injector) {
-        super(localization -> localization.getCommand().getFlectonepulse(), Command::getFlectonepulse, MessageType.COMMAND_FLECTONEPULSE);
+        super(MessageType.COMMAND_FLECTONEPULSE);
 
-        this.config = fileResolver.getConfig().getEditor();
-        this.command = fileResolver.getCommand().getFlectonepulse();
-        this.permission = fileResolver.getPermission().getCommand().getFlectonepulse();
+        this.fileResolver = fileResolver;
         this.flectonePulse = flectonePulse;
         this.commandParserProvider = commandParserProvider;
         this.timeFormatter = timeFormatter;
@@ -70,14 +66,14 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptType = addPrompt(0, Localization.Command.Prompt::getType);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
         );
 
@@ -101,7 +97,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
 
         String type = getArgument(commandContext, 0);
         if (type.equalsIgnoreCase("editor")) {
-            if (config.getHost().isEmpty()) {
+            if (fileResolver.getConfig().getEditor().getHost().isEmpty()) {
                 sendErrorMessage(metadataBuilder()
                         .sender(fPlayer)
                         .format(Localization.Command.Flectonepulse::getNullHostEditor)
@@ -114,7 +110,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
             sendMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Flectonepulse::getFormatWebStarting)
-                    .destination(command.getDestination())
+                    .destination(config().getDestination())
                     .build()
             );
 
@@ -128,7 +124,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
             sendMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(flectonepulse -> Strings.CS.replace(flectonepulse.getFormatEditor(), "<url>", url))
-                    .destination(command.getDestination())
+                    .destination(config().getDestination())
                     .sound(getModuleSound())
                     .build()
             );
@@ -148,7 +144,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
             sendMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(flectonepulse -> Strings.CS.replace(flectonepulse.getFormatTrue(), "<time>", formattedTime))
-                    .destination(command.getDestination())
+                    .destination(config().getDestination())
                     .sound(getModuleSound())
                     .build()
             );
@@ -160,11 +156,26 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                     .sender(fPlayer)
                     .format(Localization.Command.Flectonepulse::getFormatFalse)
                     .message(e.getLocalizedMessage())
-                    .destination(command.getDestination())
+                    .destination(config().getDestination())
                     .build()
             );
 
         }
+    }
+
+    @Override
+    public Command.Flectonepulse config() {
+        return fileResolver.getCommand().getFlectonepulse();
+    }
+
+    @Override
+    public Permission.Command.Flectonepulse permission() {
+        return fileResolver.getPermission().getCommand().getFlectonepulse();
+    }
+
+    @Override
+    public Localization.Command.Flectonepulse localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getFlectonepulse();
     }
 
     private void enableSpark() {

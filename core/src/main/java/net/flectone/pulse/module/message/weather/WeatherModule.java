@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.weather.listener.WeatherPulseListener;
@@ -18,32 +19,40 @@ import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 @Singleton
 public class WeatherModule extends AbstractModuleLocalization<Localization.Message.Weather> {
 
-    private final Message.Weather message;
-    private final Permission.Message.Weather permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public WeatherModule(FileResolver fileResolver,
                          ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getWeather(), MessageType.WEATHER);
+        super(MessageType.WEATHER);
 
-        this.message = fileResolver.getMessage().getWeather();
-        this.permission = fileResolver.getPermission().getMessage().getWeather();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(WeatherPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Weather config() {
+        return fileResolver.getMessage().getWeather();
+    }
+
+    @Override
+    public Permission.Message.Weather permission() {
+        return fileResolver.getPermission().getMessage().getWeather();
+    }
+
+    @Override
+    public Localization.Message.Weather localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getWeather();
     }
 
     @Async
@@ -52,7 +61,7 @@ public class WeatherModule extends AbstractModuleLocalization<Localization.Messa
 
         sendMessage(WeatherMetadata.<Localization.Message.Weather>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> switch (translationKey) {
                     case COMMANDS_WEATHER_SET_CLEAR -> localization.getFormatClear();
                     case COMMANDS_WEATHER_SET_RAIN -> localization.getFormatRain();
@@ -60,10 +69,9 @@ public class WeatherModule extends AbstractModuleLocalization<Localization.Messa
                     default -> "";
                 })
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
     }
-
 }

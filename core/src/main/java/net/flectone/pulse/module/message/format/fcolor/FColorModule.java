@@ -26,9 +26,7 @@ public class FColorModule extends AbstractModule {
 
     private final Pattern fColorPattern = Pattern.compile("(<fcolor:(\\d+)>)|(</fcolor(:\\d+)?>)");
 
-    private final Message.Format.FColor message;
-    private final Permission.Message.Format.FColor permission;
-    private final Permission.Message.Format formatPermission;
+    private final FileResolver fileResolver;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
 
@@ -36,38 +34,45 @@ public class FColorModule extends AbstractModule {
     public FColorModule(FileResolver fileResolver,
                         PermissionChecker permissionChecker,
                         ListenerRegistry listenerRegistry) {
-        this.message = fileResolver.getMessage().getFormat().getFcolor();
-        this.permission = fileResolver.getPermission().getMessage().getFormat().getFcolor();
-        this.formatPermission = fileResolver.getPermission().getMessage().getFormat();
+        this.fileResolver = fileResolver;
         this.permissionChecker = permissionChecker;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         // register fColor types
-        permission.getColors().forEach((key, value) -> registerPermission(value));
+        permission().getColors().forEach((key, value) -> registerPermission(value));
 
         listenerRegistry.register(FColorPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Format.FColor config() {
+        return fileResolver.getMessage().getFormat().getFcolor();
+    }
+
+    @Override
+    public Permission.Message.Format.FColor permission() {
+        return fileResolver.getPermission().getMessage().getFormat().getFcolor();
+    }
+
+    public Permission.Message.Format formatPermission() {
+        return fileResolver.getPermission().getMessage().getFormat();
     }
 
     public void format(MessageContext messageContext) {
         FEntity sender = messageContext.getSender();
         if (messageContext.isFlag(MessageFlag.USER_MESSAGE)
-                && !permissionChecker.check(sender, formatPermission.getLegacyColors())) return;
+                && !permissionChecker.check(sender, formatPermission().getLegacyColors())) return;
 
         FPlayer receiver = messageContext.getReceiver();
         if (isModuleDisabledFor(receiver)) return;
 
         // default map colors
-        Map<Integer, String> colorsMap = new HashMap<>(message.getDefaultColors());
+        Map<Integer, String> colorsMap = new HashMap<>(config().getDefaultColors());
 
         // receivers see colors
         updateColorsMap(colorsMap, receiver, FColor.Type.SEE);
@@ -108,7 +113,7 @@ public class FColorModule extends AbstractModule {
     }
 
     private void updateColorsMap(Map<Integer, String> colorsMap, FPlayer fPlayer, FColor.Type type) {
-        if (permissionChecker.check(fPlayer, permission.getColors().get(type))) {
+        if (permissionChecker.check(fPlayer, permission().getColors().get(type))) {
             colorsMap.putAll(fPlayer.getFColors(type));
         }
     }

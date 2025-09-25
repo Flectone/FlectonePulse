@@ -6,6 +6,7 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.mail.listener.MailPulseListener;
@@ -27,8 +28,7 @@ import org.incendo.cloud.context.CommandContext;
 @Singleton
 public class MailModule extends AbstractModuleCommand<Localization.Command.Mail> implements PulseListener {
 
-    private final Command.Mail command;
-    private final Permission.Command.Mail permission;
+    private final FileResolver fileResolver;
     private final TellModule tellModule;
     private final IntegrationModule integrationModule;
     private final FPlayerService fPlayerService;
@@ -46,10 +46,9 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
                       ListenerRegistry listenerRegistry,
                       IgnoreSender ignoreSender,
                       DisableSender disableSender) {
-        super(localization -> localization.getCommand().getMail(), Command::getMail, MessageType.COMMAND_MAIL);
+        super(MessageType.COMMAND_MAIL);
 
-        this.command = fileResolver.getCommand().getMail();
-        this.permission = fileResolver.getPermission().getCommand().getMail();
+        this.fileResolver = fileResolver;
         this.tellModule = tellModule;
         this.integrationModule = integrationModule;
         this.fPlayerService = fPlayerService;
@@ -61,15 +60,15 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         String promptMessage = addPrompt(1, Localization.Command.Prompt::getMessage);
         registerCommand(manager -> manager
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .required(promptPlayer, commandParserProvider.playerParser(true))
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
@@ -125,10 +124,25 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
                 .mail(mail)
                 .target(fReceiver)
                 .message(message)
-                .destination(command.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );
+    }
+
+    @Override
+    public Command.Mail config() {
+        return fileResolver.getCommand().getMail();
+    }
+
+    @Override
+    public Permission.Command.Mail permission() {
+        return fileResolver.getPermission().getCommand().getMail();
+    }
+
+    @Override
+    public Localization.Command.Mail localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getMail();
     }
 }

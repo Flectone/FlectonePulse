@@ -4,27 +4,25 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
+import net.flectone.pulse.processing.resolver.FileResolver;
 
 @Singleton
 public class TabModule extends AbstractModule {
 
-    private final Message.Tab message;
-    private final Permission.Message.Tab permission;
+    private final FileResolver fileResolver;
 
     @Inject
     public TabModule(FileResolver fileResolver) {
-        this.message = fileResolver.getMessage().getTab();
-        this.permission = fileResolver.getPermission().getMessage().getTab();
+        this.fileResolver = fileResolver;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         addChildren(FooterModule.class);
         addChildren(HeaderModule.class);
@@ -32,7 +30,12 @@ public class TabModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Tab config() {
+        return fileResolver.getMessage().getTab();
+    }
+
+    @Override
+    public Permission.Message.Tab permission() {
+        return fileResolver.getPermission().getMessage().getTab();
     }
 }

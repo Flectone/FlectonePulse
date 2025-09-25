@@ -18,8 +18,7 @@ import java.util.function.UnaryOperator;
 @Singleton
 public class TwitchModule extends AbstractModule {
 
-    private final Integration.Twitch integration;
-    private final Permission.Integration.Twitch permission;
+    private final FileResolver fileResolver;
     private final ReflectionResolver reflectionResolver;
     private final Injector injector;
 
@@ -27,15 +26,14 @@ public class TwitchModule extends AbstractModule {
     public TwitchModule(FileResolver fileResolver,
                         ReflectionResolver reflectionResolver,
                         Injector injector) {
-        this.integration = fileResolver.getIntegration().getTwitch();
-        this.permission = fileResolver.getPermission().getIntegration().getTwitch();
+        this.fileResolver = fileResolver;
         this.reflectionResolver = reflectionResolver;
         this.injector = injector;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         reflectionResolver.hasClassOrElse("com.github.twitch4j.TwitchClient", this::loadLibraries);
 
@@ -332,8 +330,13 @@ public class TwitchModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
+    public Integration.Twitch config() {
+        return fileResolver.getIntegration().getTwitch();
+    }
+
+    @Override
+    public Permission.Integration.Twitch permission() {
+        return fileResolver.getPermission().getIntegration().getTwitch();
     }
 
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> twitchString) {

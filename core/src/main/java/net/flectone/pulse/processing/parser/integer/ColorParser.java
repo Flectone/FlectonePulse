@@ -3,8 +3,6 @@ package net.flectone.pulse.processing.parser.integer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.processing.converter.ColorConverter;
 import net.flectone.pulse.processing.resolver.FileResolver;
@@ -23,8 +21,7 @@ import java.util.List;
 @Singleton
 public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSuggestionProvider.Strings<FPlayer> {
 
-    private final Message.Format.FColor message;
-    private final Permission.Command.Chatcolor chatcolorPermission;
+    private final FileResolver fileResolver;
     private final PermissionChecker permissionChecker;
     private final ColorConverter colorConverter;
     private final StringParser<FPlayer> stringParser;
@@ -38,8 +35,7 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
     public ColorParser(FileResolver fileResolver,
                        PermissionChecker permissionChecker,
                        ColorConverter colorConverter) {
-        this.message = fileResolver.getMessage().getFormat().getFcolor();
-        this.chatcolorPermission = fileResolver.getPermission().getCommand().getChatcolor();
+        this.fileResolver = fileResolver;
         this.permissionChecker = permissionChecker;
         this.colorConverter = colorConverter;
         this.stringParser = new StringParser<>(StringParser.StringMode.SINGLE);
@@ -59,8 +55,8 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
 
         String current = args.length == 0 || currentInput.endsWith(" ") ? "" : args[args.length - 1];
 
-        int maxColors = message.getDefaultColors().size();
-        boolean hasOtherPermission = permissionChecker.check(context.sender(), chatcolorPermission.getOther());
+        int maxColors = fileResolver.getMessage().getFormat().getFcolor().getDefaultColors().size();
+        boolean hasOtherPermission = permissionChecker.check(context.sender(), fileResolver.getPermission().getCommand().getChatcolor().getOther());
         if (!hasOtherPermission && args.length >= maxColors ||
                 hasOtherPermission && args.length >= maxColors + 1) {
             return Collections.emptyList();

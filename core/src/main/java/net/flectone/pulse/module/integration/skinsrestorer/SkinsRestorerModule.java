@@ -2,19 +2,18 @@ package net.flectone.pulse.module.integration.skinsrestorer;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.PlatformType;
 
 @Singleton
 public class SkinsRestorerModule extends AbstractModule {
 
-    private final Integration.Skinsrestorer config;
-    private final Permission.Integration.Skinsrestorer permission;
+    private final FileResolver fileResolver;
     private final SkinsRestorerIntegration skinsRestorerIntegration;
     private final PlatformServerAdapter platformServerAdapter;
 
@@ -22,15 +21,14 @@ public class SkinsRestorerModule extends AbstractModule {
     public SkinsRestorerModule(FileResolver fileResolver,
                                SkinsRestorerIntegration skinsRestorerIntegration,
                                PlatformServerAdapter platformServerAdapter) {
-        this.config = fileResolver.getIntegration().getSkinsrestorer();
-        this.permission = fileResolver.getPermission().getIntegration().getSkinsrestorer();
+        this.fileResolver = fileResolver;
         this.skinsRestorerIntegration = skinsRestorerIntegration;
         this.platformServerAdapter = platformServerAdapter;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
             // delay for init
@@ -47,8 +45,13 @@ public class SkinsRestorerModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return config.isEnable();
+    public Integration.Skinsrestorer config() {
+        return fileResolver.getIntegration().getSkinsrestorer();
+    }
+
+    @Override
+    public Permission.Integration.Skinsrestorer permission() {
+        return fileResolver.getPermission().getIntegration().getSkinsrestorer();
     }
 
     public String getTextureUrl(FPlayer fPlayer) {

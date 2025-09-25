@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.gamerule.listener.GamerulePulseListener;
@@ -20,32 +21,40 @@ import org.apache.commons.lang3.StringUtils;
 @Singleton
 public class GameruleModule extends AbstractModuleLocalization<Localization.Message.Gamerule> {
 
-    private final Message.Gamerule message;
-    private final Permission.Message.Gamerule permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public GameruleModule(FileResolver fileResolver,
                           ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getGamerule(), MessageType.GAMERULE);
+        super(MessageType.GAMERULE);
 
-        this.message = fileResolver.getMessage().getGamerule();
-        this.permission = fileResolver.getPermission().getMessage().getGamerule();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(GamerulePulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Gamerule config() {
+        return fileResolver.getMessage().getGamerule();
+    }
+
+    @Override
+    public Permission.Message.Gamerule permission() {
+        return fileResolver.getPermission().getMessage().getGamerule();
+    }
+
+    @Override
+    public Localization.Message.Gamerule localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getGamerule();
     }
 
     @Async
@@ -54,7 +63,7 @@ public class GameruleModule extends AbstractModuleLocalization<Localization.Mess
 
         sendMessage(GameruleMetadata.<Localization.Message.Gamerule>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> StringUtils.replaceEach(
                         translationKey == MinecraftTranslationKey.COMMANDS_GAMERULE_QUERY ? localization.getFormatQuery() : localization.getFormatSet(),
                         new String[]{"<gamerule>", "<value>"},
@@ -62,10 +71,9 @@ public class GameruleModule extends AbstractModuleLocalization<Localization.Mess
                 ))
                 .gamerule(gamerule)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
     }
-
 }

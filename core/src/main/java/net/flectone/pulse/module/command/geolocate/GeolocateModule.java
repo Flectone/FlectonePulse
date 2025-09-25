@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.geolocate.model.GeolocateMetadata;
@@ -30,8 +31,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
 
     private final String apiUrl = "http://ip-api.com/line/<ip>?fields=17031449";
 
-    private final Command.Geolocate command;
-    private final Permission.Command.Geolocate permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final CommandParserProvider commandParserProvider;
@@ -41,10 +41,9 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
                            FPlayerService fPlayerService,
                            PlatformPlayerAdapter platformPlayerAdapter,
                            CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getGeolocate(), Command::getGeolocate, MessageType.COMMAND_GEOLOCATE);
+        super(MessageType.COMMAND_GEOLOCATE);
 
-        this.command = fileResolver.getCommand().getGeolocate();
-        this.permission = fileResolver.getPermission().getCommand().getGeolocate();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.commandParserProvider = commandParserProvider;
@@ -52,15 +51,15 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         registerCommand(manager -> manager
-                .permission(permission.getName())
-                .required(promptPlayer, commandParserProvider.playerParser(command.isSuggestOfflinePlayers()))
+                .permission(permission().getName())
+                .required(promptPlayer, commandParserProvider.playerParser(config().isSuggestOfflinePlayers()))
         );
     }
 
@@ -102,11 +101,26 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
                         new String[]{response.get(1), response.get(2), response.get(3), response.get(4), response.get(5), response.get(6), response.get(7), response.get(8)}
                 ))
                 .response(response)
-                .destination(command.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
 
+    }
+
+    @Override
+    public Command.Geolocate config() {
+        return fileResolver.getCommand().getGeolocate();
+    }
+
+    @Override
+    public Permission.Command.Geolocate permission() {
+        return fileResolver.getPermission().getCommand().getGeolocate();
+    }
+
+    @Override
+    public Localization.Command.Geolocate localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getGeolocate();
     }
 
     private List<String> readResponse(String url) {

@@ -12,6 +12,7 @@ import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.maintenance.listener.MaintenancePacketListener;
@@ -33,8 +34,6 @@ import java.nio.file.Path;
 @Singleton
 public class MaintenanceModule extends AbstractModuleCommand<Localization.Command.Maintenance> {
 
-    private final Command.Maintenance command;
-    private final Permission.Command.Maintenance permission;
     private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
@@ -55,10 +54,8 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                              PlatformServerAdapter platformServerAdapter,
                              MessagePipeline messagePipeline,
                              IconUtil iconUtil) {
-        super(module -> module.getCommand().getMaintenance(), Command::getMaintenance, MessageType.COMMAND_MAINTENANCE);
+        super(MessageType.COMMAND_MAINTENANCE);
 
-        this.command = fileResolver.getCommand().getMaintenance();
-        this.permission = fileResolver.getPermission().getCommand().getMaintenance();
         this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
@@ -71,12 +68,12 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
-        registerPermission(permission.getJoin());
+        registerPermission(permission().getJoin());
 
         listenerRegistry.register(MaintenancePacketListener.class);
         listenerRegistry.register(MaintenancePulseListener.class);
@@ -89,12 +86,12 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
 
         icon = iconUtil.convertIcon(file);
 
-        if (command.isTurnedOn()) {
+        if (config().isTurnedOn()) {
             kickOnlinePlayers(FPlayer.UNKNOWN);
         }
 
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
+                .permission(permission().getName())
         );
     }
 
@@ -102,16 +99,16 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (isModuleDisabledFor(fPlayer, true)) return;
 
-        boolean turned = !command.isTurnedOn();
+        boolean turned = !config().isTurnedOn();
 
-        command.setTurnedOn(turned);
+        config().setTurnedOn(turned);
         fileResolver.save();
 
         sendMessage(MaintenanceMetadata.<Localization.Command.Maintenance>builder()
                 .sender(fPlayer)
                 .format(maintenance -> turned ? maintenance.getFormatTrue() : maintenance.getFormatFalse())
                 .turned(turned)
-                .destination(command.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
@@ -121,16 +118,31 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         }
     }
 
+    @Override
+    public Command.Maintenance config() {
+        return fileResolver.getCommand().getMaintenance();
+    }
+
+    @Override
+    public Permission.Command.Maintenance permission() {
+        return fileResolver.getPermission().getCommand().getMaintenance();
+    }
+
+    @Override
+    public Localization.Command.Maintenance localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getMaintenance();
+    }
+
     public void sendStatus(User user) {
         if (!isEnable()) return;
-        if (!command.isTurnedOn()) return;
+        if (!config().isTurnedOn()) return;
 
         FPlayer fPlayer = fPlayerService.getFPlayer(user.getAddress().getAddress());
         fPlayerService.loadColors(fPlayer);
 
         JsonObject responseJson = new JsonObject();
 
-        Localization.Command.Maintenance localizationMaintenance = resolveLocalization(fPlayer);
+        Localization.Command.Maintenance localizationMaintenance = localization(fPlayer);
 
         responseJson.add("version", getVersionJson(localizationMaintenance.getServerVersion()));
         responseJson.add("players", getPlayersJson());
@@ -145,9 +157,9 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
 
     public boolean isAllowed(FPlayer fPlayer) {
         if (!isEnable()) return true;
-        if (!command.isTurnedOn()) return true;
+        if (!config().isTurnedOn()) return true;
 
-        return permissionChecker.check(fPlayer, permission.getJoin());
+        return permissionChecker.check(fPlayer, permission().getJoin());
     }
 
     private JsonElement getVersionJson(String message) {
@@ -173,9 +185,9 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     private void kickOnlinePlayers(FPlayer fSender) {
         fPlayerService.getOnlineFPlayers()
                 .stream()
-                .filter(filter -> !permissionChecker.check(filter, permission.getJoin()))
+                .filter(filter -> !permissionChecker.check(filter, permission().getJoin()))
                 .forEach(fReceiver -> {
-                    Component component = messagePipeline.builder(fSender, fReceiver, resolveLocalization(fReceiver).getKick()).build();
+                    Component component = messagePipeline.builder(fSender, fReceiver, localization(fReceiver).getKick()).build();
                     fPlayerService.kick(fReceiver, component);
                 });
     }

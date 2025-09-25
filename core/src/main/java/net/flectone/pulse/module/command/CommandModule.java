@@ -53,18 +53,16 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 @Singleton
 public class CommandModule extends AbstractModule {
 
-    private final Command command;
-    private final Permission.Command permission;
+    private final FileResolver fileResolver;
 
     @Inject
     public CommandModule(FileResolver fileResolver) {
-        this.command = fileResolver.getCommand();
-        this.permission = fileResolver.getPermission().getCommand();
+        this.fileResolver = fileResolver;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         addChildren(AfkModule.class);
         addChildren(AnonModule.class);
@@ -112,7 +110,12 @@ public class CommandModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
+    public Command config() {
+        return fileResolver.getCommand();
+    }
+
+    @Override
+    public Permission.Command permission() {
+        return fileResolver.getPermission().getCommand();
     }
 }

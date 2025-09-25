@@ -32,8 +32,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
     private final Map<UUID, RockPaperScissors> gameMap = new HashMap<>();
 
-    private final Command.Rockpaperscissors command;
-    private final Permission.Command.Rockpaperscissors permission;
+    private final FileResolver fileResolver;
     private final ProxySender proxySender;
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
@@ -49,10 +48,9 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                                    IntegrationModule integrationModule,
                                    IgnoreSender ignoreSender,
                                    DisableSender disableSender) {
-        super(localization -> localization.getCommand().getRockpaperscissors(), Command::getRockpaperscissors, MessageType.COMMAND_ROCKPAPERSCISSORS);
+        super(MessageType.COMMAND_ROCKPAPERSCISSORS);
 
-        this.command = fileResolver.getCommand().getRockpaperscissors();
-        this.permission = fileResolver.getPermission().getCommand().getRockpaperscissors();
+        this.fileResolver = fileResolver;
         this.proxySender = proxySender;
         this.fPlayerService = fPlayerService;
         this.commandParserProvider = commandParserProvider;
@@ -63,16 +61,16 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         String promptMove = addPrompt(1, Localization.Command.Prompt::getMove);
         String promptUUID = addPrompt(2, Localization.Command.Prompt::getId);
         registerCommand(manager -> manager
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .required(promptPlayer, commandParserProvider.playerParser())
                 .optional(promptMove, commandParserProvider.nativeSingleMessageParser())
                 .optional(promptUUID, UUIDParser.uuidParser())
@@ -154,8 +152,23 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         );
     }
 
+    @Override
+    public Command.Rockpaperscissors config() {
+        return fileResolver.getCommand().getRockpaperscissors();
+    }
+
+    @Override
+    public Permission.Command.Rockpaperscissors permission() {
+        return fileResolver.getPermission().getCommand().getRockpaperscissors();
+    }
+
+    @Override
+    public Localization.Command.Rockpaperscissors localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getRockpaperscissors();
+    }
+
     public void finalMove(FPlayer fPlayer, FPlayer fReceiver, String move, UUID uuid) {
-        List<String> strategy = command.getStrategies().get(move);
+        List<String> strategy = config().getStrategies().get(move);
 
         if (strategy == null) {
             sendErrorMessage(metadataBuilder()
@@ -240,7 +253,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                     (p, m) -> Strings.CS.replace(
                             m.getFormatDraw(),
                             "<move>",
-                            resolveLocalization(p).getStrategies().get(move)
+                            localization(p).getStrategies().get(move)
                     );
 
             sendMessage(metadataBuilder()
@@ -263,10 +276,10 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         BiFunction<FPlayer, Localization.Command.Rockpaperscissors, String> message = (p, m) -> StringUtils.replaceEach(
                 m.getFormatWin(),
                 new String[]{"<sender_move>", "<receiver_move>"},
-                new String[]{resolveLocalization(p).getStrategies().get(senderMove), resolveLocalization(p).getStrategies().get(move)}
+                new String[]{localization(p).getStrategies().get(senderMove), localization(p).getStrategies().get(move)}
         );
 
-        FEntity winFPlayer = command.getStrategies().get(move).contains(senderMove) ? fPlayer : fReceiver;
+        FEntity winFPlayer = config().getStrategies().get(move).contains(senderMove) ? fPlayer : fReceiver;
 
         sendMessage(RockPaperScissorsMetadata.<Localization.Command.Rockpaperscissors>builder()
                 .uuid(metadataUUID)

@@ -28,8 +28,7 @@ import java.util.function.UnaryOperator;
 
 public abstract class IntegrationModule extends AbstractModule {
 
-    private final Integration integration;
-    private final Permission.Integration permission;
+    private final FileResolver fileResolver;
     private final Injector injector;
 
     protected IntegrationModule(FileResolver fileResolver,
@@ -37,8 +36,7 @@ public abstract class IntegrationModule extends AbstractModule {
                                 PlatformServerAdapter platformServerAdapter,
                                 ReflectionResolver reflectionResolver,
                                 Injector injector) {
-        this.integration = fileResolver.getIntegration();
-        this.permission = fileResolver.getPermission().getIntegration();
+        this.fileResolver = fileResolver;
         this.injector = injector;
 
         if (platformServerAdapter.hasProject("SkinsRestorer")) {
@@ -64,7 +62,7 @@ public abstract class IntegrationModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         addChildren(DeeplModule.class);
         addChildren(DiscordModule.class);
@@ -74,8 +72,13 @@ public abstract class IntegrationModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
+    public Integration config() {
+        return fileResolver.getIntegration();
+    }
+
+    @Override
+    public Permission.Integration permission() {
+        return fileResolver.getPermission().getIntegration();
     }
 
     public abstract String checkMention(FEntity fPlayer, String message);

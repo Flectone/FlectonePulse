@@ -8,11 +8,12 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
 
 import java.util.List;
@@ -20,8 +21,7 @@ import java.util.List;
 @Singleton
 public class MOTDModule extends AbstractModuleListLocalization<Localization.Message.Status.MOTD> {
 
-    private final Message.Status.MOTD message;
-    private final Permission.Message.Status.MOTD permission;
+    private final FileResolver fileResolver;
     private final MessagePipeline messagePipeline;
     private final PacketProvider packetProvider;
 
@@ -29,24 +29,42 @@ public class MOTDModule extends AbstractModuleListLocalization<Localization.Mess
     public MOTDModule(FileResolver fileResolver,
                       MessagePipeline messagePipeline,
                       PacketProvider packetProvider) {
-        super(localization -> localization.getMessage().getStatus().getMotd(), MessageType.MOTD);
+        super(MessageType.MOTD);
 
-        this.message = fileResolver.getMessage().getStatus().getMotd();
-        this.permission = fileResolver.getPermission().getMessage().getStatus().getMotd();
+        this.fileResolver = fileResolver;
         this.messagePipeline = messagePipeline;
         this.packetProvider = packetProvider;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
     }
 
+    @Override
+    public Message.Status.MOTD config() {
+        return fileResolver.getMessage().getStatus().getMotd();
+    }
+
+    @Override
+    public Permission.Message.Status.MOTD permission() {
+        return fileResolver.getPermission().getMessage().getStatus().getMotd();
+    }
+
+    @Override
+    public Localization.Message.Status.MOTD localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getStatus().getMotd();
+    }
+
+    @Override
+    public List<String> getAvailableMessages(FPlayer fPlayer) {
+        return localization(fPlayer).getValues();
+    }
 
     public JsonElement next(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return null;
 
-        String nextMessage = getNextMessage(fPlayer, this.message.isRandom());
+        String nextMessage = getNextMessage(fPlayer, config().isRandom());
         if (nextMessage == null) return null;
 
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_16_2)) {
@@ -57,15 +75,5 @@ public class MOTDModule extends AbstractModuleListLocalization<Localization.Mess
             jsonObject.addProperty("text", serializedText);
             return jsonObject;
         }
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
-    }
-
-    @Override
-    public List<String> getAvailableMessages(FPlayer fPlayer) {
-        return resolveLocalization(fPlayer).getValues();
     }
 }

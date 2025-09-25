@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.util.Moderation;
@@ -30,8 +31,7 @@ import java.util.Optional;
 @Singleton
 public class BanlistModule extends AbstractModuleCommand<Localization.Command.Banlist> {
 
-    private final Command.Banlist command;
-    private final Permission.Command.Banlist permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
@@ -51,10 +51,9 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
                          EventDispatcher eventDispatcher,
                          CommandParserProvider commandParserProvider,
                          SoundPlayer soundPlayer) {
-        super(localization -> localization.getCommand().getBanlist(), Command::getBanlist, MessageType.COMMAND_BANLIST);
+        super(MessageType.COMMAND_BANLIST);
 
-        this.command = fileResolver.getCommand().getBanlist();
-        this.permission = fileResolver.getPermission().getCommand().getBanlist();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.moderationMessageFormatter = moderationMessageFormatter;
@@ -67,15 +66,15 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         String promptNumber = addPrompt(1, Localization.Command.Prompt::getNumber);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .optional(promptPlayer, commandParserProvider.bannedParser())
                 .optional(promptNumber, commandParserProvider.integerParser())
         );
@@ -85,7 +84,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (isModuleDisabledFor(fPlayer, true)) return;
 
-        Localization.Command.Banlist localization = resolveLocalization(fPlayer);
+        Localization.Command.Banlist localization = localization(fPlayer);
         Localization.ListTypeMessage localizationType = localization.getGlobal();
 
         String commandLine = "/" + getCommandName();
@@ -136,7 +135,7 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         }
 
         int size = moderationList.size();
-        int perPage = command.getPerPage();
+        int perPage = config().getPerPage();
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
@@ -187,5 +186,20 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_BANLIST, fPlayer, component));
 
         soundPlayer.play(getModuleSound(), fPlayer);
+    }
+
+    @Override
+    public Command.Banlist config() {
+        return fileResolver.getCommand().getBanlist();
+    }
+
+    @Override
+    public Permission.Command.Banlist permission() {
+        return fileResolver.getPermission().getCommand().getBanlist();
+    }
+
+    @Override
+    public Localization.Command.Banlist localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getBanlist();
     }
 }

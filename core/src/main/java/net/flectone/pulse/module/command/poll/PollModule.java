@@ -42,8 +42,6 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
     private final HashMap<Integer, Poll> pollMap = new HashMap<>();
 
-    private final Command.Poll command;
-    private final Permission.Command.Poll permission;
     private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final ProxySender proxySender;
@@ -64,10 +62,8 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                       PacketProvider packetProvider,
                       Provider<DialogPollBuilder> dialogPollBuilderProvider,
                       YamlFileProcessor yamlFileProcessor) {
-        super(localization -> localization.getCommand().getPoll(), Command::getPoll, MessageType.COMMAND_POLL);
+        super(MessageType.COMMAND_POLL);
 
-        this.command = fileResolver.getCommand().getPoll();
-        this.permission = fileResolver.getPermission().getCommand().getPoll();
         this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.proxySender = proxySender;
@@ -81,29 +77,29 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
-        registerPermission(permission.getCreate());
+        registerPermission(permission().getCreate());
 
         String promptTime = addPrompt(0, Localization.Command.Prompt::getTime);
         String promptRepeatTime = addPrompt(1, Localization.Command.Prompt::getRepeatTime);
         String promptMultipleVote = addPrompt(2, Localization.Command.Prompt::getMultipleVote);
         String promptMessage = addPrompt(3, Localization.Command.Prompt::getMessage);
         registerCommand(manager -> manager
-                .permission(permission.getCreate().getName())
+                .permission(permission().getCreate().getName())
                 .required(promptTime, commandParserProvider.durationParser())
                 .required(promptRepeatTime, commandParserProvider.durationParser())
                 .required(promptMultipleVote, commandParserProvider.booleanParser())
                 .required(promptMessage, commandParserProvider.messageParser(), mapSuggestion())
         );
 
-        if (command.isEnableGui() && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6)) {
+        if (config().isEnableGui() && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_6)) {
             registerCustomCommand(manager ->
                     manager.commandBuilder(getCommandName() + "gui", CommandMeta.empty())
-                            .permission(permission.getCreate().getName())
+                            .permission(permission().getCreate().getName())
                             .handler(commandContext -> dialogPollBuilderProvider.get().openDialog(commandContext.sender()))
             );
         }
@@ -112,7 +108,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         String promptNumber = addPrompt(5, Localization.Command.Prompt::getNumber);
         registerCustomCommand(manager ->
                 manager.commandBuilder(getCommandName() + "vote", CommandMeta.empty())
-                        .permission(permission.getName())
+                        .permission(permission().getName())
                         .required(promptId, commandParserProvider.integerParser())
                         .required(promptNumber, commandParserProvider.integerParser())
                         .handler(commandContext -> executeVote(commandContext.sender(), commandContext))
@@ -134,7 +130,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 if (status == null) return;
 
                 FPlayer fPlayer = fPlayerService.getFPlayer(poll.getCreator());
-                Range range = command.getRange();
+                Range range = config().getRange();
 
                 sendMessage(PollMetadata.<Localization.Command.Poll>builder()
                         .sender(fPlayer)
@@ -221,8 +217,23 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         createPoll(fPlayer, title, multipleVote, time, repeatTime, answers);
     }
 
+    @Override
+    public Command.Poll config() {
+        return fileResolver.getCommand().getPoll();
+    }
+
+    @Override
+    public Permission.Command.Poll permission() {
+        return fileResolver.getPermission().getCommand().getPoll();
+    }
+
+    @Override
+    public Localization.Command.Poll localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getPoll();
+    }
+
     public void createPoll(FPlayer fPlayer, String title, boolean multipleValue, long endTimeValue, long repeatTimeValue, List<String> answers) {
-        Poll poll = new Poll(command.getLastId(),
+        Poll poll = new Poll(config().getLastId(),
                 fPlayer.getId(),
                 endTimeValue + System.currentTimeMillis(),
                 repeatTimeValue,
@@ -233,7 +244,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
         saveAndUpdateLast(poll);
 
-        Range range = command.getRange();
+        Range range = config().getRange();
 
         sendMessage(PollMetadata.<Localization.Command.Poll>builder()
                 .sender(fPlayer)
@@ -255,7 +266,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
     public void saveAndUpdateLast(Poll poll) {
         pollMap.put(poll.getId(), poll);
-        command.setLastId(poll.getId() + 1);
+        config().setLastId(poll.getId() + 1);
         yamlFileProcessor.save(fileResolver.getCommand());
     }
 

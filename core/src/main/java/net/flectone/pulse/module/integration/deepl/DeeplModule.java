@@ -7,17 +7,16 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 
 @Singleton
 public class DeeplModule extends AbstractModule {
 
-    private final Integration.Deepl integration;
-    private final Permission.Integration.Deepl permission;
+    private final FileResolver fileResolver;
     private final ReflectionResolver reflectionResolver;
     private final Injector injector;
 
@@ -25,15 +24,14 @@ public class DeeplModule extends AbstractModule {
     public DeeplModule(FileResolver fileResolver,
                        ReflectionResolver reflectionResolver,
                        Injector injector) {
-        this.integration = fileResolver.getIntegration().getDeepl();
-        this.permission = fileResolver.getPermission().getIntegration().getDeepl();
+        this.fileResolver = fileResolver;
         this.reflectionResolver = reflectionResolver;
         this.injector = injector;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         reflectionResolver.hasClassOrElse("com.deepl.api.DeepLClient", this::loadLibraries);
 
@@ -45,6 +43,22 @@ public class DeeplModule extends AbstractModule {
         injector.getInstance(DeeplIntegration.class).unhook();
     }
 
+    @Override
+    public Integration.Deepl config() {
+        return fileResolver.getIntegration().getDeepl();
+    }
+
+    @Override
+    public Permission.Integration.Deepl permission() {
+        return fileResolver.getPermission().getIntegration().getDeepl();
+    }
+
+    public String translate(FPlayer sender, String source, String target, String text) {
+        if (isModuleDisabledFor(sender)) return text;
+
+        return injector.getInstance(DeeplIntegration.class).translate(source, target, text);
+    }
+
     private void loadLibraries(LibraryResolver libraryResolver) {
         libraryResolver.loadLibrary(Library.builder()
                 .groupId("com{}deepl{}api")
@@ -53,16 +67,5 @@ public class DeeplModule extends AbstractModule {
                 .resolveTransitiveDependencies(true)
                 .build()
         );
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
-    }
-
-    public String translate(FPlayer sender, String source, String target, String text) {
-        if (isModuleDisabledFor(sender)) return text;
-
-        return injector.getInstance(DeeplIntegration.class).translate(source, target, text);
     }
 }

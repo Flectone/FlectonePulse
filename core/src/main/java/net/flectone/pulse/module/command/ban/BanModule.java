@@ -29,8 +29,7 @@ import java.util.function.BiFunction;
 @Singleton
 public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
-    private final Command.Ban command;
-    private final Permission.Command.Ban permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
@@ -48,10 +47,9 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
                      ProxySender proxySender,
                      ListenerRegistry listenerRegistry,
                      CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getBan(), Command::getBan, MessageType.COMMAND_BAN);
+        super(MessageType.COMMAND_BAN);
 
-        this.command = fileResolver.getCommand().getBan();
-        this.permission = fileResolver.getPermission().getCommand().getBan();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.moderationMessageFormatter = moderationMessageFormatter;
@@ -63,17 +61,17 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         String promptReason = addPrompt(1, Localization.Command.Prompt::getReason);
         String promptTime = addPrompt(2, Localization.Command.Prompt::getTime);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
-                .required(promptPlayer, commandParserProvider.playerParser(command.isSuggestOfflinePlayers()))
+                .permission(permission().getName())
+                .required(promptPlayer, commandParserProvider.playerParser(config().isSuggestOfflinePlayers()))
                 .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
         );
 
@@ -107,6 +105,21 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         ban(fPlayer, target, time, reason);
     }
 
+    @Override
+    public Command.Ban config() {
+        return fileResolver.getCommand().getBan();
+    }
+
+    @Override
+    public Permission.Command.Ban permission() {
+        return fileResolver.getPermission().getCommand().getBan();
+    }
+
+    @Override
+    public Localization.Command.Ban localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getBan();
+    }
+
     public void ban(FPlayer fPlayer, String target, long time, String reason) {
         if (isModuleDisabledFor(fPlayer)) return;
 
@@ -134,8 +147,8 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
                 .sender(fTarget)
                 .format(buildFormat(ban))
                 .moderation(ban)
-                .range(command.getRange())
-                .destination(command.getDestination())
+                .range(config().getRange())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream ->
                         dataOutputStream.writeAsJson(ban)
@@ -159,7 +172,7 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         if (isModuleDisabledFor(fModerator)) return;
         if (fModerator == null) return;
 
-        Localization.Command.Ban localization = resolveLocalization(fTarget);
+        Localization.Command.Ban localization = localization(fTarget);
 
         String formatPlayer = localization.getPerson();
         formatPlayer = moderationMessageFormatter.replacePlaceholders(formatPlayer, fTarget, ban);

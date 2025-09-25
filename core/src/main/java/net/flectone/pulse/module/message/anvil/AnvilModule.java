@@ -8,22 +8,25 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 
 public abstract class AnvilModule extends AbstractModule {
 
-    private final Message.Anvil message;
-    private final Permission.Message.Anvil permission;
+    private final FileResolver fileResolver;
 
     protected AnvilModule(FileResolver fileResolver) {
-        this.message = fileResolver.getMessage().getAnvil();
-        this.permission = fileResolver.getPermission().getMessage().getAnvil();
+        this.fileResolver = fileResolver;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Anvil config() {
+        return fileResolver.getMessage().getAnvil();
+    }
+
+    @Override
+    public Permission.Message.Anvil permission() {
+        return fileResolver.getPermission().getMessage().getAnvil();
     }
 
     public abstract boolean format(FPlayer fPlayer, Object itemMeta);

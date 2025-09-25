@@ -6,11 +6,13 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.module.integration.twitch.model.TwitchMetadata;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
+import net.flectone.pulse.module.integration.twitch.model.TwitchMetadata;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -18,11 +20,11 @@ import java.util.List;
 @Singleton
 public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
 
-    private final Integration.Twitch integration;
+    private final FileResolver fileResolver;
 
     @Inject
     public ChannelMessageListener(FileResolver fileResolver) {
-        this.integration = fileResolver.getIntegration().getTwitch();
+        this.fileResolver = fileResolver;
     }
 
     public Class<ChannelMessageEvent> getEventType() {
@@ -30,7 +32,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
     }
 
     public void execute(ChannelMessageEvent event) {
-        List<String> channel = integration.getMessageChannel().get(MessageType.FROM_TWITCH_TO_MINECRAFT.name());
+        List<String> channel = config().getMessageChannel().get(MessageType.FROM_TWITCH_TO_MINECRAFT.name());
         if (channel == null || channel.isEmpty()) return;
 
         String channelName = event.getChannel().getName();
@@ -55,7 +57,7 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
                 .channel(channel)
                 .message(message)
                 .range(Range.get(Range.Type.PROXY))
-                .destination(integration.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .integration(string -> StringUtils.replaceEach(
                         string,
@@ -70,7 +72,17 @@ public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
     public void onEnable() {}
 
     @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
+    public Integration.Twitch config() {
+        return fileResolver.getIntegration().getTwitch();
+    }
+
+    @Override
+    public Permission.Integration.Twitch permission() {
+        return fileResolver.getPermission().getIntegration().getTwitch();
+    }
+
+    @Override
+    public Localization.Integration.Twitch localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getIntegration().getTwitch();
     }
 }

@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.clearmail.model.ClearmailMetadata;
@@ -23,8 +24,7 @@ import java.util.Optional;
 @Singleton
 public class ClearmailModule extends AbstractModuleCommand<Localization.Command.Clearmail> {
 
-    private final Command.Clearmail command;
-    private final Permission.Command.Clearmail permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
 
@@ -32,24 +32,23 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
     public ClearmailModule(FileResolver fileResolver,
                            FPlayerService fPlayerService,
                            CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getClearmail(), Command::getClearmail, MessageType.COMMAND_CLEARMAIL);
+        super(MessageType.COMMAND_CLEARMAIL);
 
-        this.command = fileResolver.getCommand().getClearmail();
-        this.permission = fileResolver.getPermission().getCommand().getClearmail();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.commandParserProvider = commandParserProvider;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptId = addPrompt(0, Localization.Command.Prompt::getId);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .required(promptId, commandParserProvider.integerParser(), SuggestionProvider.blockingStrings((commandContext, input) -> {
                     FPlayer fPlayer = commandContext.sender();
 
@@ -90,11 +89,26 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
                 .sender(fPlayer)
                 .format(string -> Strings.CS.replaceOnce(string.getFormat(), "<id>", String.valueOf(mailID)))
                 .mail(optionalMail.get())
-                .destination(command.getDestination())
+                .destination(config().getDestination())
                 .message(optionalMail.get().message())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );
+    }
+
+    @Override
+    public Command.Clearmail config() {
+        return fileResolver.getCommand().getClearmail();
+    }
+
+    @Override
+    public Permission.Command.Clearmail permission() {
+        return fileResolver.getPermission().getCommand().getClearmail();
+    }
+
+    @Override
+    public Localization.Command.Clearmail localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getClearmail();
     }
 }

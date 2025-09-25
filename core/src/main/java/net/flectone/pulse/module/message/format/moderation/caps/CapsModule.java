@@ -17,8 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 @Singleton
 public class CapsModule extends AbstractModule {
 
-    private final Message.Format.Moderation.Caps message;
-    private final Permission.Message.Format.Moderation.Caps permission;
+    private final FileResolver fileResolver;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
 
@@ -26,22 +25,26 @@ public class CapsModule extends AbstractModule {
     public CapsModule(FileResolver fileResolver,
                       PermissionChecker permissionChecker,
                       ListenerRegistry listenerRegistry) {
-        this.message = fileResolver.getMessage().getFormat().getModeration().getCaps();
-        this.permission = fileResolver.getPermission().getMessage().getFormat().getModeration().getCaps();
+        this.fileResolver = fileResolver;
         this.permissionChecker = permissionChecker;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         listenerRegistry.register(CapsPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Format.Moderation.Caps config() {
+        return fileResolver.getMessage().getFormat().getModeration().getCaps();
+    }
+
+    @Override
+    public Permission.Message.Format.Moderation.Caps permission() {
+        return fileResolver.getPermission().getMessage().getFormat().getModeration().getCaps();
     }
 
     public void format(MessageContext messageContext) {
@@ -49,7 +52,7 @@ public class CapsModule extends AbstractModule {
 
         FEntity sender = messageContext.getSender();
         if (isModuleDisabledFor(sender)) return;
-        if (permissionChecker.check(sender, permission.getBypass())) return;
+        if (permissionChecker.check(sender, permission().getBypass())) return;
 
         String contextMessage = messageContext.getMessage();
         if (StringUtils.isEmpty(contextMessage)) return;
@@ -71,7 +74,7 @@ public class CapsModule extends AbstractModule {
             }
         }
 
-        return totalLetters > 0 && ((double) uppercaseCount / totalLetters) > message.getTrigger();
+        return totalLetters > 0 && ((double) uppercaseCount / totalLetters) > config().getTrigger();
     }
 
 }

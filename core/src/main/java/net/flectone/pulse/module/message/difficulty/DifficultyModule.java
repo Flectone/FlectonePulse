@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.difficulty.listener.DifficultyPulseListener;
@@ -19,32 +20,40 @@ import org.apache.commons.lang3.Strings;
 @Singleton
 public class DifficultyModule extends AbstractModuleLocalization<Localization.Message.Difficulty> {
 
-    private final Message.Difficulty message;
-    private final Permission.Message.Difficulty permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public DifficultyModule(FileResolver fileResolver,
                             ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getDifficulty(), MessageType.DIFFICULTY);
+        super(MessageType.DIFFICULTY);
 
-        this.message = fileResolver.getMessage().getDifficulty();
-        this.permission = fileResolver.getPermission().getMessage().getDifficulty();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(DifficultyPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Difficulty config() {
+        return fileResolver.getMessage().getDifficulty();
+    }
+
+    @Override
+    public Permission.Message.Difficulty permission() {
+        return fileResolver.getPermission().getMessage().getDifficulty();
+    }
+
+    @Override
+    public Localization.Message.Difficulty localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getDifficulty();
     }
 
     @Async
@@ -60,11 +69,10 @@ public class DifficultyModule extends AbstractModuleLocalization<Localization.Me
                 ))
                 .difficulty(difficulty)
                 .translationKey(translationKey)
-                .range(message.getRange())
-                .destination(message.getDestination())
+                .range(config().getRange())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
     }
-
 }

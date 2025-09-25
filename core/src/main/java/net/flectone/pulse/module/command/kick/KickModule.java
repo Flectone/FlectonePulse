@@ -25,8 +25,7 @@ import java.util.function.BiFunction;
 @Singleton
 public class KickModule extends AbstractModuleCommand<Localization.Command.Kick> {
 
-    private final Command.Kick command;
-    private final Permission.Command.Kick permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
@@ -40,10 +39,9 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
                       ModerationMessageFormatter moderationMessageFormatter,
                       CommandParserProvider commandParserProvider,
                       MessagePipeline messagePipeline) {
-        super(localization -> localization.getCommand().getKick(), Command::getKick, MessageType.COMMAND_KICK);
+        super(MessageType.COMMAND_KICK);
 
-        this.command = fileResolver.getCommand().getKick();
-        this.permission = fileResolver.getPermission().getCommand().getKick();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.moderationMessageFormatter = moderationMessageFormatter;
@@ -53,15 +51,15 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         String promptMessage = addPrompt(1, Localization.Command.Prompt::getMessage);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .required(promptPlayer, commandParserProvider.playerParser())
                 .optional(promptMessage, commandParserProvider.nativeMessageParser())
         );
@@ -96,14 +94,29 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
                 .sender(fTarget)
                 .format(buildFormat(kick))
                 .moderation(kick)
-                .destination(command.getDestination())
-                .range(command.getRange())
+                .destination(config().getDestination())
+                .range(config().getRange())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> dataOutputStream.writeAsJson(kick))
                 .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, kick))
                 .build()
         );
 
+    }
+
+    @Override
+    public Command.Kick config() {
+        return fileResolver.getCommand().getKick();
+    }
+
+    @Override
+    public Permission.Command.Kick permission() {
+        return fileResolver.getPermission().getCommand().getKick();
+    }
+
+    @Override
+    public Localization.Command.Kick localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getKick();
     }
 
     public BiFunction<FPlayer, Localization.Command.Kick, String> buildFormat(Moderation kick) {
@@ -113,7 +126,7 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
     public void kick(FEntity fModerator, FPlayer fReceiver, Moderation kick) {
         if (isModuleDisabledFor(fModerator)) return;
 
-        String format = moderationMessageFormatter.replacePlaceholders(resolveLocalization(fReceiver).getPerson(), fReceiver, kick);
+        String format = moderationMessageFormatter.replacePlaceholders(localization(fReceiver).getPerson(), fReceiver, kick);
 
         fPlayerService.kick(fReceiver, messagePipeline.builder(fReceiver, format).build());
     }

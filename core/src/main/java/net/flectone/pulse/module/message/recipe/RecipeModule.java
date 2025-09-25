@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.recipe.listener.RecipePulseListener;
@@ -21,32 +22,40 @@ import org.apache.commons.lang3.StringUtils;
 @Singleton
 public class RecipeModule extends AbstractModuleLocalization<Localization.Message.Recipe> {
 
-    private final Message.Recipe message;
-    private final Permission.Message.Recipe permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public RecipeModule(FileResolver fileResolver,
                         ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getRecipe(), MessageType.RECIPE);
+        super(MessageType.RECIPE);
 
-        this.message = fileResolver.getMessage().getRecipe();
-        this.permission = fileResolver.getPermission().getMessage().getRecipe();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(RecipePulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Recipe config() {
+        return fileResolver.getMessage().getRecipe();
+    }
+
+    @Override
+    public Permission.Message.Recipe permission() {
+        return fileResolver.getPermission().getMessage().getRecipe();
+    }
+
+    @Override
+    public Localization.Message.Recipe localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getRecipe();
     }
 
     @Async
@@ -55,7 +64,7 @@ public class RecipeModule extends AbstractModuleLocalization<Localization.Messag
 
         sendMessage(RecipeMetadata.<Localization.Message.Recipe>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> StringUtils.replaceEach(
                         switch (translationKey) {
                             case COMMANDS_RECIPE_GIVE_SUCCESS_MULTIPLE -> localization.getGive().getMultiple();
@@ -69,11 +78,10 @@ public class RecipeModule extends AbstractModuleLocalization<Localization.Messag
                 ))
                 .recipe(recipe)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, recipe.getTarget())})
                 .build()
         );
     }
-
 }

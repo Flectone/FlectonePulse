@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.enchant.listener.EnchantPulseListener;
@@ -27,32 +28,40 @@ import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementT
 @Singleton
 public class EnchantModule extends AbstractModuleLocalization<Localization.Message.Enchant> {
 
-    private final Message.Enchant message;
-    private final Permission.Message.Enchant permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public EnchantModule(FileResolver fileResolver,
                          ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getEnchant(), MessageType.ENCHANT);
+        super(MessageType.ENCHANT);
 
-        this.message = fileResolver.getMessage().getEnchant();
-        this.permission = fileResolver.getPermission().getMessage().getEnchant();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(EnchantPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Enchant config() {
+        return fileResolver.getMessage().getEnchant();
+    }
+
+    @Override
+    public Permission.Message.Enchant permission() {
+        return fileResolver.getPermission().getMessage().getEnchant();
+    }
+
+    @Override
+    public Localization.Message.Enchant localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getEnchant();
     }
 
     @Async
@@ -61,7 +70,7 @@ public class EnchantModule extends AbstractModuleLocalization<Localization.Messa
 
         sendMessage(EnchantMetadata.<Localization.Message.Enchant>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> switch (translationKey) {
                     case COMMANDS_ENCHANT_SUCCESS_SINGLE, COMMANDS_ENCHANT_SUCCESS -> localization.getSingle();
                     case COMMANDS_ENCHANT_SUCCESS_MULTIPLE -> Strings.CS.replace(localization.getMultiple(), "<players>", StringUtils.defaultString(enchant.getPlayers()));
@@ -69,7 +78,7 @@ public class EnchantModule extends AbstractModuleLocalization<Localization.Messa
                 })
                 .enchant(enchant)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{enchantmentRag(enchant.getName()), targetTag(fResolver, enchant.getTarget())})
                 .build()
@@ -86,5 +95,4 @@ public class EnchantModule extends AbstractModuleLocalization<Localization.Messa
                 Tag.selfClosingInserting(enchant)
         );
     }
-
 }

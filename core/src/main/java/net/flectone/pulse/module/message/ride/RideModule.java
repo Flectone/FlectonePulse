@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.ride.listener.RidePulseListener;
@@ -20,32 +21,40 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 @Singleton
 public class RideModule extends AbstractModuleLocalization<Localization.Message.Ride> {
 
-    private final Message.Ride message;
-    private final Permission.Message.Ride permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public RideModule(FileResolver fileResolver,
                       ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getRide(), MessageType.RIDE);
+        super(MessageType.RIDE);
 
-        this.message = fileResolver.getMessage().getRide();
-        this.permission = fileResolver.getPermission().getMessage().getRide();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(RidePulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Ride config() {
+        return fileResolver.getMessage().getRide();
+    }
+
+    @Override
+    public Permission.Message.Ride permission() {
+        return fileResolver.getPermission().getMessage().getRide();
+    }
+
+    @Override
+    public Localization.Message.Ride localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getRide();
     }
 
     @Async
@@ -54,14 +63,14 @@ public class RideModule extends AbstractModuleLocalization<Localization.Message.
 
         sendMessage(RideMetadata.<Localization.Message.Ride>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> translationKey == MinecraftTranslationKey.COMMANDS_RIDE_DISMOUNT_SUCCESS
                         ? localization.getDismount()
                         : localization.getMount()
                 )
                 .ride(ride)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{
                         targetTag(fResolver, ride.target()),
@@ -70,5 +79,4 @@ public class RideModule extends AbstractModuleLocalization<Localization.Message.
                 .build()
         );
     }
-
 }

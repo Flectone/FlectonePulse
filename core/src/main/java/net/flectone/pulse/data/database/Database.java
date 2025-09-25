@@ -41,8 +41,6 @@ import java.util.Optional;
 @Singleton
 public class Database {
 
-    private final Config.Database config;
-
     private final FileResolver fileResolver;
     private final Path projectPath;
     private final SystemVariableResolver systemVariableResolver;
@@ -64,7 +62,6 @@ public class Database {
                     PacketProvider packetProvider,
                     ReflectionResolver reflectionResolver,
                     Provider<VersionDAO> versionDAOProvider) {
-        this.config = fileResolver.getConfig().getDatabase();
         this.fileResolver = fileResolver;
         this.projectPath = projectPath;
         this.systemVariableResolver = systemVariableResolver;
@@ -75,12 +72,16 @@ public class Database {
         this.versionDAOProvider = versionDAOProvider;
     }
 
+    public Config.Database config() {
+        return fileResolver.getConfig().getDatabase();
+    }
+
     public void connect() throws IOException {
         if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_10_2)
-                && config.getType() == Type.SQLITE) {
+                && config().getType() == Type.SQLITE) {
             fLogger.warning("SQLite database is not supported on this version of Minecraft");
             fLogger.warning("H2 Database will be used");
-            config.setType(Type.H2);
+            config().setType(Type.H2);
         }
 
         HikariConfig hikariConfig = createHikaryConfig();
@@ -90,7 +91,7 @@ public class Database {
             jdbi = Jdbi.create(dataSource);
             jdbi.installPlugin(new SqlObjectPlugin());
 
-            if (config.getType() == Type.POSTGRESQL) {
+            if (config().getType() == Type.POSTGRESQL) {
                 jdbi.getConfig(SqlStatements.class).setTemplateEngine((sql, ctx) ->
                         Strings.CS.replace(sql, "`", "\"")
                 );
@@ -105,7 +106,7 @@ public class Database {
             throw new RuntimeException(e);
         }
 
-        executeSQLFile(platformServerAdapter.getResource("sqls/" + config.getType().name().toLowerCase() + ".sql"));
+        executeSQLFile(platformServerAdapter.getResource("sqls/" + config().getType().name().toLowerCase() + ".sql"));
 
         checkMigration();
 
@@ -120,7 +121,7 @@ public class Database {
     }
 
     public void init() {
-        fLogger.info(config.getType() + " database connected");
+        fLogger.info(config().getType() + " database connected");
     }
 
     public void disconnect() {
@@ -135,8 +136,8 @@ public class Database {
     private HikariConfig createHikaryConfig() {
         HikariConfig hikariConfig = new HikariConfig();
 
-        String connectionURL = "jdbc:" + config.getType().name().toLowerCase() + ":";
-        switch (config.getType()) {
+        String connectionURL = "jdbc:" + config().getType().name().toLowerCase() + ":";
+        switch (config().getType()) {
             case POSTGRESQL -> {
                 reflectionResolver.hasClassOrElse("org.postgresql.Driver", libraryResolver ->
                         libraryResolver.loadLibrary(Library.builder()
@@ -149,16 +150,16 @@ public class Database {
 
                 connectionURL = connectionURL +
                         "//" +
-                        systemVariableResolver.substituteEnvVars(config.getHost()) +
+                        systemVariableResolver.substituteEnvVars(config().getHost()) +
                         ":" +
-                        systemVariableResolver.substituteEnvVars(config.getPort()) +
+                        systemVariableResolver.substituteEnvVars(config().getPort()) +
                         "/" +
-                        systemVariableResolver.substituteEnvVars(config.getName()) +
-                        config.getParameters();
+                        systemVariableResolver.substituteEnvVars(config().getName()) +
+                        config().getParameters();
 
                 hikariConfig.setDriverClassName("org.postgresql.Driver");
-                hikariConfig.setUsername(systemVariableResolver.substituteEnvVars(config.getUser()));
-                hikariConfig.setPassword(systemVariableResolver.substituteEnvVars(config.getPassword()));
+                hikariConfig.setUsername(systemVariableResolver.substituteEnvVars(config().getUser()));
+                hikariConfig.setPassword(systemVariableResolver.substituteEnvVars(config().getPassword()));
                 hikariConfig.setMaximumPoolSize(8);
                 hikariConfig.setMinimumIdle(2);
                 hikariConfig.addDataSourceProperty("prepStmtCacheSize", "500");
@@ -177,7 +178,7 @@ public class Database {
                 connectionURL = connectionURL +
                         "file:./" + projectPath.toString() +
                         File.separator +
-                        systemVariableResolver.substituteEnvVars(config.getName()) + ".h2" +
+                        systemVariableResolver.substituteEnvVars(config().getName()) + ".h2" +
                         ";DB_CLOSE_DELAY=-1;MODE=MySQL";
 
                 hikariConfig.setDriverClassName("org.h2.Driver");
@@ -192,7 +193,7 @@ public class Database {
                 connectionURL = connectionURL +
                         projectPath.toString() +
                         File.separator +
-                        systemVariableResolver.substituteEnvVars(config.getName()) +
+                        systemVariableResolver.substituteEnvVars(config().getName()) +
                         ".db";
 
                 hikariConfig.setMaximumPoolSize(5);
@@ -215,15 +216,15 @@ public class Database {
 
                 connectionURL = connectionURL +
                         "//" +
-                        systemVariableResolver.substituteEnvVars(config.getHost()) +
+                        systemVariableResolver.substituteEnvVars(config().getHost()) +
                         ":" +
-                        systemVariableResolver.substituteEnvVars(config.getPort()) +
+                        systemVariableResolver.substituteEnvVars(config().getPort()) +
                         "/" +
-                        systemVariableResolver.substituteEnvVars(config.getName()) +
-                        config.getParameters();
+                        systemVariableResolver.substituteEnvVars(config().getName()) +
+                        config().getParameters();
 
-                hikariConfig.setUsername(systemVariableResolver.substituteEnvVars(config.getUser()));
-                hikariConfig.setPassword(systemVariableResolver.substituteEnvVars(config.getPassword()));
+                hikariConfig.setUsername(systemVariableResolver.substituteEnvVars(config().getUser()));
+                hikariConfig.setPassword(systemVariableResolver.substituteEnvVars(config().getPassword()));
                 hikariConfig.setMaximumPoolSize(8);
                 hikariConfig.setMinimumIdle(2);
                 hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
@@ -232,7 +233,7 @@ public class Database {
                 hikariConfig.addDataSourceProperty("useServerPrepStmts", "true");
                 hikariConfig.addDataSourceProperty("rewriteBatchedStatements", "true");
             }
-            default -> throw new IllegalStateException(config.getType() + " not supported");
+            default -> throw new IllegalStateException(config().getType() + " not supported");
         }
 
         hikariConfig.setJdbcUrl(connectionURL);
@@ -289,8 +290,8 @@ public class Database {
     }
 
     private void backupDatabase() {
-        if (config.getType() == Type.SQLITE) {
-            String databaseName = systemVariableResolver.substituteEnvVars(config.getName()) + ".db";
+        if (config().getType() == Type.SQLITE) {
+            String databaseName = systemVariableResolver.substituteEnvVars(config().getName()) + ".db";
 
             String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss").format(new Date());
             String copiedDatabaseName = databaseName + "_backup_" + timeStamp;

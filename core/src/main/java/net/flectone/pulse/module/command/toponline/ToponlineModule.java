@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -31,8 +32,7 @@ import java.util.Optional;
 @Singleton
 public class ToponlineModule extends AbstractModuleCommand<Localization.Command.Toponline> {
 
-    private final Command.Toponline command;
-    private final Permission.Command.Toponline permission;
+    private final FileResolver fileResolver;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
     private final CommandParserProvider commandParserProvider;
@@ -52,10 +52,9 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
                            TimeFormatter timeFormatter,
                            SoundPlayer soundPlayer,
                            FLogger fLogger) {
-        super(localization -> localization.getCommand().getToponline(), Command::getToponline, MessageType.COMMAND_TOPONLINE);
+        super(MessageType.COMMAND_TOPONLINE);
 
-        this.command = fileResolver.getCommand().getToponline();
-        this.permission = fileResolver.getPermission().getCommand().getToponline();
+        this.fileResolver = fileResolver;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.platformServerAdapter = platformServerAdapter;
         this.commandParserProvider = commandParserProvider;
@@ -73,14 +72,14 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
             return;
         }
 
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptNumber = addPrompt(0, Localization.Command.Prompt::getNumber);
         registerCommand(manager -> manager
-               .permission(permission.getName())
+               .permission(permission().getName())
                .optional(promptNumber, commandParserProvider.integerParser())
         );
     }
@@ -99,7 +98,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
                 .toList();
 
         int size = playedTimePlayers.size();
-        int perPage = command.getPerPage();
+        int perPage = config().getPerPage();
         int countPage = (int) Math.ceil((double) size / perPage);
 
         if (page > countPage || page < 1) {
@@ -117,7 +116,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
                 .limit(perPage)
                 .toList();
 
-        Localization.Command.Toponline localization = resolveLocalization(fPlayer);
+        Localization.Command.Toponline localization = localization(fPlayer);
 
         String header = Strings.CS.replace(localization.getHeader(), "<count>", String.valueOf(size));
         Component component = messagePipeline.builder(fPlayer, header)
@@ -147,5 +146,20 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_TOPONLINE, fPlayer, component));
 
         soundPlayer.play(getModuleSound(), fPlayer);
+    }
+
+    @Override
+    public Command.Toponline config() {
+        return fileResolver.getCommand().getToponline();
+    }
+
+    @Override
+    public Permission.Command.Toponline permission() {
+        return fileResolver.getPermission().getCommand().getToponline();
+    }
+
+    @Override
+    public Localization.Command.Toponline localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getToponline();
     }
 }

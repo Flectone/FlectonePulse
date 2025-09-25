@@ -11,8 +11,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 @Singleton
 public class MiniMOTDModule extends AbstractModule {
 
-    private final Integration.MiniMOTD integration;
-    private final Permission.Integration.MiniMOTD permission;
+    private final FileResolver fileResolver;
     private final MiniMOTDIntegration miniMOTDIntegration;
     private final StatusModule statusModule;
 
@@ -20,19 +19,18 @@ public class MiniMOTDModule extends AbstractModule {
     public MiniMOTDModule(FileResolver fileResolver,
                           MiniMOTDIntegration miniMOTDIntegration,
                           StatusModule statusModule) {
-        this.integration = fileResolver.getIntegration().getMinimotd();
-        this.permission = fileResolver.getPermission().getIntegration().getMinimotd();
+        this.fileResolver = fileResolver;
         this.miniMOTDIntegration = miniMOTDIntegration;
         this.statusModule = statusModule;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         miniMOTDIntegration.hook();
 
-        statusModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseStatus() && isHooked());
+        statusModule.addPredicate(fPlayer -> config().isDisableFlectonepulseStatus() && isHooked());
     }
 
     @Override
@@ -41,8 +39,13 @@ public class MiniMOTDModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
+    public Integration.MiniMOTD config() {
+        return fileResolver.getIntegration().getMinimotd();
+    }
+
+    @Override
+    public Permission.Integration.MiniMOTD permission() {
+        return fileResolver.getPermission().getIntegration().getMinimotd();
     }
 
     public boolean isHooked() {

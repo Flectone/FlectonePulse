@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
@@ -25,8 +26,7 @@ import java.util.Optional;
 @Singleton
 public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unban> {
 
-    private final Command.Unban command;
-    private final Permission.Command.Unban permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final CommandParserProvider commandParserProvider;
@@ -38,10 +38,9 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
                        ModerationService moderationService,
                        CommandParserProvider commandParserProvider,
                        ProxySender proxySender) {
-        super(localization -> localization.getCommand().getUnban(), Command::getUnban, MessageType.COMMAND_UNBAN);
+        super(MessageType.COMMAND_UNBAN);
 
-        this.command = fileResolver.getCommand().getUnban();
-        this.permission = fileResolver.getPermission().getCommand().getUnban();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.commandParserProvider = commandParserProvider;
@@ -49,21 +48,16 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
-    }
-
-    @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         String promptId = addPrompt(1, Localization.Command.Prompt::getId);
         registerCommand(manager -> manager
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .required(promptPlayer, commandParserProvider.bannedParser())
                 .optional(promptId, commandParserProvider.integerParser())
         );
@@ -80,6 +74,21 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         int id = optionalId.orElse(-1);
 
         unban(fPlayer, target, id);
+    }
+
+    @Override
+    public Command.Unban config() {
+        return fileResolver.getCommand().getUnban();
+    }
+
+    @Override
+    public Permission.Command.Unban permission() {
+        return fileResolver.getPermission().getCommand().getUnban();
+    }
+
+    @Override
+    public Localization.Command.Unban localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getUnban();
     }
 
     public void unban(FPlayer fPlayer, String target, int id) {
@@ -127,8 +136,8 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
                 .format(unwarn -> Strings.CS.replace(unwarn.getFormat(), "<moderator>", fPlayer.getName()))
                 .moderator(fPlayer)
                 .moderations(bans)
-                .destination(command.getDestination())
-                .range(command.getRange())
+                .destination(config().getDestination())
+                .range(config().getRange())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeAsJson(fPlayer);

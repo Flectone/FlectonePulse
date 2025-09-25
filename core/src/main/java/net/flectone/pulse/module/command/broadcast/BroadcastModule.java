@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -15,30 +16,28 @@ import org.incendo.cloud.context.CommandContext;
 @Singleton
 public class BroadcastModule extends AbstractModuleCommand<Localization.Command.Broadcast> {
 
-    private final Command.Broadcast command;
-    private final Permission.Command.Broadcast permission;
+    private final FileResolver fileResolver;
     private final CommandParserProvider commandParserProvider;
 
     @Inject
     public BroadcastModule(FileResolver fileResolver,
                            CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getBroadcast(), Command::getBroadcast, MessageType.COMMAND_BROADCAST);
+        super(MessageType.COMMAND_BROADCAST);
 
-        this.command = fileResolver.getCommand().getBroadcast();
-        this.permission = fileResolver.getPermission().getCommand().getBroadcast();
+        this.fileResolver = fileResolver;
         this.commandParserProvider = commandParserProvider;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptMessage = addPrompt(0, Localization.Command.Prompt::getMessage);
         registerCommand(manager -> manager
-                        .permission(permission.getName())
+                        .permission(permission().getName())
                         .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
     }
@@ -53,12 +52,27 @@ public class BroadcastModule extends AbstractModuleCommand<Localization.Command.
                 .sender(fPlayer)
                 .format(Localization.Command.Broadcast::getFormat)
                 .message(message)
-                .range(command.getRange())
-                .destination(command.getDestination())
+                .range(config().getRange())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
                 .integration()
                 .build()
         );
+    }
+
+    @Override
+    public Command.Broadcast config() {
+        return fileResolver.getCommand().getBroadcast();
+    }
+
+    @Override
+    public Permission.Command.Broadcast permission() {
+        return fileResolver.getPermission().getCommand().getBroadcast();
+    }
+
+    @Override
+    public Localization.Command.Broadcast localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getBroadcast();
     }
 }

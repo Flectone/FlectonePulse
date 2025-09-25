@@ -2,7 +2,6 @@ package net.flectone.pulse.module.command.flectonepulse.web;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Config;
 import net.flectone.pulse.module.command.flectonepulse.web.controller.EditorController;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import spark.Service;
@@ -10,14 +9,14 @@ import spark.Service;
 @Singleton
 public class SparkServer {
 
-    private final Config.Editor config;
+    private final FileResolver fileResolver;
     private final EditorController controller;
     private Service sparkService;
 
     @Inject
     public SparkServer(FileResolver fileResolver,
                        EditorController controller) {
-        this.config = fileResolver.getConfig().getEditor();
+        this.fileResolver = fileResolver;
         this.controller = controller;
     }
 
@@ -31,7 +30,7 @@ public class SparkServer {
         }
 
         sparkService = Service.ignite();
-        sparkService.port(config.getPort());
+        sparkService.port(fileResolver.getConfig().getEditor().getPort());
         sparkService.staticFiles.location("/");
 
         sparkService.before((req, res) -> res.type("text/html; charset=utf-8"));

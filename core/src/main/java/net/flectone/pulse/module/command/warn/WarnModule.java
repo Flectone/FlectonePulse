@@ -31,8 +31,7 @@ import java.util.function.BiFunction;
 @Singleton
 public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn> {
 
-    private final Command.Warn command;
-    private final Permission.Command.Warn permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
@@ -48,10 +47,9 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
                       CommandParserProvider commandParserProvider,
                       PlatformServerAdapter platformServerAdapter,
                       ProxySender proxySender) {
-        super(localization -> localization.getCommand().getWarn(), Command::getWarn, MessageType.COMMAND_WARN);
+        super(MessageType.COMMAND_WARN);
 
-        this.command = fileResolver.getCommand().getWarn();
-        this.permission = fileResolver.getPermission().getCommand().getWarn();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.moderationMessageFormatter = moderationMessageFormatter;
@@ -62,17 +60,17 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         String promptReason = addPrompt(1, Localization.Command.Prompt::getReason);
         String promptTime = addPrompt(2, Localization.Command.Prompt::getTime);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
-                .required(promptPlayer, commandParserProvider.playerParser(command.isSuggestOfflinePlayers()))
+                .permission(permission().getName())
+                .required(promptPlayer, commandParserProvider.playerParser(config().isSuggestOfflinePlayers()))
                 .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
         );
     }
@@ -123,8 +121,8 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
                 .sender(fTarget)
                 .format(buildFormat(warn))
                 .moderation(warn)
-                .range(command.getRange())
-                .destination(command.getDestination())
+                .range(config().getRange())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> dataOutputStream.writeAsJson(warn))
                 .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, warn))
@@ -140,10 +138,25 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
                 .filter(moderation -> moderation.isValid() && !moderation.isExpired())
                 .toList().size();
 
-        String action = command.getActions().get(countWarns);
+        String action = config().getActions().get(countWarns);
         if (StringUtils.isEmpty(action)) return;
 
         platformServerAdapter.dispatchCommand(Strings.CS.replace(action, "<target>", fTarget.getName()));
+    }
+
+    @Override
+    public Command.Warn config() {
+        return fileResolver.getCommand().getWarn();
+    }
+
+    @Override
+    public Permission.Command.Warn permission() {
+        return fileResolver.getPermission().getCommand().getWarn();
+    }
+
+    @Override
+    public Localization.Command.Warn localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getWarn();
     }
 
     public BiFunction<FPlayer, Localization.Command.Warn, String> buildFormat(Moderation warn) {

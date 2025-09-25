@@ -41,8 +41,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class StreamModule extends AbstractModuleCommand<Localization.Command.Stream> implements PulseListener {
 
-    private final Command.Stream command;
-    private final Permission.Command.Stream permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
     private final ListenerRegistry listenerRegistry;
@@ -52,10 +51,9 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                         FPlayerService fPlayerService,
                         CommandParserProvider commandParserProvider,
                         ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getCommand().getStream(), Command::getStream, MessageType.COMMAND_STREAM);
+        super(MessageType.COMMAND_STREAM);
 
-        this.command = fileResolver.getCommand().getStream();
-        this.permission = fileResolver.getPermission().getCommand().getStream();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.commandParserProvider = commandParserProvider;
         this.listenerRegistry = listenerRegistry;
@@ -63,15 +61,15 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptType = addPrompt(0, Localization.Command.Prompt::getType);
         String promptUrl = addPrompt(1, Localization.Command.Prompt::getUrl);
         registerCommand(manager -> manager
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
                 .optional(promptUrl, commandParserProvider.nativeMessageParser())
         );
@@ -121,7 +119,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
             return;
         }
 
-        fPlayer.setSetting(SettingText.STREAM_PREFIX, needStart ? resolveLocalization().getPrefixTrue() : null);
+        fPlayer.setSetting(SettingText.STREAM_PREFIX, needStart ? localization().getPrefixTrue() : null);
         fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.STREAM_PREFIX);
 
         if (needStart) {
@@ -138,8 +136,8 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                     .format(replaceUrls(urls))
                     .turned(true)
                     .urls(urls)
-                    .range(command.getRange())
-                    .destination(command.getDestination())
+                    .range(config().getRange())
+                    .destination(config().getDestination())
                     .sound(getModuleSound())
                     .proxy(dataOutputStream -> dataOutputStream.writeString(urls))
                     .integration(string -> Strings.CS.replace(string, "<urls>", StringUtils.defaultString(urls)))
@@ -150,10 +148,25 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                     .sender(fPlayer)
                     .format(Localization.Command.Stream::getFormatEnd)
                     .turned(false)
-                    .destination(command.getDestination())
+                    .destination(config().getDestination())
                     .build()
             );
         }
+    }
+
+    @Override
+    public Command.Stream config() {
+        return fileResolver.getCommand().getStream();
+    }
+
+    @Override
+    public Permission.Command.Stream permission() {
+        return fileResolver.getPermission().getCommand().getStream();
+    }
+
+    @Override
+    public Localization.Command.Stream localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getStream();
     }
 
     public void addTag(MessageContext messageContext) {

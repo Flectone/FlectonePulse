@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.save.listener.SavePulseListener;
@@ -18,32 +19,40 @@ import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 @Singleton
 public class SaveModule extends AbstractModuleLocalization<Localization.Message.Save> {
 
-    private final Message.Save message;
-    private final Permission.Message.Save permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public SaveModule(FileResolver fileResolver,
                       ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getSave(), MessageType.SAVE);
+        super(MessageType.SAVE);
 
-        this.message = fileResolver.getMessage().getSave();
-        this.permission = fileResolver.getPermission().getMessage().getSave();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(SavePulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Save config() {
+        return fileResolver.getMessage().getSave();
+    }
+
+    @Override
+    public Permission.Message.Save permission() {
+        return fileResolver.getPermission().getMessage().getSave();
+    }
+
+    @Override
+    public Localization.Message.Save localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getSave();
     }
 
     @Async
@@ -60,11 +69,10 @@ public class SaveModule extends AbstractModuleLocalization<Localization.Message.
                     case COMMANDS_SAVE_SUCCESS -> localization.getSuccess();
                     default -> "";
                 })
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .translationKey(translationKey)
                 .build()
         );
     }
-
 }

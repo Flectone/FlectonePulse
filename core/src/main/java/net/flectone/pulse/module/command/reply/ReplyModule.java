@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tell.TellModule;
@@ -16,8 +17,7 @@ import org.incendo.cloud.context.CommandContext;
 @Singleton
 public class ReplyModule extends AbstractModuleCommand<Localization.Command.Reply> {
 
-    private final Command.Reply command;
-    private final Permission.Command.Reply permission;
+    private final FileResolver fileResolver;
     private final TellModule tellModule;
     private final CommandParserProvider commandParserProvider;
 
@@ -25,24 +25,23 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
     public ReplyModule(FileResolver fileResolver,
                        TellModule tellModule,
                        CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getReply(), Command::getReply, MessageType.COMMAND_REPLY);
+        super(MessageType.COMMAND_REPLY);
 
-        this.command = fileResolver.getCommand().getReply();
-        this.permission = fileResolver.getPermission().getCommand().getReply();
+        this.fileResolver = fileResolver;
         this.tellModule = tellModule;
         this.commandParserProvider = commandParserProvider;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptMessage = addPrompt(0, Localization.Command.Prompt::getMessage);
         registerCommand(manager -> manager
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
     }
@@ -65,5 +64,20 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
         String message = getArgument(commandContext, 0);
 
         tellModule.send(fPlayer, receiverName, message);
+    }
+
+    @Override
+    public Command.Reply config() {
+        return fileResolver.getCommand().getReply();
+    }
+
+    @Override
+    public Permission.Command.Reply permission() {
+        return fileResolver.getPermission().getCommand().getReply();
+    }
+
+    @Override
+    public Localization.Command.Reply localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getReply();
     }
 }

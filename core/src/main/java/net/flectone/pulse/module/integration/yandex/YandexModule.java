@@ -10,14 +10,13 @@ import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 
 @Singleton
 public class YandexModule extends AbstractModule {
 
-    private final Integration.Yandex integration;
-    private final Permission.Integration.Yandex permission;
+    private final FileResolver fileResolver;
     private final ReflectionResolver reflectionResolver;
     private final Injector injector;
 
@@ -25,15 +24,14 @@ public class YandexModule extends AbstractModule {
     public YandexModule(FileResolver fileResolver,
                         ReflectionResolver reflectionResolver,
                         Injector injector) {
-        this.integration = fileResolver.getIntegration().getYandex();
-        this.permission = fileResolver.getPermission().getIntegration().getYandex();
+        this.fileResolver = fileResolver;
         this.reflectionResolver = reflectionResolver;
         this.injector = injector;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         reflectionResolver.hasClassOrElse("yandex.cloud.sdk.auth.Auth", this::loadLibraries);
 
@@ -56,8 +54,13 @@ public class YandexModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
+    public Integration.Yandex config() {
+        return fileResolver.getIntegration().getYandex();
+    }
+
+    @Override
+    public Permission.Integration.Yandex permission() {
+        return fileResolver.getPermission().getIntegration().getYandex();
     }
 
     public String translate(FPlayer sender, String source, String target, String text) {

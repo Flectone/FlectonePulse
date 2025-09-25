@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import lombok.Getter;
 import lombok.Setter;
+import net.flectone.pulse.config.Config;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -36,7 +37,13 @@ public abstract class AbstractModule {
 
     public void onDisable() {}
 
-    protected abstract boolean isConfigEnable();
+    public boolean isConfigEnable() {
+        return config().isEnable();
+    }
+
+    public abstract Config.IEnable config();
+
+    public abstract Permission.IPermission permission();
 
     public void registerModulePermission(Permission.IPermission permission) {
         registerPermission(permission);

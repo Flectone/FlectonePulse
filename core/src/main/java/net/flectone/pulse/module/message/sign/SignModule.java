@@ -4,11 +4,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -17,26 +17,29 @@ import org.apache.commons.lang3.Strings;
 @Singleton
 public class SignModule extends AbstractModule {
 
-    private final Message.Sign message;
-    private final Permission.Message.Sign permission;
+    private final FileResolver fileResolver;
     private final MessagePipeline messagePipeline;
 
     @Inject
     public SignModule(FileResolver fileResolver,
                       MessagePipeline messagePipeline) {
-        this.message = fileResolver.getMessage().getSign();
-        this.permission = fileResolver.getPermission().getMessage().getSign();
+        this.fileResolver = fileResolver;
         this.messagePipeline = messagePipeline;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Sign config() {
+        return fileResolver.getMessage().getSign();
+    }
+
+    @Override
+    public Permission.Message.Sign permission() {
+        return fileResolver.getPermission().getMessage().getSign();
     }
 
     public String format(FPlayer fPlayer, String string) {

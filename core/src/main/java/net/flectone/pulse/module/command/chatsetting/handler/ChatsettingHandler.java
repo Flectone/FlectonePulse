@@ -29,8 +29,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class ChatsettingHandler {
 
-    private final Permission.Message.Chat chatPermission;
-    private final Permission.Command.Chatsetting permission;
+    private final FileResolver fileResolver;
     private final ChatsettingModule chatsettingModule;
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
@@ -42,12 +41,15 @@ public class ChatsettingHandler {
                               PermissionChecker permissionChecker,
                               MessagePipeline messagePipeline,
                               FPlayerService fPlayerService) {
-        this.chatPermission = fileResolver.getPermission().getMessage().getChat();
-        this.permission = fileResolver.getPermission().getCommand().getChatsetting();
+        this.fileResolver = fileResolver;
         this.chatsettingModule = chatsettingModule;
         this.permissionChecker = permissionChecker;
         this.messagePipeline = messagePipeline;
         this.fPlayerService = fPlayerService;
+    }
+
+    public Permission.Message.Chat chatPermission() {
+        return fileResolver.getPermission().getMessage().getChat();
     }
 
     public void handleChatMenu(FPlayer fPlayer,
@@ -56,7 +58,7 @@ public class ChatsettingHandler {
                                Localization.Command.Chatsetting localization,
                                MenuBuilder menuBuilder,
                                @Nullable String id) {
-        if (!permissionChecker.check(fPlayer, permission.getSettings().get(SettingText.CHAT_NAME.name()))) {
+        if (!permissionChecker.check(fPlayer, chatsettingModule.permission().getSettings().get(SettingText.CHAT_NAME.name()))) {
             chatsettingModule.sendErrorMessage(chatsettingModule.metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatsetting::getNoPermission)
@@ -67,7 +69,7 @@ public class ChatsettingHandler {
         }
 
         List<SubMenuItem> items = chat.getTypes().stream()
-                .map(t -> new SubMenuItem(t.getName(), t.getMaterial(), null, chatPermission.getTypes().get(t.getName())))
+                .map(t -> new SubMenuItem(t.getName(), t.getMaterial(), null, chatPermission().getTypes().get(t.getName())))
                 .toList();
 
         Function<SubMenuItem, String> getItemMessage = item -> Strings.CS.replace(
@@ -92,7 +94,7 @@ public class ChatsettingHandler {
                                  Localization.Command.Chatsetting.Menu.SubMenu subMenu,
                                  MenuBuilder menuBuilder,
                                  @Nullable String id) {
-        if (!permissionChecker.check(fPlayer, permission.getSettings().get("FCOLOR_" + type.name()))) {
+        if (!permissionChecker.check(fPlayer, chatsettingModule.permission().getSettings().get("FCOLOR_" + type.name()))) {
             chatsettingModule.sendMessage(chatsettingModule.metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatsetting::getNoPermission)
@@ -146,7 +148,7 @@ public class ChatsettingHandler {
     }
 
     public Status handleCheckbox(FPlayer fPlayer, FPlayer fTarget, MessageType messageType) {
-        if (!permissionChecker.check(fPlayer, permission.getSettings().get(messageType.name()))) {
+        if (!permissionChecker.check(fPlayer, chatsettingModule.permission().getSettings().get(messageType.name()))) {
             chatsettingModule.sendMessage(chatsettingModule.metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatsetting::getNoPermission)

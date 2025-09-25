@@ -20,32 +20,40 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 @Singleton
 public class DeopModule extends AbstractModuleLocalization<Localization.Message.Deop> {
 
-    private final Message.Deop message;
-    private final Permission.Message.Deop permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public DeopModule(FileResolver fileResolver,
                       ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getDeop(), MessageType.DEOP);
+        super(MessageType.DEOP);
 
-        this.message = fileResolver.getMessage().getDeop();
-        this.permission = fileResolver.getPermission().getMessage().getDeop();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(DeopPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Deop config() {
+        return fileResolver.getMessage().getDeop();
+    }
+
+    @Override
+    public Permission.Message.Deop permission() {
+        return fileResolver.getPermission().getMessage().getDeop();
+    }
+
+    @Override
+    public Localization.Message.Deop localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getDeop();
     }
 
     @Async
@@ -57,12 +65,11 @@ public class DeopModule extends AbstractModuleLocalization<Localization.Message.
                 .target(target)
                 .translationKey(translationKey)
                 .format(Localization.Message.Deop::getFormat)
-                .range(message.getRange())
-                .destination(message.getDestination())
+                .range(config().getRange())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, target)})
                 .build()
         );
     }
-
 }

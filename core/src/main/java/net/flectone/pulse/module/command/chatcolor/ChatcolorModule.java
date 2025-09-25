@@ -8,6 +8,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.FColor;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -26,9 +27,7 @@ import java.util.*;
 @Singleton
 public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.Chatcolor> {
 
-    private final Message.Format.FColor fColorMessage;
-    private final Command.Chatcolor command;
-    private final Permission.Command.Chatcolor permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final ProxySender proxySender;
@@ -42,11 +41,9 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
                            ProxySender proxySender,
                            ColorConverter colorConverter,
                            CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getChatcolor(), Command::getChatcolor, MessageType.COMMAND_CHATCOLOR);
+        super(MessageType.COMMAND_CHATCOLOR);
 
-        this.fColorMessage = fileResolver.getMessage().getFormat().getFcolor();
-        this.command = fileResolver.getCommand().getChatcolor();
-        this.permission = fileResolver.getPermission().getCommand().getChatcolor();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
         this.proxySender = proxySender;
@@ -56,33 +53,33 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
-        registerPermission(permission.getOther());
-        permission.getColors().values().forEach(this::registerPermission);
+        registerPermission(permission().getOther());
+        permission().getColors().values().forEach(this::registerPermission);
 
         String promptType = addPrompt(0, Localization.Command.Prompt::getType);
         String promptColor = addPrompt(1, Localization.Command.Prompt::getColor);
         String promptPlayer = addPrompt(2, Localization.Command.Prompt::getPlayer);
         registerCommand(commandBuilder -> {
             commandBuilder = commandBuilder
-                    .permission(permission.getName())
+                    .permission(permission().getName())
                     .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion());
 
-            for (int i = 0; i < fColorMessage.getDefaultColors().size(); i++) {
+            for (int i = 0; i < fColorConfig().getDefaultColors().size(); i++) {
                 commandBuilder = commandBuilder.optional(promptColor + " " + (i + 1), commandParserProvider.colorParser());
             }
 
-            return commandBuilder.optional(promptPlayer, commandParserProvider.nativeMessageParser(), commandParserProvider.playerSuggestionPermission(true, permission.getOther()));
+            return commandBuilder.optional(promptPlayer, commandParserProvider.nativeMessageParser(), commandParserProvider.playerSuggestionPermission(true, permission().getOther()));
         });
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> typeSuggestion() {
         return (context, input) -> Arrays.stream(FColor.Type.values())
-                .filter(type -> permissionChecker.check(context.sender(), permission.getColors().get(type)))
+                .filter(type -> permissionChecker.check(context.sender(), permission().getColors().get(type)))
                 .map(setting -> Suggestion.suggestion(setting.name().toLowerCase()))
                 .toList();
     }
@@ -98,7 +95,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
             default -> Optional.empty();
         };
 
-        if (fColorType.isEmpty() || !permissionChecker.check(fPlayer, permission.getColors().get(fColorType.get()))) {
+        if (fColorType.isEmpty() || !permissionChecker.check(fPlayer, permission().getColors().get(fColorType.get()))) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatcolor::getNullType)
@@ -108,7 +105,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
             return;
         }
 
-        boolean hasOtherPermission = permissionChecker.check(fPlayer, permission.getOther());
+        boolean hasOtherPermission = permissionChecker.check(fPlayer, permission().getOther());
 
         FPlayer fTarget = fPlayer;
 
@@ -132,7 +129,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         fTarget.getFColors().getOrDefault(fColorType.get(), Set.of())
                 .forEach(c -> newFColors.put(c.number(), c));
 
-        for (int i = 0; i < fColorMessage.getDefaultColors().size(); i++) {
+        for (int i = 0; i < fColorConfig().getDefaultColors().size(); i++) {
             Optional<String> optionalColor = commandContext.optional(promptColor + " " + (i + 1));
             if (optionalColor.isEmpty()) continue;
 
@@ -158,6 +155,25 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         }
 
         setColors(fTarget, fColorType.get(), new HashSet<>(newFColors.values()));
+    }
+
+    @Override
+    public Command.Chatcolor config() {
+        return fileResolver.getCommand().getChatcolor();
+    }
+
+    @Override
+    public Permission.Command.Chatcolor permission() {
+        return fileResolver.getPermission().getCommand().getChatcolor();
+    }
+
+    @Override
+    public Localization.Command.Chatcolor localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getChatcolor();
+    }
+
+    public Message.Format.FColor fColorConfig() {
+        return fileResolver.getMessage().getFormat().getFcolor();
     }
 
     private void setColors(FPlayer fPlayer, FColor.Type type, Set<FColor> newFColors) {
@@ -187,7 +203,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
                 .uuid(metadataUUID)
                 .sender(fPlayer)
                 .format(Localization.Command.Chatcolor::getFormat)
-                .destination(command.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );

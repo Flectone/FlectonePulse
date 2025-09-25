@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 public abstract class EventListener<T extends Event> extends AbstractModuleLocalization<Localization.Integration.Discord> {
 
     protected EventListener() {
-        super(localization -> localization.getIntegration().getDiscord(), MessageType.FROM_DISCORD_TO_MINECRAFT);
+        super(MessageType.FROM_DISCORD_TO_MINECRAFT);
     }
 
     public abstract Class<T> getEventType();

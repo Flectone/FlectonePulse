@@ -16,7 +16,6 @@ import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.InventoryController;
 import net.flectone.pulse.platform.provider.PacketProvider;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
@@ -30,7 +29,6 @@ import java.util.function.Function;
 @Singleton
 public class InventoryMenuBuilder implements MenuBuilder {
 
-    private final Command.Chatsetting command;
     private final ChatsettingModule chatsettingModule;
     private final PlatformServerAdapter platformServerAdapter;
     private final MessagePipeline messagePipeline;
@@ -39,14 +37,12 @@ public class InventoryMenuBuilder implements MenuBuilder {
     private final boolean isNewerThanOrEqualsV_1_14;
 
     @Inject
-    public InventoryMenuBuilder(FileResolver fileResolver,
-                                ChatsettingModule chatsettingModule,
+    public InventoryMenuBuilder(ChatsettingModule chatsettingModule,
                                 PlatformServerAdapter platformServerAdapter,
                                 MessagePipeline messagePipeline,
                                 InventoryController inventoryController,
                                 ChatsettingHandler chatsettingHandler,
                                 PacketProvider packetProvider) {
-        this.command = fileResolver.getCommand().getChatsetting();
         this.chatsettingModule = chatsettingModule;
         this.platformServerAdapter = platformServerAdapter;
         this.messagePipeline = messagePipeline;
@@ -57,7 +53,7 @@ public class InventoryMenuBuilder implements MenuBuilder {
 
     @Override
     public void open(FPlayer fPlayer, FPlayer fTarget) {
-        Localization.Command.Chatsetting localization = chatsettingModule.resolveLocalization(fPlayer);
+        Localization.Command.Chatsetting localization = chatsettingModule.localization(fPlayer);
         Component header = messagePipeline.builder(fPlayer, fTarget, localization.getInventory()).build();
 
         Inventory.Builder inventoryBuilder = new Inventory.Builder()
@@ -65,8 +61,8 @@ public class InventoryMenuBuilder implements MenuBuilder {
                 .size(54);
 
         inventoryBuilder = createInventoryChatMenu(fPlayer, fTarget, inventoryBuilder, localization);
-        inventoryBuilder = createInventoryFColorMenu(fPlayer, fTarget, FColor.Type.SEE, inventoryBuilder, command.getMenu().getSee(), localization.getMenu().getSee());
-        inventoryBuilder = createInventoryFColorMenu(fPlayer, fTarget, FColor.Type.OUT, inventoryBuilder, command.getMenu().getOut(), localization.getMenu().getOut());
+        inventoryBuilder = createInventoryFColorMenu(fPlayer, fTarget, FColor.Type.SEE, inventoryBuilder, chatsettingModule.config().getMenu().getSee(), localization.getMenu().getSee());
+        inventoryBuilder = createInventoryFColorMenu(fPlayer, fTarget, FColor.Type.OUT, inventoryBuilder, chatsettingModule.config().getMenu().getOut(), localization.getMenu().getOut());
 
         for (MessageType setting : MessageType.values()) {
             inventoryBuilder = createInventoryCheckbox(fPlayer, fTarget, setting, inventoryBuilder);
@@ -76,7 +72,7 @@ public class InventoryMenuBuilder implements MenuBuilder {
     }
 
     private Inventory.Builder createInventoryCheckbox(FPlayer fPlayer, FPlayer fTarget, MessageType messageType, Inventory.Builder inventoryBuilder) {
-        Command.Chatsetting.Checkbox checkbox = command.getCheckbox();
+        Command.Chatsetting.Checkbox checkbox = chatsettingModule.config().getCheckbox();
         if (!checkbox.getTypes().containsKey(messageType.name())) return inventoryBuilder;
 
         int slot = checkbox.getTypes().get(messageType.name());
@@ -107,14 +103,14 @@ public class InventoryMenuBuilder implements MenuBuilder {
     }
 
     private Inventory.Builder createInventoryChatMenu(FPlayer fPlayer, FPlayer fTarget, Inventory.Builder inventoryBuilder, Localization.Command.Chatsetting localization) {
-        Command.Chatsetting.Menu.Chat chat = command.getMenu().getChat();
+        Command.Chatsetting.Menu.Chat chat = chatsettingModule.config().getMenu().getChat();
 
         int slot = chat.getSlot();
         if (slot == -1) return inventoryBuilder;
 
         String currentChat = chatsettingModule.getPlayerChat(fTarget);
 
-        String material = command.getMenu().getMaterial();
+        String material = chatsettingModule.config().getMenu().getMaterial();
 
         String[] messages = Strings.CS.replace(
                 localization.getMenu().getChat().getItem(),
@@ -140,7 +136,7 @@ public class InventoryMenuBuilder implements MenuBuilder {
         int slot = color.getSlot();
         if (slot == -1) return inventoryBuilder;
 
-        String material = command.getMenu().getMaterial();
+        String material = chatsettingModule.config().getMenu().getMaterial();
 
         String[] messages = subMenu.getItem().split("<br>");
 

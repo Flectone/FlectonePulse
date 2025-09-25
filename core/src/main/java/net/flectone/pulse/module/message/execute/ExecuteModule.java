@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.execute.listener.ExecutePulseListener;
@@ -21,32 +22,40 @@ import org.jetbrains.annotations.Nullable;
 @Singleton
 public class ExecuteModule extends AbstractModuleLocalization<Localization.Message.Execute> {
 
-    private final Message.Execute message;
-    private final Permission.Message.Execute permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public ExecuteModule(FileResolver fileResolver,
                          ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getExecute(), MessageType.EXECUTE);
+        super(MessageType.EXECUTE);
 
-        this.message = fileResolver.getMessage().getExecute();
-        this.permission = fileResolver.getPermission().getMessage().getExecute();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(ExecutePulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Execute config() {
+        return fileResolver.getMessage().getExecute();
+    }
+
+    @Override
+    public Permission.Message.Execute permission() {
+        return fileResolver.getPermission().getMessage().getExecute();
+    }
+
+    @Override
+    public Localization.Message.Execute localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getExecute();
     }
 
     @Async
@@ -55,13 +64,13 @@ public class ExecuteModule extends AbstractModuleLocalization<Localization.Messa
 
         sendMessage(ExecuteMetadata.<Localization.Message.Execute>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> Strings.CS.replace(
                         translationKey == MinecraftTranslationKey.COMMANDS_EXECUTE_CONDITIONAL_PASS ? localization.getPass() : localization.getPassCount(),
                         "<count>",
                         StringUtils.defaultString(count)
                 ))
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .count(count)
                 .translationKey(translationKey)

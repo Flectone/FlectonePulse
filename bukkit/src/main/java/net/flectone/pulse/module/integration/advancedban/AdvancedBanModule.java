@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.command.ban.BanModule;
 import net.flectone.pulse.module.command.banlist.BanlistModule;
@@ -24,8 +24,7 @@ import java.util.function.Predicate;
 @Singleton
 public class AdvancedBanModule extends AbstractModule {
 
-    private final Integration.Advancedban integration;
-    private final Permission.Integration.Advancedban permission;
+    private final FileResolver fileResolver;
     private final AdvancedBanIntegration advancedBanIntegration;
     private final BanModule banModule;
     private final BanlistModule banlistModule;
@@ -51,8 +50,7 @@ public class AdvancedBanModule extends AbstractModule {
                              WarnlistModule warnlistModule,
                              UnwarnModule unwarnModule,
                              KickModule kickModule) {
-        this.integration = fileResolver.getIntegration().getAdvancedban();
-        this.permission = fileResolver.getPermission().getIntegration().getAdvancedban();
+        this.fileResolver = fileResolver;
         this.advancedBanIntegration = advancedBanIntegration;
         this.banModule = banModule;
         this.banlistModule = banlistModule;
@@ -68,26 +66,26 @@ public class AdvancedBanModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         advancedBanIntegration.hook();
 
-        Predicate<FEntity> disablePredicateBan = fPlayer -> integration.isDisableFlectonepulseBan() && isHooked();
+        Predicate<FEntity> disablePredicateBan = fPlayer -> config().isDisableFlectonepulseBan() && isHooked();
         banModule.addPredicate(disablePredicateBan);
         banlistModule.addPredicate(disablePredicateBan);
         unbanModule.addPredicate(disablePredicateBan);
 
-        Predicate<FEntity> disablePredicateMute = fPlayer -> integration.isDisableFlectonepulseMute() && isHooked();
+        Predicate<FEntity> disablePredicateMute = fPlayer -> config().isDisableFlectonepulseMute() && isHooked();
         muteModule.addPredicate(disablePredicateMute);
         mutelistModule.addPredicate(disablePredicateMute);
         unmuteModule.addPredicate(disablePredicateMute);
 
-        Predicate<FEntity> disablePredicateWarn = fPlayer -> integration.isDisableFlectonepulseWarn() && isHooked();
+        Predicate<FEntity> disablePredicateWarn = fPlayer -> config().isDisableFlectonepulseWarn() && isHooked();
         warnModule.addPredicate(disablePredicateWarn);
         warnlistModule.addPredicate(disablePredicateWarn);
         unwarnModule.addPredicate(disablePredicateWarn);
 
-        kickModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseKick() && isHooked());
+        kickModule.addPredicate(fPlayer -> config().isDisableFlectonepulseKick() && isHooked());
     }
 
     @Override
@@ -96,8 +94,13 @@ public class AdvancedBanModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
+    public Integration.Advancedban config() {
+        return fileResolver.getIntegration().getAdvancedban();
+    }
+
+    @Override
+    public Permission.Integration.Advancedban permission() {
+        return fileResolver.getPermission().getIntegration().getAdvancedban();
     }
 
     public boolean isMuted(FEntity fEntity) {

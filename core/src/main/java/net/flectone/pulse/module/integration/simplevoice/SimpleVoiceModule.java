@@ -11,24 +11,21 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 @Singleton
 public class SimpleVoiceModule extends AbstractModule {
 
-    private final Integration.Simplevoice config;
-    private final Permission.Integration.Simplevoice permission;
+    private final FileResolver fileResolver;
 
     @Getter private static SimpleVoiceIntegration simpleVoiceIntegration;
 
     @Inject
     public SimpleVoiceModule(FileResolver fileResolver,
                              SimpleVoiceIntegration simpleVoiceIntegration) {
-
-        this.config = fileResolver.getIntegration().getSimplevoice();
-        this.permission = fileResolver.getPermission().getIntegration().getSimplevoice();
+        this.fileResolver = fileResolver;
 
         SimpleVoiceModule.simpleVoiceIntegration = simpleVoiceIntegration;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
         simpleVoiceIntegration.hook();
     }
 
@@ -38,7 +35,12 @@ public class SimpleVoiceModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return config.isEnable();
+    public Integration.Simplevoice config() {
+        return fileResolver.getIntegration().getSimplevoice();
+    }
+
+    @Override
+    public Permission.Integration.Simplevoice permission() {
+        return fileResolver.getPermission().getIntegration().getSimplevoice();
     }
 }

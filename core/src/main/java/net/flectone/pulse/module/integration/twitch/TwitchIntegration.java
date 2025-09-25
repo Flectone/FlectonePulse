@@ -8,7 +8,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import feign.Logger;
 import net.flectone.pulse.config.Integration;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.module.integration.twitch.listener.ChannelMessageListener;
@@ -23,8 +22,7 @@ import java.util.function.UnaryOperator;
 @Singleton
 public class TwitchIntegration implements FIntegration {
 
-    private final Integration.Twitch integration;
-    private final Localization.Integration.Twitch localization;
+    private final FileResolver fileResolver;
     private final ChannelMessageListener channelMessageListener;
     private final PlatformServerAdapter platformServerAdapter;
     private final SystemVariableResolver systemVariableResolver;
@@ -38,9 +36,7 @@ public class TwitchIntegration implements FIntegration {
                              SystemVariableResolver systemVariableResolver,
                              ChannelMessageListener channelMessageListener,
                              FLogger fLogger) {
-
-        this.integration = fileResolver.getIntegration().getTwitch();
-        this.localization = fileResolver.getLocalization().getIntegration().getTwitch();
+        this.fileResolver = fileResolver;
         this.channelMessageListener = channelMessageListener;
         this.platformServerAdapter = platformServerAdapter;
         this.systemVariableResolver = systemVariableResolver;
@@ -49,6 +45,7 @@ public class TwitchIntegration implements FIntegration {
 
     @Override
     public void hook() {
+        Integration.Twitch integration = fileResolver.getIntegration().getTwitch();
         String token = systemVariableResolver.substituteEnvVars(integration.getToken());
         String identityProvider = systemVariableResolver.substituteEnvVars(integration.getClientID());
         if (token.isEmpty() || identityProvider.isEmpty()) return;
@@ -91,11 +88,11 @@ public class TwitchIntegration implements FIntegration {
     }
 
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> twitchString) {
-        List<String> channels = integration.getMessageChannel().get(messageName);
+        List<String> channels = fileResolver.getIntegration().getTwitch().getMessageChannel().get(messageName);
         if (channels == null) return;
         if (channels.isEmpty()) return;
 
-        String message = localization.getMessageChannel().get(messageName);
+        String message = fileResolver.getLocalization().getIntegration().getTwitch().getMessageChannel().get(messageName);
         if (message == null) return;
         if (message.isEmpty()) return;
 

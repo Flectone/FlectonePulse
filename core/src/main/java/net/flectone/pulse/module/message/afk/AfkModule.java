@@ -10,11 +10,11 @@ import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.module.message.afk.model.AFKMetadata;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.afk.listener.AfkPulseListener;
+import net.flectone.pulse.module.message.afk.model.AFKMetadata;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
@@ -38,8 +38,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
 
     private final Map<UUID, Pair<Integer, PlatformPlayerAdapter.Coordinates>> playersCoordinates = new HashMap<>();
 
-    private final Message.Afk message;
-    private final Permission.Message.Afk permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final IntegrationModule integrationModule;
@@ -53,10 +52,9 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
                      IntegrationModule integrationModule,
                      PlatformPlayerAdapter platformPlayerAdapter,
                      ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getAfk(), MessageType.AFK);
+        super(MessageType.AFK);
 
-        this.message = fileResolver.getMessage().getAfk();
-        this.permission = fileResolver.getPermission().getMessage().getAfk();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.integrationModule = integrationModule;
@@ -66,10 +64,10 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        if (message.getTicker().isEnable()) {
-            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::check), message.getTicker().getPeriod());
+        if (config().getTicker().isEnable()) {
+            taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::check), config().getTicker().getPeriod());
         }
 
         listenerRegistry.register(AfkPulseListener.class);
@@ -81,8 +79,18 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Afk config() {
+        return fileResolver.getMessage().getAfk();
+    }
+
+    @Override
+    public Permission.Message.Afk permission() {
+        return fileResolver.getPermission().getMessage().getAfk();
+    }
+
+    @Override
+    public Localization.Message.Afk localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getAfk();
     }
 
     public void addTag(MessageContext messageContext) {
@@ -111,7 +119,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
         }
 
         if (isModuleDisabledFor(fPlayer)) return;
-        if (message.getIgnore().contains(action)) return;
+        if (config().getIgnore().contains(action)) return;
 
         playersCoordinates.put(fPlayer.getUuid(), Pair.of(0, new PlatformPlayerAdapter.Coordinates(0, -1000, 0)));
         check(fPlayer);
@@ -155,7 +163,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
         }
 
         if (fPlayer.getSetting(SettingText.AFK_SUFFIX) != null) return;
-        if (time - timeVector.first() < message.getDelay()) return;
+        if (time - timeVector.first() < config().getDelay()) return;
 
         setAfk(fPlayer);
     }
@@ -163,7 +171,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
     public void setAfk(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        fPlayer.setSetting(SettingText.AFK_SUFFIX, resolveLocalization().getSuffix());
+        fPlayer.setSetting(SettingText.AFK_SUFFIX, localization().getSuffix());
         fPlayerService.saveOrUpdateSetting(fPlayer, SettingText.AFK_SUFFIX);
 
         send(fPlayer);
@@ -172,7 +180,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
     private void send(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        Range range = message.getRange();
+        Range range = config().getRange();
         boolean isAfk = fPlayer.getSetting(SettingText.AFK_SUFFIX) == null;
 
         if (range.is(Range.Type.PLAYER)) {
@@ -183,7 +191,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
                             : s.getFormatTrue().getLocal()
                     )
                     .newStatus(isAfk)
-                    .destination(message.getDestination())
+                    .destination(config().getDestination())
                     .sound(getModuleSound())
                     .build()
             );
@@ -199,7 +207,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
                 )
                 .newStatus(isAfk)
                 .range(range)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .filter(fReceiver -> integrationModule.canSeeVanished(fPlayer, fReceiver))
                 .proxy(dataOutputStream -> dataOutputStream.writeBoolean(isAfk))

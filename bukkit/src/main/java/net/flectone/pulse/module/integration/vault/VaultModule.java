@@ -4,9 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.processing.resolver.FileResolver;
 
 import java.util.Collections;
 import java.util.Set;
@@ -14,21 +14,19 @@ import java.util.Set;
 @Singleton
 public class VaultModule extends AbstractModule {
 
-    private final Integration.Vault integration;
-    private final Permission.Integration.Vault permission;
+    private final FileResolver fileResolver;
     private final VaultIntegration vaultIntegration;
 
     @Inject
     public VaultModule(FileResolver fileResolver,
                        VaultIntegration vaultIntegration) {
-        this.integration = fileResolver.getIntegration().getVault();
-        this.permission = fileResolver.getPermission().getIntegration().getVault();
+        this.fileResolver = fileResolver;
         this.vaultIntegration = vaultIntegration;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         vaultIntegration.hook();
     }
@@ -39,8 +37,13 @@ public class VaultModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
+    public Integration.Vault config() {
+        return fileResolver.getIntegration().getVault();
+    }
+
+    @Override
+    public Permission.Integration.Vault permission() {
+        return fileResolver.getPermission().getIntegration().getVault();
     }
 
     public boolean hasVaultPermission(FPlayer fPlayer, String permission) {

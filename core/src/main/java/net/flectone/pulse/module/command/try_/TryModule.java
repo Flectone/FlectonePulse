@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.try_.model.TryMetadata;
@@ -20,8 +21,7 @@ import java.util.function.Function;
 @Singleton
 public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
 
-    private final Command.Try command;
-    private final Permission.Command.Try permission;
+    private final FileResolver fileResolver;
     private final RandomUtil randomUtil;
     private final CommandParserProvider commandParserProvider;
 
@@ -29,29 +29,23 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
     public TryModule(FileResolver fileResolver,
                      RandomUtil randomUtil,
                      CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getTry(), Command::getTry, MessageType.COMMAND_TRY);
+        super(MessageType.COMMAND_TRY);
 
-        this.command = fileResolver.getCommand().getTry();
-        this.permission = fileResolver.getPermission().getCommand().getTry();
+        this.fileResolver = fileResolver;
         this.randomUtil = randomUtil;
         this.commandParserProvider = commandParserProvider;
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return command.isEnable();
-    }
-
-    @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptMessage = addPrompt(0, Localization.Command.Prompt::getMessage);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
                 .handler(this)
         );
@@ -61,8 +55,8 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (isModuleDisabledFor(fPlayer, true)) return;
 
-        int min = command.getMin();
-        int max = command.getMax();
+        int min = config().getMin();
+        int max = config().getMax();
         int random = randomUtil.nextInt(min, max);
 
         String message = getArgument(commandContext, 0);
@@ -71,8 +65,8 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
                 .sender(fPlayer)
                 .format(replacePercent(random))
                 .percent(random)
-                .range(command.getRange())
-                .destination(command.getDestination())
+                .range(config().getRange())
+                .destination(config().getDestination())
                 .message(message)
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> {
@@ -84,9 +78,24 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
         );
     }
 
+    @Override
+    public Command.Try config() {
+        return fileResolver.getCommand().getTry();
+    }
+
+    @Override
+    public Permission.Command.Try permission() {
+        return fileResolver.getPermission().getCommand().getTry();
+    }
+
+    @Override
+    public Localization.Command.Try localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getTry();
+    }
+
     public Function<Localization.Command.Try, String> replacePercent(int value) {
         return message -> Strings.CS.replace(
-                value >= command.getGood() ? message.getFormatTrue() : message.getFormatFalse(),
+                value >= config().getGood() ? message.getFormatTrue() : message.getFormatFalse(),
                 "<percent>",
                 String.valueOf(value)
         );

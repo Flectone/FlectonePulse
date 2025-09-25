@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Ticker;
@@ -25,8 +26,7 @@ import java.util.List;
 @Singleton
 public class HeaderModule extends AbstractModuleListLocalization<Localization.Message.Tab.Header> {
 
-    private final Message.Tab.Header message;
-    private final Permission.Message.Tab.Header permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final ListenerRegistry listenerRegistry;
@@ -38,10 +38,9 @@ public class HeaderModule extends AbstractModuleListLocalization<Localization.Me
                         TaskScheduler taskScheduler,
                         ListenerRegistry listenerRegistry,
                         PacketSender packetSender) {
-        super(module -> module.getMessage().getTab().getHeader(), MessageType.HEADER);
+        super(MessageType.HEADER);
 
-        this.message = fileResolver.getMessage().getTab().getHeader();
-        this.permission = fileResolver.getPermission().getMessage().getTab().getHeader();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.listenerRegistry = listenerRegistry;
@@ -52,9 +51,9 @@ public class HeaderModule extends AbstractModuleListLocalization<Localization.Me
     public void onEnable() {
         fPlayerService.getPlatformFPlayers().forEach(this::send);
 
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        Ticker ticker = message.getTicker();
+        Ticker ticker = config().getTicker();
         if (ticker.isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::send), ticker.getPeriod());
         }
@@ -65,33 +64,43 @@ public class HeaderModule extends AbstractModuleListLocalization<Localization.Me
     @Override
     public void onDisable() {
         // clear tab
-        Destination.Type destinationType = message.getDestination().getType();
+        Destination.Type destinationType = config().getDestination().getType();
         if (destinationType == Destination.Type.TAB_HEADER || destinationType == Destination.Type.TAB_FOOTER) {
             packetSender.send(new WrapperPlayServerPlayerListHeaderAndFooter(Component.empty(), Component.empty()));
         }
     }
 
+    @Override
+    public Message.Tab.Header config() {
+        return fileResolver.getMessage().getTab().getHeader();
+    }
+
+    @Override
+    public Permission.Message.Tab.Header permission() {
+        return fileResolver.getPermission().getMessage().getTab().getHeader();
+    }
+
+    @Override
+    public Localization.Message.Tab.Header localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getTab().getHeader();
+    }
+
+    @Override
+    public List<String> getAvailableMessages(FPlayer fPlayer) {
+        return joinMultiList(localization(fPlayer).getLists());
+    }
+
     public void send(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        String format = getNextMessage(fPlayer, message.isRandom());
+        String format = getNextMessage(fPlayer, config().isRandom());
         if (StringUtils.isEmpty(format)) return;
 
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
                 .format(format)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .build()
         );
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
-    }
-
-    @Override
-    public List<String> getAvailableMessages(FPlayer fPlayer) {
-        return joinMultiList(resolveLocalization(fPlayer).getLists());
     }
 }

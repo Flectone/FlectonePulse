@@ -6,12 +6,14 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
-import net.flectone.pulse.module.integration.telegram.model.TelegramMetadata;
-import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.telegram.TelegramIntegration;
+import net.flectone.pulse.module.integration.telegram.model.TelegramMetadata;
 import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.constant.MessageType;
 import org.apache.commons.lang3.StringUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -22,13 +24,13 @@ import java.util.List;
 @Singleton
 public class MessageListener extends EventListener {
 
-    private final Integration.Telegram integration;
+    private final FileResolver fileResolver;
     private final Provider<TelegramIntegration> telegramIntegration;
 
     @Inject
     public MessageListener(FileResolver fileResolver,
                            Provider<TelegramIntegration> telegramIntegration) {
-        this.integration = fileResolver.getIntegration().getTelegram();
+        this.fileResolver = fileResolver;
         this.telegramIntegration = telegramIntegration;
     }
 
@@ -36,8 +38,18 @@ public class MessageListener extends EventListener {
     public void onEnable() {}
 
     @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
+    public Integration.Telegram config() {
+        return fileResolver.getIntegration().getTelegram();
+    }
+
+    @Override
+    public Permission.Integration.Telegram permission() {
+        return fileResolver.getPermission().getIntegration().getTelegram();
+    }
+
+    @Override
+    public Localization.Integration.Telegram localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getIntegration().getTelegram();
     }
 
     @Override
@@ -66,7 +78,7 @@ public class MessageListener extends EventListener {
             return;
         }
 
-        List<String> chats = integration.getMessageChannel().get(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name());
+        List<String> chats = config().getMessageChannel().get(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name());
         if (chats == null || !chats.contains(chatID)) return;
 
         sendMessage(author, chat, text);
@@ -85,7 +97,7 @@ public class MessageListener extends EventListener {
                 .chat(chat)
                 .message(message)
                 .range(Range.get(Range.Type.PROXY))
-                .destination(integration.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .integration(string -> StringUtils.replaceEach(
                         string,

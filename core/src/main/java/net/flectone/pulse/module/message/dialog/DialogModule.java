@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.dialog.listener.DialogPulseListener;
@@ -22,32 +23,40 @@ import org.apache.commons.lang3.Strings;
 @Singleton
 public class DialogModule extends AbstractModuleLocalization<Localization.Message.Dialog> {
 
-    private final Message.Dialog message;
-    private final Permission.Message.Dialog permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public DialogModule(FileResolver fileResolver,
                         ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getDialog(), MessageType.DIALOG);
+        super(MessageType.DIALOG);
 
-        this.message = fileResolver.getMessage().getDialog();
-        this.permission = fileResolver.getPermission().getMessage().getDialog();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(DialogPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Dialog config() {
+        return fileResolver.getMessage().getDialog();
+    }
+
+    @Override
+    public Permission.Message.Dialog permission() {
+        return fileResolver.getPermission().getMessage().getDialog();
+    }
+
+    @Override
+    public Localization.Message.Dialog localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getDialog();
     }
 
     @Async
@@ -56,7 +65,7 @@ public class DialogModule extends AbstractModuleLocalization<Localization.Messag
 
         sendMessage(DialogMetadata.<Localization.Message.Dialog>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> switch (translationKey) {
                     case COMMANDS_DIALOG_CLEAR_MULTIPLE -> Strings.CS.replace(localization.getClear().getMultiple(), "<players>", StringUtils.defaultString(dialog.getPlayers()));
                     case COMMANDS_DIALOG_CLEAR_SINGLE -> localization.getClear().getSingle();
@@ -66,11 +75,10 @@ public class DialogModule extends AbstractModuleLocalization<Localization.Messag
                 })
                 .dialog(dialog)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, dialog.getTarget())})
                 .build()
         );
     }
-
 }

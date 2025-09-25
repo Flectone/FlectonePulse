@@ -18,8 +18,7 @@ import java.util.function.UnaryOperator;
 @Singleton
 public class TelegramModule extends AbstractModule {
 
-    private final Integration.Telegram integration;
-    private final Permission.Integration.Telegram permission;
+    private final FileResolver fileResolver;
     private final ReflectionResolver reflectionResolver;
     private final Injector injector;
 
@@ -27,16 +26,14 @@ public class TelegramModule extends AbstractModule {
     public TelegramModule(FileResolver fileResolver,
                           ReflectionResolver reflectionResolver,
                           Injector injector) {
+        this.fileResolver = fileResolver;
         this.reflectionResolver = reflectionResolver;
         this.injector = injector;
-
-        integration = fileResolver.getIntegration().getTelegram();
-        permission = fileResolver.getPermission().getIntegration().getTelegram();
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         reflectionResolver.hasClassOrElse("org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient", this::loadLibraries);
 
@@ -75,8 +72,13 @@ public class TelegramModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
+    public Integration.Telegram config() {
+        return fileResolver.getIntegration().getTelegram();
+    }
+
+    @Override
+    public Permission.Integration.Telegram permission() {
+        return fileResolver.getPermission().getIntegration().getTelegram();
     }
 
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> telegramString) {

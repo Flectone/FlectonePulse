@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.UnModerationMetadata;
 import net.flectone.pulse.model.util.Moderation;
@@ -25,8 +26,7 @@ import java.util.Optional;
 @Singleton
 public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unmute> {
 
-    private final Command.Unmute command;
-    private final Permission.Command.Unmute permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final CommandParserProvider commandParserProvider;
@@ -38,10 +38,9 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
                         ModerationService moderationService,
                         CommandParserProvider commandParserProvider,
                         ProxySender proxySender) {
-        super(localization -> localization.getCommand().getUnmute(), Command::getUnmute, MessageType.COMMAND_UNMUTE);
+        super(MessageType.COMMAND_UNMUTE);
 
-        this.command = fileResolver.getCommand().getUnmute();
-        this.permission = fileResolver.getPermission().getCommand().getUnmute();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.commandParserProvider = commandParserProvider;
@@ -50,15 +49,15 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         String promptId = addPrompt(1, Localization.Command.Prompt::getId);
         registerCommand(manager -> manager
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .required(promptPlayer, commandParserProvider.mutedParser())
                 .optional(promptId, commandParserProvider.integerParser())
         );
@@ -75,6 +74,21 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
         int id = optionalId.orElse(-1);
 
         unmute(fPlayer, target, id);
+    }
+
+    @Override
+    public Command.Unmute config() {
+        return fileResolver.getCommand().getUnmute();
+    }
+
+    @Override
+    public Permission.Command.Unmute permission() {
+        return fileResolver.getPermission().getCommand().getUnmute();
+    }
+
+    @Override
+    public Localization.Command.Unmute localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getUnmute();
     }
 
     public void unmute(FPlayer fPlayer, String target, int id) {
@@ -121,8 +135,8 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
                 .format(unmute -> Strings.CS.replace(unmute.getFormat(), "<moderator>", fPlayer.getName()))
                 .moderator(fPlayer)
                 .moderations(mutes)
-                .destination(command.getDestination())
-                .range(command.getRange())
+                .destination(config().getDestination())
+                .range(config().getRange())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> {
                     dataOutputStream.writeAsJson(fPlayer);

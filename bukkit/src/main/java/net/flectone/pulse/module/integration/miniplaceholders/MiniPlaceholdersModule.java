@@ -16,8 +16,7 @@ import net.flectone.pulse.util.logging.FLogger;
 @Singleton
 public class MiniPlaceholdersModule extends AbstractModule {
 
-    private final Integration.MiniPlaceholders integration;
-    private final Permission.Integration.MiniPlaceholders permission;
+    private final FileResolver fileResolver;
     private final MiniPlaceholdersIntegration miniPlaceholdersIntegration;
     private final ListenerRegistry listenerRegistry;
 
@@ -25,8 +24,7 @@ public class MiniPlaceholdersModule extends AbstractModule {
     public MiniPlaceholdersModule(FileResolver fileResolver,
                                   ListenerRegistry listenerRegistry,
                                   FLogger fLogger) {
-        this.integration = fileResolver.getIntegration().getMiniplaceholders();
-        this.permission = fileResolver.getPermission().getIntegration().getMiniplaceholders();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
 
         // don't use injection because we skip relocate
@@ -35,8 +33,8 @@ public class MiniPlaceholdersModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
-        registerPermission(permission.getUse());
+        registerModulePermission(permission());
+        registerPermission(permission().getUse());
 
         miniPlaceholdersIntegration.hook();
 
@@ -57,7 +55,12 @@ public class MiniPlaceholdersModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
+    public Integration.MiniPlaceholders config() {
+        return fileResolver.getIntegration().getMiniplaceholders();
+    }
+
+    @Override
+    public Permission.Integration.MiniPlaceholders permission() {
+        return fileResolver.getPermission().getIntegration().getMiniplaceholders();
     }
 }

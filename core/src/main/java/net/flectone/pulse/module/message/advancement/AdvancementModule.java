@@ -31,8 +31,7 @@ import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementT
 @Singleton
 public class AdvancementModule extends AbstractModuleLocalization<Localization.Message.Advancement> {
 
-    private final Message.Advancement message;
-    private final Permission.Message.Advancement permission;
+    private final FileResolver fileResolver;
     private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
     private final ListenerRegistry listenerRegistry;
@@ -42,10 +41,9 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
                              IntegrationModule integrationModule,
                              MessagePipeline messagePipeline,
                              ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getAdvancement(), MessageType.ADVANCEMENT);
+        super(MessageType.ADVANCEMENT);
 
-        this.message = fileResolver.getMessage().getAdvancement();
-        this.permission = fileResolver.getPermission().getMessage().getAdvancement();
+        this.fileResolver = fileResolver;
         this.integrationModule = integrationModule;
         this.messagePipeline = messagePipeline;
         this.listenerRegistry = listenerRegistry;
@@ -53,16 +51,26 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(AdvancementPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Advancement config() {
+        return fileResolver.getMessage().getAdvancement();
+    }
+
+    @Override
+    public Permission.Message.Advancement permission() {
+        return fileResolver.getPermission().getMessage().getAdvancement();
+    }
+
+    @Override
+    public Localization.Message.Advancement localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getAdvancement();
     }
 
     @Async
@@ -82,8 +90,8 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
                 })
                 .advancement(advancement)
                 .translationKey(translationKey)
-                .range(message.getRange())
-                .destination(message.getDestination())
+                .range(config().getRange())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .filter(fPlayer -> integrationModule.canSeeVanished(fTarget, fPlayer))
                 .tagResolvers(fResolver -> new TagResolver[]{advancementTag(fTarget, fResolver, advancement.getAdvancementComponent())})
@@ -100,7 +108,7 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
     public void sendCommandAdvancement(FPlayer fPlayer, MinecraftTranslationKey translationKey, Advancement advancement) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        Message.Advancement.Command command = message.getCommand();
+        Message.Advancement.Command command = config().getCommand();
         if (!command.isEnable()) return;
 
         sendMessage(AdvancementMetadata.<Localization.Message.Advancement>builder()
@@ -147,7 +155,7 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
         boolean isChallenge = NamedTextColor.DARK_PURPLE.equals(hoverEventComponent.color());
 
         return TagResolver.resolver(tag, (argumentQueue, context) -> {
-            Localization.Message.Advancement localization = resolveLocalization(receiver);
+            Localization.Message.Advancement localization = localization(receiver);
 
             String title = isChallenge
                     ? localization.getTag().getChallenge()

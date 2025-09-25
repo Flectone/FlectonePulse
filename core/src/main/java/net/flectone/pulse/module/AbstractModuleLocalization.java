@@ -32,13 +32,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 
 import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.empty;
 
 public abstract class AbstractModuleLocalization<M extends Localization.Localizable> extends AbstractModule {
 
-    private final Function<Localization, M> localizationFunction;
     @Getter private final MessageType messageType;
 
     @Inject private FPlayerService fPlayerService;
@@ -53,9 +51,14 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     @Getter private Cooldown moduleCooldown;
     @Getter private Sound moduleSound;
 
-    protected AbstractModuleLocalization(Function<Localization, M> localizationMFunction, MessageType messageType) {
-        this.localizationFunction = localizationMFunction;
+    protected AbstractModuleLocalization(MessageType messageType) {
         this.messageType = messageType;
+    }
+
+    public abstract M localization(FEntity sender);
+
+    public M localization() {
+        return localization(FPlayer.UNKNOWN);
     }
 
     @Override
@@ -89,21 +92,13 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
         return this.moduleCooldown;
     }
 
-    public M resolveLocalization() {
-        return localizationFunction.apply(fileResolver.getLocalization());
-    }
-
-    public M resolveLocalization(FEntity sender) {
-        return localizationFunction.apply(fileResolver.getLocalization(sender));
-    }
-
     @SuppressWarnings("unchecked")
     public EventMetadata.EventMetadataBuilder<M, ?, ?> metadataBuilder() {
         return (EventMetadata.EventMetadataBuilder<M, ?, ?>) EventMetadata.builder();
     }
 
     public List<FPlayer> createReceivers(MessageType messageType, EventMetadata<M> eventMetadata) {
-        String rawFormat = eventMetadata.resolveFormat(FPlayer.UNKNOWN, resolveLocalization());
+        String rawFormat = eventMetadata.resolveFormat(FPlayer.UNKNOWN, localization());
         PreMessageSendEvent preMessageSendEvent = new PreMessageSendEvent(messageType, rawFormat, eventMetadata);
 
         eventDispatcher.dispatch(preMessageSendEvent);
@@ -192,7 +187,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     }
 
     private Component buildFormatComponent(FPlayer receiver, EventMetadata<M> eventMetadata, Component message) {
-        String formatContent = eventMetadata.resolveFormat(receiver, resolveLocalization(receiver));
+        String formatContent = eventMetadata.resolveFormat(receiver, localization(receiver));
         if (StringUtils.isEmpty(formatContent)) return Component.empty();
 
         FEntity sender = eventMetadata.getSender();

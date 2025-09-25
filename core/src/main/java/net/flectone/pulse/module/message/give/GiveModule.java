@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.give.listener.GivePulseListener;
@@ -25,32 +26,40 @@ import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementT
 @Singleton
 public class GiveModule extends AbstractModuleLocalization<Localization.Message.Give> {
 
-    private final Message.Give message;
-    private final Permission.Message.Give permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public GiveModule(FileResolver fileResolver,
                       ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getGive(), MessageType.GIVE);
+        super(MessageType.GIVE);
 
-        this.message = fileResolver.getMessage().getGive();
-        this.permission = fileResolver.getPermission().getMessage().getGive();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(GivePulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Give config() {
+        return fileResolver.getMessage().getGive();
+    }
+
+    @Override
+    public Permission.Message.Give permission() {
+        return fileResolver.getPermission().getMessage().getGive();
+    }
+
+    @Override
+    public Localization.Message.Give localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getGive();
     }
 
     @Async
@@ -66,8 +75,8 @@ public class GiveModule extends AbstractModuleLocalization<Localization.Message.
                 ))
                 .give(give)
                 .translationKey(translationKey)
-                .range(message.getRange())
-                .destination(message.getDestination())
+                .range(config().getRange())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{giveItemTag(give.getItem()), targetTag(fResolver, give.getTarget())})
                 .build()
@@ -82,5 +91,4 @@ public class GiveModule extends AbstractModuleLocalization<Localization.Message.
                 Tag.selfClosingInserting(itemName)
         );
     }
-
 }

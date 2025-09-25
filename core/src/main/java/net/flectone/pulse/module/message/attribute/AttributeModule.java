@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.attribute.listener.AttributePulseListener;
@@ -21,32 +22,40 @@ import org.apache.commons.lang3.StringUtils;
 @Singleton
 public class AttributeModule extends AbstractModuleLocalization<Localization.Message.Attribute> {
 
-    private final Message.Attribute message;
-    private final Permission.Message.Attribute permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public AttributeModule(FileResolver fileResolver,
                            ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getAttribute(), MessageType.ATTRIBUTE);
+        super(MessageType.ATTRIBUTE);
 
-        this.message = fileResolver.getMessage().getAttribute();
-        this.permission = fileResolver.getPermission().getMessage().getAttribute();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(AttributePulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Attribute config() {
+        return fileResolver.getMessage().getAttribute();
+    }
+
+    @Override
+    public Permission.Message.Attribute permission() {
+        return fileResolver.getPermission().getMessage().getAttribute();
+    }
+
+    @Override
+    public Localization.Message.Attribute localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getAttribute();
     }
 
     @Async
@@ -55,7 +64,7 @@ public class AttributeModule extends AbstractModuleLocalization<Localization.Mes
 
         sendMessage(AttributeMetadata.<Localization.Message.Attribute>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> StringUtils.replaceEach(
                         switch (translationKey) {
                             case COMMANDS_ATTRIBUTE_BASE_VALUE_GET_SUCCESS -> localization.getBaseValue().getGet();
@@ -72,11 +81,10 @@ public class AttributeModule extends AbstractModuleLocalization<Localization.Mes
                 ))
                 .attribute(attribute)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, attribute.getTarget())})
                 .build()
         );
     }
-
 }

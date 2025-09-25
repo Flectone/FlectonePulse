@@ -12,7 +12,6 @@ import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.filter.RangeFilter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.IgnoreSender;
@@ -32,8 +31,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
     @Getter private final HashMap<UUID, String> senderReceiverMap = new HashMap<>();
 
-    private final Command.Tell command;
-    private final Permission.Command.Tell permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final ProxySender proxySender;
     private final IntegrationModule integrationModule;
@@ -51,10 +49,9 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                       PlatformPlayerAdapter platformPlayerAdapter,
                       IgnoreSender ignoreSender,
                       DisableSender disableSender) {
-        super(localization -> localization.getCommand().getTell(), Command::getTell, MessageType.COMMAND_TELL);
+        super(MessageType.COMMAND_TELL);
 
-        this.command = fileResolver.getCommand().getTell();
-        this.permission = fileResolver.getPermission().getCommand().getTell();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.proxySender = proxySender;
         this.integrationModule = integrationModule;
@@ -66,17 +63,17 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         String promptMessage = addPrompt(1, Localization.Command.Prompt::getMessage);
         registerCommand(manager -> manager
-                .required(promptPlayer, commandParserProvider.playerParser(command.isSuggestOfflinePlayers()))
+                .required(promptPlayer, commandParserProvider.playerParser(config().isSuggestOfflinePlayers()))
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
-                .permission(permission.getName())
+                .permission(permission().getName())
         );
     }
 
@@ -95,6 +92,21 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
         send(fPlayer, playerName, message);
     }
 
+    @Override
+    public Command.Tell config() {
+        return fileResolver.getCommand().getTell();
+    }
+
+    @Override
+    public Permission.Command.Tell permission() {
+        return fileResolver.getPermission().getCommand().getTell();
+    }
+
+    @Override
+    public Localization.Command.Tell localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getTell();
+    }
+
     public void send(FPlayer fPlayer, String playerName, String message) {
         if (isModuleDisabledFor(fPlayer, true)) return;
 
@@ -102,7 +114,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
             sendMessage(metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Tell::getMyself)
-                    .destination(command.getDestination())
+                    .destination(config().getDestination())
                     .message(message)
                     .build()
             );
@@ -110,7 +122,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
             return;
         }
 
-        Range range = command.getRange();
+        Range range = config().getRange();
         FPlayer fReceiver = fPlayerService.getFPlayer(playerName);
 
         if (!fReceiver.isConsole()
@@ -165,7 +177,7 @@ public class TellModule extends AbstractModuleCommand<Localization.Command.Tell>
                 .sender(sender)
                 .filterPlayer(fReceiver)
                 .format(format)
-                .destination(command.getDestination())
+                .destination(config().getDestination())
                 .message(string)
                 .sound(isSenderToSender ? null : getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, target)})

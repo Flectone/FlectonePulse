@@ -31,8 +31,7 @@ import java.util.List;
 @Singleton
 public class StatusModule extends AbstractModule {
 
-    private final Message.Status message;
-    private final Permission.Message.Status permission;
+    private final FileResolver fileResolver;
     private final MOTDModule MOTDModule;
     private final IconModule iconModule;
     private final PlayersModule playersModule;
@@ -54,8 +53,7 @@ public class StatusModule extends AbstractModule {
                         FPlayerService fPlayerService,
                         ListenerRegistry listenerRegistry,
                         PacketProvider packetProvider) {
-        this.message = fileResolver.getMessage().getStatus();
-        this.permission = fileResolver.getPermission().getMessage().getStatus();
+        this.fileResolver = fileResolver;
         this.MOTDModule = MOTDModule;
         this.iconModule = iconModule;
         this.playersModule = playersModule;
@@ -69,7 +67,7 @@ public class StatusModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         listenerRegistry.register(StatusPacketListener.class);
 
@@ -80,8 +78,13 @@ public class StatusModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Status config() {
+        return fileResolver.getMessage().getStatus();
+    }
+
+    @Override
+    public Permission.Message.Status permission() {
+        return fileResolver.getPermission().getMessage().getStatus();
     }
 
     public void update(PacketSendEvent event) {
@@ -120,8 +123,8 @@ public class StatusModule extends AbstractModule {
         jsonObject.addProperty("name", version);
 
         int protocol = packetProvider.getServerVersion().getProtocolVersion();
-        if (versionModule.isEnable() && versionModule.getMessage().getProtocol() != -1) {
-            protocol = versionModule.getMessage().getProtocol();
+        if (versionModule.isEnable() && versionModule.config().getProtocol() != -1) {
+            protocol = versionModule.config().getProtocol();
         }
 
         jsonObject.addProperty("protocol", protocol);
@@ -144,12 +147,12 @@ public class StatusModule extends AbstractModule {
         JsonObject playersJson = new JsonObject();
 
         int max = playersModule.isEnable()
-                ? playersModule.getMessage().getMax()
+                ? playersModule.config().getMax()
                 : platformServerAdapter.getMaxPlayers();
         playersJson.addProperty("max", max);
 
         int online = playersModule.isEnable()
-                ? playersModule.getMessage().getOnline() == -69 ? platformServerAdapter.getOnlinePlayerCount() : playersModule.getMessage().getOnline()
+                ? playersModule.config().getOnline() == -69 ? platformServerAdapter.getOnlinePlayerCount() : playersModule.config().getOnline()
                 : platformServerAdapter.getOnlinePlayerCount();
         playersJson.addProperty("online", online);
 

@@ -15,18 +15,16 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 @Singleton
 public class ModerationModule extends AbstractModule {
 
-    private final Message.Format.Moderation message;
-    private final Permission.Message.Format.Moderation permission;
+    private final FileResolver fileResolver;
 
     @Inject
     public ModerationModule(FileResolver fileResolver) {
-        this.message = fileResolver.getMessage().getFormat().getModeration();
-        this.permission = fileResolver.getPermission().getMessage().getFormat().getModeration();
+        this.fileResolver = fileResolver;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         addChildren(CapsModule.class);
         addChildren(DeleteModule.class);
@@ -36,8 +34,13 @@ public class ModerationModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Format.Moderation config() {
+        return fileResolver.getMessage().getFormat().getModeration();
+    }
+
+    @Override
+    public Permission.Message.Format.Moderation permission() {
+        return fileResolver.getPermission().getMessage().getFormat().getModeration();
     }
 
 }

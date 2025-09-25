@@ -7,21 +7,21 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSc
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateScore;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.pipeline.MessagePipeline;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModuleListLocalization;
 import net.flectone.pulse.module.message.sidebar.listener.SidebarPulseListener;
-import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
-import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
@@ -33,8 +33,7 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
 
     private final Map<UUID, List<String>> playerSidebar = new HashMap<>();
 
-    @Getter private final Message.Sidebar message;
-    private final Permission.Message.Sidebar permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final MessagePipeline messagePipeline;
@@ -50,10 +49,9 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
                          PacketSender packetSender,
                          ListenerRegistry listenerRegistry,
                          PacketProvider packetProvider) {
-        super(localization -> localization.getMessage().getSidebar(), MessageType.SIDEBAR);
+        super(MessageType.SIDEBAR);
 
-        this.message = fileResolver.getMessage().getSidebar();
-        this.permission = fileResolver.getPermission().getMessage().getSidebar();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.messagePipeline = messagePipeline;
@@ -64,9 +62,9 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        Ticker ticker = message.getTicker();
+        Ticker ticker = config().getTicker();
         if (ticker.isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::update), ticker.getPeriod());
         }
@@ -81,8 +79,23 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Sidebar config() {
+        return fileResolver.getMessage().getSidebar();
+    }
+
+    @Override
+    public Permission.Message.Sidebar permission() {
+        return fileResolver.getPermission().getMessage().getSidebar();
+    }
+
+    @Override
+    public Localization.Message.Sidebar localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getSidebar();
+    }
+
+    @Override
+    public List<String> getAvailableMessages(FPlayer fPlayer) {
+        return joinMultiList(localization(fPlayer).getValues());
     }
 
     public void remove(FPlayer fPlayer) {
@@ -112,7 +125,7 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
     public void send(FPlayer fPlayer, WrapperPlayServerScoreboardObjective.ObjectiveMode objectiveMode) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        String format = getNextMessage(fPlayer, getMessage().isRandom());
+        String format = getNextMessage(fPlayer, config().isRandom());
         if (format == null) return;
 
         String[] lines = format.split("<br>");
@@ -200,11 +213,6 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
         }
 
         playerSidebar.put(fPlayer.getUuid(), sidebars);
-    }
-
-    @Override
-    public List<String> getAvailableMessages(FPlayer fPlayer) {
-        return joinMultiList(resolveLocalization(fPlayer).getValues());
     }
 
     private String createObjectiveName(FPlayer fPlayer) {

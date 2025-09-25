@@ -17,7 +17,6 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
@@ -28,23 +27,19 @@ import java.util.Set;
 @Singleton
 public class NameModule extends AbstractModuleLocalization<Localization.Message.Format.Name> {
 
-    private final Message.Format.Name message;
-    private final Permission.Message.Format.Name permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
-
-    private final MiniMessage defaultMiniMessage = MiniMessage.miniMessage();
 
     @Inject
     public NameModule(FileResolver fileResolver,
                       ListenerRegistry listenerRegistry,
                       IntegrationModule integrationModule,
                       MessagePipeline messagePipeline) {
-        super(localization -> localization.getMessage().getFormat().getName_(), MessageType.NAME);
+        super(MessageType.NAME);
 
-        this.message = fileResolver.getMessage().getFormat().getName_();
-        this.permission = fileResolver.getPermission().getMessage().getFormat().getName_();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
         this.integrationModule = integrationModule;
         this.messagePipeline = messagePipeline;
@@ -52,14 +47,24 @@ public class NameModule extends AbstractModuleLocalization<Localization.Message.
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         listenerRegistry.register(NamePulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Format.Name config() {
+        return fileResolver.getMessage().getFormat().getName_();
+    }
+
+    @Override
+    public Permission.Message.Format.Name permission() {
+        return fileResolver.getPermission().getMessage().getFormat().getName_();
+    }
+
+    @Override
+    public Localization.Message.Format.Name localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getFormat().getName_();
     }
 
     public void addTags(MessageContext messageContext) {
@@ -71,7 +76,7 @@ public class NameModule extends AbstractModuleLocalization<Localization.Message.
 
         if (!(sender instanceof FPlayer fPlayer)) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) -> {
-                Localization.Message.Format.Name localizationName = resolveLocalization(receiver);
+                Localization.Message.Format.Name localizationName = localization(receiver);
 
                 Component showEntityName = sender.getShowEntityName();
                 if (showEntityName == null) {
@@ -104,7 +109,7 @@ public class NameModule extends AbstractModuleLocalization<Localization.Message.
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.CONSTANT, (argumentQueue, context) -> {
             String constantName = fPlayer.getConstantName();
             if (constantName == null) {
-                constantName = resolveLocalization(fPlayer).getConstant();
+                constantName = localization(fPlayer).getConstant();
             }
 
             if (constantName.isEmpty()) {
@@ -115,7 +120,7 @@ public class NameModule extends AbstractModuleLocalization<Localization.Message.
         });
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) -> {
-            Localization.Message.Format.Name localization = resolveLocalization(receiver);
+            Localization.Message.Format.Name localization = localization(receiver);
 
             String displayName = fPlayer.isUnknown()
                     ? Strings.CS.replace(localization.getUnknown(), "<name>", fPlayer.getName())
@@ -158,12 +163,11 @@ public class NameModule extends AbstractModuleLocalization<Localization.Message.
 
         FPlayer receiver = messageContext.getReceiver();
         messageContext.addReplacementTag(Set.of(MessagePipeline.ReplacementTag.DISPLAY_NAME, MessagePipeline.ReplacementTag.PLAYER), (argumentQueue, context) -> {
-            String formatInvisible = resolveLocalization(receiver).getInvisible();
+            String formatInvisible = localization(receiver).getInvisible();
             Component name = messagePipeline.builder(sender, receiver, formatInvisible)
                     .build();
 
             return Tag.selfClosingInserting(name);
         });
     }
-
 }

@@ -7,8 +7,6 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FEntity;
@@ -31,13 +29,13 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @Singleton
 public class PlaceholderAPIIntegration extends PlaceholderExpansion implements FIntegration, PulseListener {
 
-    private final Message.Format.FColor fColorMessage;
-    private final Permission.Integration.Placeholderapi permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
@@ -51,8 +49,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
                                      PermissionChecker permissionChecker,
                                      PlaceholderAPIModule placeholderAPIModule,
                                      FLogger fLogger) {
-        this.fColorMessage = fileResolver.getMessage().getFormat().getFcolor();
-        this.permission = fileResolver.getPermission().getIntegration().getPlaceholderapi();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.platformServerAdapter = platformServerAdapter;
         this.permissionChecker = permissionChecker;
@@ -110,7 +107,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
             String number = params.substring(params.lastIndexOf("_") + 1);
             if (!StringUtils.isNumeric(number)) return null;
 
-            Map<Integer, String> colorsMap = new HashMap<>(fColorMessage.getDefaultColors());
+            Map<Integer, String> colorsMap = new HashMap<>(fileResolver.getMessage().getFormat().getFcolor().getDefaultColors());
             if (params.startsWith("fcolor_out")) {
                 colorsMap.putAll(fPlayer.getFColors(FColor.Type.OUT));
             } else if (params.startsWith("fcolor_see")) {
@@ -156,7 +153,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
 
         FEntity fReceiver = messageContext.getReceiver();
         boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
-        if (!permissionChecker.check(sender, permission.getUse()) && isUserMessage) return;
+        if (!permissionChecker.check(sender, placeholderAPIModule.permission().getUse()) && isUserMessage) return;
         if (!(sender instanceof FPlayer fPlayer)) return;
 
         String message = messageContext.getMessage();

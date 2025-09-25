@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.clone.listener.ClonePulseListener;
@@ -19,32 +20,40 @@ import org.apache.commons.lang3.Strings;
 @Singleton
 public class CloneModule extends AbstractModuleLocalization<Localization.Message.Clone> {
 
-    private final Message.Clone message;
-    private final Permission.Message.Clone permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public CloneModule(FileResolver fileResolver,
                        ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getClone(), MessageType.CLONE);
+        super(MessageType.CLONE);
 
-        this.message = fileResolver.getMessage().getClone();
-        this.permission = fileResolver.getPermission().getMessage().getClone();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(ClonePulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Clone config() {
+        return fileResolver.getMessage().getClone();
+    }
+
+    @Override
+    public Permission.Message.Clone permission() {
+        return fileResolver.getPermission().getMessage().getClone();
+    }
+
+    @Override
+    public Localization.Message.Clone localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getClone();
     }
 
     @Async
@@ -56,11 +65,10 @@ public class CloneModule extends AbstractModuleLocalization<Localization.Message
                 .format(localization -> Strings.CS.replace(localization.getFormat(), "<blocks>", blocks))
                 .blocks(blocks)
                 .translationKey(translationKey)
-                .range(message.getRange())
-                .destination(message.getDestination())
+                .range(config().getRange())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
     }
-
 }

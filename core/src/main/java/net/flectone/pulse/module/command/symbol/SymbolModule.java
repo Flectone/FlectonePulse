@@ -6,6 +6,7 @@ import lombok.NonNull;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -22,38 +23,36 @@ import java.util.Collections;
 @Singleton
 public class SymbolModule extends AbstractModuleCommand<Localization.Command.Symbol> {
 
-    private final Command.Symbol command;
-    private final Permission.Command.Symbol permission;
+    private final FileResolver fileResolver;
     private final CommandParserProvider commandParserProvider;
 
     @Inject
     public SymbolModule(FileResolver fileResolver,
                         CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getSymbol(), Command::getSymbol, MessageType.COMMAND_SYMBOL);
+        super(MessageType.COMMAND_SYMBOL);
 
-        this.command = fileResolver.getCommand().getSymbol();
-        this.permission = fileResolver.getPermission().getCommand().getSymbol();
+        this.fileResolver = fileResolver;
         this.commandParserProvider = commandParserProvider;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptCategory = addPrompt(0, Localization.Command.Prompt::getCategory);
         String promptMessage = addPrompt(1, Localization.Command.Prompt::getMessage);
         registerCommand(manager -> manager
                 .required(promptCategory, commandParserProvider.singleMessageParser(), categorySuggestion())
                 .required(promptMessage, commandParserProvider.messageParser(), symbolSuggestion())
-                .permission(permission.getName())
+                .permission(permission().getName())
         );
     }
 
     private @NonNull BlockingSuggestionProvider<FPlayer> categorySuggestion() {
-        return (context, input) -> command.getCategories()
+        return (context, input) -> config().getCategories()
                 .keySet()
                 .stream()
                 .map(Suggestion::suggestion)
@@ -67,10 +66,10 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
             if (words.length < 2) return Collections.emptyList();
 
             String category = words[1];
-            if (!command.getCategories().containsKey(category)) return Collections.emptyList();
+            if (!config().getCategories().containsKey(category)) return Collections.emptyList();
 
             String rawInput = inputString.substring(words[0].length() + words[1].length() + 2);
-            String[] symbols = command.getCategories().get(category).split(" ");
+            String[] symbols = config().getCategories().get(category).split(" ");
 
             return Arrays.stream(symbols)
                     .map(symbol -> Suggestion.suggestion(rawInput + symbol))
@@ -87,10 +86,25 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
                 .format(s -> Strings.CS.replace(s.getFormat(), "<message>", message))
-                .destination(command.getDestination())
+                .destination(config().getDestination())
                 .message(message)
                 .sound(getModuleSound())
                 .build()
         );
+    }
+
+    @Override
+    public Command.Symbol config() {
+        return fileResolver.getCommand().getSymbol();
+    }
+
+    @Override
+    public Permission.Command.Symbol permission() {
+        return fileResolver.getPermission().getCommand().getSymbol();
+    }
+
+    @Override
+    public Localization.Command.Symbol localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getSymbol();
     }
 }

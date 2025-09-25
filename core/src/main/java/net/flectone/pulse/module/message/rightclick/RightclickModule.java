@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.rightclick.listener.RightclickPacketListener;
@@ -21,8 +22,7 @@ import java.util.UUID;
 @Singleton
 public class RightclickModule extends AbstractModuleLocalization<Localization.Message.Rightclick> {
 
-    private final Message.Rightclick message;
-    private final Permission.Message.Rightclick permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ListenerRegistry listenerRegistry;
@@ -32,10 +32,9 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
                             FPlayerService fPlayerService,
                             PlatformPlayerAdapter platformPlayerAdapter,
                             ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getRightclick(), MessageType.RIGHT_CLICK);
+        super(MessageType.RIGHT_CLICK);
 
-        this.message = fileResolver.getMessage().getRightclick();
-        this.permission = fileResolver.getPermission().getMessage().getRightclick();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.listenerRegistry = listenerRegistry;
@@ -43,17 +42,27 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
-        createCooldown(message.getCooldown(), permission.getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
 
         listenerRegistry.register(RightclickPacketListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Rightclick config() {
+        return fileResolver.getMessage().getRightclick();
+    }
+
+    @Override
+    public Permission.Message.Rightclick permission() {
+        return fileResolver.getPermission().getMessage().getRightclick();
+    }
+
+    @Override
+    public Localization.Message.Rightclick localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getRightclick();
     }
 
     @Async
@@ -71,7 +80,7 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
                 .sender(fTarget)
                 .filterPlayer(fPlayer)
                 .format(Localization.Message.Rightclick::getFormat)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );

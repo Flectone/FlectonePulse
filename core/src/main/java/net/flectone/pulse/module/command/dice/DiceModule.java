@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.dice.model.DiceMetadata;
@@ -23,8 +24,7 @@ import java.util.Optional;
 @Singleton
 public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice> {
 
-    private final Command.Dice command;
-    private final Permission.Command.Dice permission;
+    private final FileResolver fileResolver;
     private final CommandParserProvider commandParserProvider;
     private final RandomUtil randomUtil;
 
@@ -32,25 +32,24 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
     public DiceModule(FileResolver fileResolver,
                       CommandParserProvider commandParserProvider,
                       RandomUtil randomUtil) {
-        super(localization -> localization.getCommand().getDice(), Command::getDice, MessageType.COMMAND_DICE);
+        super(MessageType.COMMAND_DICE);
 
-        this.command = fileResolver.getCommand().getDice();
-        this.permission = fileResolver.getPermission().getCommand().getDice();
+        this.fileResolver = fileResolver;
         this.commandParserProvider = commandParserProvider;
         this.randomUtil = randomUtil;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptMessage = addPrompt(0, Localization.Command.Prompt::getMessage);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
-                .optional(promptMessage, commandParserProvider.integerParser(command.getMin(), command.getMax()))
+                .permission(permission().getName())
+                .optional(promptMessage, commandParserProvider.integerParser(config().getMin(), config().getMax()))
         );
     }
 
@@ -58,8 +57,8 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
     public void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext) {
         if (isModuleDisabledFor(fPlayer, true)) return;
 
-        int min = command.getMin();
-        int max = command.getMax();
+        int min = config().getMin();
+        int max = config().getMax();
 
         String promptMessage = getPrompt(0);
         Optional<Integer> optionalNumber = commandContext.optional(promptMessage);
@@ -75,13 +74,28 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
                 .sender(fPlayer)
                 .cubes(cubes)
                 .format(dice -> replaceResult(cubes, dice.getSymbols(), dice.getFormat()))
-                .range(command.getRange())
-                .destination(command.getDestination())
+                .range(config().getRange())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> dataOutputStream.writeAsJson(cubes))
-                .integration(string -> replaceResult(cubes, resolveLocalization().getSymbols(), string))
+                .integration(string -> replaceResult(cubes, localization().getSymbols(), string))
                 .build()
         );
+    }
+
+    @Override
+    public Command.Dice config() {
+        return fileResolver.getCommand().getDice();
+    }
+
+    @Override
+    public Permission.Command.Dice permission() {
+        return fileResolver.getPermission().getCommand().getDice();
+    }
+
+    @Override
+    public Localization.Command.Dice localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getDice();
     }
 
     public String replaceResult(List<Integer> cubes, Map<Integer, String> symbols, String format) {

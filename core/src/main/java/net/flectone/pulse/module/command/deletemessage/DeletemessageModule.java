@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.deletemessage.model.DeletemessageMetadata;
@@ -20,8 +21,7 @@ import java.util.UUID;
 @Singleton
 public class DeletemessageModule extends AbstractModuleCommand<Localization.Command.Deletemessage> {
 
-    private final Command.Deletemessage command;
-    private final Permission.Command.Deletemessage permission;
+    private final FileResolver fileResolver;
     private final DeleteModule deleteModule;
     private final ProxySender proxySender;
 
@@ -29,24 +29,23 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
     public DeletemessageModule(FileResolver fileResolver,
                                DeleteModule deleteModule,
                                ProxySender proxySender) {
-        super(localization -> localization.getCommand().getDeletemessage(), Command::getDeletemessage, MessageType.COMMAND_DELETE);
+        super(MessageType.COMMAND_DELETE);
 
-        this.command = fileResolver.getCommand().getDeletemessage();
-        this.permission = fileResolver.getPermission().getCommand().getDeletemessage();
+        this.fileResolver = fileResolver;
         this.deleteModule = deleteModule;
         this.proxySender = proxySender;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptId = addPrompt(0, Localization.Command.Prompt::getId);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .required(promptId, UUIDParser.uuidParser())
         );
     }
@@ -75,9 +74,24 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
                 .sender(fPlayer)
                 .format(Localization.Command.Deletemessage::getFormat)
                 .deletedUUID(uuid)
-                .destination(command.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
+    }
+
+    @Override
+    public Command.Deletemessage config() {
+        return fileResolver.getCommand().getDeletemessage();
+    }
+
+    @Override
+    public Permission.Command.Deletemessage permission() {
+        return fileResolver.getPermission().getCommand().getDeletemessage();
+    }
+
+    @Override
+    public Localization.Command.Deletemessage localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getDeletemessage();
     }
 }

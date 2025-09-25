@@ -21,21 +21,16 @@ import java.util.function.UnaryOperator;
 public abstract class AbstractModuleCommand<M extends Localization.Localizable> extends AbstractModuleLocalization<M> implements CommandExecutionHandler<FPlayer> {
 
     private final List<String> prompts = new ArrayList<>();
-    private final Function<Command, Command.ICommandFile> commandFunction;
 
     @Inject private FileResolver fileResolver;
     @Inject private CommandRegistry commandParserProvider;
 
-    protected AbstractModuleCommand(Function<Localization, M> messageFunction,
-                                    Function<Command, Command.ICommandFile> commandFunction,
-                                    MessageType messageType) {
-        super(messageFunction, messageType);
-
-        this.commandFunction = commandFunction;
+    protected AbstractModuleCommand(MessageType messageType) {
+        super(messageType);
     }
 
     protected void registerCommand(UnaryOperator<org.incendo.cloud.Command.Builder<FPlayer>> commandBuilderOperator) {
-        List<String> aliases = resolveCommand().getAliases();
+        List<String> aliases = config().getAliases();
         String commandName = getCommandName();
 
         commandParserProvider.registerCommand(manager ->
@@ -79,15 +74,10 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
     }
 
     public String getCommandName() {
-        List<String> aliases = resolveCommand().getAliases();
+        List<String> aliases = config().getAliases();
         if (aliases.isEmpty()) return "flectonepulsenull";
 
         return aliases.getFirst();
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return resolveCommand().isEnable();
     }
 
     @Override
@@ -102,7 +92,5 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
 
     public abstract void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext);
 
-    private Command.ICommandFile resolveCommand() {
-        return commandFunction.apply(fileResolver.getCommand());
-    }
+    public abstract Command.ICommandFile config();
 }

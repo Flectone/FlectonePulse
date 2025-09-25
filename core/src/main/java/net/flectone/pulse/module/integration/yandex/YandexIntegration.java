@@ -2,10 +2,9 @@ package net.flectone.pulse.module.integration.yandex;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Integration;
-import net.flectone.pulse.util.logging.FLogger;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.module.integration.FIntegration;
+import net.flectone.pulse.processing.resolver.FileResolver;
+import net.flectone.pulse.util.logging.FLogger;
 import yandex.cloud.api.ai.translate.v2.TranslationServiceGrpc;
 import yandex.cloud.api.ai.translate.v2.TranslationServiceOuterClass;
 import yandex.cloud.sdk.ServiceFactory;
@@ -16,7 +15,7 @@ import java.time.Duration;
 @Singleton
 public class YandexIntegration implements FIntegration {
 
-    private final Integration.Yandex integration;
+    private final FileResolver fileResolver;
     private final FLogger fLogger;
 
     private ServiceFactory factory;
@@ -24,8 +23,7 @@ public class YandexIntegration implements FIntegration {
     @Inject
     public YandexIntegration(FileResolver fileResolver,
                              FLogger fLogger) {
-        integration = fileResolver.getIntegration().getYandex();
-
+        this.fileResolver = fileResolver;
         this.fLogger = fLogger;
     }
 
@@ -37,7 +35,7 @@ public class YandexIntegration implements FIntegration {
                 .setTargetLanguageCode(target)
                 .setFormat(TranslationServiceOuterClass.TranslateRequest.Format.PLAIN_TEXT)
                 .addTexts(text)
-                .setFolderId(integration.getFolderId())
+                .setFolderId(fileResolver.getIntegration().getYandex().getFolderId())
                 .build()
         );
 
@@ -48,7 +46,7 @@ public class YandexIntegration implements FIntegration {
     public void hook() {
         try {
             factory = ServiceFactory.builder()
-                    .credentialProvider(Auth.oauthTokenBuilder().oauth(integration.getToken()))
+                    .credentialProvider(Auth.oauthTokenBuilder().oauth(fileResolver.getIntegration().getYandex().getToken()))
                     .requestTimeout(Duration.ofMinutes(1))
                     .build();
 

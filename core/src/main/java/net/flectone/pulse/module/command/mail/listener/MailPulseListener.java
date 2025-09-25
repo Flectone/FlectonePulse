@@ -19,15 +19,12 @@ import java.util.List;
 @Singleton
 public class MailPulseListener implements PulseListener {
 
-    private final Command.Mail command;
     private final MailModule mailModule;
     private final FPlayerService fPlayerService;
 
     @Inject
-    public MailPulseListener(FileResolver fileResolver,
-                             MailModule mailModule,
+    public MailPulseListener(MailModule mailModule,
                              FPlayerService fPlayerService) {
-        this.command = fileResolver.getCommand().getMail();
         this.mailModule = mailModule;
         this.fPlayerService = fPlayerService;
     }
@@ -47,7 +44,7 @@ public class MailPulseListener implements PulseListener {
                     .sender(fPlayer)
                     .filterPlayer(fReceiver, false)
                     .format(Localization.Command.Mail::getReceiver)
-                    .destination(command.getDestination())
+                    .destination(mailModule.config().getDestination())
                     .mail(mail)
                     .target(fReceiver)
                     .message(mail.message())

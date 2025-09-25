@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.debugstick.listener.DebugStickPulseListener;
@@ -20,32 +21,40 @@ import org.apache.commons.lang3.StringUtils;
 @Singleton
 public class DebugstickModule extends AbstractModuleLocalization<Localization.Message.Debugstick> {
 
-    private final Message.Debugstick message;
-    private final Permission.Message.Debugstick permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public DebugstickModule(FileResolver fileResolver,
                             ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getDebugstick(), MessageType.DEBUG_STICK);
+        super(MessageType.DEBUG_STICK);
 
-        this.message = fileResolver.getMessage().getDebugstick();
-        this.permission = fileResolver.getPermission().getMessage().getDebugstick();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(DebugStickPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Debugstick config() {
+        return fileResolver.getMessage().getDebugstick();
+    }
+
+    @Override
+    public Permission.Message.Debugstick permission() {
+        return fileResolver.getPermission().getMessage().getDebugstick();
+    }
+
+    @Override
+    public Localization.Message.Debugstick localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getDebugstick();
     }
 
     @Async
@@ -64,13 +73,12 @@ public class DebugstickModule extends AbstractModuleLocalization<Localization.Me
                         new String[]{"<property>", "<value>"},
                         new String[]{debugStick.getProperty(), StringUtils.defaultString(debugStick.getValue())}
                 ))
-                .range(message.getRange())
+                .range(config().getRange())
                 .debugStick(debugStick)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
     }
-
 }

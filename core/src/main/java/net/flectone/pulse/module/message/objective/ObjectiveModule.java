@@ -11,37 +11,40 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.objective.belowname.BelownameModule;
 import net.flectone.pulse.module.message.objective.tabname.TabnameModule;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.platform.sender.PacketSender;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 @Singleton
 public class ObjectiveModule extends AbstractModule {
 
-    private final Message.Objective message;
-    private final Permission.Message.Objective permission;
+    private final FileResolver fileResolver;
     private final PacketSender packetSender;
 
     @Inject
     public ObjectiveModule(FileResolver fileResolver,
                            PacketSender packetSender) {
-        this.message = fileResolver.getMessage().getObjective();
-        this.permission = fileResolver.getPermission().getMessage().getObjective();
+        this.fileResolver = fileResolver;
         this.packetSender = packetSender;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         addChildren(BelownameModule.class);
         addChildren(TabnameModule.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Objective config() {
+        return fileResolver.getMessage().getObjective();
+    }
+
+    @Override
+    public Permission.Message.Objective permission() {
+        return fileResolver.getPermission().getMessage().getObjective();
     }
 
     public void createObjective(FPlayer fPlayer, @Nullable Component displayName, ScoreboardPosition scoreboardPosition) {

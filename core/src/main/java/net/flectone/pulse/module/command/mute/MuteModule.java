@@ -27,8 +27,7 @@ import java.util.function.BiFunction;
 @Singleton
 public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute> {
 
-    private final Command.Mute command;
-    private final Permission.Command.Mute permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final ModerationService moderationService;
     private final ModerationMessageFormatter moderationMessageFormatter;
@@ -42,10 +41,9 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
                       ModerationMessageFormatter moderationMessageFormatter,
                       CommandParserProvider commandParserProvider,
                       ProxySender proxySender) {
-        super(localization -> localization.getCommand().getMute(), Command::getMute, MessageType.COMMAND_MUTE);
+        super(MessageType.COMMAND_MUTE);
 
-        this.command = fileResolver.getCommand().getMute();
-        this.permission = fileResolver.getPermission().getCommand().getMute();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.moderationService = moderationService;
         this.moderationMessageFormatter = moderationMessageFormatter;
@@ -55,18 +53,18 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         String promptReason = addPrompt(1, Localization.Command.Prompt::getReason);
         String promptTime = addPrompt(2, Localization.Command.Prompt::getTime);
 
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
-                .required(promptPlayer, commandParserProvider.playerParser(command.isSuggestOfflinePlayers()))
+                .permission(permission().getName())
+                .required(promptPlayer, commandParserProvider.playerParser(config().isSuggestOfflinePlayers()))
                 .optional(promptTime + " " + promptReason, commandParserProvider.durationReasonParser())
         );
     }
@@ -116,8 +114,8 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
                 .sender(fTarget)
                 .format(buildFormat(mute))
                 .moderation(mute)
-                .range(command.getRange())
-                .destination(command.getDestination())
+                .range(config().getRange())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> dataOutputStream.writeAsJson(mute))
                 .integration(string -> moderationMessageFormatter.replacePlaceholders(string, FPlayer.UNKNOWN, mute))
@@ -125,6 +123,21 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         );
 
         sendForTarget(fPlayer, fTarget, mute);
+    }
+
+    @Override
+    public Command.Mute config() {
+        return fileResolver.getCommand().getMute();
+    }
+
+    @Override
+    public Permission.Command.Mute permission() {
+        return fileResolver.getPermission().getCommand().getMute();
+    }
+
+    @Override
+    public Localization.Command.Mute localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getMute();
     }
 
     public BiFunction<FPlayer, Localization.Command.Mute, String> buildFormat(Moderation mute) {

@@ -6,6 +6,7 @@ import lombok.NonNull;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.online.model.OnlineMetadata;
@@ -28,8 +29,7 @@ import java.util.List;
 @Singleton
 public class OnlineModule extends AbstractModuleCommand<Localization.Command.Online> {
 
-    private final Command.Online command;
-    private final Permission.Command.Online permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
@@ -47,10 +47,9 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
                         IntegrationModule integrationModule,
                         TimeFormatter timeFormatter,
                         FLogger fLogger) {
-        super(localization -> localization.getCommand().getOnline(), Command::getOnline, MessageType.COMMAND_ONLINE);
+        super(MessageType.COMMAND_ONLINE);
 
-        this.command = fileResolver.getCommand().getOnline();
-        this.permission = fileResolver.getPermission().getCommand().getOnline();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.platformServerAdapter = platformServerAdapter;
@@ -67,17 +66,17 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
             return;
         }
 
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptType = addPrompt(0, Localization.Command.Prompt::getType);
         String promptPlayer = addPrompt(1, Localization.Command.Prompt::getPlayer);
         registerCommand(manager -> manager
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
-                .required(promptPlayer, commandParserProvider.playerParser(command.isSuggestOfflinePlayers()))
+                .required(promptPlayer, commandParserProvider.playerParser(config().isSuggestOfflinePlayers()))
         );
     }
 
@@ -126,9 +125,24 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
                     default -> "";
                 })
                 .type(type)
-                .destination(command.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
+    }
+
+    @Override
+    public Command.Online config() {
+        return fileResolver.getCommand().getOnline();
+    }
+
+    @Override
+    public Permission.Command.Online permission() {
+        return fileResolver.getPermission().getCommand().getOnline();
+    }
+
+    @Override
+    public Localization.Command.Online localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getOnline();
     }
 }

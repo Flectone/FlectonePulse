@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.command.tictactoe.manager;
+package net.flectone.pulse.module.command.tictactoe.service;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -10,14 +10,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
-public class TictactoeManager {
+public class TictactoeService {
 
     private final Map<Integer, TicTacToe> ticTacToeMap = new HashMap<>();
 
     private final RandomUtil randomUtil;
 
     @Inject
-    public TictactoeManager(RandomUtil randomUtil) {
+    public TictactoeService(RandomUtil randomUtil) {
         this.randomUtil = randomUtil;
     }
 

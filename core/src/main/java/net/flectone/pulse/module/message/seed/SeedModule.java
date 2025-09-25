@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.seed.listener.SeedPulseListener;
@@ -19,32 +20,40 @@ import org.apache.commons.lang3.Strings;
 @Singleton
 public class SeedModule extends AbstractModuleLocalization<Localization.Message.Seed> {
 
-    private final Message.Seed message;
-    private final Permission.Message.Seed permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public SeedModule(FileResolver fileResolver,
                       ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getSeed(), MessageType.SEED);
+        super(MessageType.SEED);
 
-        this.message = fileResolver.getMessage().getSeed();
-        this.permission = fileResolver.getPermission().getMessage().getSeed();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(SeedPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Seed config() {
+        return fileResolver.getMessage().getSeed();
+    }
+
+    @Override
+    public Permission.Message.Seed permission() {
+        return fileResolver.getPermission().getMessage().getSeed();
+    }
+
+    @Override
+    public Localization.Message.Seed localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getSeed();
     }
 
     @Async
@@ -53,14 +62,13 @@ public class SeedModule extends AbstractModuleLocalization<Localization.Message.
 
         sendMessage(SeedMetadata.<Localization.Message.Seed>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> Strings.CS.replace(localization.getFormat(), "<seed>", seed))
                 .seed(seed)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
     }
-
 }

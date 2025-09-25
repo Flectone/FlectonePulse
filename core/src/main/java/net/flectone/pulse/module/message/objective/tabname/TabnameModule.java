@@ -2,25 +2,24 @@ package net.flectone.pulse.module.message.objective.tabname;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Ticker;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.module.message.objective.ScoreboardPosition;
 import net.flectone.pulse.module.message.objective.tabname.listener.TabnamePulseListener;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton
 public class TabnameModule extends AbstractModule {
 
-    private final Message.Objective.Tabname config;
-    private final Permission.Message.Objective.Tabname permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final TaskScheduler taskScheduler;
@@ -34,8 +33,7 @@ public class TabnameModule extends AbstractModule {
                          TaskScheduler taskScheduler,
                          ObjectiveModule objectiveModule,
                          ListenerRegistry listenerRegistry) {
-        this.config = fileResolver.getMessage().getObjective().getTabname();
-        this.permission = fileResolver.getPermission().getMessage().getObjective().getTabname();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.taskScheduler = taskScheduler;
@@ -45,9 +43,9 @@ public class TabnameModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        Ticker ticker = config.getTicker();
+        Ticker ticker = config().getTicker();
         if (ticker.isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::update), ticker.getPeriod());
         }
@@ -61,8 +59,13 @@ public class TabnameModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return config.isEnable();
+    public Message.Objective.Tabname config() {
+        return fileResolver.getMessage().getObjective().getTabname();
+    }
+
+    @Override
+    public Permission.Message.Objective.Tabname permission() {
+        return fileResolver.getPermission().getMessage().getObjective().getTabname();
     }
 
     public void create(FPlayer fPlayer) {
@@ -76,7 +79,7 @@ public class TabnameModule extends AbstractModule {
         if (isModuleDisabledFor(fPlayer)) return;
 
         fPlayerService.getVisibleFPlayersFor(fPlayer).forEach(fObjective -> {
-            int score = platformPlayerAdapter.getObjectiveScore(fObjective.getUuid(), config.getMode());
+            int score = platformPlayerAdapter.getObjectiveScore(fObjective.getUuid(), config().getMode());
             objectiveModule.updateObjective(fPlayer, fObjective, score, ScoreboardPosition.TABLIST);
         });
     }

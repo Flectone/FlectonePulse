@@ -20,8 +20,7 @@ import org.jetbrains.annotations.NotNull;
 @Singleton
 public class BubbleModule extends AbstractModule {
 
-    private final Message.Bubble message;
-    private final Permission.Message.Bubble permission;
+    private final FileResolver fileResolver;
     private final BubbleService bubbleService;
     private final ListenerRegistry listenerRegistry;
     private final PacketProvider packetProvider;
@@ -33,8 +32,7 @@ public class BubbleModule extends AbstractModule {
                         ListenerRegistry listenerRegistry,
                         PacketProvider packetProvider,
                         FLogger fLogger) {
-        this.message = fileResolver.getMessage().getBubble();
-        this.permission = fileResolver.getPermission().getMessage().getBubble();
+        this.fileResolver = fileResolver;
         this.bubbleService = bubbleService;
         this.listenerRegistry = listenerRegistry;
         this.packetProvider = packetProvider;
@@ -51,7 +49,7 @@ public class BubbleModule extends AbstractModule {
 
         bubbleService.startTicker();
 
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         listenerRegistry.register(BubblePacketListener.class);
         listenerRegistry.register(BubblePulseListener.class);
@@ -63,8 +61,13 @@ public class BubbleModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Bubble config() {
+        return fileResolver.getMessage().getBubble();
+    }
+
+    @Override
+    public Permission.Message.Bubble permission() {
+        return fileResolver.getPermission().getMessage().getBubble();
     }
 
     @Async

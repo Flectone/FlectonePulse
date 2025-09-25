@@ -16,8 +16,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 @Singleton
 public class TABModule extends AbstractModule {
 
-    private final Integration.TAB integration;
-    private final Permission.Integration.TAB permission;
+    private final FileResolver fileResolver;
     private final TABIntegration tabIntegration;
     private final HeaderModule headerModule;
     private final FooterModule footerModule;
@@ -35,8 +34,7 @@ public class TABModule extends AbstractModule {
                      ScoreboardModule scoreboardModule,
                      BelownameModule belownameModule,
                      TabnameModule tabnameModule) {
-        this.integration = fileResolver.getIntegration().getTAB();
-        this.permission = fileResolver.getPermission().getIntegration().getTAB();
+        this.fileResolver = fileResolver;
         this.tabIntegration = tabIntegration;
         this.headerModule = headerModule;
         this.footerModule = footerModule;
@@ -48,17 +46,17 @@ public class TABModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         tabIntegration.hook();
 
-        headerModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseHeader() && isHooked());
-        footerModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseFooter() && isHooked());
-        playerlistnameModule.addPredicate(fPlayer ->  integration.isDisableFlectonepulsePlayerlistname() && isHooked());
+        headerModule.addPredicate(fPlayer -> config().isDisableFlectonepulseHeader() && isHooked());
+        footerModule.addPredicate(fPlayer -> config().isDisableFlectonepulseFooter() && isHooked());
+        playerlistnameModule.addPredicate(fPlayer ->  config().isDisableFlectonepulsePlayerlistname() && isHooked());
 
-        scoreboardModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseScoreboard() && isHooked());
-        belownameModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseScoreboard() && isHooked());
-        tabnameModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseScoreboard() && isHooked());
+        scoreboardModule.addPredicate(fPlayer -> config().isDisableFlectonepulseScoreboard() && isHooked());
+        belownameModule.addPredicate(fPlayer -> config().isDisableFlectonepulseScoreboard() && isHooked());
+        tabnameModule.addPredicate(fPlayer -> config().isDisableFlectonepulseScoreboard() && isHooked());
     }
 
     @Override
@@ -67,8 +65,13 @@ public class TABModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
+    public Integration.TAB config() {
+        return fileResolver.getIntegration().getTAB();
+    }
+
+    @Override
+    public Permission.Integration.TAB permission() {
+        return fileResolver.getPermission().getIntegration().getTAB();
     }
 
     public boolean isHooked() {

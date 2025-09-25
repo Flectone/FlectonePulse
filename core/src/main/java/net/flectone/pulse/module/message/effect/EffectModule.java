@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.effect.listener.EffectPulseListener;
@@ -21,32 +22,40 @@ import org.apache.commons.lang3.StringUtils;
 @Singleton
 public class EffectModule extends AbstractModuleLocalization<Localization.Message.Effect> {
 
-    private final Message.Effect message;
-    private final Permission.Message.Effect permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public EffectModule(FileResolver fileResolver,
                         ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getEffect(), MessageType.EFFECT);
+        super(MessageType.EFFECT);
 
-        this.message = fileResolver.getMessage().getEffect();
-        this.permission = fileResolver.getPermission().getMessage().getEffect();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(EffectPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Effect config() {
+        return fileResolver.getMessage().getEffect();
+    }
+
+    @Override
+    public Permission.Message.Effect permission() {
+        return fileResolver.getPermission().getMessage().getEffect();
+    }
+
+    @Override
+    public Localization.Message.Effect localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getEffect();
     }
 
     @Async
@@ -68,8 +77,8 @@ public class EffectModule extends AbstractModuleLocalization<Localization.Messag
                         new String[]{"<effect>", "<players>"},
                         new String[]{StringUtils.defaultString(effect.getName()), StringUtils.defaultString(effect.getPlayers())}
                 ))
-                .range(message.getRange())
-                .destination(message.getDestination())
+                .range(config().getRange())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .effect(effect)
                 .translationKey(translationKey)
@@ -77,5 +86,4 @@ public class EffectModule extends AbstractModuleLocalization<Localization.Messag
                 .build()
         );
     }
-
 }

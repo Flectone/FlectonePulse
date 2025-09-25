@@ -41,8 +41,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
             .maximumSize(1000)
             .build();
 
-    private final Message.Format.Mention message;
-    private final Permission.Message.Format.Mention permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
     private final FPlayerService fPlayerService;
     private final IntegrationModule integrationModule;
@@ -58,10 +57,9 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
                          PermissionChecker permissionChecker,
                          MessagePipeline messagePipeline,
                          FLogger fLogger) {
-        super(localization -> localization.getMessage().getFormat().getMention(), MessageType.MENTION);
+        super(MessageType.MENTION);
 
-        this.message = fileResolver.getMessage().getFormat().getMention();
-        this.permission = fileResolver.getPermission().getMessage().getFormat().getMention();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
         this.fPlayerService = fPlayerService;
         this.integrationModule = integrationModule;
@@ -72,12 +70,12 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
-        registerPermission(permission.getGroup());
-        registerPermission(permission.getBypass());
+        registerPermission(permission().getGroup());
+        registerPermission(permission().getBypass());
 
         listenerRegistry.register(MentionPulseListener.class);
     }
@@ -89,8 +87,18 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Format.Mention config() {
+        return fileResolver.getMessage().getFormat().getMention();
+    }
+
+    @Override
+    public Permission.Message.Format.Mention permission() {
+        return fileResolver.getPermission().getMessage().getFormat().getMention();
+    }
+
+    @Override
+    public Localization.Message.Format.Mention localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getFormat().getMention();
     }
 
     public void format(MessageContext messageContext) {
@@ -123,7 +131,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
             String mention = mentionTag.value();
             if (mention.isEmpty()) {
-                return Tag.preProcessParsed(message.getTrigger() + mention);
+                return Tag.preProcessParsed(config().getTrigger() + mention);
             }
 
             Optional<String> group = integrationModule.getGroups().stream()
@@ -132,18 +140,18 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
             if (group.isPresent()) {
                 if (receiver instanceof FPlayer mentionFPlayer
-                        && !permissionChecker.check(mentionFPlayer, permission.getBypass())
-                        && permissionChecker.check(mentionFPlayer, permission.getGroup() + "." + group.get())) {
+                        && !permissionChecker.check(mentionFPlayer, permission().getBypass())
+                        && permissionChecker.check(mentionFPlayer, permission().getGroup() + "." + group.get())) {
                     sendMention(processId, mentionFPlayer);
                 }
             } else {
                 FPlayer mentionFPlayer = fPlayerService.getFPlayer(mention);
-                if (mentionFPlayer.equals(receiver) && !permissionChecker.check(mentionFPlayer, permission.getBypass())) {
+                if (mentionFPlayer.equals(receiver) && !permissionChecker.check(mentionFPlayer, permission().getBypass())) {
                     sendMention(processId, mentionFPlayer);
                 }
             }
 
-            String format = StringUtils.replaceEach(resolveLocalization(receiver).getFormat(),
+            String format = StringUtils.replaceEach(localization(receiver).getFormat(),
                     new String[]{"<player>", "<target>"},
                     new String[]{mention, mention}
             );
@@ -157,13 +165,13 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
         for (int i = 0; i < words.length; i++) {
             String word = words[i];
-            if (!word.startsWith(this.message.getTrigger())) continue;
+            if (!word.startsWith(config().getTrigger())) continue;
 
-            String wordWithoutPrefix = Strings.CS.replaceOnce(word, this.message.getTrigger(), "");
+            String wordWithoutPrefix = Strings.CS.replaceOnce(word, config().getTrigger(), "");
 
             FPlayer mentionFPlayer = fPlayerService.getFPlayer(wordWithoutPrefix);
             boolean isMention = !mentionFPlayer.isUnknown() && integrationModule.canSeeVanished(mentionFPlayer, sender)
-                    || integrationModule.getGroups().contains(wordWithoutPrefix) && permissionChecker.check(sender, permission.getGroup());
+                    || integrationModule.getGroups().contains(wordWithoutPrefix) && permissionChecker.check(sender, permission().getGroup());
             if (isMention) {
                 words[i] = "<mention:" + wordWithoutPrefix + ">";
             }
@@ -180,7 +188,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
                 .format(Localization.Message.Format.Mention::getPerson)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );

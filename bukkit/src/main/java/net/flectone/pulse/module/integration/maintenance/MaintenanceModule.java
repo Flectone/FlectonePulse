@@ -11,8 +11,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 @Singleton
 public class MaintenanceModule extends AbstractModule {
 
-    private final Integration.Maintenance integration;
-    private final Permission.Integration.Maintenance permission;
+    private final FileResolver fileResolver;
     private final MaintenanceIntegration maintenanceIntegration;
     private final StatusModule statusModule;
     private final net.flectone.pulse.module.command.maintenance.MaintenanceModule maintenanceModule;
@@ -22,8 +21,7 @@ public class MaintenanceModule extends AbstractModule {
                              MaintenanceIntegration maintenanceIntegration,
                              StatusModule statusModule,
                              net.flectone.pulse.module.command.maintenance.MaintenanceModule maintenanceModule) {
-        this.integration = fileResolver.getIntegration().getMaintenance();
-        this.permission = fileResolver.getPermission().getIntegration().getMaintenance();
+        this.fileResolver = fileResolver;
         this.maintenanceIntegration = maintenanceIntegration;
         this.statusModule = statusModule;
         this.maintenanceModule = maintenanceModule;
@@ -31,12 +29,12 @@ public class MaintenanceModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         maintenanceIntegration.hook();
 
         statusModule.addPredicate(fPlayer -> maintenanceIntegration.isMaintenance());
-        maintenanceModule.addPredicate(fPlayer -> integration.isDisableFlectonepulseMaintenance() && maintenanceIntegration.isHooked());
+        maintenanceModule.addPredicate(fPlayer -> config().isDisableFlectonepulseMaintenance() && maintenanceIntegration.isHooked());
     }
 
     @Override
@@ -45,7 +43,12 @@ public class MaintenanceModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
+    public Integration.Maintenance config() {
+        return fileResolver.getIntegration().getMaintenance();
+    }
+
+    @Override
+    public Permission.Integration.Maintenance permission() {
+        return fileResolver.getPermission().getIntegration().getMaintenance();
     }
 }

@@ -11,21 +11,19 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 @Singleton
 public class VanishModule extends AbstractModule {
 
-    private final Integration.Supervanish config;
-    private final Permission.Integration.Supervanish permission;
+    private final FileResolver fileResolver;
     private final VanishIntegration vanishIntegration;
 
     @Inject
     public VanishModule(FileResolver fileResolver,
                         VanishIntegration vanishIntegration) {
-        this.config = fileResolver.getIntegration().getSupervanish();
-        this.permission = fileResolver.getPermission().getIntegration().getSupervanish();
+        this.fileResolver = fileResolver;
         this.vanishIntegration = vanishIntegration;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         vanishIntegration.hook();
     }
@@ -36,8 +34,13 @@ public class VanishModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return config.isEnable();
+    public Integration.Supervanish config() {
+        return fileResolver.getIntegration().getSupervanish();
+    }
+
+    @Override
+    public Permission.Integration.Supervanish permission() {
+        return fileResolver.getPermission().getIntegration().getSupervanish();
     }
 
     public boolean isVanished(FEntity sender) {

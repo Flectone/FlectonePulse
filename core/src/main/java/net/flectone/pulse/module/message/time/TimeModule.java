@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.time.listener.TimePulseListener;
@@ -19,32 +20,40 @@ import org.apache.commons.lang3.Strings;
 @Singleton
 public class TimeModule extends AbstractModuleLocalization<Localization.Message.Time> {
 
-    private final Message.Time message;
-    private final Permission.Message.Time permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public TimeModule(FileResolver fileResolver,
                       ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getTime(), MessageType.TIME);
+        super(MessageType.TIME);
 
-        this.message = fileResolver.getMessage().getTime();
-        this.permission = fileResolver.getPermission().getMessage().getTime();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(TimePulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Time config() {
+        return fileResolver.getMessage().getTime();
+    }
+
+    @Override
+    public Permission.Message.Time permission() {
+        return fileResolver.getPermission().getMessage().getTime();
+    }
+
+    @Override
+    public Localization.Message.Time localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getTime();
     }
 
     @Async
@@ -53,7 +62,7 @@ public class TimeModule extends AbstractModuleLocalization<Localization.Message.
 
         sendMessage(TimeMetadata.<Localization.Message.Time>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> Strings.CS.replace(
                         translationKey == MinecraftTranslationKey.COMMANDS_TIME_QUERY ? localization.getQuery() : localization.getSet(),
                         "<time>",
@@ -61,10 +70,9 @@ public class TimeModule extends AbstractModuleLocalization<Localization.Message.
                 ))
                 .time(time)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
     }
-
 }

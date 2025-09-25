@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.locate.listener.LocatePulseListener;
@@ -20,32 +21,40 @@ import org.apache.commons.lang3.StringUtils;
 @Singleton
 public class LocateModule extends AbstractModuleLocalization<Localization.Message.Locate> {
 
-    private final Message.Locate message;
-    private final Permission.Message.Locate permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public LocateModule(FileResolver fileResolver,
                         ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getLocate(), MessageType.LOCATE);
+        super(MessageType.LOCATE);
 
-        this.message = fileResolver.getMessage().getLocate();
-        this.permission = fileResolver.getPermission().getMessage().getLocate();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(LocatePulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Locate config() {
+        return fileResolver.getMessage().getLocate();
+    }
+
+    @Override
+    public Permission.Message.Locate permission() {
+        return fileResolver.getPermission().getMessage().getLocate();
+    }
+
+    @Override
+    public Localization.Message.Locate localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getLocate();
     }
 
     @Async
@@ -54,7 +63,7 @@ public class LocateModule extends AbstractModuleLocalization<Localization.Messag
 
         sendMessage(LocateMetadata.<Localization.Message.Locate>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> StringUtils.replaceEach(
                         switch (translationKey) {
                             case COMMANDS_LOCATE_BIOME_SUCCESS -> localization.getBiome();
@@ -67,7 +76,7 @@ public class LocateModule extends AbstractModuleLocalization<Localization.Messag
                 ))
                 .locate(locate)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );

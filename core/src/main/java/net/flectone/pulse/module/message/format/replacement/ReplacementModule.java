@@ -55,8 +55,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
             .maximumSize(100)
             .build();
 
-    private final Message.Format.Replacement message;
-    private final Permission.Message.Format.Replacement permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
@@ -79,10 +78,9 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
                              UrlFormatter urlFormatter,
                              PermissionChecker permissionChecker,
                              FLogger fLogger) {
-        super(localization -> localization.getMessage().getFormat().getReplacement(), MessageType.REPLACEMENT);
+        super(MessageType.REPLACEMENT);
 
-        this.message = fileResolver.getMessage().getFormat().getReplacement();
-        this.permission = fileResolver.getPermission().getMessage().getFormat().getReplacement();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
         this.messagePipeline = messagePipeline;
         this.fPlayerService = fPlayerService;
@@ -97,13 +95,13 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        permission.getValues().values().forEach(this::registerPermission);
+        permission().getValues().values().forEach(this::registerPermission);
 
         listenerRegistry.register(ReplacementPulseListener.class);
 
-        message.getTriggers().forEach((name, regex) ->
+        config().getTriggers().forEach((name, regex) ->
                 triggerPatterns.put(name, Pattern.compile(regex))
         );
     }
@@ -116,8 +114,18 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Format.Replacement config() {
+        return fileResolver.getMessage().getFormat().getReplacement();
+    }
+
+    @Override
+    public Permission.Message.Format.Replacement permission() {
+        return fileResolver.getPermission().getMessage().getFormat().getReplacement();
+    }
+
+    @Override
+    public Localization.Message.Format.Replacement localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getFormat().getReplacement();
     }
 
     public void format(MessageContext messageContext) {
@@ -150,9 +158,9 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
             if (argument == null) return Tag.selfClosingInserting(Component.empty());
 
             String name = argument.value();
-            if (!permissionChecker.check(sender, permission.getValues().get(name))) return Tag.selfClosingInserting(Component.empty());
+            if (!permissionChecker.check(sender, permission().getValues().get(name))) return Tag.selfClosingInserting(Component.empty());
 
-            String replacement = resolveLocalization(receiver).getValues().get(name);
+            String replacement = localization(receiver).getValues().get(name);
             if (replacement == null) return Tag.selfClosingInserting(Component.empty());
 
             List<String> values = new ArrayList<>();
@@ -205,49 +213,49 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         });
 
         // deprecated resolvers
-        if (permissionChecker.check(sender, permission.getValues().get("ping"))) {
+        if (permissionChecker.check(sender, permission().getValues().get("ping"))) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.PING, (argumentQueue, context) ->
                     pingTag(sender, receiver)
             );
         }
 
-        if (permissionChecker.check(sender, permission.getValues().get("tps"))) {
+        if (permissionChecker.check(sender, permission().getValues().get("tps"))) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.TPS, (argumentQueue, context) ->
                     tpsTag(sender, receiver)
             );
         }
 
-        if (permissionChecker.check(sender, permission.getValues().get("online"))) {
+        if (permissionChecker.check(sender, permission().getValues().get("online"))) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.ONLINE, (argumentQueue, context) ->
                     onlineTag(sender, receiver)
             );
         }
 
-        if (permissionChecker.check(sender, permission.getValues().get("coords"))) {
+        if (permissionChecker.check(sender, permission().getValues().get("coords"))) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.COORDS, (argumentQueue, context) ->
                     coordsTag(sender, receiver)
             );
         }
 
-        if (permissionChecker.check(sender, permission.getValues().get("stats"))) {
+        if (permissionChecker.check(sender, permission().getValues().get("stats"))) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.STATS, (argumentQueue, context) ->
                     statsTag(sender, receiver)
             );
         }
 
-        if (permissionChecker.check(sender, permission.getValues().get("skin"))) {
+        if (permissionChecker.check(sender, permission().getValues().get("skin"))) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SKIN, (argumentQueue, context) ->
                     skinTag(sender, receiver)
             );
         }
 
-        if (permissionChecker.check(sender, permission.getValues().get("item"))) {
+        if (permissionChecker.check(sender, permission().getValues().get("item"))) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.ITEM, (argumentQueue, context) ->
                     itemTag(sender, receiver, isTranslateItem)
             );
         }
 
-        if (permissionChecker.check(sender, permission.getValues().get("url"))) {
+        if (permissionChecker.check(sender, permission().getValues().get("url"))) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.URL, (argumentQueue, context) -> {
                 Tag.Argument argument = argumentQueue.peek();
                 if (argument == null) return Tag.selfClosingInserting(Component.empty());
@@ -256,7 +264,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
             });
         }
 
-        if (permissionChecker.check(sender, permission.getValues().get("image"))) {
+        if (permissionChecker.check(sender, permission().getValues().get("image"))) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.IMAGE, (argumentQueue, context) -> {
                 Tag.Argument argument = argumentQueue.peek();
                 if (argument == null) return Tag.selfClosingInserting(Component.empty());
@@ -265,7 +273,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
             });
         }
 
-        if (permissionChecker.check(sender, permission.getValues().get("spoiler"))) {
+        if (permissionChecker.check(sender, permission().getValues().get("spoiler"))) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SPOILER, (argumentQueue, context) -> {
                 Tag.Argument argument = argumentQueue.peek();
                 if (argument == null) return Tag.selfClosingInserting(Component.empty());
@@ -335,7 +343,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         int length = PlainTextComponentSerializer.plainText().serialize(spoilerComponent).length();
         length = spoilerText.endsWith(" ") ? length : Math.max(1, length - 1);
 
-        Localization.Message.Format.Replacement replacement = resolveLocalization(receiver);
+        Localization.Message.Format.Replacement replacement = localization(receiver);
         String format = StringUtils.replaceEach(
                 replacement.getValues().getOrDefault("spoiler", ""),
                 new String[]{"<message_1>", "<symbols>"},
@@ -355,7 +363,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         int ping = fPlayerService.getPing(fPlayer);
 
         String format = Strings.CS.replace(
-                resolveLocalization(receiver).getValues().getOrDefault("ping", ""),
+                localization(receiver).getValues().getOrDefault("ping", ""),
                 "<ping>",
                 String.valueOf(ping)
         );
@@ -369,7 +377,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     private Tag tpsTag(FEntity sender, FPlayer receiver) {
         String format = Strings.CS.replace(
-                resolveLocalization(receiver).getValues().getOrDefault("tps", ""),
+                localization(receiver).getValues().getOrDefault("tps", ""),
                 "<tps>",
                 platformServerAdapter.getTPS()
         );
@@ -383,7 +391,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     private Tag onlineTag(FEntity sender, FPlayer receiver) {
         String format = Strings.CS.replace(
-                resolveLocalization(receiver).getValues().getOrDefault("online", ""),
+                localization(receiver).getValues().getOrDefault("online", ""),
                 "<online>",
                 String.valueOf(platformServerAdapter.getOnlinePlayerCount())
         );
@@ -401,7 +409,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         PlatformPlayerAdapter.Coordinates coordinates = platformPlayerAdapter.getCoordinates(sender);
         if (coordinates != null) {
             String format = StringUtils.replaceEach(
-                    resolveLocalization(receiver).getValues().getOrDefault("coords", ""),
+                    localization(receiver).getValues().getOrDefault("coords", ""),
                     new String[]{"<x>", "<y>", "<z>"},
                     new String[]{
                             String.valueOf(coordinates.x()),
@@ -424,7 +432,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         PlatformPlayerAdapter.Statistics statistics = platformPlayerAdapter.getStatistics(sender);
         if (statistics != null) {
             String format = StringUtils.replaceEach(
-                    resolveLocalization(receiver).getValues().getOrDefault("stats", ""),
+                    localization(receiver).getValues().getOrDefault("stats", ""),
                     new String[]{"<hp>", "<armor>", "<exp>", "<food>", "<attack>"},
                     new String[]{
                             String.valueOf(statistics.health()),
@@ -454,7 +462,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         }
 
         String format = Strings.CS.replace(
-                resolveLocalization(receiver).getValues().getOrDefault("skin", ""),
+                localization(receiver).getValues().getOrDefault("skin", ""),
                 "<message_1>",
                 url
         );
@@ -473,7 +481,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         Object itemStackObject = platformPlayerAdapter.getItem(sender.getUuid());
         Component componentItem = platformServerAdapter.translateItemName(itemStackObject, isTranslateItem);
 
-        String format = resolveLocalization(receiver).getValues().getOrDefault("item", "");
+        String format = localization(receiver).getValues().getOrDefault("item", "");
         Component componentFormat = messagePipeline.builder(sender, receiver, format)
                 .flag(MessageFlag.REPLACEMENT, false)
                 .tagResolvers(TagResolver.resolver("message_1", (argumentQueue, context) ->
@@ -489,7 +497,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         if (url.isEmpty()) return Tag.selfClosingInserting(Component.empty());
 
         String string = Strings.CS.replace(
-                resolveLocalization(receiver).getValues().getOrDefault("url", ""),
+                localization(receiver).getValues().getOrDefault("url", ""),
                 "<message_1>",
                 url
         );
@@ -514,7 +522,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         }
 
         String string = Strings.CS.replace(
-                resolveLocalization(receiver).getValues().getOrDefault("image", ""),
+                localization(receiver).getValues().getOrDefault("image", ""),
                 "<message_1>",
                 url
         );

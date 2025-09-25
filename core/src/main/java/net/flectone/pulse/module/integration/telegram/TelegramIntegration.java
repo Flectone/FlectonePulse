@@ -2,7 +2,6 @@ package net.flectone.pulse.module.integration.telegram;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
@@ -22,7 +21,6 @@ import java.util.function.UnaryOperator;
 @Singleton
 public class TelegramIntegration implements FIntegration {
 
-    private final Integration.Telegram integration;
     private final FileResolver fileResolver;
     private final SystemVariableResolver systemVariableResolver;
     private final FLogger fLogger;
@@ -36,7 +34,6 @@ public class TelegramIntegration implements FIntegration {
                                SystemVariableResolver systemVariableResolver,
                                FLogger fLogger,
                                MessageListener messageListener) {
-        this.integration = fileResolver.getIntegration().getTelegram();
         this.fileResolver = fileResolver;
         this.systemVariableResolver = systemVariableResolver;
         this.fLogger = fLogger;
@@ -45,7 +42,7 @@ public class TelegramIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        String token = systemVariableResolver.substituteEnvVars(integration.getToken());
+        String token = systemVariableResolver.substituteEnvVars(fileResolver.getIntegration().getTelegram().getToken());
         if (token.isEmpty()) return;
 
         try {
@@ -64,7 +61,7 @@ public class TelegramIntegration implements FIntegration {
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> telegramString) {
         if (botsApplication == null) return;
 
-        List<String> channels = integration.getMessageChannel().get(messageName);
+        List<String> channels = fileResolver.getIntegration().getTelegram().getMessageChannel().get(messageName);
         if (channels == null) return;
         if (channels.isEmpty()) return;
 

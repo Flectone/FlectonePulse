@@ -3,12 +3,12 @@ package net.flectone.pulse.module.message.status.icon;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.IconUtil;
 import net.flectone.pulse.util.RandomUtil;
 import org.jetbrains.annotations.Nullable;
@@ -23,8 +23,7 @@ public class IconModule extends AbstractModule {
 
     private final List<String> iconList = new ArrayList<>();
 
-    private final Message.Status.Icon message;
-    private final Permission.Message.Status.Icon permission;
+    private final FileResolver fileResolver;
     private final PlatformServerAdapter platformServerAdapter;
     private final RandomUtil randomUtil;
     private final IconUtil iconUtil;
@@ -38,8 +37,7 @@ public class IconModule extends AbstractModule {
                       PlatformServerAdapter platformServerAdapter,
                       RandomUtil randomUtil,
                       IconUtil iconUtil) {
-        this.message = fileResolver.getMessage().getStatus().getIcon();
-        this.permission = fileResolver.getPermission().getMessage().getStatus().getIcon();
+        this.fileResolver = fileResolver;
         this.platformServerAdapter = platformServerAdapter;
         this.iconUtil = iconUtil;
         this.randomUtil = randomUtil;
@@ -48,7 +46,7 @@ public class IconModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         initIcons();
     }
@@ -59,12 +57,17 @@ public class IconModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Status.Icon config() {
+        return fileResolver.getMessage().getStatus().getIcon();
+    }
+
+    @Override
+    public Permission.Message.Status.Icon permission() {
+        return fileResolver.getPermission().getMessage().getStatus().getIcon();
     }
 
     public void initIcons() {
-        List<String> iconNames = message.getValues();
+        List<String> iconNames = config().getValues();
         if (iconNames.isEmpty()) return;
 
         iconNames.forEach(iconName -> {
@@ -96,7 +99,7 @@ public class IconModule extends AbstractModule {
         if (isModuleDisabledFor(fPlayer)) return null;
         if (iconList.isEmpty()) return null;
 
-        if (message.isRandom()) {
+        if (config().isRandom()) {
             index = randomUtil.nextInt(0, iconList.size());
         } else {
             index++;

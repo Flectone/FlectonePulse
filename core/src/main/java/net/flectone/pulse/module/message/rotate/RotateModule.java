@@ -20,32 +20,40 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 @Singleton
 public class RotateModule extends AbstractModuleLocalization<Localization.Message.Rotate> {
 
-    private final Message.Rotate message;
-    private final Permission.Message.Rotate permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public RotateModule(FileResolver fileResolver,
                         ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getRotate(), MessageType.ROTATE);
+        super(MessageType.ROTATE);
 
-        this.message = fileResolver.getMessage().getRotate();
-        this.permission = fileResolver.getPermission().getMessage().getRotate();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(RotatePulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Rotate config() {
+        return fileResolver.getMessage().getRotate();
+    }
+
+    @Override
+    public Permission.Message.Rotate permission() {
+        return fileResolver.getPermission().getMessage().getRotate();
+    }
+
+    @Override
+    public Localization.Message.Rotate localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getRotate();
     }
 
     @Async
@@ -54,15 +62,14 @@ public class RotateModule extends AbstractModuleLocalization<Localization.Messag
 
         sendMessage(RotateMetadata.<Localization.Message.Rotate>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .target(target)
                 .translationKey(translationKey)
                 .format(Localization.Message.Rotate::getFormat)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, target)})
                 .build()
         );
     }
-
 }

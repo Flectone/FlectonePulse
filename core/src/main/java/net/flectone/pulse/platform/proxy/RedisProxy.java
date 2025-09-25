@@ -22,8 +22,7 @@ import java.nio.charset.StandardCharsets;
 @Singleton
 public class RedisProxy implements Proxy {
 
-    private final Config.Redis config;
-    private final Config.Database database;
+    private final FileResolver fileResolver;
     private final FLogger fLogger;
     private final Provider<RedisListener> redisListenerProvider;
     private final SystemVariableResolver systemVariableResolver;
@@ -36,16 +35,19 @@ public class RedisProxy implements Proxy {
                       FLogger fLogger,
                       Provider<RedisListener> redisListenerProvider,
                       SystemVariableResolver systemVariableResolver) {
-        this.config = fileResolver.getConfig().getRedis();
-        this.database = fileResolver.getConfig().getDatabase();
+        this.fileResolver = fileResolver;
         this.fLogger = fLogger;
         this.redisListenerProvider = redisListenerProvider;
         this.systemVariableResolver = systemVariableResolver;
     }
 
+    public Config.Redis config() {
+        return fileResolver.getConfig().getRedis();
+    }
+
     @Override
     public boolean isEnable() {
-        return config.isEnable() && database.getType() == Database.Type.MYSQL
+        return config().isEnable() && fileResolver.getConfig().getDatabase().getType() == Database.Type.MYSQL
                 && pubSubConnection != null && pubSubConnection.isOpen();
     }
 
@@ -56,14 +58,14 @@ public class RedisProxy implements Proxy {
         }
 
         RedisURI.Builder uriBuilder = RedisURI.builder()
-                .withHost(config.getHost())
-                .withPort(config.getPort())
-                .withSsl(config.isSsl());
+                .withHost(config().getHost())
+                .withPort(config().getPort())
+                .withSsl(config().isSsl());
 
-        if (!config.getUser().isEmpty() && !config.getPassword().isEmpty()) {
+        if (!config().getUser().isEmpty() && !config().getPassword().isEmpty()) {
             uriBuilder.withAuthentication(
-                    systemVariableResolver.substituteEnvVars(config.getUser()),
-                    systemVariableResolver.substituteEnvVars(config.getPassword())
+                    systemVariableResolver.substituteEnvVars(config().getUser()),
+                    systemVariableResolver.substituteEnvVars(config().getPassword())
             );
         }
 

@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.worldborder.listener.WorldborderPulseListener;
@@ -20,32 +21,40 @@ import org.apache.commons.lang3.StringUtils;
 @Singleton
 public class WorldborderModule extends AbstractModuleLocalization<Localization.Message.Worldborder> {
 
-    private final Message.Worldborder message;
-    private final Permission.Message.Worldborder permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public WorldborderModule(FileResolver fileResolver,
                              ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getWorldborder(), MessageType.WORLDBORDER);
+        super(MessageType.WORLDBORDER);
 
-        this.message = fileResolver.getMessage().getWorldborder();
-        this.permission = fileResolver.getPermission().getMessage().getWorldborder();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(WorldborderPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Worldborder config() {
+        return fileResolver.getMessage().getWorldborder();
+    }
+
+    @Override
+    public Permission.Message.Worldborder permission() {
+        return fileResolver.getPermission().getMessage().getWorldborder();
+    }
+
+    @Override
+    public Localization.Message.Worldborder localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getWorldborder();
     }
 
     @Async
@@ -72,10 +81,9 @@ public class WorldborderModule extends AbstractModuleLocalization<Localization.M
                 ))
                 .worldborder(worldborder)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
     }
-
 }

@@ -9,6 +9,8 @@ import discord4j.core.object.entity.User;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.module.integration.discord.model.DiscordMetadata;
@@ -20,11 +22,11 @@ import reactor.core.publisher.Mono;
 @Singleton
 public class MessageCreateListener extends EventListener<MessageCreateEvent> {
 
-    private final Integration.Discord integration;
+    private final FileResolver fileResolver;
 
     @Inject
     public MessageCreateListener(FileResolver fileResolver) {
-        integration = fileResolver.getIntegration().getDiscord();
+        this.fileResolver = fileResolver;
     }
 
     @Override
@@ -36,7 +38,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
     public Mono<MessageCreateEvent> execute(MessageCreateEvent event) {
         Message discordMessage = event.getMessage();
 
-        String channel = integration.getMessageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT.name());
+        String channel = config().getMessageChannel().get(MessageType.FROM_DISCORD_TO_MINECRAFT.name());
         if (channel == null) return Mono.empty();
         if (!channel.equals(discordMessage.getChannelId().asString())) return Mono.empty();
 
@@ -69,7 +71,7 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
                 .format(s -> Strings.CS.replace(s.getForMinecraft(), "<name>", nickname))
                 .nickname(nickname)
                 .range(Range.get(Range.Type.PROXY))
-                .destination(integration.getDestination())
+                .destination(config().getDestination())
                 .message(message)
                 .sound(getModuleSound())
                 .integration(string -> Strings.CS.replace(string, "<name>", nickname))
@@ -81,7 +83,17 @@ public class MessageCreateListener extends EventListener<MessageCreateEvent> {
     public void onEnable() {}
 
     @Override
-    protected boolean isConfigEnable() {
-        return integration.isEnable();
+    public Integration.Discord config() {
+        return fileResolver.getIntegration().getDiscord();
+    }
+
+    @Override
+    public Permission.Integration.Discord permission() {
+        return fileResolver.getPermission().getIntegration().getDiscord();
+    }
+
+    @Override
+    public Localization.Integration.Discord localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getIntegration().getDiscord();
     }
 }

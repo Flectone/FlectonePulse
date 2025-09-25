@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -21,8 +22,7 @@ import java.util.Optional;
 @Singleton
 public class ClearchatModule extends AbstractModuleCommand<Localization.Command.Clearchat> {
 
-    private final Command.Clearchat command;
-    private final Permission.Command.Clearchat permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final CommandParserProvider commandParserProvider;
@@ -36,10 +36,9 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
                            CommandParserProvider commandParserProvider,
                            ProxySender proxySender,
                            PlatformPlayerAdapter platformPlayerAdapter) {
-        super(localization -> localization.getCommand().getClearchat(), Command::getClearchat, MessageType.COMMAND_CLEARCHAT);
+        super(MessageType.COMMAND_CLEARCHAT);
 
-        this.command = fileResolver.getCommand().getClearchat();
-        this.permission = fileResolver.getPermission().getCommand().getClearchat();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.permissionChecker = permissionChecker;
         this.commandParserProvider = commandParserProvider;
@@ -49,17 +48,17 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
-        registerPermission(permission.getOther());
+        registerPermission(permission().getOther());
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         registerCommand(commandBuilder -> commandBuilder
-                        .permission(permission.getName())
-                        .optional(promptPlayer, commandParserProvider.playerParser(), commandParserProvider.playerSuggestionPermission(false, permission.getOther()))
+                        .permission(permission().getName())
+                        .optional(promptPlayer, commandParserProvider.playerParser(), commandParserProvider.playerSuggestionPermission(false, permission().getOther()))
         );
     }
 
@@ -72,7 +71,7 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
 
         FPlayer fTarget = fPlayer;
 
-        if (optionalPlayer.isPresent() && permissionChecker.check(fPlayer, permission.getOther())) {
+        if (optionalPlayer.isPresent() && permissionChecker.check(fPlayer, permission().getOther())) {
             String player = optionalPlayer.get();
             if (player.equals("all")) {
                 fPlayerService.findOnlineFPlayers().forEach(this::clearChat);
@@ -94,6 +93,21 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
         clearChat(fTarget);
     }
 
+    @Override
+    public Command.Clearchat config() {
+        return fileResolver.getCommand().getClearchat();
+    }
+
+    @Override
+    public Permission.Command.Clearchat permission() {
+        return fileResolver.getPermission().getCommand().getClearchat();
+    }
+
+    @Override
+    public Localization.Command.Clearchat localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getClearchat();
+    }
+
     public void clearChat(FPlayer fPlayer) {
         clearChat(fPlayer, true);
     }
@@ -108,14 +122,14 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
                 .format("<br> ".repeat(100))
-                .destination(command.getDestination())
+                .destination(config().getDestination())
                 .build()
         );
 
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
                 .format(Localization.Command.Clearchat::getFormat)
-                .destination(command.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );

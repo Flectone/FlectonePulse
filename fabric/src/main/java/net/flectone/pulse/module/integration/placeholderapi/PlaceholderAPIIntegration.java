@@ -9,8 +9,6 @@ import eu.pb4.placeholders.api.Placeholders;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Pulse;
-import net.flectone.pulse.config.Message;
-import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FEntity;
@@ -40,8 +38,7 @@ import java.util.Map;
 @Singleton
 public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
-    private final Message.Format.FColor fColorMessage;
-    private final Permission.Integration.Placeholderapi permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final FPlayerMapper fPlayerMapper;
     private final PlatformServerAdapter platformServerAdapter;
@@ -57,8 +54,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
                                      Provider<PlaceholderAPIModule> placeholderAPIModuleProvider,
                                      FLogger fLogger,
                                      PermissionChecker permissionChecker) {
-        this.fColorMessage = fileResolver.getMessage().getFormat().getFcolor();
-        this.permission = fileResolver.getPermission().getIntegration().getPlaceholderapi();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.fPlayerMapper = fPlayerMapper;
         this.platformServerAdapter = platformServerAdapter;
@@ -159,7 +155,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
         if (placeholderAPIModuleProvider.get().isModuleDisabledFor(sender)) return;
 
         boolean isUserMessage = messageContext.isFlag(MessageFlag.USER_MESSAGE);
-        if (!permissionChecker.check(sender, permission.getUse()) && isUserMessage) return;
+        if (!permissionChecker.check(sender, fileResolver.getPermission().getIntegration().getPlaceholderapi().getUse()) && isUserMessage) return;
         if (!(sender instanceof FPlayer fPlayer)) return;
 
         Object player = fPlayerService.toPlatformFPlayer(fPlayer);
@@ -177,7 +173,7 @@ public class PlaceholderAPIIntegration implements FIntegration, PulseListener {
 
         FPlayer fPlayer = fPlayerMapper.map(context.source());
 
-        Map<Integer, String> colorsMap = new HashMap<>(fColorMessage.getDefaultColors());
+        Map<Integer, String> colorsMap = new HashMap<>(fileResolver.getMessage().getFormat().getFcolor().getDefaultColors());
         for (FColor.Type type : types) {
             colorsMap.putAll(fPlayer.getFColors(type));
         }

@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
@@ -15,30 +16,28 @@ import org.incendo.cloud.context.CommandContext;
 @Singleton
 public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
 
-    private final Command.Me command;
-    private final Permission.Command.Me permission;
+    private final FileResolver fileResolver;
     private final CommandParserProvider commandParserProvider;
 
     @Inject
     public MeModule(FileResolver fileResolver,
                     CommandParserProvider commandParserProvider) {
-        super(localization -> localization.getCommand().getMe(), Command::getMe, MessageType.COMMAND_ME);
+        super(MessageType.COMMAND_ME);
 
-        this.command = fileResolver.getCommand().getMe();
-        this.permission = fileResolver.getPermission().getCommand().getMe();
+        this.fileResolver = fileResolver;
         this.commandParserProvider = commandParserProvider;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptMessage = addPrompt(0, Localization.Command.Prompt::getMessage);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .required(promptMessage, commandParserProvider.nativeMessageParser())
         );
     }
@@ -52,8 +51,8 @@ public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
                 .format(Localization.Command.Me::getFormat)
-                .destination(command.getDestination())
-                .range(command.getRange())
+                .destination(config().getDestination())
+                .range(config().getRange())
                 .message(message)
                 .sound(getModuleSound())
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
@@ -61,5 +60,20 @@ public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
                 .build()
         );
 
+    }
+
+    @Override
+    public Command.Me config() {
+        return fileResolver.getCommand().getMe();
+    }
+
+    @Override
+    public Permission.Command.Me permission() {
+        return fileResolver.getPermission().getCommand().getMe();
+    }
+
+    @Override
+    public Localization.Command.Me localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getMe();
     }
 }

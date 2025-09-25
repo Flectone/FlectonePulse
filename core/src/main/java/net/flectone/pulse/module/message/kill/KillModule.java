@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.kill.listener.KillPulseListener;
@@ -22,32 +23,40 @@ import org.apache.commons.lang3.Strings;
 @Singleton
 public class KillModule extends AbstractModuleLocalization<Localization.Message.Kill> {
 
-    private final Message.Kill message;
-    private final Permission.Message.Kill permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public KillModule(FileResolver fileResolver,
                       ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getKill(), MessageType.KILL);
+        super(MessageType.KILL);
 
-        this.message = fileResolver.getMessage().getKill();
-        this.permission = fileResolver.getPermission().getMessage().getKill();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(KillPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Kill config() {
+        return fileResolver.getMessage().getKill();
+    }
+
+    @Override
+    public Permission.Message.Kill permission() {
+        return fileResolver.getPermission().getMessage().getKill();
+    }
+
+    @Override
+    public Localization.Message.Kill localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getKill();
     }
 
     @Async
@@ -56,14 +65,14 @@ public class KillModule extends AbstractModuleLocalization<Localization.Message.
 
         sendMessage(KillMetadata.<Localization.Message.Kill>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> translationKey == MinecraftTranslationKey.COMMANDS_KILL_SUCCESS_MULTIPLE
                         ? Strings.CS.replace(localization.getMultiple(), "<entities>", StringUtils.defaultString(kill.getEntities()))
                         : localization.getSingle()
                 )
                 .kill(kill)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, kill.getTarget())})
                 .build()

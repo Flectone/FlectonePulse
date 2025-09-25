@@ -15,8 +15,7 @@ import org.bukkit.metadata.MetadataValue;
 @Singleton
 public class SuperVanishModule extends AbstractModule {
 
-    private final Integration.Supervanish config;
-    private final Permission.Integration.Supervanish permission;
+    private final FileResolver fileResolver;
     private final SuperVanishIntegration superVanishIntegration;
     private final ListenerRegistry listenerRegistry;
 
@@ -24,15 +23,14 @@ public class SuperVanishModule extends AbstractModule {
     public SuperVanishModule(FileResolver fileResolver,
                              SuperVanishIntegration superVanishIntegration,
                              ListenerRegistry listenerRegistry) {
-        this.config = fileResolver.getIntegration().getSupervanish();
-        this.permission = fileResolver.getPermission().getIntegration().getSupervanish();
+        this.fileResolver = fileResolver;
         this.superVanishIntegration = superVanishIntegration;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
         listenerRegistry.register(SuperVanishIntegration.class);
 
@@ -45,8 +43,13 @@ public class SuperVanishModule extends AbstractModule {
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return config.isEnable();
+    public Integration.Supervanish config() {
+        return fileResolver.getIntegration().getSupervanish();
+    }
+
+    @Override
+    public Permission.Integration.Supervanish permission() {
+        return fileResolver.getPermission().getIntegration().getSupervanish();
     }
 
     public boolean isVanished(FEntity sender) {

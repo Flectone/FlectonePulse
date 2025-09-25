@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.sound.listener.SoundPulseListener;
@@ -21,32 +22,40 @@ import org.apache.commons.lang3.StringUtils;
 @Singleton
 public class SoundModule extends AbstractModuleLocalization<Localization.Message.Sound> {
 
-    private final Message.CommandSound message;
-    private final Permission.Message.Sound permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public SoundModule(FileResolver fileResolver,
                        ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getSound(), MessageType.SOUND);
+        super(MessageType.SOUND);
 
-        this.message = fileResolver.getMessage().getSound();
-        this.permission = fileResolver.getPermission().getMessage().getSound();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(SoundPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.CommandSound config() {
+        return fileResolver.getMessage().getSound();
+    }
+
+    @Override
+    public Permission.Message.Sound permission() {
+        return fileResolver.getPermission().getMessage().getSound();
+    }
+
+    @Override
+    public Localization.Message.Sound localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getSound();
     }
 
     @Async
@@ -55,7 +64,7 @@ public class SoundModule extends AbstractModuleLocalization<Localization.Message
 
         sendMessage(SoundMetadata.<Localization.Message.Sound>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> StringUtils.replaceEach(
                         switch (translationKey) {
                             case COMMANDS_PLAYSOUND_SUCCESS_MULTIPLE -> localization.getPlay().getMultiple();
@@ -69,7 +78,7 @@ public class SoundModule extends AbstractModuleLocalization<Localization.Message
                         new String[]{"<sound>", "<source>", "<players>"},
                         new String[]{StringUtils.defaultString(sound.getName()), StringUtils.defaultString(sound.getSource()), StringUtils.defaultString(sound.getPlayers())}
                 ))
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .metaSound(sound)
                 .translationKey(translationKey)
                 .sound(getModuleSound())

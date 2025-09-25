@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.setblock.listener.SetblockPulseListener;
@@ -20,32 +21,40 @@ import org.apache.commons.lang3.StringUtils;
 @Singleton
 public class SetblockModule extends AbstractModuleLocalization<Localization.Message.Setblock> {
 
-    private final Message.Setblock message;
-    private final Permission.Message.Setblock permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public SetblockModule(FileResolver fileResolver,
                           ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getSetblock(), MessageType.SETBLOCK);
+        super(MessageType.SETBLOCK);
 
-        this.message = fileResolver.getMessage().getSetblock();
-        this.permission = fileResolver.getPermission().getMessage().getSetblock();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(SetblockPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Setblock config() {
+        return fileResolver.getMessage().getSetblock();
+    }
+
+    @Override
+    public Permission.Message.Setblock permission() {
+        return fileResolver.getPermission().getMessage().getSetblock();
+    }
+
+    @Override
+    public Localization.Message.Setblock localization(FEntity sender) {
+        return null;
     }
 
     @Async
@@ -54,7 +63,7 @@ public class SetblockModule extends AbstractModuleLocalization<Localization.Mess
 
         sendMessage(SetblockMetadata.<Localization.Message.Setblock>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(localization -> StringUtils.replaceEach(
                         localization.getFormat(),
                         new String[]{"<x>", "<y>", "<z>"},
@@ -62,10 +71,9 @@ public class SetblockModule extends AbstractModuleLocalization<Localization.Mess
                 ))
                 .setblock(setblock)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
     }
-
 }

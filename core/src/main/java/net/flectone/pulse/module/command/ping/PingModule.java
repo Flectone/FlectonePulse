@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -20,8 +21,7 @@ import java.util.Optional;
 @Singleton
 public class PingModule extends AbstractModuleCommand<Localization.Command.Ping> {
 
-    private final Command.Ping command;
-    private final Permission.Command.Ping permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
     private final IntegrationModule integrationModule;
@@ -33,10 +33,9 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
                       CommandParserProvider commandParserProvider,
                       IntegrationModule integrationModule,
                       PlatformPlayerAdapter platformPlayerAdapter) {
-        super(localization -> localization.getCommand().getPing(), Command::getPing, MessageType.COMMAND_PING);
+        super(MessageType.COMMAND_PING);
 
-        this.command = fileResolver.getCommand().getPing();
-        this.permission = fileResolver.getPermission().getCommand().getPing();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.commandParserProvider = commandParserProvider;
         this.integrationModule = integrationModule;
@@ -45,14 +44,14 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createCooldown(command.getCooldown(), permission.getCooldownBypass());
-        createSound(command.getSound(), permission.getSound());
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         registerCommand(commandBuilder -> commandBuilder
-                .permission(permission.getName())
+                .permission(permission().getName())
                 .optional(promptPlayer, commandParserProvider.platformPlayerParser())
         );
     }
@@ -80,10 +79,25 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
                 .sender(fTarget)
                 .filterPlayer(fPlayer)
                 .format(Localization.Command.Ping::getFormat)
-                .destination(command.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
 
+    }
+
+    @Override
+    public Command.Ping config() {
+        return fileResolver.getCommand().getPing();
+    }
+
+    @Override
+    public Permission.Command.Ping permission() {
+        return fileResolver.getPermission().getCommand().getPing();
+    }
+
+    @Override
+    public Localization.Command.Ping localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getCommand().getPing();
     }
 }

@@ -7,6 +7,7 @@ import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Ticker;
@@ -25,8 +26,7 @@ import java.util.List;
 @Singleton
 public class FooterModule extends AbstractModuleListLocalization<Localization.Message.Tab.Footer> {
 
-    private final Message.Tab.Footer message;
-    private final Permission.Message.Tab.Footer permission;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final ListenerRegistry listenerRegistry;
@@ -38,10 +38,9 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
                         TaskScheduler taskScheduler,
                         ListenerRegistry listenerRegistry,
                         PacketSender packetSender) {
-        super(module -> module.getMessage().getTab().getFooter(), MessageType.FOOTER);
+        super(MessageType.FOOTER);
 
-        this.message = fileResolver.getMessage().getTab().getFooter();
-        this.permission = fileResolver.getPermission().getMessage().getTab().getFooter();
+        this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
         this.taskScheduler = taskScheduler;
         this.listenerRegistry = listenerRegistry;
@@ -50,9 +49,9 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        Ticker ticker = message.getTicker();
+        Ticker ticker = config().getTicker();
         if (ticker.isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::send), ticker.getPeriod());
         }
@@ -63,33 +62,43 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
     @Override
     public void onDisable() {
         // clear tab
-        Destination.Type destinationType = message.getDestination().getType();
+        Destination.Type destinationType = config().getDestination().getType();
         if (destinationType == Destination.Type.TAB_HEADER || destinationType == Destination.Type.TAB_FOOTER) {
             packetSender.send(new WrapperPlayServerPlayerListHeaderAndFooter(Component.empty(), Component.empty()));
         }
     }
 
+    @Override
+    public Message.Tab.Footer config() {
+        return fileResolver.getMessage().getTab().getFooter();
+    }
+
+    @Override
+    public Permission.Message.Tab.Footer permission() {
+        return fileResolver.getPermission().getMessage().getTab().getFooter();
+    }
+
+    @Override
+    public Localization.Message.Tab.Footer localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getTab().getFooter();
+    }
+
+    @Override
+    public List<String> getAvailableMessages(FPlayer fPlayer) {
+        return joinMultiList(localization(fPlayer).getLists());
+    }
+
     public void send(FPlayer fPlayer) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        String format = getNextMessage(fPlayer, message.isRandom());
+        String format = getNextMessage(fPlayer, config().isRandom());
         if (StringUtils.isEmpty(format)) return;
 
         sendMessage(metadataBuilder()
                 .sender(fPlayer)
                 .format(format)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .build()
         );
-    }
-
-    @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
-    }
-
-    @Override
-    public List<String> getAvailableMessages(FPlayer fPlayer) {
-        return joinMultiList(resolveLocalization(fPlayer).getLists());
     }
 }

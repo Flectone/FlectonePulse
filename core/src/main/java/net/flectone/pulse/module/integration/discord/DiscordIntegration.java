@@ -46,7 +46,6 @@ public class DiscordIntegration implements FIntegration {
 
     private final Map<Long, WebhookData> channelWebhooks = new HashMap<>();
 
-    private final Integration.Discord integration;
     private final FileResolver fileResolver;
     private final TaskScheduler taskScheduler;
     private final SkinService skinService;
@@ -67,7 +66,6 @@ public class DiscordIntegration implements FIntegration {
                               SystemVariableResolver systemVariableResolver,
                               MessageCreateListener messageCreateListener,
                               FLogger fLogger) {
-        this.integration = fileResolver.getIntegration().getDiscord();
         this.fileResolver = fileResolver;
         this.taskScheduler = taskScheduler;
         this.skinService = skinService;
@@ -77,10 +75,14 @@ public class DiscordIntegration implements FIntegration {
         this.fLogger = fLogger;
     }
 
+    public Integration.Discord config() {
+        return fileResolver.getIntegration().getDiscord();
+    }
+
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> discordString) {
         if (gateway == null) return;
 
-        String integrationChannel = integration.getMessageChannel().get(messageName);
+        String integrationChannel = config().getMessageChannel().get(messageName);
         if (integrationChannel == null) return;
         if (integrationChannel.isEmpty()) return;
 
@@ -225,7 +227,7 @@ public class DiscordIntegration implements FIntegration {
 
     @Override
     public void hook() {
-        String token = systemVariableResolver.substituteEnvVars(integration.getToken());
+        String token = systemVariableResolver.substituteEnvVars(config().getToken());
         if (token.isEmpty()) return;
 
         discordClient = DiscordClient.create(token);
@@ -233,7 +235,7 @@ public class DiscordIntegration implements FIntegration {
         gateway = discordClient.gateway().login().block();
         if (gateway == null) return;
 
-        Integration.Discord.Presence presence = integration.getPresence();
+        Integration.Discord.Presence presence = config().getPresence();
 
         if (presence.isEnable()) {
             Integration.Discord.Presence.Activity activity = presence.getActivity();
@@ -245,7 +247,7 @@ public class DiscordIntegration implements FIntegration {
             gateway.updatePresence(ClientPresence.of(Status.valueOf(presence.getStatus()), clientActivity)).block();
         }
 
-        Integration.Discord.ChannelInfo channelInfo = integration.getChannelInfo();
+        Integration.Discord.ChannelInfo channelInfo = config().getChannelInfo();
 
         if (channelInfo.isEnable() && channelInfo.getTicker().isEnable()) {
             long period = channelInfo.getTicker().getPeriod();
@@ -253,7 +255,7 @@ public class DiscordIntegration implements FIntegration {
             updateChannelInfo();
         }
 
-        if (!integration.getMessageChannel().isEmpty()) {
+        if (!config().getMessageChannel().isEmpty()) {
             gateway.getEventDispatcher()
                     .on(messageCreateListener.getEventType())
                     .flatMap(messageCreateListener::execute)
@@ -265,7 +267,7 @@ public class DiscordIntegration implements FIntegration {
 
         clientID = applicationInfo.getId().asLong();
 
-        Set<Long> uniqueChannels = integration.getMessageChannel().values().stream()
+        Set<Long> uniqueChannels = config().getMessageChannel().values().stream()
                 .filter(id -> !id.isEmpty())
                 .map(id -> Snowflake.of(id).asLong())
                 .collect(Collectors.toSet());
@@ -302,7 +304,7 @@ public class DiscordIntegration implements FIntegration {
     public void updateChannelInfo() {
         if (gateway == null) return;
 
-        if (!integration.getChannelInfo().isEnable()) return;
+        if (!config().getChannelInfo().isEnable()) return;
 
         Localization.Integration.Discord localization = fileResolver.getLocalization().getIntegration().getDiscord();
         for (Map.Entry<String, String> entry : localization.getInfoChannel().entrySet()) {

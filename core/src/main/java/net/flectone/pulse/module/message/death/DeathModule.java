@@ -10,6 +10,7 @@ import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -33,8 +34,7 @@ import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementT
 @Singleton
 public class DeathModule extends AbstractModuleLocalization<Localization.Message.Death> implements PulseListener {
 
-    private final Message.Death message;
-    private final Permission.Message.Death permission;
+    private final FileResolver fileResolver;
     private final MessagePipeline messagePipeline;
     private final PacketSender packetSender;
     private final FPlayerService fPlayerService;
@@ -48,10 +48,9 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
                        FPlayerService fPlayerService,
                        ListenerRegistry listenerRegistry,
                        IntegrationModule integrationModule) {
-        super(localization -> localization.getMessage().getDeath(), MessageType.DEATH);
+        super(MessageType.DEATH);
 
-        this.message = fileResolver.getMessage().getDeath();
-        this.permission = fileResolver.getPermission().getMessage().getDeath();
+        this.fileResolver = fileResolver;
         this.messagePipeline = messagePipeline;
         this.packetSender = packetSender;
         this.fPlayerService = fPlayerService;
@@ -61,17 +60,27 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(DeathPacketListener.class);
         listenerRegistry.register(DeathPulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Death config() {
+        return fileResolver.getMessage().getDeath();
+    }
+
+    @Override
+    public Permission.Message.Death permission() {
+        return fileResolver.getPermission().getMessage().getDeath();
+    }
+
+    @Override
+    public Localization.Message.Death localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getDeath();
     }
 
     @Async
@@ -83,7 +92,7 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
                     .format(localization -> localization.getTypes().get(translationKey.toString()))
                     .death(death)
                     .translationKey(translationKey)
-                    .destination(message.getDestination())
+                    .destination(config().getDestination())
                     .sound(getModuleSound())
                     .filter(fPlayer -> integrationModule.canSeeVanished(death.getTarget(), fPlayer))
                     .tagResolvers(fResolver -> new TagResolver[]{
@@ -106,8 +115,8 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
                 .format(localization -> localization.getTypes().get(translationKey.toString()))
                 .death(death)
                 .translationKey(translationKey)
-                .range(message.getRange())
-                .destination(message.getDestination())
+                .range(config().getRange())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .filter(fPlayer -> integrationModule.canSeeVanished(fTarget, fPlayer))
                 .tagResolvers(fResolver -> new TagResolver[]{
@@ -125,7 +134,7 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
 
         // personal death screen message
         if (fTarget.isSetting(MessageType.DEATH)) {
-            String format = resolveLocalization(fReceiver).getTypes().get(translationKey.toString());
+            String format = localization(fReceiver).getTypes().get(translationKey.toString());
             Component component = messagePipeline.builder(fReceiver, format)
                     .tagResolvers(
                             targetTag(fReceiver, death.getTarget()),

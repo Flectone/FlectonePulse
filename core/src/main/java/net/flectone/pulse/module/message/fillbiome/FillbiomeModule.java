@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.message.fillbiome.listener.FillbiomePulseListener;
@@ -20,32 +21,40 @@ import org.apache.commons.lang3.StringUtils;
 @Singleton
 public class FillbiomeModule extends AbstractModuleLocalization<Localization.Message.Fillbiome> {
 
-    private final Message.Fillbiome message;
-    private final Permission.Message.Fillbiome permission;
+    private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
 
     @Inject
     public FillbiomeModule(FileResolver fileResolver,
                            ListenerRegistry listenerRegistry) {
-        super(localization -> localization.getMessage().getFillbiome(), MessageType.FILLBIOME);
+        super(MessageType.FILLBIOME);
 
-        this.message = fileResolver.getMessage().getFillbiome();
-        this.permission = fileResolver.getPermission().getMessage().getFillbiome();
+        this.fileResolver = fileResolver;
         this.listenerRegistry = listenerRegistry;
     }
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission);
+        registerModulePermission(permission());
 
-        createSound(message.getSound(), permission.getSound());
+        createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(FillbiomePulseListener.class);
     }
 
     @Override
-    protected boolean isConfigEnable() {
-        return message.isEnable();
+    public Message.Fillbiome config() {
+        return fileResolver.getMessage().getFillbiome();
+    }
+
+    @Override
+    public Permission.Message.Fillbiome permission() {
+        return fileResolver.getPermission().getMessage().getFillbiome();
+    }
+
+    @Override
+    public Localization.Message.Fillbiome localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getFillbiome();
     }
 
     @Async
@@ -54,7 +63,7 @@ public class FillbiomeModule extends AbstractModuleLocalization<Localization.Mes
 
         sendMessage(FillbiomeMetadata.<Localization.Message.Fillbiome>builder()
                 .sender(fPlayer)
-                .range(message.getRange())
+                .range(config().getRange())
                 .format(s -> StringUtils.replaceEach(
                         translationKey == MinecraftTranslationKey.COMMANDS_FILLBIOME_SUCCESS ? s.getFormat() : s.getFormatCount(),
                         new String[]{"<blocks>", "<x1>", "<y1>", "<z1>", "<x2>", "<y2>", "<z2>"},
@@ -62,10 +71,9 @@ public class FillbiomeModule extends AbstractModuleLocalization<Localization.Mes
                 ))
                 .fillbiome(fillbiome)
                 .translationKey(translationKey)
-                .destination(message.getDestination())
+                .destination(config().getDestination())
                 .sound(getModuleSound())
                 .build()
         );
     }
-
 }
