@@ -30,6 +30,11 @@ public class MessagePulseListener implements PulseListener {
         if (!Component.IS_NOT_EMPTY.test(message)) return;
 
         FPlayer fReceiver = event.getReceiver();
+        if (fReceiver.isConsole()) {
+            messageSender.sendToConsole(message);
+            return;
+        }
+
         Component submessage = event.getSubmessage();
 
         Destination destination = event.getEventMetadata().getDestination();

@@ -58,10 +58,13 @@ public class MessageSender {
         this.fLogger = fLogger;
     }
 
+    public void sendToConsole(Component component) {
+        fLogger.info(ansiSerializer.serialize(component));
+    }
 
     public void sendMessage(FPlayer fPlayer, Component component, boolean silent) {
         if (fPlayer.isConsole()) {
-            fLogger.info(ansiSerializer.serialize(component));
+            sendToConsole(component);
             return;
         }
 
