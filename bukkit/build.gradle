@@ -1,6 +1,6 @@
 dependencies {
     implementation project(":core")
-    implementation "com.alessiodp.libby:libby-bukkit:$libby_version"
+    implementation fileTree("library") { include "*.jar" }
 
     compileOnly project(":paper")
     compileOnly "com.github.Anon8281:UniversalScheduler:$UniversalScheduler_version"

@@ -44,9 +44,8 @@ dependencies {
 	// fix integration with LuckPerms
 	modImplementation(include("org.incendo:cloud-fabric:${cloud_paper_version}"))
 
-	implementation("com.alessiodp.libby:libby-fabric:$libby_version")
-
-	implementation(project(":core"))
+    implementation fileTree("library") { include "*.jar" }
+	implementation project(":core")
 }
 
 shadowJar {
