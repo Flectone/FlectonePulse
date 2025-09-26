@@ -91,7 +91,13 @@ public class YamlFileProcessor {
             try {
                 mapper.readerForUpdating(yamlFile).readValue(file);
             } catch (IOException e) {
-                throw new IOException("Failed to read " + file.getName() + "\n" + e.getMessage());
+                if (e instanceof MismatchedInputException mismatchedInputException
+                        && mismatchedInputException.getMessage() != null
+                        && mismatchedInputException.getMessage().contains("No content to map due to end-of-input")) {
+                    save(yamlFile);
+                    return;
+                }
+
                 throw new YamlReadException(file.getName(), e);
             }
         }
