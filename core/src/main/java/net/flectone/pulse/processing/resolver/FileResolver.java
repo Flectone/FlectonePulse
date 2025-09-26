@@ -7,7 +7,7 @@ import com.google.inject.name.Named;
 import lombok.Getter;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.*;
-import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;

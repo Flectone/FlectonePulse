@@ -8,7 +8,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
-import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;

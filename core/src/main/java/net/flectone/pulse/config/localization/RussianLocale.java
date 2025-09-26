@@ -2,7 +2,6 @@ package net.flectone.pulse.config.localization;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.util.constant.MessageType;
 
 import java.util.ArrayList;

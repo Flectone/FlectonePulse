@@ -2,7 +2,7 @@ package net.flectone.pulse.module.command.flectonepulse.web.controller;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.YamlFile;
 import net.flectone.pulse.processing.processor.YamlFileProcessor;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;

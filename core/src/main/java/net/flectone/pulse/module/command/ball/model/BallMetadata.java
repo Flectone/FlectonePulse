@@ -2,7 +2,7 @@ package net.flectone.pulse.module.command.ball.model;
 
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
-import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.event.EventMetadata;
 
 @Getter

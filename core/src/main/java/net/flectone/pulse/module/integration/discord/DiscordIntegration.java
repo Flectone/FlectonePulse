@@ -18,7 +18,7 @@ import discord4j.rest.util.AllowedMentions;
 import discord4j.rest.util.MultipartRequest;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
-import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FEntity;

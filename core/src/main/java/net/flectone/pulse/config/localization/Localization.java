@@ -1,10 +1,12 @@
-package net.flectone.pulse.config;
+package net.flectone.pulse.config.localization;
 
 import com.fasterxml.jackson.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.flectone.pulse.config.ModuleConfig;
+import net.flectone.pulse.config.YamlFile;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;

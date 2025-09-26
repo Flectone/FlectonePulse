@@ -11,7 +11,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.YamlFile;
 import net.flectone.pulse.config.localization.EnglishLocale;
-import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.localization.RussianLocale;
 
 import java.io.File;

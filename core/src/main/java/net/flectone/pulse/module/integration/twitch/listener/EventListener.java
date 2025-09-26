@@ -1,7 +1,7 @@
 package net.flectone.pulse.module.integration.twitch.listener;
 
 import com.github.twitch4j.chat.events.TwitchEvent;
-import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.util.constant.MessageType;
 

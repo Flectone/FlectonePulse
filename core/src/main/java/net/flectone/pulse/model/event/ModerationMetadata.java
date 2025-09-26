@@ -3,7 +3,7 @@ package net.flectone.pulse.model.event;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
-import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.util.Moderation;
 
 @Getter
