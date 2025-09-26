@@ -765,10 +765,10 @@ public class ProxyMessageHandler {
                 .uuid(metadataUUID)
                 .sender(fEntity)
                 .format(localization -> switch (translationKey) {
-                    case CHAT_TYPE_ADVANCEMENT_TASK -> localization.getTask();
-                    case CHAT_TYPE_ADVANCEMENT_GOAL -> localization.getGoal();
-                    case CHAT_TYPE_ADVANCEMENT_CHALLENGE -> localization.getChallenge();
-                    case CHAT_TYPE_ACHIEVEMENT_TAKEN -> localization.getTaken();
+                    case CHAT_TYPE_ADVANCEMENT_TASK -> localization.getFormatTask();
+                    case CHAT_TYPE_ADVANCEMENT_GOAL -> localization.getFormatGoal();
+                    case CHAT_TYPE_ADVANCEMENT_CHALLENGE -> localization.getFormatChallenge();
+                    case CHAT_TYPE_ACHIEVEMENT_TAKEN -> localization.getFormatTaken();
                     default -> "";
                 })
                 .advancement(advancement)
