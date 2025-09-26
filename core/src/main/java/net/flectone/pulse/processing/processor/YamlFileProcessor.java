@@ -1,9 +1,8 @@
 package net.flectone.pulse.processing.processor;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
@@ -13,6 +12,8 @@ import net.flectone.pulse.config.YamlFile;
 import net.flectone.pulse.config.localization.EnglishLocale;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.localization.RussianLocale;
+import net.flectone.pulse.exception.YamlReadException;
+import net.flectone.pulse.exception.YamlWriteException;
 
 import java.io.File;
 import java.io.IOException;
@@ -91,6 +92,7 @@ public class YamlFileProcessor {
                 mapper.readerForUpdating(yamlFile).readValue(file);
             } catch (IOException e) {
                 throw new IOException("Failed to read " + file.getName() + "\n" + e.getMessage());
+                throw new YamlReadException(file.getName(), e);
             }
         }
     }
@@ -108,7 +110,7 @@ public class YamlFileProcessor {
             Files.createDirectories(pathToFile.getParent());
             Files.writeString(pathToFile, yamlWithComments);
         } catch (IOException e) {
-            throw new IOException("Failed to save " + pathToFile.getFileName() + "\n" + e.getMessage());
+            throw new YamlWriteException(pathToFile.toFile().getName(), e);
         }
     }
 
