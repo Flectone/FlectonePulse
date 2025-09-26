@@ -172,7 +172,7 @@ FlectonePulse is built on the shoulders of these excellent projects:
 
 - 🏗️ **[Google Guice](https://github.com/google/guice)** — Dependency injection framework for modular code
 - 📚 **[JDBI](https://jdbi.org/)** with **[HikariCP](https://github.com/brettwooldridge/HikariCP)** — Efficient database access with connection pooling for optimal performance
-- 📦 **[Elytrium Java Serializer](https://github.com/Elytrium/java-serializer)** — Efficient data serialization
+- 📦 **[Jackson](https://github.com/FasterXML/jackson)** — Efficient data serialization
 - 🧙 **[PacketEvents](https://github.com/retrooper/packetevents)** — Advanced packet handling for Minecraft
 - 🎨 **[Adventure](https://github.com/KyoriPowered/adventure)** — Modern text formatting and styling
 - ⌨️ **[Cloud](https://github.com/Incendo/cloud)** — Command framework with robust autocomplete
