@@ -25,10 +25,12 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.IconUtil;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.incendo.cloud.context.CommandContext;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 
 @Singleton
@@ -42,6 +44,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
     private final PlatformServerAdapter platformServerAdapter;
     private final MessagePipeline messagePipeline;
     private final IconUtil iconUtil;
+    private final FLogger fLogger;
 
     private String icon;
 
@@ -53,7 +56,8 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
                              @Named("projectPath") Path projectPath,
                              PlatformServerAdapter platformServerAdapter,
                              MessagePipeline messagePipeline,
-                             IconUtil iconUtil) {
+                             IconUtil iconUtil,
+                             FLogger fLogger) {
         super(MessageType.COMMAND_MAINTENANCE);
 
         this.fileResolver = fileResolver;
@@ -64,6 +68,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         this.platformServerAdapter = platformServerAdapter;
         this.messagePipeline = messagePipeline;
         this.iconUtil = iconUtil;
+        this.fLogger = fLogger;
     }
 
     @Override
@@ -102,7 +107,13 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         boolean turned = !config().isTurnedOn();
 
         config().setTurnedOn(turned);
-        fileResolver.save();
+
+        try {
+            fileResolver.save();
+        } catch (IOException e) {
+            fLogger.warning(e);
+            return;
+        }
 
         sendMessage(MaintenanceMetadata.<Localization.Command.Maintenance>builder()
                 .sender(fPlayer)

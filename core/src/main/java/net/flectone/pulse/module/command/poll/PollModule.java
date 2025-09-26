@@ -24,6 +24,7 @@ import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +34,7 @@ import org.incendo.cloud.meta.CommandMeta;
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider;
 import org.incendo.cloud.suggestion.Suggestion;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Function;
@@ -51,6 +53,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     private final PacketProvider packetProvider;
     private final Provider<DialogPollBuilder> dialogPollBuilderProvider;
     private final YamlFileProcessor yamlFileProcessor;
+    private final FLogger fLogger;
 
     @Inject
     public PollModule(FileResolver fileResolver,
@@ -61,7 +64,8 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                       MessagePipeline messagePipeline,
                       PacketProvider packetProvider,
                       Provider<DialogPollBuilder> dialogPollBuilderProvider,
-                      YamlFileProcessor yamlFileProcessor) {
+                      YamlFileProcessor yamlFileProcessor,
+                      FLogger fLogger) {
         super(MessageType.COMMAND_POLL);
 
         this.fileResolver = fileResolver;
@@ -73,6 +77,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
         this.packetProvider = packetProvider;
         this.dialogPollBuilderProvider = dialogPollBuilderProvider;
         this.yamlFileProcessor = yamlFileProcessor;
+        this.fLogger = fLogger;
     }
 
     @Override
@@ -267,7 +272,12 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     public void saveAndUpdateLast(Poll poll) {
         pollMap.put(poll.getId(), poll);
         config().setLastId(poll.getId() + 1);
-        yamlFileProcessor.save(fileResolver.getCommand());
+
+        try {
+            yamlFileProcessor.save(fileResolver.getCommand());
+        } catch (IOException e) {
+            fLogger.warning(e);
+        }
     }
 
     public void vote(FEntity fPlayer, int id, int numberVote, UUID metadataUUID) {

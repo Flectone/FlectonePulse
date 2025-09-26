@@ -3,20 +3,19 @@ package net.flectone.pulse.processing.processor;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
-import com.fasterxml.jackson.databind.deser.ValueInstantiator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.YamlFile;
-import net.flectone.pulse.util.logging.FLogger;
+import net.flectone.pulse.config.localization.EnglishLocale;
+import net.flectone.pulse.config.Localization;
+import net.flectone.pulse.config.localization.RussianLocale;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
@@ -27,71 +26,17 @@ import java.util.*;
 public class YamlFileProcessor {
 
     private final ObjectMapper mapper = YAMLMapper.builder(new YAMLFactory())
-            .enable(SerializationFeature.INDENT_OUTPUT)
-            .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
-            .disable(YAMLGenerator.Feature.SPLIT_LINES)
-            .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
-            .disable(YAMLGenerator.Feature.USE_NATIVE_TYPE_ID)
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            .disable(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE)
-            .disable(DeserializationFeature.FAIL_ON_UNRESOLVED_OBJECT_IDS)
-            .disable(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY)
-            .addHandler(new DeserializationProblemHandler() {
-
-                @Override
-                public boolean handleUnknownProperty(DeserializationContext ctxt,
-                                                     JsonParser p,
-                                                     JsonDeserializer<?> deserializer,
-                                                     Object beanOrClass,
-                                                     String propertyName) {
-                    return false;
-                }
-
-                @Override
-                public Object handleWeirdStringValue(DeserializationContext ctxt,
-                                                     Class<?> targetType,
-                                                     String valueToConvert,
-                                                     String failureMsg) {
-                    return null;
-                }
-
-                @Override
-                public Object handleWeirdNumberValue(DeserializationContext ctxt,
-                                                     Class<?> targetType,
-                                                     Number valueToConvert,
-                                                     String failureMsg) {
-                    return null;
-                }
-
-                @Override
-                public Object handleWeirdNativeValue(DeserializationContext ctxt,
-                                                     JavaType targetType,
-                                                     Object valueToConvert,
-                                                     JsonParser p) {
-                    return null;
-                }
-
-                @Override
-                public Object handleUnexpectedToken(DeserializationContext ctxt,
-                                                    JavaType targetType,
-                                                    JsonToken t,
-                                                    JsonParser p,
-                                                    String failureMsg) {
-                    return null;
-                }
-
-                @Override
-                public Object handleMissingInstantiator(DeserializationContext ctxt,
-                                                        Class<?> instClass,
-                                                        ValueInstantiator valueInsta,
-                                                        JsonParser p,
-                                                        String msg) {
-                    return null;
-                }
-            })
+            .enable(SerializationFeature.INDENT_OUTPUT) // indent output for values
+            .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS) // fix enum names
+            .enable(MapperFeature.FIX_FIELD_NAME_UPPER_CASE_PREFIX) // fix field names
+            .disable(YAMLGenerator.Feature.SPLIT_LINES) // fix split long values
+            .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER) // fix header
+            .disable(YAMLGenerator.Feature.USE_NATIVE_TYPE_ID) // fix type id like !!java.util.Hashmap
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES) // fix error on unknown properties
             .build()
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-            .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+            .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL) // include only non null values
+            .setDefaultMergeable(Boolean.TRUE) // fix default values for null properties
+            .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE); // snake case
 
     private final String header =
             """
@@ -107,30 +52,50 @@ public class YamlFileProcessor {
             # 
             """;
 
-    private final FLogger fLogger;
+    private final EnglishLocale englishLocale;
+    private final RussianLocale russianLocale;
 
     @Inject
-    public YamlFileProcessor(FLogger fLogger) {
-        this.fLogger = fLogger;
+    public YamlFileProcessor(EnglishLocale englishLocale,
+                             RussianLocale russianLocale) {
+        this.englishLocale = englishLocale;
+        this.russianLocale = russianLocale;
     }
 
-    public <T extends YamlFile> void reload(T yamlFile) {
+    public <T extends YamlFile> void reload(T yamlFile) throws IOException {
+        if (yamlFile instanceof Localization localization) {
+            initLocalization(localization);
+        }
+
         load(yamlFile);
         save(yamlFile);
     }
 
-    public <T extends YamlFile> void load(T yamlFile) {
+    public void initLocalization(Localization localization) {
+        if (!localization.isInitialized()) {
+            if (localization.getLanguage().equals("ru_ru")) {
+                russianLocale.init(localization);
+            } else {
+                englishLocale.init(localization);
+            }
+
+            localization.setInitialized(true);
+        }
+    }
+
+    public <T extends YamlFile> void load(T yamlFile) throws IOException {
         if (Files.exists(yamlFile.getPathToFile())) {
             File file = yamlFile.getPathToFile().toFile();
+
             try {
                 mapper.readerForUpdating(yamlFile).readValue(file);
-            } catch (Exception e) {
-                fLogger.warning("Failed to read \" " + file.getName() +" \" file: " + e.getMessage());
+            } catch (IOException e) {
+                throw new IOException("Failed to read " + file.getName() + "\n" + e.getMessage());
             }
         }
     }
 
-    public <T extends YamlFile> void save(T yamlFile) {
+    public <T extends YamlFile> void save(T yamlFile) throws IOException {
         Map<String, String> comments = new LinkedHashMap<>();
         collectDescriptions(yamlFile.getClass(), "", comments, new HashSet<>());
 
@@ -142,8 +107,8 @@ public class YamlFileProcessor {
 
             Files.createDirectories(pathToFile.getParent());
             Files.writeString(pathToFile, yamlWithComments);
-        } catch (Exception e) {
-            fLogger.warning("Failed to save \" " + pathToFile.getFileName() +" \" file: " + e.getMessage());
+        } catch (IOException e) {
+            throw new IOException("Failed to save " + pathToFile.getFileName() + "\n" + e.getMessage());
         }
     }
 

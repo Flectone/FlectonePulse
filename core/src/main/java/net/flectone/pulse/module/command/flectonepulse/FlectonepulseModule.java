@@ -150,7 +150,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
             );
 
         } catch (Exception e) {
-            fLogger.warning(e);
+            fLogger.warning(e.getMessage());
 
             sendMessage(metadataBuilder()
                     .sender(fPlayer)

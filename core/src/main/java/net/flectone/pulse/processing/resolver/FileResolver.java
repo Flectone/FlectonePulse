@@ -7,6 +7,7 @@ import com.google.inject.name.Named;
 import lombok.Getter;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.*;
+import net.flectone.pulse.config.Localization;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -33,7 +34,7 @@ public class FileResolver {
 
     private final Path projectPath;
     private final Command command;
-    private Config config;
+    private final Config config;
     private final Integration integration;
     private final Message message;
     private final Permission permission;
@@ -68,26 +69,14 @@ public class FileResolver {
         return localizationMap.getOrDefault(fPlayer.getSetting(SettingText.LOCALE), defaultLocalization);
     }
 
-    public void reload() {
+    public void reload() throws IOException {
         yamlFileProcessor.reload(config);
         config.setLanguage(config.getLanguage());
 
         preInitVersion = config.getVersion();
+        boolean versionChanged = !preInitVersion.equals(BuildConfig.PROJECT_VERSION);
 
         if (!preInitVersion.equals(BuildConfig.PROJECT_VERSION)) {
-            // fix update permission name
-            if (isVersionOlderThan(preInitVersion, "1.4.3")) {
-                migration_1_4_3();
-            }
-
-            if (isVersionOlderThan(preInitVersion, "1.5.0")) {
-                migration_1_5_0();
-            }
-
-            if (isVersionOlderThan(preInitVersion, "1.6.0")) {
-                migration_1_6_0();
-            }
-
             config.setVersion(BuildConfig.PROJECT_VERSION);
             yamlFileProcessor.save(config);
         }
@@ -100,18 +89,36 @@ public class FileResolver {
         reloadLanguages();
 
         defaultLocalization = localizationMap.get(config.getLanguage());
+
+        if (versionChanged) {
+            // fix update permission name
+            if (isVersionOlderThan(preInitVersion, "1.4.3")) {
+                migration_1_4_3();
+            }
+
+            if (isVersionOlderThan(preInitVersion, "1.5.0")) {
+                migration_1_5_0();
+            }
+
+            if (isVersionOlderThan(preInitVersion, "1.6.0")) {
+                migration_1_6_0();
+            }
+        }
     }
 
-    public void save() {
+    public void save() throws IOException {
         yamlFileProcessor.save(command);
         yamlFileProcessor.save(config);
         yamlFileProcessor.save(integration);
         yamlFileProcessor.save(message);
         yamlFileProcessor.save(permission);
-        localizationMap.values().forEach(yamlFileProcessor::save);
+
+        for (Localization localization : localizationMap.values()) {
+            yamlFileProcessor.save(localization);
+        }
     }
 
-    private void reloadLanguages() {
+    private void reloadLanguages() throws IOException {
         Set<String> newLanguages = new HashSet<>(Set.of("ru_ru", "en_us"));
         newLanguages.add(config.getLanguage());
 
@@ -129,10 +136,12 @@ public class FileResolver {
             fLogger.warning(e);
         }
 
-        newLanguages.forEach(this::loadLanguage);
+        for (String language : newLanguages) {
+            loadLanguage(language);
+        }
     }
 
-    private void loadLanguage(String language) {
+    private void loadLanguage(String language) throws IOException {
         Localization localization = new Localization(projectPath, language);
         yamlFileProcessor.reload(localization);
         localizationMap.put(language, localization);
@@ -166,9 +175,7 @@ public class FileResolver {
         return (endIndex == -1 ? string : string.substring(0, endIndex)).split("\\.");
     }
 
-    private void migration_1_4_3() {
-        yamlFileProcessor.reload(permission);
-
+    private void migration_1_4_3() throws IOException {
         Permission.Message.Update update = permission.getMessage().getUpdate();
         if (update.getName().equals("flectonepulse.module.message.op")) {
             update.setName("flectonepulse.module.message.update");
@@ -177,11 +184,9 @@ public class FileResolver {
         }
     }
 
-    private void migration_1_5_0() {
+    private void migration_1_5_0() throws IOException {
         String oldChatKey = "CHAT";
         String newChatKey = "CHAT_GLOBAL";
-
-        yamlFileProcessor.reload(integration);
 
         Integration.Discord discord = integration.getDiscord();
         if (discord.getMessageChannel().containsKey(oldChatKey)) {
@@ -200,9 +205,7 @@ public class FileResolver {
 
         yamlFileProcessor.save(integration);
 
-        reloadLanguages();
-
-        localizationMap.values().forEach(localization -> {
+        for (Localization localization : localizationMap.values()) {
             Localization.Integration.Discord localizationDiscord = localization.getIntegration().getDiscord();
             if (localizationDiscord.getMessageChannel().containsKey(oldChatKey)) {
                 localizationDiscord.getMessageChannel().put(newChatKey, localizationDiscord.getMessageChannel().remove(oldChatKey));
@@ -219,12 +222,10 @@ public class FileResolver {
             }
 
             yamlFileProcessor.save(localization);
-        });
+        }
     }
 
-    private void migration_1_6_0() {
-        yamlFileProcessor.reload(command);
-
+    private void migration_1_6_0() throws IOException {
         List<Command.Chatsetting.Menu.Color.Type> colorTypes = command.getChatsetting().getMenu().getSee().getTypes();
         for (Command.Chatsetting.Menu.Color.Type colorType : colorTypes) {
             if (colorType.getName().equals("default")) {
@@ -329,8 +330,6 @@ public class FileResolver {
 
         yamlFileProcessor.save(command);
 
-        yamlFileProcessor.reload(permission);
-
         Map<String, Permission.Command.Chatsetting.SettingItem> settings = permission.getCommand().getChatsetting().getSettings();
         settings.clear();
 
@@ -364,9 +363,7 @@ public class FileResolver {
 
         yamlFileProcessor.save(permission);
 
-        reloadLanguages();
-
-        localizationMap.values().forEach(localization -> {
+        for (Localization localization : localizationMap.values()) {
             Map<String, String> localizationTypes = localization.getCommand().getChatsetting().getCheckbox().getTypes();
             localizationTypes.clear();
 
@@ -399,6 +396,7 @@ public class FileResolver {
                 localizationTypes.put(MessageType.SLEEP.name(), "<status_color>Сон");
 
                 Localization defaultRussianLocalization = new Localization(projectPath, "ru_ru");
+                yamlFileProcessor.initLocalization(defaultRussianLocalization);
 
                 localization.getCommand().setClearmail(defaultRussianLocalization.getCommand().getClearmail());
                 localization.getCommand().setMail(defaultRussianLocalization.getCommand().getMail());
@@ -443,26 +441,29 @@ public class FileResolver {
                 localizationTypes.put(MessageType.QUIT.name(), "<status_color>Quit");
                 localizationTypes.put(MessageType.SLEEP.name(), "<status_color>Sleep");
 
-                localization.getCommand().setClearmail(new Localization.Command.Clearmail());
-                localization.getCommand().setMail(new Localization.Command.Mail());
-                localization.getCommand().setTell(new Localization.Command.Tell());
-                localization.getCommand().setTictactoe(new Localization.Command.Tictactoe());
-                localization.getCommand().setToponline(new Localization.Command.Toponline());
-                localization.getMessage().setAdvancement(new Localization.Message.Advancement());
-                localization.getMessage().setClear(new Localization.Message.Clear());
-                localization.getMessage().setDeath(new Localization.Message.Death());
-                localization.getMessage().setDeop(new Localization.Message.Deop());
-                localization.getMessage().setEnchant(new Localization.Message.Enchant());
-                localization.getMessage().getFormat().getName_().setEntity(localization.getMessage().getFormat().getName_().getEntity().replace("<lang:'<name>'>", "<name>"));
-                localization.getMessage().setGamemode(new Localization.Message.Gamemode());
-                localization.getMessage().setKill(new Localization.Message.Kill());
-                localization.getMessage().setOp(new Localization.Message.Op());
-                localization.getMessage().setSeed(new Localization.Message.Seed());
-                localization.getMessage().setSleep(new Localization.Message.Sleep());
-                localization.getMessage().setSpawn(new Localization.Message.Spawn());
+                Localization defaultEnglishLocalization = new Localization(projectPath, "en_us");
+                yamlFileProcessor.initLocalization(defaultEnglishLocalization);
+
+                localization.getCommand().setClearmail(defaultEnglishLocalization.getCommand().getClearmail());
+                localization.getCommand().setMail(defaultEnglishLocalization.getCommand().getMail());
+                localization.getCommand().setTell(defaultEnglishLocalization.getCommand().getTell());
+                localization.getCommand().setTictactoe(defaultEnglishLocalization.getCommand().getTictactoe());
+                localization.getCommand().setToponline(defaultEnglishLocalization.getCommand().getToponline());
+                localization.getMessage().setAdvancement(defaultEnglishLocalization.getMessage().getAdvancement());
+                localization.getMessage().setClear(defaultEnglishLocalization.getMessage().getClear());
+                localization.getMessage().setDeath(defaultEnglishLocalization.getMessage().getDeath());
+                localization.getMessage().setDeop(defaultEnglishLocalization.getMessage().getDeop());
+                localization.getMessage().setEnchant(defaultEnglishLocalization.getMessage().getEnchant());
+                localization.getMessage().getFormat().getName_().setEntity(defaultEnglishLocalization.getMessage().getFormat().getName_().getEntity().replace("<lang:'<name>'>", "<name>"));
+                localization.getMessage().setGamemode(defaultEnglishLocalization.getMessage().getGamemode());
+                localization.getMessage().setKill(defaultEnglishLocalization.getMessage().getKill());
+                localization.getMessage().setOp(defaultEnglishLocalization.getMessage().getOp());
+                localization.getMessage().setSeed(defaultEnglishLocalization.getMessage().getSeed());
+                localization.getMessage().setSleep(defaultEnglishLocalization.getMessage().getSleep());
+                localization.getMessage().setSpawn(defaultEnglishLocalization.getMessage().getSpawn());
             }
 
             yamlFileProcessor.save(localization);
-        });
+        }
     }
 }
