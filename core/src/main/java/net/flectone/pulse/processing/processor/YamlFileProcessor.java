@@ -35,7 +35,8 @@ public class YamlFileProcessor {
             .disable(YAMLGenerator.Feature.USE_NATIVE_TYPE_ID) // fix type id like !!java.util.Hashmap
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES) // fix error on unknown properties
             .build()
-            .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL) // include only non null values
+            .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL) // show only non-null values
+            .setDefaultSetterInfo(JsonSetter.Value.forValueNulls(Nulls.SKIP)) // skip null values deserialization
             .setDefaultMergeable(Boolean.TRUE) // fix default values for null properties
             .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE); // snake case
 
