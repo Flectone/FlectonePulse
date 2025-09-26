@@ -47,7 +47,7 @@ public abstract class IntegrationModule extends AbstractModule {
             addChildren(LuckPermsModule.class);
         }
 
-        if (platformServerAdapter.hasProject("VoiceChat")) {
+        if (platformServerAdapter.hasProject("voicechat")) {
             addChildren(SimpleVoiceModule.class);
         }
 
