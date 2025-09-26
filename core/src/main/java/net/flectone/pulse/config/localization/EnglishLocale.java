@@ -77,7 +77,9 @@ public class EnglishLocale implements Locale {
         localization.command.chatsetting.disabledSelf = "<color:#ff7171><b>⁉</b> This feature is disabled via /chatsetting";
         localization.command.chatsetting.disabledOther = "<color:#ff7171><b>⁉</b> He disabled this feature via /chatsetting";
         localization.command.chatsetting.inventory = "Chat Settings";
+        localization.command.chatsetting.checkbox.enabledColor = "<color:#98FB98>";
         localization.command.chatsetting.checkbox.enabledHover = "<color:#98FB98>Display enabled";
+        localization.command.chatsetting.checkbox.disabledColor = "<color:#ff7171>";
         localization.command.chatsetting.checkbox.disabledHover = "<color:#ff7171>Display disabled";
         localization.command.chatsetting.checkbox.types = new LinkedHashMap<>() {{
             put(MessageType.AFK.name(), "<status_color>Afk");

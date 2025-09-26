@@ -77,7 +77,9 @@ public class RussianLocale implements Locale {
         localization.command.chatsetting.disabledSelf = "<color:#ff7171><b>⁉</b> Эта функция отключена с помощью /chatsetting";
         localization.command.chatsetting.disabledOther = "<color:#ff7171><b>⁉</b> Он отключил эту функцию с помощью /chatsetting";
         localization.command.chatsetting.inventory = "Настройки чата";
+        localization.command.chatsetting.checkbox.enabledColor = "<color:#98FB98>";
         localization.command.chatsetting.checkbox.enabledHover = "<color:#98FB98>Отображение включено";
+        localization.command.chatsetting.checkbox.disabledColor = "<color:#ff7171>";
         localization.command.chatsetting.checkbox.disabledHover = "<color:#ff7171>Отображение выключено";
         localization.command.chatsetting.checkbox.types = new LinkedHashMap<>() {{
             put(MessageType.AFK.name(), "<status_color>Афк");

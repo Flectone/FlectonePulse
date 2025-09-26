@@ -209,7 +209,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Advancement implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.SERVER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
 
@@ -220,7 +223,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         @AllArgsConstructor
         public static final class Command {
             private boolean enable = true;
-            private Range range = new Range(Range.Type.PLAYER);
+
+            @JsonMerge(OptBoolean.FALSE)
+            private Range range = Range.get(Range.Type.PLAYER);
+
             private Destination destination = new Destination();
         }
     }
@@ -228,7 +234,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Afk implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.SERVER);
+
         private int delay = 3000;
 
         @JsonMerge(OptBoolean.FALSE)
@@ -246,7 +255,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Attribute implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -275,7 +287,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Bed implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination(Destination.Type.ACTION_BAR);
         private Sound sound = new Sound();
     }
@@ -351,11 +366,11 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         @NoArgsConstructor
         public static final class Type {
             private boolean enable = true;
-            private boolean cancel = false;
-            private Range range = Range.get(0);
-            private int priority = 0;
-            private String trigger = "";
-            private NullReceiver nullReceiver = new NullReceiver();
+            private boolean cancel;
+            private Range range;
+            private int priority;
+            private String trigger;
+            private NullReceiver nullReceiver;
             private Destination destination = new Destination();
             private Cooldown cooldown = new Cooldown();
             private Sound sound = new Sound();
@@ -384,7 +399,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Clear implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Sound sound = new Sound();
         private Destination destination = new Destination();
     }
@@ -392,7 +410,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Clone implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Sound sound = new Sound();
         private Destination destination = new Destination();
     }
@@ -400,7 +421,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Commandblock implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Sound sound = new Sound();
         private Destination destination = new Destination();
     }
@@ -408,7 +432,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Damage implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Sound sound = new Sound();
         private Destination destination = new Destination();
     }
@@ -416,7 +443,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Death implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.SERVER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -424,7 +454,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Debugstick implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination(Destination.Type.ACTION_BAR, new Times(0, 20, 0));
         private Sound sound = new Sound();
     }
@@ -432,7 +465,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Deop implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -440,7 +476,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Dialog implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -448,7 +487,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Difficulty implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -456,7 +498,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Effect implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -464,7 +509,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Enchant implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -472,7 +520,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Execute implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -480,7 +531,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Experience implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -488,7 +542,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Fill implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -496,7 +553,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Fillbiome implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -684,7 +744,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
             @Getter
             @NoArgsConstructor
             public static final class Question {
+
+                @JsonMerge(OptBoolean.FALSE)
                 private Range range = Range.get(Range.Type.PLAYER);
+
                 private Destination destination = new Destination(Destination.Type.CHAT);
                 private Cooldown cooldown = new Cooldown();
                 private Sound sound = new Sound();
@@ -790,7 +853,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Gamemode implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -798,7 +864,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Gamerule implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -806,7 +875,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Give implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -822,7 +894,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     public static final class Join implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
         private boolean first = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.SERVER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -830,7 +905,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Kill implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Sound sound = new Sound();
         private Destination destination = new Destination();
     }
@@ -838,7 +916,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Locate implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Sound sound = new Sound();
         private Destination destination = new Destination();
     }
@@ -872,7 +953,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Op implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -880,7 +964,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Particle implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -888,7 +975,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Quit implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.SERVER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -896,7 +986,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Recipe implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -904,7 +997,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Reload implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -912,7 +1008,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Ride implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -920,7 +1019,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Rightclick implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination(Destination.Type.ACTION_BAR, new Times(0, 60, 0));
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -929,7 +1031,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Rotate implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -937,7 +1042,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Save implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -945,7 +1053,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Seed implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -953,7 +1064,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Setblock implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -973,7 +1087,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Sleep implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination(Destination.Type.ACTION_BAR);
         private Sound sound = new Sound();
     }
@@ -981,7 +1098,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class CommandSound implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -989,7 +1109,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Spawn implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -1050,7 +1173,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Stop implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -1058,7 +1184,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Summon implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -1103,7 +1232,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Teleport implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -1111,7 +1243,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Time implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -1126,7 +1261,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Weather implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
@@ -1134,7 +1272,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Worldborder implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
+
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }

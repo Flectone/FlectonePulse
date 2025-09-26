@@ -1,8 +1,11 @@
 package net.flectone.pulse.processing.processor;
 
 import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
@@ -39,7 +42,20 @@ public class YamlFileProcessor {
             .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL) // show only non-null values
             .setDefaultSetterInfo(JsonSetter.Value.forValueNulls(Nulls.SKIP)) // skip null values deserialization
             .setDefaultMergeable(Boolean.TRUE) // fix default values for null properties
-            .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE); // snake case
+            .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE) // snake case
+            .registerModule(new SimpleModule().addDeserializer(String.class, new JsonDeserializer<>() { // fix null strings
+
+                    @Override
+                    public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+                        return p.currentToken() == JsonToken.VALUE_NULL ? "" : p.getText();
+                    }
+
+                    @Override
+                    public String getNullValue(DeserializationContext ctxt) {
+                        return "";
+                    }
+
+            }));
 
     private final String header =
             """
