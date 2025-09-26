@@ -1,6 +1,9 @@
 package net.flectone.pulse.config;
 
+import com.fasterxml.jackson.annotation.JsonMerge;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.annotation.OptBoolean;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,8 +30,10 @@ public final class Permission extends YamlFile implements ModuleConfig {
 
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/")
     private Command command = new Command();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/")
     private Integration integration = new Integration();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/")
     private Message message = new Message();
 
@@ -40,88 +45,132 @@ public final class Permission extends YamlFile implements ModuleConfig {
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/afk/")
         private Afk afk = new Afk();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/anon/")
         private Anon anon = new Anon();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ball/")
         private Ball ball = new Ball();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ban/")
         private Ban ban = new Ban();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/banlist/")
         private Banlist banlist = new Banlist();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/broadcast/")
         private Broadcast broadcast = new Broadcast();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/chatcolor/")
         private Chatcolor chatcolor = new Chatcolor();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/chatsetting/")
         private Chatsetting chatsetting = new Chatsetting();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/clearchat/")
         private Clearchat clearchat = new Clearchat();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/clearmail/")
         private Clearmail clearmail = new Clearmail();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/coin/")
         private Coin coin = new Coin();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/deletemessage/")
         private Deletemessage deletemessage = new Deletemessage();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/dice/")
         private Dice dice = new Dice();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/do/")
+        @JsonProperty("do")
         private Do Do = new Do();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/flectonepulse/")
         private Flectonepulse flectonepulse = new Flectonepulse();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/geolocate/")
         private Geolocate geolocate = new Geolocate();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/helper/")
         private Helper helper = new Helper();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ignore/")
         private Ignore ignore = new Ignore();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ignorelist/")
         private Ignorelist ignorelist = new Ignorelist();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/kick/")
         private Kick kick = new Kick();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mail/")
         private Mail mail = new Mail();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/maintenance/")
         private Maintenance maintenance = new Maintenance();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/me/")
         private Me me = new Me();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mute/")
         private Mute mute = new Mute();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mutelist/")
         private Mutelist mutelist = new Mutelist();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/online/")
         private Online online = new Online();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ping/")
         private Ping ping = new Ping();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/poll/")
         private Poll poll = new Poll();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/reply/")
         private Reply reply = new Reply();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/rockpaperscissors/")
         private Rockpaperscissors rockpaperscissors = new Rockpaperscissors();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/spy/")
         private Spy spy = new Spy();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/stream/")
         private Stream stream = new Stream();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/symbol/")
         private Symbol symbol = new Symbol();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/tell/")
         private Tell tell = new Tell();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/tictactoe/")
         private Tictactoe tictactoe = new Tictactoe();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/toponline/")
         private Toponline toponline = new Toponline();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/translateto/")
         private Translateto translateto = new Translateto();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/try/")
+        @JsonProperty("try")
         private Try Try = new Try();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/unban/")
         private Unban unban = new Unban();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/unmute/")
         private Unmute unmute = new Unmute();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/unwarn/")
         private Unwarn unwarn = new Unwarn();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/warn/")
         private Warn warn = new Warn();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/warnlist/")
         private Warnlist warnlist = new Warnlist();
 
@@ -531,46 +580,68 @@ public final class Permission extends YamlFile implements ModuleConfig {
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/advancedban/")
         private Advancedban advancedban = new Advancedban();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/deepl/")
         private Deepl deepl = new Deepl();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/discord/")
         private Discord discord = new Discord();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/interactivechat/")
         private Interactivechat interactivechat = new Interactivechat();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/itemsadder/")
         private Itemsadder itemsadder = new Itemsadder();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/litebans/")
         private Litebans litebans = new Litebans();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/luckperms/")
         private Luckperms luckperms = new Luckperms();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/maintenance/")
         private Maintenance maintenance = new Maintenance();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/minimotd/")
         private MiniMOTD minimotd = new MiniMOTD();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/miniplaceholders/")
         private MiniPlaceholders miniplaceholders = new MiniPlaceholders();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/motd/")
         private MOTD motd = new MOTD();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/placeholderapi/")
         private Placeholderapi placeholderapi = new Placeholderapi();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/plasmovoice/")
         private Plasmovoice plasmovoice = new Plasmovoice();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/simplevoice/")
         private Simplevoice simplevoice = new Simplevoice();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/skinsrestorer/")
         private Skinsrestorer skinsrestorer = new Skinsrestorer();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/supervanish/")
         private Supervanish supervanish = new Supervanish();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/tab/")
+        @JsonProperty("tab")
         private TAB TAB = new TAB();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/telegram/")
         private Telegram telegram = new Telegram();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/triton/")
         private Triton triton = new Triton();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/twitch/")
         private Twitch twitch = new Twitch();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/vault/")
         private Vault vault = new Vault();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/yandex/")
         private Yandex yandex = new Yandex();
 
@@ -865,6 +936,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
             private String name = "flectonepulse.module.message.auto";
             private Type type = Type.TRUE;
 
+            @JsonMerge(OptBoolean.FALSE)
             private Map<String, PermissionEntry> types = new LinkedHashMap<>(){
                 {
                     put("announcement", new PermissionEntry("flectonepulse.module.message.auto.sound", Type.TRUE));
@@ -903,6 +975,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
             private String name = "flectonepulse.module.message.chat";
             private Permission.Type type = Permission.Type.TRUE;
 
+            @JsonMerge(OptBoolean.FALSE)
             private Map<String, Type> types = new LinkedHashMap<>(){
                 {
                     put("local", new Type("flectonepulse.module.message.chat.local", Permission.Type.TRUE,
@@ -1040,6 +1113,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
 
             private PermissionEntry legacyColors = new PermissionEntry("flectonepulse.module.message.format.legacy_color", Type.OP);
 
+            @JsonMerge(OptBoolean.FALSE)
             private Map<AdventureTag, PermissionEntry> adventureTags = new LinkedHashMap<>(){
                 {
                     put(AdventureTag.HOVER, new PermissionEntry("flectonepulse.module.message.format.hover", Type.OP));
@@ -1093,6 +1167,8 @@ public final class Permission extends YamlFile implements ModuleConfig {
             public static final class FColor implements SubFormatMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.format.fcolor";
                 private Type type = Type.TRUE;
+
+                @JsonMerge(OptBoolean.FALSE)
                 private Map<net.flectone.pulse.model.FColor.Type, PermissionEntry> colors = new LinkedHashMap<>(){
                     {
                         put(net.flectone.pulse.model.FColor.Type.OUT, new PermissionEntry("flectonepulse.module.message.format.fcolor.out", Type.TRUE));
@@ -1192,6 +1268,8 @@ public final class Permission extends YamlFile implements ModuleConfig {
             public static final class QuestionAnswer implements SubFormatMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.format.questionanswer";
                 private Type type = Type.TRUE;
+
+                @JsonMerge(OptBoolean.FALSE)
                 private Map<String, Question> questions = new LinkedHashMap<>(){
                     {
                         put("server", new Question(
@@ -1222,6 +1300,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
                 private String name = "flectonepulse.module.message.format.replacement";
                 private Type type = Type.TRUE;
 
+                @JsonMerge(OptBoolean.FALSE)
                 private Map<String, PermissionEntry> values = new LinkedHashMap<>() {
                     {
                         // emoticons

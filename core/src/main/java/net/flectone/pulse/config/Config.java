@@ -1,6 +1,8 @@
 package net.flectone.pulse.config;
 
+import com.fasterxml.jackson.annotation.JsonMerge;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.annotation.OptBoolean;
 import lombok.Getter;
 import lombok.Setter;
 import net.flectone.pulse.BuildConfig;
@@ -38,12 +40,15 @@ public final class Config extends YamlFile {
 
     private boolean velocity = false;
 
+    @JsonMerge(OptBoolean.FALSE)
     private Set<String> clusters = new HashSet<>();
 
+    @JsonMerge(OptBoolean.FALSE)
     private Set<String> fabricDisabledCommands = new HashSet<>(Set.of(
             "tell", "msg", "w", "me", "ban", "kick", "pardon", "banlist"
     ));
 
+    @JsonMerge(OptBoolean.FALSE)
     private List<String> logFilter = new ArrayList<>(List.of(
             "Paper Async Command Builder",
             "Caught previously unhandled exception :",

@@ -1,6 +1,8 @@
 package net.flectone.pulse.config;
 
+import com.fasterxml.jackson.annotation.JsonMerge;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.annotation.OptBoolean;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import lombok.AllArgsConstructor;
@@ -29,120 +31,178 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
 
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/advancement/")
     private Advancement advancement = new Advancement();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/afk/")
     private Afk afk = new Afk();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/anvil/")
     private Anvil anvil = new Anvil();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/attribute/")
     private Attribute attribute = new Attribute();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/auto/")
     private Auto auto = new Auto();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/bed/")
     private Bed bed = new Bed();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/book/")
     private Book book = new Book();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/brand/")
     private Brand brand = new Brand();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/bubble/")
     private Bubble bubble = new Bubble();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/chat/")
     private Chat chat = new Chat();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/clear/")
     private Clear clear = new Clear();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/clone/")
     private Clone clone = new Clone();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/commandblock/")
     private Commandblock commandblock = new Commandblock();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/damage/")
     private Damage damage = new Damage();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/death/")
     private Death death = new Death();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/debugstick/")
     private Debugstick debugstick = new Debugstick();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/deop/")
     private Deop deop = new Deop();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/dialog/")
     private Dialog dialog = new Dialog();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/difficulty/")
     private Difficulty difficulty = new Difficulty();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/effect/")
     private Effect effect = new Effect();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/enchant/")
     private Enchant enchant = new Enchant();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/execute/")
     private Execute execute = new Execute();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/experience/")
     private Experience experience = new Experience();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/fill/")
     private Fill fill = new Fill();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/fillbiome/")
     private Fillbiome fillbiome = new Fillbiome();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/")
     private Format format = new Format();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/gamemode/")
     private Gamemode gamemode = new Gamemode();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/gamerule/")
     private Gamerule gamerule = new Gamerule();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/give/")
     private Give give = new Give();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/greeting/")
     private Greeting greeting = new Greeting();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/join/")
     private Join join = new Join();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/kill/")
     private Kill kill = new Kill();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/locate/")
     private Locate locate = new Locate();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective/")
     private Objective objective = new Objective();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/op/")
     private Op op = new Op();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/particle/")
     private Particle particle = new Particle();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/quit/")
     private Quit quit = new Quit();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/recipe/")
     private Recipe recipe = new Recipe();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/reload/")
     private Reload reload = new Reload();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/ride/")
     private Ride ride = new Ride();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rightclick/")
     private Rightclick rightclick = new Rightclick();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rotate/")
     private Rotate rotate = new Rotate();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/save/")
     private Save save = new Save();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/seed/")
     private Seed seed = new Seed();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/setblock/")
     private Setblock setblock = new Setblock();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sidebar/")
     private Sidebar sidebar = new Sidebar();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sign/")
     private Sign sign = new Sign();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sleep/")
     private Sleep sleep = new Sleep();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sound/")
     private CommandSound sound = new CommandSound();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/spawn/")
     private Spawn spawn = new Spawn();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status/")
     private Status status = new Status();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/stop/")
     private Stop stop = new Stop();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/summon/")
     private Summon summon = new Summon();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab/")
     private Tab tab = new Tab();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/teleport/")
     private Teleport teleport = new Teleport();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/time/")
     private Time time = new Time();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/update/")
     private Update update = new Update();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/weather/")
     private Weather weather = new Weather();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/worldborder/")
     private Worldborder worldborder = new Worldborder();
 
@@ -170,7 +230,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         private boolean enable = true;
         private Range range = Range.get(Range.Type.SERVER);
         private int delay = 3000;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> ignore = new ArrayList<>(List.of("afk"));
+
         private Destination destination = new Destination();
         private Ticker ticker = new Ticker(true, 20);
     }
@@ -191,6 +254,8 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Auto implements SubMessageConfig, Config.IEnable {
         private boolean enable = false;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Map<String, Type> types = new LinkedHashMap<>(){
             {
                 put("announcement", new Type());
@@ -267,6 +332,8 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         private boolean enable = true;
         private Mode mode = Mode.BUKKIT;
         private Event.Priority priority = Event.Priority.NORMAL;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Map<String, Type> types = new LinkedHashMap<>(){
             {
                 put("local", new Type("", true, true, Range.get(100), 0));
@@ -440,6 +507,7 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         private boolean enable = true;
         private boolean convertLegacyColor = true;
 
+        @JsonMerge(OptBoolean.FALSE)
         private List<AdventureTag> adventureTags = new ArrayList<>(List.of(AdventureTag.values()));
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/fcolor/")
@@ -447,20 +515,28 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/fixation/")
         private Fixation fixation = new Fixation();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/mention/")
         private Mention mention = new Mention();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/")
         private Moderation moderation = new Moderation();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/name_/")
         private Name name_ = new Name();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/questionanswer/")
         private QuestionAnswer questionAnswer = new QuestionAnswer();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/replacement/")
         private Replacement replacement = new Replacement();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/scoreboard/")
         private Scoreboard scoreboard = new Scoreboard();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/translate/")
         private Translate translate = new Translate();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/world/")
         private World world = new World();
 
@@ -478,6 +554,8 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         @Getter
         public static final class FColor implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
+
+            @JsonMerge(OptBoolean.FALSE)
             private Map<Integer, String> defaultColors = new LinkedHashMap<>(){
                 {
                     put(1, "<gradient:#A6D8FF:#8CC8FF>");
@@ -493,6 +571,8 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
             private boolean enable = false;
             private boolean endDot = false;
             private boolean firstLetterUppercase = false;
+
+            @JsonMerge(OptBoolean.FALSE)
             private List<String> nonDotSymbols = new LinkedList<>() {
                 {
                     push(".");
@@ -522,12 +602,16 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
 
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/caps/")
             private Caps caps = new Caps();
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/delete/")
             private Delete delete = new Delete();
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/newbie/")
             private Newbie newbie = new Newbie();
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/flood/")
             private Flood flood = new Flood();
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/swear/")
             private Swear swear = new Swear();
 
@@ -567,7 +651,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
             public static final class Swear implements SubModerationFormatMessageConfig, Config.IEnable {
                 private boolean enable = false;
 
+                @JsonMerge(OptBoolean.FALSE)
                 private List<String> ignore = new ArrayList<>(List.of("тебя", "тебе"));
+
+                @JsonMerge(OptBoolean.FALSE)
                 private List<String> trigger = new ArrayList<>(List.of(
                         "((у|[нз]а|(хитро|не)?вз?[ыьъ]|с[ьъ]|(и|ра)[зс]ъ?|(о[тб]|под)[ьъ]?|(.\\B)+?[оаеи])?-?([её]б(?!о[рй])|и[пб][ае][тц]).*?|(н[иеа]|([дп]|верт)о|ра[зс]|з?а|с(ме)?|о(т|дно)?|апч)?-?ху([яйиеёю]|ли(?!ган)).*?|(в[зы]|(три|два|четыре)жды|(н|сук)а)?-?бл(я(?!(х|ш[кн]|мб)[ауеыио]).*?|[еэ][дт]ь?)|(ра[сз]|[зн]а|[со]|вы?|п(ере|р[оие]|од)|и[зс]ъ?|[ао]т)?п[иеё]зд.*?|(за)?п[ие]д[аое]?р([оа]м|(ас)?(ну.*?|и(ли)?[нщктл]ь?)?|(о(ч[еи])?|ас)?к(ой)|юг)[ауеы]?|манд([ауеыи](л(и[сзщ])?[ауеиы])?|ой|[ао]вошь?(е?к[ауе])?|юк(ов|[ауи])?)|муд([яаио].*?|е?н([ьюия]|ей))|мля([тд]ь)?|лять|([нз]а|по|пи)х|м[ао]л[ао]фь([яию]|[еёо]й))(?=[\\s,.:;\"']|$)",
                         "(([уyu]|[нзnz3][аa]|(хитро|не)?[вvwb][зz3]?[ыьъi]|[сsc][ьъ']|(и|[рpr][аa4])[зсzs]ъ?|([оo0][тбtb6]|[пp][оo0][дd9])[ьъ']?|(.\\B)+?[оаеиeo])?-?([еёe][бb6](?!о[рй])|и[пб][ае][тц]).*?|([нn][иеаaie]|([дпdp]|[вv][еe3][рpr][тt])[оo0]|[рpr][аa][зсzc3]|[з3z]?[аa]|с(ме)?|[оo0]([тt]|дно)?|апч)?-?[хxh][уuy]([яйиеёюuie]|ли(?!ган)).*?|([вvw][зы3z]|(три|два|четыре)жды|(н|[сc][уuy][кk])[аa])?-?[бb6][лl]([яy](?!(х|ш[кн]|мб)[ауеыио]).*?|[еэe][дтdt][ь']?)|([рp][аa][сзc3z]|[знzn][аa]|[соsc]|[вv][ыi]?|[пp]([еe][рpr][еe]|[рrp][оиioеe]|[оo0][дd])|и[зс]ъ?|[аоao][тt])?[пpn][иеёieu][зz3][дd9].*?|([зz3][аa])?[пp][иеieu][дd][аоеaoe]?[рrp](ну.*?|[оаoa][мm]|([аa][сcs])?([иiu]([лl][иiu])?[нщктлtlsn]ь?)?|([оo](ч[еиei])?|[аa][сcs])?[кk]([оo]й)?|[юu][гg])[ауеыauyei]?|[мm][аa][нnh][дd]([ауеыayueiи]([лl]([иi][сзc3щ])?[ауеыauyei])?|[оo][йi]|[аоao][вvwb][оo](ш|sh)[ь']?([e]?[кk][ауеayue])?|юк(ов|[ауи])?)|[мm][уuy][дd6]([яyаиоaiuo0].*?|[еe]?[нhn]([ьюия'uiya]|ей))|мля([тд]ь)?|лять|([нз]а|по|пи)х|м[ао]л[ао]фь([яию]|[её]й))(?=[\\s,.:;\"']|$)")
@@ -585,6 +672,8 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         @Getter
         public static final class QuestionAnswer implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = false;
+
+            @JsonMerge(OptBoolean.FALSE)
             private Map<String, Question> questions = new LinkedHashMap<>(){
                 {
                     put("server", new Question("(?i)\\b(what\\s+is\\s+this\\s+server|what\\'?s\\s+this\\s+server|what\\s+server\\s+is\\s+this)\\b"));
@@ -614,6 +703,7 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
             private static final String BOUNDARY = "(?<!\\\\{2,})(?<=\\s|^)(%s)(?=\\s|$|\\p{Punct})";
             private static final String FORMAT_TEMPLATE = "(?<!\\\\{2,})(?<=\\s|^)%s([^\\n]*?)%s(?=\\s|$|\\p{Punct})";
 
+            @JsonMerge(OptBoolean.FALSE)
             private Map<String, String> triggers = new LinkedHashMap<>() {
                 {
                     // emoticons
@@ -679,6 +769,8 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
             private boolean enable = true;
             private WorldModule.Mode mode = WorldModule.Mode.TYPE;
             private Ticker ticker = new Ticker(false, 100);
+
+            @JsonMerge(OptBoolean.FALSE)
             private Map<String, String> values = new LinkedHashMap<>(){
                 {
                     put("normal", "<color:#98FB98>");
@@ -909,10 +1001,13 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status/icon/")
         private Icon icon = new Icon();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status/motd/")
         private MOTD motd = new MOTD();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status/players/")
         private Players players = new Players();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status/version/")
         private Version version = new Version();
 
@@ -926,6 +1021,8 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         public static final class Icon implements SubStatusMessageConfig, Config.IEnable {
             private boolean enable = false;
             private boolean random = true;
+
+            @JsonMerge(OptBoolean.FALSE)
             private List<String> values = new ArrayList<>(){
                 {
                     add("server-icon-1.png");
@@ -973,8 +1070,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab/header/")
         private Header header = new Header();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab/footer/")
         private Footer footer = new Footer();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab/playerlistname/")
         private Playerlistname playerlistname = new Playerlistname();
 

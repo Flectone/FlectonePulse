@@ -1,6 +1,9 @@
 package net.flectone.pulse.config;
 
+import com.fasterxml.jackson.annotation.JsonMerge;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.annotation.OptBoolean;
 import lombok.Getter;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Ticker;
@@ -27,46 +30,68 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
 
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/advancedban/")
     private Advancedban advancedban = new Advancedban();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/deepl/")
     private Deepl deepl = new Deepl();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/discord/")
     private Discord discord = new Discord();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/interactivechat/")
     private Interactivechat interactivechat = new Interactivechat();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/itemsadder/")
     private Itemsadder itemsadder = new Itemsadder();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/litebans/")
     private Litebans litebans = new Litebans();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/luckperms/")
     private Luckperms luckperms = new Luckperms();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/maintenance/")
     private Maintenance maintenance = new Maintenance();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/minimotd/")
     private MiniMOTD minimotd = new MiniMOTD();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/miniplaceholders/")
     private MiniPlaceholders miniplaceholders = new MiniPlaceholders();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/motd/")
     private MOTD motd = new MOTD();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/placeholderapi/")
     private Placeholderapi placeholderapi = new Placeholderapi();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/plasmovoice/")
     private Plasmovoice plasmovoice = new Plasmovoice();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/simplevoice/")
     private Simplevoice simplevoice = new Simplevoice();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/skinsrestorer/")
     private Skinsrestorer skinsrestorer = new Skinsrestorer();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/supervanish/")
     private Supervanish supervanish = new Supervanish();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/tab/")
+    @JsonProperty("tab")
     private TAB TAB = new TAB();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/telegram/")
     private Telegram telegram = new Telegram();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/triton/")
     private Triton triton = new Triton();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/twitch/")
     private Twitch twitch = new Twitch();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/vault/")
     private Vault vault = new Vault();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/integration/yandex/")
     private Yandex yandex = new Yandex();
 
@@ -91,12 +116,15 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
         private String token = "";
         private Presence presence = new Presence();
         private ChannelInfo channelInfo = new ChannelInfo();
+
+        @JsonMerge(OptBoolean.FALSE)
         private Map<String, String> messageChannel = new LinkedHashMap<>(){
             {
                 put(MessageType.FROM_DISCORD_TO_MINECRAFT.name(), "");
                 put("CHAT_GLOBAL", "");
             }
         };
+
         private Destination destination = new Destination();
 
         @Getter
@@ -208,12 +236,15 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
     public static final class Telegram implements SubIntegrationConfig, Config.IEnable {
         private boolean enable = false;
         private String token = "";
+
+        @JsonMerge(OptBoolean.FALSE)
         private Map<String, List<String>> messageChannel = new LinkedHashMap<>(){
             {
                 put(MessageType.FROM_TELEGRAM_TO_MINECRAFT.name(), List.of("123456"));
                 put("CHAT_GLOBAL", List.of("123456"));
             }
         };
+
         private Destination destination = new Destination();
     }
 
@@ -227,15 +258,20 @@ public final class Integration extends YamlFile implements ModuleConfig.Integrat
         private boolean enable = false;
         private String clientID = "";
         private String token = "";
+
+        @JsonMerge(OptBoolean.FALSE)
         private Map<String, List<String>> messageChannel = new LinkedHashMap<>(){
             {
                 put(MessageType.FROM_TWITCH_TO_MINECRAFT.name(), List.of("faseri4ka"));
                 put("CHAT_GLOBAL", List.of("faseri4ka"));
             }
         };
+
+        @JsonMerge(OptBoolean.FALSE)
         private Map<String, List<String>> followChannel = new LinkedHashMap<>(Map.of(
                 "faseri4ka", List.of("stream start https://twitch.tv/faseri4ka")
         ));
+
         private Destination destination = new Destination();
     }
 

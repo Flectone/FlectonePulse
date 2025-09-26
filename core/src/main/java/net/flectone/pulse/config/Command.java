@@ -1,6 +1,9 @@
 package net.flectone.pulse.config;
 
+import com.fasterxml.jackson.annotation.JsonMerge;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.annotation.OptBoolean;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import lombok.AllArgsConstructor;
@@ -29,88 +32,132 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
 
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/afk/")
     private Afk afk = new Afk();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/anon/")
     private Anon anon = new Anon();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ball/")
     private Ball ball = new Ball();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ban/")
     private Ban ban = new Ban();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/banlist/")
     private Banlist banlist = new Banlist();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/broadcast/")
     private Broadcast broadcast = new Broadcast();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/chatcolor/")
     private Chatcolor chatcolor = new Chatcolor();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/chatsetting/")
     private Chatsetting chatsetting = new Chatsetting();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/clearchat/")
     private Clearchat clearchat = new Clearchat();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/clearmail/")
     private Clearmail clearmail = new Clearmail();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/coin/")
     private Coin coin = new Coin();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/deletemessage/")
     private Deletemessage deletemessage = new Deletemessage();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/dice/")
     private Dice dice = new Dice();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/do/")
+    @JsonProperty("do")
     private Do Do = new Do();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/flectonepulse/")
     private Flectonepulse flectonepulse = new Flectonepulse();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/geolocate/")
     private Geolocate geolocate = new Geolocate();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/helper/")
     private Helper helper = new Helper();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ignore/")
     private Ignore ignore = new Ignore();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ignorelist/")
     private Ignorelist ignorelist = new Ignorelist();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/kick/")
     private Kick kick = new Kick();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mail/")
     private Mail mail = new Mail();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/maintenance/")
     private Maintenance maintenance = new Maintenance();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/me/")
     private Me me = new Me();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mute/")
     private Mute mute = new Mute();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/mutelist/")
     private Mutelist mutelist = new Mutelist();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/online/")
     private Online online = new Online();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/ping/")
     private Ping ping = new Ping();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/poll/")
     private Poll poll = new Poll();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/reply/")
     private Reply reply = new Reply();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/rockpaperscissors/")
     private Rockpaperscissors rockpaperscissors = new Rockpaperscissors();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/spy/")
     private Spy spy = new Spy();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/stream/")
     private Stream stream = new Stream();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/symbol/")
     private Symbol symbol = new Symbol();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/tell/")
     private Tell tell = new Tell();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/tictactoe/")
     private Tictactoe tictactoe = new Tictactoe();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/toponline/")
     private Toponline toponline = new Toponline();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/translateto/")
     private Translateto translateto = new Translateto();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/try/")
+    @JsonProperty("try")
     private Try Try = new Try();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/unban/")
     private Unban unban = new Unban();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/unmute/")
     private Unmute unmute = new Unmute();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/unwarn/")
     private Unwarn unwarn = new Unwarn();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/warn/")
     private Warn warn = new Warn();
+
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/command/warnlist/")
     private Warnlist warnlist = new Warnlist();
 
@@ -118,7 +165,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Anon implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("anon"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -127,7 +177,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @Getter
     public static final class Afk implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("afk"));
+
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -136,7 +189,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Ball implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("ball"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -148,7 +204,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean suggestOfflinePlayers = true;
         private boolean showConnectionAttempts = true;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("ban", "tempban"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -158,7 +217,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Banlist implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int perPage = 4;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("banlist"));
+
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -167,7 +229,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Broadcast implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("broadcast"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -176,7 +241,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @Getter
     public static final class Chatcolor implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("chatcolor"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -185,7 +253,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @Getter
     public static final class Deletemessage implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("deletemessage"));
+
         private Destination destination = new Destination(Destination.Type.ACTION_BAR);
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -195,6 +266,8 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Chatsetting implements SubCommandConfig, ICommandFile {
 
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("chatsetting"));
 
         private Modern modern = new Modern();
@@ -213,6 +286,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
             private String disabledMaterial = "RED_DYE";
             private String enabledMaterial = "LIME_DYE";
 
+            @JsonMerge(OptBoolean.FALSE)
             private Map<String, Integer> types = new LinkedHashMap<>() {
                 {
                     put(MessageType.AFK.name(), 9);
@@ -297,6 +371,8 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
             public static final class Chat {
 
                 private int slot;
+
+                @JsonMerge(OptBoolean.FALSE)
                 private List<Type> types = new LinkedList<>();
 
                 @Getter
@@ -317,6 +393,8 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
             public static final class Color {
 
                 private int slot;
+
+                @JsonMerge(OptBoolean.FALSE)
                 private List<Type> types;
 
                 @Getter
@@ -326,6 +404,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
 
                     private String name;
                     private String material;
+                    @JsonMerge(OptBoolean.FALSE)
                     private LinkedHashMap<Integer, String> colors;
 
                 }
@@ -341,6 +420,8 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         @AllArgsConstructor
         public static final class SettingItem {
             private int slot = -1;
+
+            @JsonMerge(OptBoolean.FALSE)
             private List<String> materials = new ArrayList<>();
         }
     }
@@ -348,7 +429,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @Getter
     public static final class Clearchat implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("clearchat"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -357,7 +441,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @Getter
     public static final class Clearmail implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("clearmail"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -368,7 +455,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean enable = true;
         private boolean draw = true;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("coin"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -380,7 +470,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private Range range = Range.get(Range.Type.PROXY);
         private int min = 1;
         private int max = 6;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("dice"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -390,7 +483,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Do implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("do"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -399,12 +495,15 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @Getter
     public static final class Flectonepulse implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(){
             {
                 add("flectonepulse");
                 add("fp");
             }
         };
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -414,7 +513,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Geolocate implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("geolocate"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -425,7 +527,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean enable = true;
         private boolean nullHelper = true;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("helper"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -435,7 +540,11 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Ignore implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("ignore"));
+
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -445,7 +554,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Ignorelist implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int perPage = 4;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("ignorelist"));
+
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -454,7 +566,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Kick implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("kick"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -463,7 +578,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @Getter
     public static final class Mail implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("mail"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -474,7 +592,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean enable = true;
         @Setter
         public boolean turnedOn;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("maintenance"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -484,7 +605,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Me implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("me"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -495,7 +619,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("mute"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -505,7 +632,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Mutelist implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int perPage = 4;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("mutelist"));
+
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -515,7 +645,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("online"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -524,7 +657,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @Getter
     public static final class Ping implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("ping"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -537,7 +673,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private Range range = Range.get(Range.Type.PROXY);
         @Setter
         private int lastId = 1;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("poll"));
+
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -545,12 +684,15 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @Getter
     public static final class Reply implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(){
             {
                 add("reply");
                 add("r");
             }
         };
+
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -558,12 +700,16 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @Getter
     public static final class Rockpaperscissors implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(){
             {
                 add("rockpaperscissors");
                 add("rps");
             }
         };
+
+        @JsonMerge(OptBoolean.FALSE)
         private Map<String, List<String>> strategies = new LinkedHashMap<>(){
             {
                 put("rock", new ArrayList<>(List.of("scissors")));
@@ -571,6 +717,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
                 put("scissors", new ArrayList<>(List.of("paper")));
             }
         };
+
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -580,12 +727,15 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean enable = true;
         private Range range = Range.get(Range.Type.PROXY);
         private List<String> aliases = new ArrayList<>(List.of("spy"));
+
+        @JsonMerge(OptBoolean.FALSE)
         private Map<String, List<String>> categories = new LinkedHashMap<>(){
             {
                 put("command", List.of("tell", "anon"));
                 put("action", List.of("anvil", "book", "sign", "local"));
             }
         };
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -595,7 +745,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Stream implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("stream"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound(true, 1f, 1f, SoundCategory.BLOCK.name(), Sounds.BLOCK_NOTE_BLOCK_BELL.getName().toString());
@@ -604,7 +757,11 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @Getter
     public static final class Symbol implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("symbol"));
+
+        @JsonMerge(OptBoolean.FALSE)
         private Map<String, String> categories = new LinkedHashMap<>(){
             {
                 put("activities", "⚽ ⚾ ⛷ ⛸ ⛹ ⛺ \uD83C\uDF98 \uD83C\uDF99 \uD83C\uDFA4 \uD83C\uDF9E \uD83C\uDF9F \uD83C\uDFA0 \uD83C\uDFA1 \uD83C\uDFA2 \uD83C\uDFA5 \uD83C\uDFA6 \uD83C\uDFA7 \uD83C\uDFA8 \uD83C\uDFA9 \uD83C\uDFAA \uD83C\uDFAB \uD83C\uDFAC \uD83C\uDFAD \uD83C\uDFAE \uD83D\uDD79 \uD83C\uDFAF \uD83C\uDFB0 \uD83C\uDFB1 \uD83C\uDFB2 \uD83C\uDFB3 \uD83C\uDFB4 \uD83C\uDFBD \uD83C\uDFBE \uD83C\uDFBF \uD83C\uDFC0 \uD83C\uDFC1 \uD83C\uDFC2 \uD83C\uDFC3 \uD83C\uDFC4 \uD83C\uDFC7 \uD83C\uDFC8 \uD83C\uDFC9 \uD83C\uDFCA \uD83C\uDFCB \uD83C\uDFCC \uD83C\uDFCD \uD83C\uDFCE \uD83C\uDFCF \uD83C\uDFD0 \uD83C\uDFD1 \uD83C\uDFD2 \uD83C\uDFD3 \uD83E\uDD4A \uD83E\uDD4B \uD83E\uDD4C \uD83E\uDD4D \uD83E\uDD4E \uD83E\uDD4F \uD83E\uDE80 \uD83E\uDE81 \uD83E\uDE82 \uD83E\uDE83 \uD83E\uDE84 \uD83E\uDE85 \uD83E\uDE86 \uD83E\uDD3A \uD83E\uDD3B \uD83E\uDD3C \uD83E\uDD3D \uD83E\uDD3E \uD83E\uDD3F \uD83E\uDDD7 \uD83E\uDDD8 \uD83E\uDD33 \uD83E\uDD37 \uD83E\uDD38 \uD83E\uDD39 \uD83C\uDFD5 \uD83C\uDFD6 \uD83C\uDFF8 \uD83C\uDFF9 \uD83D\uDC92 \uD83C\uDF80 \uD83C\uDF81 \uD83E\uDDE7 \uD83C\uDF82 \uD83C\uDF83 \uD83C\uDF84 \uD83C\uDF85 \uD83C\uDF86 \uD83C\uDF87 \uD83C\uDF88 \uD83C\uDF89 \uD83C\uDF8A \uD83C\uDF8B \uD83C\uDF8C \uD83C\uDF8D \uD83C\uDF8E \uD83C\uDF8F \uD83C\uDF90 \uD83C\uDF91");
@@ -626,6 +783,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
                 put("transport", "⛟ ⛴ ⛵ ✈ ⛩ ⛪ ⛫ ⛰ ⛱ ⛲ ⛳ ⛽ \uD83D\uDDFB \uD83D\uDDFC \uD83D\uDDFD \uD83D\uDDFE \uD83D\uDDFF \uD83D\uDE80 \uD83D\uDE81 \uD83D\uDE82 \uD83D\uDE83 \uD83D\uDE84 \uD83D\uDE85 \uD83D\uDE86 \uD83D\uDE87 \uD83D\uDE88 \uD83D\uDE89 \uD83D\uDE8A \uD83D\uDEF2 \uD83D\uDE8B \uD83D\uDE8C \uD83D\uDE8D \uD83D\uDE8E \uD83D\uDE8F \uD83D\uDE90 \uD83D\uDE91 \uD83D\uDE92 \uD83D\uDEF1 \uD83D\uDE93 \uD83D\uDE94 \uD83D\uDE95 \uD83D\uDE96 \uD83D\uDE97 \uD83D\uDEFB \uD83D\uDE98 \uD83D\uDE99 \uD83D\uDE9A \uD83D\uDE9B \uD83D\uDE9C \uD83D\uDE9D \uD83D\uDE9E \uD83D\uDE9F \uD83D\uDEA0 \uD83D\uDEA1 \uD83D\uDEA2 \uD83D\uDEF3 \uD83D\uDEA3 \uD83D\uDEA4 \uD83D\uDEF6 \uD83D\uDEE5 \uD83D\uDEE6 \uD83D\uDEE7 \uD83D\uDEE8 \uD83D\uDEE9 \uD83D\uDEEA \uD83D\uDEEB \uD83D\uDEEC \uD83D\uDEF0 \uD83D\uDEF4 \uD83D\uDEF5 \uD83D\uDEF9 \uD83D\uDEFC \uD83D\uDEFA \uD83D\uDEF7 \uD83E\uDDBC \uD83E\uDDBD \uD83D\uDEF8 \uD83D\uDED2 \uD83D\uDEA5 \uD83D\uDEA6 \uD83D\uDEA7 \uD83D\uDEA8 \uD83C\uDFD7 \uD83C\uDFD8 \uD83C\uDFD9 \uD83C\uDFDA \uD83C\uDFDB \uD83C\uDFDF \uD83C\uDFE0 \uD83C\uDFE1 \uD83C\uDFE2 \uD83C\uDFE3 \uD83C\uDFE4 \uD83C\uDFE5 \uD83C\uDFE6 \uD83C\uDFE7 \uD83C\uDFE8 \uD83C\uDFE9 \uD83C\uDFEA \uD83C\uDFEB \uD83C\uDFEC \uD83C\uDFED \uD83C\uDFEE \uD83C\uDFEF \uD83C\uDFF0 \uD83D\uDD4B \uD83D\uDD4C \uD83D\uDD4D \uD83D\uDED0 \uD83D\uDED3 \uD83D\uDED4 \uD83D\uDED5 \uD83D\uDED6 \uD83D\uDEB2 \uD83D\uDEB3 \uD83D\uDEB4 \uD83D\uDEB5 \uD83D\uDEB6 \uD83D\uDEB7 \uD83D\uDEB8 \uD83D\uDEAA \uD83E\uDE91 \uD83E\uDE9F \uD83E\uDE9C \uD83E\uDE9D \uD83E\uDE9E \uD83D\uDEBB \uD83D\uDEBD \uD83D\uDEBE \uD83D\uDEBF \uD83D\uDEC0 \uD83D\uDEC1 \uD83D\uDEC2 \uD83D\uDEC3 \uD83D\uDEC4 \uD83D\uDEC5 \uD83D\uDECB \uD83D\uDECC \uD83D\uDECF \uD83D\uDED7 \uD83D\uDEDD \uD83D\uDEDE \uD83D\uDEDF \uD83D\uDEE3 \uD83D\uDEE4");
             }
         };
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -636,6 +794,8 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean enable = true;
         private boolean suggestOfflinePlayers = false;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(){
             {
                 add("tell");
@@ -646,6 +806,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
                 add("m");
             }
         };
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -654,12 +815,15 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     @Getter
     public static final class Tictactoe implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(){
             {
                 add("tictactoe");
                 add("ttt");
             }
         };
+
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -668,7 +832,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Toponline implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int perPage = 10;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("toponline"));
+
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
@@ -678,8 +845,13 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean enable = true;
         private Range range = Range.get(Range.Type.PLAYER);
         private Service service = Service.GOOGLE;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("translateto"));
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> languages = new ArrayList<>(List.of("en_us", "ru_ru"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -698,7 +870,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private int min = 0;
         private int max = 100;
         private int good = 50;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("try"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -708,12 +883,15 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Unban implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(){
             {
                 add("unban");
                 add("pardon");
             }
         };
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -723,7 +901,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Unmute implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("unmute"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -733,7 +914,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Unwarn implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("unwarn"));
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -744,7 +928,11 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("warn"));
+
+        @JsonMerge(OptBoolean.FALSE)
         private Map<Integer, String> actions = new LinkedHashMap<>(){
             {
                 put(2, "mute <target> 1h");
@@ -752,6 +940,7 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
                 put(5, "ban <target>");
             }
         };
+
         private Destination destination = new Destination();
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
@@ -761,7 +950,10 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Warnlist implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private int perPage = 4;
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("warnlist"));
+
         private Cooldown cooldown = new Cooldown();
         private Sound sound = new Sound();
     }
