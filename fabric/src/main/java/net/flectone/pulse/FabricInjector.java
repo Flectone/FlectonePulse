@@ -6,9 +6,12 @@ import com.google.inject.Singleton;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
 import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
+import lombok.SneakyThrows;
 import net.fabricmc.loader.api.FabricLoader;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
+import net.flectone.pulse.config.localization.EnglishLocale;
+import net.flectone.pulse.config.localization.RussianLocale;
 import net.flectone.pulse.processing.processor.YamlFileProcessor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.execution.scheduler.FabricTaskScheduler;
@@ -52,6 +55,7 @@ public class FabricInjector extends AbstractModule {
         this.packetProvider = new PacketProvider();
     }
 
+    @SneakyThrows
     @Override
     protected void configure() {
         bind(PacketProvider.class).toInstance(packetProvider);
@@ -60,7 +64,13 @@ public class FabricInjector extends AbstractModule {
         Path projectPath = FabricLoader.getInstance().getConfigDir().resolve(BuildConfig.PROJECT_MOD_ID);
         bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
 
-        YamlFileProcessor yamlFileProcessor = new YamlFileProcessor(fLogger);
+        EnglishLocale englishLocale = new EnglishLocale();
+        bind(EnglishLocale.class).toInstance(englishLocale);
+
+        RussianLocale russianLocale = new RussianLocale();
+        bind(RussianLocale.class).toInstance(russianLocale);
+
+        YamlFileProcessor yamlFileProcessor = new YamlFileProcessor(englishLocale, russianLocale);
         bind(YamlFileProcessor.class).toInstance(yamlFileProcessor);
 
         // Initialize and bind FileManager

@@ -6,8 +6,11 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
+import lombok.SneakyThrows;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
+import net.flectone.pulse.config.localization.EnglishLocale;
+import net.flectone.pulse.config.localization.RussianLocale;
 import net.flectone.pulse.processing.processor.YamlFileProcessor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.execution.scheduler.BukkitTaskScheduler;
@@ -72,6 +75,7 @@ public class BukkitInjector extends AbstractModule {
         this.fLogger = fLogger;
     }
 
+    @SneakyThrows
     @Override
     protected void configure() {
         ReflectionResolver reflectionResolver = new ReflectionResolver(libraryResolver);
@@ -81,7 +85,13 @@ public class BukkitInjector extends AbstractModule {
         Path projectPath = plugin.getDataFolder().toPath();
         bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
 
-        YamlFileProcessor yamlFileProcessor = new YamlFileProcessor(fLogger);
+        EnglishLocale englishLocale = new EnglishLocale();
+        bind(EnglishLocale.class).toInstance(englishLocale);
+
+        RussianLocale russianLocale = new RussianLocale();
+        bind(RussianLocale.class).toInstance(russianLocale);
+
+        YamlFileProcessor yamlFileProcessor = new YamlFileProcessor(englishLocale, russianLocale);
         bind(YamlFileProcessor.class).toInstance(yamlFileProcessor);
 
         // Initialize and bind FileManager
