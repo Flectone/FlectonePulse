@@ -726,6 +726,8 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Spy implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
         private Range range = Range.get(Range.Type.PROXY);
+
+        @JsonMerge(OptBoolean.FALSE)
         private List<String> aliases = new ArrayList<>(List.of("spy"));
 
         @JsonMerge(OptBoolean.FALSE)
