@@ -177,7 +177,7 @@ function updateLinks() {
             const preferredLanguages = navigator.languages;
             const hasRussian = preferredLanguages.some(lang => lang.startsWith('ru'));
             if (!hasRussian) {
-                url = url.replace("flectone.net/", "flectone.net/en/")
+                url = url.replace("flectone.net/pulse/", "flectone.net/en/pulse/")
             }
 
             let link = document.createElement('a');

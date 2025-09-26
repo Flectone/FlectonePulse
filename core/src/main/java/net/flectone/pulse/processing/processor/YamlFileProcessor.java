@@ -14,6 +14,7 @@ import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.localization.RussianLocale;
 import net.flectone.pulse.exception.YamlReadException;
 import net.flectone.pulse.exception.YamlWriteException;
+import org.apache.commons.lang3.Strings;
 
 import java.io.File;
 import java.io.IOException;
@@ -106,7 +107,10 @@ public class YamlFileProcessor {
 
     public <T extends YamlFile> void save(T yamlFile) throws IOException {
         Map<String, String> comments = new LinkedHashMap<>();
-        collectDescriptions(yamlFile.getClass(), "", comments, new HashSet<>());
+
+        boolean english = yamlFile instanceof Localization localization
+                && !localization.getLanguage().equals("ru_ru");
+        collectDescriptions(yamlFile.getClass(), "", comments, new HashSet<>(), english);
 
         Path pathToFile = yamlFile.getPathToFile();
 
@@ -121,7 +125,7 @@ public class YamlFileProcessor {
         }
     }
 
-    private void collectDescriptions(Class<?> clazz, String basePath, Map<String, String> out, Set<Class<?>> visited) {
+    private void collectDescriptions(Class<?> clazz, String basePath, Map<String, String> out, Set<Class<?>> visited, boolean english) {
         if (clazz == null || visited.contains(clazz)) return;
         visited.add(clazz);
 
@@ -136,12 +140,17 @@ public class YamlFileProcessor {
 
             JsonPropertyDescription propertyDescription = field.getAnnotation(JsonPropertyDescription.class);
             if (propertyDescription != null && propertyDescription.value() != null && !propertyDescription.value().isEmpty()) {
-                out.put(path, propertyDescription.value().trim());
+                String comment = propertyDescription.value().trim();
+                if (english) {
+                    comment = Strings.CS.replace(comment, "https://flectone.net/pulse/", "https://flectone.net/en/pulse/");
+                }
+
+                out.put(path, comment);
             }
 
             Class<?> classField = field.getType();
             if (isUserType(classField)) {
-                collectDescriptions(classField, path, out, visited);
+                collectDescriptions(classField, path, out, visited, english);
             }
         }
     }
