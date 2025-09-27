@@ -76,11 +76,6 @@ public class FileResolver {
         preInitVersion = config.getVersion();
         boolean versionChanged = !preInitVersion.equals(BuildConfig.PROJECT_VERSION);
 
-        if (!preInitVersion.equals(BuildConfig.PROJECT_VERSION)) {
-            config.setVersion(BuildConfig.PROJECT_VERSION);
-            yamlFileProcessor.save(config);
-        }
-
         yamlFileProcessor.reload(command);
         yamlFileProcessor.reload(integration);
         yamlFileProcessor.reload(message);
@@ -103,6 +98,11 @@ public class FileResolver {
             if (isVersionOlderThan(preInitVersion, "1.6.0")) {
                 migration_1_6_0();
             }
+        }
+
+        if (versionChanged) {
+            config.setVersion(BuildConfig.PROJECT_VERSION);
+            yamlFileProcessor.save(config);
         }
     }
 
