@@ -367,10 +367,13 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         public static final class Type {
             private boolean enable = true;
             private boolean cancel;
-            private Range range;
+
+            @JsonMerge(OptBoolean.FALSE)
+            private Range range = Range.get(100);
+
             private int priority;
             private String trigger;
-            private NullReceiver nullReceiver;
+            private NullReceiver nullReceiver = new NullReceiver();
             private Destination destination = new Destination();
             private Cooldown cooldown = new Cooldown();
             private Sound sound = new Sound();
