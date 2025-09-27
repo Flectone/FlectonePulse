@@ -11,7 +11,7 @@ public interface VersionSQL extends SQL {
     @SqlQuery("SELECT `name` FROM `version` WHERE `id` = 1")
     Optional<String> find();
 
-    @SqlUpdate("INSERT INTO `version` (`name`) VALUES (:name)")
+    @SqlUpdate("INSERT INTO `version` (`id`, `name`) VALUES (1, :name)")
     void insert(@Bind("name") String name);
 
     @SqlUpdate("UPDATE `version` SET `name` = :name WHERE `id` = 1")
