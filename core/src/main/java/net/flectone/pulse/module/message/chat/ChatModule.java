@@ -252,29 +252,21 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                 continue;
             }
 
-            if (!fReceiver.isIgnored(fPlayer)) {
-                return true;
-            }
-
-            if (fPlayerService.getFPlayer(fReceiver.getUuid()).isSetting(MessageType.CHAT)) {
-                return true;
+            if (!fReceiver.isIgnored(fPlayer) && fReceiver.isSetting(MessageType.CHAT)) {
+                return false;
             }
         }
 
         // check proxy players only if no online server receivers found
         for (FPlayer fReceiver : offlinePlayers) {
             fPlayerService.loadIgnores(fReceiver);
-            if (!fReceiver.isIgnored(fPlayer)) {
-                return true;
-            }
-
             fPlayerService.loadSettings(fReceiver);
-            if (fReceiver.isSetting(MessageType.CHAT)) {
-                return true;
+            if (!fReceiver.isIgnored(fPlayer) && fReceiver.isSetting(MessageType.CHAT)) {
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 
     private Pair<String, Message.Chat.Type> getPlayerChat(FPlayer fPlayer, String eventMessage) {
