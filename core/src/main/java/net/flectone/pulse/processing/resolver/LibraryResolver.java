@@ -78,6 +78,11 @@ public abstract class LibraryResolver {
                         .relocatedPattern("net.flectone.pulse.library.jackson")
                         .build()
                 )
+                .relocate(Relocation.builder()
+                        .pattern("org{}yaml{}snakeyaml")
+                        .relocatedPattern("net.flectone.pulse.library.snakeyaml")
+                        .build()
+                )
                 .build()
         );
 
