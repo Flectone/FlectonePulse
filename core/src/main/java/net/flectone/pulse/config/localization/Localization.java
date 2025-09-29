@@ -1379,8 +1379,8 @@ public final class Localization extends YamlFile implements ModuleConfig {
 
         @Getter
         public static final class Gamerule implements SubMessageConfig, Localizable {
-            String formatQuery;
-            String formatSet;
+            String query;
+            String set;
         }
 
         @Getter
@@ -1640,9 +1640,9 @@ public final class Localization extends YamlFile implements ModuleConfig {
 
         @Getter
         public static final class Weather implements SubMessageConfig, Localizable {
-            String formatClear;
-            String formatRain;
-            String formatThunder;
+            String clear;
+            String rain;
+            String thunder;
         }
 
         @Getter

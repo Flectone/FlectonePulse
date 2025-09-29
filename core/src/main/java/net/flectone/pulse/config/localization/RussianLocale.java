@@ -722,8 +722,8 @@ public class RussianLocale implements Locale {
         localization.message.gamemode.self = "<fcolor:1>\uD83D\uDDD8 Твой режим игры изменён на <fcolor:2><lang:'<gamemode>'>";
         localization.message.gamemode.other = "<fcolor:1>\uD83D\uDDD8 Режим игры игрока <target> изменён на <fcolor:2><lang:'<gamemode>'>";
 
-        localization.message.gamerule.formatQuery = "<fcolor:1>\uD83D\uDDD0 Значение игрового правила <fcolor:2><gamerule><fcolor:1>: <fcolor:2><value>";
-        localization.message.gamerule.formatSet = "<fcolor:1>\uD83D\uDDD0 Установлено значение игрового правила <fcolor:2><gamerule><fcolor:1>: <fcolor:2><value>";
+        localization.message.gamerule.query = "<fcolor:1>\uD83D\uDDD0 Значение игрового правила <fcolor:2><gamerule><fcolor:1>: <fcolor:2><value>";
+        localization.message.gamerule.set = "<fcolor:1>\uD83D\uDDD0 Установлено значение игрового правила <fcolor:2><gamerule><fcolor:1>: <fcolor:2><value>";
 
         localization.message.give.single = "<fcolor:1>⛏ Выдано <fcolor:2><items> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><give_item>\"><give_item></hover><fcolor:1>] игроку <target>";
         localization.message.give.multiple = "<fcolor:1>⛏ Выдано <fcolor:2><items> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><give_item>\"><give_item></hover><fcolor:1>] <fcolor:2><players> <fcolor:1>игрокам";
@@ -854,9 +854,9 @@ public class RussianLocale implements Locale {
         localization.message.update.formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse) <fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <url:https://modrinth.com/plugin/flectonepulse>, чтобы получить новые возможности!";
         localization.message.update.formatConsole = "<fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse";
 
-        localization.message.weather.formatClear = "<fcolor:1>☀ Установлена <fcolor:2>ясная <fcolor:1>погода";
-        localization.message.weather.formatRain = "<fcolor:1>\uD83C\uDF27 Установлена <fcolor:2>дождливая <fcolor:1>погода";
-        localization.message.weather.formatThunder = "<fcolor:1>⛈ Установлена <fcolor:2>грозовая <fcolor:1>погода";
+        localization.message.weather.clear = "<fcolor:1>☀ Установлена <fcolor:2>ясная <fcolor:1>погода";
+        localization.message.weather.rain = "<fcolor:1>\uD83C\uDF27 Установлена <fcolor:2>дождливая <fcolor:1>погода";
+        localization.message.weather.thunder = "<fcolor:1>⛈ Установлена <fcolor:2>грозовая <fcolor:1>погода";
 
         localization.message.worldborder.center =  "<fcolor:1>\uD83D\uDEAB Установлен центр границ мира: <fcolor:2><value><fcolor:1>, <fcolor:2><second_value>";
         localization.message.worldborder.damage.amount = "<fcolor:1>\uD83D\uDEAB Установлено значение урона, ежесекундно наносимого за границами мира: <fcolor:2><value> <fcolor:1>за блок";

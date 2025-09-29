@@ -624,7 +624,7 @@ public class EnglishLocale implements Locale {
 
         localization.message.dialog.clear.single = "<fcolor:1>\uD83D\uDDD4 Cleared dialog for <target>";
         localization.message.dialog.clear.multiple = "<fcolor:1>\uD83D\uDDD4 Cleared dialog for <fcolor:2><players> <fcolor:1>players";
-        localization.message.dialog.show.single = "<fcolor:1>\uD83D\uDDD4 Displayed dialog to <target";
+        localization.message.dialog.show.single = "<fcolor:1>\uD83D\uDDD4 Displayed dialog to <target>";
         localization.message.dialog.show.multiple = "<fcolor:1>\uD83D\uDDD4 Displayed dialog to <fcolor:2><players> <fcolor:1>players";
 
         localization.message.difficulty.query = "<fcolor:1>⚔ The difficulty is <fcolor:2><lang:'<difficulty>'>";
@@ -722,8 +722,8 @@ public class EnglishLocale implements Locale {
         localization.message.gamemode.self = "<fcolor:1>\uD83D\uDDD8 Set own game mode to <fcolor:2><lang:'<gamemode>'>";
         localization.message.gamemode.other = "<fcolor:1>\uD83D\uDDD8 Set <target>'s game mode to <fcolor:2><lang:'<gamemode>'>";
 
-        localization.message.gamerule.formatQuery = "<fcolor:1>\uD83D\uDDD0 Gamerule <fcolor:2><gamerule> <fcolor:1>is currently set to: <fcolor:2><value>";
-        localization.message.gamerule.formatSet = "<fcolor:1>\uD83D\uDDD0 Gamerule <fcolor:2><gamerule> <fcolor:1>is now set to: <fcolor:2><value>";
+        localization.message.gamerule.query = "<fcolor:1>\uD83D\uDDD0 Gamerule <fcolor:2><gamerule> <fcolor:1>is currently set to: <fcolor:2><value>";
+        localization.message.gamerule.set = "<fcolor:1>\uD83D\uDDD0 Gamerule <fcolor:2><gamerule> <fcolor:1>is now set to: <fcolor:2><value>";
 
         localization.message.give.single = "<fcolor:1>⛏ Gave <fcolor:2><items> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><give_item>\"><give_item></hover><fcolor:1>] to <target>";
         localization.message.give.multiple = "<fcolor:1>⛏ Gave <fcolor:2><items> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><give_item>\"><give_item></hover><fcolor:1>] to <players> players";
@@ -854,9 +854,9 @@ public class EnglishLocale implements Locale {
         localization.message.update.formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse)<fcolor:1> Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <url:https://modrinth.com/plugin/flectonepulse>, to get new opportunities!";
         localization.message.update.formatConsole = "<fcolor:1>Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse";
 
-        localization.message.weather.formatClear = "<fcolor:1>☀ Set the weather to <fcolor:2>clear";
-        localization.message.weather.formatRain = "<fcolor:1>\uD83C\uDF27 Set the weather to <fcolor:2>rain";
-        localization.message.weather.formatThunder = "<fcolor:1>⛈ Set the weather to <fcolor:2>rain & thunder";
+        localization.message.weather.clear = "<fcolor:1>☀ Set the weather to <fcolor:2>clear";
+        localization.message.weather.rain = "<fcolor:1>\uD83C\uDF27 Set the weather to <fcolor:2>rain";
+        localization.message.weather.thunder = "<fcolor:1>⛈ Set the weather to <fcolor:2>rain & thunder";
 
         localization.message.worldborder.center = "<fcolor:1>\uD83D\uDEAB Set the center of the world border to <fcolor:2><value><fcolor:1>, <fcolor:2><second_value>";
         localization.message.worldborder.damage.amount = "<fcolor:1>\uD83D\uDEAB Set the world border damage to <fcolor:2><value> <fcolor:1>per block each second";

@@ -902,7 +902,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         private Update update = new Update();
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/weather/")
         private Weather weather = new Weather();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/wolrdborder/")
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/worldborder/")
         private Worldborder worldborder = new Worldborder();
 
         @Getter
