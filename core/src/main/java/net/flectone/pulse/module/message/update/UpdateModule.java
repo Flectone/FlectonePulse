@@ -101,7 +101,8 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
 
     @Async
     public void checkAndUpdateLatestVersion() {
-        try (HttpClient client = HttpClient.newHttpClient()){
+        HttpClient client = HttpClient.newHttpClient();
+        try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.github.com/repos/Flectone/FlectonePulse/releases/latest"))
                     .build();
