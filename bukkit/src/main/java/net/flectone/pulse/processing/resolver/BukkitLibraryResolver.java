@@ -101,6 +101,7 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .groupId("com{}github{}retrooper")
                 .artifactId("packetevents-spigot")
                 .version(BuildConfig.PACKETEVENTS_SPIGOT_VERSION)
+                .repository("https://repo.codemc.io/repository/maven-releases/")
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
                         .pattern("com{}github{}retrooper")
