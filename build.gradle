@@ -78,6 +78,7 @@ subprojects {
 
     downgradeJar {
         quiet = true
+        downgradeTo = JavaVersion.VERSION_17
     }
 
     tasks.register("buildFinalJar", Jar) {
