@@ -68,6 +68,7 @@ public class DiscordModule extends AbstractModule {
                 .groupId("com{}discord4j")
                 .artifactId("discord4j-core")
                 .version(BuildConfig.DISCORD4J_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );

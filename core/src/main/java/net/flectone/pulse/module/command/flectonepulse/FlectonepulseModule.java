@@ -197,6 +197,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                 .groupId("com{}sparkjava")
                 .artifactId("spark-core")
                 .version(BuildConfig.SPARK_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
                         .pattern("spark")

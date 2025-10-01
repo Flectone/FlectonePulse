@@ -21,6 +21,7 @@ public class FabricLibraryResolver extends LibraryResolver {
                 .groupId("net{}kyori")
                 .artifactId("adventure-api")
                 .version(BuildConfig.ADVENTURE_API)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -29,6 +30,7 @@ public class FabricLibraryResolver extends LibraryResolver {
                 .groupId("net{}kyori")
                 .artifactId("adventure-text-minimessage")
                 .version(BuildConfig.ADVENTURE_API)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -37,6 +39,7 @@ public class FabricLibraryResolver extends LibraryResolver {
                 .groupId("net{}kyori")
                 .artifactId("adventure-text-serializer-gson")
                 .version(BuildConfig.ADVENTURE_API)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -45,6 +48,7 @@ public class FabricLibraryResolver extends LibraryResolver {
                 .groupId("net{}kyori")
                 .artifactId("adventure-text-serializer-plain")
                 .version(BuildConfig.ADVENTURE_API)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -53,6 +57,7 @@ public class FabricLibraryResolver extends LibraryResolver {
                 .groupId("net{}kyori")
                 .artifactId("adventure-text-serializer-json-legacy-impl")
                 .version(BuildConfig.ADVENTURE_API)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -61,6 +66,7 @@ public class FabricLibraryResolver extends LibraryResolver {
                 .groupId("net{}kyori")
                 .artifactId("adventure-text-serializer-legacy")
                 .version(BuildConfig.ADVENTURE_API)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -69,6 +75,7 @@ public class FabricLibraryResolver extends LibraryResolver {
                 .groupId("net{}kyori")
                 .artifactId("adventure-nbt")
                 .version(BuildConfig.ADVENTURE_API)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -77,6 +84,7 @@ public class FabricLibraryResolver extends LibraryResolver {
                 .groupId("net{}kyori")
                 .artifactId("adventure-key")
                 .version(BuildConfig.ADVENTURE_API)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -85,6 +93,7 @@ public class FabricLibraryResolver extends LibraryResolver {
                 .groupId("org{}xerial")
                 .artifactId("sqlite-jdbc")
                 .version("3.47.1.0")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );

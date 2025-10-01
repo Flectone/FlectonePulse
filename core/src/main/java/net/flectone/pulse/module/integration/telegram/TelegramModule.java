@@ -50,6 +50,7 @@ public class TelegramModule extends AbstractModule {
                 .groupId("org{}telegram")
                 .artifactId("telegrambots-longpolling")
                 .version(BuildConfig.TELEGRAMBOTS_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -58,6 +59,7 @@ public class TelegramModule extends AbstractModule {
                 .groupId("org{}telegram")
                 .artifactId("telegrambots-client")
                 .version(BuildConfig.TELEGRAMBOTS_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -66,6 +68,7 @@ public class TelegramModule extends AbstractModule {
                 .groupId("com{}squareup{}okhttp3")
                 .artifactId("okhttp")
                 .version("5.0.0-alpha.14")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );

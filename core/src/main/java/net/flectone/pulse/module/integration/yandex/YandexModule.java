@@ -48,6 +48,7 @@ public class YandexModule extends AbstractModule {
                 .groupId("com{}yandex{}cloud")
                 .artifactId("java-sdk-services")
                 .version(BuildConfig.YANDEXSDK_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );

@@ -64,6 +64,7 @@ public class DeeplModule extends AbstractModule {
                 .groupId("com{}deepl{}api")
                 .artifactId("deepl-java")
                 .version(BuildConfig.DEEPL_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );

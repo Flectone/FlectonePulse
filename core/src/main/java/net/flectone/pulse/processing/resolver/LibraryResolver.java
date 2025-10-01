@@ -36,17 +36,9 @@ public abstract class LibraryResolver {
     }
 
     public void resolveRepositories() {
-        libraryManager.addMavenCentral();
-        libraryManager.addJitPack();
-        libraryManager.addJCenter();
-        libraryManager.addSonatype();
-        libraryManager.addRepository("https://hub.spigotmc.org/nexus/content/repositories/snapshots/");
-        libraryManager.addRepository("https://repo.aikar.co/content/groups/aikar/");
-        libraryManager.addRepository("https://repo.minebench.de");
-        libraryManager.addRepository("https://s01.oss.sonatype.org/content/repositories/snapshots");
-        libraryManager.addRepository("https://repo.codemc.io/repository/maven-releases");
-        libraryManager.addRepository("https://repo.codemc.io/repository/maven-snapshots/");
-        libraryManager.addRepository("https://maven.fabricmc.net/");
+        libraryManager.addRepository(BuildConfig.MAVEN_REPOSITORY);
+        libraryManager.addRepository(BuildConfig.CODEMC_REPOSITORY);
+        libraryManager.addRepository(BuildConfig.JITPACK_REPOSITORY);
     }
 
     public void addLibraries() {
@@ -55,6 +47,7 @@ public abstract class LibraryResolver {
                 .groupId("com{}google{}inject")
                 .artifactId("guice")
                 .version(BuildConfig.GUICE_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
                                 .pattern("com{}google{}inject")
@@ -72,6 +65,7 @@ public abstract class LibraryResolver {
                 .groupId("com{}fasterxml{}jackson{}dataformat")
                 .artifactId("jackson-dataformat-yaml")
                 .version(BuildConfig.JACKSON_DATAFORMAT_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
                         .pattern("com{}fasterxml{}jackson")
@@ -90,6 +84,7 @@ public abstract class LibraryResolver {
                 .groupId("com{}zaxxer")
                 .artifactId("HikariCP")
                 .version(BuildConfig.HIKARICP_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
                         .pattern("com{}zaxxer")
@@ -103,6 +98,7 @@ public abstract class LibraryResolver {
                 .groupId("org{}jdbi")
                 .artifactId("jdbi3-core")
                 .version(BuildConfig.JDBI3_CORE_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
                         .pattern("org{}jdbi")
@@ -116,6 +112,7 @@ public abstract class LibraryResolver {
                 .groupId("org{}jdbi")
                 .artifactId("jdbi3-sqlobject")
                 .version(BuildConfig.JDBI3_CORE_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
                         .pattern("org{}jdbi")
@@ -129,6 +126,7 @@ public abstract class LibraryResolver {
                 .groupId("org{}apache{}commons")
                 .artifactId("commons-text")
                 .version(BuildConfig.APACHE_COMMONS_TEXT_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
                         .pattern("org{}apache{}commons")

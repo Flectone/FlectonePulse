@@ -84,6 +84,7 @@ public class ProxyRegistry implements Registry {
                 .groupId("io{}lettuce")
                 .artifactId("lettuce-core")
                 .version(BuildConfig.LETTUCE_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );

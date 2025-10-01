@@ -144,6 +144,7 @@ public class Database {
                                 .groupId("org{}postgresql")
                                 .artifactId("postgresql")
                                 .version(BuildConfig.POSTGRESQL_VERSION)
+                                .repository(BuildConfig.MAVEN_REPOSITORY)
                                 .build()
                         )
                 );
@@ -171,6 +172,7 @@ public class Database {
                                 .groupId("com{}h2database")
                                 .artifactId("h2")
                                 .version(BuildConfig.H2_VERSION)
+                                .repository(BuildConfig.MAVEN_REPOSITORY)
                                 .build()
                         )
                 );
@@ -210,6 +212,7 @@ public class Database {
                                 .groupId("com{}mysql")
                                 .artifactId("mysql-connector-j")
                                 .version(BuildConfig.MYSQL_CONNECTOR_VERSION)
+                                .repository(BuildConfig.MAVEN_REPOSITORY)
                                 .build()
                         )
                 );

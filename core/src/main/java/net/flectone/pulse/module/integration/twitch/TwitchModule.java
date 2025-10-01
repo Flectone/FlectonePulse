@@ -50,6 +50,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}philippheuer{}credentialmanager")
                 .artifactId("credentialmanager")
                 .version("0.3.1")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -58,6 +59,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}philippheuer{}events4j")
                 .artifactId("events4j-core")
                 .version("0.12.2")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -66,6 +68,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}philippheuer{}events4j")
                 .artifactId("events4j-handler-simple")
                 .version("0.12.2")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -74,6 +77,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}twitch4j")
                 .artifactId("twitch4j")
                 .version(BuildConfig.TWITCH4J_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .build()
         );
 
@@ -81,6 +85,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}twitch4j")
                 .artifactId("twitch4j-chat")
                 .version(BuildConfig.TWITCH4J_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .build()
         );
 
@@ -88,6 +93,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}twitch4j")
                 .artifactId("twitch4j-auth")
                 .version(BuildConfig.TWITCH4J_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .build()
         );
 
@@ -95,6 +101,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}twitch4j")
                 .artifactId("twitch4j-common")
                 .version(BuildConfig.TWITCH4J_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .build()
         );
 
@@ -102,6 +109,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}twitch4j")
                 .artifactId("twitch4j-client-websocket")
                 .version(BuildConfig.TWITCH4J_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .build()
         );
 
@@ -109,6 +117,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}twitch4j")
                 .artifactId("twitch4j-util")
                 .version(BuildConfig.TWITCH4J_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .build()
         );
 
@@ -116,6 +125,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}twitch4j")
                 .artifactId("twitch4j-eventsub-common")
                 .version(BuildConfig.TWITCH4J_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .build()
         );
 
@@ -123,6 +133,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}twitch4j")
                 .artifactId("twitch4j-eventsub-websocket")
                 .version(BuildConfig.TWITCH4J_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .build()
         );
 
@@ -130,6 +141,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}twitch4j")
                 .artifactId("twitch4j-extensions")
                 .version(BuildConfig.TWITCH4J_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .build()
         );
 
@@ -137,6 +149,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}twitch4j")
                 .artifactId("twitch4j-graphql")
                 .version(BuildConfig.TWITCH4J_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .build()
         );
 
@@ -144,6 +157,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}twitch4j")
                 .artifactId("twitch4j-helix")
                 .version(BuildConfig.TWITCH4J_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .build()
         );
 
@@ -151,6 +165,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}twitch4j")
                 .artifactId("twitch4j-kraken")
                 .version(BuildConfig.TWITCH4J_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .build()
         );
 
@@ -158,6 +173,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}twitch4j")
                 .artifactId("twitch4j-messaginginterface")
                 .version(BuildConfig.TWITCH4J_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .build()
         );
 
@@ -165,6 +181,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}twitch4j")
                 .artifactId("twitch4j-pubsub")
                 .version(BuildConfig.TWITCH4J_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .build()
         );
 
@@ -172,6 +189,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}twitch4j")
                 .artifactId("twitch4j-util")
                 .version(BuildConfig.TWITCH4J_VERSION)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .build()
         );
 
@@ -179,6 +197,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}neovisionaries")
                 .artifactId("nv-websocket-client")
                 .version("2.14")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -187,6 +206,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}bucket4j")
                 .artifactId("bucket4j_jdk8-core")
                 .version("8.10.1")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -195,6 +215,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("org{}slf4j")
                 .artifactId("slf4j-api")
                 .version("2.1.0-alpha1")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -203,6 +224,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("io{}github{}openfeign")
                 .artifactId("feign-slf4j")
                 .version("13.6")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -211,6 +233,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("io{}github{}openfeign")
                 .artifactId("feign-okhttp")
                 .version("13.6")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -219,6 +242,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("io{}github{}openfeign")
                 .artifactId("feign-jackson")
                 .version("13.6")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -227,6 +251,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("io{}github{}openfeign")
                 .artifactId("feign-hystrix")
                 .version("13.6")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -235,6 +260,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}fasterxml{}jackson{}core")
                 .artifactId("jackson-core")
                 .version("2.18.0-rc1")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -243,6 +269,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}fasterxml{}jackson{}core")
                 .artifactId("jackson-databind")
                 .version("2.19.1")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -252,6 +279,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}fasterxml{}jackson{}core")
                 .artifactId("jackson-annotations")
                 .version("2.19.1")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -260,6 +288,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}fasterxml{}jackson{}datatype")
                 .artifactId("jackson-datatype-jsr310")
                 .version("2.19.1")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -268,6 +297,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}github{}tony19")
                 .artifactId("named-regexp")
                 .version("1.0.0")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -276,6 +306,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("org{}jetbrains")
                 .artifactId("annotations")
                 .version("26.0.2")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -284,6 +315,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}netflix{}hystrix")
                 .artifactId("hystrix-core")
                 .version("1.5.18")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -292,6 +324,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("com{}squareup{}okhttp3")
                 .artifactId("okhttp")
                 .version("4.12.0")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -300,6 +333,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("commons-configuration")
                 .artifactId("commons-configuration")
                 .version("1.10")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -308,6 +342,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("commons-io")
                 .artifactId("commons-io")
                 .version("2.19.0")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -316,6 +351,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("io{}github{}xanthic{}cache")
                 .artifactId("cache-provider-caffeine")
                 .version("0.6.1")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
@@ -324,6 +360,7 @@ public class TwitchModule extends AbstractModule {
                 .groupId("org{}apache{}commons")
                 .artifactId("commons-lang3")
                 .version("3.17.0")
+                .repository(BuildConfig.MAVEN_REPOSITORY)
                 .resolveTransitiveDependencies(true)
                 .build()
         );
