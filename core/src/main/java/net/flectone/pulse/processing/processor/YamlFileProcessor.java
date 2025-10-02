@@ -1,14 +1,6 @@
 package net.flectone.pulse.processing.processor;
 
 import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.YamlFile;
@@ -18,6 +10,16 @@ import net.flectone.pulse.config.localization.RussianLocale;
 import net.flectone.pulse.exception.YamlReadException;
 import net.flectone.pulse.exception.YamlWriteException;
 import org.apache.commons.lang3.Strings;
+import org.snakeyaml.engine.v2.api.LoadSettings;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.*;
+import tools.jackson.databind.cfg.EnumFeature;
+import tools.jackson.databind.exc.MismatchedInputException;
+import tools.jackson.databind.module.SimpleModule;
+import tools.jackson.dataformat.yaml.YAMLFactory;
+import tools.jackson.dataformat.yaml.YAMLMapper;
+import tools.jackson.dataformat.yaml.YAMLWriteFeature;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,32 +32,40 @@ import java.util.*;
 @Singleton
 public class YamlFileProcessor {
 
-    private final ObjectMapper mapper = YAMLMapper.builder(new YAMLFactory())
+    private final ObjectMapper mapper = YAMLMapper.builder(
+                    YAMLFactory.builder()
+                            .loadSettings(LoadSettings.builder().setBufferSize(4096).build()) // increase string limit
+                            .build()
+            )
+            .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES) // jackson 2.x value
+            .disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS) // jackson 2.x value
+            .disable(EnumFeature.READ_ENUMS_USING_TO_STRING) // jackson 2.x value
+            .disable(EnumFeature.WRITE_ENUMS_USING_TO_STRING) // jackson 2.x value
+            .disable(MapperFeature.DETECT_PARAMETER_NAMES) // [databind#5314]
             .enable(SerializationFeature.INDENT_OUTPUT) // indent output for values
             .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS) // fix enum names
             .enable(MapperFeature.FIX_FIELD_NAME_UPPER_CASE_PREFIX) // fix field names
-            .disable(YAMLGenerator.Feature.SPLIT_LINES) // fix split long values
-            .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER) // fix header
-            .disable(YAMLGenerator.Feature.USE_NATIVE_TYPE_ID) // fix type id like !!java.util.Hashmap
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES) // fix error on unknown properties
-            .build()
-            .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL) // show only non-null values
-            .setDefaultSetterInfo(JsonSetter.Value.forValueNulls(Nulls.SKIP)) // skip null values deserialization
-            .setDefaultMergeable(Boolean.TRUE) // fix default values for null properties
-            .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE) // snake case
-            .registerModule(new SimpleModule().addDeserializer(String.class, new JsonDeserializer<>() { // fix null strings
+            .disable(YAMLWriteFeature.SPLIT_LINES) // fix split long values
+            .disable(YAMLWriteFeature.WRITE_DOC_START_MARKER) // fix header
+            .disable(YAMLWriteFeature.USE_NATIVE_TYPE_ID) // fix type id like !!java.util.Hashmap
+            .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+            .changeDefaultPropertyInclusion(config -> JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL)) // show only non-null values
+            .changeDefaultNullHandling(config -> JsonSetter.Value.forValueNulls(Nulls.SKIP)) // skip null values deserialization
+            .defaultMergeable(true)
+            .addModule(new SimpleModule().addDeserializer(String.class, new ValueDeserializer<>() { // fix null strings
 
-                    @Override
-                    public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-                        return p.currentToken() == JsonToken.VALUE_NULL ? "" : p.getText();
-                    }
+                @Override
+                public String deserialize(JsonParser p, DeserializationContext ctxt) {
+                    return p.currentToken() == JsonToken.VALUE_NULL ? "" : p.getString();
+                }
 
-                    @Override
-                    public String getNullValue(DeserializationContext ctxt) {
-                        return "";
-                    }
+                @Override
+                public String getNullValue(DeserializationContext ctxt) {
+                    return "";
+                }
 
-            }));
+            }))
+            .build();
 
     private final String header =
             """
@@ -108,7 +118,7 @@ public class YamlFileProcessor {
 
             try {
                 mapper.readerForUpdating(yamlFile).readValue(file);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 if (e instanceof MismatchedInputException mismatchedInputException
                         && mismatchedInputException.getMessage() != null
                         && mismatchedInputException.getMessage().contains("No content to map due to end-of-input")) {

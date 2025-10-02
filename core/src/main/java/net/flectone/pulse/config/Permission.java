@@ -14,6 +14,7 @@ import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
 
 import java.nio.file.Path;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -229,7 +230,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
             private PermissionEntry other = new PermissionEntry("flectonepulse.module.command.chatcolor.other", Type.OP);
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.chatcolor.cooldown.bypass", Type.OP);
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.command.chatcolor.sound", Type.TRUE);
-            private Map<net.flectone.pulse.model.FColor.Type, PermissionEntry> colors = new LinkedHashMap<>(){
+            private Map<net.flectone.pulse.model.FColor.Type, PermissionEntry> colors = new EnumMap<>(FColor.Type.class){
                 {
                     put(net.flectone.pulse.model.FColor.Type.OUT, new PermissionEntry("flectonepulse.module.command.chatcolor.out", Type.OP));
                     put(net.flectone.pulse.model.FColor.Type.SEE, new PermissionEntry("flectonepulse.module.command.chatcolor.see", Type.TRUE));
