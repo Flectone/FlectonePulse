@@ -23,6 +23,7 @@ import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import org.incendo.cloud.type.tuple.Triplet;
@@ -38,18 +39,21 @@ public class BasePacketListener implements PacketListener {
     private final PacketProvider packetProvider;
     private final PacketSender packetSender;
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
+    private final FLogger fLogger;
 
     @Inject
     public BasePacketListener(FPlayerService fPlayerService,
                               EventDispatcher eventDispatcher,
                               PacketProvider packetProvider,
                               PacketSender packetSender,
-                              PlayerPreLoginProcessor playerPreLoginProcessor) {
+                              PlayerPreLoginProcessor playerPreLoginProcessor,
+                              FLogger fLogger) {
         this.fPlayerService = fPlayerService;
         this.eventDispatcher = eventDispatcher;
         this.packetProvider = packetProvider;
         this.packetSender = packetSender;
         this.playerPreLoginProcessor = playerPreLoginProcessor;
+        this.fLogger = fLogger;
     }
 
     @Override
@@ -128,13 +132,17 @@ public class BasePacketListener implements PacketListener {
         MinecraftTranslationKey translationKey = MinecraftTranslationKey.UNKNOWN;
         boolean overlay = false;
 
-        if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
-            WrapperPlayServerChatMessage wrapper = new WrapperPlayServerChatMessage(event);
-            component = wrapper.getMessage().getChatContent();
-        } else if (event.getPacketType() == PacketType.Play.Server.SYSTEM_CHAT_MESSAGE) {
-            WrapperPlayServerSystemChatMessage wrapper = new WrapperPlayServerSystemChatMessage(event);
-            component = wrapper.getMessage();
-            overlay = wrapper.isOverlay();
+        try {
+            if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
+                WrapperPlayServerChatMessage wrapper = new WrapperPlayServerChatMessage(event);
+                component = wrapper.getMessage().getChatContent();
+            } else if (event.getPacketType() == PacketType.Play.Server.SYSTEM_CHAT_MESSAGE) {
+                WrapperPlayServerSystemChatMessage wrapper = new WrapperPlayServerSystemChatMessage(event);
+                component = wrapper.getMessage();
+                overlay = wrapper.isOverlay();
+            }
+        } catch (Exception e) {
+            fLogger.warning("Error when reading a PacketType.Play.Server." + event.getPacketType() + ", THIS IS NOT A FLECTONEPULSE BUG, Report to PacketEvents: " + e.getMessage());
         }
 
         if (component instanceof TranslatableComponent translatableComponent) {
