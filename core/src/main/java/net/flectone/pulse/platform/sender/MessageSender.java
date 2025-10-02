@@ -109,8 +109,10 @@ public class MessageSender {
             packetSender.send(fPlayer, new WrapperPlayServerActionBar(component));
         } else if (packetProvider.getServerVersion().isNewerThan(ServerVersion.V_1_16)) {
             packetSender.send(fPlayer, new WrapperPlayServerChatMessage(new ChatMessage_v1_16(component, ChatTypes.GAME_INFO, fPlayer.getUuid())));
-        } else {
+        } else if (packetProvider.getServerVersion().isNewerThan(ServerVersion.V_1_8_8)) {
             packetSender.send(fPlayer, new WrapperPlayServerChatMessage(new ChatMessageLegacy(component, ChatTypes.GAME_INFO)));
+        } else { // PacketEvents issue https://github.com/retrooper/packetevents/issues/1241
+            packetSender.send(fPlayer, new WrapperPlayServerChatMessage(new ChatMessageLegacy(Component.text(LegacyComponentSerializer.legacySection().serialize(component)), ChatTypes.GAME_INFO)));
         }
 
         // cannot set stay ticks for action bar, so
