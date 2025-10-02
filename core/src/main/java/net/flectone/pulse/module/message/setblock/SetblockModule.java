@@ -54,7 +54,7 @@ public class SetblockModule extends AbstractModuleLocalization<Localization.Mess
 
     @Override
     public Localization.Message.Setblock localization(FEntity sender) {
-        return null;
+        return fileResolver.getLocalization(sender).getMessage().getSetblock();
     }
 
     @Async
