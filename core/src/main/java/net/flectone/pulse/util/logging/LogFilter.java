@@ -1,6 +1,5 @@
 package net.flectone.pulse.util.logging;
 
-import lombok.Getter;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Marker;
@@ -20,17 +19,21 @@ import java.util.concurrent.TimeUnit;
  * @author Whitescan
  * @since 1.0.0
  */
-@Getter
 public class LogFilter implements Filter {
 
-    private final List<String> messages = new ArrayList<>();
+    private final List<String> filters = new ArrayList<>();
 
     public LogFilter() {
         ((Logger) LogManager.getRootLogger()).addFilter(this);
     }
 
+    public void setFilters(List<String> filters) {
+        this.filters.clear();
+        this.filters.addAll(filters);
+    }
+
     public Filter.Result checkMessage(String message) {
-        for (String string : messages) {
+        for (String string : filters) {
             if (message.contains(string)) {
                 return Filter.Result.DENY;
             }

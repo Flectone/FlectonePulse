@@ -25,7 +25,6 @@ public class BukkitFlectonePulse extends JavaPlugin implements FlectonePulse {
     public void onLoad() {
         // initialize custom logger
         fLogger = new FLogger(this.getLogger());
-        fLogger.enableFilter();
         fLogger.logEnabling();
 
         // set up library resolver for dependency loading

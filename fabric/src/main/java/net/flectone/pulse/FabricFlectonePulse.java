@@ -38,8 +38,7 @@ public class FabricFlectonePulse implements PreLaunchEntrypoint, ModInitializer,
 		// initialize custom logger
 		Logger logger = LoggerFactory.getLogger(BuildConfig.PROJECT_MOD_ID);
 		fLogger = new FLogger(logRecord -> logger.info(logRecord.getMessage()));
-		fLogger.enableFilter();
-		fLogger.logEnabling();
+        fLogger.logEnabling();
 
 		// set up library resolver for dependency loading
 		libraryResolver = new FabricLibraryResolver(logger);

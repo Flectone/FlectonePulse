@@ -21,9 +21,6 @@ public final class Config extends YamlFile {
         super(projectPath.resolve("config.yml"));
     }
 
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/")
-    private String console = "Console";
-
     @Setter
     private String version = BuildConfig.PROJECT_VERSION;
 
@@ -48,15 +45,8 @@ public final class Config extends YamlFile {
             "tell", "msg", "w", "me", "ban", "kick", "pardon", "banlist"
     ));
 
-    @JsonMerge(OptBoolean.FALSE)
-    private List<String> logFilter = new ArrayList<>(List.of(
-            "Paper Async Command Builder",
-            "Caught previously unhandled exception :",
-            "Error received from Telegram GetUpdates Request",
-            "OkHttp TaskRunner",
-            "Exception in thread \"ForkJoinPool",
-            "FlectonePulseDatabase - "
-    ));
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/#logger")
+    private Logger logger = new Logger();
 
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/#database")
     private Database database = new Database();
@@ -69,6 +59,38 @@ public final class Config extends YamlFile {
 
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/config/#editor")
     private Editor editor = new Editor();
+
+    @Getter
+    public static final class Logger {
+        private String console = "Console";
+        private String prefix = "\033[0;34m(FlectonePulse) \033[0m";
+
+        @JsonMerge(OptBoolean.FALSE)
+        private List<String> description = new ArrayList<>(List.of(
+                " \033[0;34m ___       ___  __  ___  __        ___ \033[0m",
+                " \033[0;34m|__  |    |__  /  `  |  /  \\ |\\ | |__  \033[0m",
+                " \033[0;34m|    |___ |___ \\__,  |  \\__/ | \\| |___ \033[0m",
+                " \033[0;34m __             __   ___ \033[0;96m                       \033[0m",
+                " \033[0;34m|__) |  | |    /__` |__  \033[0;96m                   \033[0m",
+                " \033[0;34m|    \\__/ |___ .__/ |___\033[0;96m   /\\         \033[0m",
+                " \033[0;96m                          /  \\ v<version>               \033[0m",
+                " \033[0;96m__/\\___  ____/\\_____  ___/    \\______ \033[0m",
+                " \033[0;96m       \\/           \\/  \033[0m"
+        ));
+
+        private String warn = "\033[0;93m";
+        private String info = "\033[0;96m";
+
+        @JsonMerge(OptBoolean.FALSE)
+        private List<String> filter = new ArrayList<>(List.of(
+                "Paper Async Command Builder",
+                "Caught previously unhandled exception :",
+                "Error received from Telegram GetUpdates Request",
+                "OkHttp TaskRunner",
+                "Exception in thread \"ForkJoinPool",
+                "FlectonePulseDatabase - "
+        ));
+    }
 
     @Getter
     @Setter

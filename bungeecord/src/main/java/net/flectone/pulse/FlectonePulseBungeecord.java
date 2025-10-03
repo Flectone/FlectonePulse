@@ -23,7 +23,7 @@ public final class FlectonePulseBungeecord extends Plugin implements Listener {
 
         registerChannel();
 
-        fLogger.logPluginInfo();
+        fLogger.logDescription();
         fLogger.logEnabled();
     }
 

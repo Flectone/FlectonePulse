@@ -2,10 +2,13 @@ package net.flectone.pulse.util.logging;
 
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
+import lombok.Setter;
 import net.flectone.pulse.BuildConfig;
+import net.flectone.pulse.config.Config;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.kyori.adventure.text.Component;
 
-import java.util.List;
+import java.util.Collections;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -14,23 +17,10 @@ import java.util.logging.Logger;
 @Singleton
 public class FLogger extends Logger {
 
-    private final String pluginName = "\033[0;34m(FlectonePulse) \033[0m";
-
-    private final List<String> pluginInfo = List.of(
-            " \033[0;34m ___       ___  __  ___  __        ___ \033[0m",
-            " \033[0;34m|__  |    |__  /  `  |  /  \\ |\\ | |__  \033[0m",
-            " \033[0;34m|    |___ |___ \\__,  |  \\__/ | \\| |___ \033[0m",
-            " \033[0;34m __             __   ___ \033[0;96m                       \033[0m",
-            " \033[0;34m|__) |  | |    /__` |__  \033[0;96m                   \033[0m",
-            " \033[0;34m|    \\__/ |___ .__/ |___\033[0;96m   /\\         \033[0m",
-            " \033[0;96m                          /  \\ v<version>               \033[0m",
-            " \033[0;96m__/\\___  ____/\\_____  ___/    \\______ \033[0m",
-            " \033[0;96m       \\/           \\/  \033[0m"
-    );
-
     private final Consumer<LogRecord> logConsumer;
+    private final LogFilter logFilter = new LogFilter();
 
-    private LogFilter logFilter;
+    @Setter private FileResolver fileResolver;
 
     public FLogger(Consumer<LogRecord> logConsumer) {
         super("", null);
@@ -48,30 +38,32 @@ public class FLogger extends Logger {
         logConsumer = super::log;
     }
 
-    public void enableFilter() {
-        this.logFilter = new LogFilter();
+    public Config.Logger config() {
+        return fileResolver == null ? null : fileResolver.getConfig().getLogger();
     }
 
-    public void reload(List<String> messages) {
-        if (logFilter == null) return;
-
-        logFilter.getMessages().clear();
-        logFilter.getMessages().addAll(messages);
+    public void setupFilter() {
+        logFilter.setFilters(config() == null ? Collections.emptyList() : config().getFilter());
     }
 
     @Override
     public void log(LogRecord logRecord) {
-        String colorLog = switch (logRecord.getLevel().intValue()) {
-            // warn
-            case 900 -> "\033[0;93m";
-            // info
-            case 800 -> "\033[0;96m";
+        if (config() == null) {
+            logRecord.setLoggerName("FlectonePulse");
+            logConsumer.accept(logRecord);
+            return;
+        }
 
+        String prefix = config().getPrefix();
+
+        String color = switch (logRecord.getLevel().intValue()) {
+            case 900 -> config().getWarn();
+            case 800 -> config().getInfo();
             default -> "";
         };
 
         logRecord.setLoggerName("");
-        logRecord.setMessage(pluginName + colorLog + logRecord.getMessage() + "\033[0m");
+        logRecord.setMessage(prefix + color + logRecord.getMessage() + "\033[0m");
 
         logConsumer.accept(logRecord);
     }
@@ -107,8 +99,11 @@ public class FLogger extends Logger {
         info("FlectonePulse v" + BuildConfig.PROJECT_VERSION + " reloaded");
     }
 
-    public void logPluginInfo() {
-        pluginInfo.forEach(string -> {
+    public void logDescription() {
+        Config.Logger config = config();
+        if (config == null) return;
+
+        config.getDescription().forEach(string -> {
             string = string.replace("<version>", BuildConfig.PROJECT_VERSION);
             info(string);
         });

@@ -43,7 +43,7 @@ public class FlectonePulseVelocity {
 
         proxyServer.getChannelRegistrar().register(IDENTIFIER);
 
-        fLogger.logPluginInfo();
+        fLogger.logDescription();
         fLogger.logEnabled();
     }
 

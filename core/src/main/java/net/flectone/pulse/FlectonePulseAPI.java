@@ -38,17 +38,20 @@ public class FlectonePulseAPI  {
 
         FLogger fLogger = instance.get(FLogger.class);
 
+        // get file resolver for configuration
+        FileResolver fileResolver = instance.get(FileResolver.class);
+
+        // set file resolver
+        fLogger.setFileResolver(fileResolver);
+
         // log plugin information
-        fLogger.logPluginInfo();
+        fLogger.logDescription();
 
         // register default listeners
         instance.get(ListenerRegistry.class).registerDefaultListeners();
 
-        // get file resolver for configuration
-        FileResolver fileResolver = instance.get(FileResolver.class);
-
-        // reload logger with new configuration
-        fLogger.reload(fileResolver.getConfig().getLogFilter());
+        // setup filter
+        fLogger.setupFilter();
 
         try {
             // connect to database
@@ -165,7 +168,7 @@ public class FlectonePulseAPI  {
         instance.get(TaskScheduler.class).reload();
 
         // reload logger with new configuration
-        fLogger.reload(fileResolver.getConfig().getLogFilter());
+        fLogger.setupFilter();
 
         // get fplayer service
         FPlayerService fPlayerService = instance.get(FPlayerService.class);
