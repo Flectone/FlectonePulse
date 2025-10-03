@@ -37,6 +37,7 @@ public class YamlFileProcessor {
                             .loadSettings(LoadSettings.builder().setBufferSize(4096).build()) // increase string limit
                             .build()
             )
+            .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY) // disable auto sorting
             .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES) // jackson 2.x value
             .disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS) // jackson 2.x value
             .disable(EnumFeature.READ_ENUMS_USING_TO_STRING) // jackson 2.x value
