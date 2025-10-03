@@ -10,31 +10,31 @@ import java.util.Optional;
 
 public interface FPlayerSQL extends SQL {
 
-    @SqlQuery("SELECT * FROM `player` WHERE UPPER(`name`) = UPPER(:name)")
+    @SqlQuery("SELECT * FROM `fp_player` WHERE UPPER(`name`) = UPPER(:name)")
     Optional<FPlayerDAO.PlayerInfo> findByName(@Bind("name") String name);
 
-    @SqlQuery("SELECT * FROM `player` WHERE `uuid` = :uuid")
+    @SqlQuery("SELECT * FROM `fp_player` WHERE `uuid` = :uuid")
     Optional<FPlayerDAO.PlayerInfo> findByUUID(@Bind("uuid") String name);
 
-    @SqlQuery("SELECT * FROM `player` WHERE `ip` = :ip LIMIT 1")
+    @SqlQuery("SELECT * FROM `fp_player` WHERE `ip` = :ip LIMIT 1")
     Optional<FPlayerDAO.PlayerInfo> findByIp(@Bind("ip") String ip);
 
-    @SqlQuery("SELECT * FROM `player` WHERE `id` = :id")
+    @SqlQuery("SELECT * FROM `fp_player` WHERE `id` = :id")
     Optional<FPlayerDAO.PlayerInfo> findById(@Bind("id") int id);
 
-    @SqlUpdate("INSERT INTO `player` (`uuid`, `name`) VALUES (:uuid, :name)")
+    @SqlUpdate("INSERT INTO `fp_player` (`uuid`, `name`) VALUES (:uuid, :name)")
     void insert(@Bind("uuid") String uuid, @Bind("name") String name);
 
-    @SqlUpdate("INSERT INTO `player` (`id`, `uuid`, `name`) VALUES (:id, :uuid, :name)")
+    @SqlUpdate("INSERT INTO `fp_player` (`id`, `uuid`, `name`) VALUES (:id, :uuid, :name)")
     void insertWithId(@Bind("id") int id, @Bind("uuid") String uuid, @Bind("name") String name);
 
-    @SqlUpdate("UPDATE `player` SET `online` = :online, `uuid` = :uuid, `name` = :name, `ip` = :ip WHERE `id` = :id")
+    @SqlUpdate("UPDATE `fp_player` SET `online` = :online, `uuid` = :uuid, `name` = :name, `ip` = :ip WHERE `id` = :id")
     void update(@Bind("id") int id, @Bind("online") boolean online, @Bind("uuid") String uuid, @Bind("name") String name, @Bind("ip") String ip);
 
-    @SqlQuery("SELECT * FROM `player` WHERE `online` = true")
+    @SqlQuery("SELECT * FROM `fp_player` WHERE `online` = true")
     List<FPlayerDAO.PlayerInfo> getOnlinePlayers();
 
-    @SqlQuery("SELECT * FROM `player`")
+    @SqlQuery("SELECT * FROM `fp_player`")
     List<FPlayerDAO.PlayerInfo> getAllPlayers();
 
 }

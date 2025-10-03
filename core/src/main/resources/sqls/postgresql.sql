@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS "player" (
+CREATE TABLE IF NOT EXISTS "fp_player" (
     "id" SERIAL PRIMARY KEY,
     "online" BOOLEAN NOT NULL DEFAULT FALSE,
     "uuid" VARCHAR(36) NOT NULL UNIQUE,
@@ -6,37 +6,37 @@ CREATE TABLE IF NOT EXISTS "player" (
     "ip" VARCHAR(39)
 );
 
-CREATE TABLE IF NOT EXISTS "setting" (
+CREATE TABLE IF NOT EXISTS "fp_setting" (
     "id" SERIAL PRIMARY KEY,
     "player" INTEGER NOT NULL,
     "type" VARCHAR(255) NOT NULL,
     "value" TEXT,
-    FOREIGN KEY("player") REFERENCES "player"("id"),
+    FOREIGN KEY("player") REFERENCES "fp_player"("id"),
     UNIQUE("player", "type")
 );
 
-CREATE TABLE IF NOT EXISTS "mail" (
+CREATE TABLE IF NOT EXISTS "fp_mail" (
     "id" SERIAL PRIMARY KEY,
     "date" BIGINT NOT NULL,
     "sender" INTEGER NOT NULL,
     "receiver" INTEGER NOT NULL,
     "message" TEXT NOT NULL,
     "valid" BOOLEAN NOT NULL DEFAULT TRUE,
-    FOREIGN KEY("sender") REFERENCES "player"("id"),
-    FOREIGN KEY("receiver") REFERENCES "player"("id")
+    FOREIGN KEY("sender") REFERENCES "fp_player"("id"),
+    FOREIGN KEY("receiver") REFERENCES "fp_player"("id")
 );
 
-CREATE TABLE IF NOT EXISTS "ignore" (
+CREATE TABLE IF NOT EXISTS "fp_ignore" (
     "id" SERIAL PRIMARY KEY,
     "date" BIGINT NOT NULL,
     "initiator" INTEGER NOT NULL,
     "target" INTEGER NOT NULL,
     "valid" BOOLEAN NOT NULL DEFAULT TRUE,
-    FOREIGN KEY("initiator") REFERENCES "player"("id"),
-    FOREIGN KEY("target") REFERENCES "player"("id")
+    FOREIGN KEY("initiator") REFERENCES "fp_player"("id"),
+    FOREIGN KEY("target") REFERENCES "fp_player"("id")
 );
 
-CREATE TABLE IF NOT EXISTS "moderation" (
+CREATE TABLE IF NOT EXISTS "fp_moderation" (
     "id" SERIAL PRIMARY KEY,
     "player" INTEGER NOT NULL,
     "date" BIGINT NOT NULL,
@@ -45,26 +45,26 @@ CREATE TABLE IF NOT EXISTS "moderation" (
     "moderator" INTEGER NOT NULL,
     "type" INTEGER NOT NULL,
     "valid" BOOLEAN NOT NULL DEFAULT TRUE,
-    FOREIGN KEY("player") REFERENCES "player"("id"),
-    FOREIGN KEY("moderator") REFERENCES "player"("id")
+    FOREIGN KEY("player") REFERENCES "fp_player"("id"),
+    FOREIGN KEY("moderator") REFERENCES "fp_player"("id")
 );
 
-CREATE TABLE IF NOT EXISTS "fcolor" (
+CREATE TABLE IF NOT EXISTS "fp_fcolor" (
     "id" SERIAL PRIMARY KEY,
     "name" TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE IF NOT EXISTS "player_fcolor" (
+CREATE TABLE IF NOT EXISTS "fp_player_fcolor" (
     "id" SERIAL PRIMARY KEY,
     "number" INTEGER NOT NULL,
     "player" INTEGER NOT NULL,
     "fcolor" INTEGER NOT NULL,
     "type" TEXT NOT NULL,
-    FOREIGN KEY("player") REFERENCES "player"("id"),
-    FOREIGN KEY("fcolor") REFERENCES "fcolor"("id")
+    FOREIGN KEY("player") REFERENCES "fp_player"("id"),
+    FOREIGN KEY("fcolor") REFERENCES "fp_fcolor"("id")
 );
 
-CREATE TABLE IF NOT EXISTS "version" (
+CREATE TABLE IF NOT EXISTS "fp_version" (
     "id" INTEGER PRIMARY KEY CHECK ("id" = 1),
     "name" TEXT NOT NULL
 );
