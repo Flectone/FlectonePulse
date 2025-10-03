@@ -319,7 +319,9 @@ public class BubbleRenderer {
             // radius
             int radiusIndex = 8;
 
-            if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
+            if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_13_2)) {
+                radiusIndex = 6;
+            } else if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_16_5)) {
                 radiusIndex = 7;
             }
 
