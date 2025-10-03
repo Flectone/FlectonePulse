@@ -41,7 +41,7 @@ public class BubbleModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        if (packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_9)) {
+        if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
             fLogger.warning("Bubble module is not supported on this version of Minecraft");
             addPredicate(fEntity -> false);
             return;
