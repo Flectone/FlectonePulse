@@ -68,6 +68,7 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
                 .sender(fPlayer)
                 .filterPlayer(fPlayer)
                 .format(localization -> translationKey == MinecraftTranslationKey.BLOCK_MINECRAFT_SET_SPAWN
+                        || translationKey == MinecraftTranslationKey.BLOCK_MINECRAFT_BED_SET_SPAWN
                         ? localization.getSet() : localization.getNotValid()
                 )
                 .destination(config().getDestination())
@@ -90,7 +91,7 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
                 .format(localization -> StringUtils.replaceEach(
                         translationKey == MinecraftTranslationKey.COMMANDS_SETWORLDSPAWN_SUCCESS ? localization.getSetWorld() : isSingle ? localization.getSingle() : localization.getMultiple(),
                         new String[]{"<players>", "<x>", "<y>", "<z>", "<angle>", "<world>"},
-                        new String[]{StringUtils.defaultString(spawn.getPlayers()), spawn.getX(), spawn.getY(), spawn.getZ(), spawn.getAngle(), StringUtils.defaultString(spawn.getWorld())}
+                        new String[]{StringUtils.defaultString(spawn.getPlayers()), spawn.getX(), spawn.getY(), spawn.getZ(), StringUtils.defaultString(spawn.getAngle()), StringUtils.defaultString(spawn.getWorld())}
                 ))
                 .spawn(spawn)
                 .translationKey(translationKey)

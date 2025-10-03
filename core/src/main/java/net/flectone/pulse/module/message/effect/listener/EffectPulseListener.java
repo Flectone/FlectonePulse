@@ -31,7 +31,8 @@ public class EffectPulseListener implements PulseListener {
         switch (translationKey) {
             case COMMANDS_EFFECT_CLEAR_EVERYTHING_SUCCESS_MULTIPLE, COMMANDS_EFFECT_CLEAR_EVERYTHING_SUCCESS_SINGLE,
                  COMMANDS_EFFECT_CLEAR_SPECIFIC_SUCCESS_MULTIPLE, COMMANDS_EFFECT_CLEAR_SPECIFIC_SUCCESS_SINGLE,
-                 COMMANDS_EFFECT_GIVE_SUCCESS_MULTIPLE, COMMANDS_EFFECT_GIVE_SUCCESS_SINGLE -> {
+                 COMMANDS_EFFECT_GIVE_SUCCESS_MULTIPLE, COMMANDS_EFFECT_GIVE_SUCCESS_SINGLE,
+                 COMMANDS_EFFECT_SUCCESS, COMMANDS_EFFECT_SUCCESS_REMOVED, COMMANDS_EFFECT_SUCCESS_REMOVED_ALL -> {
                 Optional<Effect> effect = effectExtractor.extract(translationKey, event.getTranslatableComponent());
                 if (effect.isEmpty()) return;
 

@@ -26,14 +26,14 @@ public class SpawnPulseListener implements PulseListener {
         this.spawnExtractor = spawnExtractor;
     }
 
-
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
         FPlayer fPlayer = event.getFPlayer();
         MinecraftTranslationKey translationKey = event.getTranslationKey();
-        if (translationKey == MinecraftTranslationKey.BLOCK_MINECRAFT_SET_SPAWN) {
+        if (translationKey == MinecraftTranslationKey.BLOCK_MINECRAFT_SET_SPAWN
+                || translationKey == MinecraftTranslationKey.BLOCK_MINECRAFT_BED_SET_SPAWN) {
             event.setCancelled(true);
-            spawnModule.send(fPlayer, MinecraftTranslationKey.BLOCK_MINECRAFT_SET_SPAWN);
+            spawnModule.send(fPlayer, translationKey);
             return;
         }
 

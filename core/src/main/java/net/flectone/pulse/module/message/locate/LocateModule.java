@@ -66,9 +66,9 @@ public class LocateModule extends AbstractModuleLocalization<Localization.Messag
                 .range(config().getRange())
                 .format(localization -> StringUtils.replaceEach(
                         switch (translationKey) {
-                            case COMMANDS_LOCATE_BIOME_SUCCESS -> localization.getBiome();
+                            case COMMANDS_LOCATE_BIOME_SUCCESS, COMMANDS_LOCATEBIOME_SUCCESS -> localization.getBiome();
                             case COMMANDS_LOCATE_POI_SUCCESS -> localization.getPoi();
-                            case COMMANDS_LOCATE_STRUCTURE_SUCCESS -> localization.getStructure();
+                            case COMMANDS_LOCATE_STRUCTURE_SUCCESS, COMMANDS_LOCATE_SUCCESS -> localization.getStructure();
                             default -> "";
                         },
                         new String[]{"<value>", "<x>", "<y>", "<z>", "<blocks>"},

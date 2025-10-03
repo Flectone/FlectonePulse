@@ -653,6 +653,7 @@ public class RussianLocale implements Locale {
         localization.message.experience.set.levels.multiple = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>уровней <fcolor:2><players> <fcolor:1>игрокам";
         localization.message.experience.set.points.single = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>единиц опыта игроку <target>";
         localization.message.experience.set.points.multiple = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>единиц опыта <fcolor:2><players> <fcolor:1>игрокам";
+        localization.message.experience.taken = "<fcolor:1>⏺ <target> потерял <fcolor:2><amount> <fcolor:1>уровней";
 
         localization.message.fill.format = "<fcolor:1>⏹ Успешно заполнено <fcolor:2><blocks> <fcolor:1>блоков";
 
@@ -736,9 +737,9 @@ public class RussianLocale implements Locale {
         localization.message.kill.single = "<fcolor:1>☠ <fcolor:1><target> был убит";
         localization.message.kill.multiple = "<fcolor:1>☠ <fcolor:1>Уничтожено <fcolor:2><entities> <fcolor:1>сущностей";
 
-        localization.message.locate.biome = "<fcolor:1>\uD83D\uDDFA Ближайший биом с типом <fcolor:2><value> <fcolor:1>находится по координатам <fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
-        localization.message.locate.poi = "<fcolor:1>\uD83D\uDDFA Ближайшая точка интереса с типом <fcolor:2><value> <fcolor:1>находится по координатам <fcolor:2><fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
-        localization.message.locate.structure = "<fcolor:1>\uD83D\uDDFA Ближайшее строение типа <fcolor:2><value> <fcolor:1>находится по координатам <fcolor:2><fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
+        localization.message.locate.biome = "<fcolor:1>\uD83D\uDDFA Ближайший биом с типом <fcolor:2><value> <fcolor:1>находится по координатам <fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @p <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
+        localization.message.locate.poi = "<fcolor:1>\uD83D\uDDFA Ближайшая точка интереса с типом <fcolor:2><value> <fcolor:1>находится по координатам <fcolor:2><fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @p <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
+        localization.message.locate.structure = "<fcolor:1>\uD83D\uDDFA Ближайшее строение типа <fcolor:2><value> <fcolor:1>находится по координатам <fcolor:2><fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @p <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
 
         localization.message.objective.belowname.format = "<fcolor:1>мс";
 

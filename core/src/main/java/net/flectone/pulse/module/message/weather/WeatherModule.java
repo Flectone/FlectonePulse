@@ -63,9 +63,9 @@ public class WeatherModule extends AbstractModuleLocalization<Localization.Messa
                 .sender(fPlayer)
                 .range(config().getRange())
                 .format(localization -> switch (translationKey) {
-                    case COMMANDS_WEATHER_SET_CLEAR -> localization.getClear();
-                    case COMMANDS_WEATHER_SET_RAIN -> localization.getRain();
-                    case COMMANDS_WEATHER_SET_THUNDER -> localization.getThunder();
+                    case COMMANDS_WEATHER_SET_CLEAR, COMMANDS_WEATHER_CLEAR -> localization.getClear();
+                    case COMMANDS_WEATHER_SET_RAIN, COMMANDS_WEATHER_RAIN -> localization.getRain();
+                    case COMMANDS_WEATHER_SET_THUNDER, COMMANDS_WEATHER_THUNDER -> localization.getThunder();
                     default -> "";
                 })
                 .translationKey(translationKey)

@@ -34,8 +34,54 @@ public class SoundExtractor extends Extractor {
 
                 yield Optional.of(sound);
             }
+            // Stopped all sounds for %s
+            case COMMANDS_STOPSOUND_SUCCESS_ALL -> {
+                Optional<FEntity> target = extractFEntity(translatableComponent, 0);
+                if (target.isEmpty()) yield Optional.empty();
+
+                Sound sound = Sound.builder()
+                        .target(target.get())
+                        .build();
+
+                yield Optional.of(sound);
+            }
+            // Stopped source '%s' for %s
+            case COMMANDS_STOPSOUND_SUCCESS_SOUNDSOURCE -> {
+                Optional<String> source = extractTextContent(translatableComponent, 0);
+                if (source.isEmpty()) yield Optional.empty();
+
+                Optional<FEntity> target = extractFEntity(translatableComponent, 1);
+                if (target.isEmpty()) yield Optional.empty();
+
+                Sound sound = Sound.builder()
+                        .source(source.get())
+                        .target(target.get())
+                        .build();
+
+                yield Optional.of(sound);
+            }
+            // Stopped sound '%s' with source '%s' for %s
+            case COMMANDS_STOPSOUND_SUCCESS_INDIVIDUALSOUND -> {
+                Optional<String> name = extractTextContent(translatableComponent, 0);
+                if (name.isEmpty()) yield Optional.empty();
+
+                Optional<String> source = extractTextContent(translatableComponent, 1);
+                if (source.isEmpty()) yield Optional.empty();
+
+                Optional<FEntity> target = extractFEntity(translatableComponent, 2);
+                if (target.isEmpty()) yield Optional.empty();
+
+                Sound sound = Sound.builder()
+                        .name(name.get())
+                        .source(source.get())
+                        .target(target.get())
+                        .build();
+
+                yield Optional.of(sound);
+            }
             // Played sound %s to %s
-            case COMMANDS_PLAYSOUND_SUCCESS_SINGLE -> {
+            // Played sound '%s' to %s
+            case COMMANDS_PLAYSOUND_SUCCESS_SINGLE, COMMANDS_PLAYSOUND_SUCCESS -> {
                 Optional<String> name = extractTextContent(translatableComponent, 0);
                 if (name.isEmpty()) yield Optional.empty();
 

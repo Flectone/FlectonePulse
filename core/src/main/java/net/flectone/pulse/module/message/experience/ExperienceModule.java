@@ -67,9 +67,10 @@ public class ExperienceModule extends AbstractModuleLocalization<Localization.Me
                 .range(config().getRange())
                 .format(localization -> StringUtils.replaceEach(
                         switch (translationKey) {
-                            case COMMANDS_EXPERIENCE_ADD_LEVELS_SUCCESS_SINGLE -> localization.getAdd().getLevels().getSingle();
+                            case COMMANDS_XP_SUCCESS_NEGATIVE_LEVELS -> localization.getTaken();
+                            case COMMANDS_EXPERIENCE_ADD_LEVELS_SUCCESS_SINGLE, COMMANDS_XP_SUCCESS_LEVELS -> localization.getAdd().getLevels().getSingle();
                             case COMMANDS_EXPERIENCE_ADD_LEVELS_SUCCESS_MULTIPLE -> localization.getAdd().getLevels().getMultiple();
-                            case COMMANDS_EXPERIENCE_ADD_POINTS_SUCCESS_SINGLE -> localization.getAdd().getPoints().getSingle();
+                            case COMMANDS_EXPERIENCE_ADD_POINTS_SUCCESS_SINGLE, COMMANDS_XP_SUCCESS -> localization.getAdd().getPoints().getSingle();
                             case COMMANDS_EXPERIENCE_ADD_POINTS_SUCCESS_MULTIPLE -> localization.getAdd().getPoints().getMultiple();
                             case COMMANDS_EXPERIENCE_QUERY_LEVELS -> localization.getQuery().getLevels();
                             case COMMANDS_EXPERIENCE_QUERY_POINTS -> localization.getQuery().getPoints();

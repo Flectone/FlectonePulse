@@ -31,9 +31,8 @@ public class SummonPulseListener implements PulseListener {
         if (translationKey != MinecraftTranslationKey.COMMANDS_SUMMON_SUCCESS) return;
 
         Optional<FEntity> target = summonExtractor.extract(event.getTranslatableComponent());
-        if (target.isEmpty()) return;
 
         event.setCancelled(true);
-        summonModule.send(event.getFPlayer(), translationKey, target.get());
+        summonModule.send(event.getFPlayer(), translationKey, target.orElse(null));
     }
 }

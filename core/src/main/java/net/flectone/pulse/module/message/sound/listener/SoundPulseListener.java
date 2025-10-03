@@ -31,7 +31,9 @@ public class SoundPulseListener implements PulseListener {
         switch (translationKey) {
             case COMMANDS_PLAYSOUND_SUCCESS_MULTIPLE, COMMANDS_PLAYSOUND_SUCCESS_SINGLE,
                  COMMANDS_STOPSOUND_SUCCESS_SOURCE_ANY, COMMANDS_STOPSOUND_SUCCESS_SOURCE_SOUND,
-                 COMMANDS_STOPSOUND_SUCCESS_SOURCELESS_ANY, COMMANDS_STOPSOUND_SUCCESS_SOURCELESS_SOUND -> {
+                 COMMANDS_STOPSOUND_SUCCESS_SOURCELESS_ANY, COMMANDS_STOPSOUND_SUCCESS_SOURCELESS_SOUND,
+                 COMMANDS_PLAYSOUND_SUCCESS, COMMANDS_STOPSOUND_SUCCESS_ALL,
+                 COMMANDS_STOPSOUND_SUCCESS_INDIVIDUALSOUND, COMMANDS_STOPSOUND_SUCCESS_SOUNDSOURCE -> {
                 Optional<Sound> sound = soundExtractor.extract(translationKey, event.getTranslatableComponent());
                 if (sound.isEmpty()) return;
 

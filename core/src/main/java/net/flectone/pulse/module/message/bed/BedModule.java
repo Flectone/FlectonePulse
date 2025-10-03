@@ -65,7 +65,8 @@ public class BedModule extends AbstractModuleLocalization<Localization.Message.B
                 .format(localization -> switch (minecraftTranslationKey) {
                     case BLOCK_MINECRAFT_BED_NO_SLEEP, TILE_BED_NO_SLEEP -> localization.getNoSleep();
                     case BLOCK_MINECRAFT_BED_NOT_SAFE, TILE_BED_NOT_SAFE -> localization.getNotSafe();
-                    case BLOCK_MINECRAFT_BED_OBSTRUCTED, BLOCK_MINECRAFT_SPAWN_NOT_VALID -> localization.getObstructed();
+                    case BLOCK_MINECRAFT_BED_OBSTRUCTED, BLOCK_MINECRAFT_SPAWN_NOT_VALID,
+                         BLOCK_MINECRAFT_BED_NOT_VALID, TILE_BED_NOT_VALID -> localization.getObstructed();
                     case BLOCK_MINECRAFT_BED_OCCUPIED, TILE_BED_OCCUPIED -> localization.getOccupied();
                     case BLOCK_MINECRAFT_BED_TOO_FAR_AWAY -> localization.getTooFarAway();
                     default -> "";

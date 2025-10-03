@@ -7,12 +7,13 @@ import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 @SuperBuilder
 public class SummonMetadata<L extends Localization.Localizable> extends EventMetadata<L> {
 
-    @NonNull
+    @Nullable
     private final FEntity target;
 
     @NonNull

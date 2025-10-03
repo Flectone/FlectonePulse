@@ -29,8 +29,9 @@ public class LocatePulseListener implements PulseListener {
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
         MinecraftTranslationKey translationKey = event.getTranslationKey();
         switch (translationKey) {
-            case COMMANDS_LOCATE_BIOME_SUCCESS, COMMANDS_LOCATE_POI_SUCCESS, COMMANDS_LOCATE_STRUCTURE_SUCCESS -> {
-                Optional<Locate> optionalLocate = locateExtractor.extract(event.getTranslatableComponent());
+            case COMMANDS_LOCATE_BIOME_SUCCESS, COMMANDS_LOCATE_POI_SUCCESS, COMMANDS_LOCATE_STRUCTURE_SUCCESS,
+                 COMMANDS_LOCATE_SUCCESS, COMMANDS_LOCATEBIOME_SUCCESS -> {
+                Optional<Locate> optionalLocate = locateExtractor.extract(translationKey, event.getTranslatableComponent());
                 if (optionalLocate.isEmpty()) return;
 
                 event.setCancelled(true);

@@ -68,10 +68,10 @@ public class WorldborderModule extends AbstractModuleLocalization<Localization.M
                             case COMMANDS_WORLDBORDER_CENTER_SUCCESS -> localization.getCenter();
                             case COMMANDS_WORLDBORDER_DAMAGE_AMOUNT_SUCCESS -> localization.getDamage().getAmount();
                             case COMMANDS_WORLDBORDER_DAMAGE_BUFFER_SUCCESS -> localization.getDamage().getBuffer();
-                            case COMMANDS_WORLDBORDER_GET -> localization.getGet();
-                            case COMMANDS_WORLDBORDER_SET_GROW -> localization.getSet().getGrow();
-                            case COMMANDS_WORLDBORDER_SET_IMMEDIATE -> localization.getSet().getImmediate();
-                            case COMMANDS_WORLDBORDER_SET_SHRINK -> localization.getSet().getShrink();
+                            case COMMANDS_WORLDBORDER_GET, COMMANDS_WORLDBORDER_GET_SUCCESS -> localization.getGet();
+                            case COMMANDS_WORLDBORDER_SET_GROW, COMMANDS_WORLDBORDER_SETSLOWLY_GROW_SUCCESS -> localization.getSet().getGrow();
+                            case COMMANDS_WORLDBORDER_SET_IMMEDIATE, COMMANDS_WORLDBORDER_SET_SUCCESS -> localization.getSet().getImmediate();
+                            case COMMANDS_WORLDBORDER_SET_SHRINK, COMMANDS_WORLDBORDER_SETSLOWLY_SHRINK_SUCCESS -> localization.getSet().getShrink();
                             case COMMANDS_WORLDBORDER_WARNING_DISTANCE_SUCCESS -> localization.getWarning().getDistance();
                             case COMMANDS_WORLDBORDER_WARNING_TIME_SUCCESS -> localization.getWarning().getTime();
                             default -> "";

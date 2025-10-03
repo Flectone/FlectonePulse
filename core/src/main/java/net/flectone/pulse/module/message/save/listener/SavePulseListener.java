@@ -22,7 +22,8 @@ public class SavePulseListener implements PulseListener {
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
         MinecraftTranslationKey translationKey = event.getTranslationKey();
         switch (translationKey) {
-            case COMMANDS_SAVE_DISABLED, COMMANDS_SAVE_ENABLED, COMMANDS_SAVE_SAVING, COMMANDS_SAVE_SUCCESS -> {
+            case COMMANDS_SAVE_DISABLED, COMMANDS_SAVE_ENABLED, COMMANDS_SAVE_SAVING,
+                 COMMANDS_SAVE_SUCCESS, COMMANDS_SAVE_START -> {
                 event.setCancelled(true);
                 saveModule.send(event.getFPlayer(), translationKey);
             }

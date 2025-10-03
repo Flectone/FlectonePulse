@@ -1226,6 +1226,8 @@ public final class Localization extends YamlFile implements ModuleConfig {
             Query query = new Query();
             AddSet set = new AddSet();
 
+            String taken;
+
             @Getter
             public static final class Query {
                 String levels;

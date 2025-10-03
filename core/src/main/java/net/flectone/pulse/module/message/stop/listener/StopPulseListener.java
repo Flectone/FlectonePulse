@@ -6,7 +6,6 @@ import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
 import net.flectone.pulse.module.message.stop.StopModule;
-import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 
 @Singleton
 public class StopPulseListener implements PulseListener {
@@ -20,10 +19,12 @@ public class StopPulseListener implements PulseListener {
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
-        if (event.getTranslationKey() != MinecraftTranslationKey.COMMANDS_STOP_SUCCESS) return;
-
-        event.setCancelled(true);
-        stopModule.send(event.getFPlayer());
+        switch (event.getTranslationKey()) {
+            case COMMANDS_STOP_SUCCESS, COMMANDS_STOP_START -> {
+                event.setCancelled(true);
+                stopModule.send(event.getFPlayer());
+            }
+        }
     }
 
 }

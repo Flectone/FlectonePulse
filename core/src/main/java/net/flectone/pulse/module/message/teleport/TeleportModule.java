@@ -65,22 +65,7 @@ public class TeleportModule extends AbstractModuleLocalization<Localization.Mess
     public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey, TeleportEntity teleportEntity) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        if (translationKey == MinecraftTranslationKey.COMMANDS_TELEPORT_SUCCESS_ENTITY_SINGLE) {
-            sendMessage(TeleportEntityMetadata.<Localization.Message.Teleport>builder()
-                    .sender(fPlayer)
-                    .range(config().getRange())
-                    .format(localization -> localization.getEntity().getSingle())
-                    .teleportEntity(teleportEntity)
-                    .translationKey(translationKey)
-                    .destination(config().getDestination())
-                    .sound(getModuleSound())
-                    .tagResolvers(fResolver -> new TagResolver[]{
-                            targetTag(fResolver, teleportEntity.getTarget()),
-                            targetTag("second_target", fResolver, teleportEntity.getSecondTarget())
-                    })
-                    .build()
-            );
-        } else {
+        if (translationKey == MinecraftTranslationKey.COMMANDS_TELEPORT_SUCCESS_ENTITY_MULTIPLE) {
             sendMessage(TeleportEntityMetadata.<Localization.Message.Teleport>builder()
                     .sender(fPlayer)
                     .range(config().getRange())
@@ -96,6 +81,21 @@ public class TeleportModule extends AbstractModuleLocalization<Localization.Mess
                     .tagResolvers(fResolver -> new TagResolver[]{targetTag("second_target", fResolver, teleportEntity.getSecondTarget())})
                     .build()
             );
+        } else {
+            sendMessage(TeleportEntityMetadata.<Localization.Message.Teleport>builder()
+                    .sender(fPlayer)
+                    .range(config().getRange())
+                    .format(localization -> localization.getEntity().getSingle())
+                    .teleportEntity(teleportEntity)
+                    .translationKey(translationKey)
+                    .destination(config().getDestination())
+                    .sound(getModuleSound())
+                    .tagResolvers(fResolver -> new TagResolver[]{
+                            targetTag(fResolver, teleportEntity.getTarget()),
+                            targetTag("second_target", fResolver, teleportEntity.getSecondTarget())
+                    })
+                    .build()
+            );
         }
     }
 
@@ -107,7 +107,7 @@ public class TeleportModule extends AbstractModuleLocalization<Localization.Mess
                 .sender(fPlayer)
                 .range(config().getRange())
                 .format(localization -> StringUtils.replaceEach(
-                        translationKey == MinecraftTranslationKey.COMMANDS_TELEPORT_SUCCESS_LOCATION_SINGLE ? localization.getLocation().getSingle() : localization.getLocation().getMultiple(),
+                        translationKey == MinecraftTranslationKey.COMMANDS_TELEPORT_SUCCESS_LOCATION_MULTIPLE ? localization.getLocation().getMultiple() : localization.getLocation().getSingle(),
                         new String[]{"<entities>", "<x>", "<y>", "<z>"},
                         new String[]{StringUtils.defaultString(teleportLocation.getEntities()), teleportLocation.getX(), teleportLocation.getY(), teleportLocation.getZ()}
                 ))

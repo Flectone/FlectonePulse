@@ -21,10 +21,13 @@ public class WeatherPulseListener implements PulseListener {
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
         MinecraftTranslationKey translationKey = event.getTranslationKey();
-        if (!translationKey.startsWith("commands.weather.set")) return;
-
-        event.setCancelled(true);
-        weatherModule.send(event.getFPlayer(), translationKey);
+        switch (translationKey) {
+            case COMMANDS_WEATHER_SET_CLEAR, COMMANDS_WEATHER_SET_RAIN, COMMANDS_WEATHER_SET_THUNDER,
+                 COMMANDS_WEATHER_CLEAR, COMMANDS_WEATHER_RAIN, COMMANDS_WEATHER_THUNDER -> {
+                event.setCancelled(true);
+                weatherModule.send(event.getFPlayer(), translationKey);
+            }
+        }
     }
 
 }

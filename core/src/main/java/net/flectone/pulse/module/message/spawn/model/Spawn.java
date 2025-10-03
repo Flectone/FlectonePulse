@@ -19,7 +19,7 @@ public class Spawn {
     @NonNull
     private final String z;
 
-    @NonNull
+    @Nullable
     private final String angle;
 
     @Nullable

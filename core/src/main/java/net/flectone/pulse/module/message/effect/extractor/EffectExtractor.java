@@ -31,7 +31,8 @@ public class EffectExtractor extends Extractor {
                 yield Optional.of(effect);
             }
             // Removed every effect from %s
-            case COMMANDS_EFFECT_CLEAR_EVERYTHING_SUCCESS_SINGLE -> {
+            // Took all effects from %s
+            case COMMANDS_EFFECT_CLEAR_EVERYTHING_SUCCESS_SINGLE, COMMANDS_EFFECT_SUCCESS_REMOVED_ALL -> {
                 Optional<FEntity> target = extractFEntity(translatableComponent, 0);
                 if (target.isEmpty()) yield Optional.empty();
 
@@ -57,9 +58,27 @@ public class EffectExtractor extends Extractor {
 
                 yield Optional.of(effect);
             }
+            // Given %1$s (ID %2$d) * %3$d to %4$s for %5$d seconds
+            case COMMANDS_EFFECT_SUCCESS -> {
+                Optional<String> name = extractTranslatableKey(translatableComponent, 0);
+                if (name.isEmpty()) yield Optional.empty();
+
+                // skip id and level
+                Optional<FEntity> target = extractFEntity(translatableComponent, 3);
+                if (target.isEmpty()) yield Optional.empty();
+
+                Effect effect = Effect.builder()
+                        .name(name.get())
+                        .target(target.get())
+                        .build();
+
+                yield Optional.of(effect);
+            }
             // Applied effect %s to %s
             // Removed effect %s from %s
-            case COMMANDS_EFFECT_GIVE_SUCCESS_SINGLE, COMMANDS_EFFECT_CLEAR_SPECIFIC_SUCCESS_SINGLE -> {
+            // Took %1$s from %2$s
+            case COMMANDS_EFFECT_GIVE_SUCCESS_SINGLE, COMMANDS_EFFECT_CLEAR_SPECIFIC_SUCCESS_SINGLE,
+                 COMMANDS_EFFECT_SUCCESS_REMOVED -> {
                 Optional<String> name = extractTranslatableKey(translatableComponent, 0);
                 if (name.isEmpty()) yield Optional.empty();
 

@@ -66,11 +66,11 @@ public class EffectModule extends AbstractModuleLocalization<Localization.Messag
                 .sender(fPlayer)
                 .format(string -> StringUtils.replaceEach(
                         switch (translationKey) {
-                            case COMMANDS_EFFECT_CLEAR_EVERYTHING_SUCCESS_SINGLE -> string.getClear().getEverything().getSingle();
+                            case COMMANDS_EFFECT_CLEAR_EVERYTHING_SUCCESS_SINGLE, COMMANDS_EFFECT_SUCCESS_REMOVED_ALL -> string.getClear().getEverything().getSingle();
                             case COMMANDS_EFFECT_CLEAR_EVERYTHING_SUCCESS_MULTIPLE -> string.getClear().getEverything().getMultiple();
-                            case COMMANDS_EFFECT_CLEAR_SPECIFIC_SUCCESS_SINGLE -> string.getClear().getSpecific().getSingle();
+                            case COMMANDS_EFFECT_CLEAR_SPECIFIC_SUCCESS_SINGLE, COMMANDS_EFFECT_SUCCESS_REMOVED -> string.getClear().getSpecific().getSingle();
                             case COMMANDS_EFFECT_CLEAR_SPECIFIC_SUCCESS_MULTIPLE -> string.getClear().getSpecific().getMultiple();
-                            case COMMANDS_EFFECT_GIVE_SUCCESS_SINGLE -> string.getGive().getSingle();
+                            case COMMANDS_EFFECT_GIVE_SUCCESS_SINGLE, COMMANDS_EFFECT_SUCCESS -> string.getGive().getSingle();
                             case COMMANDS_EFFECT_GIVE_SUCCESS_MULTIPLE -> string.getGive().getMultiple();
                             default -> "";
                         },

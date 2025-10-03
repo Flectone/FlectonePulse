@@ -653,6 +653,7 @@ public class EnglishLocale implements Locale {
         localization.message.experience.set.levels.multiple = "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience levels to <fcolor:2><players> <fcolor:1>players";
         localization.message.experience.set.points.single = "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience points to <target>";
         localization.message.experience.set.points.multiple = "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience points to <fcolor:2><players> <fcolor:1>players";
+        localization.message.experience.taken = "<fcolor:1>⏺ Taken <fcolor:2><amount> <fcolor:1>levels from <target>";
 
         localization.message.fill.format = "<fcolor:1>⏹ Successfully filled <fcolor:2><blocks> <fcolor:1>block(s)";
 
@@ -736,9 +737,9 @@ public class EnglishLocale implements Locale {
         localization.message.kill.single = "<color:#778899>☠ <fcolor:1>Killed <target>";
         localization.message.kill.multiple = "<color:#778899>☠ <fcolor:1>Killed <fcolor:2><entities> <fcolor:1>entities";
 
-        localization.message.locate.biome = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><value> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
-        localization.message.locate.poi = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><value> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
-        localization.message.locate.structure = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><value> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @s <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
+        localization.message.locate.biome = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><value> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @p <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
+        localization.message.locate.poi = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><value> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @p <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
+        localization.message.locate.structure = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><value> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @p <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
 
         localization.message.objective.belowname.format = "<fcolor:1>ms";
 

@@ -21,10 +21,17 @@ public class BedPulseListener implements PulseListener {
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
         MinecraftTranslationKey translationKey = event.getTranslationKey();
-        if (!translationKey.startsWith("block.minecraft.bed.") && !translationKey.startsWith("tile.bed")) return;
-
-        event.setCancelled(true);
-        bedModule.send(event.getFPlayer(), translationKey);
+        switch (translationKey) {
+            case BLOCK_MINECRAFT_BED_NO_SLEEP, TILE_BED_NO_SLEEP,
+                 BLOCK_MINECRAFT_BED_NOT_SAFE, TILE_BED_NOT_SAFE,
+                 BLOCK_MINECRAFT_BED_OBSTRUCTED, BLOCK_MINECRAFT_SPAWN_NOT_VALID,
+                 BLOCK_MINECRAFT_BED_NOT_VALID, TILE_BED_NOT_VALID,
+                 BLOCK_MINECRAFT_BED_OCCUPIED, TILE_BED_OCCUPIED,
+                 BLOCK_MINECRAFT_BED_TOO_FAR_AWAY -> {
+                event.setCancelled(true);
+                bedModule.send(event.getFPlayer(), translationKey);
+            }
+        }
     }
 
 }

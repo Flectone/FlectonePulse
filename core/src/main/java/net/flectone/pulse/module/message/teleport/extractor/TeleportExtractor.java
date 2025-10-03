@@ -36,7 +36,7 @@ public class TeleportExtractor extends Extractor {
                 yield Optional.of(teleportEntity);
             }
             // Teleported %s to %s
-            case COMMANDS_TELEPORT_SUCCESS_ENTITY_SINGLE -> {
+            case COMMANDS_TELEPORT_SUCCESS_ENTITY_SINGLE, COMMANDS_TP_SUCCESS -> {
                 Optional<FEntity> target = extractFEntity(translatableComponent, 0);
                 if (target.isEmpty()) yield Optional.empty();
 
@@ -77,7 +77,7 @@ public class TeleportExtractor extends Extractor {
                 yield Optional.of(teleportLocation);
             }
             // Teleported %s to %s, %s, %s
-            case COMMANDS_TELEPORT_SUCCESS_LOCATION_SINGLE -> {
+            case COMMANDS_TELEPORT_SUCCESS_LOCATION_SINGLE, COMMANDS_TP_SUCCESS_COORDINATES -> {
                 Optional<FEntity> target = extractFEntity(translatableComponent, 0);
                 if (target.isEmpty()) yield Optional.empty();
 

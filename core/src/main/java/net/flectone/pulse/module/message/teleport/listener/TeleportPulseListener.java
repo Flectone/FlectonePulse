@@ -29,17 +29,17 @@ public class TeleportPulseListener implements PulseListener {
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {
         MinecraftTranslationKey translationKey = event.getTranslationKey();
-        if (!translationKey.startsWith("commands.teleport.success")) return;
-
         switch (translationKey) {
-            case COMMANDS_TELEPORT_SUCCESS_ENTITY_MULTIPLE, COMMANDS_TELEPORT_SUCCESS_ENTITY_SINGLE -> {
+            case COMMANDS_TELEPORT_SUCCESS_ENTITY_MULTIPLE, COMMANDS_TELEPORT_SUCCESS_ENTITY_SINGLE,
+                 COMMANDS_TP_SUCCESS -> {
                 Optional<TeleportEntity> optionalTeleportEntity = teleportExtractor.extractEntity(translationKey, event.getTranslatableComponent());
                 if (optionalTeleportEntity.isEmpty()) return;
 
                 event.setCancelled(true);
                 teleportModule.send(event.getFPlayer(), translationKey, optionalTeleportEntity.get());
             }
-            case COMMANDS_TELEPORT_SUCCESS_LOCATION_MULTIPLE, COMMANDS_TELEPORT_SUCCESS_LOCATION_SINGLE -> {
+            case COMMANDS_TELEPORT_SUCCESS_LOCATION_MULTIPLE, COMMANDS_TELEPORT_SUCCESS_LOCATION_SINGLE,
+                 COMMANDS_TP_SUCCESS_COORDINATES -> {
                 Optional<TeleportLocation> optionalTeleportLocation = teleportExtractor.extractLocation(translationKey, event.getTranslatableComponent());
                 if (optionalTeleportLocation.isEmpty()) return;
 

@@ -58,8 +58,12 @@ public class ExperienceExtractor extends Extractor {
             // Gave %s experience points to %s
             // Set %s experience levels on %s
             // Set %s experience points on %s
+            // Given %d experience to %s
+            // Given %d levels to %s
+            // Taken %d levels from %s
             case COMMANDS_EXPERIENCE_ADD_LEVELS_SUCCESS_SINGLE, COMMANDS_EXPERIENCE_ADD_POINTS_SUCCESS_SINGLE,
-                 COMMANDS_EXPERIENCE_SET_LEVELS_SUCCESS_SINGLE, COMMANDS_EXPERIENCE_SET_POINTS_SUCCESS_SINGLE -> {
+                 COMMANDS_EXPERIENCE_SET_LEVELS_SUCCESS_SINGLE, COMMANDS_EXPERIENCE_SET_POINTS_SUCCESS_SINGLE,
+                 COMMANDS_XP_SUCCESS, COMMANDS_XP_SUCCESS_LEVELS, COMMANDS_XP_SUCCESS_NEGATIVE_LEVELS -> {
                 Optional<String> amount = extractTextContent(translatableComponent, 0);
                 if (amount.isEmpty()) yield Optional.empty();
 

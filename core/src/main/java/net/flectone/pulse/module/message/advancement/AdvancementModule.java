@@ -82,7 +82,7 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
         sendMessage(AdvancementMetadata.<Localization.Message.Advancement>builder()
                 .sender(fTarget)
                 .format(localization -> switch (translationKey) {
-                    case CHAT_TYPE_ADVANCEMENT_TASK -> localization.getFormatTask();
+                    case CHAT_TYPE_ADVANCEMENT_TASK, CHAT_TYPE_ACHIEVEMENT -> localization.getFormatTask();
                     case CHAT_TYPE_ADVANCEMENT_GOAL -> localization.getFormatGoal();
                     case CHAT_TYPE_ADVANCEMENT_CHALLENGE -> localization.getFormatChallenge();
                     case CHAT_TYPE_ACHIEVEMENT_TAKEN -> localization.getFormatTaken();
@@ -119,12 +119,12 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
                         switch (translationKey) {
                             case COMMANDS_ADVANCEMENT_GRANT_MANY_TO_MANY_SUCCESS -> localization.getGrant().getManyToMany();
                             case COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_MANY_SUCCESS -> localization.getRevoke().getManyToMany();
-                            case COMMANDS_ADVANCEMENT_GRANT_MANY_TO_ONE_SUCCESS -> localization.getGrant().getManyToOne();
-                            case COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS -> localization.getRevoke().getManyToOne();
+                            case COMMANDS_ADVANCEMENT_GRANT_MANY_TO_ONE_SUCCESS, COMMANDS_ACHIEVEMENT_GIVE_SUCCESS_ALL -> localization.getGrant().getManyToOne();
+                            case COMMANDS_ADVANCEMENT_REVOKE_MANY_TO_ONE_SUCCESS, COMMANDS_ACHIEVEMENT_TAKE_SUCCESS_ALL -> localization.getRevoke().getManyToOne();
                             case COMMANDS_ADVANCEMENT_GRANT_ONE_TO_MANY_SUCCESS -> localization.getGrant().getOneToMany();
                             case COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_MANY_SUCCESS -> localization.getRevoke().getOneToMany();
-                            case COMMANDS_ADVANCEMENT_GRANT_ONE_TO_ONE_SUCCESS -> localization.getGrant().getOneToOne();
-                            case COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS -> localization.getRevoke().getOneToOne();
+                            case COMMANDS_ADVANCEMENT_GRANT_ONE_TO_ONE_SUCCESS, COMMANDS_ACHIEVEMENT_GIVE_SUCCESS_ONE -> localization.getGrant().getOneToOne();
+                            case COMMANDS_ADVANCEMENT_REVOKE_ONE_TO_ONE_SUCCESS, COMMANDS_ACHIEVEMENT_TAKE_SUCCESS_ONE -> localization.getRevoke().getOneToOne();
                             case COMMANDS_ADVANCEMENT_GRANT_CRITERION_TO_MANY_SUCCESS -> localization.getGrant().getCriterionToMany();
                             case COMMANDS_ADVANCEMENT_GRANT_CRITERION_TO_ONE_SUCCESS -> localization.getGrant().getCriterionToOne();
                             case COMMANDS_ADVANCEMENT_REVOKE_CRITERION_TO_MANY_SUCCESS -> localization.getRevoke().getCriterionToMany();
@@ -150,7 +150,9 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
         if (!isEnable()) return empty(tag);
 
         HoverEvent<?> hoverEvent = advancementComponent.hoverEvent();
-        if (hoverEvent == null || !(hoverEvent.value() instanceof Component hoverEventComponent)) return empty(tag);
+        Component hoverEventComponent = hoverEvent != null  && hoverEvent.value() instanceof Component component
+                ? component
+                : Component.empty(); // support legacy achievement
 
         boolean isChallenge = NamedTextColor.DARK_PURPLE.equals(hoverEventComponent.color());
 
@@ -167,7 +169,10 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
 
             return Tag.selfClosingInserting(componentTag.replaceText(TextReplacementConfig.builder()
                     .match("<advancement>")
-                    .replacement(advancementComponent.hoverEvent(HoverEvent.showText(hoverEventComponent.color(componentTag.color()))))
+                    .replacement(Component.IS_NOT_EMPTY.test(hoverEventComponent)
+                            ? advancementComponent.hoverEvent(HoverEvent.showText(hoverEventComponent.color(componentTag.color())))
+                            : advancementComponent // not show empty text
+                    )
                     .build()
             ));
         });

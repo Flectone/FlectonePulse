@@ -65,7 +65,7 @@ public class SaveModule extends AbstractModuleLocalization<Localization.Message.
                 .format(localization -> switch (translationKey) {
                     case COMMANDS_SAVE_DISABLED -> localization.getDisabled();
                     case COMMANDS_SAVE_ENABLED -> localization.getEnabled();
-                    case COMMANDS_SAVE_SAVING -> localization.getSaving();
+                    case COMMANDS_SAVE_SAVING, COMMANDS_SAVE_START -> localization.getSaving();
                     case COMMANDS_SAVE_SUCCESS -> localization.getSuccess();
                     default -> "";
                 })

@@ -30,7 +30,7 @@ public class GivePulseListener implements PulseListener {
         MinecraftTranslationKey translationKey = event.getTranslationKey();
         if (!translationKey.startsWith("commands.give.success")) return;
 
-        Optional<Give> give = giveExtractor.extract(event.getTranslatableComponent());
+        Optional<Give> give = giveExtractor.extract(translationKey, event.getTranslatableComponent());
         if (give.isEmpty()) return;
 
         translationKey = give.get().getPlayers() == null ? translationKey : MinecraftTranslationKey.COMMANDS_GIVE_SUCCESS_MULTIPLE;
