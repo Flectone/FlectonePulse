@@ -413,49 +413,16 @@ public class LegacyColorConvertor {
         };
     }
 
-    /**
-     * Translation options
-     */
     public enum Option {
-        /**
-         * Translate color (e.g. &a &1 #123456)
-         */
         COLOR,
-        /**
-         * Translate standalone hex colors (e.g. #123456)
-         */
         HEX_COLOR_STANDALONE,
-        /**
-         * Translate double hash color (e.g. <##123456>)
-         */
         COLOR_DOUBLE_HASH,
-        /**
-         * Use the full MiniMessage color format {@code <color:#123456>} instead of the shortened one {@code <#123456>}
-         */
         VERBOSE_HEX_COLOR,
-        /**
-         * Translate formatting (e.g. &l &r)
-         */
         FORMAT,
-        /**
-         * Translate custom gradient format (e.g. &@gold-#123456&)
-         */
         GRADIENT,
-        /**
-         * Place the reset tag when there's 2+ tags to close
-         */
         FAST_RESET,
-        /**
-         * Translate the reset tag {@code &r}
-         */
         RESET,
-        /**
-         * Close color tags when another color was found
-         */
         CLOSE_COLORS,
-        /**
-         * Allow EssentialsX-like {@code &&} escaping
-         */
         DOUBLE_TO_ESCAPE
     }
 }
