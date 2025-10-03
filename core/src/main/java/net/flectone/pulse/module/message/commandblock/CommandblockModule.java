@@ -3,9 +3,9 @@ package net.flectone.pulse.module.message.commandblock;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
@@ -15,8 +15,10 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 import org.jetbrains.annotations.Nullable;
 
 @Singleton
@@ -66,12 +68,17 @@ public class CommandblockModule extends AbstractModuleLocalization<Localization.
                 .sender(fPlayer)
                 .format(localization -> translationKey == MinecraftTranslationKey.ADV_MODE_NOT_ENABLED
                         ? localization.getNotEnabled()
-                        : Strings.CS.replace(localization.getFormat(), "<command>", StringUtils.defaultString(command))
+                        : localization.getFormat()
                 )
                 .command(command)
                 .translationKey(translationKey)
                 .range(config().getRange())
                 .destination(config().getDestination())
+                .tagResolvers(fReceiver -> new TagResolver[]{
+                        TagResolver.resolver("command", (argumentQueue, context) ->
+                                Tag.selfClosingInserting(Component.text(StringUtils.defaultString(command)))
+                        )
+                })
                 .sound(getModuleSound())
                 .build()
         );
