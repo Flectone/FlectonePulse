@@ -65,7 +65,7 @@ public class FabricListenerRegistry extends ListenerRegistry {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             CommandNode<ServerCommandSource> root = dispatcher.getRoot();
 
-            for (String command : config.getFabricDisabledCommands()) {
+            for (String command : config.getCommand().getDisabledFabric()) {
                 root.getChildren().removeIf(node -> node.getName().equals(command));
             }
         });

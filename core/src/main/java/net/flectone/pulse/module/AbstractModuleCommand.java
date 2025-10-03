@@ -47,7 +47,7 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
     // all prompt methods for solving the problems of a non-existent argument
     // when changing the plugin language at runtime
     protected void clearPrompts() {
-        if (fileResolver.getConfig().isUnregisterOwnCommands()) {
+        if (fileResolver.getConfig().getCommand().isUnregisterOnReload()) {
             prompts.clear();
         }
     }

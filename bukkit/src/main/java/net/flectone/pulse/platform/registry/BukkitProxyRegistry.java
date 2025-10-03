@@ -31,7 +31,7 @@ public class BukkitProxyRegistry extends ProxyRegistry {
         super.onEnable();
 
         Config config = fileResolver.getConfig();
-        boolean isBukkitProxyEnable = config.isBungeecord() || config.isVelocity();
+        boolean isBukkitProxyEnable = config.getProxy().isBungeecord() || config.getProxy().isVelocity();
         if (isBukkitProxyEnable) {
             warnIfLocalDatabase();
 

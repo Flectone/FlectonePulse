@@ -31,7 +31,7 @@ public class FabricProxyRegistry extends ProxyRegistry {
         super.onEnable();
 
         Config config = fileResolver.getConfig();
-        if (config.isBungeecord() || config.isVelocity()) {
+        if (config.getProxy().isBungeecord() || config.getProxy().isVelocity()) {
             warnIfLocalDatabase();
 
             FabricProxy fabricProxy = injector.getInstance(FabricProxy.class);

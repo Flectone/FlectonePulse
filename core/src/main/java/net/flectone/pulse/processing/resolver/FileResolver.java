@@ -63,7 +63,7 @@ public class FileResolver {
     }
 
     public Localization getLocalization(FEntity sender) {
-        if (!config.isLanguagePlayer()) return defaultLocalization;
+        if (!config.getLanguage().isByPlayer()) return defaultLocalization;
         if (!(sender instanceof FPlayer fPlayer)) return defaultLocalization;
 
         return localizationMap.getOrDefault(fPlayer.getSetting(SettingText.LOCALE), defaultLocalization);
@@ -71,7 +71,7 @@ public class FileResolver {
 
     public void reload() throws IOException {
         yamlFileProcessor.reload(config);
-        config.setLanguage(config.getLanguage());
+        config.getLanguage().setType(config.getLanguage().getType());
 
         preInitVersion = config.getVersion();
         boolean versionChanged = !preInitVersion.equals(BuildConfig.PROJECT_VERSION);
@@ -83,7 +83,7 @@ public class FileResolver {
 
         reloadLanguages();
 
-        defaultLocalization = localizationMap.get(config.getLanguage());
+        defaultLocalization = localizationMap.get(config.getLanguage().getType());
 
         if (versionChanged) {
             // fix update permission name
@@ -120,7 +120,7 @@ public class FileResolver {
 
     private void reloadLanguages() throws IOException {
         Set<String> newLanguages = new HashSet<>(Set.of("ru_ru", "en_us"));
-        newLanguages.add(config.getLanguage());
+        newLanguages.add(config.getLanguage().getType());
 
         try (Stream<Path> paths = Files.walk(projectPath.resolve(Localization.FOLDER_NAME))) {
             paths.filter(Files::isRegularFile).forEach(path -> {

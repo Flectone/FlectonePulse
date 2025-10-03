@@ -56,7 +56,7 @@ public class LegacyBukkitCommandRegistry extends CommandRegistry {
                 .anyMatch(fPlayerCommand -> fPlayerCommand.rootComponent().name().equals(commandName));
 
         boolean needUnregister = plugin.getServer().getPluginCommand(commandName) != null
-                || config.isUnregisterOwnCommands() && isCloudCommand;
+                || config.getCommand().isUnregisterOnReload() && isCloudCommand;
 
         if (needUnregister) {
             unregisterCommand(commandName);
@@ -75,7 +75,7 @@ public class LegacyBukkitCommandRegistry extends CommandRegistry {
 
     @Override
     public void reload() {
-        if (!config.isUnregisterOwnCommands()) return;
+        if (!config.getCommand().isUnregisterOnReload()) return;
 
         syncRemoveCommands();
     }

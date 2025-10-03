@@ -74,7 +74,7 @@ public class ProxySender {
             output.writeUTF(tag.toProxyTag());
             output.writeUTF(metadataUUID.toString());
 
-            Set<String> clusters = fileResolver.getConfig().getClusters();
+            Set<String> clusters = fileResolver.getConfig().getProxy().getClusters();
             output.writeInt(clusters.size());
             for (String cluster : clusters) {
                 output.writeUTF(cluster);

@@ -98,11 +98,11 @@ public class FabricProxy implements Proxy {
 
     @Nullable
     public String getChannel() {
-        if (config.isBungeecord()) {
+        if (config.getProxy().isBungeecord()) {
             return "bungeecord:main";
         }
 
-        if (config.isVelocity()) {
+        if (config.getProxy().isVelocity()) {
             return "flectonepulse:main";
         }
 

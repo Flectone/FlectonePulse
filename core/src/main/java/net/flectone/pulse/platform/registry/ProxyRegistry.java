@@ -48,7 +48,7 @@ public class ProxyRegistry implements Registry {
     }
 
     public void onEnable() {
-        Config.Redis redis = fileResolver.getConfig().getRedis();
+        Config.Proxy.Redis redis = fileResolver.getConfig().getProxy().getRedis();
         if (redis.isEnable()) {
             warnIfLocalDatabase();
 

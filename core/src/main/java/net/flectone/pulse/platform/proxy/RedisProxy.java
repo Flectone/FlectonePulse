@@ -41,8 +41,8 @@ public class RedisProxy implements Proxy {
         this.systemVariableResolver = systemVariableResolver;
     }
 
-    public Config.Redis config() {
-        return fileResolver.getConfig().getRedis();
+    public Config.Proxy.Redis config() {
+        return fileResolver.getConfig().getProxy().getRedis();
     }
 
     @Override

@@ -71,7 +71,7 @@ public class ModernBukkitCommandRegistry extends LegacyBukkitCommandRegistry {
 
     @Override
     public void reload() {
-        if (!config.isUnregisterOwnCommands()) return;
+        if (!config.getCommand().isUnregisterOnReload()) return;
 
         if (reflectionResolver.isPaper()) {
             removeCommands();

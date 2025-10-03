@@ -76,11 +76,11 @@ public class BukkitProxy implements Proxy {
 
     @Nullable
     public String getChannel() {
-        if (config.isBungeecord()) {
+        if (config.getProxy().isBungeecord()) {
             return  "BungeeCord";
         }
 
-        if (config.isVelocity()) {
+        if (config.getProxy().isVelocity()) {
             return "flectonepulse:main";
         }
 

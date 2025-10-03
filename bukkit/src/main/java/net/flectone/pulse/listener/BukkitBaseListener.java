@@ -101,7 +101,7 @@ public class BukkitBaseListener implements Listener {
         try {
             return player.getLocale();
         } catch (NoSuchMethodError e) {
-            return config.getLanguage();
+            return config.getLanguage().getType();
         }
     }
 }

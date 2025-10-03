@@ -73,7 +73,7 @@ public class FlectonePulseAPI  {
         instance.get(ProxyRegistry.class).onEnable();
 
         // reload metrics service if enabled
-        if (fileResolver.getConfig().isMetrics()) {
+        if (fileResolver.getConfig().getMetrics().isEnable()) {
             instance.get(MetricsService.class).reload();
         }
 
@@ -97,7 +97,7 @@ public class FlectonePulseAPI  {
         instance.get(TaskScheduler.class).shutdown();
 
         // send metrics data if enabled
-        if (instance.get(FileResolver.class).getConfig().isMetrics()) {
+        if (instance.get(FileResolver.class).getConfig().getMetrics().isEnable()) {
             instance.get(MetricsService.class).send();
         }
 
@@ -198,7 +198,7 @@ public class FlectonePulseAPI  {
         );
 
         // reload metrics service if enabled
-        if (fileResolver.getConfig().isMetrics()) {
+        if (fileResolver.getConfig().getMetrics().isEnable()) {
             instance.get(MetricsService.class).reload();
         }
 

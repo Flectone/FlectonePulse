@@ -144,7 +144,7 @@ public class ProxyMessageHandler {
             return;
         }
 
-        Set<String> configClusters = fileResolver.getConfig().getClusters();
+        Set<String> configClusters = fileResolver.getConfig().getProxy().getClusters();
         if (!configClusters.isEmpty() && configClusters.stream().noneMatch(proxyClusters::contains)) {
             return;
         }

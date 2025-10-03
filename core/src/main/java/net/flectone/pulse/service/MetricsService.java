@@ -60,15 +60,24 @@ public class MetricsService {
         Config config = fileResolver.getConfig();
 
         metricsDTO.setProjectVersion(config.getVersion());
-        metricsDTO.setProjectLanguage(config.getLanguage());
+        metricsDTO.setProjectLanguage(config.getLanguage().getType());
         metricsDTO.setOnlineMode(platformServerAdapter.isOnlineMode() ? "True" : "False");
-        metricsDTO.setProxyMode(config.isBungeecord() ? "BungeeCord" : config.isVelocity() ? "Velocity" : "None");
+        metricsDTO.setProxyMode(getProxyMode());
         metricsDTO.setDatabaseMode(config.getDatabase().getType().name());
         metricsDTO.setPlayerCount(platformServerAdapter.getOnlinePlayerCount());
         metricsDTO.setModules(module.collectModuleStatuses());
         metricsDTO.setCreatedAt(Instant.now().toString());
 
         metricsSender.sendMetrics(metricsDTO);
+    }
+
+    private String getProxyMode() {
+        Config.Proxy config = fileResolver.getConfig().getProxy();
+        if (config.isBungeecord()) return "BungeeCord";
+        if (config.isVelocity()) return "Velocity";
+        if (config.getRedis().isEnable()) return "Redis";
+
+        return "None";
     }
 
     private String getOsName() {
