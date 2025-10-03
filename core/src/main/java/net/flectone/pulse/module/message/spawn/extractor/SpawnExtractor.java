@@ -67,15 +67,35 @@ public class SpawnExtractor extends Extractor {
         }
 
         if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_14_2)) {
-            return extract1_14_2(spawnBuilder, translationKey, translatableComponent);
-        } else {
-            return extract1_16_5(spawnBuilder, translationKey, translatableComponent);
-        }
-    }
+            return switch (translationKey) {
+                // Set the world spawn point to %s, %s, %s [%s]
+                case COMMANDS_SETWORLDSPAWN_SUCCESS -> Optional.of(spawnBuilder.build());
+                // Set spawn point to %s, %s, %s for %s players
+                case COMMANDS_SPAWNPOINT_SUCCESS_MULTIPLE -> {
+                    Optional<String> players = extractTextContent(translatableComponent, 3);
+                    if (players.isEmpty()) yield Optional.empty();
 
-    private Optional<Spawn> extract1_16_5(Spawn.SpawnBuilder spawnBuilder,
-                                          MinecraftTranslationKey translationKey,
-                                          TranslatableComponent translatableComponent) {
+                    Spawn spawn = spawnBuilder
+                            .players(players.get())
+                            .build();
+
+                    yield Optional.of(spawn);
+                }
+                // Set spawn point to %s, %s, %s for %s
+                case COMMANDS_SPAWNPOINT_SUCCESS_SINGLE -> {
+                    Optional<FEntity> target = extractFEntity(translatableComponent, 3);
+                    if (target.isEmpty()) yield Optional.empty();
+
+                    Spawn spawn = spawnBuilder
+                            .target(target.get())
+                            .build();
+
+                    yield Optional.of(spawn);
+                }
+                default -> Optional.empty();
+            };
+        }
+
         Optional<String> angle = extractTextContent(translatableComponent, 3);
         if (angle.isEmpty()) return Optional.empty();
 
@@ -109,38 +129,6 @@ public class SpawnExtractor extends Extractor {
 
                 Spawn spawn = spawnBuilder
                         .world(world.get())
-                        .target(target.get())
-                        .build();
-
-                yield Optional.of(spawn);
-            }
-            default -> Optional.empty();
-        };
-    }
-
-    private Optional<Spawn> extract1_14_2(Spawn.SpawnBuilder spawnBuilder,
-                                          MinecraftTranslationKey translationKey,
-                                          TranslatableComponent translatableComponent) {
-        return switch (translationKey) {
-            // Set the world spawn point to %s, %s, %s [%s]
-            case COMMANDS_SETWORLDSPAWN_SUCCESS -> Optional.of(spawnBuilder.build());
-            // Set spawn point to %s, %s, %s for %s players
-            case COMMANDS_SPAWNPOINT_SUCCESS_MULTIPLE -> {
-                Optional<String> players = extractTextContent(translatableComponent, 3);
-                if (players.isEmpty()) yield Optional.empty();
-
-                Spawn spawn = spawnBuilder
-                        .players(players.get())
-                        .build();
-
-                yield Optional.of(spawn);
-            }
-            // Set spawn point to %s, %s, %s for %s
-            case COMMANDS_SPAWNPOINT_SUCCESS_SINGLE -> {
-                Optional<FEntity> target = extractFEntity(translatableComponent, 3);
-                if (target.isEmpty()) yield Optional.empty();
-
-                Spawn spawn = spawnBuilder
                         .target(target.get())
                         .build();
 
