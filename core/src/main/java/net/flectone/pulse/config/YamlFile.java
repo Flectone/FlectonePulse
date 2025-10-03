@@ -11,7 +11,7 @@ public abstract class YamlFile {
     @JsonIgnore
     private final Path pathToFile;
 
-    public YamlFile(Path pathToFile) {
+    protected YamlFile(Path pathToFile) {
         this.pathToFile = pathToFile;
     }
 
