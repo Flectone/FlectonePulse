@@ -20,6 +20,7 @@ import net.flectone.pulse.module.command.ignore.model.Ignore;
 import net.flectone.pulse.module.command.mail.model.Mail;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.processing.processor.YamlFileProcessor;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
@@ -49,6 +50,7 @@ public class Database {
     private final PacketProvider packetProvider;
     private final ReflectionResolver reflectionResolver;
     private final Provider<VersionDAO> versionDAOProvider;
+    private final YamlFileProcessor yamlFileProcessor;
 
     private HikariDataSource dataSource;
     private Jdbi jdbi;
@@ -61,7 +63,8 @@ public class Database {
                     FLogger fLogger,
                     PacketProvider packetProvider,
                     ReflectionResolver reflectionResolver,
-                    Provider<VersionDAO> versionDAOProvider) {
+                    Provider<VersionDAO> versionDAOProvider,
+                    YamlFileProcessor yamlFileProcessor) {
         this.fileResolver = fileResolver;
         this.projectPath = projectPath;
         this.systemVariableResolver = systemVariableResolver;
@@ -70,6 +73,7 @@ public class Database {
         this.packetProvider = packetProvider;
         this.reflectionResolver = reflectionResolver;
         this.versionDAOProvider = versionDAOProvider;
+        this.yamlFileProcessor = yamlFileProcessor;
     }
 
     public Config.Database config() {
@@ -79,9 +83,10 @@ public class Database {
     public void connect() throws IOException {
         if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)
                 && config().getType() == Type.SQLITE) {
-            fLogger.warning("SQLite database is not supported on this version of Minecraft");
-            fLogger.warning("H2 Database will be used");
+            fLogger.warning("SQLite database is not supported on this version of Minecraft, H2 Database will be used");
+
             config().setType(Type.H2);
+            yamlFileProcessor.save(fileResolver.getConfig());
         }
 
         HikariConfig hikariConfig = createHikaryConfig();
