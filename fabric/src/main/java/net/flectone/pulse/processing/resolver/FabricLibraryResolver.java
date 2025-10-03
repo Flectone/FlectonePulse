@@ -88,15 +88,6 @@ public class FabricLibraryResolver extends LibraryResolver {
                 .resolveTransitiveDependencies(true)
                 .build()
         );
-
-        addLibrary(Library.builder()
-                .groupId("org{}xerial")
-                .artifactId("sqlite-jdbc")
-                .version("3.47.1.0")
-                .repository(BuildConfig.MAVEN_REPOSITORY)
-                .resolveTransitiveDependencies(true)
-                .build()
-        );
     }
 
 }

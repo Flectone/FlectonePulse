@@ -77,7 +77,7 @@ public class Database {
     }
 
     public void connect() throws IOException {
-        if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_10_2)
+        if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)
                 && config().getType() == Type.SQLITE) {
             fLogger.warning("SQLite database is not supported on this version of Minecraft");
             fLogger.warning("H2 Database will be used");
@@ -145,6 +145,7 @@ public class Database {
                                 .artifactId("postgresql")
                                 .version(BuildConfig.POSTGRESQL_VERSION)
                                 .repository(BuildConfig.MAVEN_REPOSITORY)
+                                .resolveTransitiveDependencies(true)
                                 .build()
                         )
                 );
@@ -173,6 +174,7 @@ public class Database {
                                 .artifactId("h2")
                                 .version(BuildConfig.H2_VERSION)
                                 .repository(BuildConfig.MAVEN_REPOSITORY)
+                                .resolveTransitiveDependencies(true)
                                 .build()
                         )
                 );
@@ -192,6 +194,17 @@ public class Database {
                 hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "4096");
             }
             case SQLITE -> {
+                reflectionResolver.hasClassOrElse("org.sqlite.JDBC", libraryResolver ->
+                        libraryResolver.loadLibrary(Library.builder()
+                                .groupId("org{}xerial")
+                                .artifactId("sqlite-jdbc")
+                                .version(BuildConfig.SQLITE_JDBC_VERSION)
+                                .repository(BuildConfig.MAVEN_REPOSITORY)
+                                .resolveTransitiveDependencies(true)
+                                .build()
+                        )
+                );
+
                 connectionURL = connectionURL +
                         projectPath.toString() +
                         File.separator +
@@ -213,6 +226,7 @@ public class Database {
                                 .artifactId("mysql-connector-j")
                                 .version(BuildConfig.MYSQL_CONNECTOR_VERSION)
                                 .repository(BuildConfig.MAVEN_REPOSITORY)
+                                .resolveTransitiveDependencies(true)
                                 .build()
                         )
                 );
