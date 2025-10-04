@@ -31,7 +31,8 @@
         "https://maven.nucleoid.xyz/",
         "https://api.modrinth.com/maven",
         "https://maven.fabricmc.net/",
-        "https://repo1.maven.org/maven2/"
+        "https://repo1.maven.org/maven2/",
+        "https://maven.wagyourtail.xyz/releases"
       ]
     }
   ]
