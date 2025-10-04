@@ -25,7 +25,7 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.apache.commons.lang3.Strings;
+import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
@@ -40,6 +40,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 @Singleton
 public class BukkitServerAdapter implements PlatformServerAdapter {
@@ -292,18 +293,11 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     private Component createTranslatableItemName(org.bukkit.inventory.ItemStack itemStack, boolean translatable) {
-        if (translatable) {
-            String itemName = getItemName(itemStack);
+        String itemName = getItemName(itemStack);
+        Component itemComponent = Component.translatable(itemName);
 
-            return Component.translatable(itemName);
-        }
-
-        String itemName = Strings.CS.replace(
-                itemStack.getType().name().toLowerCase(),
-                "_",
-                " "
-        );
-
-        return Component.text(itemName);
+        return translatable
+                ? itemComponent
+                : GlobalTranslator.render(itemComponent, Locale.ROOT);
     }
 }

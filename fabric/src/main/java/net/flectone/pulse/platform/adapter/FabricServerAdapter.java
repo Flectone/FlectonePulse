@@ -24,6 +24,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.translation.GlobalTranslator;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +37,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 @Singleton
 public class FabricServerAdapter implements PlatformServerAdapter {
@@ -209,11 +211,11 @@ public class FabricServerAdapter implements PlatformServerAdapter {
     }
 
     private Component createTranslatableItemName(net.minecraft.item.ItemStack itemStack, boolean translatable) {
-        if (translatable) {
-            return Component.translatable(itemStack.getItem().getTranslationKey());
-        }
+        Component itemComponent = Component.translatable(itemStack.getItem().getTranslationKey());
 
-        return Component.text(itemStack.getItemName().getString());
+        return translatable
+                ? itemComponent
+                : GlobalTranslator.render(itemComponent, Locale.ROOT);
     }
 
     @Override
