@@ -1,11 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ],
-  "labels": [
-    "dependencies"
-  ],
+  "extends": ["config:recommended"],
+  "labels": ["dependencies"],
   "semanticCommitType": "build",
   "commitMessagePrefix": "chore(deps): ",
   "packageRules": [
@@ -37,11 +33,11 @@
       ]
     },
     {
-      "matchPackageNames": ["com.loohp/InteractiveChat"],
+      "matchPackageNames": ["com.loohp:InteractiveChat"],
       "registryUrls": ["https://repo.loohpjames.com/repository"]
     },
     {
-      "matchPackageNames": ["com.mojang/minecraft"],
+      "matchPackageNames": ["com.mojang:minecraft"],
       "registryUrls": ["https://libraries.minecraft.net"]
     }
   ]
