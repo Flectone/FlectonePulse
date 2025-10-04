@@ -4,35 +4,32 @@
   "labels": ["dependencies"],
   "semanticCommitType": "build",
   "commitMessagePrefix": "chore(deps): ",
+  "registryUrls": [
+    "https://jitpack.io",
+    "https://hub.spigotmc.org/nexus/content/repositories/snapshots/",
+    "https://oss.sonatype.org/content/groups/public/",
+    "https://repo.aikar.co/content/groups/aikar/",
+    "https://repo.codemc.io/repository/maven-releases/",
+    "https://repo.minebench.de",
+    "https://repo.alessiodp.com/snapshots",
+    "https://libraries.minecraft.net",
+    "https://maven.maxhenkel.de/repository/public",
+    "https://repo.extendedclip.com/content/repositories/placeholderapi/",
+    "https://repo.plasmoverse.com/releases",
+    "https://repo.plasmoverse.com/snapshots",
+    "https://repo.loohpjames.com/repository",
+    "https://repo.diogotc.com/releases",
+    "https://repo.codemc.io/repository/maven-snapshots/",
+    "https://maven.devs.beer/",
+    "https://maven.nucleoid.xyz/",
+    "https://api.modrinth.com/maven",
+    "https://maven.fabricmc.net/",
+    "https://repo1.maven.org/maven2/"
+  ],
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true
-    },
-    {
-      "registryUrls": [
-        "https://jitpack.io",
-        "https://hub.spigotmc.org/nexus/content/repositories/snapshots/",
-        "https://oss.sonatype.org/content/groups/public/",
-        "https://repo.aikar.co/content/groups/aikar/",
-        "https://repo.codemc.io/repository/maven-releases/",
-        "https://repo.minebench.de",
-        "https://repo.alessiodp.com/snapshots",
-        "https://libraries.minecraft.net",
-        "https://maven.maxhenkel.de/repository/public",
-        "https://repo.extendedclip.com/content/repositories/placeholderapi/",
-        "https://repo.plasmoverse.com/releases",
-        "https://repo.plasmoverse.com/snapshots",
-        "https://repo.loohpjames.com/repository",
-        "https://repo.diogotc.com/releases",
-        "https://repo.codemc.io/repository/maven-snapshots/",
-        "https://maven.devs.beer/",
-        "https://maven.nucleoid.xyz/",
-        "https://api.modrinth.com/maven",
-        "https://maven.fabricmc.net/",
-        "https://repo1.maven.org/maven2/"
-      ]
     }
-
   ]
 }
