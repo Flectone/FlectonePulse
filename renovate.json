@@ -35,6 +35,14 @@
         "https://maven.wagyourtail.xyz/releases",
         "https://maven.wagyourtail.xyz/snapshots"
       ]
+    },
+    {
+      "matchPackageNames": ["com.loohp/InteractiveChat"],
+      "registryUrls": ["https://repo.loohpjames.com/repository"]
+    },
+    {
+      "matchPackageNames": ["com.mojang/minecraft"],
+      "registryUrls": ["https://libraries.minecraft.net"]
     }
   ]
 }
