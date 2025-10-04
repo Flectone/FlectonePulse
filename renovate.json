@@ -35,10 +35,6 @@
         "https://maven.wagyourtail.xyz/releases",
         "https://maven.wagyourtail.xyz/snapshots"
       ]
-    },
-    {
-      "matchPackageNames": ["net.fabricmc/yarn", "net.fabricmc/fabric-loader", "fabric-loom/fabric-loom.gradle.plugin"],
-      "datasource": "maven"
     }
   ]
 }
