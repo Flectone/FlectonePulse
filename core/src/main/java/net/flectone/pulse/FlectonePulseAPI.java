@@ -21,6 +21,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MetricsService;
 import net.flectone.pulse.service.ModerationService;
+import net.flectone.pulse.service.MinecraftTranslationService;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
@@ -46,6 +47,8 @@ public class FlectonePulseAPI  {
 
         // log plugin information
         fLogger.logDescription();
+
+        instance.get(MinecraftTranslationService.class).reload();
 
         // register default listeners
         instance.get(ListenerRegistry.class).registerDefaultListeners();
@@ -153,6 +156,8 @@ public class FlectonePulseAPI  {
         } catch (Exception e) {
             reloadException = new ReloadException(e.getMessage(), e);
         }
+
+        instance.get(MinecraftTranslationService.class).reload();
 
         // close all open inventories
         instance.get(InventoryController.class).closeAll();

@@ -40,12 +40,13 @@ import java.util.List;
 @Singleton
 public class FabricServerAdapter implements PlatformServerAdapter {
 
+    private final PlainTextComponentSerializer plainTextComponentSerializer = PlainTextComponentSerializer.plainText();
+
     private final FabricFlectonePulse fabricFlectonePulse;
     private final Provider<MessagePipeline> messagePipelineProvider;
     private final Path projectPath;
     private final TpsTracker tpsTracker;
     private final FLogger fLogger;
-    private final PlainTextComponentSerializer plainTextComponentSerializer = PlainTextComponentSerializer.plainText();
 
     @Inject
     public FabricServerAdapter(FabricFlectonePulse fabricFlectonePulse,

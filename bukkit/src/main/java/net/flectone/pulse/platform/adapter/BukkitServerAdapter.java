@@ -44,13 +44,15 @@ import java.util.List;
 @Singleton
 public class BukkitServerAdapter implements PlatformServerAdapter {
 
+    private final PlainTextComponentSerializer plainTextComponentSerializer = PlainTextComponentSerializer.plainText();
+    private final LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer.legacySection();
+
     private final Plugin plugin;
     private final Provider<IntegrationModule> integrationModuleProvider;
     private final Provider<FPlayerService> fPlayerServiceProvider;
     private final Provider<MessagePipeline> messagePipelineProvider;
     private final PacketProvider packetProvider;
     private final ReflectionResolver reflectionResolver;
-    private final PlainTextComponentSerializer plainTextComponentSerializer = PlainTextComponentSerializer.plainText();
 
     @Inject
     public BukkitServerAdapter(Plugin plugin,
@@ -200,17 +202,13 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         org.bukkit.inventory.ItemStack legacyItem = new org.bukkit.inventory.ItemStack(material);
         ItemMeta meta = legacyItem.getItemMeta();
 
-        meta.setDisplayName(serializeComponent(name));
+        meta.setDisplayName(legacyComponentSerializer.serialize(name));
         meta.setLore(lore.stream()
-                .map(this::serializeComponent)
+                .map(component -> legacyComponentSerializer.serialize(name))
                 .toList());
 
         legacyItem.setItemMeta(meta);
         return SpigotConversionUtil.fromBukkitItemStack(legacyItem);
-    }
-
-    private @NotNull String serializeComponent(@NotNull Component component) {
-        return LegacyComponentSerializer.legacySection().serialize(component);
     }
 
     @Override

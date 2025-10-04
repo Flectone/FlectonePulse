@@ -13,10 +13,12 @@ import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.translation.GlobalTranslator;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
+import java.util.Locale;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
@@ -24,6 +26,7 @@ import java.util.regex.Pattern;
 public class IntegrationSender {
 
     private final Pattern finalClearMessagePattern = Pattern.compile("[\\p{C}\\p{So}\\x{E0100}-\\x{E01EF}]+");
+    private final PlainTextComponentSerializer plainTextComponentSerializer = PlainTextComponentSerializer.plainText();
 
     private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
@@ -62,11 +65,11 @@ public class IntegrationSender {
                 .flag(MessageFlag.QUESTION, false)
                 .build();
 
-        PlainTextComponentSerializer serializer = PlainTextComponentSerializer.plainText();
-        String plainMessage = serializer.serialize(componentMessage);
+        String plainFormat = plainSerialize(componentFormat);
+        String plainMessage = plainSerialize(componentMessage);
 
         String finalMessage = Strings.CS.replace(
-                serializer.serialize(componentFormat),
+                plainFormat,
                 "<message>",
                 plainMessage
         );
@@ -90,6 +93,10 @@ public class IntegrationSender {
 
         String messageName = createMessageName(messageType, eventMetadata);
         integrationModule.sendMessage(sender, messageName, interfaceReplaceString);
+    }
+
+    private String plainSerialize(Component component) {
+        return plainTextComponentSerializer.serialize(GlobalTranslator.render(component, Locale.ROOT));
     }
 
     private String createMessageName(MessageType messageType, EventMetadata<?> eventMetadata) {

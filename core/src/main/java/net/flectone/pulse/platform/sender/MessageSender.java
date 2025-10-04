@@ -29,6 +29,7 @@ import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.ansi.ANSIComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.translation.GlobalTranslator;
 
 import java.util.*;
 
@@ -59,7 +60,8 @@ public class MessageSender {
     }
 
     public void sendToConsole(Component component) {
-        fLogger.info(ansiSerializer.serialize(component));
+        String consoleString = ansiSerializer.serialize(GlobalTranslator.render(component, Locale.ROOT));
+        fLogger.info(consoleString);
     }
 
     public void sendMessage(FPlayer fPlayer, Component component, boolean silent) {
