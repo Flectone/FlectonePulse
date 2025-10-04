@@ -1,10 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": ["config:best-practices"],
   "labels": ["dependencies"],
   "semanticCommitType": "build",
   "commitMessagePrefix": "chore(deps): ",
   "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
+    },
     {
       "matchManagers": ["gradle"],
       "registryUrls": [
@@ -26,8 +30,9 @@
         "https://maven.nucleoid.xyz/",
         "https://api.modrinth.com/maven",
         "https://maven.fabricmc.net/",
-        "https://maven.wagyourtail.xyz/releases",
+        "https://maven.wagyourtail.xyz/releases"
       ]
     }
+
   ]
 }
