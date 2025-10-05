@@ -17,6 +17,8 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 @Singleton
 public class BubbleModule extends AbstractModule {
 
@@ -71,10 +73,10 @@ public class BubbleModule extends AbstractModule {
     }
 
     @Async
-    public void add(@NotNull FPlayer fPlayer, @NotNull String inputString) {
+    public void add(@NotNull FPlayer fPlayer, @NotNull String inputString, List<FPlayer> receivers) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        bubbleService.addMessage(fPlayer, inputString);
+        bubbleService.addMessage(fPlayer, inputString, receivers);
     }
 
     public enum Billboard {

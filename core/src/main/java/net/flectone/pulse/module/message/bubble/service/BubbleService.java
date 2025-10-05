@@ -56,7 +56,7 @@ public class BubbleService {
         taskScheduler.runAsyncTimer(() -> playerBubbleQueues.forEach(this::processBubbleQueue), 5L, 5L);
     }
 
-    public void addMessage(@NotNull FPlayer sender, @NotNull String message) {
+    public void addMessage(@NotNull FPlayer sender, @NotNull String message, List<FPlayer> receivers) {
         if (!bubbleRenderer.isCorrectPlayer(sender)) return;
 
         Queue<Bubble> bubbleQueue = playerBubbleQueues.computeIfAbsent(
@@ -72,12 +72,12 @@ public class BubbleService {
                 .flag(MessageFlag.TRANSLATE_ITEM, false)
                 .plainSerializerBuild();
 
-        List<Bubble> bubbles = splitMessageToBubbles(sender, message);
+        List<Bubble> bubbles = splitMessageToBubbles(sender, message, receivers);
 
         bubbleQueue.addAll(bubbles);
     }
 
-    private List<Bubble> splitMessageToBubbles(@NotNull FPlayer sender, @NotNull String message) {
+    private List<Bubble> splitMessageToBubbles(@NotNull FPlayer sender, @NotNull String message, List<FPlayer> receivers) {
         int id = randomUtil.nextInt(Integer.MAX_VALUE);
 
         // default bubble
@@ -117,7 +117,7 @@ public class BubbleService {
             bubbles.add(buildBubble(
                     id, sender, newMessage, duration, elevation, interactionHeight,
                     useInteractionRiding, useModernBubble, hasShadow, background,
-                    animationTime, scale, billboard
+                    animationTime, scale, billboard, receivers
             ));
 
             line.setLength(0);
@@ -127,7 +127,7 @@ public class BubbleService {
             bubbles.add(buildBubble(
                     id, sender, line.toString(), duration, elevation, interactionHeight,
                     useInteractionRiding, useModernBubble, hasShadow, background,
-                    animationTime, scale, billboard
+                    animationTime, scale, billboard, receivers
             ));
         }
 
@@ -136,20 +136,21 @@ public class BubbleService {
 
     private Bubble buildBubble(int id, FPlayer sender, String message, long duration, int elevation, float interactionHeight,
                                boolean interactionRiding, boolean useModern, boolean hasShadow, int background,
-                               int animationTime, float scale, BubbleModule.Billboard billboard) {
-        Bubble.Builder builder = useModern
-                ? new ModernBubble.ModernBuilder()
+                               int animationTime, float scale, BubbleModule.Billboard billboard, List<FPlayer> receivers) {
+        Bubble.BubbleBuilder<?, ?> builder = useModern
+                ? ModernBubble.builder()
                 .hasShadow(hasShadow)
                 .background(background)
                 .animationTime(animationTime)
                 .scale(scale)
                 .billboard(billboard)
-                : new Bubble.Builder();
+                .viewers(receivers)
+                : Bubble.builder();
 
         return builder
                 .id(id)
                 .sender(sender)
-                .message(message)
+                .rawMessage(message)
                 .duration(duration)
                 .elevation(elevation)
                 .interactionHeight(interactionHeight)

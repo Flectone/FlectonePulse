@@ -11,6 +11,8 @@ import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.service.FPlayerService;
 
+import java.util.Collections;
+
 @Singleton
 public class BubblePacketListener implements PacketListener {
 
@@ -37,6 +39,6 @@ public class BubblePacketListener implements PacketListener {
         WrapperPlayClientChatMessage wrapper = new WrapperPlayClientChatMessage(event);
         String message = wrapper.getMessage();
 
-        bubbleModule.add(fPlayer, message);
+        bubbleModule.add(fPlayer, message, Collections.emptyList());
     }
 }

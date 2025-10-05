@@ -96,27 +96,31 @@ public class BubbleRenderer {
         nearbyEntitiesFuture.thenAccept(nearbyEntities -> nearbyEntities
                 .stream()
                 .map(fPlayerService::getFPlayer)
+                .filter(fViewer -> !bubble.getViewers().isEmpty() && bubble.getViewers().contains(fViewer))
                 .filter(fViewer -> !fViewer.isUnknown())
                 .filter(fViewer -> !fViewer.isIgnored(sender))
                 .filter(fViewer -> integrationModule.canSeeVanished(sender, fViewer))
-                .forEach(fViewer -> {
-                    Component formattedMessage = createFormattedMessage(bubble, fViewer);
+                .forEach(fViewer -> renderBubble(fViewer, bubble)));
+    }
 
-                    String key = sender.getUuid().toString() + fViewer.getUuid();
-                    Deque<BubbleEntity> bubbleEntities = activeBubbleEntities.getOrDefault(key, new ConcurrentLinkedDeque<>());
+    public void renderBubble(FPlayer fViewer, Bubble bubble) {
+        Component formattedMessage = createFormattedMessage(bubble, fViewer);
 
-                    // create bubble entity
-                    BubbleEntity bubbleEntity = createBubbleEntity(bubble, formattedMessage, fViewer);
-                    bubbleEntities.push(bubbleEntity);
+        FPlayer sender = bubble.getSender();
+        String key = sender.getUuid().toString() + fViewer.getUuid();
+        Deque<BubbleEntity> bubbleEntities = activeBubbleEntities.getOrDefault(key, new ConcurrentLinkedDeque<>());
 
-                    for (int i = 0; i < bubble.getElevation(); i++) {
-                        bubbleEntities.push(createSpaceBubbleEntity(bubble, fViewer));
-                    }
+        // create bubble entity
+        BubbleEntity bubbleEntity = createBubbleEntity(bubble, formattedMessage, fViewer);
+        bubbleEntities.push(bubbleEntity);
 
-                    activeBubbleEntities.put(key, bubbleEntities);
+        for (int i = 0; i < bubble.getElevation(); i++) {
+            bubbleEntities.push(createSpaceBubbleEntity(bubble, fViewer));
+        }
 
-                    rideEntities(sender, fViewer);
-               }));
+        activeBubbleEntities.put(key, bubbleEntities);
+
+        rideEntities(sender, fViewer);
     }
 
     public void removeBubble(Bubble bubble) {
