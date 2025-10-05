@@ -29,8 +29,18 @@ public class FEntity {
         this.uuid = uuid;
     }
 
-    public boolean equals(FEntity fEntity) {
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+
+        FEntity fEntity = (FEntity) object;
         return this.uuid.equals(fEntity.getUuid());
+    }
+
+    @Override
+    public int hashCode() {
+        return uuid.hashCode();
     }
 
     public boolean isUnknown() {

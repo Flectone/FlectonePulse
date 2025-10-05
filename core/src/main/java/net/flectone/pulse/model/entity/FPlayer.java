@@ -129,7 +129,12 @@ public class FPlayer extends FEntity {
         settingsBoolean.remove(messageType);
     }
 
-    public boolean equals(FPlayer fPlayer) {
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+
+        FPlayer fPlayer = (FPlayer) object;
         return this.id == fPlayer.getId();
     }
 
