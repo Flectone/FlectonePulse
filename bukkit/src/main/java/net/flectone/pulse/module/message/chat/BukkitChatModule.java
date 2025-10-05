@@ -9,9 +9,9 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.chat.listener.ChatBukkitListener;
 import net.flectone.pulse.module.message.chat.listener.ChatPaperListener;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.registry.BukkitListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.CooldownSender;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.MuteSender;
@@ -33,7 +33,6 @@ public class BukkitChatModule extends ChatModule {
     @Inject
     protected BukkitChatModule(FileResolver fileResolver,
                                FPlayerService fPlayerService,
-                               PlatformPlayerAdapter platformPlayerAdapter,
                                PlatformServerAdapter platformServerAdapter,
                                PermissionChecker permissionChecker,
                                IntegrationModule integrationModule,
@@ -44,10 +43,11 @@ public class BukkitChatModule extends ChatModule {
                                MuteSender muteSender,
                                DisableSender disableSender,
                                CooldownSender cooldownSender,
-                               FLogger fLogger) {
-        super(fileResolver, fPlayerService, platformPlayerAdapter, platformServerAdapter, permissionChecker,
+                               FLogger fLogger,
+                               ProxyRegistry proxyRegistry) {
+        super(fileResolver, fPlayerService, platformServerAdapter, permissionChecker,
                 integrationModule, bubbleModuleProvider, spyModuleProvider, listenerRegistry, muteSender,
-                disableSender, cooldownSender);
+                disableSender, cooldownSender, proxyRegistry);
 
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;

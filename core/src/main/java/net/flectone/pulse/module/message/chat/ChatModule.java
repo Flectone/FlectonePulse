@@ -4,9 +4,9 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Cooldown;
@@ -18,9 +18,9 @@ import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.chat.listener.ChatPacketListener;
 import net.flectone.pulse.module.message.chat.model.ChatMetadata;
-import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
+import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.platform.sender.CooldownSender;
 import net.flectone.pulse.platform.sender.DisableSender;
 import net.flectone.pulse.platform.sender.MuteSender;
@@ -33,7 +33,6 @@ import net.flectone.pulse.util.constant.SettingText;
 import org.apache.commons.lang3.StringUtils;
 import org.incendo.cloud.type.tuple.Pair;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +47,6 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
     private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
-    private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
     private final PermissionChecker permissionChecker;
     private final IntegrationModule integrationModule;
@@ -58,11 +56,11 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
     private final MuteSender muteSender;
     private final DisableSender disableSender;
     private final CooldownSender cooldownSender;
+    private final ProxyRegistry proxyRegistry;
 
     @Inject
     public ChatModule(FileResolver fileResolver,
                       FPlayerService fPlayerService,
-                      PlatformPlayerAdapter platformPlayerAdapter,
                       PlatformServerAdapter platformServerAdapter,
                       PermissionChecker permissionChecker,
                       IntegrationModule integrationModule,
@@ -71,12 +69,12 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                       ListenerRegistry listenerRegistry,
                       MuteSender muteSender,
                       DisableSender disableSender,
-                      CooldownSender cooldownSender) {
+                      CooldownSender cooldownSender,
+                      ProxyRegistry proxyRegistry) {
         super(MessageType.CHAT);
 
         this.fileResolver = fileResolver;
         this.fPlayerService = fPlayerService;
-        this.platformPlayerAdapter = platformPlayerAdapter;
         this.platformServerAdapter = platformServerAdapter;
         this.permissionChecker = permissionChecker;
         this.integrationModule = integrationModule;
@@ -86,6 +84,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
         this.muteSender = muteSender;
         this.disableSender = disableSender;
         this.cooldownSender = cooldownSender;
+        this.proxyRegistry = proxyRegistry;
     }
 
     @Override
@@ -237,38 +236,46 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
     }
 
     private boolean noGlobalReceiversFor(FPlayer fPlayer, String chatName) {
-        List<FPlayer> fReceivers = fPlayerService.findOnlineFPlayers()
+        List<FPlayer> serverReceivers = fPlayerService.getOnlineFPlayers()
                 .stream()
-                .filter(fReceiver -> !fReceiver.isUnknown())
-                .filter(fReceiver -> !fReceiver.equals(fPlayer))
-                .filter(fReceiver -> integrationModule.canSeeVanished(fReceiver, fPlayer))
-                .filter(permissionFilter(chatName))
+                .filter(filterReceivers(fPlayer, chatName))
                 .toList();
 
-        List<FPlayer> offlinePlayers = new ArrayList<>();
-
         // check online server players first
-        for (FPlayer fReceiver : fReceivers) {
-            if (!platformPlayerAdapter.isOnline(fReceiver)) {
-                offlinePlayers.add(fReceiver);
-                continue;
-            }
-
+        for (FPlayer fReceiver : serverReceivers) {
             if (!fReceiver.isIgnored(fPlayer) && fReceiver.isSetting(MessageType.CHAT)) {
                 return false;
             }
         }
 
-        // check proxy players only if no online server receivers found
-        for (FPlayer fReceiver : offlinePlayers) {
-            fPlayerService.loadIgnores(fReceiver);
-            fPlayerService.loadSettings(fReceiver);
-            if (!fReceiver.isIgnored(fPlayer) && fReceiver.isSetting(MessageType.CHAT)) {
-                return false;
+        if (proxyRegistry.hasEnabledProxy()) {
+            List<FPlayer> proxyReceivers = fPlayerService.findOnlineFPlayers()
+                    .stream()
+                    .filter(fReceiver -> !serverReceivers.contains(fReceiver))
+                    .filter(filterReceivers(fPlayer, chatName))
+                    .toList();
+
+            // check proxy players only if no online server receivers found
+            for (FPlayer fReceiver : proxyReceivers) {
+                fPlayerService.loadIgnores(fReceiver);
+                fPlayerService.loadSettings(fReceiver);
+                if (!fReceiver.isIgnored(fPlayer) && fReceiver.isSetting(MessageType.CHAT)) {
+                    return false;
+                }
             }
         }
 
         return true;
+    }
+
+    private Predicate<FPlayer> filterReceivers(FPlayer fPlayer, String chatName) {
+        return fReceiver -> {
+            if (fReceiver.isUnknown()) return false;
+            if (fReceiver.equals(fPlayer)) return false;
+            if (!integrationModule.canSeeVanished(fReceiver, fPlayer)) return false;
+
+            return permissionFilter(chatName).test(fReceiver);
+        };
     }
 
     private Pair<String, Message.Chat.Type> getPlayerChat(FPlayer fPlayer, String eventMessage) {
