@@ -11,7 +11,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
-import net.flectone.pulse.model.event.message.PreMessageSendEvent;
+import net.flectone.pulse.model.event.message.MessagePrepareEvent;
 import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Sound;
@@ -82,11 +82,13 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
 
     public List<FPlayer> createReceivers(MessageType messageType, EventMetadata<M> eventMetadata) {
         String rawFormat = eventMetadata.resolveFormat(FPlayer.UNKNOWN, localization());
-        PreMessageSendEvent preMessageSendEvent = new PreMessageSendEvent(messageType, rawFormat, eventMetadata);
 
-        eventDispatcher.dispatch(preMessageSendEvent);
+        MessagePrepareEvent messagePrepareEvent = new MessagePrepareEvent(messageType, rawFormat, eventMetadata);
 
-        if (preMessageSendEvent.isCancelled()) return Collections.emptyList();
+        eventDispatcher.dispatch(messagePrepareEvent);
+
+        // if canceled, it means that message was sent to Proxy
+        if (messagePrepareEvent.isCancelled()) return Collections.emptyList();
 
         FPlayer filterPlayer = eventMetadata.getFilterPlayer();
 

@@ -8,7 +8,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
-import net.flectone.pulse.model.event.message.PreMessageSendEvent;
+import net.flectone.pulse.model.event.message.MessagePrepareEvent;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
@@ -80,7 +80,7 @@ public class BasePulseListener implements PulseListener {
     }
 
     @Pulse
-    public void onPreMessageSendEvent(PreMessageSendEvent event) {
+    public void onMessagePrepareEvent(MessagePrepareEvent event) {
         MessageType messageType = event.getMessageType();
         String rawFormat = event.getRawFormat();
         EventMetadata<?> eventMetadata = event.getEventMetadata();
