@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS "fp_moderation" (
     "id" SERIAL PRIMARY KEY,
     "player" INTEGER NOT NULL,
     "date" BIGINT NOT NULL,
-    "time" INTEGER NOT NULL,
+    "time" BIGINT NOT NULL,
     "reason" TEXT,
     "moderator" INTEGER NOT NULL,
     "type" INTEGER NOT NULL,
