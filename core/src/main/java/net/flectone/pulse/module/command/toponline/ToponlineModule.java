@@ -3,8 +3,8 @@ package net.flectone.pulse.module.command.toponline;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
@@ -12,14 +12,11 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
-import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.formatter.TimeFormatter;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
-import net.flectone.pulse.util.constant.PlatformType;
-import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -34,44 +31,33 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
 
     private final FileResolver fileResolver;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-    private final PlatformServerAdapter platformServerAdapter;
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
     private final EventDispatcher eventDispatcher;
     private final TimeFormatter timeFormatter;
     private final SoundPlayer soundPlayer;
-    private final FLogger fLogger;
 
     @Inject
     public ToponlineModule(FileResolver fileResolver,
                            PlatformPlayerAdapter platformPlayerAdapter,
-                           PlatformServerAdapter platformServerAdapter,
                            CommandParserProvider commandParserProvider,
                            MessagePipeline messagePipeline,
                            EventDispatcher eventDispatcher,
                            TimeFormatter timeFormatter,
-                           SoundPlayer soundPlayer,
-                           FLogger fLogger) {
+                           SoundPlayer soundPlayer) {
         super(MessageType.COMMAND_TOPONLINE);
 
         this.fileResolver = fileResolver;
         this.platformPlayerAdapter = platformPlayerAdapter;
-        this.platformServerAdapter = platformServerAdapter;
         this.commandParserProvider = commandParserProvider;
         this.messagePipeline = messagePipeline;
         this.eventDispatcher = eventDispatcher;
         this.timeFormatter = timeFormatter;
         this.soundPlayer = soundPlayer;
-        this.fLogger = fLogger;
     }
 
     @Override
     public void onEnable() {
-        if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
-            fLogger.warning("/toponline module is disabled! This is not supported on Fabric");
-            return;
-        }
-
         super.onEnable();
 
         String promptNumber = addPrompt(0, Localization.Command.Prompt::getNumber);

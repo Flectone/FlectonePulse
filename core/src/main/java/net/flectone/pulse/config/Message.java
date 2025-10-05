@@ -8,6 +8,7 @@ import com.github.retrooper.packetevents.protocol.sound.Sounds;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.util.*;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
@@ -693,7 +694,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
             @Getter
             public static final class Newbie implements SubModerationFormatMessageConfig, Config.IEnable {
                 private boolean enable = false;
+
+                @Setter
                 private Mode mode = Mode.PLAYED_TIME;
+
                 private long timeout = 3600;
 
                 public enum Mode {

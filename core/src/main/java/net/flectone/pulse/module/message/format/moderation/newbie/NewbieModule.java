@@ -11,11 +11,14 @@ import net.flectone.pulse.model.util.ExternalModeration;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.processing.processor.YamlFileProcessor;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.logging.FLogger;
+
+import java.io.IOException;
 
 @Singleton
 public class NewbieModule extends AbstractModuleLocalization<Localization.Message.Format.Moderation.Newbie> {
@@ -24,6 +27,7 @@ public class NewbieModule extends AbstractModuleLocalization<Localization.Messag
     private final PermissionChecker permissionChecker;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PlatformServerAdapter platformServerAdapter;
+    private final YamlFileProcessor yamlFileProcessor;
     private final FLogger fLogger;
 
     @Inject
@@ -31,6 +35,7 @@ public class NewbieModule extends AbstractModuleLocalization<Localization.Messag
                         PermissionChecker permissionChecker,
                         PlatformPlayerAdapter platformPlayerAdapter,
                         PlatformServerAdapter platformServerAdapter,
+                        YamlFileProcessor yamlFileProcessor,
                         FLogger fLogger) {
         super(MessageType.NEWBIE);
 
@@ -38,6 +43,7 @@ public class NewbieModule extends AbstractModuleLocalization<Localization.Messag
         this.permissionChecker = permissionChecker;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.platformServerAdapter = platformServerAdapter;
+        this.yamlFileProcessor = yamlFileProcessor;
         this.fLogger = fLogger;
     }
 
@@ -45,11 +51,19 @@ public class NewbieModule extends AbstractModuleLocalization<Localization.Messag
     public void onEnable() {
         if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC
                 && config().getMode() == Message.Format.Moderation.Newbie.Mode.PLAYED_TIME) {
-            fLogger.warning("Newbie module is disabled! Mode PLAYED_TIME is not supported on Fabric");
-            return;
+            fLogger.warning("Newbie module with Mode PLAYED_TIME is not supported on Fabric, SINCE_JOIN will be used");
+
+            config().setMode(Message.Format.Moderation.Newbie.Mode.SINCE_JOIN);
+
+            try {
+                yamlFileProcessor.save(fileResolver.getMessage());
+            } catch (IOException e) {
+                fLogger.warning(e);
+            }
         }
 
         super.onEnable();
+
         registerPermission(permission().getBypass());
     }
 

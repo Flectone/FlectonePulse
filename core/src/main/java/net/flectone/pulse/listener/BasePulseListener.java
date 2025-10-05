@@ -7,28 +7,33 @@ import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
-import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.MessagePrepareEvent;
+import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.command.online.OnlineModule;
+import net.flectone.pulse.module.command.toponline.ToponlineModule;
 import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.tab.TabModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.IntegrationSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 public class BasePulseListener implements PulseListener {
     
     private final FPlayerService fPlayerService;
+    private final PlatformServerAdapter platformServerAdapter;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ProxySender proxySender;
     private final IntegrationSender integrationSender;
@@ -38,6 +43,7 @@ public class BasePulseListener implements PulseListener {
 
     @Inject
     public BasePulseListener(FPlayerService fPlayerService,
+                             PlatformServerAdapter platformServerAdapter,
                              PlatformPlayerAdapter platformPlayerAdapter,
                              ProxySender proxySender,
                              IntegrationSender integrationSender,
@@ -45,6 +51,7 @@ public class BasePulseListener implements PulseListener {
                              PacketProvider packetProvider,
                              FLogger fLogger) {
         this.fPlayerService = fPlayerService;
+        this.platformServerAdapter = platformServerAdapter;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.proxySender = proxySender;
         this.integrationSender = integrationSender;
@@ -106,6 +113,20 @@ public class BasePulseListener implements PulseListener {
                 && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)
                 && packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_9_4)) {
             fLogger.warning("TAB module is not supported on this version of Minecraft");
+            event.setCancelled(true);
+            return;
+        }
+
+        if (eventModule instanceof OnlineModule
+                && platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
+            fLogger.warning("Online module is not supported on Fabric");
+            event.setCancelled(true);
+            return;
+        }
+
+        if (eventModule instanceof ToponlineModule
+                && platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
+            fLogger.warning("Toponline module is not supported on Fabric");
             event.setCancelled(true);
         }
     }
