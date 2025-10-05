@@ -62,7 +62,7 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         Ticker ticker = config().getTicker();
         if (ticker.isEnable()) {
@@ -74,6 +74,8 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         fPlayerService.getOnlineFPlayers().forEach(this::remove);
         // no clear playerSidebar map for next sidebars
     }

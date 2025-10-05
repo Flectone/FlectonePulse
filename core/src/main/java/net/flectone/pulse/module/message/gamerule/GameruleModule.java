@@ -35,7 +35,7 @@ public class GameruleModule extends AbstractModuleLocalization<Localization.Mess
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         createSound(config().getSound(), permission().getSound());
 

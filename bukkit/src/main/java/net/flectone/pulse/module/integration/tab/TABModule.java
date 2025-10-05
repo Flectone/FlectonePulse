@@ -27,7 +27,7 @@ public class TABModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         tabIntegration.hook();
 
@@ -36,6 +36,8 @@ public class TABModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         tabIntegration.unhook();
     }
 

@@ -26,7 +26,7 @@ public class ItemsAdderModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         itemsAdderIntegration.hook();
 
@@ -35,6 +35,8 @@ public class ItemsAdderModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         itemsAdderIntegration.unhook();
     }
 

@@ -29,7 +29,7 @@ public class InteractiveChatModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         interactiveChatIntegration.hook();
 
@@ -39,6 +39,8 @@ public class InteractiveChatModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         interactiveChatIntegration.unhook();
     }
 

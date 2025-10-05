@@ -34,9 +34,9 @@ public class BubbleModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        bubbleService.startTicker();
+        super.onEnable();
 
-        registerModulePermission(permission());
+        bubbleService.startTicker();
 
         listenerRegistry.register(BubblePacketListener.class);
         listenerRegistry.register(BubblePulseListener.class);
@@ -44,6 +44,8 @@ public class BubbleModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         bubbleService.clear();
     }
 

@@ -61,7 +61,7 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         fPlayerService.getPlatformFPlayers().forEach(this::send);
 

@@ -34,7 +34,7 @@ public class OpModule extends AbstractModuleLocalization<Localization.Message.Op
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         createSound(config().getSound(), permission().getSound());
 

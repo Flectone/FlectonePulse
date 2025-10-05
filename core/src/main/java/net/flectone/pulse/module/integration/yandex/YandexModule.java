@@ -31,7 +31,7 @@ public class YandexModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         reflectionResolver.hasClassOrElse("yandex.cloud.sdk.auth.Auth", this::loadLibraries);
 
@@ -40,6 +40,8 @@ public class YandexModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         injector.getInstance(YandexIntegration.class).unhook();
     }
 

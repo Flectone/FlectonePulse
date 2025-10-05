@@ -54,8 +54,8 @@ public class BukkitIntegrationModule extends IntegrationModule {
     }
 
     @Override
-    public void onEnable() {
-        super.onEnable();
+    public void configureChildren() {
+        super.configureChildren();
 
         if (platformServerAdapter.hasProject("AdvancedBan")) {
             addChildren(AdvancedBanModule.class);

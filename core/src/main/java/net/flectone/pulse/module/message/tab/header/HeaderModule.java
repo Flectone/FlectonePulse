@@ -51,7 +51,7 @@ public class HeaderModule extends AbstractModuleListLocalization<Localization.Me
     public void onEnable() {
         fPlayerService.getPlatformFPlayers().forEach(this::send);
 
-        registerModulePermission(permission());
+        super.onEnable();
 
         Ticker ticker = config().getTicker();
         if (ticker.isEnable()) {

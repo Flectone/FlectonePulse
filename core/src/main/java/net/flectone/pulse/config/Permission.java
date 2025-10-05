@@ -176,7 +176,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         private Warnlist warnlist = new Warnlist();
 
         @Getter
-        public static final class Afk implements SubCommandConfig, IPermission {
+        public static final class Afk implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.afk";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.afk.cooldown.bypass", Type.OP);
@@ -184,7 +184,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Anon implements SubCommandConfig, IPermission {
+        public static final class Anon implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.anon";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.anon.cooldown.bypass", Type.OP);
@@ -192,7 +192,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Ball implements SubCommandConfig, IPermission {
+        public static final class Ball implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.ball";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.ball.cooldown.bypass", Type.OP);
@@ -200,7 +200,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Ban implements SubCommandConfig, IPermission {
+        public static final class Ban implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.ban";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.ban.cooldown.bypass", Type.OP);
@@ -208,7 +208,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Banlist implements SubCommandConfig, IPermission {
+        public static final class Banlist implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.banlist";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.banlist.cooldown.bypass", Type.OP);
@@ -216,7 +216,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Broadcast implements SubCommandConfig, IPermission {
+        public static final class Broadcast implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.broadcast";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.broadcast.cooldown.bypass", Type.OP);
@@ -224,7 +224,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Chatcolor implements SubCommandConfig, IPermission {
+        public static final class Chatcolor implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.chatcolor";
             private Type type = Type.TRUE;
             private PermissionEntry other = new PermissionEntry("flectonepulse.module.command.chatcolor.other", Type.OP);
@@ -239,7 +239,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Chatsetting implements SubCommandConfig, IPermission {
+        public static final class Chatsetting implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.chatsetting";
             private Type type = Type.TRUE;
 
@@ -288,7 +288,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Clearchat implements SubCommandConfig, IPermission {
+        public static final class Clearchat implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.clearchat";
             private Type type = Type.TRUE;
             private PermissionEntry other = new PermissionEntry("flectonepulse.module.command.clearchat.other", Type.OP);
@@ -297,7 +297,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Clearmail implements SubCommandConfig, IPermission {
+        public static final class Clearmail implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.clearmail";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.clearmail.cooldown.bypass", Type.OP);
@@ -305,7 +305,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Coin implements SubCommandConfig, IPermission {
+        public static final class Coin implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.coin";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.coin.cooldown.bypass", Type.OP);
@@ -313,7 +313,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Deletemessage implements SubCommandConfig, IPermission {
+        public static final class Deletemessage implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.deletemessage";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.deletemessage.cooldown.bypass", Type.OP);
@@ -321,7 +321,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Dice implements SubCommandConfig, IPermission {
+        public static final class Dice implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.dice";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.dice.cooldown.bypass", Type.OP);
@@ -329,7 +329,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Do implements SubCommandConfig, IPermission {
+        public static final class Do implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.do";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.do.cooldown.bypass", Type.OP);
@@ -337,7 +337,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Flectonepulse implements SubCommandConfig, IPermission {
+        public static final class Flectonepulse implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.flectonepulse";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.flectonepulse.cooldown.bypass", Type.OP);
@@ -345,7 +345,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Geolocate implements SubCommandConfig, IPermission {
+        public static final class Geolocate implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.geolocate";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.geolocate.cooldown.bypass", Type.OP);
@@ -353,7 +353,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Helper implements SubCommandConfig, IPermission {
+        public static final class Helper implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.helper";
             private Type type = Type.TRUE;
             private PermissionEntry see = new PermissionEntry("flectonepulse.module.command.helper.see", Type.OP);
@@ -362,7 +362,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Ignore implements SubCommandConfig, IPermission {
+        public static final class Ignore implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.ignore";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.ignore.cooldown.bypass", Type.OP);
@@ -370,7 +370,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Ignorelist implements SubCommandConfig, IPermission {
+        public static final class Ignorelist implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.ignorelist";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.ignorelist.cooldown.bypass", Type.OP);
@@ -378,7 +378,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Kick implements SubCommandConfig, IPermission {
+        public static final class Kick implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.kick";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.kick.cooldown.bypass", Type.OP);
@@ -386,7 +386,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Mail implements SubCommandConfig, IPermission {
+        public static final class Mail implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.mail";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.mail.cooldown.bypass", Type.OP);
@@ -394,7 +394,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Maintenance implements SubCommandConfig, IPermission {
+        public static final class Maintenance implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.maintenance";
             private Type type = Type.OP;
             private PermissionEntry join = new PermissionEntry("flectonepulse.module.command.maintenance.join", Type.OP);
@@ -403,7 +403,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Me implements SubCommandConfig, IPermission {
+        public static final class Me implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.me";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.me.cooldown.bypass", Type.OP);
@@ -411,7 +411,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Mute implements SubCommandConfig, IPermission {
+        public static final class Mute implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.mute";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.mute.cooldown.bypass", Type.OP);
@@ -419,7 +419,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Mutelist implements SubCommandConfig, IPermission {
+        public static final class Mutelist implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.mutelist";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.mutelist.cooldown.bypass", Type.OP);
@@ -427,7 +427,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Online implements SubCommandConfig, IPermission {
+        public static final class Online implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.online";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.online.cooldown.bypass", Type.OP);
@@ -435,7 +435,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Ping implements SubCommandConfig, IPermission {
+        public static final class Ping implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.ping";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.ping.cooldown.bypass", Type.OP);
@@ -443,7 +443,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Poll implements SubCommandConfig, IPermission {
+        public static final class Poll implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.poll";
             private Type type = Type.TRUE;
             private PermissionEntry create = new PermissionEntry("flectonepulse.module.command.poll.create", Type.OP);
@@ -452,7 +452,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Reply implements SubCommandConfig, IPermission {
+        public static final class Reply implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.reply";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.reply.cooldown.bypass", Type.OP);
@@ -460,7 +460,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Rockpaperscissors implements SubCommandConfig, IPermission {
+        public static final class Rockpaperscissors implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.rockpaperscissors";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.rockpaperscissors.cooldown.bypass", Type.OP);
@@ -468,7 +468,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Spy implements SubCommandConfig, IPermission {
+        public static final class Spy implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.spy";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.spy.cooldown.bypass", Type.OP);
@@ -476,7 +476,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Stream implements SubCommandConfig, IPermission {
+        public static final class Stream implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.stream";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.stream.cooldown.bypass", Type.OP);
@@ -484,7 +484,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Symbol implements SubCommandConfig, IPermission {
+        public static final class Symbol implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.symbol";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.symbol.cooldown.bypass", Type.OP);
@@ -492,7 +492,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Tell implements SubCommandConfig, IPermission {
+        public static final class Tell implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.tell";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.tell.cooldown.bypass", Type.OP);
@@ -500,7 +500,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Tictactoe implements SubCommandConfig, IPermission {
+        public static final class Tictactoe implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.tictactoe";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.tictactoe.cooldown.bypass", Type.OP);
@@ -508,7 +508,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Toponline implements SubCommandConfig, IPermission {
+        public static final class Toponline implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.toponline";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.toponline.cooldown.bypass", Type.OP);
@@ -516,7 +516,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Translateto implements SubCommandConfig, IPermission {
+        public static final class Translateto implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.translateto";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.translateto.cooldown.bypass", Type.OP);
@@ -524,7 +524,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Try implements SubCommandConfig, IPermission {
+        public static final class Try implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.try";
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.try.cooldown.bypass", Type.OP);
@@ -532,7 +532,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Unban implements SubCommandConfig, IPermission {
+        public static final class Unban implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.unban";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.unban.cooldown.bypass", Type.OP);
@@ -540,7 +540,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Unmute implements SubCommandConfig, IPermission {
+        public static final class Unmute implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.unmute";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.unmute.cooldown.bypass", Type.OP);
@@ -548,7 +548,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Unwarn implements SubCommandConfig, IPermission {
+        public static final class Unwarn implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.unwarn";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.unwarn.cooldown.bypass", Type.OP);
@@ -556,7 +556,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Warn implements SubCommandConfig, IPermission {
+        public static final class Warn implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.warn";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.warn.cooldown.bypass", Type.OP);
@@ -564,7 +564,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Warnlist implements SubCommandConfig, IPermission {
+        public static final class Warnlist implements SubCommandConfig, ICommandPermission {
             private String name = "flectonepulse.module.command.warnlist";
             private Type type = Type.OP;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.command.warnlist.cooldown.bypass", Type.OP);
@@ -1689,8 +1689,19 @@ public final class Permission extends YamlFile implements ModuleConfig {
     }
 
     public interface IPermission {
+
         String getName();
+
         Type getType();
+
+    }
+
+    public interface ICommandPermission extends IPermission {
+
+        PermissionEntry getCooldownBypass();
+
+        PermissionEntry getSound();
+
     }
 
     public enum Type {

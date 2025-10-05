@@ -53,13 +53,15 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         listenerRegistry.register(TranslatePulseListener.class);
     }
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         messageCache.invalidateAll();
     }
 

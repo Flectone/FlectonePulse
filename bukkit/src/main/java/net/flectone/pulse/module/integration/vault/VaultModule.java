@@ -26,13 +26,15 @@ public class VaultModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         vaultIntegration.hook();
     }
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         vaultIntegration.unhook();
     }
 

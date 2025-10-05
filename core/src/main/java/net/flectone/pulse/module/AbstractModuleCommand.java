@@ -2,6 +2,7 @@ package net.flectone.pulse.module;
 
 import com.google.inject.Inject;
 import net.flectone.pulse.config.Command;
+import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.registry.CommandRegistry;
@@ -81,7 +82,17 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
     }
 
     @Override
+    public void onEnable() {
+        super.onEnable();
+
+        createCooldown(config().getCooldown(), permission().getCooldownBypass());
+        createSound(config().getSound(), permission().getSound());
+    }
+
+    @Override
     public void onDisable() {
+        super.onDisable();
+
         clearPrompts();
     }
 
@@ -89,6 +100,8 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
     public void execute(@NonNull CommandContext<FPlayer> commandContext) {
         execute(commandContext.sender(), commandContext);
     }
+
+    public abstract Permission.ICommandPermission permission();
 
     public abstract void execute(FPlayer fPlayer, CommandContext<FPlayer> commandContext);
 

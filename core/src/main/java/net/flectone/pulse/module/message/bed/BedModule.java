@@ -33,7 +33,7 @@ public class BedModule extends AbstractModuleLocalization<Localization.Message.B
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         createSound(config().getSound(), permission().getSound());
 

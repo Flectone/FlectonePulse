@@ -66,10 +66,7 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
             return;
         }
 
-        registerModulePermission(permission());
-
-        createCooldown(config().getCooldown(), permission().getCooldownBypass());
-        createSound(config().getSound(), permission().getSound());
+        super.onEnable();
 
         String promptType = addPrompt(0, Localization.Command.Prompt::getType);
         String promptPlayer = addPrompt(1, Localization.Command.Prompt::getPlayer);

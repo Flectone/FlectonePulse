@@ -36,7 +36,7 @@ public class ExecuteModule extends AbstractModuleLocalization<Localization.Messa
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         createSound(config().getSound(), permission().getSound());
 

@@ -28,11 +28,6 @@ public class SignModule extends AbstractModule {
     }
 
     @Override
-    public void onEnable() {
-        registerModulePermission(permission());
-    }
-
-    @Override
     public Message.Sign config() {
         return fileResolver.getMessage().getSign();
     }

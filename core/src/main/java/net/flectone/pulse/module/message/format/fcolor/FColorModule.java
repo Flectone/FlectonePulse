@@ -41,7 +41,7 @@ public class FColorModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         // register fColor types
         permission().getColors().forEach((key, value) -> registerPermission(value));

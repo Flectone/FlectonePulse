@@ -33,7 +33,7 @@ public class MiniPlaceholdersModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
         registerPermission(permission().getUse());
 
         miniPlaceholdersIntegration.hook();
@@ -51,6 +51,8 @@ public class MiniPlaceholdersModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         miniPlaceholdersIntegration.unhook();
     }
 

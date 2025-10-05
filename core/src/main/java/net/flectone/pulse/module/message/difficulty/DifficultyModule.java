@@ -34,7 +34,7 @@ public class DifficultyModule extends AbstractModuleLocalization<Localization.Me
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         createSound(config().getSound(), permission().getSound());
 

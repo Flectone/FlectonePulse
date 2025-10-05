@@ -33,7 +33,7 @@ public class TelegramModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         reflectionResolver.hasClassOrElse("org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient", this::loadLibraries);
 
@@ -42,6 +42,8 @@ public class TelegramModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         injector.getInstance(TelegramIntegration.class).unhook();
     }
 

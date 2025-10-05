@@ -21,6 +21,7 @@ import net.kyori.adventure.text.Component;
 public class FabricIntegrationModule extends IntegrationModule {
 
     private final Provider<PermissionChecker> permissionCheckerProvider;
+    private final PlatformServerAdapter platformServerAdapter;
     private final Injector injector;
 
     @Inject
@@ -33,7 +34,13 @@ public class FabricIntegrationModule extends IntegrationModule {
         super(fileManager, fLogger, platformServerAdapter, reflectionResolver, injector);
 
         this.permissionCheckerProvider = permissionCheckerProvider;
+        this.platformServerAdapter = platformServerAdapter;
         this.injector = injector;
+    }
+
+    @Override
+    public void configureChildren() {
+        super.configureChildren();
 
         if (platformServerAdapter.hasProject("melius-vanish")) {
             addChildren(VanishModule.class);

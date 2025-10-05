@@ -61,7 +61,7 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         config().getQuestions().forEach((key, questionMessage) -> {
 
@@ -84,6 +84,8 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         processedQuestions.clear();
         soundMap.clear();
         cooldownMap.clear();

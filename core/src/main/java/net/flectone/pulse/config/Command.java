@@ -1180,6 +1180,12 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     }
 
     public interface ICommandFile extends Config.IEnable {
+
         List<String> getAliases();
+
+        Cooldown getCooldown();
+
+        Sound getSound();
+
     }
 }

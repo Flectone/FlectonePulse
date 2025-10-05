@@ -23,8 +23,8 @@ public class ModerationModule extends AbstractModule {
     }
 
     @Override
-    public void onEnable() {
-        registerModulePermission(permission());
+    public void configureChildren() {
+        super.configureChildren();
 
         addChildren(CapsModule.class);
         addChildren(DeleteModule.class);

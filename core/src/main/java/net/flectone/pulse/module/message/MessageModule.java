@@ -77,8 +77,8 @@ public class MessageModule extends AbstractModule {
     }
 
     @Override
-    public void onEnable() {
-        registerModulePermission(permission());
+    public void configureChildren() {
+        super.configureChildren();
 
         addChildren(AdvancementModule.class);
         addChildren(AfkModule.class);

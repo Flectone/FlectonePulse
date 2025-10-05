@@ -82,10 +82,7 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
-
-        createCooldown(config().getCooldown(), permission().getCooldownBypass());
-        createSound(config().getSound(), permission().getSound());
+        super.onEnable();
 
         registerPermission(permission().getCreate());
 

@@ -38,10 +38,7 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
-
-        createCooldown(config().getCooldown(), permission().getCooldownBypass());
-        createSound(config().getSound(), permission().getSound());
+        super.onEnable();
 
         String promptMessage = addPrompt(0, Localization.Command.Prompt::getMessage);
         registerCommand(commandBuilder -> commandBuilder

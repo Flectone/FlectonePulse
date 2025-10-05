@@ -53,10 +53,7 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
-
-        createCooldown(config().getCooldown(), permission().getCooldownBypass());
-        createSound(config().getSound(), permission().getSound());
+        super.onEnable();
 
         registerPermission(permission().getOther());
         permission().getColors().values().forEach(this::registerPermission);

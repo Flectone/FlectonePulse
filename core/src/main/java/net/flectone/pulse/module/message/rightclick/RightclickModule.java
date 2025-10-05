@@ -42,7 +42,7 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         createSound(config().getSound(), permission().getSound());
         createCooldown(config().getCooldown(), permission().getCooldownBypass());

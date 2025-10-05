@@ -27,7 +27,7 @@ public class MiniMOTDModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         miniMOTDIntegration.hook();
 
@@ -36,6 +36,8 @@ public class MiniMOTDModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         miniMOTDIntegration.unhook();
     }
 

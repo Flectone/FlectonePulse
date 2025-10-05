@@ -29,7 +29,7 @@ public class AdvancedBanModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         advancedBanIntegration.hook();
 
@@ -38,6 +38,8 @@ public class AdvancedBanModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         advancedBanIntegration.unhook();
     }
 

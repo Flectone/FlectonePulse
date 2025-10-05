@@ -24,11 +24,6 @@ public class VersionModule extends AbstractModuleLocalization<Localization.Messa
     }
 
     @Override
-    public void onEnable() {
-        registerModulePermission(permission());
-    }
-
-    @Override
     public Message.Status.Version config() {
         return fileResolver.getMessage().getStatus().getVersion();
     }

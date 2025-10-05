@@ -28,7 +28,7 @@ public class SkinsRestorerModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         if (platformServerAdapter.getPlatformType() == PlatformType.FABRIC) {
             // delay for init
@@ -41,6 +41,8 @@ public class SkinsRestorerModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         skinsRestorerIntegration.unhook();
     }
 

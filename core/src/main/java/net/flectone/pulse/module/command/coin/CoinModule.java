@@ -34,10 +34,7 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
-
-        createCooldown(config().getCooldown(), permission().getCooldownBypass());
-        createSound(config().getSound(), permission().getSound());
+        super.onEnable();
 
         registerCommand(commandBuilder -> commandBuilder
                 .permission(permission().getName())

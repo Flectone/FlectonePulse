@@ -44,10 +44,7 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
-
-        createCooldown(config().getCooldown(), permission().getCooldownBypass());
-        createSound(config().getSound(), permission().getSound());
+        super.onEnable();
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         registerCommand(commandBuilder -> commandBuilder

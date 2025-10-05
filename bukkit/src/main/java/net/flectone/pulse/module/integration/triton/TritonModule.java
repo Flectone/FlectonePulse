@@ -28,7 +28,7 @@ public class TritonModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         listenerRegistry.register(TritonIntegration.class);
 
@@ -37,6 +37,8 @@ public class TritonModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         tritonIntegration.unhook();
     }
 

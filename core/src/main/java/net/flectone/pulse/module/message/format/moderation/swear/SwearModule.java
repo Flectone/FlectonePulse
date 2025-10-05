@@ -64,7 +64,7 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         registerPermission(permission().getBypass());
         registerPermission(permission().getSee());
@@ -80,6 +80,8 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         messageCache.invalidateAll();
     }
 

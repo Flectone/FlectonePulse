@@ -72,10 +72,7 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
             return;
         }
 
-        registerModulePermission(permission());
-
-        createCooldown(config().getCooldown(), permission().getCooldownBypass());
-        createSound(config().getSound(), permission().getSound());
+        super.onEnable();
 
         String promptNumber = addPrompt(0, Localization.Command.Prompt::getNumber);
         registerCommand(manager -> manager

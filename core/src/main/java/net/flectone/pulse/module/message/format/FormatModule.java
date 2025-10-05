@@ -53,8 +53,24 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
     }
 
     @Override
+    public void configureChildren() {
+        super.configureChildren();
+
+        addChildren(FColorModule.class);
+        addChildren(FixationModule.class);
+        addChildren(MentionModule.class);
+        addChildren(ModerationModule.class);
+        addChildren(NameModule.class);
+        addChildren(QuestionAnswerModule.class);
+        addChildren(ReplacementModule.class);
+        addChildren(ScoreboardModule.class);
+        addChildren(TranslateModule.class);
+        addChildren(WorldModule.class);
+    }
+
+    @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         registerPermission(permission().getLegacyColors());
 
@@ -80,17 +96,6 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
         putAdventureTag(AdventureTag.PRIDE, StandardTags.pride());
         putAdventureTag(AdventureTag.SHADOW_COLOR, StandardTags.shadowColor());
 
-        addChildren(FColorModule.class);
-        addChildren(FixationModule.class);
-        addChildren(MentionModule.class);
-        addChildren(ModerationModule.class);
-        addChildren(NameModule.class);
-        addChildren(QuestionAnswerModule.class);
-        addChildren(ReplacementModule.class);
-        addChildren(ScoreboardModule.class);
-        addChildren(TranslateModule.class);
-        addChildren(WorldModule.class);
-
         listenerRegistry.register(FormatPulseListener.class);
 
         if (config().isConvertLegacyColor()) {
@@ -100,6 +105,8 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         tagResolverMap.clear();
     }
 

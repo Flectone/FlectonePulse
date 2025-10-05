@@ -71,15 +71,20 @@ public class StatusModule extends AbstractModule {
     }
 
     @Override
-    public void onEnable() {
-        registerModulePermission(permission());
-
-        listenerRegistry.register(StatusPacketListener.class);
+    public void configureChildren() {
+        super.configureChildren();
 
         addChildren(MOTDModule.class);
         addChildren(IconModule.class);
         addChildren(PlayersModule.class);
         addChildren(VersionModule.class);
+    }
+
+    @Override
+    public void onEnable() {
+        super.onEnable();
+
+        listenerRegistry.register(StatusPacketListener.class);
     }
 
     @Override

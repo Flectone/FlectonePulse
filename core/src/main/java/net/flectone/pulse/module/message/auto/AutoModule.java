@@ -39,7 +39,7 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         config().getTypes().forEach((key, value) -> {
             Sound sound = createSound(value.getSound(), permission().getTypes().get(key));

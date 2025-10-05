@@ -70,7 +70,7 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         createSound(config().getSound(), permission().getSound());
 
@@ -82,6 +82,8 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         processedMentions.clear();
         messageCache.invalidateAll();
     }

@@ -56,7 +56,7 @@ public class ScoreboardModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         Ticker ticker = config().getTicker();
         if (ticker.isEnable()) {
@@ -78,6 +78,8 @@ public class ScoreboardModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         uuidTeamMap.values().forEach(team -> sendPacket(team, WrapperPlayServerTeams.TeamMode.REMOVE));
         uuidTeamMap.clear();
     }

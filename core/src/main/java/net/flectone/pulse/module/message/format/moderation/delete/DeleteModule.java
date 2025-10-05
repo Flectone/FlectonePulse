@@ -60,13 +60,15 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         listenerRegistry.register(DeletePulseListener.class);
     }
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         playersHistory.clear();
         cachedComponents.clear();
     }

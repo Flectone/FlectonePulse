@@ -27,7 +27,7 @@ public class MOTDModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         motdIntegration.hook();
 
@@ -36,6 +36,8 @@ public class MOTDModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         motdIntegration.unhook();
     }
 

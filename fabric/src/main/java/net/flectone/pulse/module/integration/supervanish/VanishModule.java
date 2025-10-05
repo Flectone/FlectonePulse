@@ -23,13 +23,15 @@ public class VanishModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         vanishIntegration.hook();
     }
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         vanishIntegration.unhook();
     }
 

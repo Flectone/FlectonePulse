@@ -29,6 +29,9 @@ import java.util.function.UnaryOperator;
 public abstract class IntegrationModule extends AbstractModule {
 
     private final FileResolver fileResolver;
+    private final FLogger fLogger;
+    private final PlatformServerAdapter platformServerAdapter;
+    private final ReflectionResolver reflectionResolver;
     private final Injector injector;
 
     protected IntegrationModule(FileResolver fileResolver,
@@ -37,7 +40,15 @@ public abstract class IntegrationModule extends AbstractModule {
                                 ReflectionResolver reflectionResolver,
                                 Injector injector) {
         this.fileResolver = fileResolver;
+        this.fLogger = fLogger;
+        this.platformServerAdapter = platformServerAdapter;
+        this.reflectionResolver = reflectionResolver;
         this.injector = injector;
+    }
+
+    @Override
+    public void configureChildren() {
+        super.configureChildren();
 
         if (platformServerAdapter.hasProject("SkinsRestorer")) {
             addChildren(SkinsRestorerModule.class);
@@ -58,11 +69,6 @@ public abstract class IntegrationModule extends AbstractModule {
                 fLogger.warning("Update PlasmoVoice to the latest version");
             }
         }
-    }
-
-    @Override
-    public void onEnable() {
-        registerModulePermission(permission());
 
         addChildren(DeeplModule.class);
         addChildren(DiscordModule.class);

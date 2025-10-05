@@ -45,10 +45,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
-
-        createCooldown(config().getCooldown(), permission().getCooldownBypass());
-        createSound(config().getSound(), permission().getSound());
+        super.onEnable();
 
         registerPermission(permission().getSee());
 

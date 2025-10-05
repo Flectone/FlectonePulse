@@ -42,10 +42,7 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
-
-        createCooldown(config().getCooldown(), permission().getCooldownBypass());
-        createSound(config().getSound(), permission().getSound());
+        super.onEnable();
 
         registerCommand(manager -> manager
                 .permission(permission().getName())

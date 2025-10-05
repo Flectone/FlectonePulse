@@ -23,7 +23,7 @@ public class PlasmoVoiceModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         PlasmoVoiceServer.getAddonsLoader().load(plasmoVoiceIntegration);
         plasmoVoiceIntegration.hook();
@@ -31,6 +31,8 @@ public class PlasmoVoiceModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         plasmoVoiceIntegration.unhook();
     }
 

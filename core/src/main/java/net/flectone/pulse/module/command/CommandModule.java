@@ -61,8 +61,8 @@ public class CommandModule extends AbstractModule {
     }
 
     @Override
-    public void onEnable() {
-        registerModulePermission(permission());
+    public void configureChildren() {
+        super.configureChildren();
 
         addChildren(AfkModule.class);
         addChildren(AnonModule.class);

@@ -36,7 +36,7 @@ public class AttributeModule extends AbstractModuleLocalization<Localization.Mes
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         createSound(config().getSound(), permission().getSound());
 

@@ -41,10 +41,7 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
-
-        createCooldown(config().getCooldown(), permission().getCooldownBypass());
-        createSound(config().getSound(), permission().getSound());
+        super.onEnable();
 
         String promptId = addPrompt(0, Localization.Command.Prompt::getId);
         registerCommand(commandBuilder -> commandBuilder

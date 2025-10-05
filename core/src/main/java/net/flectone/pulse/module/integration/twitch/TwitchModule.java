@@ -33,7 +33,7 @@ public class TwitchModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         reflectionResolver.hasClassOrElse("com.github.twitch4j.TwitchClient", this::loadLibraries);
 
@@ -42,6 +42,8 @@ public class TwitchModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         injector.getInstance(TwitchIntegration.class).unhook();
     }
 

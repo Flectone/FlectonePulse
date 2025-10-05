@@ -35,7 +35,7 @@ public class SleepModule extends AbstractModuleLocalization<Localization.Message
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         createSound(config().getSound(), permission().getSound());
 

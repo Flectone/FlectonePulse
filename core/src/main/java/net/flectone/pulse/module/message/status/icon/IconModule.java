@@ -46,13 +46,15 @@ public class IconModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         initIcons();
     }
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         iconList.clear();
     }
 

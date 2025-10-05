@@ -95,7 +95,7 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         permission().getValues().values().forEach(this::registerPermission);
 
@@ -108,6 +108,8 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         triggerPatterns.clear();
         messageCache.invalidateAll();
         imageCache.invalidateAll();

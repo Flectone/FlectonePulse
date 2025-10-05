@@ -32,7 +32,7 @@ public class CapsModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         listenerRegistry.register(CapsPulseListener.class);
     }

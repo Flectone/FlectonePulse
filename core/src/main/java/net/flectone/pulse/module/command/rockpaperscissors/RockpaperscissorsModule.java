@@ -61,10 +61,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
-
-        createCooldown(config().getCooldown(), permission().getCooldownBypass());
-        createSound(config().getSound(), permission().getSound());
+        super.onEnable();
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         String promptMove = addPrompt(1, Localization.Command.Prompt::getMove);

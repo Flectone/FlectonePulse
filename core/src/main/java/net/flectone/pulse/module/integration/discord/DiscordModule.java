@@ -37,7 +37,7 @@ public class DiscordModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         reflectionResolver.hasClassOrElse("discord4j.core.DiscordClient", this::loadLibraries);
 
@@ -50,6 +50,8 @@ public class DiscordModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         injector.getInstance(DiscordIntegration.class).unhook();
     }
 

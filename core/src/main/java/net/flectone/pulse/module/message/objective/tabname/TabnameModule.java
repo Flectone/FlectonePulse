@@ -43,7 +43,7 @@ public class TabnameModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         Ticker ticker = config().getTicker();
         if (ticker.isEnable()) {
@@ -55,6 +55,8 @@ public class TabnameModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         fPlayerService.getPlatformFPlayers().forEach(this::remove);
     }
 

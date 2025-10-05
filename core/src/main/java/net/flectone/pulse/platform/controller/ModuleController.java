@@ -66,7 +66,10 @@ public class ModuleController {
     }
 
     public void reload(Class<? extends AbstractModule> clazz) {
-        load(clazz);
+        // configure all modules
+        configureChildren(clazz);
+
+        // enable
         enable(clazz, module -> module.config().isEnable());
     }
 
@@ -78,13 +81,13 @@ public class ModuleController {
         enable(clazz, module -> false);
     }
 
-    public void load(Class<? extends AbstractModule> clazz) {
+    public void configureChildren(Class<? extends AbstractModule> clazz) {
         AbstractModule module = injector.getInstance(clazz);
 
-        module.getPredicates().clear();
-        addDefaultPredicates(module);
+        module.getChildren().clear();
+        module.configureChildren();
 
-        module.getChildren().forEach(this::load);
+        module.getChildren().forEach(this::configureChildren);
     }
 
     public void enable(Class<? extends AbstractModule> clazz, Predicate<AbstractModule> enablePredicate) {
@@ -101,6 +104,8 @@ public class ModuleController {
                 module.onDisable();
             }
         }
+
+        addDefaultPredicates(module);
 
         module.setEnable(enablePredicate.test(module));
 
@@ -121,6 +126,8 @@ public class ModuleController {
     }
 
     public void addDefaultPredicates(AbstractModule module) {
+        module.getPredicates().clear();
+
         module.addPredicate(fPlayer -> !module.isEnable());
         module.addPredicate(fPlayer -> !permissionChecker.check(fPlayer, module.getPermission()));
 

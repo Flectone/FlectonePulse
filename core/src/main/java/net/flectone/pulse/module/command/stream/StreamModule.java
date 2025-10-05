@@ -59,10 +59,7 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
-
-        createCooldown(config().getCooldown(), permission().getCooldownBypass());
-        createSound(config().getSound(), permission().getSound());
+        super.onEnable();
 
         String promptType = addPrompt(0, Localization.Command.Prompt::getType);
         String promptUrl = addPrompt(1, Localization.Command.Prompt::getUrl);

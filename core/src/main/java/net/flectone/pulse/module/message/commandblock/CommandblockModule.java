@@ -38,7 +38,7 @@ public class CommandblockModule extends AbstractModuleLocalization<Localization.
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         createSound(config().getSound(), permission().getSound());
 

@@ -34,7 +34,7 @@ public class RotateModule extends AbstractModuleLocalization<Localization.Messag
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         createSound(config().getSound(), permission().getSound());
 

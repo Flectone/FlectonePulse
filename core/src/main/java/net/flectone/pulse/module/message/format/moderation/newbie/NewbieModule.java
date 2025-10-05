@@ -49,7 +49,7 @@ public class NewbieModule extends AbstractModuleLocalization<Localization.Messag
             return;
         }
 
-        registerModulePermission(permission());
+        super.onEnable();
         registerPermission(permission().getBypass());
     }
 

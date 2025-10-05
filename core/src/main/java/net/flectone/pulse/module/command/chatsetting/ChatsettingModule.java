@@ -75,10 +75,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
-
-        createCooldown(config().getCooldown(), permission().getCooldownBypass());
-        createSound(config().getSound(), permission().getSound());
+        super.onEnable();
 
         permission().getSettings().values().forEach(this::registerPermission);
 

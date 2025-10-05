@@ -29,7 +29,7 @@ public class LiteBansModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         liteBansIntegration.hook();
 
@@ -38,6 +38,8 @@ public class LiteBansModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         liteBansIntegration.unhook();
     }
 

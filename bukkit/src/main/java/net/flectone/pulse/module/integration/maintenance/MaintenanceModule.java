@@ -27,7 +27,7 @@ public class MaintenanceModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         maintenanceIntegration.hook();
 
@@ -36,6 +36,8 @@ public class MaintenanceModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         maintenanceIntegration.unhook();
     }
 

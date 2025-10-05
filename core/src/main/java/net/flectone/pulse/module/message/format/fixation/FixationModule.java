@@ -27,7 +27,7 @@ public class FixationModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         listenerRegistry.register(FixationPulseListener.class);
     }

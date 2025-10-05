@@ -42,7 +42,7 @@ public class BrandModule extends AbstractModuleListLocalization<Localization.Mes
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         Ticker ticker = config().getTicker();
         if (ticker.isEnable()) {

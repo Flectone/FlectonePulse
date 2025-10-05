@@ -47,7 +47,7 @@ public class NameModule extends AbstractModuleLocalization<Localization.Message.
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         listenerRegistry.register(NamePulseListener.class);
     }

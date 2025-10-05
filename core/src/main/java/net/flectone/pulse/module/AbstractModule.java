@@ -34,21 +34,21 @@ public abstract class AbstractModule {
     protected AbstractModule() {
     }
 
-    public void onEnable() {}
-
-    public void onDisable() {}
-
-    public abstract Config.IEnable config();
-
-    public abstract Permission.IPermission permission();
-
-    public void registerModulePermission(Permission.IPermission permission) {
-        if (permission == null) return;
+    public void onEnable() {
+        Permission.IPermission permission = permission();
 
         registerPermission(permission);
 
         this.permission = permission.getName();
     }
+
+    public void onDisable() {}
+
+    public void configureChildren() {}
+
+    public abstract Config.IEnable config();
+
+    public abstract Permission.IPermission permission();
 
     public void registerPermission(Permission.IPermission permission) {
         if (permission == null) return;

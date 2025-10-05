@@ -31,7 +31,7 @@ public class DeeplModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         reflectionResolver.hasClassOrElse("com.deepl.api.DeepLClient", this::loadLibraries);
 
@@ -40,6 +40,8 @@ public class DeeplModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         injector.getInstance(DeeplIntegration.class).unhook();
     }
 

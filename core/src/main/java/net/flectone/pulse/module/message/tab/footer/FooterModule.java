@@ -49,7 +49,7 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         Ticker ticker = config().getTicker();
         if (ticker.isEnable()) {
@@ -61,6 +61,8 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         // clear tab
         Destination.Type destinationType = config().getDestination().getType();
         if (destinationType == Destination.Type.TAB_HEADER || destinationType == Destination.Type.TAB_FOOTER) {

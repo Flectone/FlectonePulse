@@ -90,7 +90,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         config().getTypes().forEach((key, value) -> {
             Permission.Message.Chat.Type permissions = permission().getTypes().get(key);
@@ -108,6 +108,8 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         cooldownMap.clear();
         soundMap.clear();
     }

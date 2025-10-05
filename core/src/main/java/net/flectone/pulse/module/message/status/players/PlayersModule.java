@@ -40,7 +40,7 @@ public class PlayersModule extends AbstractModuleLocalization<Localization.Messa
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
         registerPermission(permission().getBypass());
 
         listenerRegistry.register(PlayersPulseListener.class);

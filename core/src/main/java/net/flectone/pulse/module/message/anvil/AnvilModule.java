@@ -15,11 +15,6 @@ public abstract class AnvilModule extends AbstractModule {
     }
 
     @Override
-    public void onEnable() {
-        registerModulePermission(permission());
-    }
-
-    @Override
     public Message.Anvil config() {
         return fileResolver.getMessage().getAnvil();
     }

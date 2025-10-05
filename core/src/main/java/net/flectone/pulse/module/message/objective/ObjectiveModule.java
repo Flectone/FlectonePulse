@@ -30,8 +30,8 @@ public class ObjectiveModule extends AbstractModule {
     }
 
     @Override
-    public void onEnable() {
-        registerModulePermission(permission());
+    public void configureChildren() {
+        super.configureChildren();
 
         addChildren(BelownameModule.class);
         addChildren(TabnameModule.class);

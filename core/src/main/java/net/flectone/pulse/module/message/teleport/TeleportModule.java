@@ -39,7 +39,7 @@ public class TeleportModule extends AbstractModuleLocalization<Localization.Mess
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         createSound(config().getSound(), permission().getSound());
 

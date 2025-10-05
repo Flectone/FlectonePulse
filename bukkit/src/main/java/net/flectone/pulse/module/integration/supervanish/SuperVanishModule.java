@@ -30,7 +30,7 @@ public class SuperVanishModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         listenerRegistry.register(SuperVanishIntegration.class);
 
@@ -39,6 +39,8 @@ public class SuperVanishModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         superVanishIntegration.unhook();
     }
 

@@ -37,11 +37,6 @@ public class MOTDModule extends AbstractModuleListLocalization<Localization.Mess
     }
 
     @Override
-    public void onEnable() {
-        registerModulePermission(permission());
-    }
-
-    @Override
     public Message.Status.MOTD config() {
         return fileResolver.getMessage().getStatus().getMotd();
     }

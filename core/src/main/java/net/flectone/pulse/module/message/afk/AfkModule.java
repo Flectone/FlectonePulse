@@ -64,7 +64,7 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         if (config().getTicker().isEnable()) {
             taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(this::check), config().getTicker().getPeriod());
@@ -75,6 +75,8 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         playersCoordinates.clear();
     }
 

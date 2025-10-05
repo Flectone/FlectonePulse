@@ -26,7 +26,8 @@ public class PlaceholderAPIModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
+
         registerPermission(permission().getUse());
 
         placeholderAPIIntegration.hook();
@@ -36,6 +37,8 @@ public class PlaceholderAPIModule extends AbstractModule {
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         placeholderAPIIntegration.unhook();
     }
 

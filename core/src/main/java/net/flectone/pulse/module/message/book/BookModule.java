@@ -28,11 +28,6 @@ public class BookModule extends AbstractModule {
     }
 
     @Override
-    public void onEnable() {
-        registerModulePermission(permission());
-    }
-
-    @Override
     public Message.Book config() {
         return fileResolver.getMessage().getBook();
     }

@@ -49,10 +49,7 @@ public class UnwarnModule extends AbstractModuleCommand<Localization.Command.Unw
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
-
-        createCooldown(config().getCooldown(), permission().getCooldownBypass());
-        createSound(config().getSound(), permission().getSound());
+        super.onEnable();
 
         String promptPlayer = addPrompt(0, Localization.Command.Prompt::getPlayer);
         String promptId = addPrompt(1, Localization.Command.Prompt::getId);

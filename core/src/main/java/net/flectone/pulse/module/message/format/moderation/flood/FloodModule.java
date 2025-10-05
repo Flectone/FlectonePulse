@@ -32,7 +32,7 @@ public class FloodModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
 
         listenerRegistry.register(FloodPulseListener.class);
     }

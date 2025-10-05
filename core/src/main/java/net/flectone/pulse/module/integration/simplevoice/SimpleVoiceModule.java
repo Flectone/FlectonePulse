@@ -25,12 +25,14 @@ public class SimpleVoiceModule extends AbstractModule {
 
     @Override
     public void onEnable() {
-        registerModulePermission(permission());
+        super.onEnable();
         simpleVoiceIntegration.hook();
     }
 
     @Override
     public void onDisable() {
+        super.onDisable();
+
         simpleVoiceIntegration.unhook();
     }
 

@@ -20,8 +20,8 @@ public class Module extends AbstractModule {
     }
 
     @Override
-    public void onEnable() {
-        registerModulePermission(permission());
+    public void configureChildren() {
+        super.configureChildren();
 
         addChildren(IntegrationModule.class);
         addChildren(CommandModule.class);
