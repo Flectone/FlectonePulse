@@ -28,6 +28,3 @@ DROP TABLE `fcolor`;
 
 INSERT INTO `fp_player_fcolor` SELECT * FROM `player_fcolor`;
 DROP TABLE `player_fcolor`;
-
-INSERT INTO `fp_version` SELECT * FROM `version`;
-DROP TABLE `version`;
