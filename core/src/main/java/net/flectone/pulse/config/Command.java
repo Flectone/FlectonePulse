@@ -335,42 +335,213 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
                     new Chat.Type("global", "BLACK_DYE")
             ));
             private Color see = new Color(1, List.of(
-                    new Color.Type("default", "ARROW", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "", 4, ""))),
-                    new Color.Type("white", "WHITE_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#F5F9FF:#E6F0FF>", 2, "<gradient:#D4E4FF:#B8D2FF>", 3, "", 4, ""))),
-                    new Color.Type("light_gray", "LIGHT_GRAY_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#E0E3E6:#C8CCD0>", 2, "<gradient:#B5B9BD:#9DA2A6>", 3, "", 4, ""))),
-                    new Color.Type("gray", "GRAY_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#6B7378:#535A5F>", 2, "<gradient:#4A5054:#3A3F42>", 3, "", 4, ""))),
-                    new Color.Type("black", "BLACK_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#2E3133:#1F2123>", 2, "<gradient:#17191A:#0D0E0F>", 3, "", 4, ""))),
-                    new Color.Type("brown", "BROWN_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#A67C52:#8C6A4A>", 2, "<gradient:#7A5A40:#634A34>", 3, "", 4, ""))),
-                    new Color.Type("red", "RED_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#FF6B6B:#E74C4C>", 2, "<gradient:#D63E3E:#C12B2B>", 3, "", 4, ""))),
-                    new Color.Type("orange", "ORANGE_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#FFB347:#FF9A1F>", 2, "<gradient:#FF8C00:#E67E00>", 3, "", 4, ""))),
-                    new Color.Type("yellow", "YELLOW_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#FFF689:#FFEE57>", 2, "<gradient:#FFE83D:#FFD900>", 3, "", 4, ""))),
-                    new Color.Type("lime", "LIME_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#C1FF72:#A2F55F>", 2, "<gradient:#8EE53F:#7ACC29>", 3, "", 4, ""))),
-                    new Color.Type("green", "GREEN_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#77DD77:#5DC75D>", 2, "<gradient:#4BB54B:#3AA33A>", 3, "", 4, ""))),
-                    new Color.Type("cyan", "CYAN_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#7FE5F0:#5FD9E8>", 2, "<gradient:#3ECFDF:#2AB7C9>", 3, "", 4, ""))),
-                    new Color.Type("light_blue", "LIGHT_BLUE_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#A6D8FF:#8CC8FF>", 2, "<gradient:#6BB6FF:#4DA6FF>", 3, "", 4, ""))),
-                    new Color.Type("blue", "BLUE_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#7AA7FF:#5D8EFF>", 2, "<gradient:#3A75FF:#1F5AFF>", 3, "", 4, ""))),
-                    new Color.Type("purple", "PURPLE_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#C792EA:#B77DDA>", 2, "<gradient:#A368C7:#8A4DBF>", 3, "", 4, ""))),
-                    new Color.Type("magenta", "MAGENTA_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#FF9CEE:#FF7AE3>", 2, "<gradient:#FF5CD9:#FF3DCF>", 3, "", 4, ""))),
-                    new Color.Type("pink", "PINK_DYE", new LinkedHashMap<>(Map.of(1, "<gradient:#FFB6D9:#FF9BC8>", 2, "<gradient:#FF80B7:#FF66A6>", 3, "", 4, "")))
+                    new Color.Type("default", "ARROW", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "");
+                        put(4, "");
+                    }}),
+                    new Color.Type("white", "WHITE_DYE", new LinkedHashMap<>() {{
+                        put(1, "<gradient:#F5F9FF:#E6F0FF>");
+                        put(2, "<gradient:#D4E4FF:#B8D2FF>");
+                        put(3, "");
+                        put(4, "");
+                    }}),
+                    new Color.Type("light_gray", "LIGHT_GRAY_DYE", new LinkedHashMap<>() {{
+                        put(1, "<gradient:#E0E3E6:#C8CCD0>");
+                        put(2, "<gradient:#B5B9BD:#9DA2A6>");
+                        put(3, "");
+                        put(4, "");
+                    }}),
+                    new Color.Type("gray", "GRAY_DYE", new LinkedHashMap<>() {{
+                        put(1, "<gradient:#6B7378:#535A5F>");
+                        put(2, "<gradient:#4A5054:#3A3F42>");
+                        put(3, "");
+                        put(4, "");
+                    }}),
+                    new Color.Type("black", "BLACK_DYE", new LinkedHashMap<>() {{
+                        put(1, "<gradient:#2E3133:#1F2123>");
+                        put(2, "<gradient:#17191A:#0D0E0F>");
+                        put(3, "");
+                        put(4, "");
+                    }}),
+                    new Color.Type("brown", "BROWN_DYE", new LinkedHashMap<>() {{
+                        put(1, "<gradient:#A67C52:#8C6A4A>");
+                        put(2, "<gradient:#7A5A40:#634A34>");
+                        put(3, "");
+                        put(4, "");
+                    }}),
+                    new Color.Type("red", "RED_DYE", new LinkedHashMap<>() {{
+                        put(1, "<gradient:#FF6B6B:#E74C4C>");
+                        put(2, "<gradient:#D63E3E:#C12B2B>");
+                        put(3, "");
+                        put(4, "");
+                    }}),
+                    new Color.Type("orange", "ORANGE_DYE", new LinkedHashMap<>() {{
+                        put(1, "<gradient:#FFB347:#FF9A1F>");
+                        put(2, "<gradient:#FF8C00:#E67E00>");
+                        put(3, "");
+                        put(4, "");
+                    }}),
+                    new Color.Type("yellow", "YELLOW_DYE", new LinkedHashMap<>() {{
+                        put(1, "<gradient:#FFF689:#FFEE57>");
+                        put(2, "<gradient:#FFE83D:#FFD900>");
+                        put(3, "");
+                        put(4, "");
+                    }}),
+                    new Color.Type("lime", "LIME_DYE", new LinkedHashMap<>() {{
+                        put(1, "<gradient:#C1FF72:#A2F55F>");
+                        put(2, "<gradient:#8EE53F:#7ACC29>");
+                        put(3, "");
+                        put(4, "");
+                    }}),
+                    new Color.Type("green", "GREEN_DYE", new LinkedHashMap<>() {{
+                        put(1, "<gradient:#77DD77:#5DC75D>");
+                        put(2, "<gradient:#4BB54B:#3AA33A>");
+                        put(3, "");
+                        put(4, "");
+                    }}),
+                    new Color.Type("cyan", "CYAN_DYE", new LinkedHashMap<>() {{
+                        put(1, "<gradient:#7FE5F0:#5FD9E8>");
+                        put(2, "<gradient:#3ECFDF:#2AB7C9>");
+                        put(3, "");
+                        put(4, "");
+                    }}),
+                    new Color.Type("light_blue", "LIGHT_BLUE_DYE", new LinkedHashMap<>() {{
+                        put(1, "<gradient:#A6D8FF:#8CC8FF>");
+                        put(2, "<gradient:#6BB6FF:#4DA6FF>");
+                        put(3, "");
+                        put(4, "");
+                    }}),
+                    new Color.Type("blue", "BLUE_DYE", new LinkedHashMap<>() {{
+                        put(1, "<gradient:#7AA7FF:#5D8EFF>");
+                        put(2, "<gradient:#3A75FF:#1F5AFF>");
+                        put(3, "");
+                        put(4, "");
+                    }}),
+                    new Color.Type("purple", "PURPLE_DYE", new LinkedHashMap<>() {{
+                        put(1, "<gradient:#C792EA:#B77DDA>");
+                        put(2, "<gradient:#A368C7:#8A4DBF>");
+                        put(3, "");
+                        put(4, "");
+                    }}),
+                    new Color.Type("magenta", "MAGENTA_DYE", new LinkedHashMap<>() {{
+                        put(1, "<gradient:#FF9CEE:#FF7AE3>");
+                        put(2, "<gradient:#FF5CD9:#FF3DCF>");
+                        put(3, "");
+                        put(4, "");
+                    }}),
+                    new Color.Type("pink", "PINK_DYE", new LinkedHashMap<>() {{
+                        put(1, "<gradient:#FFB6D9:#FF9BC8>");
+                        put(2, "<gradient:#FF80B7:#FF66A6>");
+                        put(3, "");
+                        put(4, "");
+                    }})
             ));
+
             private Color out = new Color(2, List.of(
-                    new Color.Type("default", "ARROW", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "", 4, ""))),
-                    new Color.Type("white", "WHITE_DYE", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "<gradient:#F5F9FF:#E6F0FF>", 4, "<gradient:#D4E4FF:#B8D2FF>"))),
-                    new Color.Type("light_gray", "LIGHT_GRAY_DYE", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "<gradient:#E0E3E6:#C8CCD0>", 4, "<gradient:#B5B9BD:#9DA2A6>"))),
-                    new Color.Type("gray", "GRAY_DYE", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "<gradient:#6B7378:#535A5F>", 4, "<gradient:#4A5054:#3A3F42>"))),
-                    new Color.Type("black", "BLACK_DYE", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "<gradient:#2E3133:#1F2123>", 4, "<gradient:#17191A:#0D0E0F>"))),
-                    new Color.Type("brown", "BROWN_DYE", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "<gradient:#A67C52:#8C6A4A>", 4, "<gradient:#7A5A40:#634A34>"))),
-                    new Color.Type("red", "RED_DYE", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "<gradient:#FF6B6B:#E74C4C>", 4, "<gradient:#D63E3E:#C12B2B>"))),
-                    new Color.Type("orange", "ORANGE_DYE", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "<gradient:#FFB347:#FF9A1F>", 4, "<gradient:#FF8C00:#E67E00>"))),
-                    new Color.Type("yellow", "YELLOW_DYE", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "<gradient:#FFF689:#FFEE57>", 4, "<gradient:#FFE83D:#FFD900>"))),
-                    new Color.Type("lime", "LIME_DYE", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "<gradient:#C1FF72:#A2F55F>", 4, "<gradient:#8EE53F:#7ACC29>"))),
-                    new Color.Type("green", "GREEN_DYE", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "<gradient:#77DD77:#5DC75D>", 4, "<gradient:#4BB54B:#3AA33A>"))),
-                    new Color.Type("cyan", "CYAN_DYE", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "<gradient:#7FE5F0:#5FD9E8>", 4, "<gradient:#3ECFDF:#2AB7C9>"))),
-                    new Color.Type("light_blue", "LIGHT_BLUE_DYE", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "<gradient:#A6D8FF:#8CC8FF>", 4, "<gradient:#6BB6FF:#4DA6FF>"))),
-                    new Color.Type("blue", "BLUE_DYE", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "<gradient:#7AA7FF:#5D8EFF>", 4, "<gradient:#3A75FF:#1F5AFF>"))),
-                    new Color.Type("purple", "PURPLE_DYE", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "<gradient:#C792EA:#B77DDA>", 4, "<gradient:#A368C7:#8A4DBF>"))),
-                    new Color.Type("magenta", "MAGENTA_DYE", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "<gradient:#FF9CEE:#FF7AE3>", 4, "<gradient:#FF5CD9:#FF3DCF>"))),
-                    new Color.Type("pink", "PINK_DYE", new LinkedHashMap<>(Map.of(1, "", 2, "", 3, "<gradient:#FFB6D9:#FF9BC8>", 4, "<gradient:#FF80B7:#FF66A6>")))
+                    new Color.Type("default", "ARROW", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "");
+                        put(4, "");
+                    }}),
+                    new Color.Type("white", "WHITE_DYE", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "<gradient:#F5F9FF:#E6F0FF>");
+                        put(4, "<gradient:#D4E4FF:#B8D2FF>");
+                    }}),
+                    new Color.Type("light_gray", "LIGHT_GRAY_DYE", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "<gradient:#E0E3E6:#C8CCD0>");
+                        put(4, "<gradient:#B5B9BD:#9DA2A6>");
+                    }}),
+                    new Color.Type("gray", "GRAY_DYE", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "<gradient:#6B7378:#535A5F>");
+                        put(4, "<gradient:#4A5054:#3A3F42>");
+                    }}),
+                    new Color.Type("black", "BLACK_DYE", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "<gradient:#2E3133:#1F2123>");
+                        put(4, "<gradient:#17191A:#0D0E0F>");
+                    }}),
+                    new Color.Type("brown", "BROWN_DYE", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "<gradient:#A67C52:#8C6A4A>");
+                        put(4, "<gradient:#7A5A40:#634A34>");
+                    }}),
+                    new Color.Type("red", "RED_DYE", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "<gradient:#FF6B6B:#E74C4C>");
+                        put(4, "<gradient:#D63E3E:#C12B2B>");
+                    }}),
+                    new Color.Type("orange", "ORANGE_DYE", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "<gradient:#FFB347:#FF9A1F>");
+                        put(4, "<gradient:#FF8C00:#E67E00>");
+                    }}),
+                    new Color.Type("yellow", "YELLOW_DYE", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "<gradient:#FFF689:#FFEE57>");
+                        put(4, "<gradient:#FFE83D:#FFD900>");
+                    }}),
+                    new Color.Type("lime", "LIME_DYE", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "<gradient:#C1FF72:#A2F55F>");
+                        put(4, "<gradient:#8EE53F:#7ACC29>");
+                    }}),
+                    new Color.Type("green", "GREEN_DYE", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "<gradient:#77DD77:#5DC75D>");
+                        put(4, "<gradient:#4BB54B:#3AA33A>");
+                    }}),
+                    new Color.Type("cyan", "CYAN_DYE", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "<gradient:#7FE5F0:#5FD9E8>");
+                        put(4, "<gradient:#3ECFDF:#2AB7C9>");
+                    }}),
+                    new Color.Type("light_blue", "LIGHT_BLUE_DYE", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "<gradient:#A6D8FF:#8CC8FF>");
+                        put(4, "<gradient:#6BB6FF:#4DA6FF>");
+                    }}),
+                    new Color.Type("blue", "BLUE_DYE", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "<gradient:#7AA7FF:#5D8EFF>");
+                        put(4, "<gradient:#3A75FF:#1F5AFF>");
+                    }}),
+                    new Color.Type("purple", "PURPLE_DYE", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "<gradient:#C792EA:#B77DDA>");
+                        put(4, "<gradient:#A368C7:#8A4DBF>");
+                    }}),
+                    new Color.Type("magenta", "MAGENTA_DYE", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "<gradient:#FF9CEE:#FF7AE3>");
+                        put(4, "<gradient:#FF5CD9:#FF3DCF>");
+                    }}),
+                    new Color.Type("pink", "PINK_DYE", new LinkedHashMap<>() {{
+                        put(1, "");
+                        put(2, "");
+                        put(3, "<gradient:#FFB6D9:#FF9BC8>");
+                        put(4, "<gradient:#FF80B7:#FF66A6>");
+                    }})
             ));
 
             @Getter
