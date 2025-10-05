@@ -10,9 +10,9 @@ import net.flectone.pulse.exception.ReloadException;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
-import net.flectone.pulse.module.Module;
 import net.flectone.pulse.platform.controller.DialogController;
 import net.flectone.pulse.platform.controller.InventoryController;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.registry.CommandRegistry;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.registry.PermissionRegistry;
@@ -20,8 +20,8 @@ import net.flectone.pulse.platform.registry.ProxyRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.MetricsService;
-import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.service.MinecraftTranslationService;
+import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
@@ -67,7 +67,7 @@ public class FlectonePulseAPI  {
         PacketEvents.getAPI().init();
 
         // reload modules and their children
-        instance.get(net.flectone.pulse.module.Module.class).reload();
+        instance.get(ModuleController.class).reload();
 
         // reload fplayer service
         instance.get(FPlayerService.class).reload();
@@ -119,7 +119,7 @@ public class FlectonePulseAPI  {
         fPlayerService.clear();
 
         // disable all modules
-        instance.get(net.flectone.pulse.module.Module.class).terminate();
+        instance.get(ModuleController.class).terminate();
 
         // unregister all listeners
         instance.get(ListenerRegistry.class).unregisterAll();
@@ -194,7 +194,7 @@ public class FlectonePulseAPI  {
         instance.get(ModerationService.class).reload();
 
         // reload modules and their children
-        instance.get(Module.class).reload();
+        instance.get(ModuleController.class).reload();
 
         // process player load event for all platform fplayers
         EventDispatcher eventDispatcher = instance.get(EventDispatcher.class);

@@ -5,8 +5,8 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.dto.MetricsDTO;
-import net.flectone.pulse.module.Module;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
+import net.flectone.pulse.platform.controller.ModuleController;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.MetricsSender;
 import net.flectone.pulse.processing.resolver.FileResolver;
@@ -21,7 +21,7 @@ public class MetricsService {
     private final PlatformServerAdapter platformServerAdapter;
     private final PacketProvider packetProvider;
     private final FileResolver fileResolver;
-    private final Module module;
+    private final ModuleController moduleController;
 
     @Inject
     public MetricsService(TaskScheduler taskScheduler,
@@ -29,13 +29,13 @@ public class MetricsService {
                           PlatformServerAdapter platformServerAdapter,
                           PacketProvider packetProvider,
                           FileResolver fileResolver,
-                          Module module) {
+                          ModuleController moduleController) {
         this.taskScheduler = taskScheduler;
         this.metricsSender = metricsSender;
         this.platformServerAdapter = platformServerAdapter;
         this.packetProvider = packetProvider;
         this.fileResolver = fileResolver;
-        this.module = module;
+        this.moduleController = moduleController;
     }
 
     public void reload() {
@@ -65,7 +65,7 @@ public class MetricsService {
         metricsDTO.setProxyMode(getProxyMode());
         metricsDTO.setDatabaseMode(config.getDatabase().getType().name());
         metricsDTO.setPlayerCount(platformServerAdapter.getOnlinePlayerCount());
-        metricsDTO.setModules(module.collectModuleStatuses());
+        metricsDTO.setModules(moduleController.collectModuleStatuses());
         metricsDTO.setCreatedAt(Instant.now().toString());
 
         metricsSender.sendMetrics(metricsDTO);

@@ -1,5 +1,6 @@
 package net.flectone.pulse.listener;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.flectone.pulse.annotation.Pulse;
@@ -8,15 +9,21 @@ import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.model.event.message.MessageSendEvent;
 import net.flectone.pulse.model.event.message.PreMessageSendEvent;
+import net.flectone.pulse.model.event.module.ModuleEnableEvent;
 import net.flectone.pulse.model.event.player.PlayerJoinEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
 import net.flectone.pulse.model.util.Sound;
+import net.flectone.pulse.module.AbstractModule;
+import net.flectone.pulse.module.message.bubble.BubbleModule;
+import net.flectone.pulse.module.message.tab.TabModule;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
+import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.IntegrationSender;
 import net.flectone.pulse.platform.sender.ProxySender;
 import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
+import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
 public class BasePulseListener implements PulseListener {
@@ -26,18 +33,24 @@ public class BasePulseListener implements PulseListener {
     private final ProxySender proxySender;
     private final IntegrationSender integrationSender;
     private final SoundPlayer soundPlayer;
+    private final PacketProvider packetProvider;
+    private final FLogger fLogger;
 
     @Inject
     public BasePulseListener(FPlayerService fPlayerService,
                              PlatformPlayerAdapter platformPlayerAdapter,
                              ProxySender proxySender,
                              IntegrationSender integrationSender,
-                             SoundPlayer soundPlayer) {
+                             SoundPlayer soundPlayer,
+                             PacketProvider packetProvider,
+                             FLogger fLogger) {
         this.fPlayerService = fPlayerService;
         this.platformPlayerAdapter = platformPlayerAdapter;
         this.proxySender = proxySender;
         this.integrationSender = integrationSender;
         this.soundPlayer = soundPlayer;
+        this.packetProvider = packetProvider;
+        this.fLogger = fLogger;
     }
 
     @Pulse(priority = Event.Priority.LOWEST, ignoreCancelled = true)
@@ -75,6 +88,24 @@ public class BasePulseListener implements PulseListener {
         integrationSender.send(messageType, rawFormat, eventMetadata);
 
         if (proxySender.send(messageType, eventMetadata)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @Pulse
+    public void onModuleEnableEvent(ModuleEnableEvent event) {
+        AbstractModule eventModule = event.getModule();
+        if (eventModule instanceof BubbleModule
+                && packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_12_2)) {
+            fLogger.warning("Bubble module is not supported on this version of Minecraft");
+            event.setCancelled(true);
+            return;
+        }
+
+        if (eventModule instanceof TabModule
+                && packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_9)
+                && packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_9_4)) {
+            fLogger.warning("TAB module is not supported on this version of Minecraft");
             event.setCancelled(true);
         }
     }

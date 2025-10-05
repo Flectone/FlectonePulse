@@ -7,11 +7,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.localization.Localization;
+import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.event.message.StatusResponseEvent;
 import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.module.message.status.icon.IconModule;
 import net.flectone.pulse.module.message.status.listener.StatusPacketListener;
@@ -41,6 +43,7 @@ public class StatusModule extends AbstractModule {
     private final FPlayerService fPlayerService;
     private final ListenerRegistry listenerRegistry;
     private final PacketProvider packetProvider;
+    private final EventDispatcher eventDispatcher;
 
     @Inject
     public StatusModule(FileResolver fileResolver,
@@ -52,7 +55,8 @@ public class StatusModule extends AbstractModule {
                         PlatformServerAdapter platformServerAdapter,
                         FPlayerService fPlayerService,
                         ListenerRegistry listenerRegistry,
-                        PacketProvider packetProvider) {
+                        PacketProvider packetProvider,
+                        EventDispatcher eventDispatcher) {
         this.fileResolver = fileResolver;
         this.MOTDModule = MOTDModule;
         this.iconModule = iconModule;
@@ -63,6 +67,7 @@ public class StatusModule extends AbstractModule {
         this.fPlayerService = fPlayerService;
         this.listenerRegistry = listenerRegistry;
         this.packetProvider = packetProvider;
+        this.eventDispatcher = eventDispatcher;
     }
 
     @Override
@@ -106,6 +111,10 @@ public class StatusModule extends AbstractModule {
         }
 
         responseJson.addProperty("enforcesSecureChat", false);
+
+        StatusResponseEvent responseEvent = new StatusResponseEvent(responseJson);
+        eventDispatcher.dispatch(responseEvent);
+        if (responseEvent.isCancelled()) return;
 
         event.markForReEncode(true);
 

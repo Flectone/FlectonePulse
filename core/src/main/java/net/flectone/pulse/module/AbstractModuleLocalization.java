@@ -3,8 +3,8 @@ package net.flectone.pulse.module;
 import com.google.inject.Inject;
 import lombok.Getter;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
@@ -16,10 +16,6 @@ import net.flectone.pulse.model.util.Cooldown;
 import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.model.util.Sound;
 import net.flectone.pulse.platform.filter.RangeFilter;
-import net.flectone.pulse.platform.sender.CooldownSender;
-import net.flectone.pulse.platform.sender.DisableSender;
-import net.flectone.pulse.platform.sender.MuteSender;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
@@ -40,10 +36,6 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     @Getter private final MessageType messageType;
 
     @Inject private FPlayerService fPlayerService;
-    @Inject private CooldownSender cooldownSender;
-    @Inject private DisableSender disableSender;
-    @Inject private MuteSender muteSender;
-    @Inject private FileResolver fileResolver;
     @Inject private RangeFilter rangeFilter;
     @Inject private MessagePipeline messagePipeline;
     @Inject private EventDispatcher eventDispatcher;
@@ -59,15 +51,6 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
 
     public M localization() {
         return localization(FPlayer.UNKNOWN);
-    }
-
-    @Override
-    protected void addDefaultPredicates() {
-        super.addDefaultPredicates();
-
-        addPredicate((fPlayer, needBoolean) -> needBoolean && disableSender.sendIfDisabled(fPlayer, fPlayer, messageType));
-        addPredicate((fPlayer, needBoolean) -> needBoolean && cooldownSender.sendIfCooldown(fPlayer, getModuleCooldown()));
-        addPredicate((fPlayer, needBoolean) -> needBoolean && muteSender.sendIfMuted(fPlayer));
     }
 
     public Sound createSound(Sound sound, Permission.IPermission permission) {

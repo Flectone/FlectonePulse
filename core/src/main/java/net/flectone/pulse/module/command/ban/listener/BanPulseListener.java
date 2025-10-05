@@ -70,7 +70,7 @@ public class BanPulseListener implements PulseListener {
                         })
                         .moderation(ban)
                         .range(Range.get(Range.Type.SERVER))
-                        .filter(filter -> permissionChecker.check(filter, banModule.getModulePermission()))
+                        .filter(filter -> permissionChecker.check(filter, banModule.getPermission()))
                         .build()
                 );
             }

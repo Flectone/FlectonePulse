@@ -6,10 +6,9 @@ import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
+import net.flectone.pulse.module.integration.interactivechat.listener.InteractiveChatPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 
 @Singleton
@@ -18,34 +17,24 @@ public class InteractiveChatModule extends AbstractModule {
     private final FileResolver fileResolver;
     private final InteractiveChatIntegration interactiveChatIntegration;
     private final ListenerRegistry listenerRegistry;
-    private final DeleteModule deleteModule;
-    private final FLogger fLogger;
 
     @Inject
     public InteractiveChatModule(FileResolver fileResolver,
                                  InteractiveChatIntegration interactiveChatIntegration,
-                                 ListenerRegistry listenerRegistry,
-                                 DeleteModule deleteModule,
-                                 FLogger fLogger) {
+                                 ListenerRegistry listenerRegistry) {
         this.fileResolver = fileResolver;
         this.interactiveChatIntegration = interactiveChatIntegration;
         this.listenerRegistry = listenerRegistry;
-        this.deleteModule = deleteModule;
-        this.fLogger = fLogger;
     }
 
     @Override
     public void onEnable() {
-        if (fileResolver.getMessage().getFormat().getModeration().getDelete().isEnable()) {
-            fLogger.warning("InteractiveChat and Delete module incompatible");
-            deleteModule.addPredicate(fEntity -> false);
-        }
-
         registerModulePermission(permission());
 
         interactiveChatIntegration.hook();
 
         listenerRegistry.register(InteractiveChatIntegration.class);
+        listenerRegistry.register(InteractiveChatPulseListener.class);
     }
 
     @Override

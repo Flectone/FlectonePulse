@@ -5,7 +5,8 @@ import com.google.inject.Singleton;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
-import net.flectone.pulse.module.message.status.StatusModule;
+import net.flectone.pulse.module.integration.minimotd.listener.MiniMOTDPulseListener;
+import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 
 @Singleton
@@ -13,15 +14,15 @@ public class MiniMOTDModule extends AbstractModule {
 
     private final FileResolver fileResolver;
     private final MiniMOTDIntegration miniMOTDIntegration;
-    private final StatusModule statusModule;
+    private final ListenerRegistry listenerRegistry;
 
     @Inject
     public MiniMOTDModule(FileResolver fileResolver,
                           MiniMOTDIntegration miniMOTDIntegration,
-                          StatusModule statusModule) {
+                          ListenerRegistry listenerRegistry) {
         this.fileResolver = fileResolver;
         this.miniMOTDIntegration = miniMOTDIntegration;
-        this.statusModule = statusModule;
+        this.listenerRegistry = listenerRegistry;
     }
 
     @Override
@@ -30,7 +31,7 @@ public class MiniMOTDModule extends AbstractModule {
 
         miniMOTDIntegration.hook();
 
-        statusModule.addPredicate(fPlayer -> config().isDisableFlectonepulseStatus() && isHooked());
+        listenerRegistry.register(MiniMOTDPulseListener.class);
     }
 
     @Override
