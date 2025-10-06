@@ -188,7 +188,7 @@ public class Database {
                         "file:./" + projectPath.toString() +
                         File.separator +
                         systemVariableResolver.substituteEnvVars(config().getName()) + ".h2" +
-                        ";DB_CLOSE_DELAY=-1;MODE=MySQL";
+                        ";TRACE_LEVEL_FILE=0;DB_CLOSE_DELAY=-1;MODE=MySQL";
 
                 hikariConfig.setDriverClassName("org.h2.Driver");
                 hikariConfig.setMaximumPoolSize(5);
