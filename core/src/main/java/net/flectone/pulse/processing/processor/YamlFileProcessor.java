@@ -37,23 +37,35 @@ public class YamlFileProcessor {
                             .loadSettings(LoadSettings.builder().setBufferSize(4096).build()) // increase string limit
                             .build()
             )
+            // mapper
             .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY) // disable auto sorting
+            .disable(MapperFeature.DETECT_PARAMETER_NAMES) // [databind#5314]
+            .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS) // fix enum names
+            // deserialization
             .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES) // jackson 2.x value
             .disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS) // jackson 2.x value
-            .disable(EnumFeature.READ_ENUMS_USING_TO_STRING) // jackson 2.x value
-            .disable(EnumFeature.WRITE_ENUMS_USING_TO_STRING) // jackson 2.x value
-            .disable(MapperFeature.DETECT_PARAMETER_NAMES) // [databind#5314]
+            .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
+            // serialization
             .enable(SerializationFeature.INDENT_OUTPUT) // indent output for values
-            .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS) // fix enum names
-            .enable(MapperFeature.FIX_FIELD_NAME_UPPER_CASE_PREFIX) // fix field names
             .disable(YAMLWriteFeature.SPLIT_LINES) // fix split long values
             .disable(YAMLWriteFeature.WRITE_DOC_START_MARKER) // fix header
             .disable(YAMLWriteFeature.USE_NATIVE_TYPE_ID) // fix type id like !!java.util.Hashmap
             .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+            // enum
+            .disable(EnumFeature.READ_ENUMS_USING_TO_STRING) // jackson 2.x value
+            .disable(EnumFeature.WRITE_ENUMS_USING_TO_STRING) // jackson 2.x value
+            // fix nulls
             .changeDefaultPropertyInclusion(config -> JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL)) // show only non-null values
             .changeDefaultNullHandling(config -> JsonSetter.Value.forValueNulls(Nulls.SKIP)) // skip null values deserialization
+            .withConfigOverride(String.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null string
+            .withConfigOverride(Collection.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null collection
+            .withConfigOverride(List.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null list
+            .withConfigOverride(Set.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null set
+            .withConfigOverride(Map.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null map
             .defaultMergeable(true)
-            .addModule(new SimpleModule().addDeserializer(String.class, new ValueDeserializer<>() { // fix null strings
+            .addModule(new SimpleModule().addDeserializer(String.class, new ValueDeserializer<>() {
+                // fix null values like "key: null"
+                // idk, why withConfigOverride(String.class, ...) doesn't fix it
 
                 @Override
                 public String deserialize(JsonParser p, DeserializationContext ctxt) {
