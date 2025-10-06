@@ -99,9 +99,10 @@ public class FPlayerService {
 
         moderationService.invalidate(uuid);
 
-        // player can be in the cache and be unknown
+        // player can be in cache and be unknown
+        // or uuid and name can be invalid
         FPlayer fPlayer = fPlayerRepository.get(uuid);
-        if (fPlayer.isUnknown()) {
+        if (fPlayer.isUnknown() || !fPlayer.getUuid().equals(uuid) || !fPlayer.getName().equals(name)) {
             fPlayerRepository.invalid(uuid);
             fPlayer = fPlayerRepository.get(uuid);
         }
