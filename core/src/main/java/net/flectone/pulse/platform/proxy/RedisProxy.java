@@ -47,8 +47,12 @@ public class RedisProxy implements Proxy {
 
     @Override
     public boolean isEnable() {
-        return config().isEnable() && fileResolver.getConfig().getDatabase().getType() == Database.Type.MYSQL
-                && pubSubConnection != null && pubSubConnection.isOpen();
+        Database.Type database = fileResolver.getConfig().getDatabase().getType();
+        boolean serverDatabase = database == Database.Type.MYSQL
+                || database == Database.Type.MARIADB
+                || database == Database.Type.POSTGRESQL;
+
+        return config().isEnable() && serverDatabase && pubSubConnection != null && pubSubConnection.isOpen();
     }
 
     @Override

@@ -1,0 +1,70 @@
+CREATE TABLE IF NOT EXISTS `fp_player` (
+	`id` INTEGER PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,
+    `online` INTEGER NOT NULL DEFAULT '0',
+	`uuid` VARCHAR(36) NOT NULL UNIQUE,
+	`name` VARCHAR(255) NOT NULL UNIQUE,
+	`ip` VARCHAR(39)
+);
+
+CREATE TABLE IF NOT EXISTS `fp_setting` (
+    `id` INTEGER PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,
+    `player` INTEGER NOT NULL,
+    `type` VARCHAR(255) NOT NULL,
+    `value` TEXT,
+FOREIGN KEY(`player`) REFERENCES `fp_player`(`id`),
+UNIQUE(`player`, `type`)
+);
+
+CREATE TABLE IF NOT EXISTS `fp_mail` (
+	`id` INTEGER PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,
+	`date` BIGINT NOT NULL,
+	`sender` INTEGER NOT NULL,
+	`receiver` INTEGER NOT NULL,
+	`message` TEXT NOT NULL,
+    `valid` INTEGER NOT NULL DEFAULT '1',
+FOREIGN KEY(`sender`) REFERENCES `fp_player`(`id`),
+FOREIGN KEY(`receiver`) REFERENCES `fp_player`(`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `fp_ignore` (
+	`id` INTEGER PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,
+	`date` BIGINT NOT NULL,
+	`initiator` INTEGER NOT NULL,
+	`target` INTEGER NOT NULL,
+    `valid` INTEGER NOT NULL DEFAULT '1',
+FOREIGN KEY(`initiator`) REFERENCES `fp_player`(`id`),
+FOREIGN KEY(`target`) REFERENCES `fp_player`(`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `fp_moderation` (
+	`id` INTEGER PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,
+	`player` INTEGER NOT NULL,
+	`date` BIGINT NOT NULL,
+	`time` BIGINT NOT NULL,
+	`reason` TEXT,
+	`moderator` INTEGER NOT NULL,
+    `type` INTEGER NOT NULL,
+    `valid` INTEGER NOT NULL DEFAULT '1',
+FOREIGN KEY(`player`) REFERENCES `fp_player`(`id`),
+FOREIGN KEY(`moderator`) REFERENCES `fp_player`(`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `fp_fcolor` (
+	`id` INTEGER PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,
+	`name` TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS `fp_player_fcolor` (
+	`id` INTEGER PRIMARY KEY NOT NULL UNIQUE AUTO_INCREMENT,
+    `number` INTEGER NOT NULL,
+	`player` INTEGER NOT NULL,
+	`fcolor` INTEGER NOT NULL,
+    `type` TEXT NOT NULL,
+FOREIGN KEY(`player`) REFERENCES `fp_player`(`id`),
+FOREIGN KEY(`fcolor`) REFERENCES `fp_fcolor`(`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `fp_version` (
+    `id` INTEGER PRIMARY KEY CHECK (`id` = 1),
+    `name` TEXT NOT NULL
+);

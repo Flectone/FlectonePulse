@@ -90,7 +90,7 @@ public class Database {
             yamlFileProcessor.save(fileResolver.getConfig());
         }
 
-        HikariConfig hikariConfig = createHikaryConfig();
+        HikariConfig hikariConfig = createHikariConfig();
 
         try {
             dataSource = new HikariDataSource(hikariConfig);
@@ -139,7 +139,7 @@ public class Database {
         }
     }
 
-    private HikariConfig createHikaryConfig() {
+    private HikariConfig createHikariConfig() {
         HikariConfig hikariConfig = new HikariConfig();
 
         String connectionURL = "jdbc:" + config().getType().name().toLowerCase() + ":";
@@ -225,17 +225,33 @@ public class Database {
                 hikariConfig.addDataSourceProperty("synchronous", "NORMAL");
                 hikariConfig.addDataSourceProperty("journal_size_limit", "6144000");
             }
-            case MYSQL -> {
-                reflectionResolver.hasClassOrElse("com.mysql.jdbc.Driver", libraryResolver ->
-                        libraryResolver.loadLibrary(Library.builder()
-                                .groupId("com{}mysql")
-                                .artifactId("mysql-connector-j")
-                                .version(BuildConfig.MYSQL_CONNECTOR_VERSION)
-                                .repository(BuildConfig.MAVEN_REPOSITORY)
-                                .resolveTransitiveDependencies(true)
-                                .build()
-                        )
-                );
+            case MYSQL, MARIADB -> {
+
+                if (config().getType() == Type.MYSQL) {
+                    reflectionResolver.hasClassOrElse("com.mysql.jdbc.Driver", libraryResolver ->
+                            libraryResolver.loadLibrary(Library.builder()
+                                    .groupId("com{}mysql")
+                                    .artifactId("mysql-connector-j")
+                                    .version(BuildConfig.MYSQL_CONNECTOR_VERSION)
+                                    .repository(BuildConfig.MAVEN_REPOSITORY)
+                                    .resolveTransitiveDependencies(true)
+                                    .build()
+                            )
+                    );
+                } else {
+                    reflectionResolver.hasClassOrElse("org.mariadb.jdbc.Driver", libraryResolver ->
+                            libraryResolver.loadLibrary(Library.builder()
+                                    .groupId("org{}mariadb{}jdbc")
+                                    .artifactId("mariadb-java-client")
+                                    .version(BuildConfig.MARIADB_JAVA_CLIENT_VERSION)
+                                    .repository(BuildConfig.MAVEN_REPOSITORY)
+                                    .resolveTransitiveDependencies(true)
+                                    .build()
+                            )
+                    );
+
+                    hikariConfig.setDriverClassName("org.mariadb.jdbc.Driver");
+                }
 
                 connectionURL = connectionURL +
                         "//" +
@@ -320,6 +336,7 @@ public class Database {
         POSTGRESQL,
         H2,
         SQLITE,
-        MYSQL
+        MYSQL,
+        MARIADB
     }
 }

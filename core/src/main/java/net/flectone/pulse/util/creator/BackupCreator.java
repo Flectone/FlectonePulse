@@ -67,7 +67,7 @@ public class BackupCreator {
 
                 backup(databaseName, projectPath.resolve(databaseName));
             }
-            case MYSQL, POSTGRESQL -> {
+            case MYSQL, MARIADB, POSTGRESQL -> {
                 try {
                     String backupFileName = databaseName + "_" + simpleDateFormat.format(new Date()) + ".sql";
                     Path backupPath = resolveBackupPath(backupFileName);
@@ -79,7 +79,7 @@ public class BackupCreator {
 
                     Map<String, String> env = new HashMap<>(System.getenv());
                     ProcessBuilder processBuilder;
-                    if (databaseType == Database.Type.MYSQL) {
+                    if (databaseType == Database.Type.MYSQL || databaseType == Database.Type.MARIADB) {
                         env.put("MYSQL_PWD", password);
                         processBuilder = new ProcessBuilder(
                                 getMySQLDumpCommand(),

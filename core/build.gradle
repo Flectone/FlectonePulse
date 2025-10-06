@@ -19,6 +19,7 @@ dependencies {
     compileOnly "com.yandex.cloud:java-sdk-services:$yandexsdk_version"
     compileOnly "com.deepl.api:deepl-java:$deepl_version"
     compileOnly "com.sparkjava:spark-core:$spark_version"
+    compileOnly "org.mariadb.jdbc:mariadb-java-client:$mariadb_java_client_version"
     compileOnly "com.h2database:h2:$h2_version"
     compileOnly "org.postgresql:postgresql:$postgresql_version"
     compileOnly "io.lettuce:lettuce-core:$lettuce_version"
