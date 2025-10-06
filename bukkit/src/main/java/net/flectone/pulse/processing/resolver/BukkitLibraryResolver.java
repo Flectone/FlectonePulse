@@ -108,6 +108,7 @@ public class BukkitLibraryResolver extends LibraryResolver {
                 .artifactId("packetevents-spigot")
                 .version(BuildConfig.PACKETEVENTS_SPIGOT_VERSION)
                 .repository(BuildConfig.CODEMC_REPOSITORY)
+                .fallbackRepository("https://repo.codemc.io/repository/maven-snapshots/")
                 .resolveTransitiveDependencies(true)
                 .relocate(Relocation.builder()
                         .pattern("com{}github{}retrooper")
