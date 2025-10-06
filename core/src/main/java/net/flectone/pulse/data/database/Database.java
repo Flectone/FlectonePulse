@@ -294,7 +294,11 @@ public class Database {
         }
 
         if (versionName.isEmpty()) {
-            migration("1_6_0");
+            if (config().getType() == Type.POSTGRESQL) {
+                migration("1_6_0_postgre");
+            } else {
+                migration("1_6_0");
+            }
         }
 
         versionDAO.insertOrUpdate(fileResolver.getConfig().getVersion());
