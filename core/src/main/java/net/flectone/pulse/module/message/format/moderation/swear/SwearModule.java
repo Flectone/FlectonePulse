@@ -25,6 +25,7 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -152,7 +153,8 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
         Matcher matcher = combinedPattern.matcher(string);
         while (matcher.find()) {
             String word = matcher.group(0);
-            if (word != null && config().getIgnore().contains(word.trim().toLowerCase())) continue;
+            int start = matcher.start();
+            if (isIgnored(word) || isIgnored(getFullWord(string, start))) continue;
 
             matcher.appendReplacement(result, "<swear:'" + word + "'>");
         }
@@ -160,5 +162,30 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
         matcher.appendTail(result);
 
         return result.toString();
+    }
+
+    private boolean isIgnored(String word) {
+        if (StringUtils.isEmpty(word)) return true;
+        if (config().getIgnore().isEmpty()) return false;
+
+        String fullWord = word.trim().toLowerCase(Locale.ROOT);
+
+        return config().getIgnore().contains(fullWord);
+    }
+
+    private String getFullWord(String text, int position) {
+        if (position < 0 || position >= text.length()) return text;
+
+        int start = position;
+        while (start > 0 && Character.isLetterOrDigit(text.charAt(start - 1))) {
+            start--;
+        }
+
+        int end = position;
+        while (end < text.length() && Character.isLetterOrDigit(text.charAt(end))) {
+            end++;
+        }
+
+        return text.substring(start, end);
     }
 }
