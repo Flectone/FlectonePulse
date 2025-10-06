@@ -34,7 +34,11 @@ public class YamlFileProcessor {
 
     private final ObjectMapper mapper = YAMLMapper.builder(
                     YAMLFactory.builder()
-                            .loadSettings(LoadSettings.builder().setBufferSize(4096).build()) // increase string limit
+                            .loadSettings(LoadSettings.builder()
+                                    .setBufferSize(4096) // increase string limit
+                                    .setAllowDuplicateKeys(true) // fix duplicate keys
+                                    .build()
+                            )
                             .build()
             )
             // mapper
