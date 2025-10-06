@@ -24,6 +24,7 @@ import net.flectone.pulse.processing.processor.YamlFileProcessor;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
+import net.flectone.pulse.util.creator.BackupCreator;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.Strings;
 import org.jdbi.v3.core.Jdbi;
@@ -33,10 +34,7 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Optional;
 
 @Singleton
@@ -51,6 +49,7 @@ public class Database {
     private final ReflectionResolver reflectionResolver;
     private final Provider<VersionDAO> versionDAOProvider;
     private final YamlFileProcessor yamlFileProcessor;
+    private final BackupCreator backupCreator;
 
     private HikariDataSource dataSource;
     private Jdbi jdbi;
@@ -64,7 +63,8 @@ public class Database {
                     PacketProvider packetProvider,
                     ReflectionResolver reflectionResolver,
                     Provider<VersionDAO> versionDAOProvider,
-                    YamlFileProcessor yamlFileProcessor) {
+                    YamlFileProcessor yamlFileProcessor,
+                    BackupCreator backupCreator) {
         this.fileResolver = fileResolver;
         this.projectPath = projectPath;
         this.systemVariableResolver = systemVariableResolver;
@@ -74,6 +74,7 @@ public class Database {
         this.reflectionResolver = reflectionResolver;
         this.versionDAOProvider = versionDAOProvider;
         this.yamlFileProcessor = yamlFileProcessor;
+        this.backupCreator = backupCreator;
     }
 
     public Config.Database config() {
@@ -286,6 +287,8 @@ public class Database {
     private void checkMigration() {
         if (!fileResolver.isVersionOlderThan(fileResolver.getPreInitVersion(), fileResolver.getConfig().getVersion())) return;
 
+        backupCreator.backup(config());
+
         VersionDAO versionDAO = versionDAOProvider.get();
         Optional<String> versionName = versionDAO.find();
 
@@ -305,28 +308,11 @@ public class Database {
     }
 
     private void migration(String version) {
-        backupDatabase();
-
         try {
             InputStream sqlFile = platformServerAdapter.getResource("sqls/migrations/" + version + ".sql");
             executeSQLFile(sqlFile);
         } catch (IOException e) {
             fLogger.warning(e);
-        }
-    }
-
-    private void backupDatabase() {
-        if (config().getType() == Type.SQLITE) {
-            String databaseName = systemVariableResolver.substituteEnvVars(config().getName()) + ".db";
-
-            String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss").format(new Date());
-            String copiedDatabaseName = databaseName + "_backup_" + timeStamp;
-
-            try {
-                Files.copy(projectPath.resolve(databaseName), projectPath.resolve(copiedDatabaseName));
-            } catch (IOException e) {
-                fLogger.warning(e);
-            }
         }
     }
 

@@ -14,6 +14,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.processing.processor.YamlFileProcessor;
 import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
+import net.flectone.pulse.util.creator.BackupCreator;
 import net.flectone.pulse.util.logging.FLogger;
 import org.apache.commons.lang3.Strings;
 
@@ -40,6 +41,7 @@ public class FileResolver {
     private final Permission permission;
     private final FLogger fLogger;
     private final YamlFileProcessor yamlFileProcessor;
+    private final BackupCreator backupCreator;
 
     private String preInitVersion;
     private Localization defaultLocalization;
@@ -47,7 +49,8 @@ public class FileResolver {
     @Inject
     public FileResolver(@Named("projectPath") Path projectPath,
                         FLogger fLogger,
-                        YamlFileProcessor yamlFileProcessor) {
+                        YamlFileProcessor yamlFileProcessor,
+                        BackupCreator backupCreator) {
         this.projectPath = projectPath;
         this.command = new Command(projectPath);
         this.config = new Config(projectPath);
@@ -56,6 +59,7 @@ public class FileResolver {
         this.permission = new Permission(projectPath);
         this.fLogger = fLogger;
         this.yamlFileProcessor = yamlFileProcessor;
+        this.backupCreator = backupCreator;
     }
 
     public Localization getLocalization() {
@@ -70,20 +74,23 @@ public class FileResolver {
     }
 
     public void reload() throws IOException {
+        // this is to check FlectonePulse version
+        // mb in the future we should put version in a separate file, but I think it's not so important
         yamlFileProcessor.reload(config);
-        config.getLanguage().setType(config.getLanguage().getType());
 
+        // init localization file names
+        loadLanguages();
+
+        // check version
         preInitVersion = config.getVersion();
         boolean versionChanged = !preInitVersion.equals(BuildConfig.PROJECT_VERSION);
 
-        yamlFileProcessor.reload(command);
-        yamlFileProcessor.reload(integration);
-        yamlFileProcessor.reload(message);
-        yamlFileProcessor.reload(permission);
+        // backup if version changed
+        if (versionChanged) {
+            backupConfiguration();
+        }
 
-        reloadLanguages();
-
-        defaultLocalization = localizationMap.get(config.getLanguage().getType());
+        reloadConfiguration();
 
         if (versionChanged) {
             // fix update permission name
@@ -106,6 +113,33 @@ public class FileResolver {
         }
     }
 
+    private void backupConfiguration() {
+        backupCreator.setPreInitVersion(preInitVersion);
+
+        // we can't backup config.yml because it has already been reloaded
+        backupCreator.backup(command);
+        backupCreator.backup(integration);
+        backupCreator.backup(message);
+        backupCreator.backup(permission);
+
+        for (Localization localization : localizationMap.values()) {
+            backupCreator.backup(localization);
+        }
+    }
+
+    private void reloadConfiguration() throws IOException {
+        yamlFileProcessor.reload(command);
+        yamlFileProcessor.reload(integration);
+        yamlFileProcessor.reload(message);
+        yamlFileProcessor.reload(permission);
+
+        for (Localization localization : localizationMap.values()) {
+            yamlFileProcessor.reload(localization);
+        }
+
+        defaultLocalization = localizationMap.get(config.getLanguage().getType());
+    }
+
     public void save() throws IOException {
         yamlFileProcessor.save(command);
         yamlFileProcessor.save(config);
@@ -118,7 +152,7 @@ public class FileResolver {
         }
     }
 
-    private void reloadLanguages() throws IOException {
+    private void loadLanguages() {
         Set<String> newLanguages = new HashSet<>(Set.of("ru_ru", "en_us"));
         newLanguages.add(config.getLanguage().getType());
 
@@ -141,9 +175,8 @@ public class FileResolver {
         }
     }
 
-    private void loadLanguage(String language) throws IOException {
+    private void loadLanguage(String language) {
         Localization localization = new Localization(projectPath, language);
-        yamlFileProcessor.reload(localization);
         localizationMap.put(language, localization);
     }
 

@@ -28,8 +28,10 @@ import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.registry.*;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
+import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.checker.FabricPermissionChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.creator.BackupCreator;
 import net.flectone.pulse.util.interceptor.AsyncInterceptor;
 import net.flectone.pulse.util.interceptor.SyncInterceptor;
 import net.flectone.pulse.util.logging.FLogger;
@@ -73,8 +75,14 @@ public class FabricInjector extends AbstractModule {
         YamlFileProcessor yamlFileProcessor = new YamlFileProcessor(englishLocale, russianLocale);
         bind(YamlFileProcessor.class).toInstance(yamlFileProcessor);
 
+        SystemVariableResolver systemVariableResolver = new SystemVariableResolver();
+        bind(SystemVariableResolver.class).toInstance(systemVariableResolver);
+
+        BackupCreator backupCreator = new BackupCreator(systemVariableResolver, projectPath, fLogger);
+        bind(BackupCreator.class).toInstance(backupCreator);
+
         // Initialize and bind FileManager
-        FileResolver fileResolver = new FileResolver(projectPath, fLogger, yamlFileProcessor);
+        FileResolver fileResolver = new FileResolver(projectPath, fLogger, yamlFileProcessor, backupCreator);
         fileResolver.reload();
 
         bind(FileResolver.class).toInstance(fileResolver);
