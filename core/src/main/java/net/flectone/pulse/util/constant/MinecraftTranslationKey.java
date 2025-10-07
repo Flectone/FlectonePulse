@@ -175,9 +175,12 @@ public enum MinecraftTranslationKey {
     COMMANDS_STOPSOUND_SUCCESS_ALL("commands.stopsound.success.all"), // legacy 1.9-1.12
 
     COMMANDS_SPAWNPOINT_SUCCESS_MULTIPLE("commands.spawnpoint.success.multiple"), // 1.13+
+    COMMANDS_SPAWNPOINT_SUCCESS_MULTIPLE_NEW("commands.spawnpoint.success.multiple.new"), // 1.21.9+
     COMMANDS_SPAWNPOINT_SUCCESS_SINGLE("commands.spawnpoint.success.single"), // 1.13+
+    COMMANDS_SPAWNPOINT_SUCCESS_SINGLE_NEW("commands.spawnpoint.success.single.new"), // 1.21.9+
     COMMANDS_SPAWNPOINT_SUCCESS("commands.spawnpoint.success"), // legacy 1.8-1.12
     COMMANDS_SETWORLDSPAWN_SUCCESS("commands.setworldspawn.success"), // 1.8+
+    COMMANDS_SETWORLDSPAWN_SUCCESS_NEW("commands.setworldspawn.success.new"), // 1.21.9+
 
     COMMANDS_STOP_SUCCESS("commands.stop.stopping"), // 1.13+
     COMMANDS_STOP_START("commands.stop.start"), // legacy 1.8-1.12

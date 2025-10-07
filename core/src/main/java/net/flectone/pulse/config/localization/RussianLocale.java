@@ -800,9 +800,9 @@ public class RussianLocale implements Locale {
 
         localization.message.spawn.notValid = "<fcolor:1>\uD83D\uDECC У вас нет кровати или заряженного якоря возрождения, либо доступ к ним затруднён";
         localization.message.spawn.set = "<fcolor:1>\uD83D\uDECC Точка возрождения установлена";
-        localization.message.spawn.setWorld = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения мира <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>]";
-        localization.message.spawn.single = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>] в <fcolor:2><world> <fcolor:1>для <target>";
-        localization.message.spawn.multiple = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>] в <fcolor:2><world> <fcolor:1>для <fcolor:2><players><fcolor:1> игроков";
+        localization.message.spawn.setWorld = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения мира <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>, <fcolor:2><yaw><fcolor:1>]";
+        localization.message.spawn.single = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>, <fcolor:2><yaw><fcolor:1>] в <fcolor:2><world> <fcolor:1>для <target>";
+        localization.message.spawn.multiple = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>, <fcolor:2><yaw><fcolor:1>] в <fcolor:2><world> <fcolor:1>для <fcolor:2><players><fcolor:1> игроков";
 
         localization.message.status.motd.values = new LinkedList<>() {{
             add("<fcolor:1>Добро пожаловать на сервер!");

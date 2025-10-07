@@ -38,7 +38,8 @@ public class SpawnPulseListener implements PulseListener {
         }
 
         if (!translationKey.startsWith("commands.spawnpoint.success")
-                && translationKey != MinecraftTranslationKey.COMMANDS_SETWORLDSPAWN_SUCCESS) return;
+                && translationKey != MinecraftTranslationKey.COMMANDS_SETWORLDSPAWN_SUCCESS
+                && translationKey != MinecraftTranslationKey.COMMANDS_SETWORLDSPAWN_SUCCESS_NEW) return;
 
         Optional<Spawn> spawn = spawnExtractor.extract(translationKey, event.getTranslatableComponent());
         if (spawn.isEmpty()) return;

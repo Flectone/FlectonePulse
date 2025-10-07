@@ -800,9 +800,9 @@ public class EnglishLocale implements Locale {
 
         localization.message.spawn.notValid = "<fcolor:1>\uD83D\uDECC You have no home bed or charged respawn anchor, or it was obstructed";
         localization.message.spawn.set = "<fcolor:1>\uD83D\uDECC Respawn point set";
-        localization.message.spawn.setWorld = "<fcolor:1>\uD83D\uDECC Set the world spawn point to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>]";
-        localization.message.spawn.single = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>] in <fcolor:2><world><fcolor:1> for <target>";
-        localization.message.spawn.multiple = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>] in <fcolor:2><world><fcolor:1> for <fcolor:2><players><fcolor:1> players";
+        localization.message.spawn.setWorld = "<fcolor:1>\uD83D\uDECC Set the world spawn point to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>, <fcolor:2><yaw><fcolor:1>]";
+        localization.message.spawn.single = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>, <fcolor:2><yaw><fcolor:1>] in <fcolor:2><world><fcolor:1> for <target>";
+        localization.message.spawn.multiple = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>, <fcolor:2><yaw><fcolor:1>] in <fcolor:2><world><fcolor:1> for <fcolor:2><players><fcolor:1> players";
 
         localization.message.status.motd.values = new LinkedList<>() {{
             add("<fcolor:1>Welcome to our server!");

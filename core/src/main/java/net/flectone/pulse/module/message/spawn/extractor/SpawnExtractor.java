@@ -101,34 +101,74 @@ public class SpawnExtractor extends Extractor {
 
         spawnBuilder = spawnBuilder.angle(angle.get());
 
-        return switch (translationKey) {
-            // Set the world spawn point to %s, %s, %s [%s]
-            case COMMANDS_SETWORLDSPAWN_SUCCESS -> Optional.of(spawnBuilder.build());
-            // Set spawn point to %s, %s, %s [%s] in %s for %s players
-            case COMMANDS_SPAWNPOINT_SUCCESS_MULTIPLE -> {
-                Optional<String> world = extractTextContent(translatableComponent, 4);
-                if (world.isEmpty()) yield Optional.empty();
+        if (packetProvider.getServerVersion().isOlderThanOrEquals(ServerVersion.V_1_21_8)) {
+            return switch (translationKey) {
+                // Set the world spawn point to %s, %s, %s [%s]
+                case COMMANDS_SETWORLDSPAWN_SUCCESS -> Optional.of(spawnBuilder.build());
+                // Set spawn point to %s, %s, %s [%s] in %s for %s players
+                case COMMANDS_SPAWNPOINT_SUCCESS_MULTIPLE -> {
+                    Optional<String> world = extractTextContent(translatableComponent, 4);
+                    if (world.isEmpty()) yield Optional.empty();
 
-                Optional<String> players = extractTextContent(translatableComponent, 5);
+                    Optional<String> players = extractTextContent(translatableComponent, 5);
+                    if (players.isEmpty()) yield Optional.empty();
+
+                    Spawn spawn = spawnBuilder
+                            .world(world.get())
+                            .players(players.get())
+                            .build();
+
+                    yield Optional.of(spawn);
+                }
+                // Set spawn point to %s, %s, %s [%s] in %s for %s
+                case COMMANDS_SPAWNPOINT_SUCCESS_SINGLE -> {
+                    Optional<String> world = extractTextContent(translatableComponent, 4);
+                    if (world.isEmpty()) yield Optional.empty();
+
+                    Optional<FEntity> target = extractFEntity(translatableComponent, 5);
+                    if (target.isEmpty()) yield Optional.empty();
+
+                    Spawn spawn = spawnBuilder
+                            .world(world.get())
+                            .target(target.get())
+                            .build();
+
+                    yield Optional.of(spawn);
+                }
+                default -> Optional.empty();
+            };
+        }
+
+        Optional<String> yaw = extractTextContent(translatableComponent, 4);
+        if (yaw.isEmpty()) return Optional.empty();
+
+        Optional<String> world = extractTextContent(translatableComponent, 5);
+        if (world.isEmpty()) return Optional.empty();
+
+        spawnBuilder = spawnBuilder
+                .yaw(yaw.get())
+                .world(world.get());
+
+        return switch (translationKey) {
+            // Set the world spawn point to %s, %s, %s [%s, %s] in %s
+            case COMMANDS_SETWORLDSPAWN_SUCCESS, COMMANDS_SETWORLDSPAWN_SUCCESS_NEW -> Optional.of(spawnBuilder.build());
+            // Set spawn point to %s, %s, %s [%s, %s] in %s for %s players
+            case COMMANDS_SPAWNPOINT_SUCCESS_MULTIPLE, COMMANDS_SPAWNPOINT_SUCCESS_MULTIPLE_NEW -> {
+                Optional<String> players = extractTextContent(translatableComponent, 6);
                 if (players.isEmpty()) yield Optional.empty();
 
                 Spawn spawn = spawnBuilder
-                        .world(world.get())
                         .players(players.get())
                         .build();
 
                 yield Optional.of(spawn);
             }
-            // Set spawn point to %s, %s, %s [%s] in %s for %s
-            case COMMANDS_SPAWNPOINT_SUCCESS_SINGLE -> {
-                Optional<String> world = extractTextContent(translatableComponent, 4);
-                if (world.isEmpty()) yield Optional.empty();
-
-                Optional<FEntity> target = extractFEntity(translatableComponent, 5);
+            // Set spawn point to %s, %s, %s [%s, %s] in %s for %s
+            case COMMANDS_SPAWNPOINT_SUCCESS_SINGLE, COMMANDS_SPAWNPOINT_SUCCESS_SINGLE_NEW -> {
+                Optional<FEntity> target = extractFEntity(translatableComponent, 6);
                 if (target.isEmpty()) yield Optional.empty();
 
                 Spawn spawn = spawnBuilder
-                        .world(world.get())
                         .target(target.get())
                         .build();
 

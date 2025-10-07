@@ -20,7 +20,12 @@ public class Spawn {
     private final String z;
 
     @Nullable
-    private final String angle;
+    @Builder.Default
+    private final String angle = "0";
+
+    @Nullable
+    @Builder.Default
+    private final String yaw = "0";
 
     @Nullable
     private final String world;

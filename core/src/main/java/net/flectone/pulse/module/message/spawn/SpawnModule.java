@@ -82,16 +82,18 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
     public void send(FPlayer fPlayer, MinecraftTranslationKey translationKey, Spawn spawn) {
         if (isModuleDisabledFor(fPlayer)) return;
 
-        boolean isSingle = translationKey == MinecraftTranslationKey.COMMANDS_SPAWNPOINT_SUCCESS_SINGLE
-                || translationKey == MinecraftTranslationKey.COMMANDS_SPAWNPOINT_SUCCESS;
-
         sendMessage(SpawnMetadata.<Localization.Message.Spawn>builder()
                 .sender(fPlayer)
                 .range(config().getRange())
                 .format(localization -> StringUtils.replaceEach(
-                        translationKey == MinecraftTranslationKey.COMMANDS_SETWORLDSPAWN_SUCCESS ? localization.getSetWorld() : isSingle ? localization.getSingle() : localization.getMultiple(),
-                        new String[]{"<players>", "<x>", "<y>", "<z>", "<angle>", "<world>"},
-                        new String[]{StringUtils.defaultString(spawn.getPlayers()), spawn.getX(), spawn.getY(), spawn.getZ(), StringUtils.defaultString(spawn.getAngle()), StringUtils.defaultString(spawn.getWorld())}
+                        switch (translationKey) {
+                            case COMMANDS_SETWORLDSPAWN_SUCCESS, COMMANDS_SETWORLDSPAWN_SUCCESS_NEW -> localization.getSetWorld();
+                            case COMMANDS_SPAWNPOINT_SUCCESS, COMMANDS_SPAWNPOINT_SUCCESS_SINGLE, COMMANDS_SPAWNPOINT_SUCCESS_SINGLE_NEW -> localization.getSingle();
+                            case COMMANDS_SPAWNPOINT_SUCCESS_MULTIPLE, COMMANDS_SPAWNPOINT_SUCCESS_MULTIPLE_NEW -> localization.getMultiple();
+                            default -> "";
+                        },
+                        new String[]{"<players>", "<x>", "<y>", "<z>", "<angle>", "<yaw>", "<world>"},
+                        new String[]{StringUtils.defaultString(spawn.getPlayers()), spawn.getX(), spawn.getY(), spawn.getZ(), spawn.getAngle(), spawn.getYaw(), StringUtils.defaultString(spawn.getWorld())}
                 ))
                 .spawn(spawn)
                 .translationKey(translationKey)
