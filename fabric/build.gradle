@@ -42,7 +42,7 @@ dependencies {
     modCompileOnly("io.github.miniplaceholders:miniplaceholders-api:$miniplaceholders_api_version")
 
 	// fix integration with LuckPerms
-	modImplementation(include("org.incendo:cloud-fabric:${cloud_paper_version}"))
+	modImplementation(include("org.incendo:cloud-fabric:${cloud_fabric_version}"))
 
     implementation fileTree("library") { include "*.jar" }
 	implementation project(":core")
