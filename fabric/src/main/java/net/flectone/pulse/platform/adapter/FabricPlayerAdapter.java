@@ -93,6 +93,11 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
+    public @Nullable Class<?> getPlayerClass() {
+        return ServerPlayerEntity.class;
+    }
+
+    @Override
     public @Nullable Object convertToPlatformPlayer(@NotNull FPlayer fPlayer) {
         return getPlayer(fPlayer.getUuid());
     }

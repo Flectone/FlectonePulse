@@ -75,6 +75,11 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
+    public @NotNull Class<?> getPlayerClass() {
+        return Player.class;
+    }
+
+    @Override
     public @Nullable UUID getUUID(@NotNull Object player) {
         return player instanceof Entity entity ? entity.getUniqueId() : null;
     }

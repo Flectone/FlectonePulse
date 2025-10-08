@@ -49,6 +49,7 @@ public interface PlatformPlayerAdapter {
     int getEntityId(@NotNull UUID uuid);
     @Nullable UUID getPlayerByEntityId(int entityId);
     @Nullable UUID getUUID(@NotNull Object platformPlayer);
+    @Nullable Class<?> getPlayerClass();
     @Nullable Object convertToPlatformPlayer(@NotNull FPlayer fPlayer);
     @Nullable Object convertToPlatformPlayer(@NotNull UUID uuid);
 
