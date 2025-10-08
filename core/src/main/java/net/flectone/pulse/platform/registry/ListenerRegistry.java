@@ -53,12 +53,11 @@ public class ListenerRegistry implements Registry {
         if (PacketListener.class.isAssignableFrom(clazzListener)) {
             PacketListener packetListener = (PacketListener) injector.getInstance(clazzListener);
             register(packetListener, PacketListenerPriority.valueOf(eventPriority.name()));
-            return;
-        }
-
-        if (PulseListener.class.isAssignableFrom(clazzListener)) {
+        } else if (PulseListener.class.isAssignableFrom(clazzListener)) {
             PulseListener pulseListener = (PulseListener) injector.getInstance(clazzListener);
             register(pulseListener);
+        } else {
+            throw new IllegalArgumentException("Class " + clazzListener.getName() + " is not a valid listener");
         }
     }
 
