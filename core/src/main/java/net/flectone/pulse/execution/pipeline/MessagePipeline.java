@@ -154,6 +154,8 @@ public class MessagePipeline {
         QUESTION,
         TRANSLATE,
         WORLD_PREFIX,
+        PLAYER_HEAD,
+        SPRITE,
 
         @Deprecated
         IMAGE,

@@ -6,6 +6,7 @@ import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.util.logging.FLogger;
+import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.skinsrestorer.api.PropertyUtils;
 import net.skinsrestorer.api.SkinsRestorer;
 import net.skinsrestorer.api.SkinsRestorerProvider;
@@ -48,15 +49,29 @@ public class SkinsRestorerIntegration implements FIntegration {
         fLogger.info("✖ SkinsRestorer unhooked");
     }
 
-    public String getTextureUrl(FPlayer fPlayer) {
+    private SkinProperty getSkinProperty(FPlayer fPlayer) {
         if (skinsRestorer == null) return null;
 
         PlayerStorage storage = skinsRestorer.getPlayerStorage();
         try {
             Optional<SkinProperty> skin = storage.getSkinForPlayer(fPlayer.getUuid(), fPlayer.getName());
-            return skin.map(PropertyUtils::getSkinTextureHash).orElse(null);
+            return skin.orElse(null);
         } catch (DataRequestException e) {
             return null;
         }
+    }
+
+    public String getTextureUrl(FPlayer fPlayer) {
+        SkinProperty skinProperty = getSkinProperty(fPlayer);
+        if (skinProperty == null) return null;
+
+        return PropertyUtils.getSkinTextureHash(skinProperty);
+    }
+
+    public PlayerHeadObjectContents.ProfileProperty getProfileProperty(FPlayer fPlayer) {
+        SkinProperty skinProperty = getSkinProperty(fPlayer);
+        if (skinProperty == null) return null;
+
+        return PlayerHeadObjectContents.property("textures", skinProperty.getValue(), skinProperty.getSignature());
     }
 }

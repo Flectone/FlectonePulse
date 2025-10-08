@@ -1285,6 +1285,11 @@ public final class Localization extends YamlFile implements ModuleConfig {
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/name_/")
             Name name_ = new Name();
 
+            @Override
+            public SubFormatMessageConfig getObject() {
+                return null;
+            }
+
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/questionanswer/")
             QuestionAnswer questionAnswer = new QuestionAnswer();
 

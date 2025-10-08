@@ -153,6 +153,7 @@ public interface ModuleConfig {
             SubFormatMessageConfig getMention();
             ModerationFormatMessageConfig getModeration();
             SubFormatMessageConfig getName_();
+            SubFormatMessageConfig getObject();
             SubFormatMessageConfig getQuestionAnswer();
             SubFormatMessageConfig getReplacement();
             SubFormatMessageConfig getScoreboard();

@@ -14,6 +14,7 @@ import net.flectone.pulse.module.message.format.listener.LegacyColorPulseListene
 import net.flectone.pulse.module.message.format.mention.MentionModule;
 import net.flectone.pulse.module.message.format.moderation.ModerationModule;
 import net.flectone.pulse.module.message.format.name.NameModule;
+import net.flectone.pulse.module.message.format.object.ObjectModule;
 import net.flectone.pulse.module.message.format.questionanswer.QuestionAnswerModule;
 import net.flectone.pulse.module.message.format.replacement.ReplacementModule;
 import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
@@ -61,6 +62,7 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
         addChildren(MentionModule.class);
         addChildren(ModerationModule.class);
         addChildren(NameModule.class);
+        addChildren(ObjectModule.class);
         addChildren(QuestionAnswerModule.class);
         addChildren(ReplacementModule.class);
         addChildren(ScoreboardModule.class);

@@ -9,6 +9,7 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.PlatformType;
+import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 
 @Singleton
 public class SkinsRestorerModule extends AbstractModule {
@@ -60,6 +61,12 @@ public class SkinsRestorerModule extends AbstractModule {
         if (isModuleDisabledFor(fPlayer)) return null;
 
         return skinsRestorerIntegration.getTextureUrl(fPlayer);
+    }
+
+    public PlayerHeadObjectContents.ProfileProperty getProfileProperty(FPlayer fPlayer) {
+        if (isModuleDisabledFor(fPlayer)) return null;
+
+        return skinsRestorerIntegration.getProfileProperty(fPlayer);
     }
 
 }

@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.event.EventManager;
 import com.github.retrooper.packetevents.manager.player.PlayerManager;
 import com.github.retrooper.packetevents.manager.protocol.ProtocolManager;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -60,6 +61,13 @@ public class PacketProvider {
 
     public ServerVersion getServerVersion() {
         return api.getServerManager().getVersion();
+    }
+
+    public boolean isNewerThanOrEquals(FPlayer fPlayer, ClientVersion clientVersion) {
+        User user = getUser(fPlayer);
+        if (user == null) return false;
+
+        return user.getClientVersion().isNewerThanOrEquals(clientVersion);
     }
 
     public @Nullable String getHostAddress(@Nullable InetSocketAddress inetSocketAddress) {

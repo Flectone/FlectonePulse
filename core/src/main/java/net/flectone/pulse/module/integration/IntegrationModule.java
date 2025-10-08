@@ -21,6 +21,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 
 import java.util.Collections;
 import java.util.Set;
@@ -117,6 +118,14 @@ public abstract class IntegrationModule extends AbstractModule {
         if (!(sender instanceof FPlayer fPlayer)) return null;
 
         return injector.getInstance(SkinsRestorerModule.class).getTextureUrl(fPlayer);
+    }
+
+    public PlayerHeadObjectContents.ProfileProperty getProfileProperty(FEntity sender) {
+        if (!isEnable()) return null;
+        if (!getChildren().contains(SkinsRestorerModule.class)) return null;
+        if (!(sender instanceof FPlayer fPlayer)) return null;
+
+        return injector.getInstance(SkinsRestorerModule.class).getProfileProperty(fPlayer);
     }
 
     public String getPrefix(FPlayer fPlayer) {
