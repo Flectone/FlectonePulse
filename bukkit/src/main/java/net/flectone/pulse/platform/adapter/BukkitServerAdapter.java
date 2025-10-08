@@ -37,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -54,6 +55,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private final Provider<MessagePipeline> messagePipelineProvider;
     private final PacketProvider packetProvider;
     private final ReflectionResolver reflectionResolver;
+    private final Method modernGetTPSMethod;
 
     @Inject
     public BukkitServerAdapter(Plugin plugin,
@@ -61,13 +63,17 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
                                Provider<FPlayerService> fPlayerServiceProvider,
                                Provider<MessagePipeline> messagePipelineProvider,
                                PacketProvider packetProvider,
-                               ReflectionResolver reflectionResolver) {
+                               ReflectionResolver reflectionResolver) throws NoSuchMethodException {
         this.plugin = plugin;
         this.integrationModuleProvider = integrationModuleProvider;
         this.fPlayerServiceProvider = fPlayerServiceProvider;
         this.messagePipelineProvider = messagePipelineProvider;
         this.packetProvider = packetProvider;
         this.reflectionResolver = reflectionResolver;
+
+        this.modernGetTPSMethod = reflectionResolver.hasMethod(Server.class, "getTPS")
+                ? Bukkit.getServer().getClass().getMethod("getTPS")
+                : null;
     }
 
     @Sync
@@ -89,6 +95,11 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
     private double[] getRecentTps() throws ReflectiveOperationException {
         Server server = Bukkit.getServer();
+        if (modernGetTPSMethod != null) {
+            return (double[]) modernGetTPSMethod.invoke(server);
+        }
+
+        // legacy get tps
         Object minecraftServer = getMinecraftServer(server);
         Field recentTpsField = minecraftServer.getClass().getSuperclass().getDeclaredField("recentTps");
         recentTpsField.setAccessible(true);
@@ -96,9 +107,14 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     }
 
     private Object getMinecraftServer(@NotNull Server server) throws ReflectiveOperationException {
-        Field consoleField = server.getClass().getDeclaredField("console");
-        consoleField.setAccessible(true);
-        return consoleField.get(server);
+        try {
+            Field consoleField = server.getClass().getDeclaredField("console");
+            consoleField.setAccessible(true);
+            return consoleField.get(server);
+        } catch (NoSuchFieldException e) {
+            Method getServerMethod = server.getClass().getMethod("getServer");
+            return getServerMethod.invoke(server);
+        }
     }
 
     @Override
