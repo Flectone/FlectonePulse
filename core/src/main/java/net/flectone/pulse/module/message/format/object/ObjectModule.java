@@ -85,7 +85,7 @@ public class ObjectModule extends AbstractModule {
 
             String playerHead = argumentQueue.hasNext() ? argumentQueue.pop().value() : null;
             if (playerHead == null) {
-                PlayerHeadObjectContents.ProfileProperty profileProperty = skinService.getProfileProperty(sender);
+                PlayerHeadObjectContents.ProfileProperty profileProperty = skinService.getProfilePropertyFromCache(sender);
                 if (profileProperty == null) return Tag.selfClosingInserting(Component.empty());
 
                 return Tag.selfClosingInserting(Component.object().contents(
