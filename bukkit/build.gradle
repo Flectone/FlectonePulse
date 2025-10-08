@@ -6,7 +6,7 @@ dependencies {
     compileOnly "com.github.Anon8281:UniversalScheduler:$UniversalScheduler_version"
     compileOnly "org.incendo:cloud-paper:$cloud_paper_version"
     compileOnly "org.spigotmc:spigot-api:$spigot_version"
-    compileOnly "com.github.retrooper:packetevents-spigot:$packetevents_spigot_version"
+    implementation "com.github.retrooper:packetevents-spigot:$packetevents_spigot_version"
     compileOnly "me.clip:placeholderapi:$placeholderapi_version"
     compileOnly "com.github.MilkBowl:VaultAPI:$vaultapi_version"
     compileOnly "com.github.LeonMangler:SuperVanish:$supervanishapi_version"

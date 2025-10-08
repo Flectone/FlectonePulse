@@ -124,7 +124,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
         if (player == null) return "";
 
-        return player.getWorld().getRegistryKey().getValue().getPath();
+        return player.getEntityWorld().getRegistryKey().getValue().getPath();
     }
 
     @Override
@@ -259,7 +259,7 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
         ServerPlayerEntity secondPlayer = getPlayer(second.getUuid());
         if (secondPlayer == null) return -1.0;
-        if (!firstPlayer.getWorld().equals(secondPlayer.getWorld())) return -1.0;
+        if (!firstPlayer.getEntityWorld().equals(secondPlayer.getEntityWorld())) return -1.0;
 
         return firstPlayer.distanceTo(secondPlayer);
     }
@@ -341,10 +341,10 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
         Vec3d position = new Vec3d(player.getX(), player.getY(), player.getZ());
         Box searchBox = new Box(position.subtract(x, y, z), position.add(x, y, z));
-        return player.getWorld().getEntitiesByClass(ServerPlayerEntity.class, searchBox, entity -> true)
+        return player.getEntityWorld().getEntitiesByClass(ServerPlayerEntity.class, searchBox, entity -> true)
                 .stream()
                 .filter(target -> {
-                    HitResult hitResult = target.getWorld().raycast(
+                    HitResult hitResult = target.getEntityWorld().raycast(
                             new RaycastContext(
                                     target.getCameraPosVec(1.0F),
                                     player.getCameraPosVec(1.0F),
