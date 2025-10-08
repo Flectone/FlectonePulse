@@ -1,4 +1,4 @@
-package net.flectone.pulse.module.message.format.name;
+package net.flectone.pulse.module.message.format.names;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -10,7 +10,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleLocalization;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.format.name.listener.NamePulseListener;
+import net.flectone.pulse.module.message.format.names.listener.NamesPulseListener;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
@@ -25,7 +25,7 @@ import org.apache.commons.lang3.Strings;
 import java.util.Set;
 
 @Singleton
-public class NameModule extends AbstractModuleLocalization<Localization.Message.Format.Name> {
+public class NamesModule extends AbstractModuleLocalization<Localization.Message.Format.Names> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
@@ -33,10 +33,10 @@ public class NameModule extends AbstractModuleLocalization<Localization.Message.
     private final MessagePipeline messagePipeline;
 
     @Inject
-    public NameModule(FileResolver fileResolver,
-                      ListenerRegistry listenerRegistry,
-                      IntegrationModule integrationModule,
-                      MessagePipeline messagePipeline) {
+    public NamesModule(FileResolver fileResolver,
+                       ListenerRegistry listenerRegistry,
+                       IntegrationModule integrationModule,
+                       MessagePipeline messagePipeline) {
         super(MessageType.NAME);
 
         this.fileResolver = fileResolver;
@@ -49,22 +49,22 @@ public class NameModule extends AbstractModuleLocalization<Localization.Message.
     public void onEnable() {
         super.onEnable();
 
-        listenerRegistry.register(NamePulseListener.class);
+        listenerRegistry.register(NamesPulseListener.class);
     }
 
     @Override
-    public Message.Format.Name config() {
-        return fileResolver.getMessage().getFormat().getName_();
+    public Message.Format.Names config() {
+        return fileResolver.getMessage().getFormat().getNames();
     }
 
     @Override
-    public Permission.Message.Format.Name permission() {
-        return fileResolver.getPermission().getMessage().getFormat().getName_();
+    public Permission.Message.Format.Names permission() {
+        return fileResolver.getPermission().getMessage().getFormat().getNames();
     }
 
     @Override
-    public Localization.Message.Format.Name localization(FEntity sender) {
-        return fileResolver.getLocalization(sender).getMessage().getFormat().getName_();
+    public Localization.Message.Format.Names localization(FEntity sender) {
+        return fileResolver.getLocalization(sender).getMessage().getFormat().getNames();
     }
 
     public void addTags(MessageContext messageContext) {
@@ -76,7 +76,7 @@ public class NameModule extends AbstractModuleLocalization<Localization.Message.
 
         if (!(sender instanceof FPlayer fPlayer)) {
             messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) -> {
-                Localization.Message.Format.Name localizationName = localization(receiver);
+                Localization.Message.Format.Names localizationName = localization(receiver);
 
                 Component showEntityName = sender.getShowEntityName();
                 if (showEntityName == null) {
@@ -120,7 +120,7 @@ public class NameModule extends AbstractModuleLocalization<Localization.Message.
         });
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.DISPLAY_NAME, (argumentQueue, context) -> {
-            Localization.Message.Format.Name localization = localization(receiver);
+            Localization.Message.Format.Names localization = localization(receiver);
 
             String displayName = fPlayer.isUnknown()
                     ? Strings.CS.replace(localization.getUnknown(), "<name>", fPlayer.getName())

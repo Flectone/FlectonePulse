@@ -1150,7 +1150,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/")
             private Moderation moderation = new Moderation();
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/name_/")
-            private Name name_ = new Name();
+            private Names names = new Names();
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/object/")
             private Object object = new Object();
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/questionanswer/")
@@ -1256,7 +1256,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
             }
 
             @Getter
-            public static final class Name implements SubFormatMessageConfig, IPermission {
+            public static final class Names implements SubFormatMessageConfig, IPermission {
                 private String name = "flectonepulse.module.message.format.name";
                 private Type type = Type.TRUE;
             }

@@ -1283,7 +1283,7 @@ public final class Localization extends YamlFile implements ModuleConfig {
             Moderation moderation = new Moderation();
 
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/name_/")
-            Name name_ = new Name();
+            Names names = new Names();
 
             @Override
             public SubFormatMessageConfig getObject() {
@@ -1357,7 +1357,7 @@ public final class Localization extends YamlFile implements ModuleConfig {
 
             @Getter
             @Setter
-            public static final class Name implements SubFormatMessageConfig, Localizable {
+            public static final class Names implements SubFormatMessageConfig, Localizable {
                 String constant;
                 String display;
                 String entity;

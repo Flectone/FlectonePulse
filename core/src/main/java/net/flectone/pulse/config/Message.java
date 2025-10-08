@@ -586,8 +586,8 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/")
         private Moderation moderation = new Moderation();
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/name_/")
-        private Name name_ = new Name();
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/names/")
+        private Names names = new Names();
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/object/")
         private Object object = new Object();
@@ -734,7 +734,7 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         }
 
         @Getter
-        public static final class Name implements SubFormatMessageConfig, Config.IEnable {
+        public static final class Names implements SubFormatMessageConfig, Config.IEnable {
             private boolean enable = true;
             private boolean shouldCheckInvisibility = false;
         }

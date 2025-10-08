@@ -103,7 +103,7 @@ public class ProxySender {
 
 
     private String getConstantName(FPlayer sender) {
-        String message = fileResolver.getLocalization(sender).getMessage().getFormat().getName_().getConstant();
+        String message = fileResolver.getLocalization(sender).getMessage().getFormat().getNames().getConstant();
         if (message.isEmpty()) return "";
 
         return messagePipeline.builder(sender, message).defaultSerializerBuild();

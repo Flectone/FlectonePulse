@@ -441,7 +441,6 @@ public class FileResolver {
                 localization.getMessage().setDeath(defaultRussianLocalization.getMessage().getDeath());
                 localization.getMessage().setDeop(defaultRussianLocalization.getMessage().getDeop());
                 localization.getMessage().setEnchant(defaultRussianLocalization.getMessage().getEnchant());
-                localization.getMessage().getFormat().getName_().setEntity(defaultRussianLocalization.getMessage().getFormat().getName_().getEntity().replace("<lang:'<name>'>", "<name>"));
                 localization.getMessage().setGamemode(defaultRussianLocalization.getMessage().getGamemode());
                 localization.getMessage().setKill(defaultRussianLocalization.getMessage().getKill());
                 localization.getMessage().setOp(defaultRussianLocalization.getMessage().getOp());
@@ -487,7 +486,6 @@ public class FileResolver {
                 localization.getMessage().setDeath(defaultEnglishLocalization.getMessage().getDeath());
                 localization.getMessage().setDeop(defaultEnglishLocalization.getMessage().getDeop());
                 localization.getMessage().setEnchant(defaultEnglishLocalization.getMessage().getEnchant());
-                localization.getMessage().getFormat().getName_().setEntity(defaultEnglishLocalization.getMessage().getFormat().getName_().getEntity().replace("<lang:'<name>'>", "<name>"));
                 localization.getMessage().setGamemode(defaultEnglishLocalization.getMessage().getGamemode());
                 localization.getMessage().setKill(defaultEnglishLocalization.getMessage().getKill());
                 localization.getMessage().setOp(defaultEnglishLocalization.getMessage().getOp());

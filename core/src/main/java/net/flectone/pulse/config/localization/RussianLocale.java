@@ -706,11 +706,11 @@ public class RussianLocale implements Locale {
 
         localization.message.format.moderation.swear.symbol = "❤";
 
-        localization.message.format.name_.constant = "";
-        localization.message.format.name_.display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <player>\"><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>";
-        localization.message.format.name_.entity = "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><name></hover>";
-        localization.message.format.name_.unknown = "<fcolor:2><name>";
-        localization.message.format.name_.invisible = "<fcolor:2>\uD83D\uDC7B Невидимка";
+        localization.message.format.names.constant = "";
+        localization.message.format.names.display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Написать <white><player_head></white> <player>\"><white><player_head></white> <vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>";
+        localization.message.format.names.entity = "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Тип <fcolor:2><lang:'<type>'> <br><fcolor:1>Айди <fcolor:2><uuid>\"><sprite:gui:icon/accessibility> <name></hover>";
+        localization.message.format.names.unknown = "<fcolor:2><name>";
+        localization.message.format.names.invisible = "<fcolor:2>\uD83D\uDC7B Невидимка";
 
         localization.message.format.questionAnswer.questions = new LinkedHashMap<>() {{
             put("server", "<fcolor:2>[Вопрос-Ответ] @<player><fcolor:1>, это ванильный сервер в Майнкрафте!");
