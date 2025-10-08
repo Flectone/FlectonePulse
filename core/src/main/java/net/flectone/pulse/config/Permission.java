@@ -1149,7 +1149,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
             private Mention mention = new Mention();
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/")
             private Moderation moderation = new Moderation();
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/name_/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/names/")
             private Names names = new Names();
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/object/")
             private Object object = new Object();

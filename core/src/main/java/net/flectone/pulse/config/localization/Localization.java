@@ -1282,7 +1282,7 @@ public final class Localization extends YamlFile implements ModuleConfig {
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/moderation/")
             Moderation moderation = new Moderation();
 
-            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/name_/")
+            @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/names/")
             Names names = new Names();
 
             @Override
