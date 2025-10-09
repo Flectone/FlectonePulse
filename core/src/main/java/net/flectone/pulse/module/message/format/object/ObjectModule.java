@@ -1,5 +1,6 @@
 package net.flectone.pulse.module.message.format.object;
 
+import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -16,8 +17,10 @@ import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.SkinService;
 import net.flectone.pulse.util.checker.PermissionChecker;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.object.ObjectContents;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -30,13 +33,14 @@ public class ObjectModule extends AbstractModule {
 
     // ANSI serializer converts object components to a string like "[TheFaser head]" or "[item/diamond_sword]"
     // this is too long, so we replace it with "☐"
-    private final Component DEFAULT_OBJECT_COMPONENT = Component.text("☐");
+    private final Component DEFAULT_OBJECT_COMPONENT = Component.text("☐").color(NamedTextColor.WHITE);
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
     private final SkinService skinService;
     private final PacketProvider packetProvider;
+    private final boolean isNewerThanOrEqualsV_1_21_9;
 
     @Inject
     public ObjectModule(FileResolver fileResolver,
@@ -49,6 +53,7 @@ public class ObjectModule extends AbstractModule {
         this.permissionChecker = permissionChecker;
         this.skinService = skinService;
         this.packetProvider = packetProvider;
+        this.isNewerThanOrEqualsV_1_21_9 = packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_9);
     }
 
     @Override
@@ -78,8 +83,8 @@ public class ObjectModule extends AbstractModule {
         if (!permissionChecker.check(sender, permission().getPlayerHead())) return;
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.PLAYER_HEAD, ((argumentQueue, context) -> {
-            FPlayer fReceiver = messageContext.getReceiver();
-            if (fReceiver.isUnknown() || !packetProvider.isNewerThanOrEquals(fReceiver, ClientVersion.V_1_21_9)) return Tag.selfClosingInserting(DEFAULT_OBJECT_COMPONENT);
+            Tag receiverVersionTag = checkAndGetReceiverTag(messageContext);
+            if (receiverVersionTag != null) return receiverVersionTag;
 
             PlayerHeadObjectContents.Builder playerHeadBuilderComponent = ObjectContents.playerHead();
 
@@ -88,14 +93,19 @@ public class ObjectModule extends AbstractModule {
                 PlayerHeadObjectContents.ProfileProperty profileProperty = skinService.getProfilePropertyFromCache(sender);
                 if (profileProperty == null) return Tag.selfClosingInserting(Component.empty());
 
-                return Tag.selfClosingInserting(Component.object().contents(
-                                playerHeadBuilderComponent
-                                        .name(sender.getName())
-                                        .id(sender.getUuid())
-                                        .profileProperty(profileProperty)
-                                        .build()
-                        )
-                );
+                Component playerHeadComponent = Component.object().contents(
+                        playerHeadBuilderComponent
+                                .name(sender.getName())
+                                .id(sender.getUuid())
+                                .profileProperty(profileProperty)
+                                .build()
+                ).build().color(NamedTextColor.WHITE);
+
+                if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
+                    playerHeadComponent = playerHeadComponent.append(Component.space());
+                }
+
+                return Tag.selfClosingInserting(playerHeadComponent);
             }
 
             try {
@@ -118,8 +128,8 @@ public class ObjectModule extends AbstractModule {
         if (!permissionChecker.check(sender, permission().getSprite())) return;
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SPRITE, ((argumentQueue, context) -> {
-            FPlayer fReceiver = messageContext.getReceiver();
-            if (fReceiver.isUnknown() || !packetProvider.isNewerThanOrEquals(fReceiver, ClientVersion.V_1_21_9)) return Tag.selfClosingInserting(DEFAULT_OBJECT_COMPONENT);
+            Tag receiverVersionTag = checkAndGetReceiverTag(messageContext);
+            if (receiverVersionTag != null) return receiverVersionTag;
             if (!argumentQueue.hasNext()) return Tag.selfClosingInserting(Component.empty());
 
             Key sprite = Key.key(argumentQueue.pop().value());
@@ -129,7 +139,39 @@ public class ObjectModule extends AbstractModule {
                     ? ObjectContents.sprite(sprite)
                     : ObjectContents.sprite(sprite, Key.key(secondArgument.value())); // first atlas, second sprite
 
-            return Tag.selfClosingInserting(Component.object().contents(spriteObjectContents));
+            Component spriteComponent = Component.object().contents(spriteObjectContents)
+                    .build()
+                    .color(NamedTextColor.WHITE);
+
+            if (!messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
+                spriteComponent = spriteComponent.append(Component.space());
+            }
+
+            return Tag.selfClosingInserting(spriteComponent);
         }));
+    }
+
+    private Tag checkAndGetReceiverTag(MessageContext messageContext) {
+        FPlayer fReceiver = messageContext.getReceiver();
+
+        // check console version
+        if (isNewerThanOrEqualsV_1_21_9 && fReceiver.isUnknown()) {
+            if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
+                return Tag.selfClosingInserting(DEFAULT_OBJECT_COMPONENT);
+            }
+
+            return Tag.selfClosingInserting(DEFAULT_OBJECT_COMPONENT.append(Component.space()));
+        } else if (fReceiver.isUnknown()) {
+            return Tag.selfClosingInserting(Component.empty());
+        }
+
+        // check player version
+        if (packetProvider.isNewerThanOrEquals(fReceiver, ClientVersion.V_1_21_9)) {
+            // continue building
+            return null;
+        }
+
+        // return empty for old client
+        return Tag.selfClosingInserting(Component.empty());
     }
 }
