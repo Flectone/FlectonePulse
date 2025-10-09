@@ -96,7 +96,7 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
                     .sound(getModuleSound())
                     .filter(fPlayer -> integrationModule.canSeeVanished(death.getTarget(), fPlayer))
                     .tagResolvers(fResolver -> new TagResolver[]{
-                            targetTag(fReceiver, death.getTarget()),
+                            targetTag(fResolver, death.getTarget()),
                             targetTag("killer", fResolver, death.getKiller()),
                             killerItemTag(death.getKillerItem())
                     })
@@ -120,7 +120,7 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
                 .sound(getModuleSound())
                 .filter(fPlayer -> integrationModule.canSeeVanished(fTarget, fPlayer))
                 .tagResolvers(fResolver -> new TagResolver[]{
-                        targetTag(fReceiver, death.getTarget()),
+                        targetTag(fResolver, death.getTarget()),
                         targetTag("killer", fResolver, death.getKiller()),
                         killerItemTag(death.getKillerItem())
                 })
