@@ -1257,7 +1257,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
 
             @Getter
             public static final class Names implements SubFormatMessageConfig, IPermission {
-                private String name = "flectonepulse.module.message.format.name";
+                private String name = "flectonepulse.module.message.format.names";
                 private Type type = Type.TRUE;
             }
 
