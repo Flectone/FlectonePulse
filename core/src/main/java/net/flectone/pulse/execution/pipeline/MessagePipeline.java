@@ -101,13 +101,15 @@ public class MessagePipeline {
             eventDispatcher.dispatch(new MessageFormattingEvent(context));
 
             // replace disabled tags
-            Arrays.stream(ReplacementTag.values())
-                    .filter(tag -> context.getTagResolvers()
-                            .stream()
-                            .filter(tagResolver -> !tagResolver.equals(StandardTags.translatable()))
-                            .noneMatch(tagResolver -> tagResolver.has(tag.getTagName()))
-                    )
-                    .forEach(tag -> context.addReplacementTag(tag.empty()));
+            if (context.isFlag(MessageFlag.REPLACE_DISABLED_TAGS)) {
+                Arrays.stream(ReplacementTag.values())
+                        .filter(tag -> context.getTagResolvers()
+                                .stream()
+                                .filter(tagResolver -> !tagResolver.equals(StandardTags.translatable()))
+                                .noneMatch(tagResolver -> tagResolver.has(tag.getTagName()))
+                        )
+                        .forEach(tag -> context.addReplacementTag(tag.empty()));
+            }
 
             try {
                 return miniMessage.deserialize(
