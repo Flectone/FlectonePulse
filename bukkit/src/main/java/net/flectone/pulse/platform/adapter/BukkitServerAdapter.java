@@ -19,6 +19,7 @@ import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.PaperItemStackUtil;
 import net.flectone.pulse.util.constant.PlatformType;
+import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -32,10 +33,12 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.incendo.cloud.type.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
+import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -55,7 +58,8 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private final Provider<MessagePipeline> messagePipelineProvider;
     private final PacketProvider packetProvider;
     private final ReflectionResolver reflectionResolver;
-    private final Method modernGetTPSMethod;
+    private final FLogger fLogger;
+    private final Pair<MethodHandle, Object> getTPSMethodPair;
 
     @Inject
     public BukkitServerAdapter(Plugin plugin,
@@ -63,14 +67,16 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
                                Provider<FPlayerService> fPlayerServiceProvider,
                                Provider<MessagePipeline> messagePipelineProvider,
                                PacketProvider packetProvider,
-                               ReflectionResolver reflectionResolver) {
+                               ReflectionResolver reflectionResolver,
+                               FLogger fLogger) {
         this.plugin = plugin;
         this.integrationModuleProvider = integrationModuleProvider;
         this.fPlayerServiceProvider = fPlayerServiceProvider;
         this.messagePipelineProvider = messagePipelineProvider;
         this.packetProvider = packetProvider;
         this.reflectionResolver = reflectionResolver;
-        this.modernGetTPSMethod = reflectionResolver.resolveMethod(Server.class, "getTPS");
+        this.fLogger = fLogger;
+        this.getTPSMethodPair = findGetTPSMethod();
     }
 
     @Sync
@@ -81,29 +87,36 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
     @Override
     public @NotNull String getTPS() {
+        if (getTPSMethodPair == null) return "";
+
         try {
-            double[] recentTps = getRecentTps();
+            double[] recentTps = (double[]) getTPSMethodPair.first().invoke(getTPSMethodPair.second());
             double tps = Math.min(Math.round(recentTps[0] * 10.0) / 10.0, 20.0);
             return String.valueOf(tps);
-        } catch (ReflectiveOperationException e) {
+        } catch (Throwable ignored) {
             return "";
         }
     }
 
-    private double[] getRecentTps() throws ReflectiveOperationException {
-        Server server = Bukkit.getServer();
-        if (modernGetTPSMethod != null) {
-            return (double[]) modernGetTPSMethod.invoke(server);
+    public Pair<MethodHandle, Object> findGetTPSMethod() {
+        Object minecraftServer = Bukkit.getServer();
+        MethodHandle getTPS = reflectionResolver.unreflectMethod(Server.class, "getTPS");
+        if (getTPS == null) {
+            try {
+                minecraftServer = getLegacyMinecraftServer();
+                Field recentTpsField = minecraftServer.getClass().getSuperclass().getDeclaredField("recentTps");
+                getTPS = reflectionResolver.unreflect(lookup -> lookup.unreflectGetter(recentTpsField));
+            } catch (ReflectiveOperationException e) {
+                fLogger.warning(e);
+                return null;
+            }
         }
 
-        // legacy get tps
-        Object minecraftServer = getMinecraftServer(server);
-        Field recentTpsField = minecraftServer.getClass().getSuperclass().getDeclaredField("recentTps");
-        recentTpsField.setAccessible(true);
-        return (double[]) recentTpsField.get(minecraftServer);
+        return Pair.of(getTPS, minecraftServer);
     }
 
-    private Object getMinecraftServer(@NotNull Server server) throws ReflectiveOperationException {
+    private Object getLegacyMinecraftServer() throws ReflectiveOperationException {
+        Server server = Bukkit.getServer();
         try {
             Field consoleField = server.getClass().getDeclaredField("console");
             consoleField.setAccessible(true);
