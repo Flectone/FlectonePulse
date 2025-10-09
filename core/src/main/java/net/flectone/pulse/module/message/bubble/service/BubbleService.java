@@ -70,6 +70,8 @@ public class BubbleService {
                 .flag(MessageFlag.INTERACTIVE_CHAT, false)
                 .flag(MessageFlag.QUESTION, false)
                 .flag(MessageFlag.TRANSLATE_ITEM, false)
+                .flag(MessageFlag.OBJECT, false)
+                .flag(MessageFlag.REPLACE_DISABLED_TAGS, false)
                 .plainSerializerBuild();
 
         List<Bubble> bubbles = splitMessageToBubbles(sender, message, receivers);
