@@ -6,6 +6,8 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.function.Consumer;
 
@@ -61,5 +63,30 @@ public class ReflectionResolver {
         }
 
         return null;
+    }
+
+    public @Nullable MethodHandle unreflectMethod(@NotNull Class<?> clazz, @NotNull String methodName, Class<?>... parameterTypes) {
+        return unreflectMethod(resolveMethod(clazz, methodName, parameterTypes));
+    }
+
+    public @Nullable MethodHandle unreflectMethod(@Nullable Method method) {
+        if (method == null) return null;
+
+        return unreflect(lookup -> lookup.unreflect(method));
+    }
+
+    public @Nullable MethodHandle unreflect(HandleFunction<MethodHandles.Lookup, MethodHandle> handleFunction) {
+        try {
+            return handleFunction.apply(MethodHandles.lookup());
+        } catch (IllegalAccessException e) {
+            return null;
+        }
+    }
+
+    @FunctionalInterface
+    public interface HandleFunction<T, R> {
+
+        R apply(T t) throws IllegalAccessException;
+
     }
 }
