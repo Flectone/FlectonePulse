@@ -707,7 +707,7 @@ public class EnglishLocale implements Locale {
         localization.message.format.moderation.swear.symbol = "❤";
 
         localization.message.format.names.constant = "";
-        localization.message.format.names.display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <player_head><player>\"<player_head><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>";
+        localization.message.format.names.display = "<click:suggest_command:\"/msg <player> \"><hover:show_text:\"<fcolor:2>Write to <player_head><player>\"><player_head><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix></hover></click>";
         localization.message.format.names.entity = "<fcolor:2><hover:show_text:\"<fcolor:2><name> <br><fcolor:1>Type <fcolor:2><lang:'<type>'> <br><fcolor:1>ID <fcolor:2><uuid>\"><sprite:gui:icon/accessibility><name></hover>";
         localization.message.format.names.unknown = "<fcolor:2><name>";
         localization.message.format.names.invisible = "<fcolor:2>\uD83D\uDC7B Invisible";
