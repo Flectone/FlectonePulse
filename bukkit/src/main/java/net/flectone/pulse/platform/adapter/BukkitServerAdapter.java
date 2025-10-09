@@ -63,17 +63,14 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
                                Provider<FPlayerService> fPlayerServiceProvider,
                                Provider<MessagePipeline> messagePipelineProvider,
                                PacketProvider packetProvider,
-                               ReflectionResolver reflectionResolver) throws NoSuchMethodException {
+                               ReflectionResolver reflectionResolver) {
         this.plugin = plugin;
         this.integrationModuleProvider = integrationModuleProvider;
         this.fPlayerServiceProvider = fPlayerServiceProvider;
         this.messagePipelineProvider = messagePipelineProvider;
         this.packetProvider = packetProvider;
         this.reflectionResolver = reflectionResolver;
-
-        this.modernGetTPSMethod = reflectionResolver.hasMethod(Server.class, "getTPS")
-                ? Bukkit.getServer().getClass().getMethod("getTPS")
-                : null;
+        this.modernGetTPSMethod = reflectionResolver.resolveMethod(Server.class, "getTPS");
     }
 
     @Sync
