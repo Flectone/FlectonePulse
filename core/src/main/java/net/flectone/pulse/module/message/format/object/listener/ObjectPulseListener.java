@@ -7,6 +7,7 @@ import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.message.MessageFormattingEvent;
 import net.flectone.pulse.module.message.format.object.ObjectModule;
 import net.flectone.pulse.processing.context.MessageContext;
+import net.flectone.pulse.util.constant.MessageFlag;
 
 @Singleton
 public class ObjectPulseListener implements PulseListener {
@@ -21,6 +22,7 @@ public class ObjectPulseListener implements PulseListener {
     @Pulse
     public void onMessageFormattingEvent(MessageFormattingEvent event) {
         MessageContext messageContext = event.getContext();
+        if (!messageContext.isFlag(MessageFlag.OBJECT)) return;
 
         objectModule.addPlayerHeadTag(messageContext);
         objectModule.addSpriteTag(messageContext);

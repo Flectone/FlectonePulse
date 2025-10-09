@@ -77,10 +77,13 @@ public class ObjectModule extends AbstractModule {
     }
 
     public void addPlayerHeadTag(MessageContext messageContext) {
-        FEntity sender = messageContext.getSender();
-        if (isModuleDisabledFor(sender)) return;
         if (!config().isPlayerHead()) return;
-        if (!permissionChecker.check(sender, permission().getPlayerHead())) return;
+
+        FEntity sender = messageContext.getSender();
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
+            if (isModuleDisabledFor(sender)) return;
+            if (!permissionChecker.check(sender, permission().getPlayerHead())) return;
+        }
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.PLAYER_HEAD, ((argumentQueue, context) -> {
             Tag receiverVersionTag = checkAndGetReceiverTag(messageContext);
@@ -122,10 +125,13 @@ public class ObjectModule extends AbstractModule {
     }
 
     public void addSpriteTag(MessageContext messageContext) {
-        FEntity sender = messageContext.getSender();
-        if (isModuleDisabledFor(sender)) return;
         if (!config().isSprite()) return;
-        if (!permissionChecker.check(sender, permission().getSprite())) return;
+
+        FEntity sender = messageContext.getSender();
+        if (messageContext.isFlag(MessageFlag.USER_MESSAGE)) {
+            if (isModuleDisabledFor(sender)) return;
+            if (!permissionChecker.check(sender, permission().getSprite())) return;
+        }
 
         messageContext.addReplacementTag(MessagePipeline.ReplacementTag.SPRITE, ((argumentQueue, context) -> {
             Tag receiverVersionTag = checkAndGetReceiverTag(messageContext);

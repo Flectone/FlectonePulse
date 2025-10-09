@@ -19,7 +19,8 @@ public enum MessageFlag {
     IMAGE(true),
     LEGACY_COLORS(true),
     INTERACTIVE_CHAT(true),
-    INVISIBLE_NAME(true);
+    INVISIBLE_NAME(true),
+    OBJECT(true);
 
     private final boolean defaultValue;
 
