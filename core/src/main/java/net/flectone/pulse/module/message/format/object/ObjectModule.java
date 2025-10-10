@@ -1,9 +1,10 @@
 package net.flectone.pulse.module.message.format.object;
 
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -29,32 +30,19 @@ import net.kyori.adventure.text.object.SpriteObjectContents;
 import java.util.UUID;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ObjectModule extends AbstractModule {
 
     // ANSI serializer converts object components to a string like "[TheFaser head]" or "[item/diamond_sword]"
     // this is too long, so we replace it with "☐"
-    private final Component DEFAULT_OBJECT_COMPONENT = Component.text("☐").color(NamedTextColor.WHITE);
+    private static final Component DEFAULT_OBJECT_COMPONENT = Component.text("☐").color(NamedTextColor.WHITE);
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
     private final SkinService skinService;
     private final PacketProvider packetProvider;
-    private final boolean isNewerThanOrEqualsV_1_21_9;
-
-    @Inject
-    public ObjectModule(FileResolver fileResolver,
-                        ListenerRegistry listenerRegistry,
-                        PermissionChecker permissionChecker,
-                        SkinService skinService,
-                        PacketProvider packetProvider) {
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-        this.permissionChecker = permissionChecker;
-        this.skinService = skinService;
-        this.packetProvider = packetProvider;
-        this.isNewerThanOrEqualsV_1_21_9 = packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_21_9);
-    }
+    private final @Named("isNewerThanOrEqualsV_1_21_9") boolean isNewerThanOrEqualsV_1_21_9;
 
     @Override
     public void onEnable() {

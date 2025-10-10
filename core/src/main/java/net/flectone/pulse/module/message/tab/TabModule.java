@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.tab;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
@@ -11,14 +12,10 @@ import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 import net.flectone.pulse.processing.resolver.FileResolver;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TabModule extends AbstractModule {
 
     private final FileResolver fileResolver;
-
-    @Inject
-    public TabModule(FileResolver fileResolver) {
-        this.fileResolver = fileResolver;
-    }
 
     @Override
     public void configureChildren() {

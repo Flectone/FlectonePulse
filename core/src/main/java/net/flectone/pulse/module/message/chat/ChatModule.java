@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.chat;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -40,6 +41,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ChatModule extends AbstractModuleLocalization<Localization.Message.Chat> {
 
     private final Map<String, Cooldown> cooldownMap = new HashMap<>();
@@ -57,35 +59,6 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
     private final DisableSender disableSender;
     private final CooldownSender cooldownSender;
     private final ProxyRegistry proxyRegistry;
-
-    @Inject
-    public ChatModule(FileResolver fileResolver,
-                      FPlayerService fPlayerService,
-                      PlatformServerAdapter platformServerAdapter,
-                      PermissionChecker permissionChecker,
-                      IntegrationModule integrationModule,
-                      Provider<BubbleModule> bubbleModuleProvider,
-                      Provider<SpyModule> spyModuleProvider,
-                      ListenerRegistry listenerRegistry,
-                      MuteSender muteSender,
-                      DisableSender disableSender,
-                      CooldownSender cooldownSender,
-                      ProxyRegistry proxyRegistry) {
-        super(MessageType.CHAT);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.platformServerAdapter = platformServerAdapter;
-        this.permissionChecker = permissionChecker;
-        this.integrationModule = integrationModule;
-        this.bubbleModuleProvider = bubbleModuleProvider;
-        this.spyModuleProvider = spyModuleProvider;
-        this.listenerRegistry = listenerRegistry;
-        this.muteSender = muteSender;
-        this.disableSender = disableSender;
-        this.cooldownSender = cooldownSender;
-        this.proxyRegistry = proxyRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -114,6 +87,11 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
     }
 
     @Override
+    public MessageType messageType() {
+        return MessageType.CHAT;
+    }
+
+    @Override
     public Message.Chat config() {
         return fileResolver.getMessage().getChat();
     }
@@ -134,7 +112,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
             return;
         }
 
-        if (disableSender.sendIfDisabled(fPlayer, fPlayer, getMessageType())) {
+        if (disableSender.sendIfDisabled(fPlayer, fPlayer, messageType())) {
             cancelEvent.run();
             return;
         }
@@ -193,7 +171,7 @@ public class ChatModule extends AbstractModuleLocalization<Localization.Message.
                 .integration()
                 .build();
 
-        List<FPlayer> receivers = createReceivers(getMessageType(), chatMetadata);
+        List<FPlayer> receivers = createReceivers(messageType(), chatMetadata);
 
         sendMessage(receivers, chatMetadata);
 

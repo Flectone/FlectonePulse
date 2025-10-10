@@ -2,6 +2,7 @@ package net.flectone.pulse.data.database.dao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.FColorSQL;
 import net.flectone.pulse.model.FColor;
@@ -10,11 +11,19 @@ import net.flectone.pulse.model.entity.FPlayer;
 import java.util.*;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ColorsDAO extends BaseDAO<FColorSQL> {
 
-    @Inject
-    public ColorsDAO(Database database) {
-        super(database, FColorSQL.class);
+    private final Database database;
+
+    @Override
+    public Database database() {
+        return database;
+    }
+
+    @Override
+    public Class<FColorSQL> sqlClass() {
+        return FColorSQL.class;
     }
 
     public void save(FPlayer fPlayer) {

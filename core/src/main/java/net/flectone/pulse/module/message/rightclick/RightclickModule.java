@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.rightclick;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -20,25 +21,13 @@ import java.util.UUID;
 
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RightclickModule extends AbstractModuleLocalization<Localization.Message.Rightclick> {
 
     private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public RightclickModule(FileResolver fileResolver,
-                            FPlayerService fPlayerService,
-                            PlatformPlayerAdapter platformPlayerAdapter,
-                            ListenerRegistry listenerRegistry) {
-        super(MessageType.RIGHT_CLICK);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -48,6 +37,11 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
         createCooldown(config().getCooldown(), permission().getCooldownBypass());
 
         listenerRegistry.register(RightclickPacketListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.RIGHT_CLICK;
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.localization.Localization;
@@ -31,6 +32,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class StatusModule extends AbstractModule {
 
     private final FileResolver fileResolver;
@@ -44,31 +46,6 @@ public class StatusModule extends AbstractModule {
     private final ListenerRegistry listenerRegistry;
     private final PacketProvider packetProvider;
     private final EventDispatcher eventDispatcher;
-
-    @Inject
-    public StatusModule(FileResolver fileResolver,
-                        MOTDModule MOTDModule,
-                        IconModule iconModule,
-                        PlayersModule playersModule,
-                        VersionModule versionModule,
-                        MessagePipeline messagePipeline,
-                        PlatformServerAdapter platformServerAdapter,
-                        FPlayerService fPlayerService,
-                        ListenerRegistry listenerRegistry,
-                        PacketProvider packetProvider,
-                        EventDispatcher eventDispatcher) {
-        this.fileResolver = fileResolver;
-        this.MOTDModule = MOTDModule;
-        this.iconModule = iconModule;
-        this.playersModule = playersModule;
-        this.versionModule = versionModule;
-        this.messagePipeline = messagePipeline;
-        this.platformServerAdapter = platformServerAdapter;
-        this.fPlayerService = fPlayerService;
-        this.listenerRegistry = listenerRegistry;
-        this.packetProvider = packetProvider;
-        this.eventDispatcher = eventDispatcher;
-    }
 
     @Override
     public void configureChildren() {

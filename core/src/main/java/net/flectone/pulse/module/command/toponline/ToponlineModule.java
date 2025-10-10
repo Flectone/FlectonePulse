@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.toponline;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.localization.Localization;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ToponlineModule extends AbstractModuleCommand<Localization.Command.Toponline> {
 
     private final FileResolver fileResolver;
@@ -36,25 +38,6 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
     private final EventDispatcher eventDispatcher;
     private final TimeFormatter timeFormatter;
     private final SoundPlayer soundPlayer;
-
-    @Inject
-    public ToponlineModule(FileResolver fileResolver,
-                           PlatformPlayerAdapter platformPlayerAdapter,
-                           CommandParserProvider commandParserProvider,
-                           MessagePipeline messagePipeline,
-                           EventDispatcher eventDispatcher,
-                           TimeFormatter timeFormatter,
-                           SoundPlayer soundPlayer) {
-        super(MessageType.COMMAND_TOPONLINE);
-
-        this.fileResolver = fileResolver;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.commandParserProvider = commandParserProvider;
-        this.messagePipeline = messagePipeline;
-        this.eventDispatcher = eventDispatcher;
-        this.timeFormatter = timeFormatter;
-        this.soundPlayer = soundPlayer;
-    }
 
     @Override
     public void onEnable() {
@@ -129,6 +112,11 @@ public class ToponlineModule extends AbstractModuleCommand<Localization.Command.
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_TOPONLINE, fPlayer, component));
 
         soundPlayer.play(getModuleSound(), fPlayer);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_TOPONLINE;
     }
 
     @Override

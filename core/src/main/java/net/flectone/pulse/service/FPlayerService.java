@@ -4,8 +4,8 @@ import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDisconnect;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.Config;
 import net.flectone.pulse.data.repository.FPlayerRepository;
 import net.flectone.pulse.data.repository.SocialRepository;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -41,9 +41,10 @@ import java.util.UUID;
  * @see FPlayer
  */
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FPlayerService {
 
-    private final Config config;
+    private final FileResolver fileResolver;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final FPlayerRepository fPlayerRepository;
     private final SocialRepository socialRepository;
@@ -51,25 +52,6 @@ public class FPlayerService {
     private final IntegrationModule integrationModule;
     private final PacketSender packetSender;
     private final PacketProvider packetProvider;
-
-    @Inject
-    public FPlayerService(FileResolver fileResolver,
-                          PlatformPlayerAdapter platformPlayerAdapter,
-                          FPlayerRepository fPlayerRepository,
-                          SocialRepository socialRepository,
-                          ModerationService moderationService,
-                          IntegrationModule integrationModule,
-                          PacketSender packetSender,
-                          PacketProvider packetProvider) {
-        this.config = fileResolver.getConfig();
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.fPlayerRepository = fPlayerRepository;
-        this.socialRepository = socialRepository;
-        this.moderationService = moderationService;
-        this.integrationModule = integrationModule;
-        this.packetSender = packetSender;
-        this.packetProvider = packetProvider;
-    }
 
     public void clear() {
         fPlayerRepository.clearCache();
@@ -88,7 +70,7 @@ public class FPlayerService {
     }
 
     public void addConsole() {
-        FPlayer console = new FPlayer(true, config.getLogger().getConsole());
+        FPlayer console = new FPlayer(true, fileResolver.getConfig().getLogger().getConsole());
         fPlayerRepository.add(console);
         fPlayerRepository.saveOrIgnore(console);
     }

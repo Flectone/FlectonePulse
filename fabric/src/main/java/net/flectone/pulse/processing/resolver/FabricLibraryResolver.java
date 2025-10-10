@@ -28,6 +28,15 @@ public class FabricLibraryResolver extends LibraryResolver {
 
         addLibrary(Library.builder()
                 .groupId("net{}kyori")
+                .artifactId("adventure-text-serializer-ansi")
+                .version(BuildConfig.ADVENTURE_API)
+                .repository(BuildConfig.MAVEN_REPOSITORY)
+                .resolveTransitiveDependencies(true)
+                .build()
+        );
+
+        addLibrary(Library.builder()
+                .groupId("net{}kyori")
                 .artifactId("adventure-text-minimessage")
                 .version(BuildConfig.ADVENTURE_API)
                 .repository(BuildConfig.MAVEN_REPOSITORY)

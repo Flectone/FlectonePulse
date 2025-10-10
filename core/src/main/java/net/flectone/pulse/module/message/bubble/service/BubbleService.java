@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.bubble.service;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
@@ -23,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BubbleService {
 
     private final Map<UUID, Queue<Bubble>> playerBubbleQueues = new ConcurrentHashMap<>();
@@ -34,23 +36,6 @@ public class BubbleService {
     private final PacketProvider packetProvider;
     private final RandomUtil randomUtil;
     private final MessagePipeline messagePipeline;
-    
-    @Inject
-    public BubbleService(FileResolver fileResolver,
-                         BubbleRenderer bubbleRenderer,
-                         ColorConverter colorConverter,
-                         TaskScheduler taskScheduler,
-                         PacketProvider packetProvider,
-                         RandomUtil randomUtil,
-                         MessagePipeline messagePipeline) {
-        this.fileResolver = fileResolver;
-        this.bubbleRenderer = bubbleRenderer;
-        this.colorConverter = colorConverter;
-        this.taskScheduler = taskScheduler;
-        this.packetProvider = packetProvider;
-        this.randomUtil = randomUtil;
-        this.messagePipeline = messagePipeline;
-    }
 
     public void startTicker() {
         taskScheduler.runAsyncTimer(() -> playerBubbleQueues.forEach(this::processBubbleQueue), 5L, 5L);

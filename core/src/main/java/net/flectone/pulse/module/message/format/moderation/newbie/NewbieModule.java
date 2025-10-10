@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.format.moderation.newbie;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -21,6 +22,7 @@ import net.flectone.pulse.util.logging.FLogger;
 import java.io.IOException;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class NewbieModule extends AbstractModuleLocalization<Localization.Message.Format.Moderation.Newbie> {
 
     private final FileResolver fileResolver;
@@ -29,23 +31,6 @@ public class NewbieModule extends AbstractModuleLocalization<Localization.Messag
     private final PlatformServerAdapter platformServerAdapter;
     private final YamlFileProcessor yamlFileProcessor;
     private final FLogger fLogger;
-
-    @Inject
-    public NewbieModule(FileResolver fileResolver,
-                        PermissionChecker permissionChecker,
-                        PlatformPlayerAdapter platformPlayerAdapter,
-                        PlatformServerAdapter platformServerAdapter,
-                        YamlFileProcessor yamlFileProcessor,
-                        FLogger fLogger) {
-        super(MessageType.NEWBIE);
-
-        this.fileResolver = fileResolver;
-        this.permissionChecker = permissionChecker;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.platformServerAdapter = platformServerAdapter;
-        this.yamlFileProcessor = yamlFileProcessor;
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void onEnable() {
@@ -65,6 +50,11 @@ public class NewbieModule extends AbstractModuleLocalization<Localization.Messag
         super.onEnable();
 
         registerPermission(permission().getBypass());
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.NEWBIE;
     }
 
     @Override

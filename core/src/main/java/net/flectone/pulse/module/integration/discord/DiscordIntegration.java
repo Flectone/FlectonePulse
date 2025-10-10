@@ -16,6 +16,7 @@ import discord4j.core.spec.WebhookCreateSpec;
 import discord4j.discordjson.json.*;
 import discord4j.rest.util.AllowedMentions;
 import discord4j.rest.util.MultipartRequest;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.localization.Localization;
@@ -42,6 +43,7 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DiscordIntegration implements FIntegration {
 
     private final Map<Long, WebhookData> channelWebhooks = new HashMap<>();
@@ -57,23 +59,6 @@ public class DiscordIntegration implements FIntegration {
     private DiscordClient discordClient;
     private GatewayDiscordClient gateway;
     private long clientID;
-
-    @Inject
-    public DiscordIntegration(FileResolver fileResolver,
-                              TaskScheduler taskScheduler,
-                              SkinService skinService,
-                              MessagePipeline messagePipeline,
-                              SystemVariableResolver systemVariableResolver,
-                              MessageCreateListener messageCreateListener,
-                              FLogger fLogger) {
-        this.fileResolver = fileResolver;
-        this.taskScheduler = taskScheduler;
-        this.skinService = skinService;
-        this.messagePipeline = messagePipeline;
-        this.systemVariableResolver = systemVariableResolver;
-        this.messageCreateListener = messageCreateListener;
-        this.fLogger = fLogger;
-    }
 
     public Integration.Discord config() {
         return fileResolver.getIntegration().getDiscord();

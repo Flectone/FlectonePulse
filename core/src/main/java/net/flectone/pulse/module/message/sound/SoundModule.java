@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.sound;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -20,19 +21,11 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SoundModule extends AbstractModuleLocalization<Localization.Message.Sound> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public SoundModule(FileResolver fileResolver,
-                       ListenerRegistry listenerRegistry) {
-        super(MessageType.SOUND);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -41,6 +34,11 @@ public class SoundModule extends AbstractModuleLocalization<Localization.Message
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(SoundPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.SOUND;
     }
 
     @Override

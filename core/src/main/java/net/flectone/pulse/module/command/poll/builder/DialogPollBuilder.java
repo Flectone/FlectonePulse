@@ -16,6 +16,7 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.dialog.Dialog;
@@ -31,27 +32,18 @@ import java.util.Collections;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DialogPollBuilder {
 
-    private final String inputKey = "fp_input";
-    private final String multipleKey = "fp_multiple";
-    private final String endTimeKey = "fp_end_time";
-    private final String repeatTimeKey = "fp_repeat_time";
-    private final String answerKey = "fp_answer_";
+    private static final String INPUT_KEY = "fp_input";
+    private static final String MULTIPLE_KEY = "fp_multiple";
+    private static final String END_TIME_KEY = "fp_end_time";
+    private static final String REPEAT_TIME_KEY = "fp_repeat_time";
+    private static final String ANSWER_KEY = "fp_answer_";
 
     private final PollModule pollModule;
     private final MessagePipeline messagePipeline;
     private final DialogController dialogController;
-
-    @Inject
-    public DialogPollBuilder(PollModule pollModule,
-                             MessagePipeline messagePipeline,
-                             DialogController dialogController) {
-        this.pollModule = pollModule;
-        this.messagePipeline = messagePipeline;
-        this.dialogController = dialogController;
-    }
-
 
     public void openDialog(FPlayer fPlayer) {
         Localization.Command.Poll.Modern poll = pollModule.localization(fPlayer).getModern();
@@ -64,7 +56,7 @@ public class DialogPollBuilder {
         Component headerName = messagePipeline.builder(fPlayer, poll.getHeader()).build();
         DialogBody dialogBody = new PlainMessageDialogBody(new PlainMessage(Component.empty(), 10));
 
-        Input input = new Input(inputKey, new TextInputControl(200,
+        Input input = new Input(INPUT_KEY, new TextInputControl(200,
                 messagePipeline.builder(fPlayer, poll.getInputName()).build(),
                 true,
                 inputValue,
@@ -72,21 +64,21 @@ public class DialogPollBuilder {
                 null
         ));
 
-        Input multiple = new Input(multipleKey, new BooleanInputControl(
+        Input multiple = new Input(MULTIPLE_KEY, new BooleanInputControl(
                 messagePipeline.builder(fPlayer, poll.getMultipleName()).build(),
                 multipleValue,
                 "true",
                 "false"
         ));
 
-        Input endTime = new Input(endTimeKey, new NumberRangeInputControl(
+        Input endTime = new Input(END_TIME_KEY, new NumberRangeInputControl(
                 200,
                 messagePipeline.builder(fPlayer, poll.getEndTimeName()).build(),
                 "options.generic_value",
                 new NumberRangeInputControl.RangeInfo(1.0f, 600.0f, endTimeValue, 1.0f)
         ));
 
-        Input repeatTime = new Input(repeatTimeKey, new NumberRangeInputControl(
+        Input repeatTime = new Input(REPEAT_TIME_KEY, new NumberRangeInputControl(
                 200,
                 messagePipeline.builder(fPlayer, poll.getRepeatTimeName()).build(),
                 "options.generic_value",
@@ -97,7 +89,7 @@ public class DialogPollBuilder {
 
         for (int i = 0; i < answers.size(); i++) {
             String inputAnswerName = Strings.CS.replace(poll.getInputAnswerName(), "<number>", String.valueOf(i + 1));
-            Input inputAnswer = new Input(answerKey + i, new TextInputControl(200,
+            Input inputAnswer = new Input(ANSWER_KEY + i, new TextInputControl(200,
                     messagePipeline.builder(fPlayer, inputAnswerName).build(),
                     true,
                     answers.get(i),
@@ -208,14 +200,14 @@ public class DialogPollBuilder {
     }
 
     private NBTPoll readPoll(FPlayer fPlayer, NBTCompound nbtCompound) {
-        String inputName = nbtCompound.getStringTagValueOrDefault(inputKey, pollModule.localization(fPlayer).getModern().getInputInitial());
-        boolean multiple = nbtCompound.getBooleanOr(multipleKey, false);
-        float endTime = (float) nbtCompound.getNumberTagValueOrDefault(endTimeKey, 5.0f);
-        float repeatTime = (float) nbtCompound.getNumberTagValueOrDefault(repeatTimeKey, 1.0f);
+        String inputName = nbtCompound.getStringTagValueOrDefault(INPUT_KEY, pollModule.localization(fPlayer).getModern().getInputInitial());
+        boolean multiple = nbtCompound.getBooleanOr(MULTIPLE_KEY, false);
+        float endTime = (float) nbtCompound.getNumberTagValueOrDefault(END_TIME_KEY, 5.0f);
+        float repeatTime = (float) nbtCompound.getNumberTagValueOrDefault(REPEAT_TIME_KEY, 1.0f);
 
         List<String> answers = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            String answerValue = nbtCompound.getStringTagValueOrNull(answerKey + i);
+            String answerValue = nbtCompound.getStringTagValueOrNull(ANSWER_KEY + i);
             if (answerValue == null) break;
 
             answers.add(answerValue);

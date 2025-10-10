@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.supervanish;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
@@ -13,20 +14,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SuperVanishModule extends AbstractModule {
 
     private final FileResolver fileResolver;
     private final SuperVanishIntegration superVanishIntegration;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public SuperVanishModule(FileResolver fileResolver,
-                             SuperVanishIntegration superVanishIntegration,
-                             ListenerRegistry listenerRegistry) {
-        this.fileResolver = fileResolver;
-        this.superVanishIntegration = superVanishIntegration;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {

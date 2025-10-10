@@ -8,6 +8,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerShowDialog;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.model.dialog.Dialog;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -20,16 +21,12 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DialogController {
 
     private final Map<UUID, Dialog> dialogMap = new ConcurrentHashMap<>();
 
     private final PacketSender packetSender;
-
-    @Inject
-    public DialogController(PacketSender packetSender) {
-        this.packetSender = packetSender;
-    }
 
     public Dialog get(UUID uuid) {
         return dialogMap.get(uuid);

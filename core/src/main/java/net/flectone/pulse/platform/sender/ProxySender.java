@@ -3,6 +3,7 @@ package net.flectone.pulse.platform.sender;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -22,6 +23,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ProxySender {
 
     private final ProxyRegistry proxyRegistry;
@@ -29,19 +31,6 @@ public class ProxySender {
     private final MessagePipeline messagePipeline;
     private final Gson gson;
     private final FLogger fLogger;
-
-    @Inject
-    public ProxySender(ProxyRegistry proxyRegistry,
-                       FileResolver fileResolver,
-                       MessagePipeline messagePipeline,
-                       Gson gson,
-                       FLogger fLogger) {
-        this.proxyRegistry = proxyRegistry;
-        this.fileResolver = fileResolver;
-        this.messagePipeline = messagePipeline;
-        this.gson = gson;
-        this.fLogger = fLogger;
-    }
 
     public boolean send(MessageType messageType, EventMetadata<?> eventMetadata) {
         ProxyDataConsumer<SafeDataOutputStream> proxyConsumer = eventMetadata.getProxy();

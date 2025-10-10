@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.locate.extractor;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.message.locate.model.Locate;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.extractor.Extractor;
@@ -13,14 +14,10 @@ import net.kyori.adventure.text.TranslatableComponent;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class LocateExtractor extends Extractor {
 
     private final PacketProvider packetProvider;
-
-    @Inject
-    public LocateExtractor(PacketProvider packetProvider) {
-        this.packetProvider = packetProvider;
-    }
 
     public Optional<Locate> extract(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
         // Located %s at %s (y?) %s

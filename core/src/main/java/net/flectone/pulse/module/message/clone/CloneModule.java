@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.clone;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -18,19 +19,11 @@ import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import org.apache.commons.lang3.Strings;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class CloneModule extends AbstractModuleLocalization<Localization.Message.Clone> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public CloneModule(FileResolver fileResolver,
-                       ListenerRegistry listenerRegistry) {
-        super(MessageType.CLONE);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -39,6 +32,11 @@ public class CloneModule extends AbstractModuleLocalization<Localization.Message
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(ClonePulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.CLONE;
     }
 
     @Override

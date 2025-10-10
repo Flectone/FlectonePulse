@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.fillbiome;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -19,19 +20,11 @@ import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import org.apache.commons.lang3.StringUtils;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FillbiomeModule extends AbstractModuleLocalization<Localization.Message.Fillbiome> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public FillbiomeModule(FileResolver fileResolver,
-                           ListenerRegistry listenerRegistry) {
-        super(MessageType.FILLBIOME);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -40,6 +33,11 @@ public class FillbiomeModule extends AbstractModuleLocalization<Localization.Mes
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(FillbiomePulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.FILLBIOME;
     }
 
     @Override

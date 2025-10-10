@@ -7,7 +7,6 @@ import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.platform.registry.CommandRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.util.constant.MessageType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
@@ -25,10 +24,6 @@ public abstract class AbstractModuleCommand<M extends Localization.Localizable> 
 
     @Inject private FileResolver fileResolver;
     @Inject private CommandRegistry commandParserProvider;
-
-    protected AbstractModuleCommand(MessageType messageType) {
-        super(messageType);
-    }
 
     protected void registerCommand(UnaryOperator<org.incendo.cloud.Command.Builder<FPlayer>> commandBuilderOperator) {
         List<String> aliases = config().getAliases();

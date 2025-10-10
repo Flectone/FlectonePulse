@@ -2,6 +2,7 @@ package net.flectone.pulse.util.checker;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.platform.adapter.FabricPlayerAdapter;
 import net.flectone.pulse.config.Permission;
@@ -13,23 +14,13 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FabricPermissionChecker implements PermissionChecker {
 
     private final FabricFlectonePulse fabricFlectonePulse;
     private final FabricIntegrationModule integrationModule;
     private final FabricPlayerAdapter fabricPlayerAdapter;
     private final FabricPermissionRegistry fabricPermissionRegistry;
-
-    @Inject
-    public FabricPermissionChecker(FabricFlectonePulse fabricFlectonePulse,
-                                   FabricIntegrationModule integrationModule,
-                                   FabricPlayerAdapter fabricPlayerAdapter,
-                                   FabricPermissionRegistry fabricPermissionRegistry) {
-        this.fabricFlectonePulse = fabricFlectonePulse;
-        this.integrationModule = integrationModule;
-        this.fabricPlayerAdapter = fabricPlayerAdapter;
-        this.fabricPermissionRegistry = fabricPermissionRegistry;
-    }
 
     @Override
     public boolean check(FEntity entity, String permission) {

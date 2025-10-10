@@ -3,10 +3,10 @@ package net.flectone.pulse.platform.proxy;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.flectone.pulse.FabricFlectonePulse;
-import net.flectone.pulse.config.Config;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.platform.handler.ProxyMessageHandler;
 import net.flectone.pulse.processing.resolver.FileResolver;
@@ -20,23 +20,15 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FabricProxy implements Proxy {
 
-    private final Config config;
+    private final FileResolver fileResolver;
     private final FabricFlectonePulse fabricFlectonePulse;
     private final ProxyMessageHandler proxyMessageHandler;
 
     private CustomPayload.Id<ProxyPayload> channel;
     private PacketCodec<RegistryByteBuf, ProxyPayload> packetCodec;
-
-    @Inject
-    public FabricProxy(FileResolver fileResolver,
-                       FabricFlectonePulse fabricFlectonePulse,
-                       ProxyMessageHandler proxyMessageHandler) {
-        this.config = fileResolver.getConfig();
-        this.fabricFlectonePulse = fabricFlectonePulse;
-        this.proxyMessageHandler = proxyMessageHandler;
-    }
 
     @Override
     public boolean isEnable() {
@@ -98,11 +90,11 @@ public class FabricProxy implements Proxy {
 
     @Nullable
     public String getChannel() {
-        if (config.getProxy().isBungeecord()) {
+        if (fileResolver.getConfig().getProxy().isBungeecord()) {
             return "bungeecord:main";
         }
 
-        if (config.getProxy().isVelocity()) {
+        if (fileResolver.getConfig().getProxy().isVelocity()) {
             return "flectonepulse:main";
         }
 

@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.format.world;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -26,6 +27,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class WorldModule extends AbstractModule {
 
     private final FileResolver fileResolver;
@@ -34,21 +36,6 @@ public class WorldModule extends AbstractModule {
     private final ListenerRegistry listenerRegistry;
     private final TaskScheduler taskScheduler;
     private final PacketProvider packetProvider;
-
-    @Inject
-    public WorldModule(FileResolver fileResolver,
-                       FPlayerService fPlayerService,
-                       PlatformPlayerAdapter platformPlayerAdapter,
-                       ListenerRegistry listenerRegistry,
-                       TaskScheduler taskScheduler,
-                       PacketProvider packetProvider) {
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.listenerRegistry = listenerRegistry;
-        this.taskScheduler = taskScheduler;
-        this.packetProvider = packetProvider;
-    }
 
     @Override
     public void onEnable() {

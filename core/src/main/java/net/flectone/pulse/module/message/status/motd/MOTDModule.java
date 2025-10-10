@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -19,21 +20,16 @@ import net.flectone.pulse.util.constant.MessageType;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MOTDModule extends AbstractModuleListLocalization<Localization.Message.Status.MOTD> {
 
     private final FileResolver fileResolver;
     private final MessagePipeline messagePipeline;
     private final PacketProvider packetProvider;
 
-    @Inject
-    public MOTDModule(FileResolver fileResolver,
-                      MessagePipeline messagePipeline,
-                      PacketProvider packetProvider) {
-        super(MessageType.MOTD);
-
-        this.fileResolver = fileResolver;
-        this.messagePipeline = messagePipeline;
-        this.packetProvider = packetProvider;
+    @Override
+    public MessageType messageType() {
+        return MessageType.MOTD;
     }
 
     @Override

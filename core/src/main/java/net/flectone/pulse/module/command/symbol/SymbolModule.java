@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.symbol;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -21,19 +22,11 @@ import java.util.Arrays;
 import java.util.Collections;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SymbolModule extends AbstractModuleCommand<Localization.Command.Symbol> {
 
     private final FileResolver fileResolver;
     private final CommandParserProvider commandParserProvider;
-
-    @Inject
-    public SymbolModule(FileResolver fileResolver,
-                        CommandParserProvider commandParserProvider) {
-        super(MessageType.COMMAND_SYMBOL);
-
-        this.fileResolver = fileResolver;
-        this.commandParserProvider = commandParserProvider;
-    }
 
     @Override
     public void onEnable() {
@@ -88,6 +81,11 @@ public class SymbolModule extends AbstractModuleCommand<Localization.Command.Sym
                 .sound(getModuleSound())
                 .build()
         );
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_SYMBOL;
     }
 
     @Override

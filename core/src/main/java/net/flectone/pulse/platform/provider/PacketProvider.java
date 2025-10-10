@@ -10,7 +10,7 @@ import com.github.retrooper.packetevents.protocol.player.ClientVersion;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,15 +18,11 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.UUID;
 
-@Getter
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PacketProvider {
 
     private final PacketEventsAPI<?> api = PacketEvents.getAPI();
-
-    @Inject
-    public PacketProvider() {
-    }
 
     public EventManager getEventManager() {
         return api.getEventManager();

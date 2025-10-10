@@ -3,6 +3,7 @@ package net.flectone.pulse.data.database.dao;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.FPlayerSQL;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -16,19 +17,21 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FPlayerDAO extends BaseDAO<FPlayerSQL> {
 
+    private final Database database;
     private final FLogger logger;
     private final Provider<SettingDAO> settingDAOProvider;
 
-    @Inject
-    public FPlayerDAO(Database database,
-                      FLogger logger,
-                      Provider<SettingDAO> settingDAOProvider) {
-        super(database, FPlayerSQL.class);
+    @Override
+    public Database database() {
+        return database;
+    }
 
-        this.logger = logger;
-        this.settingDAOProvider = settingDAOProvider;
+    @Override
+    public Class<FPlayerSQL> sqlClass() {
+        return FPlayerSQL.class;
     }
 
     public record PlayerInfo(int id, boolean online, String uuid, String name, @Nullable String ip) {}

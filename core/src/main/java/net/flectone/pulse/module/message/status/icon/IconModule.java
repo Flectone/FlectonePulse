@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.status.icon;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class IconModule extends AbstractModule {
 
     private final List<String> iconList = new ArrayList<>();
@@ -27,22 +29,9 @@ public class IconModule extends AbstractModule {
     private final PlatformServerAdapter platformServerAdapter;
     private final RandomUtil randomUtil;
     private final IconUtil iconUtil;
-    private final Path iconPath;
+    private final @Named("imagePath") Path iconPath;
 
     private int index;
-
-    @Inject
-    public IconModule(FileResolver fileResolver,
-                      @Named("projectPath") Path projectPath,
-                      PlatformServerAdapter platformServerAdapter,
-                      RandomUtil randomUtil,
-                      IconUtil iconUtil) {
-        this.fileResolver = fileResolver;
-        this.platformServerAdapter = platformServerAdapter;
-        this.iconUtil = iconUtil;
-        this.randomUtil = randomUtil;
-        this.iconPath = projectPath.resolve("images");
-    }
 
     @Override
     public void onEnable() {

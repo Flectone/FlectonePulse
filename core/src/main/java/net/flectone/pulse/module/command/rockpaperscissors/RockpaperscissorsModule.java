@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.rockpaperscissors;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -28,6 +29,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.Command.Rockpaperscissors> {
 
     private final Map<UUID, RockPaperScissors> gameMap = new HashMap<>();
@@ -39,25 +41,6 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
     private final IntegrationModule integrationModule;
     private final IgnoreSender ignoreSender;
     private final DisableSender disableSender;
-
-    @Inject
-    public RockpaperscissorsModule(FileResolver fileResolver,
-                                   ProxySender proxySender,
-                                   FPlayerService fPlayerService,
-                                   CommandParserProvider commandParserProvider,
-                                   IntegrationModule integrationModule,
-                                   IgnoreSender ignoreSender,
-                                   DisableSender disableSender) {
-        super(MessageType.COMMAND_ROCKPAPERSCISSORS);
-
-        this.fileResolver = fileResolver;
-        this.proxySender = proxySender;
-        this.fPlayerService = fPlayerService;
-        this.commandParserProvider = commandParserProvider;
-        this.integrationModule = integrationModule;
-        this.ignoreSender = ignoreSender;
-        this.disableSender = disableSender;
-    }
 
     @Override
     public void onEnable() {
@@ -111,7 +94,7 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
 
         fPlayerService.loadSettingsIfOffline(fReceiver);
-        if (disableSender.sendIfDisabled(fPlayer, fReceiver, getMessageType())) return;
+        if (disableSender.sendIfDisabled(fPlayer, fReceiver, messageType())) return;
 
         String promptMove = getPrompt(1);
         Optional<String> optionalMove = commandContext.optional(promptMove);
@@ -147,6 +130,11 @@ public class RockpaperscissorsModule extends AbstractModuleCommand<Localization.
                 .sound(getModuleSound())
                 .build()
         );
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_ROCKPAPERSCISSORS;
     }
 
     @Override

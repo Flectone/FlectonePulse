@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.banlist;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BanlistModule extends AbstractModuleCommand<Localization.Command.Banlist> {
 
     private final FileResolver fileResolver;
@@ -40,29 +42,6 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
     private final EventDispatcher eventDispatcher;
     private final CommandParserProvider commandParserProvider;
     private final SoundPlayer soundPlayer;
-
-    @Inject
-    public BanlistModule(FileResolver fileResolver,
-                         FPlayerService fPlayerService,
-                         ModerationService moderationService,
-                         ModerationMessageFormatter moderationMessageFormatter,
-                         UnbanModule unbanModule,
-                         MessagePipeline messagePipeline,
-                         EventDispatcher eventDispatcher,
-                         CommandParserProvider commandParserProvider,
-                         SoundPlayer soundPlayer) {
-        super(MessageType.COMMAND_BANLIST);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.moderationService = moderationService;
-        this.moderationMessageFormatter = moderationMessageFormatter;
-        this.unbanModule = unbanModule;
-        this.messagePipeline = messagePipeline;
-        this.eventDispatcher = eventDispatcher;
-        this.commandParserProvider = commandParserProvider;
-        this.soundPlayer = soundPlayer;
-    }
 
     @Override
     public void onEnable() {
@@ -183,6 +162,11 @@ public class BanlistModule extends AbstractModuleCommand<Localization.Command.Ba
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_BANLIST, fPlayer, component));
 
         soundPlayer.play(getModuleSound(), fPlayer);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_BANLIST;
     }
 
     @Override

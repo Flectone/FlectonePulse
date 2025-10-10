@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.bed;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -17,19 +18,11 @@ import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BedModule extends AbstractModuleLocalization<Localization.Message.Bed> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public BedModule(FileResolver fileResolver,
-                     ListenerRegistry listenerRegistry) {
-        super(MessageType.BED);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -38,6 +31,11 @@ public class BedModule extends AbstractModuleLocalization<Localization.Message.B
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(BedPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.BED;
     }
 
     @Override

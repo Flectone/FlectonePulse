@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.enchant;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -26,19 +27,11 @@ import org.apache.commons.lang3.Strings;
 import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.empty;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class EnchantModule extends AbstractModuleLocalization<Localization.Message.Enchant> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public EnchantModule(FileResolver fileResolver,
-                         ListenerRegistry listenerRegistry) {
-        super(MessageType.ENCHANT);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -47,6 +40,11 @@ public class EnchantModule extends AbstractModuleLocalization<Localization.Messa
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(EnchantPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.ENCHANT;
     }
 
     @Override

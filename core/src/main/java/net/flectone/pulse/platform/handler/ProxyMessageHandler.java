@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.leangen.geantyref.TypeToken;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -81,6 +82,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ProxyMessageHandler {
 
     private final Injector injector;
@@ -89,21 +91,6 @@ public class ProxyMessageHandler {
     private final FLogger fLogger;
     private final ModerationService moderationService;
     private final Gson gson;
-
-    @Inject
-    public ProxyMessageHandler(Injector injector,
-                               FileResolver fileResolver,
-                               FPlayerService fPlayerService,
-                               FLogger fLogger,
-                               ModerationService moderationService,
-                               Gson gson) {
-        this.injector = injector;
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.fLogger = fLogger;
-        this.moderationService = moderationService;
-        this.gson = gson;
-    }
 
     @Async
     public void handleProxyMessage(byte[] bytes) {

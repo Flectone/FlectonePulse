@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.clearchat;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -20,6 +21,7 @@ import org.incendo.cloud.context.CommandContext;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ClearchatModule extends AbstractModuleCommand<Localization.Command.Clearchat> {
 
     private final FileResolver fileResolver;
@@ -28,23 +30,6 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
     private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-
-    @Inject
-    public ClearchatModule(FPlayerService fPlayerService,
-                           FileResolver fileResolver,
-                           PermissionChecker permissionChecker,
-                           CommandParserProvider commandParserProvider,
-                           ProxySender proxySender,
-                           PlatformPlayerAdapter platformPlayerAdapter) {
-        super(MessageType.COMMAND_CLEARCHAT);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.permissionChecker = permissionChecker;
-        this.commandParserProvider = commandParserProvider;
-        this.proxySender = proxySender;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-    }
 
     @Override
     public void onEnable() {
@@ -88,6 +73,11 @@ public class ClearchatModule extends AbstractModuleCommand<Localization.Command.
         }
 
         clearChat(fTarget);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_CLEARCHAT;
     }
 
     @Override

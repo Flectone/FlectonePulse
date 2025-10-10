@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.format.questionanswer;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -34,6 +35,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class QuestionAnswerModule extends AbstractModuleLocalization<Localization.Message.Format.QuestionAnswer> {
 
     private final Map<UUID, Boolean> processedQuestions = new WeakHashMap<>();
@@ -45,19 +47,6 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
     private final FLogger fLogger;
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
-
-    @Inject
-    public QuestionAnswerModule(FileResolver fileResolver,
-                                FLogger fLogger,
-                                ListenerRegistry listenerRegistry,
-                                PermissionChecker permissionChecker) {
-        super(MessageType.QUESTION_ANSWER);
-
-        this.fileResolver = fileResolver;
-        this.fLogger = fLogger;
-        this.listenerRegistry = listenerRegistry;
-        this.permissionChecker = permissionChecker;
-    }
 
     @Override
     public void onEnable() {
@@ -90,6 +79,11 @@ public class QuestionAnswerModule extends AbstractModuleLocalization<Localizatio
         soundMap.clear();
         cooldownMap.clear();
         patternMap.clear();
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.QUESTION_ANSWER;
     }
 
     @Override

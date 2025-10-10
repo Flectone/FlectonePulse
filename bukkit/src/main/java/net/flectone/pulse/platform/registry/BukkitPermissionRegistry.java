@@ -2,16 +2,14 @@ package net.flectone.pulse.platform.registry;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitPermissionRegistry implements PermissionRegistry {
-
-    @Inject
-    public BukkitPermissionRegistry() {
-    }
 
     @Override
     public void register(String name, net.flectone.pulse.config.Permission.Type type) {

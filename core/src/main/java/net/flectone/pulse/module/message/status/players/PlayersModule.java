@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.status.players;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -18,6 +19,7 @@ import net.flectone.pulse.util.constant.MessageType;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PlayersModule extends AbstractModuleLocalization<Localization.Message.Status.Players> {
 
     private final FileResolver fileResolver;
@@ -25,25 +27,17 @@ public class PlayersModule extends AbstractModuleLocalization<Localization.Messa
     private final PlatformServerAdapter platformServerAdapter;
     private final ListenerRegistry listenerRegistry;
 
-    @Inject
-    public PlayersModule(FileResolver fileResolver,
-                         PermissionChecker permissionChecker,
-                         PlatformServerAdapter platformServerAdapter,
-                         ListenerRegistry listenerRegistry) {
-        super(MessageType.PLAYERS);
-
-        this.fileResolver = fileResolver;
-        this.permissionChecker = permissionChecker;
-        this.platformServerAdapter = platformServerAdapter;
-        this.listenerRegistry = listenerRegistry;
-    }
-
     @Override
     public void onEnable() {
         super.onEnable();
         registerPermission(permission().getBypass());
 
         listenerRegistry.register(PlayersPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.PLAYERS;
     }
 
     @Override

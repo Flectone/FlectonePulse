@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.helper;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class HelperModule extends AbstractModuleCommand<Localization.Command.Helper> {
 
     private final FileResolver fileResolver;
@@ -27,21 +29,6 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
     private final ProxyRegistry proxyRegistry;
     private final PermissionChecker permissionChecker;
     private final CommandParserProvider commandParserProvider;
-
-    @Inject
-    public HelperModule(FileResolver fileResolver,
-                        FPlayerService fPlayerService,
-                        ProxyRegistry proxyRegistry,
-                        PermissionChecker permissionChecker,
-                        CommandParserProvider commandParserProvider) {
-        super(MessageType.COMMAND_HELPER);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.proxyRegistry = proxyRegistry;
-        this.permissionChecker = permissionChecker;
-        this.commandParserProvider = commandParserProvider;
-    }
 
     @Override
     public void onEnable() {
@@ -98,6 +85,11 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
                 .integration()
                 .build()
         );
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_HELPER;
     }
 
     @Override

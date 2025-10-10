@@ -3,14 +3,14 @@ package net.flectone.pulse.listener;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.Config;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.model.event.player.PlayerPersistAndDisposeEvent;
-import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.platform.provider.PacketProvider;
+import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
@@ -25,26 +25,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.UUID;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitBaseListener implements Listener {
 
-    private final Config config;
+    private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final EventDispatcher eventDispatcher;
     private final PacketProvider packetProvider;
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
-
-    @Inject
-    public BukkitBaseListener(FileResolver fileResolver,
-                              FPlayerService fPlayerService,
-                              EventDispatcher eventDispatcher,
-                              PacketProvider packetProvider,
-                              PlayerPreLoginProcessor playerPreLoginProcessor) {
-        this.config = fileResolver.getConfig();
-        this.fPlayerService = fPlayerService;
-        this.eventDispatcher = eventDispatcher;
-        this.packetProvider = packetProvider;
-        this.playerPreLoginProcessor = playerPreLoginProcessor;
-    }
 
     @EventHandler
     public void onAsyncPreLoginEvent(AsyncPlayerPreLoginEvent event) {
@@ -101,7 +89,7 @@ public class BukkitBaseListener implements Listener {
         try {
             return player.getLocale();
         } catch (NoSuchMethodError e) {
-            return config.getLanguage().getType();
+            return fileResolver.getConfig().getLanguage().getType();
         }
     }
 }

@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.gamemode.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.message.gamemode.model.Gamemode;
 import net.flectone.pulse.processing.extractor.Extractor;
@@ -11,11 +12,8 @@ import net.kyori.adventure.text.TranslatableComponent;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class GamemodeExtractor extends Extractor {
-
-    @Inject
-    public GamemodeExtractor() {
-    }
 
     public Optional<Gamemode> extract(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
         return switch (translationKey) {

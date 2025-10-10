@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -32,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MentionModule extends AbstractModuleLocalization<Localization.Message.Format.Mention> {
 
     private final WeakHashMap<UUID, Boolean> processedMentions = new WeakHashMap<>();
@@ -48,25 +50,6 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
     private final FLogger fLogger;
-
-    @Inject
-    public MentionModule(FileResolver fileResolver,
-                         ListenerRegistry listenerRegistry,
-                         FPlayerService fPlayerService,
-                         IntegrationModule integrationModule,
-                         PermissionChecker permissionChecker,
-                         MessagePipeline messagePipeline,
-                         FLogger fLogger) {
-        super(MessageType.MENTION);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-        this.fPlayerService = fPlayerService;
-        this.integrationModule = integrationModule;
-        this.permissionChecker = permissionChecker;
-        this.messagePipeline = messagePipeline;
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void onEnable() {
@@ -86,6 +69,11 @@ public class MentionModule extends AbstractModuleLocalization<Localization.Messa
 
         processedMentions.clear();
         messageCache.invalidateAll();
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.MENTION;
     }
 
     @Override

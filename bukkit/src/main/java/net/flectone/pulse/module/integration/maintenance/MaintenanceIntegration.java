@@ -5,10 +5,12 @@ import com.google.inject.Singleton;
 import eu.kennytv.maintenance.api.Maintenance;
 import eu.kennytv.maintenance.api.MaintenanceProvider;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MaintenanceIntegration implements FIntegration {
 
     private final FLogger fLogger;
@@ -16,11 +18,6 @@ public class MaintenanceIntegration implements FIntegration {
     private Maintenance maintenance;
 
     @Getter private boolean hooked;
-
-    @Inject
-    public MaintenanceIntegration(FLogger fLogger) {
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void hook() {

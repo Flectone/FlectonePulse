@@ -2,6 +2,7 @@ package net.flectone.pulse.util;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.util.logging.FLogger;
 
 import javax.imageio.ImageIO;
@@ -11,14 +12,10 @@ import java.io.File;
 import java.util.Base64;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class IconUtil {
 
     private final FLogger fLogger;
-
-    @Inject
-    private IconUtil(FLogger fLogger) {
-        this.fLogger = fLogger;
-    }
 
     public String convertIcon(File icon) {
         try {
@@ -36,7 +33,7 @@ public class IconUtil {
             return new String(Base64.getEncoder().encode(bytes));
 
         } catch (Exception e) {
-            fLogger.warning("Failed to load " + icon.getName());
+            fLogger.warning("Failed to load " + icon.getName(), e);
         }
 
         return null;

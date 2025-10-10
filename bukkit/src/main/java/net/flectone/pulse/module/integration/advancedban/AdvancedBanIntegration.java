@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration.advancedban;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import me.leoko.advancedban.manager.PunishmentManager;
 import me.leoko.advancedban.manager.UUIDManager;
 import me.leoko.advancedban.utils.Punishment;
@@ -12,17 +13,13 @@ import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AdvancedBanIntegration implements FIntegration {
 
     private final FLogger fLogger;
 
     @Getter
     private boolean hooked;
-
-    @Inject
-    public AdvancedBanIntegration(FLogger fLogger) {
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void hook() {

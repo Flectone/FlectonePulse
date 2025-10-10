@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.skinsrestorer;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -12,20 +13,12 @@ import net.flectone.pulse.util.constant.PlatformType;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SkinsRestorerModule extends AbstractModule {
 
     private final FileResolver fileResolver;
     private final SkinsRestorerIntegration skinsRestorerIntegration;
     private final PlatformServerAdapter platformServerAdapter;
-
-    @Inject
-    public SkinsRestorerModule(FileResolver fileResolver,
-                               SkinsRestorerIntegration skinsRestorerIntegration,
-                               PlatformServerAdapter platformServerAdapter) {
-        this.fileResolver = fileResolver;
-        this.skinsRestorerIntegration = skinsRestorerIntegration;
-        this.platformServerAdapter = platformServerAdapter;
-    }
 
     @Override
     public void onEnable() {

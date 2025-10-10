@@ -2,6 +2,7 @@ package net.flectone.pulse.processing.parser.integer;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.context.CommandContext;
@@ -20,14 +21,11 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DurationReasonParser implements ArgumentParser<FPlayer, Pair<Long, String>>, BlockingSuggestionProvider.Strings<FPlayer> {
 
     private static final Pattern DURATION_PATTERN = Pattern.compile("(\\d+[dhms])");
     private static final List<String> TIME_UNITS = List.of("d", "h", "m", "s");
-
-    @Inject
-    public DurationReasonParser() {
-    }
 
     @Override
     public @NonNull ArgumentParseResult<Pair<Long, String>> parse(@NonNull CommandContext<FPlayer> commandContext, @NonNull CommandInput commandInput) {

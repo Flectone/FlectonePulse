@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.broadcast;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -14,19 +15,11 @@ import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BroadcastModule extends AbstractModuleCommand<Localization.Command.Broadcast> {
 
     private final FileResolver fileResolver;
     private final CommandParserProvider commandParserProvider;
-
-    @Inject
-    public BroadcastModule(FileResolver fileResolver,
-                           CommandParserProvider commandParserProvider) {
-        super(MessageType.COMMAND_BROADCAST);
-
-        this.fileResolver = fileResolver;
-        this.commandParserProvider = commandParserProvider;
-    }
 
     @Override
     public void onEnable() {
@@ -56,6 +49,11 @@ public class BroadcastModule extends AbstractModuleCommand<Localization.Command.
                 .integration()
                 .build()
         );
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_BROADCAST;
     }
 
     @Override

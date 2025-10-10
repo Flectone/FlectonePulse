@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.fillbiome.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.message.fillbiome.model.Fillbiome;
 import net.flectone.pulse.processing.extractor.Extractor;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
@@ -10,11 +11,8 @@ import net.kyori.adventure.text.TranslatableComponent;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FillbiomeExtractor extends Extractor {
-
-    @Inject
-    public FillbiomeExtractor() {
-    }
 
     public Optional<Fillbiome> extract(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
         Optional<String> blocks = Optional.empty();

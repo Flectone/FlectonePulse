@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.format;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -34,6 +35,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FormatModule extends AbstractModuleLocalization<Localization.Message.Format> {
 
     private final Map<AdventureTag, TagResolver> tagResolverMap = new EnumMap<>(AdventureTag.class);
@@ -41,17 +43,6 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
     private final PermissionChecker permissionChecker;
-
-    @Inject
-    public FormatModule(FileResolver fileResolver,
-                        ListenerRegistry listenerRegistry,
-                        PermissionChecker permissionChecker) {
-        super(MessageType.FORMAT);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-        this.permissionChecker = permissionChecker;
-    }
 
     @Override
     public void configureChildren() {
@@ -110,6 +101,11 @@ public class FormatModule extends AbstractModuleLocalization<Localization.Messag
         super.onDisable();
 
         tagResolverMap.clear();
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.FORMAT;
     }
 
     @Override

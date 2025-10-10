@@ -4,6 +4,7 @@ import com.alessiodp.libby.Library;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
@@ -14,20 +15,12 @@ import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DeeplModule extends AbstractModule {
 
     private final FileResolver fileResolver;
     private final ReflectionResolver reflectionResolver;
     private final Injector injector;
-
-    @Inject
-    public DeeplModule(FileResolver fileResolver,
-                       ReflectionResolver reflectionResolver,
-                       Injector injector) {
-        this.fileResolver = fileResolver;
-        this.reflectionResolver = reflectionResolver;
-        this.injector = injector;
-    }
 
     @Override
     public void onEnable() {

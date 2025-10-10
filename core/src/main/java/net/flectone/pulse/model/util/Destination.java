@@ -171,9 +171,7 @@ public class Destination {
 
                 return new Destination(type, bossBar);
             }
-            default -> {
-                return new Destination(type);
-            }
+            default -> throw new RuntimeException("123");
         }
     }
 

@@ -2,27 +2,30 @@ package net.flectone.pulse.data.database.dao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.MailSQL;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.mail.model.Mail;
-import org.jdbi.v3.core.Handle;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MailDAO extends BaseDAO<MailSQL> {
 
-    @Inject
-    public MailDAO(Database database) {
-        super(database, MailSQL.class);
+    private final Database database;
+
+    @Override
+    public Database database() {
+        return database;
     }
 
     @Override
-    public MailSQL getSQL(Handle handle) {
-        return handle.attach(MailSQL.class);
+    public Class<MailSQL> sqlClass() {
+        return MailSQL.class;
     }
 
     @Nullable

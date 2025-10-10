@@ -7,6 +7,7 @@ import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import feign.Logger;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.function.UnaryOperator;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TwitchIntegration implements FIntegration {
 
     private final FileResolver fileResolver;
@@ -29,19 +31,6 @@ public class TwitchIntegration implements FIntegration {
     private final FLogger fLogger;
 
     private TwitchClient twitchClient;
-
-    @Inject
-    public TwitchIntegration(FileResolver fileResolver,
-                             PlatformServerAdapter platformServerAdapter,
-                             SystemVariableResolver systemVariableResolver,
-                             ChannelMessageListener channelMessageListener,
-                             FLogger fLogger) {
-        this.fileResolver = fileResolver;
-        this.channelMessageListener = channelMessageListener;
-        this.platformServerAdapter = platformServerAdapter;
-        this.systemVariableResolver = systemVariableResolver;
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void hook() {

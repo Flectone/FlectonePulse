@@ -3,6 +3,7 @@ package net.flectone.pulse.processing.parser.integer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.processing.converter.ColorConverter;
 import net.flectone.pulse.processing.resolver.FileResolver;
@@ -19,27 +20,18 @@ import java.util.Collections;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSuggestionProvider.Strings<FPlayer> {
 
-    private final FileResolver fileResolver;
-    private final PermissionChecker permissionChecker;
-    private final ColorConverter colorConverter;
-    private final StringParser<FPlayer> stringParser;
-
-    private final List<String> hexSymbols = List.of(
+    private static final List<String> HEX_SYMBOLS = List.of(
             "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
             "a", "b", "c", "d", "e", "f"
     );
 
-    @Inject
-    public ColorParser(FileResolver fileResolver,
-                       PermissionChecker permissionChecker,
-                       ColorConverter colorConverter) {
-        this.fileResolver = fileResolver;
-        this.permissionChecker = permissionChecker;
-        this.colorConverter = colorConverter;
-        this.stringParser = new StringParser<>(StringParser.StringMode.SINGLE);
-    }
+    private final StringParser<FPlayer> stringParser = new StringParser<>(StringParser.StringMode.SINGLE);
+
+    private final FileResolver fileResolver;
+    private final PermissionChecker permissionChecker;
 
     @Override
     public @NonNull ArgumentParseResult<String> parse(@NonNull CommandContext<FPlayer> context, @NonNull CommandInput input) {
@@ -73,15 +65,15 @@ public class ColorParser implements ArgumentParser<FPlayer, String>, BlockingSug
         }
 
         if (current.startsWith("#") && current.length() < 7) {
-            for (String symbol : hexSymbols) {
+            for (String symbol : HEX_SYMBOLS) {
                 suggestions.add(current + symbol);
             }
 
         } else if (current.startsWith("&") && current.length() == 1) {
-            suggestions.addAll(colorConverter.getLegacyColors());
+            suggestions.addAll(ColorConverter.LEGACY_COLORS);
 
         } else if (!current.isEmpty()) {
-            for (String color : colorConverter.getNamedColors()) {
+            for (String color : ColorConverter.NAMED_COLORS) {
                 if (color.startsWith(current)) {
                     suggestions.add(color);
                 }

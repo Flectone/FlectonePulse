@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.deletemessage;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -19,22 +20,12 @@ import org.incendo.cloud.parser.standard.UUIDParser;
 import java.util.UUID;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DeletemessageModule extends AbstractModuleCommand<Localization.Command.Deletemessage> {
 
     private final FileResolver fileResolver;
     private final DeleteModule deleteModule;
     private final ProxySender proxySender;
-
-    @Inject
-    public DeletemessageModule(FileResolver fileResolver,
-                               DeleteModule deleteModule,
-                               ProxySender proxySender) {
-        super(MessageType.COMMAND_DELETE);
-
-        this.fileResolver = fileResolver;
-        this.deleteModule = deleteModule;
-        this.proxySender = proxySender;
-    }
 
     @Override
     public void onEnable() {
@@ -75,6 +66,11 @@ public class DeletemessageModule extends AbstractModuleCommand<Localization.Comm
                 .sound(getModuleSound())
                 .build()
         );
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_DELETE;
     }
 
     @Override

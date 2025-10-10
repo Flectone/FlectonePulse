@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.status.version;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -12,15 +13,14 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class VersionModule extends AbstractModuleLocalization<Localization.Message.Status.Version> {
 
     private final FileResolver fileResolver;
 
-    @Inject
-    public VersionModule(FileResolver fileResolver) {
-        super(MessageType.VERSION);
-
-        this.fileResolver = fileResolver;
+    @Override
+    public MessageType messageType() {
+        return MessageType.VERSION;
     }
 
     @Override

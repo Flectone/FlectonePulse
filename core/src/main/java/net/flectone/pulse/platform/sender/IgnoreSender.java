@@ -2,6 +2,7 @@ package net.flectone.pulse.platform.sender;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -12,20 +13,12 @@ import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class IgnoreSender {
 
     private final MessagePipeline messagePipeline;
     private final EventDispatcher eventDispatcher;
     private final FileResolver fileResolver;
-
-    @Inject
-    public IgnoreSender(MessagePipeline messagePipeline,
-                        EventDispatcher eventDispatcher,
-                        FileResolver fileResolver) {
-        this.messagePipeline = messagePipeline;
-        this.eventDispatcher = eventDispatcher;
-        this.fileResolver = fileResolver;
-    }
 
     public boolean sendIfIgnored(FPlayer sender, FPlayer receiver) {
         Localization.Command.Ignore localization = fileResolver.getLocalization(sender).getCommand().getIgnore();

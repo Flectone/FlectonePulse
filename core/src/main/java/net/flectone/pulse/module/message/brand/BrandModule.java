@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.brand;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -20,25 +21,13 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BrandModule extends AbstractModuleListLocalization<Localization.Message.Brand> {
 
     private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final TaskScheduler taskScheduler;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public BrandModule(FileResolver fileResolver,
-                       FPlayerService fPlayerService,
-                       TaskScheduler taskScheduler,
-                       ListenerRegistry listenerRegistry) {
-        super(MessageType.BRAND);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.taskScheduler = taskScheduler;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -50,6 +39,11 @@ public class BrandModule extends AbstractModuleListLocalization<Localization.Mes
         }
 
         listenerRegistry.register(BrandPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.BRAND;
     }
 
     @Override

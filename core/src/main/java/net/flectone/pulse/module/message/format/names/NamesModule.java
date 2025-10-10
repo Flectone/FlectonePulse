@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.format.names;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -25,25 +26,13 @@ import org.apache.commons.lang3.Strings;
 import java.util.Set;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class NamesModule extends AbstractModuleLocalization<Localization.Message.Format.Names> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
-
-    @Inject
-    public NamesModule(FileResolver fileResolver,
-                       ListenerRegistry listenerRegistry,
-                       IntegrationModule integrationModule,
-                       MessagePipeline messagePipeline) {
-        super(MessageType.NAME);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-        this.integrationModule = integrationModule;
-        this.messagePipeline = messagePipeline;
-    }
 
     @Override
     public void onEnable() {
@@ -60,6 +49,11 @@ public class NamesModule extends AbstractModuleLocalization<Localization.Message
     @Override
     public Permission.Message.Format.Names permission() {
         return fileResolver.getPermission().getMessage().getFormat().getNames();
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.NAME;
     }
 
     @Override

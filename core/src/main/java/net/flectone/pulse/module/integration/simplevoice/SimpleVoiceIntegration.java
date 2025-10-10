@@ -7,6 +7,7 @@ import de.maxhenkel.voicechat.api.VoicechatPlugin;
 import de.maxhenkel.voicechat.api.events.EntitySoundPacketEvent;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -18,6 +19,7 @@ import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
 
     private final FPlayerService fPlayerService;
@@ -31,27 +33,7 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
 
     // only for fabric support
     public SimpleVoiceIntegration() {
-        fPlayerService = null;
-        moderationMessageFormatter = null;
-        muteChecker = null;
-        messageSender = null;
-        messagePipeline = null;
-        fLogger = null;
-    }
-
-    @Inject
-    public SimpleVoiceIntegration(FPlayerService fPlayerService,
-                                  ModerationMessageFormatter moderationMessageFormatter,
-                                  MuteChecker muteChecker,
-                                  MessageSender messageSender,
-                                  MessagePipeline messagePipeline,
-                                  FLogger fLogger) {
-        this.fPlayerService = fPlayerService;
-        this.moderationMessageFormatter = moderationMessageFormatter;
-        this.muteChecker = muteChecker;
-        this.messageSender = messageSender;
-        this.messagePipeline = messagePipeline;
-        this.fLogger = fLogger;
+        this(null, null, null, null, null, null);
     }
 
     @Override
@@ -61,7 +43,7 @@ public class SimpleVoiceIntegration implements FIntegration, VoicechatPlugin {
 
     @Override
     public void registerEvents(EventRegistration registration) {
-        SimpleVoiceIntegration simpleVoiceIntegration = SimpleVoiceModule.getSimpleVoiceIntegration();
+        SimpleVoiceIntegration simpleVoiceIntegration = SimpleVoiceModule.getSIMPLE_VOICE_INTEGRATION();
         if (simpleVoiceIntegration == null) return;
 
         registration.registerEvent(MicrophonePacketEvent.class, simpleVoiceIntegration::onMicrophonePacketEvent);

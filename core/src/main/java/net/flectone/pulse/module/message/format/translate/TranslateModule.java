@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -29,6 +30,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TranslateModule extends AbstractModuleLocalization<Localization.Message.Format.Translate> {
 
     private final Cache<String, UUID> messageCache = CacheBuilder.newBuilder()
@@ -39,17 +41,6 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
-
-    @Inject
-    public TranslateModule(FileResolver fileResolver,
-                           ListenerRegistry listenerRegistry,
-                           MessagePipeline messagePipeline) {
-        super(MessageType.TRANSLATE);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-        this.messagePipeline = messagePipeline;
-    }
 
     @Override
     public void onEnable() {
@@ -63,6 +54,11 @@ public class TranslateModule extends AbstractModuleLocalization<Localization.Mes
         super.onDisable();
 
         messageCache.invalidateAll();
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.TRANSLATE;
     }
 
     @Override

@@ -7,8 +7,8 @@ import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateC
 
 public abstract class EventListener extends AbstractModuleLocalization<Localization.Integration.Telegram> implements LongPollingSingleThreadUpdateConsumer {
 
-    protected EventListener() {
-        super(MessageType.FROM_TELEGRAM_TO_MINECRAFT);
+    public MessageType messageType() {
+        return MessageType.FROM_TELEGRAM_TO_MINECRAFT;
     }
 
 }

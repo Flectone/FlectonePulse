@@ -7,6 +7,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSc
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateScore;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -29,6 +30,7 @@ import net.kyori.adventure.text.Component;
 import java.util.*;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SidebarModule extends AbstractModuleListLocalization<Localization.Message.Sidebar> {
 
     private final Map<UUID, List<String>> playerSidebar = new HashMap<>();
@@ -40,25 +42,6 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
     private final PacketSender packetSender;
     private final ListenerRegistry listenerRegistry;
     private final PacketProvider packetProvider;
-
-    @Inject
-    public SidebarModule(FileResolver fileResolver,
-                         FPlayerService fPlayerService,
-                         TaskScheduler taskScheduler,
-                         MessagePipeline messagePipeline,
-                         PacketSender packetSender,
-                         ListenerRegistry listenerRegistry,
-                         PacketProvider packetProvider) {
-        super(MessageType.SIDEBAR);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.taskScheduler = taskScheduler;
-        this.messagePipeline = messagePipeline;
-        this.packetSender = packetSender;
-        this.listenerRegistry = listenerRegistry;
-        this.packetProvider = packetProvider;
-    }
 
     @Override
     public void onEnable() {
@@ -78,6 +61,11 @@ public class SidebarModule extends AbstractModuleListLocalization<Localization.M
 
         fPlayerService.getOnlineFPlayers().forEach(this::remove);
         // no clear playerSidebar map for next sidebars
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.SIDEBAR;
     }
 
     @Override

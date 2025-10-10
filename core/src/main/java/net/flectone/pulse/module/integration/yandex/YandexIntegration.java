@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.yandex;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.logging.FLogger;
@@ -13,19 +14,13 @@ import yandex.cloud.sdk.auth.Auth;
 import java.time.Duration;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class YandexIntegration implements FIntegration {
 
     private final FileResolver fileResolver;
     private final FLogger fLogger;
 
     private ServiceFactory factory;
-
-    @Inject
-    public YandexIntegration(FileResolver fileResolver,
-                             FLogger fLogger) {
-        this.fileResolver = fileResolver;
-        this.fLogger = fLogger;
-    }
 
     public String translate(String source, String target, String text) {
         TranslationServiceGrpc.TranslationServiceBlockingStub translationService = factory.create(TranslationServiceGrpc.TranslationServiceBlockingStub.class, TranslationServiceGrpc::newBlockingStub);

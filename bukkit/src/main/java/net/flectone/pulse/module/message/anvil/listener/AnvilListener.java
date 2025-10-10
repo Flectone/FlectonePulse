@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.anvil.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.anvil.BukkitAnvilModule;
 import net.flectone.pulse.service.FPlayerService;
@@ -14,17 +15,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AnvilListener implements Listener {
 
     private final FPlayerService fPlayerService;
     private final BukkitAnvilModule anvilModule;
-
-    @Inject
-    public AnvilListener(FPlayerService fPlayerService,
-                         BukkitAnvilModule anvilModule) {
-        this.fPlayerService = fPlayerService;
-        this.anvilModule = anvilModule;
-    }
 
     @EventHandler
     public void inventoryClickEvent(InventoryClickEvent event) {

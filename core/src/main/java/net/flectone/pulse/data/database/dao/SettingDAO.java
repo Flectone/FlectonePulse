@@ -2,6 +2,7 @@ package net.flectone.pulse.data.database.dao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.SettingSQL;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -10,16 +11,20 @@ import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SettingDAO extends BaseDAO<SettingSQL> {
 
+    private final Database database;
     private final FLogger fLogger;
 
-    @Inject
-    public SettingDAO(Database database,
-                      FLogger fLogger) {
-        super(database, SettingSQL.class);
+    @Override
+    public Database database() {
+        return database;
+    }
 
-        this.fLogger = fLogger;
+    @Override
+    public Class<SettingSQL> sqlClass() {
+        return SettingSQL.class;
     }
 
     public void save(FPlayer player) {

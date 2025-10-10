@@ -3,6 +3,7 @@ package net.flectone.pulse.platform.formatter;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.util.checker.MuteChecker;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.processing.resolver.FileResolver;
@@ -18,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ModerationMessageFormatter {
 
     private final FileResolver fileResolver;
@@ -26,21 +28,6 @@ public class ModerationMessageFormatter {
     private final ModerationService moderationService;
     private final Provider<IntegrationModule> integrationModuleProvider;
     private final Provider<NewbieModule> newbieModuleProvider;
-
-    @Inject
-    public ModerationMessageFormatter(FileResolver fileResolver,
-                                      FPlayerService fPlayerService,
-                                      TimeFormatter timeFormatter,
-                                      ModerationService moderationService,
-                                      Provider<IntegrationModule> integrationModuleProvider,
-                                      Provider<NewbieModule> newbieModuleProvider) {
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.timeFormatter = timeFormatter;
-        this.moderationService = moderationService;
-        this.integrationModuleProvider = integrationModuleProvider;
-        this.newbieModuleProvider = newbieModuleProvider;
-    }
 
     public String replacePlaceholders(String message,
                                       String playerName,

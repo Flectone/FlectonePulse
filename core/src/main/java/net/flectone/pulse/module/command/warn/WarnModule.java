@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.warn;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -29,6 +30,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn> {
 
     private final FileResolver fileResolver;
@@ -38,25 +40,6 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
     private final CommandParserProvider commandParserProvider;
     private final PlatformServerAdapter platformServerAdapter;
     private final ProxySender proxySender;
-
-    @Inject
-    public WarnModule(FileResolver fileResolver,
-                      FPlayerService fPlayerService,
-                      ModerationService moderationService,
-                      ModerationMessageFormatter moderationMessageFormatter,
-                      CommandParserProvider commandParserProvider,
-                      PlatformServerAdapter platformServerAdapter,
-                      ProxySender proxySender) {
-        super(MessageType.COMMAND_WARN);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.moderationService = moderationService;
-        this.moderationMessageFormatter = moderationMessageFormatter;
-        this.commandParserProvider = commandParserProvider;
-        this.platformServerAdapter = platformServerAdapter;
-        this.proxySender = proxySender;
-    }
 
     @Override
     public void onEnable() {
@@ -139,6 +122,11 @@ public class WarnModule extends AbstractModuleCommand<Localization.Command.Warn>
         if (StringUtils.isEmpty(action)) return;
 
         platformServerAdapter.dispatchCommand(Strings.CS.replace(action, "<target>", fTarget.getName()));
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_WARN;
     }
 
     @Override

@@ -17,6 +17,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.*;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.BossBar;
@@ -34,9 +35,9 @@ import net.kyori.adventure.translation.GlobalTranslator;
 import java.util.*;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MessageSender {
 
-    private final ANSIComponentSerializer ansiSerializer = ANSIComponentSerializer.ansi();
     private final PacketSerializer packetSerializer;
     private final TaskScheduler taskScheduler;
     private final PacketSender packetSender;
@@ -44,23 +45,8 @@ public class MessageSender {
     private final IntegrationModule integrationModule;
     private final FLogger fLogger;
 
-    @Inject
-    public MessageSender(PacketSerializer packetSerializer,
-                         TaskScheduler taskScheduler,
-                         PacketSender packetSender,
-                         PacketProvider packetProvider,
-                         IntegrationModule integrationModule,
-                         FLogger fLogger) {
-        this.packetSerializer = packetSerializer;
-        this.taskScheduler = taskScheduler;
-        this.packetSender = packetSender;
-        this.packetProvider = packetProvider;
-        this.integrationModule = integrationModule;
-        this.fLogger = fLogger;
-    }
-
     public void sendToConsole(Component component) {
-        String consoleString = ansiSerializer.serialize(GlobalTranslator.render(component, Locale.ROOT));
+        String consoleString = ANSIComponentSerializer.ansi().serialize(GlobalTranslator.render(component, Locale.ROOT));
         fLogger.info(consoleString);
     }
 

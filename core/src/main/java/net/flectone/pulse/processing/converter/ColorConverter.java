@@ -3,6 +3,7 @@ package net.flectone.pulse.processing.converter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang3.Strings;
@@ -12,26 +13,22 @@ import java.util.List;
 
 @Getter
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ColorConverter {
 
-    private final int defaultBackground = 0x40000000;
+    public static final int DEFAULT_BACKGROUND_COLOR = 0x40000000;
 
-    private final List<String> legacyColors = List.of(
+    public static final List<String> LEGACY_COLORS = List.of(
             "&0", "&1", "&2", "&3", "&4", "&5", "&6", "&7", "&8", "&9",
             "&a", "&b", "&c", "&d", "&e", "&f", "&k", "&l", "&m", "&n", "&o"
     );
 
-    private final List<String> namedColors = NamedTextColor.NAMES.values()
+    public static final List<String> NAMED_COLORS = NamedTextColor.NAMES.values()
             .stream()
             .map(namedTextColor -> "<" + namedTextColor.toString() + ">")
             .toList();
 
     private final FLogger fLogger;
-
-    @Inject
-    public ColorConverter(FLogger fLogger) {
-        this.fLogger = fLogger;
-    }
 
     @Nullable
     public String isCorrect(String color) {
@@ -48,11 +45,11 @@ public class ColorConverter {
             }
         }
 
-        if (legacyColors.contains(color)) {
+        if (LEGACY_COLORS.contains(color)) {
             return color;
         }
 
-        if (namedColors.contains(color)) {
+        if (NAMED_COLORS.contains(color)) {
             return color;
         }
 
@@ -79,7 +76,7 @@ public class ColorConverter {
 
         if (hex.length() != 3 && hex.length() != 4 && hex.length() != 6 && hex.length() != 8) {
             fLogger.warning("Incorrect HEX string length");
-            return defaultBackground;
+            return DEFAULT_BACKGROUND_COLOR;
         }
 
         // #RGB -> RRGGBB, #RGBA -> RRGGBBAA
@@ -108,7 +105,7 @@ public class ColorConverter {
             return (alpha << 24) | (r << 16) | (g << 8) | b;
         } catch (NumberFormatException e) {
             fLogger.warning("Incorrect HEX characters");
-            return defaultBackground;
+            return DEFAULT_BACKGROUND_COLOR;
         }
     }
 

@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.rotate.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
@@ -13,17 +14,11 @@ import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RotatePulseListener implements PulseListener {
 
     private final RotateModule rotateModule;
     private final RotateExtractor rotateExtractor;
-
-    @Inject
-    public RotatePulseListener(RotateModule rotateModule,
-                               RotateExtractor rotateExtractor) {
-        this.rotateModule = rotateModule;
-        this.rotateExtractor = rotateExtractor;
-    }
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {

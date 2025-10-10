@@ -6,14 +6,12 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDeathCombatEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.TranslatableComponent;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DeathPacketListener implements PacketListener {
-
-    @Inject
-    public DeathPacketListener() {
-    }
 
     @Override
     public void onPacketSend(PacketSendEvent event) {

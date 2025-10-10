@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.format.moderation.delete.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -21,14 +22,10 @@ import net.kyori.adventure.text.Component;
 import java.util.UUID;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DeletePulseListener implements PulseListener {
 
     private final DeleteModule deleteModule;
-
-    @Inject
-    public DeletePulseListener(DeleteModule deleteModule) {
-        this.deleteModule = deleteModule;
-    }
 
     @Pulse
     public void onMessageFormattingEvent(MessageFormattingEvent event) {

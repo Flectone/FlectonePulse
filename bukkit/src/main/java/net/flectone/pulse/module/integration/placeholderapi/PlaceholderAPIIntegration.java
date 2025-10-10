@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.placeholderapi;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.flectone.pulse.BuildConfig;
@@ -33,6 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PlaceholderAPIIntegration extends PlaceholderExpansion implements FIntegration, PulseListener {
 
     private final FileResolver fileResolver;
@@ -41,21 +43,6 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion implements F
     private final PermissionChecker permissionChecker;
     private final PlaceholderAPIModule placeholderAPIModule;
     private final FLogger fLogger;
-
-    @Inject
-    public PlaceholderAPIIntegration(FPlayerService fPlayerService,
-                                     FileResolver fileResolver,
-                                     PlatformServerAdapter platformServerAdapter,
-                                     PermissionChecker permissionChecker,
-                                     PlaceholderAPIModule placeholderAPIModule,
-                                     FLogger fLogger) {
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.platformServerAdapter = platformServerAdapter;
-        this.permissionChecker = permissionChecker;
-        this.placeholderAPIModule = placeholderAPIModule;
-        this.fLogger = fLogger;
-    }
 
     @Override
     public @NotNull String getIdentifier() {

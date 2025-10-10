@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.format.fixation;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
@@ -13,17 +14,11 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageFlag;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FixationModule extends AbstractModule {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public FixationModule(FileResolver fileResolver,
-                          ListenerRegistry listenerRegistry) {
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {

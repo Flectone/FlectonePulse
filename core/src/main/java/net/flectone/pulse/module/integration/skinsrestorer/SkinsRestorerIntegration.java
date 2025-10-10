@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration.skinsrestorer;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FlectonePulse;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SkinsRestorerIntegration implements FIntegration {
 
     private final FlectonePulse flectonePulse;
@@ -32,17 +34,6 @@ public class SkinsRestorerIntegration implements FIntegration {
 
     private SkinsRestorer skinsRestorer;
     private boolean skinApplyEventSubscribed;
-
-    @Inject
-    public SkinsRestorerIntegration(FlectonePulse flectonePulse,
-                                    PlatformPlayerAdapter platformPlayerAdapter,
-                                    Provider<SkinService> skinServiceProvider,
-                                    FLogger fLogger) {
-        this.flectonePulse = flectonePulse;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.skinServiceProvider = skinServiceProvider;
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void hook() {

@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.setblock;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -19,19 +20,11 @@ import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import org.apache.commons.lang3.StringUtils;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SetblockModule extends AbstractModuleLocalization<Localization.Message.Setblock> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public SetblockModule(FileResolver fileResolver,
-                          ListenerRegistry listenerRegistry) {
-        super(MessageType.SETBLOCK);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -40,6 +33,11 @@ public class SetblockModule extends AbstractModuleLocalization<Localization.Mess
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(SetblockPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.SETBLOCK;
     }
 
     @Override

@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.gamerule;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -19,19 +20,11 @@ import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import org.apache.commons.lang3.StringUtils;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class GameruleModule extends AbstractModuleLocalization<Localization.Message.Gamerule> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public GameruleModule(FileResolver fileResolver,
-                          ListenerRegistry listenerRegistry) {
-        super(MessageType.GAMERULE);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -50,6 +43,11 @@ public class GameruleModule extends AbstractModuleLocalization<Localization.Mess
     @Override
     public Permission.Message.Gamerule permission() {
         return fileResolver.getPermission().getMessage().getGamerule();
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.GAMERULE;
     }
 
     @Override

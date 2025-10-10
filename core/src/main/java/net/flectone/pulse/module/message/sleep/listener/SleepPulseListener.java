@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.sleep.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
@@ -13,17 +14,11 @@ import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SleepPulseListener implements PulseListener {
 
     private final SleepModule sleepModule;
     private final SleepExtractor sleepExtractor;
-
-    @Inject
-    public SleepPulseListener(SleepModule sleepModule,
-                              SleepExtractor sleepExtractor) {
-        this.sleepModule = sleepModule;
-        this.sleepExtractor = sleepExtractor;
-    }
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {

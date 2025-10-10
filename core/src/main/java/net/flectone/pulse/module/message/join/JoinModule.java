@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.join;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -18,25 +19,13 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class JoinModule extends AbstractModuleLocalization<Localization.Message.Join> {
 
     private final FileResolver fileResolver;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final IntegrationModule integrationModule;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public JoinModule(FileResolver fileResolver,
-                      PlatformPlayerAdapter platformPlayerAdapter,
-                      IntegrationModule integrationModule,
-                      ListenerRegistry listenerRegistry) {
-        super(MessageType.JOIN);
-
-        this.fileResolver = fileResolver;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.integrationModule =  integrationModule;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -45,6 +34,11 @@ public class JoinModule extends AbstractModuleLocalization<Localization.Message.
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(JoinPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.JOIN;
     }
 
     @Override

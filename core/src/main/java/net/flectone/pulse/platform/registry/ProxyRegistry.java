@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.data.database.Database;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ProxyRegistry implements Registry {
 
     @Getter private final List<Proxy> proxies = new ArrayList<>();
@@ -27,17 +29,6 @@ public class ProxyRegistry implements Registry {
     private final ReflectionResolver reflectionResolver;
     private final FLogger fLogger;
     private final Injector injector;
-
-    @Inject
-    public ProxyRegistry(FileResolver fileResolver,
-                         ReflectionResolver reflectionResolver,
-                         FLogger fLogger,
-                         Injector injector) {
-        this.fileResolver = fileResolver;
-        this.reflectionResolver = reflectionResolver;
-        this.fLogger = fLogger;
-        this.injector = injector;
-    }
 
     public boolean hasEnabledProxy() {
         return proxies.stream().anyMatch(Proxy::isEnable);

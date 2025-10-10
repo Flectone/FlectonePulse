@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.ignore;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -19,22 +20,12 @@ import org.incendo.cloud.context.CommandContext;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ignore> {
 
     private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
-
-    @Inject
-    public IgnoreModule(FileResolver fileResolver,
-                        FPlayerService fPlayerService,
-                        CommandParserProvider commandParserProvider) {
-        super(MessageType.COMMAND_IGNORE);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.commandParserProvider = commandParserProvider;
-    }
 
     @Override
     public void onEnable() {
@@ -106,6 +97,11 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
     }
 
     @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_IGNORE;
+    }
+
+    @Override
     public Command.Ignore config() {
         return fileResolver.getCommand().getIgnore();
     }
@@ -114,6 +110,8 @@ public class IgnoreModule extends AbstractModuleCommand<Localization.Command.Ign
     public Permission.Command.Ignore permission() {
         return fileResolver.getPermission().getCommand().getIgnore();
     }
+
+
 
     @Override
     public Localization.Command.Ignore localization(FEntity sender) {

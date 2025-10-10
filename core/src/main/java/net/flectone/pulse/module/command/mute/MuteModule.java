@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.mute;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -25,6 +26,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute> {
 
     private final FileResolver fileResolver;
@@ -33,23 +35,6 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
-
-    @Inject
-    public MuteModule(FileResolver fileResolver,
-                      FPlayerService fPlayerService,
-                      ModerationService moderationService,
-                      ModerationMessageFormatter moderationMessageFormatter,
-                      CommandParserProvider commandParserProvider,
-                      ProxySender proxySender) {
-        super(MessageType.COMMAND_MUTE);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.moderationService = moderationService;
-        this.moderationMessageFormatter = moderationMessageFormatter;
-        this.commandParserProvider = commandParserProvider;
-        this.proxySender = proxySender;
-    }
 
     @Override
     public void onEnable() {
@@ -120,6 +105,11 @@ public class MuteModule extends AbstractModuleCommand<Localization.Command.Mute>
         );
 
         sendForTarget(fPlayer, fTarget, mute);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_MUTE;
     }
 
     @Override

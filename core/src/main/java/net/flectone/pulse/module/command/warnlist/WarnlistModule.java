@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.warnlist;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class WarnlistModule extends AbstractModuleCommand<Localization.Command.Warnlist> {
 
     private final FileResolver fileResolver;
@@ -40,29 +42,6 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
     private final CommandParserProvider commandParserProvider;
     private final EventDispatcher eventDispatcher;
     private final SoundPlayer soundPlayer;
-
-    @Inject
-    public WarnlistModule(FileResolver fileResolver,
-                          FPlayerService fPlayerService,
-                          ModerationService moderationService,
-                          ModerationMessageFormatter moderationMessageFormatter,
-                          UnwarnModule unwarnModule,
-                          MessagePipeline messagePipeline,
-                          CommandParserProvider commandParserProvider,
-                          EventDispatcher eventDispatcher,
-                          SoundPlayer soundPlayer) {
-        super(MessageType.COMMAND_WARNLIST);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.moderationService = moderationService;
-        this.moderationMessageFormatter = moderationMessageFormatter;
-        this.unwarnModule = unwarnModule;
-        this.messagePipeline = messagePipeline;
-        this.eventDispatcher = eventDispatcher;
-        this.commandParserProvider = commandParserProvider;
-        this.soundPlayer = soundPlayer;
-    }
 
     @Override
     public void onEnable() {
@@ -184,6 +163,11 @@ public class WarnlistModule extends AbstractModuleCommand<Localization.Command.W
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_WARNLIST, fPlayer, component));
 
         soundPlayer.play(getModuleSound(), fPlayer);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_WARNLIST;
     }
 
     @Override

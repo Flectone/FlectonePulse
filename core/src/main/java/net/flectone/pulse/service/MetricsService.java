@@ -2,6 +2,7 @@ package net.flectone.pulse.service;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.dto.MetricsDTO;
@@ -14,6 +15,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import java.time.Instant;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MetricsService {
 
     private final TaskScheduler taskScheduler;
@@ -22,21 +24,6 @@ public class MetricsService {
     private final PacketProvider packetProvider;
     private final FileResolver fileResolver;
     private final ModuleController moduleController;
-
-    @Inject
-    public MetricsService(TaskScheduler taskScheduler,
-                          MetricsSender metricsSender,
-                          PlatformServerAdapter platformServerAdapter,
-                          PacketProvider packetProvider,
-                          FileResolver fileResolver,
-                          ModuleController moduleController) {
-        this.taskScheduler = taskScheduler;
-        this.metricsSender = metricsSender;
-        this.platformServerAdapter = platformServerAdapter;
-        this.packetProvider = packetProvider;
-        this.fileResolver = fileResolver;
-        this.moduleController = moduleController;
-    }
 
     public void reload() {
         taskScheduler.runAsyncTimer(this::send, 0L, 20L * 60 * 60);

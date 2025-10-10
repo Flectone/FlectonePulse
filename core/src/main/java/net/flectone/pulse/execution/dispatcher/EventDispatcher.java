@@ -2,6 +2,7 @@ package net.flectone.pulse.execution.dispatcher;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.event.Event;
 import net.flectone.pulse.platform.registry.ListenerRegistry;
 
@@ -10,14 +11,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class EventDispatcher {
 
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public EventDispatcher(ListenerRegistry listenerRegistry) {
-        this.listenerRegistry = listenerRegistry;
-    }
 
     public void dispatch(Event event) {
         EnumMap<Event.Priority, List<Consumer<Event>>> priorityMap = listenerRegistry.getPulseListeners().get(event.getClass());

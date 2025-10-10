@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.luckperms;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
@@ -16,16 +17,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class LuckPermsIntegration implements FIntegration {
 
     private final FLogger fLogger;
 
     private LuckPerms luckPerms;
-
-    @Inject
-    public LuckPermsIntegration(FLogger fLogger) {
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void hook() {

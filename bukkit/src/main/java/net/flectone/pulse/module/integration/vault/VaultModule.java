@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.vault;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -12,17 +13,11 @@ import java.util.Collections;
 import java.util.Set;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class VaultModule extends AbstractModule {
 
     private final FileResolver fileResolver;
     private final VaultIntegration vaultIntegration;
-
-    @Inject
-    public VaultModule(FileResolver fileResolver,
-                       VaultIntegration vaultIntegration) {
-        this.fileResolver = fileResolver;
-        this.vaultIntegration = vaultIntegration;
-    }
 
     @Override
     public void onEnable() {

@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.greeting;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -23,25 +24,13 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class GreetingModule extends AbstractModuleLocalization<Localization.Message.Greeting> {
 
     private final FileResolver fileResolver;
     private final SkinService skinService;
     private final FLogger fLogger;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public GreetingModule(FileResolver fileResolver,
-                          SkinService skinService,
-                          FLogger fLogger,
-                          ListenerRegistry listenerRegistry) {
-        super(MessageType.GREETING);
-
-        this.fileResolver = fileResolver;
-        this.skinService = skinService;
-        this.fLogger = fLogger;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -50,6 +39,11 @@ public class GreetingModule extends AbstractModuleLocalization<Localization.Mess
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(GreetingPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.GREETING;
     }
 
     @Override

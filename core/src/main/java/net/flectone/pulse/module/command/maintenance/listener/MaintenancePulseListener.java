@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.maintenance.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.listener.PulseListener;
@@ -12,20 +13,12 @@ import net.flectone.pulse.service.FPlayerService;
 import net.kyori.adventure.text.Component;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MaintenancePulseListener implements PulseListener {
 
     private final MaintenanceModule maintenanceModule;
     private final FPlayerService fPlayerService;
     private final MessagePipeline messagePipeline;
-
-    @Inject
-    public MaintenancePulseListener(MaintenanceModule maintenanceModule,
-                                    FPlayerService fPlayerService,
-                                    MessagePipeline messagePipeline) {
-        this.maintenanceModule = maintenanceModule;
-        this.fPlayerService = fPlayerService;
-        this.messagePipeline = messagePipeline;
-    }
 
     @Pulse
     public void onPlayerPreLoginEvent(PlayerPreLoginEvent event) {

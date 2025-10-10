@@ -15,6 +15,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSe
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -44,6 +45,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  * Responsible for rendering bubbles above players' heads
  */
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BubbleRenderer {
     
     private final Map<String, Deque<BubbleEntity>> activeBubbleEntities = new ConcurrentHashMap<>();
@@ -57,27 +59,6 @@ public class BubbleRenderer {
     private final IntegrationModule integrationModule;
     private final TaskScheduler taskScheduler;
     private final RandomUtil randomUtil;
-    
-    @Inject
-    public BubbleRenderer(FileResolver fileResolver,
-                          FPlayerService fPlayerService,
-                          PlatformPlayerAdapter platformPlayerAdapter,
-                          PacketSender packetSender,
-                          PacketProvider packetProvider,
-                          MessagePipeline messagePipeline,
-                          IntegrationModule integrationModule,
-                          TaskScheduler taskScheduler,
-                          RandomUtil randomUtil) {
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.packetSender = packetSender;
-        this.packetProvider = packetProvider;
-        this.messagePipeline = messagePipeline;
-        this.integrationModule = integrationModule;
-        this.taskScheduler = taskScheduler;
-        this.randomUtil = randomUtil;
-    }
 
     public void renderBubble(Bubble bubble) {
         FPlayer sender = bubble.getSender();

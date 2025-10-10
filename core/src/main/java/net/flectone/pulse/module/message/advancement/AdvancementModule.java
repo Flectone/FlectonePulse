@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.advancement;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -29,25 +30,13 @@ import org.apache.commons.lang3.StringUtils;
 import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.empty;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AdvancementModule extends AbstractModuleLocalization<Localization.Message.Advancement> {
 
     private final FileResolver fileResolver;
     private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public AdvancementModule(FileResolver fileResolver,
-                             IntegrationModule integrationModule,
-                             MessagePipeline messagePipeline,
-                             ListenerRegistry listenerRegistry) {
-        super(MessageType.ADVANCEMENT);
-
-        this.fileResolver = fileResolver;
-        this.integrationModule = integrationModule;
-        this.messagePipeline = messagePipeline;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -56,6 +45,11 @@ public class AdvancementModule extends AbstractModuleLocalization<Localization.M
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(AdvancementPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.ADVANCEMENT;
     }
 
     @Override

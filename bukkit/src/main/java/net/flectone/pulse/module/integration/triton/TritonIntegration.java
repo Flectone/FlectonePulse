@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import com.rexcantor64.triton.api.TritonAPI;
 import com.rexcantor64.triton.api.events.PlayerChangeLanguageSpigotEvent;
 import com.rexcantor64.triton.api.players.LanguagePlayer;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.service.FPlayerService;
@@ -15,17 +16,11 @@ import org.bukkit.event.Listener;
 import org.jetbrains.annotations.Nullable;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TritonIntegration implements Listener, FIntegration {
 
     private final FPlayerService fPlayerService;
     private final FLogger fLogger;
-
-    @Inject
-    public TritonIntegration(FPlayerService fPlayerService,
-                             FLogger fLogger) {
-        this.fPlayerService = fPlayerService;
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void hook() {

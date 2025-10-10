@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration.twitch.listener;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.localization.Localization;
@@ -18,14 +19,10 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ChannelMessageListener extends EventListener<ChannelMessageEvent> {
 
     private final FileResolver fileResolver;
-
-    @Inject
-    public ChannelMessageListener(FileResolver fileResolver) {
-        this.fileResolver = fileResolver;
-    }
 
     public Class<ChannelMessageEvent> getEventType() {
         return ChannelMessageEvent.class;

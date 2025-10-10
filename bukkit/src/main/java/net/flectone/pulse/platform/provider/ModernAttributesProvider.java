@@ -2,16 +2,14 @@ package net.flectone.pulse.platform.provider;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ModernAttributesProvider implements AttributesProvider {
-
-    @Inject
-    public ModernAttributesProvider() {
-    }
 
     @Override
     public double getArmorValue(Player player) {

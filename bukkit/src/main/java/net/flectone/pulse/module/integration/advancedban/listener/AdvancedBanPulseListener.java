@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.advancedban.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.listener.PulseListener;
@@ -22,6 +23,7 @@ import net.flectone.pulse.module.integration.advancedban.AdvancedBanModule;
 import java.util.Set;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AdvancedBanPulseListener implements PulseListener {
 
     private final Set<Class<? extends AbstractModule>> banModules = Set.of(BanModule.class, BanlistModule.class, UnbanModule.class);
@@ -30,11 +32,6 @@ public class AdvancedBanPulseListener implements PulseListener {
     private final Set<Class<? extends AbstractModule>> kickModules = Set.of(KickModule.class);
 
     private final AdvancedBanModule advancedBanModule;
-
-    @Inject
-    public AdvancedBanPulseListener(AdvancedBanModule advancedBanModule) {
-        this.advancedBanModule = advancedBanModule;
-    }
 
     @Pulse
     public void onModuleEnableEvent(ModuleEnableEvent event) {

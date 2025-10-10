@@ -3,6 +3,7 @@ package net.flectone.pulse.platform.sender;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.dto.MetricsDTO;
 
 import java.io.OutputStream;
@@ -13,22 +14,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPOutputStream;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MetricsSender {
 
-    private final String apiUrl = "https://flectone.net/api/pulse/metrics";
+    private static final String FLECTONEPULSE_API_URL = "https://flectone.net/api/pulse/metrics";
 
     private final Gson gson;
-
-    @Inject
-    public MetricsSender(Gson gson) {
-        this.gson = gson;
-    }
 
     public void sendMetrics(MetricsDTO metrics) {
         try {
             String jsonData = gson.toJson(metrics);
 
-            URL url = new URI(apiUrl).toURL();
+            URL url = new URI(FLECTONEPULSE_API_URL).toURL();
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Length", String.valueOf(jsonData.getBytes(StandardCharsets.UTF_8).length));

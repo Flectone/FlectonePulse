@@ -2,6 +2,7 @@ package net.flectone.pulse.platform.filter;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Range;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
@@ -10,17 +11,11 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import java.util.function.Predicate;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RangeFilter {
 
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PermissionChecker permissionChecker;
-
-    @Inject
-    public RangeFilter(PlatformPlayerAdapter platformPlayerAdapter,
-                       PermissionChecker permissionChecker) {
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.permissionChecker = permissionChecker;
-    }
 
     public Predicate<FPlayer> createFilter(FPlayer filterPlayer, Range range) {
         if (range.is(Range.Type.PLAYER)) {

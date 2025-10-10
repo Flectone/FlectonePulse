@@ -5,17 +5,14 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.command.maintenance.MaintenanceModule;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MaintenancePacketListener implements PacketListener {
 
     private final MaintenanceModule maintenanceModule;
-
-    @Inject
-    public MaintenancePacketListener(MaintenanceModule maintenanceModule) {
-        this.maintenanceModule = maintenanceModule;
-    }
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {

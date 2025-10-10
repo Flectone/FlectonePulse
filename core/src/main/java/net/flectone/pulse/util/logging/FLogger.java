@@ -119,6 +119,7 @@ public class FLogger extends Logger {
     public void warning(String exception, Throwable throwable) {
         LogRecord logRecord = new LogRecord(Level.WARNING, exception);
         logRecord.setThrown(throwable);
+        throwable.printStackTrace();
 
         log(logRecord);
     }

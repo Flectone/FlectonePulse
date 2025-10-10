@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.maintenance;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
@@ -10,20 +11,12 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.processing.resolver.FileResolver;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MaintenanceModule extends AbstractModule {
 
     private final FileResolver fileResolver;
     private final MaintenanceIntegration maintenanceIntegration;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public MaintenanceModule(FileResolver fileResolver,
-                             MaintenanceIntegration maintenanceIntegration,
-                             ListenerRegistry listenerRegistry) {
-        this.fileResolver = fileResolver;
-        this.maintenanceIntegration = maintenanceIntegration;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {

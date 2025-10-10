@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.dice;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -22,22 +23,12 @@ import java.util.Map;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice> {
 
     private final FileResolver fileResolver;
     private final CommandParserProvider commandParserProvider;
     private final RandomUtil randomUtil;
-
-    @Inject
-    public DiceModule(FileResolver fileResolver,
-                      CommandParserProvider commandParserProvider,
-                      RandomUtil randomUtil) {
-        super(MessageType.COMMAND_DICE);
-
-        this.fileResolver = fileResolver;
-        this.commandParserProvider = commandParserProvider;
-        this.randomUtil = randomUtil;
-    }
 
     @Override
     public void onEnable() {
@@ -78,6 +69,11 @@ public class DiceModule extends AbstractModuleCommand<Localization.Command.Dice>
                 .integration(string -> replaceResult(cubes, localization().getSymbols(), string))
                 .build()
         );
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_DICE;
     }
 
     @Override

@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.ban.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -19,6 +20,7 @@ import net.flectone.pulse.util.checker.PermissionChecker;
 import net.kyori.adventure.text.Component;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BanPulseListener implements PulseListener {
 
     private final BanModule banModule;
@@ -27,21 +29,6 @@ public class BanPulseListener implements PulseListener {
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final MessagePipeline messagePipeline;
     private final PermissionChecker permissionChecker;
-
-    @Inject
-    public BanPulseListener(BanModule banModule,
-                            ModerationService moderationService,
-                            FPlayerService fPlayerService,
-                            ModerationMessageFormatter moderationMessageFormatter,
-                            MessagePipeline messagePipeline,
-                            PermissionChecker permissionChecker) {
-        this.banModule = banModule;
-        this.moderationService = moderationService;
-        this.fPlayerService = fPlayerService;
-        this.moderationMessageFormatter = moderationMessageFormatter;
-        this.messagePipeline = messagePipeline;
-        this.permissionChecker = permissionChecker;
-    }
 
     @Pulse
     public void onPlayerPreLoginEvent(PlayerPreLoginEvent event) {

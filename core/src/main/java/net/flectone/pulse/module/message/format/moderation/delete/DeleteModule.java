@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.format.moderation.delete;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -30,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DeleteModule extends AbstractModuleLocalization<Localization.Message.Format.Moderation.Delete> {
 
     private final Map<UUID, List<HistoryMessage>> playersHistory = new ConcurrentHashMap<>();
@@ -42,21 +44,6 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
     private final MessageSender messageSender;
-
-    @Inject
-    public DeleteModule(FileResolver fileResolver,
-                        ListenerRegistry listenerRegistry,
-                        MessagePipeline messagePipeline,
-                        FPlayerService fPlayerService,
-                        MessageSender messageSender) {
-        super(MessageType.DELETE);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-        this.messagePipeline = messagePipeline;
-        this.fPlayerService = fPlayerService;
-        this.messageSender = messageSender;
-    }
 
     @Override
     public void onEnable() {
@@ -71,6 +58,11 @@ public class DeleteModule extends AbstractModuleLocalization<Localization.Messag
 
         playersHistory.clear();
         cachedComponents.clear();
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.DELETE;
     }
 
     @Override

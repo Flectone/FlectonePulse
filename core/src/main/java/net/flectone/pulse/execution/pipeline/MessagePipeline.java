@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -29,20 +30,12 @@ import java.util.Map;
 import java.util.UUID;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MessagePipeline {
 
     private final FLogger fLogger;
     private final MiniMessage miniMessage;
     private final EventDispatcher eventDispatcher;
-
-    @Inject
-    public MessagePipeline(FLogger fLogger,
-                           MiniMessage miniMessage,
-                           EventDispatcher eventDispatcher) {
-        this.fLogger = fLogger;
-        this.miniMessage = miniMessage;
-        this.eventDispatcher = eventDispatcher;
-    }
 
     public Builder builder(@NotNull String message) {
         return builder(FPlayer.UNKNOWN, message);

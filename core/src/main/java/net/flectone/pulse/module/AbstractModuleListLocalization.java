@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.util.RandomUtil;
-import net.flectone.pulse.util.constant.MessageType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -15,10 +14,6 @@ public abstract class AbstractModuleListLocalization<M extends Localization.Loca
     private final HashMap<Integer, Integer> messageIndexMap = new HashMap<>();
 
     @Inject private RandomUtil randomUtil;
-
-    protected AbstractModuleListLocalization(MessageType messageType) {
-        super(messageType);
-    }
 
     public abstract List<String> getAvailableMessages(FPlayer fPlayer);
 

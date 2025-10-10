@@ -2,6 +2,7 @@ package net.flectone.pulse.platform.sender;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
@@ -16,6 +17,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class CooldownSender {
 
     private final PermissionChecker permissionChecker;
@@ -23,19 +25,6 @@ public class CooldownSender {
     private final TimeFormatter timeFormatter;
     private final EventDispatcher eventDispatcher;
     private final FileResolver fileResolver;
-
-    @Inject
-    public CooldownSender(PermissionChecker permissionChecker,
-                          MessagePipeline messagePipeline,
-                          TimeFormatter timeFormatter,
-                          EventDispatcher eventDispatcher,
-                          FileResolver fileResolver) {
-        this.permissionChecker = permissionChecker;
-        this.messagePipeline = messagePipeline;
-        this.timeFormatter = timeFormatter;
-        this.eventDispatcher = eventDispatcher;
-        this.fileResolver = fileResolver;
-    }
 
     public boolean sendIfCooldown(FEntity entity, @Nullable Cooldown cooldown) {
         if (cooldown == null) return false;

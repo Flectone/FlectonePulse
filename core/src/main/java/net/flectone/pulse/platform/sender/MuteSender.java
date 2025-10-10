@@ -2,6 +2,7 @@ package net.flectone.pulse.platform.sender;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
@@ -13,23 +14,13 @@ import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MuteSender {
 
     private final MuteChecker muteChecker;
     private final MessagePipeline messagePipeline;
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final EventDispatcher eventDispatcher;
-
-    @Inject
-    public MuteSender(MuteChecker muteChecker,
-                      MessagePipeline messagePipeline,
-                      ModerationMessageFormatter moderationMessageFormatter,
-                      EventDispatcher eventDispatcher) {
-        this.muteChecker = muteChecker;
-        this.messagePipeline = messagePipeline;
-        this.moderationMessageFormatter = moderationMessageFormatter;
-        this.eventDispatcher = eventDispatcher;
-    }
 
     public boolean sendIfMuted(FEntity entity) {
         // skip message for entity

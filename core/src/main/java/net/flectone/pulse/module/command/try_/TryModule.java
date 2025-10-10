@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.try_;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -19,22 +20,12 @@ import org.incendo.cloud.context.CommandContext;
 import java.util.function.Function;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
 
     private final FileResolver fileResolver;
     private final RandomUtil randomUtil;
     private final CommandParserProvider commandParserProvider;
-
-    @Inject
-    public TryModule(FileResolver fileResolver,
-                     RandomUtil randomUtil,
-                     CommandParserProvider commandParserProvider) {
-        super(MessageType.COMMAND_TRY);
-
-        this.fileResolver = fileResolver;
-        this.randomUtil = randomUtil;
-        this.commandParserProvider = commandParserProvider;
-    }
 
     @Override
     public void onEnable() {
@@ -73,6 +64,11 @@ public class TryModule extends AbstractModuleCommand<Localization.Command.Try> {
                 .integration(string -> Strings.CS.replace(string, "<percent>", String.valueOf(random)))
                 .build()
         );
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_TRY;
     }
 
     @Override

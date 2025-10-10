@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.afk;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -15,22 +16,12 @@ import net.flectone.pulse.util.constant.SettingText;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AfkModule extends AbstractModuleCommand<Localization.Command> {
 
     private final FileResolver fileResolver;
     private final net.flectone.pulse.module.message.afk.AfkModule afkMessageModule;
     private final SoundPlayer soundPlayer;
-
-    @Inject
-    public AfkModule(FileResolver fileResolver,
-                     net.flectone.pulse.module.message.afk.AfkModule afkMessageModule,
-                     SoundPlayer soundPlayer) {
-        super(MessageType.COMMAND_AFK);
-
-        this.fileResolver = fileResolver;
-        this.afkMessageModule = afkMessageModule;
-        this.soundPlayer = soundPlayer;
-    }
 
     @Override
     public void onEnable() {
@@ -39,6 +30,11 @@ public class AfkModule extends AbstractModuleCommand<Localization.Command> {
         registerCommand(commandBuilder -> commandBuilder
                 .permission(permission().getName())
         );
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_AFK;
     }
 
     @Override

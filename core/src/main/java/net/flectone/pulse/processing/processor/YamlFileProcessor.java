@@ -1,8 +1,10 @@
 package net.flectone.pulse.processing.processor;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.YamlFile;
 import net.flectone.pulse.config.localization.EnglishLocale;
 import net.flectone.pulse.config.localization.Localization;
@@ -10,16 +12,8 @@ import net.flectone.pulse.config.localization.RussianLocale;
 import net.flectone.pulse.exception.YamlReadException;
 import net.flectone.pulse.exception.YamlWriteException;
 import org.apache.commons.lang3.Strings;
-import org.snakeyaml.engine.v2.api.LoadSettings;
-import tools.jackson.core.JsonParser;
-import tools.jackson.core.JsonToken;
-import tools.jackson.databind.*;
-import tools.jackson.databind.cfg.EnumFeature;
+import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.exc.MismatchedInputException;
-import tools.jackson.databind.module.SimpleModule;
-import tools.jackson.dataformat.yaml.YAMLFactory;
-import tools.jackson.dataformat.yaml.YAMLMapper;
-import tools.jackson.dataformat.yaml.YAMLWriteFeature;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,59 +24,8 @@ import java.nio.file.Path;
 import java.util.*;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class YamlFileProcessor {
-
-    private final ObjectMapper mapper = YAMLMapper.builder(
-                    YAMLFactory.builder()
-                            .loadSettings(LoadSettings.builder()
-                                    .setBufferSize(4096) // increase string limit
-                                    .setAllowDuplicateKeys(true) // fix duplicate keys
-                                    .build()
-                            )
-                            .build()
-            )
-            // mapper
-            .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY) // disable auto sorting
-            .disable(MapperFeature.DETECT_PARAMETER_NAMES) // [databind#5314]
-            .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS) // fix enum names
-            // deserialization
-            .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES) // jackson 2.x value
-            .disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS) // jackson 2.x value
-            .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
-            // serialization
-            .enable(SerializationFeature.INDENT_OUTPUT) // indent output for values
-            .disable(YAMLWriteFeature.SPLIT_LINES) // fix split long values
-            .disable(YAMLWriteFeature.WRITE_DOC_START_MARKER) // fix header
-            .disable(YAMLWriteFeature.USE_NATIVE_TYPE_ID) // fix type id like !!java.util.Hashmap
-            .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
-            // enum
-            .disable(EnumFeature.READ_ENUMS_USING_TO_STRING) // jackson 2.x value
-            .disable(EnumFeature.WRITE_ENUMS_USING_TO_STRING) // jackson 2.x value
-            // fix nulls
-            .changeDefaultPropertyInclusion(config -> JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL)) // show only non-null values
-            .changeDefaultNullHandling(config -> JsonSetter.Value.forValueNulls(Nulls.SKIP)) // skip null values deserialization
-            .withConfigOverride(String.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null string
-            .withConfigOverride(Collection.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null collection
-            .withConfigOverride(List.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null list
-            .withConfigOverride(Set.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null set
-            .withConfigOverride(Map.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null map
-            .defaultMergeable(true)
-            .addModule(new SimpleModule().addDeserializer(String.class, new ValueDeserializer<>() {
-                // fix null values like "key: null"
-                // idk, why withConfigOverride(String.class, ...) doesn't fix it
-
-                @Override
-                public String deserialize(JsonParser p, DeserializationContext ctxt) {
-                    return p.currentToken() == JsonToken.VALUE_NULL ? "" : p.getString();
-                }
-
-                @Override
-                public String getNullValue(DeserializationContext ctxt) {
-                    return "";
-                }
-
-            }))
-            .build();
 
     private final String header =
             """
@@ -98,15 +41,9 @@ public class YamlFileProcessor {
             #
             """;
 
+    private final ObjectMapper mapper;
     private final EnglishLocale englishLocale;
     private final RussianLocale russianLocale;
-
-    @Inject
-    public YamlFileProcessor(EnglishLocale englishLocale,
-                             RussianLocale russianLocale) {
-        this.englishLocale = englishLocale;
-        this.russianLocale = russianLocale;
-    }
 
     public <T extends YamlFile> void reload(T yamlFile) throws IOException {
         if (yamlFile instanceof Localization localization) {

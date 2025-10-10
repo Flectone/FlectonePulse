@@ -3,6 +3,7 @@ package net.flectone.pulse.module.integration.telegram.listener;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.localization.Localization;
@@ -22,17 +23,11 @@ import org.telegram.telegrambots.meta.api.objects.message.Message;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MessageListener extends EventListener {
 
     private final FileResolver fileResolver;
     private final Provider<TelegramIntegration> telegramIntegration;
-
-    @Inject
-    public MessageListener(FileResolver fileResolver,
-                           Provider<TelegramIntegration> telegramIntegration) {
-        this.fileResolver = fileResolver;
-        this.telegramIntegration = telegramIntegration;
-    }
 
     @Override
     public void onEnable() {}

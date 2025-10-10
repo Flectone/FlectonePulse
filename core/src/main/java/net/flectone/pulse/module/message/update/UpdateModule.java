@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -26,6 +27,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class UpdateModule extends AbstractModuleLocalization<Localization.Message.Update> {
 
     private final FileResolver fileResolver;
@@ -33,17 +35,6 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
     private final Gson gson;
 
     private String latestVersion;
-
-    @Inject
-    public UpdateModule(FileResolver fileResolver,
-                        ListenerRegistry listenerRegistry,
-                        Gson gson) {
-        super(MessageType.UPDATE);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-        this.gson = gson;
-    }
 
     @Override
     public void onEnable() {
@@ -54,6 +45,11 @@ public class UpdateModule extends AbstractModuleLocalization<Localization.Messag
         listenerRegistry.register(UpdatePulseListener.class);
 
         checkAndUpdateLatestVersion();
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.UPDATE;
     }
 
     @Override

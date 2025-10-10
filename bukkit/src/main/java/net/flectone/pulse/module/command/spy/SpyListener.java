@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.spy;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
@@ -11,14 +12,10 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerEditBookEvent;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SpyListener implements Listener {
 
     private final BukkitSpyModule spyModule;
-
-    @Inject
-    public SpyListener(BukkitSpyModule spyModule) {
-        this.spyModule = spyModule;
-    }
 
     @EventHandler
     public void playerCommandPreprocessEvent(PlayerCommandPreprocessEvent event) {

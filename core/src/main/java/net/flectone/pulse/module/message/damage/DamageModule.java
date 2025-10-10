@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.damage;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -20,19 +21,11 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.Strings;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DamageModule extends AbstractModuleLocalization<Localization.Message.Damage> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public DamageModule(FileResolver fileResolver,
-                        ListenerRegistry listenerRegistry) {
-        super(MessageType.DAMAGE);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -41,6 +34,11 @@ public class DamageModule extends AbstractModuleLocalization<Localization.Messag
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(DamagePulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.DAMAGE;
     }
 
     @Override

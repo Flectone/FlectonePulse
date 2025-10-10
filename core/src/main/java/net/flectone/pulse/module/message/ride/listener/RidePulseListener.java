@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.ride.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
@@ -13,17 +14,11 @@ import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RidePulseListener implements PulseListener {
 
     private final RideModule rideModule;
     private final RideExtractor rideExtractor;
-
-    @Inject
-    public RidePulseListener(RideModule rideModule,
-                             RideExtractor rideExtractor) {
-        this.rideModule = rideModule;
-        this.rideExtractor = rideExtractor;
-    }
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {

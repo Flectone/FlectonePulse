@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.mail.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.listener.PulseListener;
@@ -15,17 +16,11 @@ import net.flectone.pulse.service.FPlayerService;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MailPulseListener implements PulseListener {
 
     private final MailModule mailModule;
     private final FPlayerService fPlayerService;
-
-    @Inject
-    public MailPulseListener(MailModule mailModule,
-                             FPlayerService fPlayerService) {
-        this.mailModule = mailModule;
-        this.fPlayerService = fPlayerService;
-    }
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {

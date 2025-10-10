@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.format.scoreboard;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -28,6 +29,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ScoreboardModule extends AbstractModule {
 
     private final Map<UUID, Team> uuidTeamMap = new ConcurrentHashMap<>();
@@ -38,21 +40,6 @@ public class ScoreboardModule extends AbstractModule {
     private final MessagePipeline messagePipeline;
     private final PacketSender packetSender;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public ScoreboardModule(FileResolver fileResolver,
-                            FPlayerService fPlayerService,
-                            TaskScheduler taskScheduler,
-                            MessagePipeline messagePipeline,
-                            PacketSender packetSender,
-                            ListenerRegistry listenerRegistry) {
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.taskScheduler = taskScheduler;
-        this.messagePipeline = messagePipeline;
-        this.packetSender = packetSender;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {

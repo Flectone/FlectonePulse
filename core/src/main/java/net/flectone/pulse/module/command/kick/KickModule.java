@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.kick;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class KickModule extends AbstractModuleCommand<Localization.Command.Kick> {
 
     private final FileResolver fileResolver;
@@ -31,23 +33,6 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
     private final ModerationMessageFormatter moderationMessageFormatter;
     private final CommandParserProvider commandParserProvider;
     private final MessagePipeline messagePipeline;
-
-    @Inject
-    public KickModule(FileResolver fileResolver,
-                      FPlayerService fPlayerService,
-                      ModerationService moderationService,
-                      ModerationMessageFormatter moderationMessageFormatter,
-                      CommandParserProvider commandParserProvider,
-                      MessagePipeline messagePipeline) {
-        super(MessageType.COMMAND_KICK);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.moderationService = moderationService;
-        this.moderationMessageFormatter = moderationMessageFormatter;
-        this.commandParserProvider = commandParserProvider;
-        this.messagePipeline = messagePipeline;
-    }
 
     @Override
     public void onEnable() {
@@ -99,6 +84,11 @@ public class KickModule extends AbstractModuleCommand<Localization.Command.Kick>
                 .build()
         );
 
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_KICK;
     }
 
     @Override

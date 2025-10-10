@@ -3,6 +3,7 @@ package net.flectone.pulse.util.creator;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.config.YamlFile;
@@ -20,28 +21,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BackupCreator {
 
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
+    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
 
     private final SystemVariableResolver systemVariableResolver;
-    private final Path projectPath;
-    private final Path backupPath;
+    private final @Named("projectPath") Path projectPath;
+    private final @Named("backupPath") Path backupPath;
     private final FLogger fLogger;
 
     @Setter
     @Nullable
     private String preInitVersion;
-
-    @Inject
-    public BackupCreator(SystemVariableResolver systemVariableResolver,
-                         @Named("projectPath") Path projectPath,
-                         FLogger fLogger) {
-        this.systemVariableResolver = systemVariableResolver;
-        this.projectPath = projectPath;
-        this.backupPath = projectPath.resolve("backups");
-        this.fLogger = fLogger;
-    }
 
     public <T extends YamlFile> void backup(T yamlFile) {
         if (preInitVersion == null) {
@@ -69,7 +61,7 @@ public class BackupCreator {
             }
             case MYSQL, MARIADB, POSTGRESQL -> {
                 try {
-                    String backupFileName = databaseName + "_" + simpleDateFormat.format(new Date()) + ".sql";
+                    String backupFileName = databaseName + "_" + SIMPLE_DATE_FORMAT.format(new Date()) + ".sql";
                     Path backupPath = resolveBackupPath(backupFileName);
 
                     String host = systemVariableResolver.substituteEnvVars(database.getHost());
@@ -145,7 +137,7 @@ public class BackupCreator {
     }
 
     private void backup(String fileName, Path pathToFile) {
-        String newFileName = fileName + "_" + simpleDateFormat.format(new Date());
+        String newFileName = fileName + "_" + SIMPLE_DATE_FORMAT.format(new Date());
         Path backupFilePath = resolveBackupPath(newFileName);
 
         try {

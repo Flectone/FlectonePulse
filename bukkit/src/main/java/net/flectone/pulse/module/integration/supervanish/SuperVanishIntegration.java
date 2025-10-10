@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import de.myzelyam.api.vanish.PlayerHideEvent;
 import de.myzelyam.api.vanish.PlayerShowEvent;
 import de.myzelyam.api.vanish.VanishAPI;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.FIntegration;
@@ -16,23 +17,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SuperVanishIntegration implements Listener, FIntegration {
 
     private final FPlayerService fPlayerService;
     private final QuitModule quitModule;
     private final JoinModule joinModule;
     private final FLogger fLogger;
-
-    @Inject
-    public SuperVanishIntegration(FPlayerService fPlayerService,
-                                  QuitModule quitModule,
-                                  JoinModule joinModule,
-                                  FLogger fLogger) {
-        this.fPlayerService = fPlayerService;
-        this.quitModule = quitModule;
-        this.joinModule = joinModule;
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void hook() {

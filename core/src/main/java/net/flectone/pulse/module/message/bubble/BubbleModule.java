@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.bubble;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -17,20 +18,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BubbleModule extends AbstractModule {
 
     private final FileResolver fileResolver;
     private final BubbleService bubbleService;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public BubbleModule(FileResolver fileResolver,
-                        BubbleService bubbleService,
-                        ListenerRegistry listenerRegistry) {
-        this.fileResolver = fileResolver;
-        this.bubbleService = bubbleService;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {

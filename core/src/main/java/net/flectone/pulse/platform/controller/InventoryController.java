@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -20,19 +21,13 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class InventoryController {
 
     private final Map<UUID, Inventory> inventoryMap = new ConcurrentHashMap<>();
 
     private final PacketSender packetSender;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-
-    @Inject
-    public InventoryController(PacketSender packetSender,
-                               PlatformPlayerAdapter platformPlayerAdapter) {
-        this.packetSender = packetSender;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-    }
 
     public Inventory get(UUID uuid) {
         return inventoryMap.get(uuid);

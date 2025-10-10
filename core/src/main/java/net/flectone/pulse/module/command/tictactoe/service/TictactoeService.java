@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.tictactoe.service;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
 import net.flectone.pulse.util.RandomUtil;
@@ -10,16 +11,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TictactoeService {
 
     private final Map<Integer, TicTacToe> ticTacToeMap = new HashMap<>();
 
     private final RandomUtil randomUtil;
-
-    @Inject
-    public TictactoeService(RandomUtil randomUtil) {
-        this.randomUtil = randomUtil;
-    }
 
     public TicTacToe create(int id, FPlayer fPlayer, FPlayer fReceiver, boolean hard) {
         TicTacToe ticTacToe = new TicTacToe(id, fPlayer.getId(), fReceiver.getId(), hard);

@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.FlectonePulse;
 import net.flectone.pulse.config.Command;
@@ -33,9 +34,10 @@ import java.time.Instant;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FlectonepulseModule extends AbstractModuleCommand<Localization.Command.Flectonepulse> {
 
-    private final String sparkClass = "net.flectone.pulse.library.spark.Service";
+    private static final String SPARK_CLASS = "net.flectone.pulse.library.spark.Service";
 
     private final FileResolver fileResolver;
     private final FlectonePulse flectonePulse;
@@ -44,25 +46,6 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     private final FLogger fLogger;
     private final ReflectionResolver reflectionResolver;
     private final Injector injector;
-
-    @Inject
-    public FlectonepulseModule(FileResolver fileResolver,
-                               CommandParserProvider commandParserProvider,
-                               TimeFormatter timeFormatter,
-                               FlectonePulse flectonePulse,
-                               FLogger fLogger,
-                               ReflectionResolver reflectionResolver,
-                               Injector injector) {
-        super(MessageType.COMMAND_FLECTONEPULSE);
-
-        this.fileResolver = fileResolver;
-        this.flectonePulse = flectonePulse;
-        this.commandParserProvider = commandParserProvider;
-        this.timeFormatter = timeFormatter;
-        this.fLogger = fLogger;
-        this.reflectionResolver = reflectionResolver;
-        this.injector = injector;
-    }
 
     @Override
     public void onEnable() {
@@ -74,7 +57,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
                 .required(promptType, commandParserProvider.singleMessageParser(), typeSuggestion())
         );
 
-        if (reflectionResolver.hasClass(sparkClass)) {
+        if (reflectionResolver.hasClass(SPARK_CLASS)) {
             enableSpark();
         }
     }
@@ -83,7 +66,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
     public void onDisable() {
         super.onDisable();
 
-        if (reflectionResolver.hasClass(sparkClass)) {
+        if (reflectionResolver.hasClass(SPARK_CLASS)) {
             injector.getInstance(SparkServer.class).onDisable();
         }
     }
@@ -114,7 +97,7 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
             UrlService urlService = injector.getInstance(UrlService.class);
             String url = urlService.generateUrl();
 
-            reflectionResolver.hasClassOrElse(sparkClass, this::loadSparkLibrary);
+            reflectionResolver.hasClassOrElse(SPARK_CLASS, this::loadSparkLibrary);
 
             enableSpark();
 
@@ -158,6 +141,11 @@ public class FlectonepulseModule extends AbstractModuleCommand<Localization.Comm
             );
 
         }
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_FLECTONEPULSE;
     }
 
     @Override

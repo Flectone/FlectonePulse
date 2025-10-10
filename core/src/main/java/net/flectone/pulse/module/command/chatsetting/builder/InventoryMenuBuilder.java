@@ -1,9 +1,10 @@
 package net.flectone.pulse.module.command.chatsetting.builder;
 
-import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -15,7 +16,6 @@ import net.flectone.pulse.module.command.chatsetting.handler.ChatsettingHandler;
 import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.InventoryController;
-import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class InventoryMenuBuilder implements MenuBuilder {
 
     private final ChatsettingModule chatsettingModule;
@@ -34,22 +35,7 @@ public class InventoryMenuBuilder implements MenuBuilder {
     private final MessagePipeline messagePipeline;
     private final InventoryController inventoryController;
     private final ChatsettingHandler chatsettingHandler;
-    private final boolean isNewerThanOrEqualsV_1_14;
-
-    @Inject
-    public InventoryMenuBuilder(ChatsettingModule chatsettingModule,
-                                PlatformServerAdapter platformServerAdapter,
-                                MessagePipeline messagePipeline,
-                                InventoryController inventoryController,
-                                ChatsettingHandler chatsettingHandler,
-                                PacketProvider packetProvider) {
-        this.chatsettingModule = chatsettingModule;
-        this.platformServerAdapter = platformServerAdapter;
-        this.messagePipeline = messagePipeline;
-        this.inventoryController = inventoryController;
-        this.chatsettingHandler = chatsettingHandler;
-        this.isNewerThanOrEqualsV_1_14 = packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_14);
-    }
+    private final @Named("isNewerThanOrEqualsV_1_14") boolean isNewerThanOrEqualsV_1_14;
 
     @Override
     public void open(FPlayer fPlayer, FPlayer fTarget) {

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.listener.PulseListener;
@@ -16,17 +17,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ItemsAdderIntegration implements FIntegration, PulseListener {
 
     private final FLogger fLogger;
 
     @Getter
     private boolean hooked;
-
-    @Inject
-    public ItemsAdderIntegration(FLogger fLogger) {
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void hook() {

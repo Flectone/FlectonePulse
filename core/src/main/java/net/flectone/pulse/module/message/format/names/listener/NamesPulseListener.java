@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.format.names.listener;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FEntity;
@@ -14,17 +15,11 @@ import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.constant.MessageFlag;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class NamesPulseListener implements PulseListener {
 
     private final NamesModule namesModule;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-
-    @Inject
-    public NamesPulseListener(NamesModule namesModule,
-                              PlatformPlayerAdapter platformPlayerAdapter) {
-        this.namesModule = namesModule;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-    }
 
     @Pulse(priority = Event.Priority.HIGH)
     public void onMessageFormattingEvent(MessageFormattingEvent event) {

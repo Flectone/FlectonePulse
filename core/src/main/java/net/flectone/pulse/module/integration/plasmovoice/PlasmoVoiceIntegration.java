@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.plasmovoice;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -25,6 +26,7 @@ import java.util.UUID;
 
 @Singleton
 @Addon(id = "flectonepulse", scope = AddonLoaderScope.SERVER, version = BuildConfig.PROJECT_VERSION, authors = BuildConfig.PROJECT_AUTHOR)
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
 
     private final FPlayerService fPlayerService;
@@ -35,21 +37,6 @@ public class PlasmoVoiceIntegration implements FIntegration, AddonInitializer {
     private final FLogger fLogger;
 
     private boolean enable;
-
-    @Inject
-    public PlasmoVoiceIntegration(FPlayerService fPlayerService,
-                                  ModerationMessageFormatter moderationMessageFormatter,
-                                  MuteChecker muteChecker,
-                                  MessageSender messageSender,
-                                  MessagePipeline messagePipeline,
-                                  FLogger fLogger) {
-        this.fPlayerService = fPlayerService;
-        this.moderationMessageFormatter = moderationMessageFormatter;
-        this.muteChecker = muteChecker;
-        this.messageSender = messageSender;
-        this.messagePipeline = messagePipeline;
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void hook() {

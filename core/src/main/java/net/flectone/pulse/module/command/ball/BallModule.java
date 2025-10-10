@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.ball;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -21,22 +22,12 @@ import java.util.List;
 import java.util.function.Function;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BallModule extends AbstractModuleCommand<Localization.Command.Ball> {
 
     private final FileResolver fileResolver;
     private final RandomUtil randomUtil;
     private final CommandParserProvider commandParserProvider;
-
-    @Inject
-    public BallModule(FileResolver fileResolver,
-                      RandomUtil randomUtil,
-                      CommandParserProvider commandParserProvider) {
-        super(MessageType.COMMAND_BALL);
-
-        this.fileResolver = fileResolver;
-        this.randomUtil = randomUtil;
-        this.commandParserProvider = commandParserProvider;
-    }
 
     @Override
     public void onEnable() {
@@ -79,6 +70,11 @@ public class BallModule extends AbstractModuleCommand<Localization.Command.Ball>
                 })
                 .build()
         );
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_BALL;
     }
 
     @Override

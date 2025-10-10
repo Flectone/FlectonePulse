@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.worldborder;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -19,19 +20,11 @@ import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import org.apache.commons.lang3.StringUtils;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class WorldborderModule extends AbstractModuleLocalization<Localization.Message.Worldborder> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public WorldborderModule(FileResolver fileResolver,
-                             ListenerRegistry listenerRegistry) {
-        super(MessageType.WORLDBORDER);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -40,6 +33,11 @@ public class WorldborderModule extends AbstractModuleLocalization<Localization.M
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(WorldborderPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.WORLDBORDER;
     }
 
     @Override

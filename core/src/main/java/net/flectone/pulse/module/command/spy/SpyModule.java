@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.spy;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -23,22 +24,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
 
     private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
-
-    @Inject
-    public SpyModule(FileResolver fileResolver,
-                     FPlayerService fPlayerService,
-                     PermissionChecker permissionChecker) {
-        super(MessageType.COMMAND_SPY);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.permissionChecker = permissionChecker;
-    }
 
     @Override
     public void onEnable() {
@@ -71,6 +62,11 @@ public class SpyModule extends AbstractModuleCommand<Localization.Command.Spy> {
                 .sound(getModuleSound())
                 .build()
         );
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_SPY;
     }
 
     @Override

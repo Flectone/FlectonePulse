@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.telegram;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.integration.FIntegration;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.function.UnaryOperator;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TelegramIntegration implements FIntegration {
 
     private final FileResolver fileResolver;
@@ -28,17 +30,6 @@ public class TelegramIntegration implements FIntegration {
 
     private TelegramBotsLongPollingApplication botsApplication;
     private OkHttpTelegramClient telegramClient;
-
-    @Inject
-    public TelegramIntegration(FileResolver fileResolver,
-                               SystemVariableResolver systemVariableResolver,
-                               FLogger fLogger,
-                               MessageListener messageListener) {
-        this.fileResolver = fileResolver;
-        this.systemVariableResolver = systemVariableResolver;
-        this.fLogger = fLogger;
-        this.messageListener = messageListener;
-    }
 
     @Override
     public void hook() {

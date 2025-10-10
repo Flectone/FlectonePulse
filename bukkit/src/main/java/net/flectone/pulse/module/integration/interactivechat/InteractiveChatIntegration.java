@@ -7,6 +7,7 @@ import com.loohp.interactivechat.api.InteractiveChatAPI;
 import com.loohp.interactivechat.data.PlayerDataManager;
 import com.loohp.interactivechat.listeners.ChatEvents;
 import com.loohp.interactivechat.registry.Registry;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.processing.context.MessageContext;
@@ -27,14 +28,10 @@ import java.util.UUID;
 // but users really like it, so...
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class InteractiveChatIntegration implements FIntegration, PulseListener {
 
     private final FLogger fLogger;
-
-    @Inject
-    public InteractiveChatIntegration(FLogger fLogger) {
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void hook() {

@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.save;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -17,19 +18,11 @@ import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SaveModule extends AbstractModuleLocalization<Localization.Message.Save> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public SaveModule(FileResolver fileResolver,
-                      ListenerRegistry listenerRegistry) {
-        super(MessageType.SAVE);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -38,6 +31,11 @@ public class SaveModule extends AbstractModuleLocalization<Localization.Message.
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(SavePulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.SAVE;
     }
 
     @Override

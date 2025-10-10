@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.spawn.extractor;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.message.spawn.model.Spawn;
 import net.flectone.pulse.platform.provider.PacketProvider;
@@ -13,14 +14,10 @@ import net.kyori.adventure.text.TranslatableComponent;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SpawnExtractor extends Extractor {
 
     private final PacketProvider packetProvider;
-
-    @Inject
-    public SpawnExtractor(PacketProvider packetProvider) {
-        this.packetProvider = packetProvider;
-    }
 
     public Optional<Spawn> extract(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
         // Set %s's spawn point to (%d, %d, %d)

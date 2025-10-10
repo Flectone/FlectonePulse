@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.ride;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -19,19 +20,11 @@ import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RideModule extends AbstractModuleLocalization<Localization.Message.Ride> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public RideModule(FileResolver fileResolver,
-                      ListenerRegistry listenerRegistry) {
-        super(MessageType.RIDE);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -40,6 +33,11 @@ public class RideModule extends AbstractModuleLocalization<Localization.Message.
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(RidePulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.RIDE;
     }
 
     @Override

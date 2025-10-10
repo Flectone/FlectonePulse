@@ -5,6 +5,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -33,6 +34,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SwearModule extends AbstractModuleLocalization<Localization.Message.Format.Moderation.Swear> {
 
     private final Cache<String, String> messageCache = CacheBuilder.newBuilder()
@@ -47,21 +49,6 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
     private final MessagePipeline messagePipeline;
 
     @Getter private Pattern combinedPattern;
-
-    @Inject
-    public SwearModule(FileResolver fileResolver,
-                       FLogger fLogger,
-                       ListenerRegistry listenerRegistry,
-                       PermissionChecker permissionChecker,
-                       MessagePipeline messagePipeline) {
-        super(MessageType.SWEAR);
-
-        this.fileResolver = fileResolver;
-        this.fLogger = fLogger;
-        this.listenerRegistry = listenerRegistry;
-        this.permissionChecker = permissionChecker;
-        this.messagePipeline = messagePipeline;
-    }
 
     @Override
     public void onEnable() {
@@ -87,6 +74,11 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
     }
 
     @Override
+    public MessageType messageType() {
+        return MessageType.SWEAR;
+    }
+
+    @Override
     public Message.Format.Moderation.Swear config() {
         return fileResolver.getMessage().getFormat().getModeration().getSwear();
     }
@@ -95,6 +87,8 @@ public class SwearModule extends AbstractModuleLocalization<Localization.Message
     public Permission.Message.Format.Moderation.Swear permission() {
         return fileResolver.getPermission().getMessage().getFormat().getModeration().getSwear();
     }
+
+
 
     @Override
     public Localization.Message.Format.Moderation.Swear localization(FEntity sender) {

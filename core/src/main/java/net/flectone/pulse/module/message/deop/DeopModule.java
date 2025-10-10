@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.deop;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -18,19 +19,11 @@ import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DeopModule extends AbstractModuleLocalization<Localization.Message.Deop> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public DeopModule(FileResolver fileResolver,
-                      ListenerRegistry listenerRegistry) {
-        super(MessageType.DEOP);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -39,6 +32,11 @@ public class DeopModule extends AbstractModuleLocalization<Localization.Message.
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(DeopPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.DEOP;
     }
 
     @Override

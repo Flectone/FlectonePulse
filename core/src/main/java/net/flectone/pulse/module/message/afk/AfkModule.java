@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.afk;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -34,6 +35,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AfkModule extends AbstractModuleLocalization<Localization.Message.Afk> {
 
     private final Map<UUID, Pair<Integer, PlatformPlayerAdapter.Coordinates>> playersCoordinates = new HashMap<>();
@@ -44,23 +46,6 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
     private final IntegrationModule integrationModule;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public AfkModule(FileResolver fileResolver,
-                     FPlayerService fPlayerService,
-                     TaskScheduler taskScheduler,
-                     IntegrationModule integrationModule,
-                     PlatformPlayerAdapter platformPlayerAdapter,
-                     ListenerRegistry listenerRegistry) {
-        super(MessageType.AFK);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.taskScheduler = taskScheduler;
-        this.integrationModule = integrationModule;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -78,6 +63,11 @@ public class AfkModule extends AbstractModuleLocalization<Localization.Message.A
         super.onDisable();
 
         playersCoordinates.clear();
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.AFK;
     }
 
     @Override

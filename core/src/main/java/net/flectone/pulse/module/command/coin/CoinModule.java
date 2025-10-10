@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.coin;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -18,19 +19,11 @@ import org.incendo.cloud.context.CommandContext;
 import java.util.function.Function;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin> {
 
     private final FileResolver fileResolver;
     private final RandomUtil randomUtil;
-
-    @Inject
-    public CoinModule(FileResolver fileResolver,
-                      RandomUtil randomUtil) {
-        super(MessageType.COMMAND_COIN);
-
-        this.fileResolver = fileResolver;
-        this.randomUtil = randomUtil;
-    }
 
     @Override
     public void onEnable() {
@@ -62,6 +55,11 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
                 ))
                 .build()
         );
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_COIN;
     }
 
     @Override

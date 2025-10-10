@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.worldborder.extractor;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.message.worldborder.model.Worldborder;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.extractor.Extractor;
@@ -12,14 +13,10 @@ import net.kyori.adventure.text.TranslatableComponent;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class WorldborderExtractor extends Extractor {
 
     private final PacketProvider packetProvider;
-
-    @Inject
-    public WorldborderExtractor(PacketProvider packetProvider) {
-        this.packetProvider = packetProvider;
-    }
 
     // Set the world border damage to %s per block each second
     // Set the world border damage buffer to %s block(s)

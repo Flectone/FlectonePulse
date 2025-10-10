@@ -1,7 +1,9 @@
 package net.flectone.pulse.util.interceptor;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.execution.scheduler.SchedulerRunnable;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
@@ -13,11 +15,12 @@ import org.aopalliance.intercept.MethodInvocation;
 import java.lang.reflect.Method;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AsyncInterceptor implements MethodInterceptor {
 
-    @Inject private TaskScheduler taskScheduler;
-    @Inject private PlatformServerAdapter platformServerAdapter;
-    @Inject private FLogger fLogger;
+    private final Provider<TaskScheduler> taskScheduler;
+    private final Provider<PlatformServerAdapter> platformServerAdapter;
+    private final FLogger fLogger;
 
     @Override
     public Object invoke(final MethodInvocation invocation) throws Throwable {
@@ -33,9 +36,9 @@ public class AsyncInterceptor implements MethodInterceptor {
         SchedulerRunnable task = () -> proceedSafely(invocation);
 
         if (delay > 0) {
-            taskScheduler.runAsyncLater(task, delay);
-        } else if (independent || platformServerAdapter.isPrimaryThread() || isRestrictedAsyncThread()) {
-            taskScheduler.runAsync(task);
+            taskScheduler.get().runAsyncLater(task, delay);
+        } else if (independent || platformServerAdapter.get().isPrimaryThread() || isRestrictedAsyncThread()) {
+            taskScheduler.get().runAsync(task);
         } else {
             // already async
             task.run();

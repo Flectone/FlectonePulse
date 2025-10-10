@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.unmute;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unmute> {
 
     private final FileResolver fileResolver;
@@ -31,21 +33,6 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
     private final ModerationService moderationService;
     private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
-
-    @Inject
-    public UnmuteModule(FileResolver fileResolver,
-                        FPlayerService fPlayerService,
-                        ModerationService moderationService,
-                        CommandParserProvider commandParserProvider,
-                        ProxySender proxySender) {
-        super(MessageType.COMMAND_UNMUTE);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.moderationService = moderationService;
-        this.commandParserProvider = commandParserProvider;
-        this.proxySender = proxySender;
-    }
 
     @Override
     public void onEnable() {
@@ -71,6 +58,11 @@ public class UnmuteModule extends AbstractModuleCommand<Localization.Command.Unm
         int id = optionalId.orElse(-1);
 
         unmute(fPlayer, target, id);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_UNMUTE;
     }
 
     @Override

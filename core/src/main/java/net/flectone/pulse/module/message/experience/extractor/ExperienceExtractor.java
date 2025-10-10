@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.experience.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.message.experience.model.Experience;
 import net.flectone.pulse.processing.extractor.Extractor;
@@ -11,11 +12,8 @@ import net.kyori.adventure.text.TranslatableComponent;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ExperienceExtractor extends Extractor {
-
-    @Inject
-    public ExperienceExtractor() {
-    }
 
     public Optional<Experience> extract(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
         return switch (translationKey) {

@@ -15,6 +15,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCh
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
@@ -32,6 +33,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BasePacketListener implements PacketListener {
 
     private final FPlayerService fPlayerService;
@@ -40,21 +42,6 @@ public class BasePacketListener implements PacketListener {
     private final PacketSender packetSender;
     private final PlayerPreLoginProcessor playerPreLoginProcessor;
     private final FLogger fLogger;
-
-    @Inject
-    public BasePacketListener(FPlayerService fPlayerService,
-                              EventDispatcher eventDispatcher,
-                              PacketProvider packetProvider,
-                              PacketSender packetSender,
-                              PlayerPreLoginProcessor playerPreLoginProcessor,
-                              FLogger fLogger) {
-        this.fPlayerService = fPlayerService;
-        this.eventDispatcher = eventDispatcher;
-        this.packetProvider = packetProvider;
-        this.packetSender = packetSender;
-        this.playerPreLoginProcessor = playerPreLoginProcessor;
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {

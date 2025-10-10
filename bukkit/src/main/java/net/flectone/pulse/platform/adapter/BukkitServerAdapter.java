@@ -10,6 +10,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -19,7 +20,6 @@ import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.PaperItemStackUtil;
 import net.flectone.pulse.util.constant.PlatformType;
-import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -47,10 +47,8 @@ import java.util.List;
 import java.util.Locale;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitServerAdapter implements PlatformServerAdapter {
-
-    private final PlainTextComponentSerializer plainTextComponentSerializer = PlainTextComponentSerializer.plainText();
-    private final LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer.legacySection();
 
     private final Plugin plugin;
     private final Provider<IntegrationModule> integrationModuleProvider;
@@ -58,26 +56,8 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
     private final Provider<MessagePipeline> messagePipelineProvider;
     private final PacketProvider packetProvider;
     private final ReflectionResolver reflectionResolver;
-    private final FLogger fLogger;
-    private final Pair<MethodHandle, Object> getTPSMethodPair;
 
-    @Inject
-    public BukkitServerAdapter(Plugin plugin,
-                               Provider<IntegrationModule> integrationModuleProvider,
-                               Provider<FPlayerService> fPlayerServiceProvider,
-                               Provider<MessagePipeline> messagePipelineProvider,
-                               PacketProvider packetProvider,
-                               ReflectionResolver reflectionResolver,
-                               FLogger fLogger) {
-        this.plugin = plugin;
-        this.integrationModuleProvider = integrationModuleProvider;
-        this.fPlayerServiceProvider = fPlayerServiceProvider;
-        this.messagePipelineProvider = messagePipelineProvider;
-        this.packetProvider = packetProvider;
-        this.reflectionResolver = reflectionResolver;
-        this.fLogger = fLogger;
-        this.getTPSMethodPair = findGetTPSMethod();
-    }
+    private Pair<MethodHandle, Object> getTPSMethodPair;
 
     @Sync
     @Override
@@ -87,7 +67,9 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
 
     @Override
     public @NotNull String getTPS() {
-        if (getTPSMethodPair == null) return "";
+        if (getTPSMethodPair == null) {
+            getTPSMethodPair = findGetTPSMethod();
+        }
 
         try {
             double[] recentTps = (double[]) getTPSMethodPair.first().invoke(getTPSMethodPair.second());
@@ -107,8 +89,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
                 Field recentTpsField = minecraftServer.getClass().getSuperclass().getDeclaredField("recentTps");
                 getTPS = reflectionResolver.unreflect(lookup -> lookup.unreflectGetter(recentTpsField));
             } catch (ReflectiveOperationException e) {
-                fLogger.warning(e);
-                return null;
+                throw new RuntimeException(e);
             }
         }
 
@@ -229,6 +210,8 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         org.bukkit.inventory.ItemStack legacyItem = new org.bukkit.inventory.ItemStack(material);
         ItemMeta meta = legacyItem.getItemMeta();
 
+        LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer.legacySection();
+
         meta.setDisplayName(legacyComponentSerializer.serialize(name));
         meta.setLore(lore.stream()
                 .map(component -> legacyComponentSerializer.serialize(name))
@@ -313,7 +296,7 @@ public class BukkitServerAdapter implements PlatformServerAdapter {
         if (displayName == null) return Component.empty();
 
         Component componentName = messagePipelineProvider.get().builder(displayName).build();
-        String clearedDisplayName = plainTextComponentSerializer.serialize(componentName);
+        String clearedDisplayName = PlainTextComponentSerializer.plainText().serialize(componentName);
 
         return Component.text(clearedDisplayName).decorate(TextDecoration.ITALIC);
     }

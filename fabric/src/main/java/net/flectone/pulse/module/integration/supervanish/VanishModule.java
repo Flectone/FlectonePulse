@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.supervanish;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
@@ -9,17 +10,11 @@ import net.flectone.pulse.module.AbstractModule;
 import net.flectone.pulse.processing.resolver.FileResolver;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class VanishModule extends AbstractModule {
 
     private final FileResolver fileResolver;
     private final VanishIntegration vanishIntegration;
-
-    @Inject
-    public VanishModule(FileResolver fileResolver,
-                        VanishIntegration vanishIntegration) {
-        this.fileResolver = fileResolver;
-        this.vanishIntegration = vanishIntegration;
-    }
 
     @Override
     public void onEnable() {

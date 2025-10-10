@@ -12,6 +12,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import lombok.RequiredArgsConstructor;
 import net.fabricmc.loader.api.FabricLoader;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -40,28 +41,14 @@ import java.util.List;
 import java.util.Locale;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FabricServerAdapter implements PlatformServerAdapter {
-
-    private final PlainTextComponentSerializer plainTextComponentSerializer = PlainTextComponentSerializer.plainText();
 
     private final FabricFlectonePulse fabricFlectonePulse;
     private final Provider<MessagePipeline> messagePipelineProvider;
-    private final Path projectPath;
+    private final @Named("projectPath") Path projectPath;
     private final TpsTracker tpsTracker;
     private final FLogger fLogger;
-
-    @Inject
-    public FabricServerAdapter(FabricFlectonePulse fabricFlectonePulse,
-                               Provider<MessagePipeline> messagePipelineProvider,
-                               @Named("projectPath") Path projectPath,
-                               TpsTracker tpsTracker,
-                               FLogger fLogger) {
-        this.fabricFlectonePulse = fabricFlectonePulse;
-        this.messagePipelineProvider = messagePipelineProvider;
-        this.projectPath = projectPath;
-        this.tpsTracker = tpsTracker;
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void dispatchCommand(String command) {
@@ -205,7 +192,7 @@ public class FabricServerAdapter implements PlatformServerAdapter {
         if (displayName == null) return Component.empty();
 
         Component componentName = messagePipelineProvider.get().builder(displayName).build();
-        String clearedDisplayName = plainTextComponentSerializer.serialize(componentName);
+        String clearedDisplayName = PlainTextComponentSerializer.plainText().serialize(componentName);
 
         return Component.text(clearedDisplayName).decorate(TextDecoration.ITALIC);
     }

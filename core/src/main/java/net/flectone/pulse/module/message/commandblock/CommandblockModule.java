@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.commandblock;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -22,19 +23,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class CommandblockModule extends AbstractModuleLocalization<Localization.Message.Commandblock> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public CommandblockModule(FileResolver fileResolver,
-                              ListenerRegistry listenerRegistry) {
-        super(MessageType.COMMANDBLOCK);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -43,6 +36,11 @@ public class CommandblockModule extends AbstractModuleLocalization<Localization.
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(CommandBlockPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMANDBLOCK;
     }
 
     @Override

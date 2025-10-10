@@ -28,6 +28,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
@@ -44,9 +45,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class LegacyColorConvertor {
 
-    private final Set<Option> defOptions = Collections.unmodifiableSet(EnumSet.of(
+    private static final Pattern HEX_COLOR_PATTERN = Pattern.compile("[\\da-fA-F]{6}");
+
+    private static final Set<Option> DEFAULT_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
             Option.COLOR,
             Option.HEX_COLOR_STANDALONE,
             Option.COLOR_DOUBLE_HASH,
@@ -62,20 +66,9 @@ public class LegacyColorConvertor {
             .maximumSize(100000)
             .build();
 
-    private final Pattern hexColorPattern = Pattern.compile("[\\da-fA-F]{6}");
-
     private final FileResolver fileResolver;
     private final PermissionChecker permissionChecker;
     private final FLogger fLogger;
-
-    @Inject
-    public LegacyColorConvertor(FileResolver fileResolver,
-                                PermissionChecker permissionChecker,
-                                FLogger fLogger) {
-        this.fileResolver = fileResolver;
-        this.permissionChecker = permissionChecker;
-        this.fLogger = fLogger;
-    }
 
     public void convert(MessageContext messageContext) {
         FEntity sender = messageContext.getSender();
@@ -91,10 +84,10 @@ public class LegacyColorConvertor {
     public String convert(String text) {
         String convertedMessage;
         try {
-            convertedMessage = messageCache.get(text, () -> convert(text, defOptions));
+            convertedMessage = messageCache.get(text, () -> convert(text, DEFAULT_OPTIONS));
         } catch (ExecutionException e) {
             fLogger.warning(e);
-            convertedMessage = convert(text, defOptions);
+            convertedMessage = convert(text, DEFAULT_OPTIONS);
         }
 
         return convertedMessage;
@@ -287,7 +280,7 @@ public class LegacyColorConvertor {
 
             if (startIndex + 9 <= text.length() && text.charAt(startIndex + 9) == '>') {
                 String hexColor = text.substring(startIndex + 3, startIndex + 9);
-                if (hexColorPattern.matcher(hexColor).matches()) {
+                if (HEX_COLOR_PATTERN.matcher(hexColor).matches()) {
                     result.append("<#").append(hexColor).append(">");
                     index = startIndex + 10;
                 } else {

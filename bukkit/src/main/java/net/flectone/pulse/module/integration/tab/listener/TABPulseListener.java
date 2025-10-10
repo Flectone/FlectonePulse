@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.tab.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.listener.PulseListener;
@@ -16,14 +17,10 @@ import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.module.message.tab.playerlist.PlayerlistnameModule;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TABPulseListener implements PulseListener {
 
     private final TABModule tabModule;
-
-    @Inject
-    public TABPulseListener(TABModule tabModule) {
-        this.tabModule = tabModule;
-    }
 
     @Pulse
     public void onModuleEnableEvent(ModuleEnableEvent event) {

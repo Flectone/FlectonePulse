@@ -2,6 +2,7 @@ package net.flectone.pulse.data.database.dao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.ModerationSQL;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -11,11 +12,19 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ModerationDAO extends BaseDAO<ModerationSQL> {
 
-    @Inject
-    public ModerationDAO(Database database) {
-        super(database, ModerationSQL.class);
+    private final Database database;
+
+    @Override
+    public Database database() {
+        return database;
+    }
+
+    @Override
+    public Class<ModerationSQL> sqlClass() {
+        return ModerationSQL.class;
     }
 
     public List<Moderation> get(FPlayer player, Moderation.Type type) {

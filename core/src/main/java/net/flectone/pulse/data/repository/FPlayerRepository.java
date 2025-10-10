@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.dao.ColorsDAO;
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
 import net.flectone.pulse.data.database.dao.SettingDAO;
@@ -20,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FPlayerRepository {
 
     private final Map<UUID, FPlayer> onlinePlayers = new ConcurrentHashMap<>();
@@ -31,15 +33,6 @@ public class FPlayerRepository {
     private final FPlayerDAO fPlayerDAO;
     private final SettingDAO settingDAO;
     private final ColorsDAO colorsDAO;
-
-    @Inject
-    public FPlayerRepository(FPlayerDAO fPlayerDAO,
-                             SettingDAO settingDAO,
-                             ColorsDAO colorsDAO) {
-        this.fPlayerDAO = fPlayerDAO;
-        this.settingDAO = settingDAO;
-        this.colorsDAO = colorsDAO;
-    }
 
     public void invalid(UUID uuid) {
         onlinePlayers.remove(uuid);

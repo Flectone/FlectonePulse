@@ -6,7 +6,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.Integration;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SkinService {
 
     private final Cache<UUID, PlayerHeadObjectContents.ProfileProperty> profilePropertyCache = CacheBuilder.newBuilder()
@@ -28,21 +29,10 @@ public class SkinService {
             .maximumSize(1000)
             .build();
 
-    private final Integration integration;
+    private final FileResolver fileResolver;
     private final IntegrationModule integrationModule;
     private final PacketProvider packetProvider;
     private final FLogger fLogger;
-
-    @Inject
-    public SkinService(FileResolver fileResolver,
-                       IntegrationModule integrationModule,
-                       PacketProvider packetProvider,
-                       FLogger fLogger) {
-        this.integration = fileResolver.getIntegration();
-        this.integrationModule = integrationModule;
-        this.packetProvider = packetProvider;
-        this.fLogger = fLogger;
-    }
 
     public void updateProfilePropertyCache(UUID uuid, PlayerHeadObjectContents.ProfileProperty profileProperty) {
         profilePropertyCache.put(uuid, profileProperty);
@@ -77,11 +67,11 @@ public class SkinService {
     }
 
     public String getAvatarUrl(FEntity entity) {
-        return Strings.CS.replace(integration.getAvatarApiUrl(), "<skin>", getSkin(entity));
+        return Strings.CS.replace(fileResolver.getIntegration().getAvatarApiUrl(), "<skin>", getSkin(entity));
     }
 
     public String getBodyUrl(FEntity entity) {
-        return Strings.CS.replace(integration.getBodyApiUrl(), "<skin>", getSkin(entity));
+        return Strings.CS.replace(fileResolver.getIntegration().getBodyApiUrl(), "<skin>", getSkin(entity));
     }
 
     public String getSkin(FEntity entity) {

@@ -2,8 +2,10 @@ package net.flectone.pulse.util;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TpsTracker {
 
     private static final int TICK_HISTORY = 20;
@@ -14,10 +16,6 @@ public class TpsTracker {
 
     private int tickCount = 0;
     private int sampleCount = 0;
-
-    @Inject
-    public TpsTracker() {
-    }
 
     public void onTick() {
         long now = System.nanoTime() / 1000000;

@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.format.scoreboard.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -11,14 +12,10 @@ import net.flectone.pulse.model.event.player.PlayerQuitEvent;
 import net.flectone.pulse.module.message.format.scoreboard.ScoreboardModule;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ScoreboardPulseListener implements PulseListener {
 
     private final ScoreboardModule scoreboardModule;
-
-    @Inject
-    public ScoreboardPulseListener(ScoreboardModule scoreboardModule) {
-        this.scoreboardModule = scoreboardModule;
-    }
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {

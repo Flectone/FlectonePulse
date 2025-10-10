@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.clearmail;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -22,22 +23,12 @@ import org.incendo.cloud.suggestion.SuggestionProvider;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ClearmailModule extends AbstractModuleCommand<Localization.Command.Clearmail> {
 
     private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
-
-    @Inject
-    public ClearmailModule(FileResolver fileResolver,
-                           FPlayerService fPlayerService,
-                           CommandParserProvider commandParserProvider) {
-        super(MessageType.COMMAND_CLEARMAIL);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.commandParserProvider = commandParserProvider;
-    }
 
     @Override
     public void onEnable() {
@@ -92,6 +83,11 @@ public class ClearmailModule extends AbstractModuleCommand<Localization.Command.
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_CLEARMAIL;
     }
 
     @Override

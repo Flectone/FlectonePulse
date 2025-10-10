@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.tab.header.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -10,14 +11,10 @@ import net.flectone.pulse.model.event.player.PlayerLoadEvent;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class HeaderPulseListener implements PulseListener {
 
     private final HeaderModule headerModule;
-
-    @Inject
-    public HeaderPulseListener(HeaderModule headerModule) {
-        this.headerModule = headerModule;
-    }
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {

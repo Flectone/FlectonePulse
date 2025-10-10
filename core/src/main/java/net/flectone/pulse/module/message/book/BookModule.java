@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.book;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -15,17 +16,11 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.apache.commons.lang3.Strings;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BookModule extends AbstractModule {
 
     private final FileResolver fileResolver;
     private final MessagePipeline messagePipeline;
-
-    @Inject
-    public BookModule(FileResolver fileResolver,
-                      MessagePipeline messagePipeline) {
-        this.fileResolver = fileResolver;
-        this.messagePipeline = messagePipeline;
-    }
 
     @Override
     public Message.Book config() {

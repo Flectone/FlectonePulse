@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.online;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.localization.Localization;
@@ -24,6 +25,7 @@ import org.incendo.cloud.suggestion.Suggestion;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class OnlineModule extends AbstractModuleCommand<Localization.Command.Online> {
 
     private final FileResolver fileResolver;
@@ -32,23 +34,6 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
     private final CommandParserProvider commandParserProvider;
     private final IntegrationModule integrationModule;
     private final TimeFormatter timeFormatter;
-
-    @Inject
-    public OnlineModule(FileResolver fileResolver,
-                        FPlayerService fPlayerService,
-                        PlatformPlayerAdapter platformPlayerAdapter,
-                        CommandParserProvider commandParserProvider,
-                        IntegrationModule integrationModule,
-                        TimeFormatter timeFormatter) {
-        super(MessageType.COMMAND_ONLINE);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.commandParserProvider = commandParserProvider;
-        this.integrationModule = integrationModule;
-        this.timeFormatter = timeFormatter;
-    }
 
     @Override
     public void onEnable() {
@@ -112,6 +97,11 @@ public class OnlineModule extends AbstractModuleCommand<Localization.Command.Onl
                 .sound(getModuleSound())
                 .build()
         );
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_ONLINE;
     }
 
     @Override

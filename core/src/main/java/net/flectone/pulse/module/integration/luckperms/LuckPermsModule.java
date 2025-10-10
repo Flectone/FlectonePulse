@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.luckperms;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -14,20 +15,12 @@ import java.util.Collections;
 import java.util.Set;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class LuckPermsModule extends AbstractModule {
 
     private final FileResolver fileResolver;
     private final LuckPermsIntegration luckPermsIntegration;
     private final PlatformServerAdapter platformServerAdapter;
-
-    @Inject
-    public LuckPermsModule(FileResolver fileResolver,
-                           LuckPermsIntegration luckPermsIntegration,
-                           PlatformServerAdapter platformServerAdapter) {
-        this.fileResolver = fileResolver;
-        this.luckPermsIntegration = luckPermsIntegration;
-        this.platformServerAdapter = platformServerAdapter;
-    }
 
     @Override
     public void onEnable() {

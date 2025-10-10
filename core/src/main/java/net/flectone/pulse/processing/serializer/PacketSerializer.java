@@ -4,14 +4,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import lombok.RequiredArgsConstructor;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PacketSerializer {
 
     public static final String MINECRAFT_BRAND = "minecraft:brand";
-
-    @Inject
-    public PacketSerializer() {}
 
     public byte[] serialize(String string) {
         ByteBuf buf = Unpooled.buffer();

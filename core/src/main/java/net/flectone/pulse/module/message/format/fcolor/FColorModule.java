@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.format.fcolor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.FColor;
@@ -22,22 +23,14 @@ import java.util.regex.Pattern;
 
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FColorModule extends AbstractModule {
 
-    private final Pattern fColorPattern = Pattern.compile("(<fcolor:(\\d+)>)|(</fcolor(:\\d+)?>)");
+    private static final Pattern FCOLOR_PATTERN = Pattern.compile("(<fcolor:(\\d+)>)|(</fcolor(:\\d+)?>)");
 
     private final FileResolver fileResolver;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public FColorModule(FileResolver fileResolver,
-                        PermissionChecker permissionChecker,
-                        ListenerRegistry listenerRegistry) {
-        this.fileResolver = fileResolver;
-        this.permissionChecker = permissionChecker;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -92,7 +85,7 @@ public class FColorModule extends AbstractModule {
     }
 
     private String replaceFColorPlaceholders(String contextMessage, Map<Integer, String> colorsMap) {
-        Matcher matcher = fColorPattern.matcher(contextMessage);
+        Matcher matcher = FCOLOR_PATTERN.matcher(contextMessage);
         StringBuilder stringBuilder = new StringBuilder(contextMessage.length());
         int lastEnd = 0;
         while (matcher.find()) {

@@ -11,6 +11,7 @@ import com.github.retrooper.packetevents.protocol.dialog.button.CommonButtonData
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -31,23 +32,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DialogMenuBuilder implements MenuBuilder {
 
     private final ChatsettingModule chatsettingModule;
     private final MessagePipeline messagePipeline;
     private final DialogController dialogController;
     private final ChatsettingHandler chatsettingHandler;
-
-    @Inject
-    public DialogMenuBuilder(ChatsettingModule chatsettingModule,
-                             MessagePipeline messagePipeline,
-                             DialogController dialogController,
-                             ChatsettingHandler chatsettingHandler) {
-        this.chatsettingModule = chatsettingModule;
-        this.messagePipeline = messagePipeline;
-        this.dialogController = dialogController;
-        this.chatsettingHandler = chatsettingHandler;
-    }
 
     @Override
     public void open(FPlayer fPlayer, FPlayer fTarget) {

@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.do_;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -14,19 +15,11 @@ import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DoModule extends AbstractModuleCommand<Localization.Command.Do> {
 
     private final FileResolver fileResolver;
     private final CommandParserProvider commandParserProvider;
-
-    @Inject
-    public DoModule(FileResolver fileResolver,
-                    CommandParserProvider commandParserProvider) {
-        super(MessageType.COMMAND_DO);
-
-        this.fileResolver = fileResolver;
-        this.commandParserProvider = commandParserProvider;
-    }
 
     @Override
     public void onEnable() {
@@ -56,6 +49,11 @@ public class DoModule extends AbstractModuleCommand<Localization.Command.Do> {
                 .integration()
                 .build()
         );
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_DO;
     }
 
     @Override

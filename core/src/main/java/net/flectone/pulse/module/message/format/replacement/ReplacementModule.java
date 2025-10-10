@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -43,6 +44,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ReplacementModule extends AbstractModuleLocalization<Localization.Message.Format.Replacement> {
 
     private final Map<String, Pattern> triggerPatterns = new LinkedHashMap<>();
@@ -67,32 +69,6 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
     private final PermissionChecker permissionChecker;
     private final FLogger fLogger;
 
-    @Inject
-    public ReplacementModule(FileResolver fileResolver,
-                             ListenerRegistry listenerRegistry,
-                             MessagePipeline messagePipeline,
-                             FPlayerService fPlayerService,
-                             PlatformServerAdapter platformServerAdapter,
-                             PlatformPlayerAdapter platformPlayerAdapter,
-                             SkinService skinService,
-                             UrlFormatter urlFormatter,
-                             PermissionChecker permissionChecker,
-                             FLogger fLogger) {
-        super(MessageType.REPLACEMENT);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-        this.messagePipeline = messagePipeline;
-        this.fPlayerService = fPlayerService;
-        this.platformServerAdapter = platformServerAdapter;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.skinService = skinService;
-        this.urlFormatter = urlFormatter;
-        this.permissionChecker = permissionChecker;
-        this.defaultMiniMessage = MiniMessage.miniMessage();
-        this.fLogger = fLogger;
-    }
-
     @Override
     public void onEnable() {
         super.onEnable();
@@ -113,6 +89,11 @@ public class ReplacementModule extends AbstractModuleLocalization<Localization.M
         triggerPatterns.clear();
         messageCache.invalidateAll();
         imageCache.invalidateAll();
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.REPLACEMENT;
     }
 
     @Override

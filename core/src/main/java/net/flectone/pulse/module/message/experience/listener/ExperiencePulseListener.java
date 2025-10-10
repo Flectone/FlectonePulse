@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.experience.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
@@ -13,17 +14,11 @@ import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ExperiencePulseListener implements PulseListener {
 
     private final ExperienceModule experienceModule;
     private final ExperienceExtractor experienceExtractor;
-
-    @Inject
-    public ExperiencePulseListener(ExperienceModule experienceModule,
-                                   ExperienceExtractor experienceExtractor) {
-        this.experienceModule = experienceModule;
-        this.experienceExtractor = experienceExtractor;
-    }
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {

@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.ban;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -27,6 +28,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
 
     private final FileResolver fileResolver;
@@ -37,27 +39,6 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
     private final ProxySender proxySender;
     private final ListenerRegistry listenerRegistry;
     private final CommandParserProvider commandParserProvider;
-
-    @Inject
-    public BanModule(FileResolver fileResolver,
-                     FPlayerService fPlayerService,
-                     ModerationService moderationService,
-                     ModerationMessageFormatter moderationMessageFormatter,
-                     MessagePipeline messagePipeline,
-                     ProxySender proxySender,
-                     ListenerRegistry listenerRegistry,
-                     CommandParserProvider commandParserProvider) {
-        super(MessageType.COMMAND_BAN);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.moderationService = moderationService;
-        this.moderationMessageFormatter = moderationMessageFormatter;
-        this.messagePipeline = messagePipeline;
-        this.proxySender = proxySender;
-        this.listenerRegistry = listenerRegistry;
-        this.commandParserProvider = commandParserProvider;
-    }
 
     @Override
     public void onEnable() {
@@ -100,6 +81,11 @@ public class BanModule extends AbstractModuleCommand<Localization.Command.Ban> {
         }
 
         ban(fPlayer, target, time, reason);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_BAN;
     }
 
     @Override

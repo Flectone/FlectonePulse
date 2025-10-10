@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.death;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDeathCombatEvent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.config.localization.Localization;
@@ -32,6 +33,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementTag.empty;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DeathModule extends AbstractModuleLocalization<Localization.Message.Death> implements PulseListener {
 
     private final FileResolver fileResolver;
@@ -41,23 +43,6 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
     private final ListenerRegistry listenerRegistry;
     private final IntegrationModule integrationModule;
 
-    @Inject
-    public DeathModule(FileResolver fileResolver,
-                       MessagePipeline messagePipeline,
-                       PacketSender packetSender,
-                       FPlayerService fPlayerService,
-                       ListenerRegistry listenerRegistry,
-                       IntegrationModule integrationModule) {
-        super(MessageType.DEATH);
-
-        this.fileResolver = fileResolver;
-        this.messagePipeline = messagePipeline;
-        this.packetSender = packetSender;
-        this.fPlayerService = fPlayerService;
-        this.listenerRegistry = listenerRegistry;
-        this.integrationModule = integrationModule;
-    }
-
     @Override
     public void onEnable() {
         super.onEnable();
@@ -66,6 +51,11 @@ public class DeathModule extends AbstractModuleLocalization<Localization.Message
 
         listenerRegistry.register(DeathPacketListener.class);
         listenerRegistry.register(DeathPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.DEATH;
     }
 
     @Override

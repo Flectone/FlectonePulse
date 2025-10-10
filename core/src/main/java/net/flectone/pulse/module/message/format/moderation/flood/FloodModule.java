@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.format.moderation.flood;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
@@ -15,20 +16,12 @@ import net.flectone.pulse.util.constant.MessageFlag;
 import org.apache.commons.lang3.StringUtils;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FloodModule extends AbstractModule {
 
     private final FileResolver fileResolver;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public FloodModule(FileResolver fileResolver,
-                       PermissionChecker permissionChecker,
-                       ListenerRegistry listenerRegistry) {
-        this.fileResolver = fileResolver;
-        this.permissionChecker = permissionChecker;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {

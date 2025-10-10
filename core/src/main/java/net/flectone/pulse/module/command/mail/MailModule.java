@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.mail;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -26,6 +27,7 @@ import org.apache.commons.lang3.Strings;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MailModule extends AbstractModuleCommand<Localization.Command.Mail> implements PulseListener {
 
     private final FileResolver fileResolver;
@@ -36,27 +38,6 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
     private final ListenerRegistry listenerRegistry;
     private final IgnoreSender ignoreSender;
     private final DisableSender disableSender;
-
-    @Inject
-    public MailModule(FileResolver fileResolver,
-                      TellModule tellModule,
-                      IntegrationModule integrationModule,
-                      FPlayerService fPlayerService,
-                      CommandParserProvider commandParserProvider,
-                      ListenerRegistry listenerRegistry,
-                      IgnoreSender ignoreSender,
-                      DisableSender disableSender) {
-        super(MessageType.COMMAND_MAIL);
-
-        this.fileResolver = fileResolver;
-        this.tellModule = tellModule;
-        this.integrationModule = integrationModule;
-        this.fPlayerService = fPlayerService;
-        this.commandParserProvider = commandParserProvider;
-        this.listenerRegistry = listenerRegistry;
-        this.ignoreSender = ignoreSender;
-        this.disableSender = disableSender;
-    }
 
     @Override
     public void onEnable() {
@@ -108,7 +89,7 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
 
         fPlayerService.loadSettingsIfOffline(fReceiver);
-        if (disableSender.sendIfDisabled(fPlayer, fReceiver, getMessageType())) return;
+        if (disableSender.sendIfDisabled(fPlayer, fReceiver, messageType())) return;
 
         String message = getArgument(commandContext, 1);
 
@@ -126,6 +107,11 @@ public class MailModule extends AbstractModuleCommand<Localization.Command.Mail>
                 .tagResolvers(fResolver -> new TagResolver[]{targetTag(fResolver, fReceiver)})
                 .build()
         );
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_MAIL;
     }
 
     @Override

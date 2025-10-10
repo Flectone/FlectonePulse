@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.tictactoe;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -29,6 +30,7 @@ import java.util.UUID;
 import java.util.function.BiFunction;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TictactoeModule extends AbstractModuleCommand<Localization.Command.Tictactoe> {
 
     private final FileResolver fileResolver;
@@ -40,29 +42,6 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
     private final Gson gson;
     private final IgnoreSender ignoreSender;
     private final DisableSender disableSender;
-
-    @Inject
-    public TictactoeModule(FileResolver fileResolver,
-                           FPlayerService fPlayerService,
-                           TictactoeService tictactoeService,
-                           ProxySender proxySender,
-                           IntegrationModule integrationModule,
-                           CommandParserProvider commandParserProvider,
-                           Gson gson,
-                           IgnoreSender ignoreSender,
-                           DisableSender disableSender) {
-        super(MessageType.COMMAND_TICTACTOE);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.tictactoeService = tictactoeService;
-        this.proxySender = proxySender;
-        this.integrationModule = integrationModule;
-        this.commandParserProvider = commandParserProvider;
-        this.gson = gson;
-        this.ignoreSender = ignoreSender;
-        this.disableSender = disableSender;
-    }
 
     @Override
     public void onEnable() {
@@ -129,7 +108,7 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         if (ignoreSender.sendIfIgnored(fPlayer, fReceiver)) return;
 
         fPlayerService.loadSettingsIfOffline(fReceiver);
-        if (disableSender.sendIfDisabled(fPlayer, fReceiver, getMessageType())) return;
+        if (disableSender.sendIfDisabled(fPlayer, fReceiver, messageType())) return;
 
         TicTacToe ticTacToe = tictactoeService.create(fPlayer, fReceiver, isHard);
 
@@ -154,6 +133,11 @@ public class TictactoeModule extends AbstractModuleCommand<Localization.Command.
         if (isSent) return;
 
         sendCreateMessage(fPlayer, fReceiver, ticTacToe, metadataUUID);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_TICTACTOE;
     }
 
     @Override

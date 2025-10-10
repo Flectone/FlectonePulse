@@ -2,6 +2,7 @@ package net.flectone.pulse.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
@@ -12,17 +13,11 @@ import net.flectone.pulse.platform.sender.MessageSender;
 import net.kyori.adventure.text.Component;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MessagePulseListener implements PulseListener {
 
     private final MessageSender messageSender;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-
-    @Inject
-    public MessagePulseListener(MessageSender messageSender,
-                                PlatformPlayerAdapter platformPlayerAdapter) {
-        this.messageSender = messageSender;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-    }
 
     @Pulse(priority = Event.Priority.HIGHEST)
     public void onSenderToReceiverMessageEvent(MessageSendEvent event) {

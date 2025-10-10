@@ -2,6 +2,7 @@ package net.flectone.pulse.processing.mapper;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.service.FPlayerService;
@@ -12,17 +13,11 @@ import org.incendo.cloud.SenderMapper;
 import org.jetbrains.annotations.NotNull;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FPlayerMapper implements SenderMapper<ServerCommandSource, FPlayer> {
 
     private final FabricFlectonePulse fabricFlectonePulse;
     private final FPlayerService fPlayerService;
-
-    @Inject
-    public FPlayerMapper(FabricFlectonePulse fabricFlectonePulse,
-                         FPlayerService fPlayerService) {
-        this.fabricFlectonePulse = fabricFlectonePulse;
-        this.fPlayerService = fPlayerService;
-    }
 
     @Override
     public @NotNull FPlayer map(@NotNull ServerCommandSource sender) {

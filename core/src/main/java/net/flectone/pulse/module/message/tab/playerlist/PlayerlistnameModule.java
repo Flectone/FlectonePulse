@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -27,6 +28,7 @@ import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PlayerlistnameModule extends AbstractModuleLocalization<Localization.Message.Tab.Playerlistname> {
 
     private final FileResolver fileResolver;
@@ -37,27 +39,6 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
     private final PacketProvider packetProvider;
     private final TaskScheduler taskScheduler;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public PlayerlistnameModule(FPlayerService fPlayerService,
-                                PlatformPlayerAdapter platformPlayerAdapter,
-                                FileResolver fileResolver,
-                                MessagePipeline messagePipeline,
-                                PacketSender packetSender,
-                                PacketProvider packetProvider,
-                                TaskScheduler taskScheduler,
-                                ListenerRegistry listenerRegistry) {
-        super(MessageType.PLAYERLISTNAME);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.messagePipeline = messagePipeline;
-        this.packetSender = packetSender;
-        this.packetProvider = packetProvider;
-        this.taskScheduler = taskScheduler;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -71,6 +52,11 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
         }
 
         listenerRegistry.register(PlayerlistnamePulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.PLAYERLISTNAME;
     }
 
     @Override

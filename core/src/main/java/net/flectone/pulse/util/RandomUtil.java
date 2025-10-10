@@ -2,24 +2,23 @@ package net.flectone.pulse.util;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Random;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RandomUtil {
 
-    private final Random random = new Random();
-
-    @Inject
-    public RandomUtil() {}
+    private static final Random RANDOM = new Random();
 
     public int nextInt(int start, int end) {
         if (start > end) return 0;
-        return start == end ? start : start + random.nextInt(end - start);
+        return start == end ? start : start + RANDOM.nextInt(end - start);
     }
 
     public int nextInt(int bound) {
-        return random.nextInt(bound);
+        return RANDOM.nextInt(bound);
     }
 
 }

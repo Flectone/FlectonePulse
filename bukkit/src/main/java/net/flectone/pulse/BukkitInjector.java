@@ -1,18 +1,7 @@
 package net.flectone.pulse;
 
 import com.github.Anon8281.universalScheduler.UniversalScheduler;
-import com.google.gson.Gson;
-import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
-import com.google.inject.matcher.Matchers;
-import com.google.inject.name.Names;
-import lombok.SneakyThrows;
-import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.annotation.Sync;
-import net.flectone.pulse.config.localization.EnglishLocale;
-import net.flectone.pulse.config.localization.RussianLocale;
-import net.flectone.pulse.processing.processor.YamlFileProcessor;
-import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.execution.scheduler.BukkitTaskScheduler;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.module.command.spy.BukkitSpyModule;
@@ -41,73 +30,35 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.provider.*;
 import net.flectone.pulse.platform.registry.*;
-import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
-import net.flectone.pulse.processing.resolver.SystemVariableResolver;
 import net.flectone.pulse.util.checker.BukkitPermissionChecker;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.creator.BackupCreator;
-import net.flectone.pulse.util.interceptor.AsyncInterceptor;
-import net.flectone.pulse.util.interceptor.SyncInterceptor;
 import net.flectone.pulse.util.logging.FLogger;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.nio.file.Path;
-
 @Singleton
-public class BukkitInjector extends AbstractModule {
+public class BukkitInjector extends PlatformInjector {
 
     private final BukkitFlectonePulse instance;
     private final Plugin plugin;
-    private final LibraryResolver libraryResolver;
-    private final FLogger fLogger;
 
     public BukkitInjector(BukkitFlectonePulse instance,
                           Plugin plugin,
                           LibraryResolver libraryResolver,
                           FLogger fLogger) {
+        super(plugin.getDataFolder().toPath(), libraryResolver, fLogger);
+
         this.instance = instance;
         this.plugin = plugin;
-        this.libraryResolver = libraryResolver;
-        this.fLogger = fLogger;
     }
 
-    @SneakyThrows
     @Override
-    protected void configure() {
-        ReflectionResolver reflectionResolver = new ReflectionResolver(libraryResolver);
-        bind(ReflectionResolver.class).toInstance(reflectionResolver);
-
-        // Bind project path
-        Path projectPath = plugin.getDataFolder().toPath();
-        bind(Path.class).annotatedWith(Names.named("projectPath")).toInstance(projectPath);
-
-        EnglishLocale englishLocale = new EnglishLocale();
-        bind(EnglishLocale.class).toInstance(englishLocale);
-
-        RussianLocale russianLocale = new RussianLocale();
-        bind(RussianLocale.class).toInstance(russianLocale);
-
-        YamlFileProcessor yamlFileProcessor = new YamlFileProcessor(englishLocale, russianLocale);
-        bind(YamlFileProcessor.class).toInstance(yamlFileProcessor);
-
-        SystemVariableResolver systemVariableResolver = new SystemVariableResolver();
-        bind(SystemVariableResolver.class).toInstance(systemVariableResolver);
-
-        BackupCreator backupCreator = new BackupCreator(systemVariableResolver, projectPath, fLogger);
-        bind(BackupCreator.class).toInstance(backupCreator);
-
-        // Initialize and bind FileManager
-        FileResolver fileResolver = new FileResolver(projectPath, fLogger, yamlFileProcessor, backupCreator);
-        fileResolver.reload();
-
-        bind(FileResolver.class).toInstance(fileResolver);
-        bind(Database.class).asEagerSingleton();
+    public void setupPlatform(ReflectionResolver reflectionResolver) {
+        bind(FlectonePulse.class).toInstance(instance);
+        bind(BukkitFlectonePulse.class).toInstance(instance);
+        bind(Plugin.class).toInstance(plugin);
 
         // Adapters
         bind(PlatformPlayerAdapter.class).to(BukkitPlayerAdapter.class);
@@ -157,52 +108,8 @@ public class BukkitInjector extends AbstractModule {
         bind(JoinModule.class).to(BukkitJoinModule.class);
         bind(QuitModule.class).to(BukkitQuitModule.class);
 
-        // Libraries and serialization
-        bind(LibraryResolver.class).toInstance(libraryResolver);
-        bind(Gson.class).toInstance(GsonComponentSerializer.gson().serializer());
-
-        // Core bindings
-        bind(FlectonePulse.class).toInstance(instance);
-        bind(BukkitFlectonePulse.class).toInstance(instance);
-        bind(FlectonePulseAPI.class).asEagerSingleton();
-        bind(Plugin.class).toInstance(plugin);
-        bind(FLogger.class).toInstance(fLogger);
-
         // Scheduler
         bind(com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler.class)
                 .toInstance(UniversalScheduler.getScheduler(plugin));
-
-        // Interceptors
-        setupInterceptors();
-
-        // MiniMessage
-        bind(MiniMessage.class).toInstance(MiniMessage.builder().tags(TagResolver.builder().build()).build());
-
-//        try {
-//            Package[] packs = Package.getPackages();
-//
-//            Arrays.stream(packs)
-//                    .map(Package::getName)
-//                    .filter(string -> string.contains("net.flectone.pulse.library"))
-//                    .sorted()
-//                    .forEach(fLogger::warning);
-//
-//        } catch (Exception e) {
-//            fLogger.warning(e);
-//        }
-    }
-
-    private void setupInterceptors() {
-        SyncInterceptor syncInterceptor = new SyncInterceptor();
-        requestInjection(syncInterceptor);
-
-        AsyncInterceptor asyncInterceptor = new AsyncInterceptor();
-        requestInjection(asyncInterceptor);
-
-        bindInterceptor(Matchers.any(),
-                Matchers.annotatedWith(Sync.class).or(Matchers.annotatedWith(Async.class)),
-                asyncInterceptor,
-                syncInterceptor
-        );
     }
 }

@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.ride.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.message.ride.model.Ride;
 import net.flectone.pulse.processing.extractor.Extractor;
@@ -10,11 +11,8 @@ import net.kyori.adventure.text.TranslatableComponent;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RideExtractor extends Extractor {
-
-    @Inject
-    public RideExtractor() {
-    }
 
     // %s stopped riding %s
     // %s started riding %s

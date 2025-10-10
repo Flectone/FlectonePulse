@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.quit;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -17,22 +18,12 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class QuitModule extends AbstractModuleLocalization<Localization.Message.Quit> {
 
     private final FileResolver fileResolver;
     private final IntegrationModule integrationModule;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public QuitModule(FileResolver fileResolver,
-                      IntegrationModule integrationModule,
-                      ListenerRegistry listenerRegistry) {
-        super(MessageType.QUIT);
-
-        this.fileResolver = fileResolver;
-        this.integrationModule = integrationModule;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -41,6 +32,11 @@ public class QuitModule extends AbstractModuleLocalization<Localization.Message.
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(QuitPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.QUIT;
     }
 
     @Override

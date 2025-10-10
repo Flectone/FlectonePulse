@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.chatsetting.handler;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -27,6 +28,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ChatsettingHandler {
 
     private final FileResolver fileResolver;
@@ -34,19 +36,6 @@ public class ChatsettingHandler {
     private final PermissionChecker permissionChecker;
     private final MessagePipeline messagePipeline;
     private final FPlayerService fPlayerService;
-
-    @Inject
-    public ChatsettingHandler(FileResolver fileResolver,
-                              ChatsettingModule chatsettingModule,
-                              PermissionChecker permissionChecker,
-                              MessagePipeline messagePipeline,
-                              FPlayerService fPlayerService) {
-        this.fileResolver = fileResolver;
-        this.chatsettingModule = chatsettingModule;
-        this.permissionChecker = permissionChecker;
-        this.messagePipeline = messagePipeline;
-        this.fPlayerService = fPlayerService;
-    }
 
     public Permission.Message.Chat chatPermission() {
         return fileResolver.getPermission().getMessage().getChat();

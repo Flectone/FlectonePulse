@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.summon;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -19,19 +20,11 @@ import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SummonModule extends AbstractModuleLocalization<Localization.Message.Summon> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public SummonModule(FileResolver fileResolver,
-                        ListenerRegistry listenerRegistry) {
-        super(MessageType.SUMMON);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -40,6 +33,11 @@ public class SummonModule extends AbstractModuleLocalization<Localization.Messag
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(SummonPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.SUMMON;
     }
 
     @Override

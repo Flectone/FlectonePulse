@@ -3,6 +3,7 @@ package net.flectone.pulse.listener;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.Event;
@@ -30,6 +31,7 @@ import net.flectone.pulse.util.constant.PlatformType;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BasePulseListener implements PulseListener {
     
     private final FPlayerService fPlayerService;
@@ -40,25 +42,6 @@ public class BasePulseListener implements PulseListener {
     private final SoundPlayer soundPlayer;
     private final PacketProvider packetProvider;
     private final FLogger fLogger;
-
-    @Inject
-    public BasePulseListener(FPlayerService fPlayerService,
-                             PlatformServerAdapter platformServerAdapter,
-                             PlatformPlayerAdapter platformPlayerAdapter,
-                             ProxySender proxySender,
-                             IntegrationSender integrationSender,
-                             SoundPlayer soundPlayer,
-                             PacketProvider packetProvider,
-                             FLogger fLogger) {
-        this.fPlayerService = fPlayerService;
-        this.platformServerAdapter = platformServerAdapter;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.proxySender = proxySender;
-        this.integrationSender = integrationSender;
-        this.soundPlayer = soundPlayer;
-        this.packetProvider = packetProvider;
-        this.fLogger = fLogger;
-    }
 
     @Pulse(priority = Event.Priority.LOWEST, ignoreCancelled = true)
     public void onPlayerJoinEvent(PlayerJoinEvent event) {

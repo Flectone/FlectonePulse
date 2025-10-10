@@ -2,6 +2,7 @@ package net.flectone.pulse.service;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.data.repository.ModerationRepository;
@@ -10,14 +11,10 @@ import java.util.List;
 import java.util.UUID;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ModerationService {
 
     private final ModerationRepository moderationRepository;
-
-    @Inject
-    public ModerationService(ModerationRepository moderationRepository) {
-        this.moderationRepository = moderationRepository;
-    }
 
     public void reload() {
         moderationRepository.invalidateAll();

@@ -8,18 +8,15 @@ import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientClickWindow;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.platform.controller.InventoryController;
 import net.flectone.pulse.model.inventory.Inventory;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class InventoryPacketListener implements PacketListener {
 
     private final InventoryController inventoryController;
-
-    @Inject
-    public InventoryPacketListener(InventoryController inventoryController) {
-        this.inventoryController = inventoryController;
-    }
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {

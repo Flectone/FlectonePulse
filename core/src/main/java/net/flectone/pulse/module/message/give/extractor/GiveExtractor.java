@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.give.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.message.give.model.Give;
 import net.flectone.pulse.processing.extractor.Extractor;
@@ -13,11 +14,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class GiveExtractor extends Extractor {
-
-    @Inject
-    public GiveExtractor() {
-    }
 
     public Optional<Give> extract(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
         return switch (translationKey) {

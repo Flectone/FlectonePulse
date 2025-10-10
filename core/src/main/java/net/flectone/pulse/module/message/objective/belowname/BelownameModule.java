@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.objective.belowname;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -22,6 +23,7 @@ import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BelownameModule extends AbstractModuleLocalization<Localization.Message.Objective.Belowname> {
 
     private final FileResolver fileResolver;
@@ -31,25 +33,6 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
     private final ObjectiveModule objectiveModule;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;
-
-    @Inject
-    public BelownameModule(FileResolver fileResolver,
-                           FPlayerService fPlayerService,
-                           PlatformPlayerAdapter platformPlayerAdapter,
-                           TaskScheduler taskScheduler,
-                           ObjectiveModule objectiveModule,
-                           ListenerRegistry listenerRegistry,
-                           MessagePipeline messagePipeline) {
-        super(MessageType.OBJECTIVE);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.taskScheduler = taskScheduler;
-        this.objectiveModule = objectiveModule;
-        this.listenerRegistry = listenerRegistry;
-        this.messagePipeline = messagePipeline;
-    }
 
     @Override
     public void onEnable() {
@@ -68,6 +51,11 @@ public class BelownameModule extends AbstractModuleLocalization<Localization.Mes
         super.onDisable();
 
         fPlayerService.getPlatformFPlayers().forEach(this::remove);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.OBJECTIVE;
     }
 
     @Override

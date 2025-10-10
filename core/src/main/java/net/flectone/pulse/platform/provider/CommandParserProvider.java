@@ -3,6 +3,7 @@ package net.flectone.pulse.platform.provider;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.leangen.geantyref.TypeToken;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.processing.parser.player.PlatformPlayerParser;
 import net.flectone.pulse.util.checker.PermissionChecker;
 import net.flectone.pulse.config.Permission;
@@ -29,6 +30,7 @@ import java.time.Duration;
 import java.util.Collections;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class CommandParserProvider {
 
     private final PermissionChecker permissionChecker;
@@ -47,31 +49,6 @@ public class CommandParserProvider {
     private final IntegerParser<FPlayer> integerParser = new IntegerParser<>(0, Integer.MAX_VALUE);
     private final BooleanParser<FPlayer> booleanParser = new BooleanParser<>(false);
     private final DurationParser<FPlayer> durationParser = new DurationParser<>();
-
-    @Inject
-    public CommandParserProvider(PermissionChecker permissionChecker,
-                                 PlayerParser playerParser,
-                                 PlatformPlayerParser platformPlayerParser,
-                                 OfflinePlayerParser offlinePlayerParser,
-                                 DurationReasonParser durationReasonParser,
-                                 BanModerationParser banModerationParser,
-                                 MuteModerationParser muteModerationParser,
-                                 WarnModerationParser warnModerationParser,
-                                 ColorParser colorParser,
-                                 MessageParser messageParser,
-                                 SingleMessageParser singleMessageParser) {
-        this.permissionChecker = permissionChecker;
-        this.banModerationParser = banModerationParser;
-        this.muteModerationParser = muteModerationParser;
-        this.warnModerationParser = warnModerationParser;
-        this.playerParser = playerParser;
-        this.platformPlayerParser = platformPlayerParser;
-        this.offlinePlayerParser = offlinePlayerParser;
-        this.durationReasonParser = durationReasonParser;
-        this.colorParser = colorParser;
-        this.messageParser = messageParser;
-        this.singleMessageParser = singleMessageParser;
-    }
 
     public @NonNull ParserDescriptor<FPlayer, String> playerParser(boolean offlinePlayers) {
         return offlinePlayers ? offlinePlayerParser() : playerParser();

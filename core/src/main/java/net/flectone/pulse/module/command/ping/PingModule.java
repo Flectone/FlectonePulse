@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.ping;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -19,6 +20,7 @@ import org.incendo.cloud.context.CommandContext;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PingModule extends AbstractModuleCommand<Localization.Command.Ping> {
 
     private final FileResolver fileResolver;
@@ -26,21 +28,6 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
     private final CommandParserProvider commandParserProvider;
     private final IntegrationModule integrationModule;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-
-    @Inject
-    public PingModule(FileResolver fileResolver,
-                      FPlayerService fPlayerService,
-                      CommandParserProvider commandParserProvider,
-                      IntegrationModule integrationModule,
-                      PlatformPlayerAdapter platformPlayerAdapter) {
-        super(MessageType.COMMAND_PING);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.commandParserProvider = commandParserProvider;
-        this.integrationModule = integrationModule;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-    }
 
     @Override
     public void onEnable() {
@@ -81,6 +68,11 @@ public class PingModule extends AbstractModuleCommand<Localization.Command.Ping>
                 .build()
         );
 
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_PING;
     }
 
     @Override

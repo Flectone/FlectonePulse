@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.localization.Localization;
@@ -40,6 +41,7 @@ import java.util.*;
 import java.util.function.Function;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class PollModule extends AbstractModuleCommand<Localization.Command.Poll> {
 
     private final HashMap<Integer, Poll> pollMap = new HashMap<>();
@@ -54,31 +56,6 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
     private final Provider<DialogPollBuilder> dialogPollBuilderProvider;
     private final YamlFileProcessor yamlFileProcessor;
     private final FLogger fLogger;
-
-    @Inject
-    public PollModule(FileResolver fileResolver,
-                      FPlayerService fPlayerService,
-                      ProxySender proxySender,
-                      TaskScheduler taskScheduler,
-                      CommandParserProvider commandParserProvider,
-                      MessagePipeline messagePipeline,
-                      PacketProvider packetProvider,
-                      Provider<DialogPollBuilder> dialogPollBuilderProvider,
-                      YamlFileProcessor yamlFileProcessor,
-                      FLogger fLogger) {
-        super(MessageType.COMMAND_POLL);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.proxySender = proxySender;
-        this.taskScheduler = taskScheduler;
-        this.commandParserProvider = commandParserProvider;
-        this.messagePipeline = messagePipeline;
-        this.packetProvider = packetProvider;
-        this.dialogPollBuilderProvider = dialogPollBuilderProvider;
-        this.yamlFileProcessor = yamlFileProcessor;
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void onEnable() {
@@ -217,6 +194,11 @@ public class PollModule extends AbstractModuleCommand<Localization.Command.Poll>
                 : List.of();
 
         createPoll(fPlayer, title, multipleVote, time, repeatTime, answers);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_POLL;
     }
 
     @Override

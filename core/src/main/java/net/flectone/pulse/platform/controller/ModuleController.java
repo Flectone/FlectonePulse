@@ -3,6 +3,7 @@ package net.flectone.pulse.platform.controller;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.model.event.module.ModuleDisableEvent;
 import net.flectone.pulse.model.event.module.ModuleEnableEvent;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ModuleController {
 
     private final Injector injector;
@@ -27,21 +29,6 @@ public class ModuleController {
     private final DisableSender disableSender;
     private final CooldownSender cooldownSender;
     private final MuteSender muteSender;
-
-    @Inject
-    public ModuleController(Injector injector,
-                            EventDispatcher eventDispatcher,
-                            PermissionChecker permissionChecker,
-                            DisableSender disableSender,
-                            CooldownSender cooldownSender,
-                            MuteSender muteSender) {
-        this.injector = injector;
-        this.eventDispatcher = eventDispatcher;
-        this.permissionChecker = permissionChecker;
-        this.disableSender = disableSender;
-        this.cooldownSender = cooldownSender;
-        this.muteSender = muteSender;
-    }
 
     public Map<String, String> collectModuleStatuses() {
         return collectModuleStatuses(Module.class);
@@ -132,7 +119,7 @@ public class ModuleController {
         module.addPredicate(fPlayer -> !permissionChecker.check(fPlayer, module.getPermission()));
 
         if (module instanceof AbstractModuleLocalization<?> localizationModule) {
-            module.addPredicate((fPlayer, needBoolean) -> needBoolean && disableSender.sendIfDisabled(fPlayer, fPlayer, localizationModule.getMessageType()));
+            module.addPredicate((fPlayer, needBoolean) -> needBoolean && disableSender.sendIfDisabled(fPlayer, fPlayer, localizationModule.messageType()));
             module.addPredicate((fPlayer, needBoolean) -> needBoolean && cooldownSender.sendIfCooldown(fPlayer, localizationModule.getModuleCooldown()));
             module.addPredicate((fPlayer, needBoolean) -> needBoolean && muteSender.sendIfMuted(fPlayer));
         }

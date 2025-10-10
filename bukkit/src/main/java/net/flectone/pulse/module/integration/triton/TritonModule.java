@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.triton;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -11,20 +12,12 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import org.jetbrains.annotations.Nullable;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TritonModule extends AbstractModule {
 
     private final FileResolver fileResolver;
     private final TritonIntegration tritonIntegration;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public TritonModule(FileResolver fileResolver,
-                        TritonIntegration tritonIntegration,
-                        ListenerRegistry listenerRegistry) {
-        this.fileResolver = fileResolver;
-        this.tritonIntegration = tritonIntegration;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {

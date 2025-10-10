@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.interactivechat;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
@@ -12,20 +13,12 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.kyori.adventure.text.Component;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class InteractiveChatModule extends AbstractModule {
 
     private final FileResolver fileResolver;
     private final InteractiveChatIntegration interactiveChatIntegration;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public InteractiveChatModule(FileResolver fileResolver,
-                                 InteractiveChatIntegration interactiveChatIntegration,
-                                 ListenerRegistry listenerRegistry) {
-        this.fileResolver = fileResolver;
-        this.interactiveChatIntegration = interactiveChatIntegration;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {

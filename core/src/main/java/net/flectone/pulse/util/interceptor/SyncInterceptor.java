@@ -1,7 +1,9 @@
 package net.flectone.pulse.util.interceptor;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.execution.scheduler.SchedulerRunnable;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
@@ -13,11 +15,12 @@ import org.aopalliance.intercept.MethodInvocation;
 import java.lang.reflect.Method;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SyncInterceptor implements MethodInterceptor {
 
-    @Inject private TaskScheduler taskScheduler;
-    @Inject private PlatformServerAdapter platformServerAdapter;
-    @Inject private FLogger fLogger;
+    private final Provider<TaskScheduler> taskScheduler;
+    private final Provider<PlatformServerAdapter> platformServerAdapter;
+    private final FLogger fLogger;
 
     @Override
     public Object invoke(final MethodInvocation invocation) throws Throwable {
@@ -32,12 +35,12 @@ public class SyncInterceptor implements MethodInterceptor {
         SchedulerRunnable task = () -> proceedSafely(invocation);
 
         if (delay > 0) {
-            taskScheduler.runSyncLater(task, delay);
-        } else if (platformServerAdapter.isPrimaryThread()) {
+            taskScheduler.get().runSyncLater(task, delay);
+        } else if (platformServerAdapter.get().isPrimaryThread()) {
             // already sync
             task.run();
         } else {
-            taskScheduler.runSync(task);
+            taskScheduler.get().runSync(task);
         }
 
         return null;

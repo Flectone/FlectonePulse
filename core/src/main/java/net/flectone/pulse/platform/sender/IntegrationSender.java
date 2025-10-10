@@ -2,6 +2,7 @@ package net.flectone.pulse.platform.sender;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
@@ -23,20 +24,13 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class IntegrationSender {
 
-    private final Pattern finalClearMessagePattern = Pattern.compile("[\\p{C}\\p{So}\\x{E0100}-\\x{E01EF}]+");
-    private final PlainTextComponentSerializer plainTextComponentSerializer = PlainTextComponentSerializer.plainText();
+    private static final Pattern FINAL_CLEAR_MESSAGE_PATTERN = Pattern.compile("[\\p{C}\\p{So}\\x{E0100}-\\x{E01EF}]+");
 
     private final IntegrationModule integrationModule;
     private final MessagePipeline messagePipeline;
-
-    @Inject
-    public IntegrationSender(IntegrationModule integrationModule,
-                             MessagePipeline messagePipeline) {
-        this.integrationModule = integrationModule;
-        this.messagePipeline = messagePipeline;
-    }
 
     @Async(independent = true)
     public void send(MessageType messageType, String format, EventMetadata<?> eventMetadata) {
@@ -76,7 +70,7 @@ public class IntegrationSender {
 
         String finalClearMessage = RegExUtils.replaceAll(
                 (CharSequence) finalMessage,
-                finalClearMessagePattern,
+                FINAL_CLEAR_MESSAGE_PATTERN,
                 StringUtils.EMPTY
         );
 
@@ -96,7 +90,7 @@ public class IntegrationSender {
     }
 
     private String plainSerialize(Component component) {
-        return plainTextComponentSerializer.serialize(GlobalTranslator.render(component, Locale.ROOT));
+        return PlainTextComponentSerializer.plainText().serialize(GlobalTranslator.render(component, Locale.ROOT));
     }
 
     private String createMessageName(MessageType messageType, EventMetadata<?> eventMetadata) {

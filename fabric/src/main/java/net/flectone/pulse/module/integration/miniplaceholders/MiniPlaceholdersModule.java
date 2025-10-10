@@ -2,6 +2,7 @@ package net.flectone.pulse.module.integration.miniplaceholders;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FEntity;
@@ -13,20 +14,12 @@ import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.processing.resolver.FileResolver;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MiniPlaceholdersModule extends AbstractModule {
 
     private final FileResolver fileResolver;
     private final MiniPlaceholdersIntegration miniPlaceholdersIntegration;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public MiniPlaceholdersModule(FileResolver fileResolver,
-                                  ListenerRegistry listenerRegistry,
-                                  MiniPlaceholdersIntegration miniPlaceholdersIntegration) {
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-        this.miniPlaceholdersIntegration = miniPlaceholdersIntegration;
-    }
 
     @Override
     public void onEnable() {

@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -30,25 +31,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TranslatetoModule extends AbstractModuleCommand<Localization.Command.Translateto> {
 
     private final FileResolver fileResolver;
     private final CommandParserProvider commandParserProvider;
     private final IntegrationModule integrationModule;
     private final Provider<TranslateModule> translateModuleProvider;
-
-    @Inject
-    public TranslatetoModule(FileResolver fileResolver,
-                             CommandParserProvider commandParserProvider,
-                             IntegrationModule integrationModule,
-                             Provider<TranslateModule> translateModuleProvider) {
-        super(MessageType.COMMAND_TRANSLATETO);
-
-        this.fileResolver = fileResolver;
-        this.commandParserProvider = commandParserProvider;
-        this.integrationModule = integrationModule;
-        this.translateModuleProvider = translateModuleProvider;
-    }
 
     @Override
     public void onEnable() {
@@ -115,6 +104,11 @@ public class TranslatetoModule extends AbstractModuleCommand<Localization.Comman
                 .integration(string -> Strings.CS.replace(string, "<language>", targetLang))
                 .build()
         );
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_TRANSLATETO;
     }
 
     @Override

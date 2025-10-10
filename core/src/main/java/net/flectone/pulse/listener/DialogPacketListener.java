@@ -9,6 +9,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.platform.controller.DialogController;
 
 import java.util.UUID;
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DialogPacketListener implements PacketListener {
 
     private final Cache<UUID, AtomicInteger> clickCounts = CacheBuilder.newBuilder()
@@ -23,11 +25,6 @@ public class DialogPacketListener implements PacketListener {
             .build();
 
     private final DialogController dialogController;
-
-    @Inject
-    public DialogPacketListener(DialogController dialogController) {
-        this.dialogController = dialogController;
-    }
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {

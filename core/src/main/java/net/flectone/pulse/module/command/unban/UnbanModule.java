@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.unban;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unban> {
 
     private final FileResolver fileResolver;
@@ -31,21 +33,6 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
     private final ModerationService moderationService;
     private final CommandParserProvider commandParserProvider;
     private final ProxySender proxySender;
-
-    @Inject
-    public UnbanModule(FileResolver fileResolver,
-                       FPlayerService fPlayerService,
-                       ModerationService moderationService,
-                       CommandParserProvider commandParserProvider,
-                       ProxySender proxySender) {
-        super(MessageType.COMMAND_UNBAN);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.moderationService = moderationService;
-        this.commandParserProvider = commandParserProvider;
-        this.proxySender = proxySender;
-    }
 
     @Override
     public void onEnable() {
@@ -71,6 +58,11 @@ public class UnbanModule extends AbstractModuleCommand<Localization.Command.Unba
         int id = optionalId.orElse(-1);
 
         unban(fPlayer, target, id);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_UNBAN;
     }
 
     @Override

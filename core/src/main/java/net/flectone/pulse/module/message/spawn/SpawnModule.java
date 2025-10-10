@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.spawn;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -21,19 +22,11 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.StringUtils;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SpawnModule extends AbstractModuleLocalization<Localization.Message.Spawn> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public SpawnModule(FileResolver fileResolver,
-                       ListenerRegistry listenerRegistry) {
-        super(MessageType.SPAWN);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -43,6 +36,11 @@ public class SpawnModule extends AbstractModuleLocalization<Localization.Message
 
         listenerRegistry.register(SpawnPacketListener.class);
         listenerRegistry.register(SpawnPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.SPAWN;
     }
 
     @Override

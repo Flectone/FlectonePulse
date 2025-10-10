@@ -5,24 +5,19 @@ import com.deepl.api.DeepLClientOptions;
 import com.deepl.api.DeepLException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.integration.FIntegration;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.logging.FLogger;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DeeplIntegration implements FIntegration {
 
     private final FileResolver fileResolver;
     private final FLogger fLogger;
 
     private DeepLClient client;
-
-    @Inject
-    public DeeplIntegration(FileResolver fileResolver,
-                            FLogger fLogger) {
-        this.fileResolver = fileResolver;
-        this.fLogger = fLogger;
-    }
 
     public String translate(String source, String target, String text) {
         try {

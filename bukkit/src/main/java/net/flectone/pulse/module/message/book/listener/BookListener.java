@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.book.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.book.BukkitBookModule;
 import net.flectone.pulse.service.FPlayerService;
@@ -11,17 +12,11 @@ import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.inventory.meta.BookMeta;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BookListener implements Listener {
 
     private final FPlayerService fPlayerService;
     private final BukkitBookModule bookModule;
-
-    @Inject
-    public BookListener(FPlayerService fPlayerService,
-                        BukkitBookModule bookModule) {
-        this.fPlayerService = fPlayerService;
-        this.bookModule = bookModule;
-    }
 
     @EventHandler
     public void playerEditBookEvent(PlayerEditBookEvent event) {

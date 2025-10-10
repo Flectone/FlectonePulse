@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.geolocate;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -27,27 +28,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class GeolocateModule extends AbstractModuleCommand<Localization.Command.Geolocate> {
 
-    private final String apiUrl = "http://ip-api.com/line/<ip>?fields=17031449";
+    private static final String IP_API_URL = "http://ip-api.com/line/<ip>?fields=17031449";
 
     private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final CommandParserProvider commandParserProvider;
-
-    @Inject
-    public GeolocateModule(FileResolver fileResolver,
-                           FPlayerService fPlayerService,
-                           PlatformPlayerAdapter platformPlayerAdapter,
-                           CommandParserProvider commandParserProvider) {
-        super(MessageType.COMMAND_GEOLOCATE);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.commandParserProvider = commandParserProvider;
-    }
 
     @Override
     public void onEnable() {
@@ -79,7 +68,7 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
 
         String ip = platformPlayerAdapter.isOnline(fTarget) ? platformPlayerAdapter.getIp(fTarget) : fTarget.getIp();
 
-        List<String> response = ip == null ? List.of() : readResponse(Strings.CS.replace(apiUrl, "<ip>", ip));
+        List<String> response = ip == null ? List.of() : readResponse(Strings.CS.replace(IP_API_URL, "<ip>", ip));
         if (response.isEmpty() || response.get(0).equals("fail")) {
             sendErrorMessage(metadataBuilder()
                     .sender(fPlayer)
@@ -103,6 +92,11 @@ public class GeolocateModule extends AbstractModuleCommand<Localization.Command.
                 .build()
         );
 
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_GEOLOCATE;
     }
 
     @Override

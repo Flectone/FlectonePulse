@@ -7,6 +7,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSoundEffect;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -18,23 +19,13 @@ import java.util.Arrays;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SoundPlayer {
 
     private final FPlayerService fPlayerService;
     private final PlatformPlayerAdapter platformPlayerAdapter;
     private final PacketSender packetSender;
     private final PermissionChecker permissionChecker;
-
-    @Inject
-    public SoundPlayer(FPlayerService fPlayerService,
-                       PlatformPlayerAdapter platformPlayerAdapter,
-                       PacketSender packetSender,
-                       PermissionChecker permissionChecker) {
-        this.fPlayerService = fPlayerService;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.packetSender = packetSender;
-        this.permissionChecker = permissionChecker;
-    }
 
     public void play(Sound sound, FEntity sender) {
         if (sender instanceof FPlayer fPlayer) {

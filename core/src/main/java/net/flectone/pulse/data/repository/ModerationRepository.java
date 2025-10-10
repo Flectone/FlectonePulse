@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.dao.ModerationDAO;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.util.Moderation;
@@ -13,6 +14,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ModerationRepository {
 
     // cache only for specific player
@@ -24,11 +26,6 @@ public class ModerationRepository {
     private record CacheKey(UUID playerId, Moderation.Type type) {}
 
     private final ModerationDAO moderationDAO;
-
-    @Inject
-    public ModerationRepository(ModerationDAO moderationDAO) {
-        this.moderationDAO = moderationDAO;
-    }
 
     public List<Moderation> getValid(FPlayer player, Moderation.Type type) {
         try {

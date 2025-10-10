@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.afk.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.service.FPlayerService;
@@ -11,17 +12,11 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AfkListener implements Listener {
 
     private final FPlayerService fPlayerService;
     private final AfkModule afkModule;
-
-    @Inject
-    public AfkListener(FPlayerService fPlayerService,
-                       AfkModule afkModule) {
-        this.fPlayerService = fPlayerService;
-        this.afkModule = afkModule;
-    }
 
     @EventHandler
     public void asyncPlayerChatEvent(AsyncPlayerChatEvent event) {

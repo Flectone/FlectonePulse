@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
@@ -67,14 +68,10 @@ import net.flectone.pulse.module.message.worldborder.WorldborderModule;
 import net.flectone.pulse.processing.resolver.FileResolver;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MessageModule extends AbstractModule {
 
     private final FileResolver fileResolver;
-
-    @Inject
-    public MessageModule(FileResolver fileResolver) {
-        this.fileResolver = fileResolver;
-    }
 
     @Override
     public void configureChildren() {

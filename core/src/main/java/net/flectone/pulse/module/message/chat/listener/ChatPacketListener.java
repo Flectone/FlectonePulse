@@ -6,23 +6,18 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientChatMessage;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ChatPacketListener implements PacketListener {
 
     private final FPlayerService fPlayerService;
     private final ChatModule chatModule;
-
-    @Inject
-    public ChatPacketListener(FPlayerService fPlayerService,
-                              ChatModule chatModule) {
-        this.fPlayerService = fPlayerService;
-        this.chatModule = chatModule;
-    }
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {

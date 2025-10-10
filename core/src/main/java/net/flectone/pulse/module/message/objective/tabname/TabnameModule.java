@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.objective.tabname;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
@@ -17,6 +18,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TabnameModule extends AbstractModule {
 
     private final FileResolver fileResolver;
@@ -25,21 +27,6 @@ public class TabnameModule extends AbstractModule {
     private final TaskScheduler taskScheduler;
     private final ObjectiveModule objectiveModule;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public TabnameModule(FileResolver fileResolver,
-                         FPlayerService fPlayerService,
-                         PlatformPlayerAdapter platformPlayerAdapter,
-                         TaskScheduler taskScheduler,
-                         ObjectiveModule objectiveModule,
-                         ListenerRegistry listenerRegistry) {
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-        this.taskScheduler = taskScheduler;
-        this.objectiveModule = objectiveModule;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {

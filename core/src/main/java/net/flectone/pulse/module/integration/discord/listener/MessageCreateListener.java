@@ -6,6 +6,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Attachment;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.Integration;
 import net.flectone.pulse.config.localization.Localization;
@@ -20,14 +21,10 @@ import org.apache.commons.lang3.Strings;
 import reactor.core.publisher.Mono;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MessageCreateListener extends EventListener<MessageCreateEvent> {
 
     private final FileResolver fileResolver;
-
-    @Inject
-    public MessageCreateListener(FileResolver fileResolver) {
-        this.fileResolver = fileResolver;
-    }
 
     @Override
     public Class<MessageCreateEvent> getEventType() {

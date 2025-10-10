@@ -2,26 +2,29 @@ package net.flectone.pulse.data.database.dao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.IgnoreSQL;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.command.ignore.model.Ignore;
-import org.jdbi.v3.core.Handle;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class IgnoreDAO extends BaseDAO<IgnoreSQL> {
 
-    @Inject
-    public IgnoreDAO(Database database) {
-        super(database, IgnoreSQL.class);
+    private final Database database;
+
+    @Override
+    public Database database() {
+        return database;
     }
 
     @Override
-    public IgnoreSQL getSQL(Handle handle) {
-        return handle.attach(IgnoreSQL.class);
+    public Class<IgnoreSQL> sqlClass() {
+        return IgnoreSQL.class;
     }
 
     @Nullable

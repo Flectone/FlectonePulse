@@ -7,8 +7,8 @@ import net.flectone.pulse.util.constant.MessageType;
 
 public abstract class EventListener<T extends TwitchEvent>  extends AbstractModuleLocalization<Localization.Integration.Twitch> {
 
-    protected EventListener() {
-        super(MessageType.FROM_TWITCH_TO_MINECRAFT);
+    public MessageType messageType() {
+        return MessageType.FROM_TWITCH_TO_MINECRAFT;
     }
 
     public abstract Class<T> getEventType();

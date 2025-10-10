@@ -2,10 +2,11 @@ package net.flectone.pulse.module.command.flectonepulse.web.controller;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.flectone.pulse.config.localization.Localization;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.YamlFile;
-import net.flectone.pulse.processing.processor.YamlFileProcessor;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.module.command.flectonepulse.web.service.UrlService;
+import net.flectone.pulse.processing.processor.YamlFileProcessor;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import org.apache.commons.lang3.StringUtils;
 import spark.Request;
@@ -18,23 +19,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class EditorController {
+
+    private final Map<String, YamlFile> configFiles = new LinkedHashMap<>();
+    private final Map<String, List<LocalizationFile>> localizationFiles = new HashMap<>();
 
     private final UrlService urlService;
     private final FileResolver fileResolver;
-    private final Map<String, YamlFile> configFiles = new LinkedHashMap<>();
-    private final Map<String, List<LocalizationFile>> localizationFiles = new HashMap<>();
     private final YamlFileProcessor yamlFileProcessor;
-
-    @Inject
-    public EditorController(UrlService urlService,
-                            FileResolver fileResolver,
-                            YamlFileProcessor yamlFileProcessor) {
-        this.urlService = urlService;
-        this.fileResolver = fileResolver;
-        this.yamlFileProcessor = yamlFileProcessor;
-        initConfigFiles();
-    }
 
     public void initConfigFiles() {
         configFiles.clear();

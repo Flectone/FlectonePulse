@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.auto;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -20,22 +21,12 @@ import java.util.Collections;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class AutoModule extends AbstractModuleListLocalization<Localization.Message.Auto> {
 
     private final FileResolver fileResolver;
     private final TaskScheduler taskScheduler;
     private final FPlayerService fPlayerService;
-
-    @Inject
-    public AutoModule(FileResolver fileResolver,
-                      TaskScheduler taskScheduler,
-                      FPlayerService fPlayerService) {
-        super(MessageType.AUTO);
-
-        this.fileResolver = fileResolver;
-        this.taskScheduler = taskScheduler;
-        this.fPlayerService = fPlayerService;
-    }
 
     @Override
     public void onEnable() {
@@ -49,6 +40,11 @@ public class AutoModule extends AbstractModuleListLocalization<Localization.Mess
                 taskScheduler.runAsyncTimer(() -> fPlayerService.getOnlineFPlayers().forEach(fPlayer -> send(fPlayer, key, value, sound)), ticker.getPeriod());
             }
         });
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.AUTO;
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.localization.Localization;
@@ -34,42 +35,20 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MaintenanceModule extends AbstractModuleCommand<Localization.Command.Maintenance> {
 
     private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final PermissionChecker permissionChecker;
     private final ListenerRegistry listenerRegistry;
-    private final Path iconPath;
+    private final @Named("imagePath") Path iconPath;
     private final PlatformServerAdapter platformServerAdapter;
     private final MessagePipeline messagePipeline;
     private final IconUtil iconUtil;
     private final FLogger fLogger;
 
     private String icon;
-
-    @Inject
-    public MaintenanceModule(FileResolver fileResolver,
-                             FPlayerService fPlayerService,
-                             PermissionChecker permissionChecker,
-                             ListenerRegistry listenerRegistry,
-                             @Named("projectPath") Path projectPath,
-                             PlatformServerAdapter platformServerAdapter,
-                             MessagePipeline messagePipeline,
-                             IconUtil iconUtil,
-                             FLogger fLogger) {
-        super(MessageType.COMMAND_MAINTENANCE);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.permissionChecker = permissionChecker;
-        this.listenerRegistry = listenerRegistry;
-        this.iconPath = projectPath.resolve("images");
-        this.platformServerAdapter = platformServerAdapter;
-        this.messagePipeline = messagePipeline;
-        this.iconUtil = iconUtil;
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void onEnable() {
@@ -80,7 +59,7 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         listenerRegistry.register(MaintenancePacketListener.class);
         listenerRegistry.register(MaintenancePulseListener.class);
 
-        File file = new File(iconPath.toString() + File.separator + "maintenance.png");
+        File file = iconPath.resolve("maintenance.png").toFile();
 
         if (!file.exists()) {
             platformServerAdapter.saveResource("images" + File.separator + "maintenance.png");
@@ -124,6 +103,11 @@ public class MaintenanceModule extends AbstractModuleCommand<Localization.Comman
         if (turned) {
             kickOnlinePlayers(fPlayer);
         }
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_MAINTENANCE;
     }
 
     @Override

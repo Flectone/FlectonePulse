@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.tab.footer;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerListHeaderAndFooter;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
@@ -24,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FooterModule extends AbstractModuleListLocalization<Localization.Message.Tab.Footer> {
 
     private final FileResolver fileResolver;
@@ -31,21 +33,6 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
     private final TaskScheduler taskScheduler;
     private final ListenerRegistry listenerRegistry;
     private final PacketSender packetSender;
-
-    @Inject
-    public FooterModule(FileResolver fileResolver,
-                        FPlayerService fPlayerService,
-                        TaskScheduler taskScheduler,
-                        ListenerRegistry listenerRegistry,
-                        PacketSender packetSender) {
-        super(MessageType.FOOTER);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.taskScheduler = taskScheduler;
-        this.listenerRegistry = listenerRegistry;
-        this.packetSender = packetSender;
-    }
 
     @Override
     public void onEnable() {
@@ -68,6 +55,11 @@ public class FooterModule extends AbstractModuleListLocalization<Localization.Me
         if (destinationType == Destination.Type.TAB_HEADER || destinationType == Destination.Type.TAB_FOOTER) {
             packetSender.send(new WrapperPlayServerPlayerListHeaderAndFooter(Component.empty(), Component.empty()));
         }
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.FOOTER;
     }
 
     @Override

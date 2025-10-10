@@ -3,6 +3,7 @@ package net.flectone.pulse.module.message.join.listener;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.listener.PulseListener;
@@ -13,17 +14,11 @@ import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class JoinPulseListener implements PulseListener {
 
     private final PacketProvider packetProvider;
     private final JoinModule joinModule;
-
-    @Inject
-    public JoinPulseListener(PacketProvider packetProvider,
-                             JoinModule joinModule) {
-        this.packetProvider = packetProvider;
-        this.joinModule = joinModule;
-    }
 
     @Pulse
     public void onPlayerJoinEvent(PlayerJoinEvent event) {

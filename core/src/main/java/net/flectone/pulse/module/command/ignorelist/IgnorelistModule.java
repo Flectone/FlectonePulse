@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command.ignorelist;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class IgnorelistModule extends AbstractModuleCommand<Localization.Command.Ignorelist> {
 
     private final FileResolver fileResolver;
@@ -36,25 +38,6 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
     private final CommandParserProvider commandParserProvider;
     private final TimeFormatter timeFormatter;
     private final SoundPlayer soundPlayer;
-
-    @Inject
-    public IgnorelistModule(FileResolver fileResolver,
-                            FPlayerService fPlayerService,
-                            EventDispatcher eventDispatcher,
-                            MessagePipeline messagePipeline,
-                            CommandParserProvider commandParserProvider,
-                            TimeFormatter timeFormatter,
-                            SoundPlayer soundPlayer) {
-        super(MessageType.COMMAND_IGNORELIST);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.eventDispatcher = eventDispatcher;
-        this.messagePipeline = messagePipeline;
-        this.commandParserProvider = commandParserProvider;
-        this.timeFormatter = timeFormatter;
-        this.soundPlayer = soundPlayer;
-    }
 
     @Override
     public void onEnable() {
@@ -139,6 +122,11 @@ public class IgnorelistModule extends AbstractModuleCommand<Localization.Command
         eventDispatcher.dispatch(new MessageSendEvent(MessageType.COMMAND_IGNORELIST, fPlayer, component));
 
         soundPlayer.play(getModuleSound(), fPlayer);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_IGNORELIST;
     }
 
     @Override

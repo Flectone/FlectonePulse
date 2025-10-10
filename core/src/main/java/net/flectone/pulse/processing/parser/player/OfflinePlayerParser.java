@@ -12,6 +12,7 @@ import org.incendo.cloud.context.CommandInput;
 
 @Singleton
 public class OfflinePlayerParser extends PlayerParser {
+
     private final FPlayerService playerService;
 
     @Inject

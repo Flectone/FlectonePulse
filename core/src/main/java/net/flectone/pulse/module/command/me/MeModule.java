@@ -2,9 +2,10 @@ package net.flectone.pulse.module.command.me;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
@@ -14,19 +15,11 @@ import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
 
     private final FileResolver fileResolver;
     private final CommandParserProvider commandParserProvider;
-
-    @Inject
-    public MeModule(FileResolver fileResolver,
-                    CommandParserProvider commandParserProvider) {
-        super(MessageType.COMMAND_ME);
-
-        this.fileResolver = fileResolver;
-        this.commandParserProvider = commandParserProvider;
-    }
 
     @Override
     public void onEnable() {
@@ -57,6 +50,11 @@ public class MeModule extends AbstractModuleCommand<Localization.Command.Me> {
                 .build()
         );
 
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_ME;
     }
 
     @Override

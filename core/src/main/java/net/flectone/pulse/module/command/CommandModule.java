@@ -2,6 +2,7 @@ package net.flectone.pulse.module.command;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.module.AbstractModule;
@@ -51,14 +52,10 @@ import net.flectone.pulse.module.command.warnlist.WarnlistModule;
 import net.flectone.pulse.processing.resolver.FileResolver;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class CommandModule extends AbstractModule {
 
     private final FileResolver fileResolver;
-
-    @Inject
-    public CommandModule(FileResolver fileResolver) {
-        this.fileResolver = fileResolver;
-    }
 
     @Override
     public void configureChildren() {

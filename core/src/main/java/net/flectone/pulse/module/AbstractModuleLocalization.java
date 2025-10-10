@@ -33,8 +33,6 @@ import static net.flectone.pulse.execution.pipeline.MessagePipeline.ReplacementT
 
 public abstract class AbstractModuleLocalization<M extends Localization.Localizable> extends AbstractModule {
 
-    @Getter private final MessageType messageType;
-
     @Inject private FPlayerService fPlayerService;
     @Inject private RangeFilter rangeFilter;
     @Inject private MessagePipeline messagePipeline;
@@ -43,9 +41,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     @Getter private Cooldown moduleCooldown;
     @Getter private Sound moduleSound;
 
-    protected AbstractModuleLocalization(MessageType messageType) {
-        this.messageType = messageType;
-    }
+    public abstract MessageType messageType();
 
     public abstract M localization(FEntity sender);
 
@@ -100,7 +96,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     }
 
     public void sendMessage(EventMetadata<M> eventMetadata) {
-        sendMessage(this.messageType, eventMetadata);
+        sendMessage(messageType(), eventMetadata);
     }
 
     public void sendMessage(MessageType messageType, EventMetadata<M> eventMetadata) {
@@ -109,7 +105,7 @@ public abstract class AbstractModuleLocalization<M extends Localization.Localiza
     }
 
     public void sendMessage(List<FPlayer> receivers, EventMetadata<M> eventMetadata) {
-        sendMessage(this.messageType, receivers, eventMetadata);
+        sendMessage(messageType(), receivers, eventMetadata);
     }
 
     @Async

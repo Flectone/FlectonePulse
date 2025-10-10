@@ -7,6 +7,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -31,23 +32,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
 
     private final Injector injector;
     private final PacketProvider packetProvider;
     private final AttributesProvider attributesProvider;
     private final PassengersProvider passengersProvider;
-
-    @Inject
-    public BukkitPlayerAdapter(Injector injector,
-                               PacketProvider packetProvider,
-                               AttributesProvider attributesProvider,
-                               PassengersProvider passengersProvider) {
-        this.injector = injector;
-        this.packetProvider = packetProvider;
-        this.attributesProvider = attributesProvider;
-        this.passengersProvider = passengersProvider;
-    }
 
     @Override
     public @Nullable Object convertToPlatformPlayer(@NotNull FPlayer fPlayer) {

@@ -3,6 +3,7 @@ package net.flectone.pulse.service;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.logging.FLogger;
@@ -29,34 +30,24 @@ import java.util.Locale;
 import java.util.Map;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MinecraftTranslationService {
 
-    private final String MINECRAFT_TRANSLATION_API = "https://assets.mcasset.cloud/<version>/assets/minecraft/lang/<language>";
+    private static final String MINECRAFT_TRANSLATION_API = "https://assets.mcasset.cloud/<version>/assets/minecraft/lang/<language>";
+
     private final Map<String, String> translations = new HashMap<>();
 
-    // FlectonePulse/localizations/minecraft/...
-    private final Path translationPath;
+    private final @Named("translationPath") Path translationPath;
     private final PacketProvider packetProvider;
     private final FileResolver fileResolver;
     private final FLogger fLogger;
 
-    private final boolean isModern;
-
     private Translator translator;
-
-    @Inject
-    public MinecraftTranslationService(@Named("projectPath") Path projectPath,
-                                       PacketProvider packetProvider,
-                                       FileResolver fileResolver,
-                                       FLogger fLogger) {
-        this.translationPath = projectPath.resolve("localizations/minecraft");
-        this.packetProvider = packetProvider;
-        this.fileResolver = fileResolver;
-        this.fLogger = fLogger;
-        this.isModern = detectModernVersion();
-    }
+    private boolean isModern;
 
     public void reload() {
+        isModern = detectModernVersion();
+
         translations.clear();
         downloadLocalizationFile();
         loadLocalization();

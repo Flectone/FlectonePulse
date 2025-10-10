@@ -2,6 +2,7 @@ package net.flectone.pulse.util.checker;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -11,14 +12,10 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitPermissionChecker implements PermissionChecker {
 
     private final IntegrationModule integrationModule;
-
-    @Inject
-    public BukkitPermissionChecker(IntegrationModule integrationModule) {
-        this.integrationModule = integrationModule;
-    }
 
     @Override
     public boolean check(FEntity entity, String permission) {

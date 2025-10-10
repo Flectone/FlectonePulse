@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSc
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateScore;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -17,17 +18,11 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ObjectiveModule extends AbstractModule {
 
     private final FileResolver fileResolver;
     private final PacketSender packetSender;
-
-    @Inject
-    public ObjectiveModule(FileResolver fileResolver,
-                           PacketSender packetSender) {
-        this.fileResolver = fileResolver;
-        this.packetSender = packetSender;
-    }
 
     @Override
     public void configureChildren() {

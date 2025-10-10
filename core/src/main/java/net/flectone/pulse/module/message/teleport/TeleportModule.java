@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.teleport;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -23,19 +24,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TeleportModule extends AbstractModuleLocalization<Localization.Message.Teleport> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public TeleportModule(FileResolver fileResolver,
-                          ListenerRegistry listenerRegistry) {
-        super(MessageType.TELEPORT);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -44,6 +37,11 @@ public class TeleportModule extends AbstractModuleLocalization<Localization.Mess
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(TeleportPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.TELEPORT;
     }
 
     @Override

@@ -2,17 +2,26 @@ package net.flectone.pulse.data.database.dao;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.VersionSQL;
 
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class VersionDAO extends BaseDAO<VersionSQL> {
 
-    @Inject
-    public VersionDAO(Database database) {
-        super(database, VersionSQL.class);
+    private final Database database;
+
+    @Override
+    public Database database() {
+        return database;
+    }
+
+    @Override
+    public Class<VersionSQL> sqlClass() {
+        return VersionSQL.class;
     }
 
     public Optional<String> find() {

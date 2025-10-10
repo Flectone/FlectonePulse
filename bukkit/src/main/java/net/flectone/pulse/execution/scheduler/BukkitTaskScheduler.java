@@ -2,12 +2,14 @@ package net.flectone.pulse.execution.scheduler;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.util.logging.FLogger;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.plugin.Plugin;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitTaskScheduler implements TaskScheduler {
 
     private final Plugin plugin;
@@ -15,15 +17,6 @@ public class BukkitTaskScheduler implements TaskScheduler {
     private final FLogger fLogger;
 
     private volatile boolean disabled = false;
-
-    @Inject
-    public BukkitTaskScheduler(Plugin plugin,
-                               com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler taskScheduler,
-                               FLogger fLogger) {
-        this.plugin = plugin;
-        this.taskScheduler = taskScheduler;
-        this.fLogger = fLogger;
-    }
 
     @Override
     public void shutdown() {

@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.chatcolor;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -25,6 +26,7 @@ import org.incendo.cloud.suggestion.Suggestion;
 import java.util.*;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.Chatcolor> {
 
     private final FileResolver fileResolver;
@@ -33,23 +35,6 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
     private final ProxySender proxySender;
     private final ColorConverter colorConverter;
     private final CommandParserProvider commandParserProvider;
-
-    @Inject
-    public ChatcolorModule(FileResolver fileResolver,
-                           FPlayerService fPlayerService,
-                           PermissionChecker permissionChecker,
-                           ProxySender proxySender,
-                           ColorConverter colorConverter,
-                           CommandParserProvider commandParserProvider) {
-        super(MessageType.COMMAND_CHATCOLOR);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.permissionChecker = permissionChecker;
-        this.proxySender = proxySender;
-        this.colorConverter = colorConverter;
-        this.commandParserProvider = commandParserProvider;
-    }
 
     @Override
     public void onEnable() {
@@ -152,6 +137,11 @@ public class ChatcolorModule extends AbstractModuleCommand<Localization.Command.
         }
 
         setColors(fTarget, fColorType.get(), new HashSet<>(newFColors.values()));
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_CHATCOLOR;
     }
 
     @Override

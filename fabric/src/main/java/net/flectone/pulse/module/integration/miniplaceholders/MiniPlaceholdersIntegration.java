@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.miniplaceholders.api.MiniPlaceholders;
 import io.github.miniplaceholders.api.types.RelationalAudience;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
@@ -26,20 +27,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class MiniPlaceholdersIntegration implements FIntegration, PulseListener {
 
-    private final Pattern bracesPattern = Pattern.compile("\\{([^}]*)}");
+    private static final Pattern BRACES_PATTERN = Pattern.compile("\\{([^}]*)}");
 
     private final FLogger fLogger;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
     private final PlatformPlayerAdapter platformPlayerAdapter;
-
-    @Inject
-    public MiniPlaceholdersIntegration(FLogger fLogger,
-                                       PlatformPlayerAdapter platformPlayerAdapter) {
-        this.fLogger = fLogger;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-    }
 
     @Override
     public void hook() {
@@ -85,7 +80,7 @@ public class MiniPlaceholdersIntegration implements FIntegration, PulseListener 
     }
 
     private String replaceMiniPlaceholders(String text, TagResolver[] resolvers, Audience sender, Audience receiver) {
-        Matcher matcher = bracesPattern.matcher(text);
+        Matcher matcher = BRACES_PATTERN.matcher(text);
         StringBuilder result = new StringBuilder();
         while (matcher.find()) {
             String content = matcher.group(1);

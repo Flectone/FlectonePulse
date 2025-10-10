@@ -3,6 +3,7 @@ package net.flectone.pulse.module.command.stream;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
 import net.flectone.pulse.config.Permission;
 import net.flectone.pulse.config.localization.Localization;
@@ -37,25 +38,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class StreamModule extends AbstractModuleCommand<Localization.Command.Stream> implements PulseListener {
 
     private final FileResolver fileResolver;
     private final FPlayerService fPlayerService;
     private final CommandParserProvider commandParserProvider;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public StreamModule(FileResolver fileResolver,
-                        FPlayerService fPlayerService,
-                        CommandParserProvider commandParserProvider,
-                        ListenerRegistry listenerRegistry) {
-        super(MessageType.COMMAND_STREAM);
-
-        this.fileResolver = fileResolver;
-        this.fPlayerService = fPlayerService;
-        this.commandParserProvider = commandParserProvider;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -147,6 +136,11 @@ public class StreamModule extends AbstractModuleCommand<Localization.Command.Str
                     .build()
             );
         }
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.COMMAND_STREAM;
     }
 
     @Override

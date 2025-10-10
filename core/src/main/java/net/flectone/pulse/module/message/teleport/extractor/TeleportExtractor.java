@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.teleport.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.message.teleport.model.TeleportEntity;
 import net.flectone.pulse.module.message.teleport.model.TeleportLocation;
@@ -12,11 +13,8 @@ import net.kyori.adventure.text.TranslatableComponent;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TeleportExtractor extends Extractor {
-
-    @Inject
-    public TeleportExtractor() {
-    }
 
     public Optional<TeleportEntity> extractEntity(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
         Optional<FEntity> secondTarget = extractFEntity(translatableComponent, 1);

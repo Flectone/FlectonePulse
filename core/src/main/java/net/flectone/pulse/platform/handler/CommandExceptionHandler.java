@@ -2,6 +2,7 @@ package net.flectone.pulse.platform.handler;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.execution.dispatcher.EventDispatcher;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -24,23 +25,13 @@ import org.incendo.cloud.parser.standard.DurationParser;
 import org.incendo.cloud.parser.standard.StringParser;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class CommandExceptionHandler {
 
     private final FileResolver fileResolver;
     private final EventDispatcher eventDispatcher;
     private final MessagePipeline messagePipeline;
     private final FLogger fLogger;
-
-    @Inject
-    public CommandExceptionHandler(FileResolver fileResolver,
-                                   EventDispatcher eventDispatcher,
-                                   MessagePipeline messagePipeline,
-                                   FLogger fLogger) {
-        this.fileResolver = fileResolver;
-        this.eventDispatcher = eventDispatcher;
-        this.messagePipeline = messagePipeline;
-        this.fLogger = fLogger;
-    }
 
     public void handleArgumentParseException(ExceptionContext<FPlayer, ArgumentParseException> context) {
         FPlayer fPlayer = context.context().sender();

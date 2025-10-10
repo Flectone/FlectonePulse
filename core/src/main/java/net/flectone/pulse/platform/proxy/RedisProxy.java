@@ -8,6 +8,7 @@ import io.lettuce.core.RedisURI;
 import io.lettuce.core.codec.ByteArrayCodec;
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 import io.lettuce.core.pubsub.api.async.RedisPubSubAsyncCommands;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.listener.RedisListener;
@@ -20,6 +21,7 @@ import net.flectone.pulse.util.logging.FLogger;
 import java.nio.charset.StandardCharsets;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RedisProxy implements Proxy {
 
     private final FileResolver fileResolver;
@@ -29,17 +31,6 @@ public class RedisProxy implements Proxy {
 
     private RedisClient redisClient;
     private StatefulRedisPubSubConnection<byte[], byte[]> pubSubConnection;
-
-    @Inject
-    public RedisProxy(FileResolver fileResolver,
-                      FLogger fLogger,
-                      Provider<RedisListener> redisListenerProvider,
-                      SystemVariableResolver systemVariableResolver) {
-        this.fileResolver = fileResolver;
-        this.fLogger = fLogger;
-        this.redisListenerProvider = redisListenerProvider;
-        this.systemVariableResolver = systemVariableResolver;
-    }
 
     public Config.Proxy.Redis config() {
         return fileResolver.getConfig().getProxy().getRedis();

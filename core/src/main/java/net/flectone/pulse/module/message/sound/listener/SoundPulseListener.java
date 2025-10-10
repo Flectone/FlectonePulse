@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.sound.listener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Pulse;
 import net.flectone.pulse.listener.PulseListener;
 import net.flectone.pulse.model.event.message.MessageReceiveEvent;
@@ -13,17 +14,11 @@ import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SoundPulseListener implements PulseListener {
 
     private final SoundModule soundModule;
     private final SoundExtractor soundExtractor;
-
-    @Inject
-    public SoundPulseListener(SoundModule soundModule,
-                              SoundExtractor soundExtractor) {
-        this.soundModule = soundModule;
-        this.soundExtractor = soundExtractor;
-    }
 
     @Pulse
     public void onTranslatableMessageReceiveEvent(MessageReceiveEvent event) {

@@ -2,6 +2,7 @@ package net.flectone.pulse.config.localization;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.util.constant.MessageType;
 
 import java.util.ArrayList;
@@ -10,11 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class EnglishLocale implements Locale {
-
-    @Inject
-    public EnglishLocale() {
-    }
 
     @Override
     public void init(Localization localization) {

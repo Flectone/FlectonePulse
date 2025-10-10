@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.sleep.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.message.sleep.model.Sleep;
 import net.flectone.pulse.processing.extractor.Extractor;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
@@ -10,11 +11,8 @@ import net.kyori.adventure.text.TranslatableComponent;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SleepExtractor extends Extractor {
-
-    @Inject
-    public SleepExtractor() {
-    }
 
     public Optional<Sleep> extract(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
         return switch (translationKey) {

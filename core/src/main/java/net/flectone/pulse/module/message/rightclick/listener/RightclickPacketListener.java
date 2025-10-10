@@ -6,17 +6,14 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.message.rightclick.RightclickModule;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RightclickPacketListener implements PacketListener {
 
     private final RightclickModule rightClickModule;
-
-    @Inject
-    public RightclickPacketListener(RightclickModule rightClickModuleBukkit) {
-        this.rightClickModule = rightClickModuleBukkit;
-    }
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {

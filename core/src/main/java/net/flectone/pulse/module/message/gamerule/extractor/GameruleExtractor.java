@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.gamerule.extractor;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.module.message.gamerule.model.Gamerule;
 import net.flectone.pulse.processing.extractor.Extractor;
 import net.flectone.pulse.util.constant.MinecraftTranslationKey;
@@ -10,11 +11,8 @@ import net.kyori.adventure.text.TranslatableComponent;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class GameruleExtractor extends Extractor {
-
-    @Inject
-    public GameruleExtractor() {
-    }
 
     public Optional<Gamerule> extract(MinecraftTranslationKey translationKey, TranslatableComponent translatableComponent) {
         return switch (translationKey) {

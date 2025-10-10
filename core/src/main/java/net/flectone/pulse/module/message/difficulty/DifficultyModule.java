@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.difficulty;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -18,19 +19,11 @@ import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import org.apache.commons.lang3.Strings;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DifficultyModule extends AbstractModuleLocalization<Localization.Message.Difficulty> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
-
-    @Inject
-    public DifficultyModule(FileResolver fileResolver,
-                            ListenerRegistry listenerRegistry) {
-        super(MessageType.DIFFICULTY);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-    }
 
     @Override
     public void onEnable() {
@@ -39,6 +32,11 @@ public class DifficultyModule extends AbstractModuleLocalization<Localization.Me
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(DifficultyPulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.DIFFICULTY;
     }
 
     @Override

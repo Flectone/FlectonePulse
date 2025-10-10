@@ -8,6 +8,7 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
@@ -37,20 +38,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FabricPlayerAdapter implements PlatformPlayerAdapter {
 
     private final FabricFlectonePulse fabricFlectonePulse;
     private final PacketProvider packetProvider;
     private final Injector injector;
-
-    @Inject
-    public FabricPlayerAdapter(FabricFlectonePulse fabricFlectonePulse,
-                               PacketProvider packetProvider,
-                               Injector injector) {
-        this.fabricFlectonePulse = fabricFlectonePulse;
-        this.packetProvider = packetProvider;
-        this.injector = injector;
-    }
 
     @Override
     public int getEntityId(@NotNull UUID uuid) {

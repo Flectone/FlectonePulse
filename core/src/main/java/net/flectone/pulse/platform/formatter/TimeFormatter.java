@@ -2,6 +2,7 @@ package net.flectone.pulse.platform.formatter;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -12,19 +13,15 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TimeFormatter {
 
     // 1s = 20ticks -> 20ticks * 50 = 1000ms -> 1s = 1000ms
     public static final long MULTIPLIER = 50L;
 
-    private final Format simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final Format SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private final FileResolver fileResolver;
-
-    @Inject
-    public TimeFormatter(FileResolver fileResolver) {
-        this.fileResolver = fileResolver;
-    }
 
     public String format(FPlayer fPlayer, long time) {
 
@@ -85,6 +82,6 @@ public class TimeFormatter {
     }
 
     public String formatDate(long date) {
-        return simpleDateFormat.format(date);
+        return SIMPLE_DATE_FORMAT.format(date);
     }
 }

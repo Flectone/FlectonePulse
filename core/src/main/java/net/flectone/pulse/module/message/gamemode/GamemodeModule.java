@@ -2,6 +2,7 @@ package net.flectone.pulse.module.message.gamemode;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
 import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
@@ -21,22 +22,12 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.Strings;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class GamemodeModule extends AbstractModuleLocalization<Localization.Message.Gamemode> {
 
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
     private final PlatformPlayerAdapter platformPlayerAdapter;
-
-    @Inject
-    public GamemodeModule(FileResolver fileResolver,
-                          ListenerRegistry listenerRegistry,
-                          PlatformPlayerAdapter platformPlayerAdapter) {
-        super(MessageType.GAMEMODE);
-
-        this.fileResolver = fileResolver;
-        this.listenerRegistry = listenerRegistry;
-        this.platformPlayerAdapter = platformPlayerAdapter;
-    }
 
     @Override
     public void onEnable() {
@@ -45,6 +36,11 @@ public class GamemodeModule extends AbstractModuleLocalization<Localization.Mess
         createSound(config().getSound(), permission().getSound());
 
         listenerRegistry.register(GamemodePulseListener.class);
+    }
+
+    @Override
+    public MessageType messageType() {
+        return MessageType.GAMEMODE;
     }
 
     @Override

@@ -10,6 +10,7 @@ import com.google.inject.name.Named;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
+import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.BuildConfig;
 import net.flectone.pulse.config.Config;
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
@@ -38,10 +39,11 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class Database {
 
     private final FileResolver fileResolver;
-    private final Path projectPath;
+    private final @Named("projectPath") Path projectPath;
     private final SystemVariableResolver systemVariableResolver;
     private final PlatformServerAdapter platformServerAdapter;
     private final FLogger fLogger;
@@ -53,29 +55,6 @@ public class Database {
 
     private HikariDataSource dataSource;
     private Jdbi jdbi;
-
-    @Inject
-    public Database(FileResolver fileResolver,
-                    @Named("projectPath") Path projectPath,
-                    SystemVariableResolver systemVariableResolver,
-                    PlatformServerAdapter platformServerAdapter,
-                    FLogger fLogger,
-                    PacketProvider packetProvider,
-                    ReflectionResolver reflectionResolver,
-                    Provider<VersionDAO> versionDAOProvider,
-                    YamlFileProcessor yamlFileProcessor,
-                    BackupCreator backupCreator) {
-        this.fileResolver = fileResolver;
-        this.projectPath = projectPath;
-        this.systemVariableResolver = systemVariableResolver;
-        this.platformServerAdapter = platformServerAdapter;
-        this.fLogger = fLogger;
-        this.packetProvider = packetProvider;
-        this.reflectionResolver = reflectionResolver;
-        this.versionDAOProvider = versionDAOProvider;
-        this.yamlFileProcessor = yamlFileProcessor;
-        this.backupCreator = backupCreator;
-    }
 
     public Config.Database config() {
         return fileResolver.getConfig().getDatabase();
