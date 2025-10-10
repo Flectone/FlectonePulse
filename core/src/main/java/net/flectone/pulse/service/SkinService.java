@@ -3,9 +3,9 @@ package net.flectone.pulse.service;
 import com.github.retrooper.packetevents.protocol.player.TextureProperty;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.integration.IntegrationModule;
@@ -18,17 +18,12 @@ import org.apache.commons.lang3.Strings;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class SkinService {
 
-    private final Cache<UUID, PlayerHeadObjectContents.ProfileProperty> profilePropertyCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(1, TimeUnit.HOURS)
-            .maximumSize(1000)
-            .build();
-
+    private final @Named("profileProperty") Cache<UUID, PlayerHeadObjectContents.ProfileProperty> profilePropertyCache;
     private final FileResolver fileResolver;
     private final IntegrationModule integrationModule;
     private final PacketProvider packetProvider;

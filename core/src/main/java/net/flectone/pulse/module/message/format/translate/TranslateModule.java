@@ -1,13 +1,13 @@
 package net.flectone.pulse.module.message.format.translate;
 
 import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -27,17 +27,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class TranslateModule extends AbstractModuleLocalization<Localization.Message.Format.Translate> {
 
-    private final Cache<String, UUID> messageCache = CacheBuilder.newBuilder()
-            .maximumSize(5000)
-            .expireAfterWrite(1, TimeUnit.HOURS)
-            .build();
-
+    private final @Named("translateMessage") Cache<String, UUID> messageCache;
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;

@@ -5,10 +5,14 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.manager.server.ServerVersion;
+import com.google.common.cache.Cache;
 import com.google.gson.Gson;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.inject.matcher.Matchers;
+import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import lombok.SneakyThrows;
 import net.flectone.pulse.annotation.Async;
@@ -16,19 +20,25 @@ import net.flectone.pulse.annotation.Sync;
 import net.flectone.pulse.config.localization.EnglishLocale;
 import net.flectone.pulse.config.localization.RussianLocale;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
+import net.flectone.pulse.model.entity.FPlayer;
+import net.flectone.pulse.model.util.Moderation;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.processor.YamlFileProcessor;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.LibraryResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.flectone.pulse.processing.resolver.SystemVariableResolver;
+import net.flectone.pulse.platform.registry.CacheRegistry;
 import net.flectone.pulse.util.creator.BackupCreator;
 import net.flectone.pulse.util.interceptor.AsyncInterceptor;
 import net.flectone.pulse.util.interceptor.SyncInterceptor;
 import net.flectone.pulse.util.logging.FLogger;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import org.incendo.cloud.type.tuple.Pair;
 import org.snakeyaml.engine.v2.api.LoadSettings;
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.JsonToken;
@@ -41,10 +51,8 @@ import tools.jackson.dataformat.yaml.YAMLWriteFeature;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class PlatformInjector extends AbstractModule {
 
@@ -136,9 +144,62 @@ public abstract class PlatformInjector extends AbstractModule {
         bind(BackupCreator.class).toInstance(backupCreator);
 
         FileResolver fileResolver = new FileResolver(projectPath, fLogger, yamlFileProcessor, backupCreator);
+        bind(FileResolver.class).toInstance(fileResolver);
         fileResolver.reload();
 
-        bind(FileResolver.class).toInstance(fileResolver);
+        CacheRegistry cacheRegistry = new CacheRegistry(fileResolver);
+        bind(CacheRegistry.class).toInstance(cacheRegistry);
+        cacheRegistry.init();
+    }
+
+    @Provides @Singleton @Named("offlinePlayers")
+    public Cache<UUID, FPlayer> provideOfflinePlayersCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getOfflinePlayersCache();
+    }
+
+    @Provides @Singleton @Named("profileProperty")
+    public Cache<UUID, PlayerHeadObjectContents.ProfileProperty> provideProfilePropertyCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getProfilePropertyCache();
+    }
+
+    @Provides @Singleton @Named("dialogClick")
+    public Cache<UUID, AtomicInteger> provideDialogClickCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getDialogClickCache();
+    }
+
+    @Provides @Singleton @Named("moderation")
+    public Cache<Pair<UUID, Moderation.Type>, List<Moderation>> provideModerationCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getModerationCache();
+    }
+
+    @Provides @Singleton @Named("legacyColorMessage")
+    public Cache<String, String> provideLegacyColorMessageCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getLegacyColorMessageCache();
+    }
+
+    @Provides @Singleton @Named("mentionMessage")
+    public Cache<String, String> provideMentionMessageCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getMentionMessageCache();
+    }
+
+    @Provides @Singleton @Named("swearMessage")
+    public Cache<String, String> provideSwearMessageCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getSwearMessageCache();
+    }
+
+    @Provides @Singleton @Named("replacementMessage")
+    public Cache<String, String> provideReplacementMessageCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getReplacementMessageCache();
+    }
+
+    @Provides @Singleton @Named("replacementImage")
+    public Cache<String, Component> provideReplacementImageCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getReplacementImageCache();
+    }
+
+    @Provides @Singleton @Named("translateMessage")
+    public Cache<String, UUID> provideTranslateMessageCache(CacheRegistry cacheRegistry) {
+        return cacheRegistry.getTranslateMessageCache();
     }
 
     private void setupInterceptors() {

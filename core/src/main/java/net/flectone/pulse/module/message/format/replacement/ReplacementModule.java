@@ -1,13 +1,13 @@
 package net.flectone.pulse.module.message.format.replacement;
 
 import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,15 +47,9 @@ import java.util.regex.Pattern;
 public class ReplacementModule extends AbstractModuleLocalization<Localization.Message.Format.Replacement> {
 
     private final Map<String, Pattern> triggerPatterns = new LinkedHashMap<>();
-    private final Cache<String, String> messageCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(10, TimeUnit.MINUTES)
-            .maximumSize(100000)
-            .build();
-    private final Cache<String, Component> imageCache = CacheBuilder.newBuilder()
-            .expireAfterAccess(10, TimeUnit.MINUTES)
-            .maximumSize(100)
-            .build();
 
+    private final @Named("replacementMessage") Cache<String, String> messageCache;
+    private final @Named("replacementImage") Cache<String, Component> imageCache;
     private final FileResolver fileResolver;
     private final ListenerRegistry listenerRegistry;
     private final MessagePipeline messagePipeline;

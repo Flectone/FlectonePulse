@@ -1,9 +1,9 @@
 package net.flectone.pulse.data.repository;
 
 import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.dao.ColorsDAO;
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
@@ -18,18 +18,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class FPlayerRepository {
 
     private final Map<UUID, FPlayer> onlinePlayers = new ConcurrentHashMap<>();
-    private final Cache<UUID, FPlayer> offlinePlayersCache = CacheBuilder.newBuilder()
-            .expireAfterAccess(1, TimeUnit.HOURS)
-            .maximumSize(1000)
-            .build();
 
+    private final @Named("offlinePlayers") Cache<UUID, FPlayer> offlinePlayersCache;
     private final FPlayerDAO fPlayerDAO;
     private final SettingDAO settingDAO;
     private final ColorsDAO colorsDAO;

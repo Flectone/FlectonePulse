@@ -3,15 +3,16 @@ package net.flectone.pulse.config;
 import com.fasterxml.jackson.annotation.JsonMerge;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.OptBoolean;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.flectone.pulse.BuildConfig;
+import net.flectone.pulse.util.constant.CacheName;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings({"FieldMayBeFinal", "unused"})
 @Getter
@@ -45,6 +46,9 @@ public final class Config extends YamlFile {
 
     @JsonPropertyDescription("https://flectone.net/pulse/docs/config/#logger")
     private Logger logger = new Logger();
+
+    @JsonPropertyDescription("https://flectone.net/pulse/docs/config/#cache")
+    private Cache cache = new Cache();
 
     @JsonPropertyDescription("Help us improve FlectonePulse! This collects basic, anonymous data like server version and module usage. \nNo personal data, No IPs, No player names. \nThis helps us understand what features matter most and focus development where it's needed. \nYou can see the public stats here: https://flectone.net/pulse/metrics/ \nThanks for supporting the project! ❤️")
     private Metrics metrics = new Metrics();
@@ -167,6 +171,34 @@ public final class Config extends YamlFile {
                 "Exception in thread \"ForkJoinPool",
                 "FlectonePulseDatabase - "
         ));
+    }
+
+    @Getter
+    public static final class Cache {
+
+        @JsonMerge(OptBoolean.FALSE)
+        private Map<CacheName, CacheSetting> types = new EnumMap<>(CacheName.class){{
+            put(CacheName.DIALOG_CLICK, new CacheSetting(1, TimeUnit.SECONDS, 100));
+            put(CacheName.OFFLINE_PLAYERS, new CacheSetting(1, TimeUnit.HOURS, 1000));
+            put(CacheName.MODERATION, new CacheSetting(1, TimeUnit.HOURS, 5000));
+            put(CacheName.LEGACY_COLOR_MESSAGE, new CacheSetting(10, TimeUnit.MINUTES, 100000));
+            put(CacheName.MENTION_MESSAGE, new CacheSetting(10, TimeUnit.MINUTES, 1000));
+            put(CacheName.SWEAR_MESSAGE, new CacheSetting(10, TimeUnit.MINUTES, 100000));
+            put(CacheName.REPLACEMENT_MESSAGE, new CacheSetting(10, TimeUnit.MINUTES, 100000));
+            put(CacheName.REPLACEMENT_IMAGE, new CacheSetting(10, TimeUnit.MINUTES, 100));
+            put(CacheName.TRANSLATE_MESSAGE, new CacheSetting(1, TimeUnit.HOURS, 5000));
+            put(CacheName.PROFILE_PROPERTY, new CacheSetting(1, TimeUnit.HOURS, 1000));
+        }};
+
+        @Getter
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static final class CacheSetting {
+            private long duration = 1;
+            private TimeUnit timeUnit = TimeUnit.MINUTES;
+            private long size = 100;
+        }
+
     }
 
     @Getter

@@ -25,9 +25,9 @@ package net.flectone.pulse.module.message.format.convertor;
  */
 
 import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.processing.context.MessageContext;
@@ -41,7 +41,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 @Singleton
@@ -61,11 +60,7 @@ public class LegacyColorConvertor {
             Option.DOUBLE_TO_ESCAPE
     ));
 
-    private final Cache<String, String> messageCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(10, TimeUnit.MINUTES)
-            .maximumSize(100000)
-            .build();
-
+    private final @Named("legacyColorMessage") Cache<String, String> messageCache;
     private final FileResolver fileResolver;
     private final PermissionChecker permissionChecker;
     private final FLogger fLogger;

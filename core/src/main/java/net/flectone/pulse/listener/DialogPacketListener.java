@@ -6,24 +6,20 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.User;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCustomClickAction;
 import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.platform.controller.DialogController;
 
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class DialogPacketListener implements PacketListener {
 
-    private final Cache<UUID, AtomicInteger> clickCounts = CacheBuilder.newBuilder()
-            .expireAfterWrite(1, TimeUnit.SECONDS)
-            .build();
-
+    private final @Named("dialogClick") Cache<UUID, AtomicInteger> dialogClickCache;
     private final DialogController dialogController;
 
     @Override
@@ -43,10 +39,10 @@ public class DialogPacketListener implements PacketListener {
     }
 
     public boolean isSpam(UUID uuid) {
-        AtomicInteger count = clickCounts.getIfPresent(uuid);
+        AtomicInteger count = dialogClickCache.getIfPresent(uuid);
         if (count == null) {
             count = new AtomicInteger(0);
-            clickCounts.put(uuid, count);
+            dialogClickCache.put(uuid, count);
         }
 
         int current = count.incrementAndGet();
