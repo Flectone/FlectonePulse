@@ -234,6 +234,7 @@ public abstract class PlatformInjector extends AbstractModule {
                 .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY) // disable auto sorting
                 .disable(MapperFeature.DETECT_PARAMETER_NAMES) // [databind#5314]
                 .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS) // fix enum names
+                .enable(MapperFeature.ALLOW_FINAL_FIELDS_AS_MUTATORS) // fix custom classes deserialization
                 // deserialization
                 .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES) // jackson 2.x value
                 .disable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS) // jackson 2.x value
