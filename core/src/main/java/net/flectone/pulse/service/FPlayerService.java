@@ -127,14 +127,19 @@ public class FPlayerService {
     }
 
     public String getSortedName(FPlayer fPlayer) {
-        if (packetProvider.getServerVersion().isOlderThan(ServerVersion.V_1_17)) {
-            return fPlayer.getName();
-        }
-
         int weight = integrationModule.getGroupWeight(fPlayer);
 
-        String paddedRank = String.format("%010d", Integer.MAX_VALUE - weight);
-        String paddedName = String.format("%-16s", fPlayer.getName());
+        // 32767 limit
+        if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_18)) {
+            String paddedRank = String.format("%010d", Integer.MAX_VALUE - weight);
+            String paddedName = String.format("%-16s", fPlayer.getName());
+            return paddedRank + paddedName;
+        }
+
+        // 16 limit
+        String paddedRank = String.format("%06d", Integer.MAX_VALUE - weight);
+        String truncatedName = fPlayer.getName().substring(0, Math.min(fPlayer.getName().length(), 10));
+        String paddedName = String.format("%-10s", truncatedName);
         return paddedRank + paddedName;
     }
 
