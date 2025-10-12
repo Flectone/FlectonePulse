@@ -855,9 +855,6 @@ public final class Localization extends YamlFile implements ModuleConfig {
     @Setter
     public static final class Message implements MessageConfig, Localizable {
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/advancement/")
-        Advancement advancement = new Advancement();
-
         @Override
         public SubMessageConfig getAnvil() {
             return null;
@@ -866,14 +863,8 @@ public final class Localization extends YamlFile implements ModuleConfig {
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/afk/")
         Afk afk = new Afk();
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/attribute/")
-        Attribute attribute = new Attribute();
-
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/auto/")
         Auto auto = new Auto();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/bed/")
-        Bed bed = new Bed();
 
         @Override
         public SubMessageConfig getBook() {
@@ -889,62 +880,8 @@ public final class Localization extends YamlFile implements ModuleConfig {
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/chat/")
         Chat chat = new Chat();
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/clear/")
-        Clear clear = new Clear();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/clone/")
-        Clone clone = new Clone();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/commandblock/")
-        Commandblock commandblock = new Commandblock();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/damage/")
-        Damage damage = new Damage();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/death/")
-        Death death = new Death();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/debugstick/")
-        Debugstick debugstick = new Debugstick();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/deop/")
-        Deop deop = new Deop();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/dialog/")
-        Dialog dialog = new Dialog();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/difficulty/")
-        Difficulty difficulty = new Difficulty();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/effect/")
-        Effect effect = new Effect();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/enchant/")
-        Enchant enchant = new Enchant();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/execute/")
-        Execute execute = new Execute();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/experience/")
-        Experience experience = new Experience();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/fill/")
-        Fill fill = new Fill();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/fillbiome/")
-        Fillbiome fillbiome = new Fillbiome();
-
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/")
         Format format = new Format();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/gamemode/")
-        Gamemode gamemode = new Gamemode();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/gamerule/")
-        Gamerule gamerule = new Gamerule();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/give/")
-        Give give = new Give();
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/greeting/")
         Greeting greeting = new Greeting();
@@ -952,47 +889,14 @@ public final class Localization extends YamlFile implements ModuleConfig {
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/join/")
         Join join = new Join();
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/kill/")
-        Kill kill = new Kill();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/locate/")
-        Locate locate = new Locate();
-
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective/")
         Objective objective = new Objective();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/op/")
-        Op op = new Op();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/particle/")
-        Particle particle = new Particle();
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/quit/")
         Quit quit = new Quit();
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/recipe/")
-        Recipe recipe = new Recipe();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/reload/")
-        Reload reload = new Reload();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/ride/")
-        Ride ride = new Ride();
-
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rightclick/")
         Rightclick rightclick = new Rightclick();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rotate/")
-        Rotate rotate = new Rotate();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/save/")
-        Save save = new Save();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/seed/")
-        Seed seed = new Seed();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/setblock/")
-        Setblock setblock = new Setblock();
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sidebar/")
         Sidebar sidebar = new Sidebar();
@@ -1002,71 +906,17 @@ public final class Localization extends YamlFile implements ModuleConfig {
             return null;
         }
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sleep/")
-        Sleep sleep = new Sleep();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sound/")
-        Sound sound = new Sound();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/spawn/")
-        Spawn spawn = new Spawn();
-
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status/")
         Status status = new Status();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/stop/")
-        Stop stop = new Stop();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/summon/")
-        Summon summon = new Summon();
 
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab/")
         Tab tab = new Tab();
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/teleport/")
-        Teleport teleport = new Teleport();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/time/")
-        Time time = new Time();
-
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/update/")
         Update update = new Update();
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/weather/")
-        Weather weather = new Weather();
-
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/worldborder/")
-        Worldborder worldborder = new Worldborder();
-
-        @Getter
-        public static final class Advancement implements SubMessageConfig, Localizable {
-
-            String formatTask;
-            String formatGoal;
-            String formatChallenge;
-            String formatTaken;
-            Tag tag = new Tag();
-            Command revoke = new Command();
-            Command grant = new Command();
-
-            @Getter
-            @NoArgsConstructor
-            public static final class Tag {
-                String task;
-                String challenge;
-            }
-
-            @Getter
-            @NoArgsConstructor
-            public static final class Command {
-                String manyToOne;
-                String oneToMany;
-                String manyToMany;
-                String oneToOne;
-                String criterionToMany;
-                String criterionToOne;
-            }
-        }
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/vanilla/")
+        Vanilla vanilla = new Vanilla();
 
         @Getter
         public static final class Afk implements SubMessageConfig, Localizable {
@@ -1083,42 +933,9 @@ public final class Localization extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Attribute implements SubMessageConfig, Localizable {
-            BaseValue baseValue = new BaseValue();
-            Modifier modifier = new Modifier();
-            String valueGet;
-
-            @Getter
-            @NoArgsConstructor
-            public static final class BaseValue {
-                String get;
-                String reset;
-                String set;
-            }
-
-            @Getter
-            @AllArgsConstructor
-            @NoArgsConstructor
-            public static final class Modifier {
-                String add;
-                String remove;
-                String valueGet;
-            }
-        }
-
-        @Getter
         public static final class Auto implements SubMessageConfig, Localizable {
             @JsonMerge(OptBoolean.FALSE)
             Map<String, List<String>> types = new LinkedHashMap<>();
-        }
-
-        @Getter
-        public static final class Bed implements SubMessageConfig, Localizable {
-            String noSleep;
-            String notSafe;
-            String obstructed;
-            String occupied;
-            String tooFarAway;
         }
 
         @Getter
@@ -1139,120 +956,6 @@ public final class Localization extends YamlFile implements ModuleConfig {
 
             @JsonMerge(OptBoolean.FALSE)
             Map<String, String> types = new LinkedHashMap<>();
-        }
-
-        @Getter
-        public static final class Clear implements SubMessageConfig, Localizable {
-            String single;
-            String multiple;
-        }
-
-        @Getter
-        public static final class Clone implements SubMessageConfig, Localizable {
-            String format;
-        }
-
-        @Getter
-        public static final class Commandblock implements SubMessageConfig, Localizable {
-            String notEnabled;
-            String format;
-        }
-
-        @Getter
-        public static final class Damage implements SubMessageConfig, Localizable {
-            String format;
-        }
-
-        @Getter
-        public static final class Death implements SubMessageConfig, Localizable {
-            @JsonMerge(OptBoolean.FALSE)
-            Map<String, String> types = new LinkedHashMap<>();
-        }
-
-        @Getter
-        public static final class Debugstick implements SubMessageConfig, Localizable {
-            String empty;
-            String select;
-            String update;
-        }
-
-        @Getter
-        public static final class Deop implements SubMessageConfig, Localizable {
-            String format;
-        }
-
-        @Getter
-        public static final class Dialog implements SubMessageConfig, Localizable {
-            SingleMultiple clear = new SingleMultiple();
-            SingleMultiple show = new SingleMultiple();
-        }
-
-        @Getter
-        public static final class Difficulty implements SubMessageConfig, Localizable {
-            String query;
-            String success;
-        }
-
-        @Getter
-        public static final class Effect implements SubMessageConfig, Localizable {
-
-            Clear clear = new Clear();
-            SingleMultiple give = new SingleMultiple();
-
-            @Getter
-            public static final class Clear {
-                SingleMultiple everything = new SingleMultiple();
-                SingleMultiple specific = new SingleMultiple();
-            }
-
-        }
-
-        @Getter
-        public static final class Enchant implements SubMessageConfig, Localizable {
-            String single;
-            String multiple;
-        }
-
-        @Getter
-        public static final class Execute implements SubMessageConfig, Localizable {
-            String pass;
-            String passCount;
-        }
-
-        @Getter
-        public static final class Experience implements SubMessageConfig, Localizable {
-
-            AddSet add = new AddSet();
-            Query query = new Query();
-            AddSet set = new AddSet();
-
-            String taken;
-
-            @Getter
-            public static final class Query {
-                String levels;
-                String points;
-            }
-
-
-            @Getter
-            @NoArgsConstructor
-            public static final class AddSet {
-                SingleMultiple levels = new SingleMultiple();
-                SingleMultiple points = new SingleMultiple();
-            }
-
-        }
-
-        @Getter
-        public static final class Fill implements SubMessageConfig, Localizable {
-            String format;
-        }
-
-        @Getter
-        public static final class Fillbiome implements SubMessageConfig, Localizable {
-            String format;
-            String formatCount;
         }
 
         @Getter
@@ -1378,25 +1081,6 @@ public final class Localization extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Gamemode implements SubMessageConfig, Localizable {
-            String setDefault;
-            String self;
-            String other;
-        }
-
-        @Getter
-        public static final class Gamerule implements SubMessageConfig, Localizable {
-            String query;
-            String set;
-        }
-
-        @Getter
-        public static final class Give implements SubMessageConfig, Localizable {
-            String single;
-            String multiple;
-        }
-
-        @Getter
         public static final class Greeting implements SubMessageConfig, Localizable {
             String format;
         }
@@ -1405,19 +1089,6 @@ public final class Localization extends YamlFile implements ModuleConfig {
         public static final class Join implements SubMessageConfig, Localizable {
             String format;
             String formatFirstTime;
-        }
-
-        @Getter
-        public static final class Kill implements SubMessageConfig, Localizable {
-            String single;
-            String multiple;
-        }
-
-        @Getter
-        public static final class Locate implements SubMessageConfig, Localizable {
-            String biome;
-            String poi;
-            String structure;
         }
 
         @Getter
@@ -1440,35 +1111,8 @@ public final class Localization extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Op implements SubMessageConfig, Localizable {
-            String format;
-        }
-
-        @Getter
-        public static final class Particle implements SubMessageConfig, Localizable {
-            String format;
-        }
-
-        @Getter
         public static final class Quit implements SubMessageConfig, Localizable {
             String format;
-        }
-
-        @Getter
-        public static final class Recipe implements SubMessageConfig, Localizable {
-            SingleMultiple give = new SingleMultiple();
-            SingleMultiple take = new SingleMultiple();
-        }
-
-        @Getter
-        public static final class Reload implements SubMessageConfig, Localizable {
-            String format;
-        }
-
-        @Getter
-        public static final class Ride implements SubMessageConfig, Localizable {
-            String dismount;
-            String mount;
         }
 
         @Getter
@@ -1477,70 +1121,9 @@ public final class Localization extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Rotate implements SubMessageConfig, Localizable {
-            String format;
-        }
-
-        @Getter
-        public static final class Save implements SubMessageConfig, Localizable {
-            String disabled;
-            String enabled;
-            String saving;
-            String success;
-        }
-
-        @Getter
-        public static final class Seed implements SubMessageConfig, Localizable {
-            String format;
-        }
-
-        @Getter
-        public static final class Setblock implements SubMessageConfig, Localizable {
-            String format;
-        }
-
-        @Getter
         public static final class Sidebar implements SubMessageConfig, Localizable {
             @JsonMerge(OptBoolean.FALSE)
             List<List<String>> values = new LinkedList<>();
-        }
-
-        @Getter
-        public static final class Sleep implements SubMessageConfig, Localizable {
-            String notPossible;
-            String playersSleeping;
-            String skippingNight;
-        }
-
-        @Getter
-        public static final class Sound implements SubMessageConfig, Localizable {
-            Play play = new Play();
-            Stop stop = new Stop();
-
-            @Getter
-            @NoArgsConstructor
-            public static final class Play {
-                String multiple;
-                String single;
-            }
-
-            @Getter
-            @NoArgsConstructor
-            public static final class Stop {
-                String sourceAny;
-                String sourceSound;
-                String sourcelessAny;
-                String sourcelessSound;
-            }
-        }
-
-        @Getter
-        public static final class Spawn implements SubMessageConfig, Localizable {
-            String notValid;
-            String set;
-            String setWorld;
-            String single;
-            String multiple;
         }
 
         @Getter
@@ -1588,16 +1171,6 @@ public final class Localization extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Stop implements SubMessageConfig, Localizable {
-            String format;
-        }
-
-        @Getter
-        public static final class Summon implements SubMessageConfig, Localizable {
-            String format;
-        }
-
-        @Getter
         public static final class Tab implements TabMessageConfig, Localizable {
 
             @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab/header/")
@@ -1628,61 +1201,15 @@ public final class Localization extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Teleport implements SubMessageConfig, Localizable {
-            SingleMultiple entity = new SingleMultiple();
-            SingleMultiple location = new SingleMultiple();
-        }
-
-        @Getter
-        public static final class Time implements SubMessageConfig, Localizable {
-            String query;
-            String set;
-        }
-
-        @Getter
         public static final class Update implements SubMessageConfig, Localizable {
             String formatPlayer;
             String formatConsole;
         }
 
         @Getter
-        public static final class Weather implements SubMessageConfig, Localizable {
-            String clear;
-            String rain;
-            String thunder;
+        public static final class Vanilla implements SubMessageConfig, Localizable {
+            Map<String, String> types = new LinkedHashMap<>();
         }
-
-        @Getter
-        public static final class Worldborder implements SubMessageConfig, Localizable {
-            String center;
-            Damage damage = new Damage();
-            String get;
-            Set set = new Set();
-            Warning warning = new Warning();
-
-            @Getter
-            @NoArgsConstructor
-            public static final class Damage {
-                String amount;
-                String buffer;
-            }
-
-            @Getter
-            @NoArgsConstructor
-            public static final class Set {
-                String grow;
-                String immediate;
-                String shrink;
-            }
-
-            @Getter
-            @NoArgsConstructor
-            public static final class Warning {
-                String distance;
-                String time;
-            }
-        }
-
     }
 
     public interface Localizable {}
@@ -1706,12 +1233,4 @@ public final class Localization extends YamlFile implements ModuleConfig {
         }
 
     }
-
-    @Getter
-    @NoArgsConstructor
-    public static final class SingleMultiple {
-        String single;
-        String multiple;
-    }
-
 }

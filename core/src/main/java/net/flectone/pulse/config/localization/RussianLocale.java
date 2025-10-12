@@ -439,38 +439,11 @@ public class RussianLocale implements Locale {
             put("CHAT_GLOBAL", "<final_message>");
         }};
 
-        localization.message.advancement.formatTask = "<fcolor:1>🌠 <display_name> получил достижение «<advancement>»";
-        localization.message.advancement.formatGoal = "<fcolor:1>🌠 <display_name> достиг цели «<advancement>»";
-        localization.message.advancement.formatChallenge = "<fcolor:1>🌠 <display_name> завершил испытание «<advancement>»";
-        localization.message.advancement.formatTaken = "<fcolor:1>🌠 <display_name> потерял достижение «<advancement>»";
-        localization.message.advancement.tag.task = "<color:#4eff52>[<hover:show_text:\"<color:#4eff52><advancement>\"><advancement></hover>]";
-        localization.message.advancement.tag.challenge = "<color:#834eff>[<hover:show_text:\"<color:#834eff><advancement>\"><advancement></hover>]";
-        localization.message.advancement.revoke.manyToOne = "<fcolor:1>🌠 Отозвано <fcolor:2><advancements> <fcolor:1>достижений у игрока <target>";
-        localization.message.advancement.revoke.oneToMany = "<fcolor:1>🌠 Достижение «<advancement>» отозвано у <fcolor:2><players> <fcolor:1>игрокам";
-        localization.message.advancement.revoke.manyToMany = "<fcolor:1>🌠 Отозвано <fcolor:2><advancements> <fcolor:1>достижений у <fcolor:2><players> <fcolor:1>игроков";
-        localization.message.advancement.revoke.oneToOne = "<fcolor:1>🌠 Отозвано достижение «<advancement>» у игрока <target>";
-        localization.message.advancement.revoke.criterionToMany = "<fcolor:1>🌠 Отозвано условие «<fcolor:2><criterion><fcolor:1>» достижения <advancement> у <fcolor:2><players> <fcolor:1>игроков";
-        localization.message.advancement.revoke.criterionToOne = "<fcolor:1>🌠 Отозвано условие «<fcolor:2><criterion><fcolor:1>» достижения <advancement> у игрока <target>";
-        localization.message.advancement.grant.manyToOne = "<fcolor:1>🌠 Выдано <fcolor:2><advancements> <fcolor:1>достижений игроку <target>";
-        localization.message.advancement.grant.oneToMany = "<fcolor:1>🌠 Достижение «<advancement>» выдано <fcolor:2><players> <fcolor:1>игрокам";
-        localization.message.advancement.grant.manyToMany = "<fcolor:1>🌠 Выдано <fcolor:2><advancements> <fcolor:1>достижений <fcolor:2><players> <fcolor:1>игрокам";
-        localization.message.advancement.grant.oneToOne = "<fcolor:1>🌠 Достижение «<advancement>» выдано игроку <target>";
-        localization.message.advancement.grant.criterionToMany = "<fcolor:1>🌠 Условие «<fcolor:2><criterion><fcolor:1>» достижения <advancement> зачтено <fcolor:2><players> <fcolor:1>игрокам";
-        localization.message.advancement.grant.criterionToOne = "<fcolor:1>🌠 Условие «<fcolor:2><criterion><fcolor:1>» достижения <advancement> зачтено игроку <target>";
-
         localization.message.afk.suffix = " <color:#FFFF00>⌚</color>";
         localization.message.afk.formatTrue.global = "<gradient:#ffd500:#FFFF00>⌚ <player> отошёл";
         localization.message.afk.formatTrue.local = "<gradient:#ffd500:#FFFF00>⌚ Ты отошёл от игры";
         localization.message.afk.formatFalse.global = "<gradient:#ffd500:#FFFF00>⌚ <player> вернулся";
         localization.message.afk.formatFalse.local = "<gradient:#ffd500:#FFFF00>⌚ Ты вернулся в игру";
-
-        localization.message.attribute.baseValue.get = "<fcolor:1>❤ Базовое значение атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <target> равно <fcolor:2><value>";
-        localization.message.attribute.baseValue.reset = "<fcolor:1>❤ Базовое значение атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <target> возвращено к <fcolor:2><value>";
-        localization.message.attribute.baseValue.set = "<fcolor:1>❤ Базовое значение атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <target> изменено на <fcolor:2><value>";
-        localization.message.attribute.modifier.add = "<fcolor:1>❤ Добавлен модификатор <fcolor:2><modifier> <fcolor:1>к атрибуту «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <target>";
-        localization.message.attribute.modifier.remove = "<fcolor:1>❤ Удалён модификатор <fcolor:2><modifier> <fcolor:1>с атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <target>";
-        localization.message.attribute.modifier.valueGet = "<fcolor:1>❤ Значение модификатора <fcolor:2><modifier> <fcolor:1>атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <target> равно <fcolor:2><value>";
-        localization.message.attribute.valueGet = "<fcolor:1>❤ Значение атрибута «<fcolor:2><lang:'<attribute>'><fcolor:1>» у сущности <target> равно <fcolor:2><value>";
 
         localization.message.auto.types = new LinkedHashMap<>() {{
             put("announcement", new LinkedList<>() {{
@@ -480,12 +453,6 @@ public class RussianLocale implements Locale {
                 add("<br><fcolor:1>   ✉ Заходи в телеграм ✉ <br><fcolor:2>    <u><click:open_url:\"https://t.me/flectone\"><hover:show_text:\"<fcolor:2>https://t.me/flectone\">https://t.me/flectone</hover></click></u><br>");
             }});
         }};
-
-        localization.message.bed.noSleep = "<fcolor:1>\uD83D\uDECC Вы можете спать только ночью или во время грозы";
-        localization.message.bed.notSafe = "<fcolor:1>\uD83D\uDECC Вы не можете уснуть, пока рядом есть монстры";
-        localization.message.bed.obstructed = "<fcolor:1>\uD83D\uDECC Эта кровать заблокирована";
-        localization.message.bed.occupied = "<fcolor:1>\uD83D\uDECC Эта кровать занята";
-        localization.message.bed.tooFarAway = "<fcolor:1>\uD83D\uDECC Вы не можете уснуть, кровать слишком далеко";
 
         localization.message.brand.values = new LinkedList<>() {{
             add("<white>Майнкрафт");
@@ -500,163 +467,6 @@ public class RussianLocale implements Locale {
             put("global", "<delete><display_name> <world_prefix>»<fcolor:4> <message><reset><translate>");
             put("local", "<delete><display_name><fcolor:3>: <message><reset><translate>");
         }};
-
-        localization.message.clear.single = "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><items> <fcolor:1>предметов у игрока <target>";
-        localization.message.clear.multiple = "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><items> <fcolor:1>предметов у <fcolor:2><players> <fcolor:1>игроков";
-
-        localization.message.clone.format = "<fcolor:1>⏹ Успешно скопировано <fcolor:2><blocks> <fcolor:1>блоков";
-
-        localization.message.commandblock.notEnabled = "<fcolor:1>\uD83E\uDD16 На этом сервере командные блоки отключены";
-        localization.message.commandblock.format = "<fcolor:1>\uD83E\uDD16 Команда задана: <fcolor:2><command>";
-
-        localization.message.damage.format = "<fcolor:1>\uD83D\uDDE1 Нанесено <fcolor:2><amount> <fcolor:1>урона <target>";
-
-        localization.message.death.types = new LinkedHashMap<>() {{
-            put("death.attack.anvil", "<fcolor:1>☠ <target> раздавлен упавшей наковальней");
-            put("death.attack.anvil.player", "<fcolor:1>☠ <target> был раздавлен упавшей наковальней, пока боролся с <killer>");
-            put("death.attack.arrow", "<fcolor:1>☠ <target> застрелен <killer>");
-            put("death.attack.arrow.item", "<fcolor:1>☠ <target> застрелен <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.badRespawnPoint.message", "<fcolor:1>☠ <target> стал жертвой <fcolor:2>[<click:open_url:\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"><hover:show_text:\"<fcolor:2>MCPE-28723\">жестоких правил игры</hover></click>]");
-            put("death.attack.cactus", "<fcolor:1>☠ <target> исколот до смерти");
-            put("death.attack.cactus.player", "<fcolor:1>☠ <target> наткнулся на кактус, спасаясь от <killer>");
-            put("death.attack.cramming", "<fcolor:1>☠ <target> расплющен в лепёшку");
-            put("death.attack.cramming.player", "<fcolor:1>☠ <target> расплющен <killer>");
-            put("death.attack.dragonBreath", "<fcolor:1>☠ <target> испепелён дыханием дракона");
-            put("death.attack.dragonBreath.player", "<fcolor:1>☠ <target> сварился заживо в драконьем дыхании из-за <killer>");
-            put("death.attack.drown", "<fcolor:1>☠ <target> утонул");
-            put("death.attack.drown.player", "<fcolor:1>☠ <target> утонул, спасаясь от <killer>");
-            put("death.attack.dryout", "<fcolor:1>☠ <target> умер от обезвоживания");
-            put("death.attack.dryout.player", "<fcolor:1>☠ <target> умер от обезвоживания, спасаясь от <killer>");
-            put("death.attack.even_more_magic", "<fcolor:1>☠ <target> был убит неизведанной магией");
-            put("death.attack.explosion", "<fcolor:1>☠ <target> взорвался");
-            put("death.attack.explosion.player", "<fcolor:1>☠ <target> был взорван <killer>");
-            put("death.attack.explosion.item", "<fcolor:1>☠ <target> был взорван <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.explosion.player.item", "<fcolor:1>☠ <target> был взорван <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.fall", "<fcolor:1>☠ <target> разбился вдребезги");
-            put("death.attack.fall.player", "<fcolor:1>☠ <target> разбился вдребезги, спасаясь от <killer>");
-            put("death.attack.fallingBlock", "<fcolor:1>☠ <target> раздавлен упавшим блоком");
-            put("death.attack.fallingBlock.player", "<fcolor:1>☠ <target> был раздавлен упавшим блоком, пока боролся с <killer>");
-            put("death.attack.fallingStalactite", "<fcolor:1>☠ <target> был пронзён обрушившимся сталактитом");
-            put("death.attack.fallingStalactite.player", "<fcolor:1>☠ <target> был пронзён обрушившимся сталактитом, пока боролся с <killer>");
-            put("death.attack.fireball", "<fcolor:1>☠ <target> убит файерболом <killer>");
-            put("death.attack.fireball.item", "<fcolor:1>☠ <target> убит файерболом <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.fireworks", "<fcolor:1>☠ <target> с треском разлетелся");
-            put("death.attack.fireworks.item", "<fcolor:1>☠ <target> с треском разлетелся из-за фейерверка <killer>, выпущенного из <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.fireworks.player", "<fcolor:1>☠ <target> с треском разлетелся, пока боролся с <killer>");
-            put("death.attack.flyIntoWall", "<fcolor:1>☠ <target> преобразовал кинетическую энергию во внутреннюю");
-            put("death.attack.flyIntoWall.player", "<fcolor:1>☠ <target> преобразовал кинетическую энергию во внутреннюю, спасаясь от <killer>");
-            put("death.attack.freeze", "<fcolor:1>☠ <target> замёрз насмерть");
-            put("death.attack.freeze.player", "<fcolor:1>☠ <target> замёрз насмерть благодаря <killer>");
-            put("death.attack.generic", "<fcolor:1>☠ <target> умер");
-            put("death.attack.generic.player", "<fcolor:1>☠ <target> умер из-за <killer>");
-            put("death.attack.genericKill", "<fcolor:1>☠ <target> убит");
-            put("death.attack.genericKill.player", "<fcolor:1>☠ <target> был убит, сражаясь с <killer>");
-            put("death.attack.hotFloor", "<fcolor:1>☠ <target> обнаружил, что пол — это лава");
-            put("death.attack.hotFloor.player", "<fcolor:1>☠ <target> зашёл в опасную зону из-за <killer>");
-            put("death.attack.inFire", "<fcolor:1>☠ <target> умер в огне");
-            put("death.attack.inFire.player", "<fcolor:1>☠ <target> сгорел в огне, пока боролся с <killer>");
-            put("death.attack.inWall", "<fcolor:1>☠ <target> погребён заживо");
-            put("death.attack.inWall.player", "<fcolor:1>☠ <target> был погребён заживо, пока боролся с <killer>");
-            put("death.attack.indirectMagic", "<fcolor:1>☠ <target> был убит <killer> с помощью магии");
-            put("death.attack.indirectMagic.item", "<fcolor:1>☠ <target> был убит <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.lava", "<fcolor:1>☠ <target> решил поплавать в лаве");
-            put("death.attack.lava.player", "<fcolor:1>☠ <target> упал в лаву, убегая от <killer>");
-            put("death.attack.lightningBolt", "<fcolor:1>☠ <target> был поражён молнией");
-            put("death.attack.lightningBolt.player", "<fcolor:1>☠ <target> был поражён молнией, пока боролся с <killer>");
-            put("death.attack.mace_smash", "<fcolor:1>☠ <target> был сокрушён <killer>");
-            put("death.attack.mace_smash.item", "<fcolor:1>☠ <target> был сокрушён <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.magic", "<fcolor:1>☠ <target> был убит магией");
-            put("death.attack.magic.player", "<fcolor:1>☠ <target> был убит магией, убегая от <killer>");
-            put("death.attack.mob", "<fcolor:1>☠ <target> был убит <killer>");
-            put("death.attack.mob.item", "<fcolor:1>☠ <target> был убит <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.onFire", "<fcolor:1>☠ <target> сгорел заживо");
-            put("death.attack.onFire.item", "<fcolor:1>☠ <target> был сожжён дотла, пока боролся с <killer>, держащим <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.onFire.player", "<fcolor:1>☠ <target> был сожжён дотла, пока боролся с <killer>");
-            put("death.attack.outOfWorld", "<fcolor:1>☠ <target> выпал из мира");
-            put("death.attack.outOfWorld.player", "<fcolor:1>☠ <target> не захотел жить в том же мире, что и <killer>");
-            put("death.attack.outsideBorder", "<fcolor:1>☠ <target> покинул пределы этого мира");
-            put("death.attack.outsideBorder.player", "<fcolor:1>☠ <target> покинул пределы этого мира, пока боролся с <killer>");
-            put("death.attack.player", "<fcolor:1>☠ <target> был убит <killer>");
-            put("death.attack.player.item", "<fcolor:1>☠ <target> был убит <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.sonic_boom", "<fcolor:1>☠ <target> был уничтожен звуковым зарядом");
-            put("death.attack.sonic_boom.item", "<fcolor:1>☠ <target> был уничтожен звуковым зарядом, спасаясь от <killer>, держащего <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.sonic_boom.player", "<fcolor:1>☠ <target> был уничтожен звуковым зарядом, спасаясь от <killer>");
-            put("death.attack.stalagmite", "<fcolor:1>☠ <target> пронзён сталагмитом");
-            put("death.attack.stalagmite.player", "<fcolor:1>☠ <target> был пронзён сталагмитом, пока боролся с <killer>");
-            put("death.attack.starve", "<fcolor:1>☠ <target> умер от голода");
-            put("death.attack.starve.player", "<fcolor:1>☠ <target> умер от голода, пока боролся с <killer>");
-            put("death.attack.sting", "<fcolor:1>☠ <target> изжален до смерти");
-            put("death.attack.sting.item", "<fcolor:1>☠ <target> был изжален до смерти <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.sting.player", "<fcolor:1>☠ <target> изжален до смерти <killer>");
-            put("death.attack.sweetBerryBush", "<fcolor:1>☠ <target> искололся до смерти в кустах сладких ягод");
-            put("death.attack.sweetBerryBush.player", "<fcolor:1>☠ <target> искололся до смерти в кустах сладких ягод, спасаясь от <killer>");
-            put("death.attack.thorns", "<fcolor:1>☠ <target> был убит, пытаясь навредить <killer>");
-            put("death.attack.thorns.item", "<fcolor:1>☠ <target> был убит <fcolor:2>[<killer_item>]<fcolor:1>, пытаясь навредить <killer>");
-            put("death.attack.thrown", "<fcolor:1>☠ <target> был избит <killer>");
-            put("death.attack.thrown.item", "<fcolor:1>☠ <target> был избит <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.trident", "<fcolor:1>☠ <target> был пронзён <killer>");
-            put("death.attack.trident.item", "<fcolor:1>☠ <target> пронзён <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.wither", "<fcolor:1>☠ <target> иссушён");
-            put("death.attack.wither.player", "<fcolor:1>☠ <target> был иссушён, пока боролся с <killer>");
-            put("death.attack.witherSkull", "<fcolor:1>☠ <target> был поражён черепом из <killer>");
-            put("death.attack.witherSkull.item", "<fcolor:1>☠ <target> был поражён черепом из <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.fell.accident.generic", "<fcolor:1>☠ <target> разбился насмерть");
-            put("death.fell.accident.ladder", "<fcolor:1>☠ <target> свалился с лестницы");
-            put("death.fell.accident.other_climbable", "<fcolor:1>☠ <target> сорвался");
-            put("death.fell.accident.scaffolding", "<fcolor:1>☠ <target> сорвался с подмосток");
-            put("death.fell.accident.twisting_vines", "<fcolor:1>☠ <target> сорвался с вьющейся лозы");
-            put("death.fell.accident.vines", "<fcolor:1>☠ <target> сорвался с лианы");
-            put("death.fell.accident.weeping_vines", "<fcolor:1>☠ <target> сорвался с плакучей лозы");
-            put("death.fell.assist", "<fcolor:1>☠ <target> свалился благодаря <killer>");
-            put("death.fell.assist.item", "<fcolor:1>☠ <target> был обречён на падение <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.fell.finish", "<fcolor:1>☠ <target> упал с высоты и был добит <killer>");
-            put("death.fell.finish.item", "<fcolor:1>☠ <target> упал с высоты и был добит <killer> с помощью <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.fell.killer", "<fcolor:1>☠ <target> был обречён на падение");
-        }};
-
-        localization.message.debugstick.empty = "<fcolor:1>\uD83D\uDD27 Свойства объекта <fcolor:2><property> <fcolor:1>не заданы";
-        localization.message.debugstick.select = "<fcolor:1>\uD83D\uDD27 выбрано «<fcolor:2><property><fcolor:1>» (<fcolor:2><value><fcolor:1>)";
-        localization.message.debugstick.update = "<fcolor:1>\uD83D\uDD27 «<fcolor:2><property><fcolor:1>»: <fcolor:2><value>";
-
-        localization.message.deop.format = "<fcolor:1>\uD83E\uDD16 <target> больше не является оператором сервера";
-
-        localization.message.dialog.clear.single = "<fcolor:1>\uD83D\uDDD4 Убран диалог у игрока «<target>»";
-        localization.message.dialog.clear.multiple = "<fcolor:1>\uD83D\uDDD4 Убран диалог у <fcolor:2><players> <fcolor:1>игроков";
-        localization.message.dialog.show.single = "<fcolor:1>\uD83D\uDDD4 Отображён диалог игроку «<target>»";
-        localization.message.dialog.show.multiple = "<fcolor:1>\uD83D\uDDD4 Отображён диалог <fcolor:2><players> <fcolor:1>игрокам";
-
-        localization.message.difficulty.query = "<fcolor:1>⚔ Сложность игры: <fcolor:2><lang:'<difficulty>'>";
-        localization.message.difficulty.success = "<fcolor:1>⚔ Установлена сложность игры: <fcolor:2><lang:'<difficulty>'>";
-
-        localization.message.effect.clear.everything.single = "<fcolor:1>⚗ Убраны все эффекты с <target>";
-        localization.message.effect.clear.everything.multiple = "<fcolor:1>⚗ Убраны все эффекты с <fcolor:2><players> <fcolor:1>целей";
-        localization.message.effect.clear.specific.single = "<fcolor:1>⚗ Убран эффект «<fcolor:2><lang:'<effect>'><fcolor:1>» с <target>";
-        localization.message.effect.clear.specific.multiple = "<fcolor:1>⚗ Убран эффект «<fcolor:2><lang:'<effect>'><fcolor:1>» с <fcolor:2><players> <fcolor:1>целей";
-        localization.message.effect.give.single = "<fcolor:1>⚗ Применён эффект «<fcolor:2><lang:'<effect>'><fcolor:1>» к <target>";
-        localization.message.effect.give.multiple = "<fcolor:1>⚗ Применён эффект <fcolor:2><lang:'<effect>'><fcolor:1>» к <fcolor:2><players> <fcolor:1>целям";
-
-        localization.message.enchant.single = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><enchantment><fcolor:1>» на предмет <target>";
-        localization.message.enchant.multiple = "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><enchantment><fcolor:1>» на предмет <fcolor:2><players><fcolor:1> сущностей";
-
-        localization.message.execute.pass = "<fcolor:1>⚡ Условие выполнено";
-        localization.message.execute.passCount = "<fcolor:1>⚡ Условие выполнено; счётчик: <fcolor:2><count>";
-
-        localization.message.experience.add.levels.single = "<fcolor:1>⏺ Выдано <fcolor:2><amount> <fcolor:1>уровней игроку <target>";
-        localization.message.experience.add.levels.multiple = "<fcolor:1>⏺ Выдано <fcolor:2><amount> <fcolor:1>уровней <fcolor:2><players> <fcolor:1>игрокам";
-        localization.message.experience.add.points.single = "<fcolor:1>⏺ Выдано <fcolor:2><amount> <fcolor:1>единиц опыта игроку <target>";
-        localization.message.experience.add.points.multiple = "<fcolor:1>⏺ Выдано <fcolor:2><amount> <fcolor:1>единиц опыта <fcolor:2><players> <fcolor:1>игрокам";
-        localization.message.experience.query.levels = "<fcolor:1>⏺ <target> имеет <fcolor:2><amount> <fcolor:1>уровней";
-        localization.message.experience.query.points = "<fcolor:1>⏺ <target> имеет <fcolor:2><amount> <fcolor:1>ед. опыта";
-        localization.message.experience.set.levels.single = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>уровней игроку <target>";
-        localization.message.experience.set.levels.multiple = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>уровней <fcolor:2><players> <fcolor:1>игрокам";
-        localization.message.experience.set.points.single = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>единиц опыта игроку <target>";
-        localization.message.experience.set.points.multiple = "<fcolor:1>⏺ Установлено <fcolor:2><amount> <fcolor:1>единиц опыта <fcolor:2><players> <fcolor:1>игрокам";
-        localization.message.experience.taken = "<fcolor:1>⏺ <target> потерял <fcolor:2><amount> <fcolor:1>уровней";
-
-        localization.message.fill.format = "<fcolor:1>⏹ Успешно заполнено <fcolor:2><blocks> <fcolor:1>блоков";
-
-        localization.message.fillbiome.format = "<fcolor:1>⏹ Заменены биомы между точками <fcolor:2><x1><fcolor:1>, <fcolor:2><y1><fcolor:1>, <fcolor:2><z1> <fcolor:1>и <fcolor:2><x2><fcolor:1>, <fcolor:2><y2><fcolor:1>, <fcolor:2><z2>";
-        localization.message.fillbiome.formatCount = "<fcolor:1>⏹ Биом был заменён у <fcolor:2><blocks> <fcolor:1>блоков между точками <fcolor:2><x1><fcolor:1>, <fcolor:2><y1><fcolor:1>, <fcolor:2><z1> <fcolor:1>и <fcolor:2><x2><fcolor:1>, <fcolor:2><y2><fcolor:1>, <fcolor:2><z2>";
 
         localization.message.format.replacement.spoilerSymbol = "█";
         localization.message.format.replacement.values = new LinkedHashMap<>() {{
@@ -717,58 +527,16 @@ public class RussianLocale implements Locale {
 
         localization.message.format.translate.action = " <click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Перевести сообщение\"><fcolor:1>⇄";
 
-        localization.message.gamemode.setDefault = "<fcolor:1>\uD83D\uDDD8 Новый режим игры по умолчанию: <fcolor:2><lang:'<gamemode>'>";
-        localization.message.gamemode.self = "<fcolor:1>\uD83D\uDDD8 Твой режим игры изменён на <fcolor:2><lang:'<gamemode>'>";
-        localization.message.gamemode.other = "<fcolor:1>\uD83D\uDDD8 Режим игры игрока <target> изменён на <fcolor:2><lang:'<gamemode>'>";
-
-        localization.message.gamerule.query = "<fcolor:1>\uD83D\uDDD0 Значение игрового правила <fcolor:2><gamerule><fcolor:1>: <fcolor:2><value>";
-        localization.message.gamerule.set = "<fcolor:1>\uD83D\uDDD0 Установлено значение игрового правила <fcolor:2><gamerule><fcolor:1>: <fcolor:2><value>";
-
-        localization.message.give.single = "<fcolor:1>⛏ Выдано <fcolor:2><items> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><give_item>\"><give_item></hover><fcolor:1>] игроку <target>";
-        localization.message.give.multiple = "<fcolor:1>⛏ Выдано <fcolor:2><items> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><give_item>\"><give_item></hover><fcolor:1>] <fcolor:2><players> <fcolor:1>игрокам";
-
         localization.message.greeting.format = "<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]  <fcolor:1>Привет,<br>[#][#][#][#][#][#][#][#]  <player><br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>";
 
         localization.message.join.format = "<color:#4eff52>→ <display_name>";
         localization.message.join.formatFirstTime = "<color:#4eff52>→ <display_name> <fcolor:1>впервые тут!";
 
-        localization.message.kill.single = "<fcolor:1>☠ <fcolor:1><target> был убит";
-        localization.message.kill.multiple = "<fcolor:1>☠ <fcolor:1>Уничтожено <fcolor:2><entities> <fcolor:1>сущностей";
-
-        localization.message.locate.biome = "<fcolor:1>\uD83D\uDDFA Ближайший биом с типом <fcolor:2><value> <fcolor:1>находится по координатам <fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @p <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
-        localization.message.locate.poi = "<fcolor:1>\uD83D\uDDFA Ближайшая точка интереса с типом <fcolor:2><value> <fcolor:1>находится по координатам <fcolor:2><fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @p <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
-        localization.message.locate.structure = "<fcolor:1>\uD83D\uDDFA Ближайшее строение типа <fcolor:2><value> <fcolor:1>находится по координатам <fcolor:2><fcolor:2><hover:show_text:\"<fcolor:2>Нажми для телепортации\"><click:suggest_command:\"/tp @p <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(в <fcolor:2><blocks> <fcolor:1>блоках отсюда)";
-
         localization.message.objective.belowname.format = "<fcolor:1>мс";
-
-        localization.message.op.format = "<fcolor:1>\uD83E\uDD16 <target> назначен оператором сервера";
-
-        localization.message.particle.format = "<fcolor:1>❄ Отображена частица «<fcolor:2><particle><fcolor:1>»";
 
         localization.message.quit.format = "<color:#ff4e4e>← <display_name>";
 
-        localization.message.recipe.give.single = "<fcolor:1>\uD83D\uDCA1 Выдано <fcolor:2><recipes> <fcolor:1>рецептов игроку <target>";
-        localization.message.recipe.give.multiple = "<fcolor:1>\uD83D\uDCA1 Выдан(о) <fcolor:2><recipes> <fcolor:1>рецепт(ов) <fcolor:2><players> <fcolor:1>игрокам";
-        localization.message.recipe.take.single = "<fcolor:1>\uD83D\uDCA1 Изъято <fcolor:2><recipes> <fcolor:1>рецептов у игрока <target>";
-        localization.message.recipe.take.multiple = "<fcolor:1>\uD83D\uDCA1 Изъято <fcolor:2><recipes> <fcolor:1>рецептов у <fcolor:2><players> <fcolor:1>игроков";
-
-        localization.message.reload.format = "<fcolor:1>\uD83D\uDEC8 Перезагрузка!";
-
-        localization.message.ride.dismount = "<fcolor:1>\uD83C\uDFC7 <target> больше не сидит на <second_target>";
-        localization.message.ride.mount = "<fcolor:1>\uD83C\uDFC7 <target> теперь сидит на <second_target>";
-
         localization.message.rightclick.format = "<fcolor:1>◁ <display_name> ▷";
-
-        localization.message.rotate.format = "<fcolor:1>\uD83E\uDD38 <target> повёрнут";
-
-        localization.message.save.disabled = "<fcolor:1>\uD83D\uDEC8 Автосохранение отключено";
-        localization.message.save.enabled = "<fcolor:1>\uD83D\uDEC8 Автосохранение включено";
-        localization.message.save.saving = "<fcolor:1>\uD83D\uDEC8 Сохранение мира (может занять некоторое время!)";
-        localization.message.save.success = "<fcolor:1>\uD83D\uDEC8 Игра сохранена";
-
-        localization.message.seed.format = "<fcolor:1>\uD83D\uDD11 Ключ генератора: [<fcolor:2><hover:show_text:'<fcolor:2>Нажми, чтобы скопировать в буфер обмена'><click:copy_to_clipboard:<seed>><seed></click></hover><fcolor:1>]";
-
-        localization.message.setblock.format = "<fcolor:1>⏹ Изменён блок в точке <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>";
 
         localization.message.sidebar.values = new LinkedList<>() {{
             add(new LinkedList<>() {{
@@ -785,23 +553,6 @@ public class RussianLocale implements Locale {
             }});
         }};
 
-        localization.message.sleep.notPossible = "<fcolor:1>\uD83D\uDECC Никакой отдых не поможет пропустить эту ночь";
-        localization.message.sleep.playersSleeping = "<fcolor:1>\uD83D\uDECC <fcolor:2><players_sleeping> <fcolor:1>из <fcolor:2><players> <fcolor:1>игроков спят";
-        localization.message.sleep.skippingNight = "<fcolor:1>\uD83D\uDECC Вы проспите всю ночь";
-
-        localization.message.sound.play.multiple =  "<fcolor:1>\uD83D\uDD0A Воспроизведён звук «<fcolor:2><sound><fcolor:1>» <fcolor:2><players> <fcolor:1>игрокам";
-        localization.message.sound.play.single = "<fcolor:1>\uD83D\uDD0A Воспроизведён звук «<fcolor:2><sound><fcolor:1>» игроку <target>";
-        localization.message.sound.stop.sourceAny = "<fcolor:1>\uD83D\uDD07 Отключены все звуки от источника «<fcolor:2><source><fcolor:1>»";
-        localization.message.sound.stop.sourceSound = "<fcolor:1>\uD83D\uDD07 Отключён звук «<fcolor:2><sound><fcolor:1>» от источника «<fcolor:2><source><fcolor:1>»";
-        localization.message.sound.stop.sourcelessAny = "<fcolor:1>\uD83D\uDD07 Отключены все звуки";
-        localization.message.sound.stop.sourcelessSound = "<fcolor:1>\uD83D\uDD07 Отключён звук «<fcolor:2><sound><fcolor:1>»";
-
-        localization.message.spawn.notValid = "<fcolor:1>\uD83D\uDECC У вас нет кровати или заряженного якоря возрождения, либо доступ к ним затруднён";
-        localization.message.spawn.set = "<fcolor:1>\uD83D\uDECC Точка возрождения установлена";
-        localization.message.spawn.setWorld = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения мира <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>, <fcolor:2><yaw><fcolor:1>]";
-        localization.message.spawn.single = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>, <fcolor:2><yaw><fcolor:1>] в <fcolor:2><world> <fcolor:1>для <target>";
-        localization.message.spawn.multiple = "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>, <fcolor:2><yaw><fcolor:1>] в <fcolor:2><world> <fcolor:1>для <fcolor:2><players><fcolor:1> игроков";
-
         localization.message.status.motd.values = new LinkedList<>() {{
             add("<fcolor:1>Добро пожаловать на сервер!");
             add("<fcolor:1>Присоединяйся и наслаждайся уникальным опытом игры!");
@@ -811,10 +562,6 @@ public class RussianLocale implements Locale {
         localization.message.status.players.full = "<color:#ff7171>Сервер полон";
         localization.message.status.players.samples = new LinkedList<>(List.of(new Localization.Message.Status.Players.Sample()));
         localization.message.status.version.name = "Майнкрафт сервер";
-
-        localization.message.stop.format = "<fcolor:1>\uD83D\uDEC8 Выключение сервера";
-
-        localization.message.summon.format = "<fcolor:1>\uD83D\uDC3A Сущность «<target>» создана";
 
         localization.message.tab.footer.lists = new LinkedList<>() {{
             add(new LinkedList<>() {{
@@ -842,30 +589,291 @@ public class RussianLocale implements Locale {
         }};
         localization.message.tab.playerlistname.format = "<world_prefix>▋ <reset><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix>";
 
-        localization.message.teleport.entity.single = "<fcolor:1>\uD83C\uDF00 <target> телепортирован к <second_target>";
-        localization.message.teleport.entity.multiple = "<fcolor:1>\uD83C\uDF00 <fcolor:2><entities> <fcolor:1>сущностей телепортированы к <second_target>";
-        localization.message.teleport.location.single = "<fcolor:1>\uD83C\uDF00 <target> телепортирован в точку <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>";
-        localization.message.teleport.location.multiple = "<fcolor:1>\uD83C\uDF00 <fcolor:2><entities> <fcolor:1>сущностей телепортированы в точку <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>";
-
-        localization.message.time.query = "<fcolor:1>☽ Время: <fcolor:2><time>";
-        localization.message.time.set = "<fcolor:1>☽ Установлено время: <fcolor:2><time>";
-
         localization.message.update.formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse) <fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <url:https://modrinth.com/plugin/flectonepulse>, чтобы получить новые возможности!";
         localization.message.update.formatConsole = "<fcolor:1>Твоя версия <fcolor:2><current_version> <fcolor:1>устарела! Обновись до <fcolor:2><latest_version> <fcolor:1>с помощью <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse";
 
-        localization.message.weather.clear = "<fcolor:1>☀ Установлена <fcolor:2>ясная <fcolor:1>погода";
-        localization.message.weather.rain = "<fcolor:1>\uD83C\uDF27 Установлена <fcolor:2>дождливая <fcolor:1>погода";
-        localization.message.weather.thunder = "<fcolor:1>⛈ Установлена <fcolor:2>грозовая <fcolor:1>погода";
-
-        localization.message.worldborder.center =  "<fcolor:1>\uD83D\uDEAB Установлен центр границ мира: <fcolor:2><value><fcolor:1>, <fcolor:2><second_value>";
-        localization.message.worldborder.damage.amount = "<fcolor:1>\uD83D\uDEAB Установлено значение урона, ежесекундно наносимого за границами мира: <fcolor:2><value> <fcolor:1>за блок";
-        localization.message.worldborder.damage.buffer = "<fcolor:1>\uD83D\uDEAB Установлен предел нанесения урона за границами мира: <fcolor:2><value> <fcolor:1>блоков";
-        localization.message.worldborder.get = "<fcolor:1>\uD83D\uDEAB Ширина границы мира: <fcolor:2><value> <fcolor:1>блоков";
-        localization.message.worldborder.set.grow = "<fcolor:1>\uD83D\uDEAB Через <fcolor:2><second_value> <fcolor:1>секунд ширина границы мира увеличится до <fcolor:2><value> <fcolor:1>блоков";
-        localization.message.worldborder.set.immediate = "<fcolor:1>\uD83D\uDEAB Установлена граница мира шириной <fcolor:2><value> <fcolor:1>блоков";
-        localization.message.worldborder.set.shrink = "<fcolor:1>\uD83D\uDEAB Через <fcolor:2><second_value> <fcolor:1>секунд ширина границы мира уменьшится до <fcolor:2><value> <fcolor:1>блоков";
-        localization.message.worldborder.warning.distance = "<fcolor:1>\uD83D\uDEAB Установлено расстояние предупреждения о пересечении границы мира: <fcolor:2><value> <fcolor:1>блоков";
-        localization.message.worldborder.warning.time = "<fcolor:1>\uD83D\uDEAB Установлено время предупреждения о столкновении с границей мира: <fcolor:2><value> <fcolor:1>секунд";
+        localization.message.vanilla.types = new LinkedHashMap<>() {
+            {
+                put("advMode.notEnabled", "<fcolor:1>\uD83E\uDD16 На этом сервере командные блоки отключены");
+                put("advMode.setCommand.success", "<fcolor:1>\uD83E\uDD16 Команда задана: <fcolor:2><arg_0>");
+                put("block.minecraft.bed.no_sleep", "<fcolor:1>\uD83D\uDECC Вы можете спать только ночью или во время грозы");
+                put("block.minecraft.bed.not_safe", "<fcolor:1>\uD83D\uDECC Вы не можете уснуть, пока рядом есть монстры");
+                put("block.minecraft.bed.obstructed", "<fcolor:1>\uD83D\uDECC Эта кровать заблокирована");
+                put("block.minecraft.bed.occupied", "<fcolor:1>\uD83D\uDECC Эта кровать занята");
+                put("block.minecraft.bed.too_far_away", "<fcolor:1>\uD83D\uDECC Вы не можете уснуть, кровать слишком далеко");
+                put("tile.bed.noSleep", "<fcolor:1>\uD83D\uDECC Вы можете спать только ночью или во время грозы");
+                put("tile.bed.notSafe", "<fcolor:1>\uD83D\uDECC Вы не можете уснуть, пока рядом есть монстры");
+                put("tile.bed.notValid", "<fcolor:1>\uD83D\uDECC Эта кровать заблокирована");
+                put("tile.bed.occupied", "<fcolor:1>\uD83D\uDECC Эта кровать занята");
+                put("block.minecraft.spawn.not_valid", "<fcolor:1>\uD83D\uDECC У вас нет кровати или заряженного якоря возрождения, либо доступ к ним затруднён");
+                put("block.minecraft.bed.not_valid", "<fcolor:1>\uD83D\uDECC У вас нет кровати, либо доступ к ней затруднён");
+                put("block.minecraft.set_spawn", "<fcolor:1>\uD83D\uDECC Точка возрождения установлена");
+                put("chat.type.advancement.challenge", "<fcolor:1>🌠 <arg_0> завершил испытание «<arg_1>»");
+                put("chat.type.advancement.goal", "<fcolor:1>🌠 <arg_0> достиг цели «<arg_1>»");
+                put("chat.type.advancement.task", "<fcolor:1>🌠 <arg_0> получил достижение «<arg_1>»");
+                put("chat.type.achievement", "<fcolor:1>🌠 <arg_0> получил достижение «<arg_1>»");
+                put("chat.type.achievement.taken", "<fcolor:1>🌠 <arg_0> потерял достижение «<arg_1>»");
+                put("sleep.not_possible", "<fcolor:1>\uD83D\uDECC Никакой отдых не поможет пропустить эту ночь");
+                put("sleep.players_sleeping", "<fcolor:1>\uD83D\uDECC <fcolor:2><arg_0> <fcolor:1>из <fcolor:2><arg_1> <fcolor:1>игроков спят");
+                put("sleep.skipping_night", "<fcolor:1>\uD83D\uDECC Вы проспите всю ночь");
+                put("item.minecraft.debug_stick.empty", "<fcolor:1>\uD83D\uDD27 Свойства объекта <fcolor:2><arg_0> <fcolor:1>не заданы");
+                put("item.minecraft.debug_stick.select", "<fcolor:1>\uD83D\uDD27 выбрано «<fcolor:2><arg_0><fcolor:1>» (<fcolor:2><arg_1><fcolor:1>)");
+                put("item.minecraft.debug_stick.update", "<fcolor:1>\uD83D\uDD27 «<fcolor:2><arg_0><fcolor:1>»: <fcolor:2><arg_1>");
+                put("commands.advancement.grant.criterion.to.many.success",  "<fcolor:1>🌠 Условие «<fcolor:2><arg_0><fcolor:1>» достижения <arg_1> зачтено <fcolor:2><arg_2> <fcolor:1>игрокам");
+                put("commands.advancement.revoke.criterion.to.many.success", "<fcolor:1>🌠 Отозвано условие «<fcolor:2><arg_0><fcolor:1>» достижения <arg_1> у <fcolor:2><arg_2> <fcolor:1>игроков");
+                put("commands.advancement.grant.criterion.to.one.success", "<fcolor:1>🌠 Условие «<fcolor:2><arg_0><fcolor:1>» достижения <arg_1> зачтено игроку <arg_2>");
+                put("commands.advancement.revoke.criterion.to.one.success", "<fcolor:1>🌠 Отозвано условие «<fcolor:2><arg_0><fcolor:1>» достижения <arg_1> у игрока <arg_2>");
+                put("commands.achievement.give.success.all", "<fcolor:1>🌠 Выданы все достижения игроку <arg_0>");
+                put("commands.achievement.take.success.all", "<fcolor:1>🌠 Отозваны все достижения у игрока <arg_0>");
+                put("commands.advancement.grant.many.to.many.success", "<fcolor:1>🌠 Выдано <fcolor:2><arg_0> <fcolor:1>достижений <fcolor:2><arg_1> <fcolor:1>игрокам");
+                put("commands.advancement.revoke.many.to.many.success",  "<fcolor:1>🌠 Отозвано <fcolor:2><arg_0> <fcolor:1>достижений у <fcolor:2><arg_1> <fcolor:1>игроков");
+                put("commands.advancement.grant.many.to.one.success", "<fcolor:1>🌠 Выдано <fcolor:2><arg_0> <fcolor:1>достижений игроку <arg_1>");
+                put("commands.advancement.revoke.many.to.one.success", "<fcolor:1>🌠 Отозвано <fcolor:2><arg_0> <fcolor:1>достижений у игрока <arg_1>");
+                put("commands.advancement.grant.one.to.many.success", "<fcolor:1>🌠 Достижение «<arg_0>» выдано <fcolor:2><arg_1> <fcolor:1>игрокам");
+                put("commands.advancement.revoke.one.to.many.success", "<fcolor:1>🌠 Достижение «<arg_0>» отозвано у <fcolor:2><arg_1> <fcolor:1>игрокам");
+                put("commands.advancement.grant.one.to.one.success", "<fcolor:1>🌠 Достижение «<arg_0>» выдано игроку <arg_1>");
+                put("commands.advancement.revoke.one.to.one.success", "<fcolor:1>🌠 Отозвано достижение «<arg_0>» у игрока <arg_1>");
+                put("commands.achievement.give.success.one", "<fcolor:1>🌠 Достижение «<arg_0>» выдано игроку <arg_1>");
+                put("commands.achievement.take.success.one", "<fcolor:1>🌠 Отозвано достижение «<arg_0>» у игрока <arg_1>");
+                put("commands.attribute.base_value.get.success", "<fcolor:1>❤ Базовое значение атрибута «<fcolor:2><arg_0><fcolor:1>» у сущности <arg_1> равно <fcolor:2><arg_2>");
+                put("commands.attribute.base_value.reset.success", "<fcolor:1>❤ Базовое значение атрибута «<fcolor:2><arg_0><fcolor:1>» у сущности <arg_1> возвращено к <fcolor:2><arg_2>");
+                put("commands.attribute.base_value.set.success", "<fcolor:1>❤ Базовое значение атрибута «<fcolor:2><arg_0><fcolor:1>» у сущности <arg_1> изменено на <fcolor:2><arg_2>");
+                put("commands.attribute.value.get.success", "<fcolor:1>❤ Значение атрибута «<fcolor:2><arg_0><fcolor:1>» у сущности <arg_1> равно <fcolor:2><arg_2>");
+                put("commands.attribute.modifier.add.success", "<fcolor:1>❤ Добавлен модификатор <fcolor:2><arg_0> <fcolor:1>к атрибуту «<fcolor:2><arg_1><fcolor:1>» у сущности <arg_2>");
+                put("commands.attribute.modifier.remove.success", "<fcolor:1>❤ Удалён модификатор <fcolor:2><arg_0> <fcolor:1>с атрибута «<fcolor:2><arg_1><fcolor:1>» у сущности <arg_2>");
+                put("commands.attribute.modifier.value.get.success", "<fcolor:1>❤ Значение модификатора <fcolor:2><arg_0> <fcolor:1>атрибута «<fcolor:2><arg_1><fcolor:1>» у сущности <arg_2> равно <fcolor:2><arg_3>");
+                put("commands.clear.success.multiple", "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><arg_0> <fcolor:1>предметов у <fcolor:2><arg_1> <fcolor:1>игроков");
+                put("commands.clear.success.single", "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><arg_0> <fcolor:1>предметов у игрока <arg_1>");
+                put("commands.clear.success", "<fcolor:1>\uD83C\uDF0A Удалено <fcolor:2><arg_1> <fcolor:1>предметов у игрока <arg_0>");
+                put("commands.clone.success", "<fcolor:1>⏹ Успешно скопировано <fcolor:2><arg_0> <fcolor:1>блоков");
+                put("commands.damage.success", "<fcolor:1>\uD83D\uDDE1 Нанесено <fcolor:2><arg_0> <fcolor:1>урона <arg_1>");
+                put("commands.deop.success", "<fcolor:1>\uD83E\uDD16 <arg_0> больше не является оператором сервера");
+                put("commands.dialog.clear.multiple", "<fcolor:1>\uD83D\uDDD4 Убран диалог у <fcolor:2><arg_0> <fcolor:1>игроков");
+                put("commands.dialog.clear.single", "<fcolor:1>\uD83D\uDDD4 Убран диалог у игрока «<arg_0>»");
+                put("commands.dialog.show.multiple", "<fcolor:1>\uD83D\uDDD4 Отображён диалог <fcolor:2><arg_0> <fcolor:1>игрокам");
+                put("commands.dialog.show.single", "<fcolor:1>\uD83D\uDDD4 Отображён диалог игроку «<arg_0>»");
+                put("commands.difficulty.query", "<fcolor:1>⚔ Сложность игры: <fcolor:2><arg_0>");
+                put("commands.difficulty.success", "<fcolor:1>⚔ Установлена сложность игры: <fcolor:2><arg_0>");
+                put("commands.effect.clear.everything.success.multiple", "<fcolor:1>⚗ Убраны все эффекты с <fcolor:2><arg_0> <fcolor:1>целей");
+                put("commands.effect.clear.everything.success.single", "<fcolor:1>⚗ Убраны все эффекты с <arg_0>");
+                put("commands.effect.clear.specific.success.multiple", "<fcolor:1>⚗ Убран эффект «<fcolor:2><arg_0><fcolor:1>» с <fcolor:2><arg_1> <fcolor:1>целей");
+                put("commands.effect.clear.specific.success.single", "<fcolor:1>⚗ Убран эффект «<fcolor:2><arg_0><fcolor:1>» с <arg_1>");
+                put("commands.effect.give.success.multiple", "<fcolor:1>⚗ Применён эффект <fcolor:2><arg_0><fcolor:1>» к <fcolor:2><arg_1> <fcolor:1>целям");
+                put("commands.effect.give.success.single", "<fcolor:1>⚗ Применён эффект «<fcolor:2><arg_0><fcolor:1>» к <arg_1>");
+                put("commands.effect.success", "<fcolor:1>⚗ Применён эффект «<fcolor:2><arg_0><fcolor:1>» к <arg_3>");
+                put("commands.effect.success.removed", "<fcolor:1>⚗ Убран эффект «<fcolor:2><arg_0><fcolor:1>» с <arg_1>");
+                put("commands.effect.success.removed.all", "<fcolor:1>⚗ Убраны все эффекты с <arg_0>");
+                put("commands.enchant.success.multiple", "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><arg_0><fcolor:1>» на предмет <fcolor:2><arg_1><fcolor:1> сущностей");
+                put("commands.enchant.success.single", "<fcolor:1>\uD83D\uDCD6 Наложены чары «<fcolor:2><arg_0><fcolor:1>» на предмет <arg_1>");
+                put("commands.enchant.success", "<fcolor:1>\uD83D\uDCD6 Наложены чары на предмет");
+                put("commands.execute.conditional.pass", "<fcolor:1>⚡ Условие выполнено");
+                put("commands.execute.conditional.pass_count", "<fcolor:1>⚡ Условие выполнено; счётчик: <fcolor:2><arg_0>");
+                put("commands.experience.query.levels", "<fcolor:1>⏺ <arg_0> имеет <fcolor:2><arg_1> <fcolor:1>уровней");
+                put("commands.experience.query.points", "<fcolor:1>⏺ <arg_0> имеет <fcolor:2><arg_1> <fcolor:1>ед. опыта");
+                put("commands.experience.add.levels.success.multiple", "<fcolor:1>⏺ Выдано <fcolor:2><arg_0> <fcolor:1>уровней <fcolor:2><arg_1> <fcolor:1>игрокам");
+                put("commands.experience.add.points.success.multiple", "<fcolor:1>⏺ Выдано <fcolor:2><arg_0> <fcolor:1>единиц опыта <fcolor:2><arg_1> <fcolor:1>игрокам");
+                put("commands.experience.set.levels.success.multiple", "<fcolor:1>⏺ Установлено <fcolor:2><arg_0> <fcolor:1>уровней <fcolor:2><arg_1> <fcolor:1>игрокам");
+                put("commands.experience.set.points.success.multiple", "<fcolor:1>⏺ Установлено <fcolor:2><arg_0> <fcolor:1>единиц опыта <fcolor:2><arg_1> <fcolor:1>игрокам");
+                put("commands.experience.add.levels.success.single", "<fcolor:1>⏺ Выдано <fcolor:2><arg_0> <fcolor:1>уровней игроку <arg_1>");
+                put("commands.experience.add.points.success.single", "<fcolor:1>⏺ Выдано <fcolor:2><arg_0> <fcolor:1>единиц опыта игроку <arg_1>");
+                put("commands.experience.set.levels.success.single", "<fcolor:1>⏺ Установлено <fcolor:2><arg_0> <fcolor:1>уровней игроку <arg_1>");
+                put("commands.experience.set.points.success.single", "<fcolor:1>⏺ Установлено <fcolor:2><arg_0> <fcolor:1>единиц опыта игроку <arg_1>");
+                put("commands.xp.success", "<fcolor:1>⏺ Выдано <fcolor:2><arg_0> <fcolor:1>единиц опыта игроку <arg_1>");
+                put("commands.xp.success.levels", "<fcolor:1>⏺ Выдано <fcolor:2><arg_0> <fcolor:1>уровней игроку <arg_1>");
+                put("commands.xp.success.negative.levels", "<fcolor:1>⏺ <arg_0> потерял <fcolor:2><arg_1> <fcolor:1>уровней");
+                put("commands.fill.success", "<fcolor:1>⏹ Успешно заполнено <fcolor:2><arg_0> <fcolor:1>блоков");
+                put("commands.fillbiome.success", "<fcolor:1>⏹ Заменены биомы между точками <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2> <fcolor:1>и <fcolor:2><arg_3><fcolor:1>, <fcolor:2><arg_4><fcolor:1>, <fcolor:2><arg_5>");
+                put("commands.fillbiome.success.count", "<fcolor:1>⏹ Биом был заменён у <fcolor:2><arg_0> <fcolor:1>блоков между точками <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1>, <fcolor:2><arg_3> <fcolor:1>и <fcolor:2><arg_4><fcolor:1>, <fcolor:2><arg_5><fcolor:1>, <fcolor:2><arg_6>");
+                put("gameMode.changed", "<fcolor:1>\uD83D\uDDD8 Ваш игровой режим изменён на <fcolor:2><arg_0>");
+                put("commands.gamemode.success.other", "<fcolor:1>\uD83D\uDDD8 Режим игры игрока <arg_0> изменён на <fcolor:2><arg_1>");
+                put("commands.gamemode.success.self", "<fcolor:1>\uD83D\uDDD8 Твой режим игры изменён на <fcolor:2><arg_0>");
+                put("commands.defaultgamemode.success", "<fcolor:1>\uD83D\uDDD8 Новый режим игры по умолчанию: <fcolor:2><arg_0>");
+                put("commands.gamerule.query", "<fcolor:1>\uD83D\uDDD0 Значение игрового правила <fcolor:2><arg_0><fcolor:1>: <fcolor:2><arg_1>");
+                put("commands.gamerule.set", "<fcolor:1>\uD83D\uDDD0 Установлено значение игрового правила <fcolor:2><arg_0><fcolor:1>: <fcolor:2><arg_1>");
+                put("commands.gamerule.success", "<fcolor:1>\uD83D\uDDD0 Игровое правило изменено");
+                put("commands.give.successcommands.give.success.multiple", "<fcolor:1>⛏ Выдано <fcolor:2><arg_0> <fcolor:2><arg_1><fcolor:1> <fcolor:2><arg_2> <fcolor:1>игрокам");
+                put("commands.give.success.single", "<fcolor:1>⛏ Выдано <fcolor:2><arg_0> <fcolor:2><arg_1><fcolor:1> игроку <arg_2>");
+                put("commands.give.success", "<fcolor:1>⛏ Выдано <fcolor:2><arg_1><fcolor:1> * <fcolor:2><arg_0><fcolor:1> игроку <arg_2>");
+                put("commands.kill.success.multiple", "<fcolor:1>☠ Уничтожено <fcolor:2><arg_0> <fcolor:1>сущностей");
+                put("commands.kill.success.single", "<fcolor:1>☠ <arg_0> был убит");
+                put("commands.kill.successful", "<fcolor:1>☠ <fcolor:1><arg_0> был убит");
+                put("commands.locate.biome.success", "<fcolor:1>\uD83D\uDDFA Ближайший биом с типом <fcolor:2><arg_0><fcolor:1> находится по координатам <fcolor:2><arg_1><fcolor:1> (в <fcolor:2><arg_2> <fcolor:1>блоках отсюда)");
+                put("commands.locate.poi.success", "<fcolor:1>\uD83D\uDDFA Ближайшая точка интереса с типом <fcolor:2><arg_0><fcolor:1> находится по координатам <fcolor:2><arg_1><fcolor:1> (в <fcolor:2><arg_2> <fcolor:1>блоках отсюда)");
+                put("commands.locate.structure.success", "<fcolor:1>\uD83D\uDDFA Ближайшее строение типа <fcolor:2><arg_0><fcolor:1> находится по координатам <fcolor:2><arg_1><fcolor:1> (в <fcolor:2><arg_2> <fcolor:1>блоках отсюда)");
+                put("commands.locate.success", "<fcolor:1>\uD83D\uDDFA Ближайшее строение типа <fcolor:2><arg_0><fcolor:1> находится по координатам <fcolor:2><arg_1><fcolor:1> (в <fcolor:2><arg_2> <fcolor:1>блоках отсюда)");
+                put("commands.locatebiome.success", "<fcolor:1>\uD83D\uDDFA Ближайший биом с типом <fcolor:2><arg_0><fcolor:1> находится по координатам <fcolor:2><arg_1><fcolor:1> (в <fcolor:2><arg_2> <fcolor:1>блоках отсюда)");
+                put("commands.op.success", "<fcolor:1>\uD83E\uDD16 <arg_0> назначен оператором сервера");
+                put("commands.particle.success", "<fcolor:1>❄ Отображена частица «<fcolor:2><arg_0><fcolor:1>»");
+                put("commands.recipe.give.success.multiple", "<fcolor:1>\uD83D\uDCA1 Выдан(о) <fcolor:2><arg_0> <fcolor:1>рецепт(ов) <fcolor:2><arg_1> <fcolor:1>игрокам");
+                put("commands.recipe.give.success.single", "<fcolor:1>\uD83D\uDCA1 Выдано <fcolor:2><arg_0> <fcolor:1>рецептов игроку <arg_1>");
+                put("commands.recipe.take.success.multiple", "<fcolor:1>\uD83D\uDCA1 Изъято <fcolor:2><arg_0> <fcolor:1>рецептов у <fcolor:2><arg_1> <fcolor:1>игроков");
+                put("commands.recipe.take.success.single", "<fcolor:1>\uD83D\uDCA1 Изъято <fcolor:2><arg_0> <fcolor:1>рецептов у игрока <arg_1>");
+                put("commands.reload.success", "<fcolor:1>\uD83D\uDEC8 Перезагрузка!");
+                put("commands.ride.dismount.success", "<fcolor:1>\uD83C\uDFC7 <arg_0> больше не сидит на <arg_1>");
+                put("commands.ride.mount.success", "<fcolor:1>\uD83C\uDFC7 <arg_0> теперь сидит на <arg_1>");
+                put("commands.rotate.success", "<fcolor:1>\uD83E\uDD38 <arg_0> повёрнут");
+                put("commands.save.disabled", "<fcolor:1>\uD83D\uDEC8 Автосохранение отключено");
+                put("commands.save.enabled", "<fcolor:1>\uD83D\uDEC8 Автосохранение включено");
+                put("commands.save.start", "<fcolor:1>\uD83D\uDEC8 Сохранение мира (может занять некоторое время!)");
+                put("commands.save.saving", "<fcolor:1>\uD83D\uDEC8 Сохранение мира (может занять некоторое время!)");
+                put("commands.save.success", "<fcolor:1>\uD83D\uDEC8 Игра сохранена");
+                put("commands.seed.success", "<fcolor:1>\uD83D\uDD11 Ключ генератора: <arg_0>");
+                put("commands.setblock.success.1_19_4", "<fcolor:1>⏹ Изменён блок");
+                put("commands.setblock.success", "<fcolor:1>⏹ Изменён блок в точке <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1>");
+                put("commands.playsound.success.multiple", "<fcolor:1>\uD83D\uDD0A Воспроизведён звук «<fcolor:2><arg_0><fcolor:1>» <fcolor:2><arg_1> <fcolor:1>игрокам");
+                put("commands.playsound.success.single", "<fcolor:1>\uD83D\uDD0A Воспроизведён звук «<fcolor:2><arg_0><fcolor:1>» игроку <arg_1>");
+                put("commands.stopsound.success.all", "<fcolor:1>\uD83D\uDD07 Отключены все звуки от источника «<fcolor:2><arg_0><fcolor:1>»");
+                put("commands.stopsound.success.soundSource", "<fcolor:1>\uD83D\uDD07 Отключены все звуки");
+                put("commands.stopsound.success.individualSound", "<fcolor:1>\uD83D\uDD07 Отключён звук «<fcolor:2><arg_0><fcolor:1>» от источника «<fcolor:2><arg_1><fcolor:1>»");
+                put("commands.playsound.success", "<fcolor:1>\uD83D\uDD0A Воспроизведён звук «<fcolor:2><arg_0><fcolor:1>» игроку <arg_1>");
+                put("commands.stopsound.success.source.any", "<fcolor:1>\uD83D\uDD07 Отключены все звуки от источника «<fcolor:2><arg_0><fcolor:1>»");
+                put("commands.stopsound.success.source.sound",  "<fcolor:1>\uD83D\uDD07 Отключён звук «<fcolor:2><arg_0><fcolor:1>» от источника «<fcolor:2><arg_1><fcolor:1>»");
+                put("commands.stopsound.success.sourceless.any", "<fcolor:1>\uD83D\uDD07 Отключены все звуки");
+                put("commands.stopsound.success.sourceless.sound", "<fcolor:1>\uD83D\uDD07 Отключён звук «<fcolor:2><arg_0><fcolor:1>»");
+                put("commands.spawnpoint.success", "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> <fcolor:1>для <arg_3>");
+                put("commands.setworldspawn.success.1_16", "<fcolor:1>\uD83D\uDECC Установлена точка возрождения мира <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1>");
+                put("commands.setworldspawn.success.1_21_8", "<fcolor:1>\uD83D\uDECC Установлена точка возрождения мира <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>]");
+                put("commands.setworldspawn.success", "<fcolor:1>\uD83D\uDECC Установлена точка возрождения мира <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>, <fcolor:2><arg_4><fcolor:1>] в <fcolor:2><arg_5>");
+                put("commands.setworldspawn.success.new", "<fcolor:1>\uD83D\uDECC Установлена точка возрождения мира <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>, <fcolor:2><arg_4><fcolor:1>] в <fcolor:2><arg_5>");
+                put("commands.spawnpoint.success.multiple.1_14_2", "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> для <fcolor:2><arg_3><fcolor:1> игроков");
+                put("commands.spawnpoint.success.multiple.1_21.8", "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>] в <fcolor:2><arg_4> <fcolor:1>для <fcolor:2><arg_5><fcolor:1> игроков");
+                put("commands.spawnpoint.success.multiple", "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>, <fcolor:2><arg_4><fcolor:1>] в <fcolor:2><arg_5> <fcolor:1>для <fcolor:2><arg_6><fcolor:1> игроков");
+                put("commands.spawnpoint.success.multiple.new", "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>, <fcolor:2><arg_4><fcolor:1>] в <fcolor:2><arg_5> <fcolor:1>для <fcolor:2><arg_6><fcolor:1> игроков");
+                put("commands.spawnpoint.success.single.1_14_2", "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> <fcolor:1>для <arg_3>");
+                put("commands.spawnpoint.success.single.1_21_8", "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>] в <fcolor:2><arg_4> <fcolor:1>для <arg_5>");
+                put("commands.spawnpoint.success.single", "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>, <fcolor:2><arg_4><fcolor:1>] в <fcolor:2><arg_5> <fcolor:1>для <arg_6>");
+                put("commands.spawnpoint.success.single.new", "<fcolor:1>\uD83D\uDECC Установлена точка возрождения <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>, <fcolor:2><arg_4><fcolor:1>] в <fcolor:2><arg_5> <fcolor:1>для <arg_6>");
+                put("commands.stop.stopping", "<fcolor:1>\uD83D\uDEC8 Выключение сервера");
+                put("commands.stop.start", "<fcolor:1>\uD83D\uDEC8 Выключение сервера");
+                put("commands.summon.success", "<fcolor:1>\uD83D\uDC3A Сущность «<arg_0>» создана");
+                put("commands.teleport.success.entity.multiple", "<fcolor:1>\uD83C\uDF00 <fcolor:2><arg_0> <fcolor:1>сущностей телепортированы к <arg_1>");
+                put("commands.teleport.success.entity.single", "<fcolor:1>\uD83C\uDF00 <arg_0> телепортирован к <arg_1>");
+                put("commands.tp.success", "<fcolor:1>\uD83C\uDF00 <arg_0> телепортирован к <arg_1>");
+                put("commands.teleport.success.location.multiple", "<fcolor:1>\uD83C\uDF00 <fcolor:2><arg_0> <fcolor:1>сущностей телепортированы в точку <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1>, <fcolor:2><arg_3><fcolor:1>");
+                put("commands.teleport.success.location.single", "<fcolor:1>\uD83C\uDF00 <arg_0> телепортирован в точку <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1>, <fcolor:2><arg_3><fcolor:1>");
+                put("commands.tp.success.coordinates", "<fcolor:1>\uD83C\uDF00 <arg_0> телепортирован в точку <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1>, <fcolor:2><arg_3><fcolor:1>");
+                put("commands.time.query", "<fcolor:1>☽ Время: <fcolor:2><arg_0>");
+                put("commands.time.set", "<fcolor:1>☽ Установлено время: <fcolor:2><arg_0>");
+                put("commands.weather.set.clear", "<fcolor:1>☀ Установлена <fcolor:2>ясная <fcolor:1>погода");
+                put("commands.weather.clear", "<fcolor:1>☀ Установлена <fcolor:2>ясная <fcolor:1>погода");
+                put("commands.weather.set.rain", "<fcolor:1>\uD83C\uDF27 Установлена <fcolor:2>дождливая <fcolor:1>погода");
+                put("commands.weather.rain", "<fcolor:1>\uD83C\uDF27 Установлена <fcolor:2>дождливая <fcolor:1>погода");
+                put("commands.weather.set.thunder", "<fcolor:1>⛈ Установлена <fcolor:2>грозовая <fcolor:1>погода");
+                put("commands.weather.thunder", "<fcolor:1>⛈ Установлена <fcolor:2>грозовая <fcolor:1>погода");
+                put("commands.worldborder.center.success", "<fcolor:1>\uD83D\uDEAB Установлен центр границ мира: <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1>");
+                put("commands.worldborder.damage.amount.success", "<fcolor:1>\uD83D\uDEAB Установлено значение урона, ежесекундно наносимого за границами мира: <fcolor:2><arg_0> <fcolor:1>за блок");
+                put("commands.worldborder.damage.buffer.success", "<fcolor:1>\uD83D\uDEAB Установлен предел нанесения урона за границами мира: <fcolor:2><arg_0> <fcolor:1>блоков");
+                put("commands.worldborder.get.success", "<fcolor:1>\uD83D\uDEAB Ширина границы мира: <fcolor:2><arg_0> <fcolor:1>блоков");
+                put("commands.worldborder.get", "<fcolor:1>\uD83D\uDEAB Ширина границы мира: <fcolor:2><arg_0> <fcolor:1>блоков");
+                put("commands.worldborder.set.success", "<fcolor:1>\uD83D\uDEAB Установлена граница мира шириной <fcolor:2><arg_0> <fcolor:1>блоков");
+                put("commands.worldborder.setSlowly.grow.success", "<fcolor:1>\uD83D\uDEAB Через <fcolor:2><arg_2> <fcolor:1>секунд ширина границы мира увеличится до <fcolor:2><arg_0> <fcolor:1>блоков");
+                put("commands.worldborder.set.grow", "<fcolor:1>\uD83D\uDEAB Через <fcolor:2><arg_1> <fcolor:1>секунд ширина границы мира увеличится до <fcolor:2><arg_0> <fcolor:1>блоков");
+                put("commands.worldborder.set.immediate", "<fcolor:1>\uD83D\uDEAB Установлена граница мира шириной <fcolor:2><arg_0> <fcolor:1>блоков");
+                put("commands.worldborder.setSlowly.shrink.success", "<fcolor:1>\uD83D\uDEAB Через <fcolor:2><arg_2> <fcolor:1>секунд ширина границы мира уменьшится до <fcolor:2><arg_0> <fcolor:1>блоков");
+                put("commands.worldborder.set.shrink", "<fcolor:1>\uD83D\uDEAB Через <fcolor:2><arg_1> <fcolor:1>секунд ширина границы мира уменьшится до <fcolor:2><arg_0> <fcolor:1>блоков");
+                put("commands.worldborder.warning.distance.success", "<fcolor:1>\uD83D\uDEAB Установлено расстояние предупреждения о пересечении границы мира: <fcolor:2><arg_0> <fcolor:1>блоков");
+                put("commands.worldborder.warning.time.success", "<fcolor:1>\uD83D\uDEAB Установлено время предупреждения о столкновении с границей мира: <fcolor:2><arg_0> <fcolor:1>секунд");
+                put("death.attack.anvil", "<fcolor:1>☠ <arg_0> раздавлен упавшей наковальней");
+                put("death.attack.anvil.player", "<fcolor:1>☠ <arg_0> был раздавлен упавшей наковальней, пока боролся с <arg_1>");
+                put("death.attack.arrow", "<fcolor:1>☠ <arg_0> застрелен <arg_1>");
+                put("death.attack.arrow.item", "<fcolor:1>☠ <arg_0> застрелен <arg_1> с помощью <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.badRespawnPoint.message", "<fcolor:1>☠ <arg_0> стал жертвой <fcolor:2>[<click:open_url:\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"><hover:show_text:\"<fcolor:2>MCPE-28723\">жестоких правил игры</hover></click>]");
+                put("death.attack.cactus", "<fcolor:1>☠ <arg_0> исколот до смерти");
+                put("death.attack.cactus.player", "<fcolor:1>☠ <arg_0> наткнулся на кактус, спасаясь от <arg_1>");
+                put("death.attack.cramming", "<fcolor:1>☠ <arg_0> расплющен в лепёшку");
+                put("death.attack.cramming.player", "<fcolor:1>☠ <arg_0> расплющен <arg_1>");
+                put("death.attack.dragonBreath", "<fcolor:1>☠ <arg_0> испепелён дыханием дракона");
+                put("death.attack.dragonBreath.player", "<fcolor:1>☠ <arg_0> сварился заживо в драконьем дыхании из-за <arg_1>");
+                put("death.attack.drown", "<fcolor:1>☠ <arg_0> утонул");
+                put("death.attack.drown.player", "<fcolor:1>☠ <arg_0> утонул, спасаясь от <arg_1>");
+                put("death.attack.dryout", "<fcolor:1>☠ <arg_0> умер от обезвоживания");
+                put("death.attack.dryout.player", "<fcolor:1>☠ <arg_0> умер от обезвоживания, спасаясь от <arg_1>");
+                put("death.attack.even_more_magic", "<fcolor:1>☠ <arg_0> был убит неизведанной магией");
+                put("death.attack.explosion", "<fcolor:1>☠ <arg_0> взорвался");
+                put("death.attack.explosion.player", "<fcolor:1>☠ <arg_0> был взорван <arg_1>");
+                put("death.attack.explosion.item", "<fcolor:1>☠ <arg_0> был взорван <arg_1> с помощью <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.explosion.player.item", "<fcolor:1>☠ <arg_0> был взорван <arg_1> с помощью <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.fall", "<fcolor:1>☠ <arg_0> разбился вдребезги");
+                put("death.attack.fall.player", "<fcolor:1>☠ <arg_0> разбился вдребезги, спасаясь от <arg_1>");
+                put("death.attack.fallingBlock", "<fcolor:1>☠ <arg_0> раздавлен упавшим блоком");
+                put("death.attack.fallingBlock.player", "<fcolor:1>☠ <arg_0> был раздавлен упавшим блоком, пока боролся с <arg_1>");
+                put("death.attack.fallingStalactite", "<fcolor:1>☠ <arg_0> был пронзён обрушившимся сталактитом");
+                put("death.attack.fallingStalactite.player", "<fcolor:1>☠ <arg_0> был пронзён обрушившимся сталактитом, пока боролся с <arg_1>");
+                put("death.attack.fireball", "<fcolor:1>☠ <arg_0> убит файерболом <arg_1>");
+                put("death.attack.fireball.item", "<fcolor:1>☠ <arg_0> убит файерболом <arg_1> с помощью <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.fireworks", "<fcolor:1>☠ <arg_0> с треском разлетелся");
+                put("death.attack.fireworks.item", "<fcolor:1>☠ <arg_0> с треском разлетелся из-за фейерверка <arg_1>, выпущенного из <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.fireworks.player", "<fcolor:1>☠ <arg_0> с треском разлетелся, пока боролся с <arg_1>");
+                put("death.attack.flyIntoWall", "<fcolor:1>☠ <arg_0> преобразовал кинетическую энергию во внутреннюю");
+                put("death.attack.flyIntoWall.player", "<fcolor:1>☠ <arg_0> преобразовал кинетическую энергию во внутреннюю, спасаясь от <arg_1>");
+                put("death.attack.freeze", "<fcolor:1>☠ <arg_0> замёрз насмерть");
+                put("death.attack.freeze.player", "<fcolor:1>☠ <arg_0> замёрз насмерть благодаря <arg_1>");
+                put("death.attack.generic", "<fcolor:1>☠ <arg_0> умер");
+                put("death.attack.generic.player", "<fcolor:1>☠ <arg_0> умер из-за <arg_1>");
+                put("death.attack.genericKill", "<fcolor:1>☠ <arg_0> убит");
+                put("death.attack.genericKill.player", "<fcolor:1>☠ <arg_0> был убит, сражаясь с <arg_1>");
+                put("death.attack.hotFloor", "<fcolor:1>☠ <arg_0> обнаружил, что пол — это лава");
+                put("death.attack.hotFloor.player", "<fcolor:1>☠ <arg_0> зашёл в опасную зону из-за <arg_1>");
+                put("death.attack.inFire", "<fcolor:1>☠ <arg_0> умер в огне");
+                put("death.attack.inFire.player", "<fcolor:1>☠ <arg_0> сгорел в огне, пока боролся с <arg_1>");
+                put("death.attack.inWall", "<fcolor:1>☠ <arg_0> погребён заживо");
+                put("death.attack.inWall.player", "<fcolor:1>☠ <arg_0> был погребён заживо, пока боролся с <arg_1>");
+                put("death.attack.indirectMagic", "<fcolor:1>☠ <arg_0> был убит <arg_1> с помощью магии");
+                put("death.attack.indirectMagic.item", "<fcolor:1>☠ <arg_0> был убит <arg_1> с помощью <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.lava", "<fcolor:1>☠ <arg_0> решил поплавать в лаве");
+                put("death.attack.lava.player", "<fcolor:1>☠ <arg_0> упал в лаву, убегая от <arg_1>");
+                put("death.attack.lightningBolt", "<fcolor:1>☠ <arg_0> был поражён молнией");
+                put("death.attack.lightningBolt.player", "<fcolor:1>☠ <arg_0> был поражён молнией, пока боролся с <arg_1>");
+                put("death.attack.mace_smash", "<fcolor:1>☠ <arg_0> был сокрушён <arg_1>");
+                put("death.attack.mace_smash.item", "<fcolor:1>☠ <arg_0> был сокрушён <arg_1> с помощью <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.magic", "<fcolor:1>☠ <arg_0> был убит магией");
+                put("death.attack.magic.player", "<fcolor:1>☠ <arg_0> был убит магией, убегая от <arg_1>");
+                put("death.attack.mob", "<fcolor:1>☠ <arg_0> был убит <arg_1>");
+                put("death.attack.mob.item", "<fcolor:1>☠ <arg_0> был убит <arg_1> с помощью <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.onFire", "<fcolor:1>☠ <arg_0> сгорел заживо");
+                put("death.attack.onFire.item", "<fcolor:1>☠ <arg_0> был сожжён дотла, пока боролся с <arg_1>, держащим <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.onFire.player", "<fcolor:1>☠ <arg_0> был сожжён дотла, пока боролся с <arg_1>");
+                put("death.attack.outOfWorld", "<fcolor:1>☠ <arg_0> выпал из мира");
+                put("death.attack.outOfWorld.player", "<fcolor:1>☠ <arg_0> не захотел жить в том же мире, что и <arg_1>");
+                put("death.attack.outsideBorder", "<fcolor:1>☠ <arg_0> покинул пределы этого мира");
+                put("death.attack.outsideBorder.player", "<fcolor:1>☠ <arg_0> покинул пределы этого мира, пока боролся с <arg_1>");
+                put("death.attack.player", "<fcolor:1>☠ <arg_0> был убит <arg_1>");
+                put("death.attack.player.item", "<fcolor:1>☠ <arg_0> был убит <arg_1> с помощью <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.sonic_boom", "<fcolor:1>☠ <arg_0> был уничтожен звуковым зарядом");
+                put("death.attack.sonic_boom.item", "<fcolor:1>☠ <arg_0> был уничтожен звуковым зарядом, спасаясь от <arg_1>, держащего <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.sonic_boom.player", "<fcolor:1>☠ <arg_0> был уничтожен звуковым зарядом, спасаясь от <arg_1>");
+                put("death.attack.stalagmite", "<fcolor:1>☠ <arg_0> пронзён сталагмитом");
+                put("death.attack.stalagmite.player", "<fcolor:1>☠ <arg_0> был пронзён сталагмитом, пока боролся с <arg_1>");
+                put("death.attack.starve", "<fcolor:1>☠ <arg_0> умер от голода");
+                put("death.attack.starve.player", "<fcolor:1>☠ <arg_0> умер от голода, пока боролся с <arg_1>");
+                put("death.attack.sting", "<fcolor:1>☠ <arg_0> изжален до смерти");
+                put("death.attack.sting.item", "<fcolor:1>☠ <arg_0> был изжален до смерти <arg_1> с помощью <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.sting.player", "<fcolor:1>☠ <arg_0> изжален до смерти <arg_1>");
+                put("death.attack.sweetBerryBush", "<fcolor:1>☠ <arg_0> искололся до смерти в кустах сладких ягод");
+                put("death.attack.sweetBerryBush.player", "<fcolor:1>☠ <arg_0> искололся до смерти в кустах сладких ягод, спасаясь от <arg_1>");
+                put("death.attack.thorns", "<fcolor:1>☠ <arg_0> был убит, пытаясь навредить <arg_1>");
+                put("death.attack.thorns.item", "<fcolor:1>☠ <arg_0> был убит <fcolor:2><arg_2><fcolor:1>, пытаясь навредить <arg_1>");
+                put("death.attack.thrown", "<fcolor:1>☠ <arg_0> был избит <arg_1>");
+                put("death.attack.thrown.item", "<fcolor:1>☠ <arg_0> был избит <arg_1> с помощью <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.trident", "<fcolor:1>☠ <arg_0> был пронзён <arg_1>");
+                put("death.attack.trident.item", "<fcolor:1>☠ <arg_0> пронзён <arg_1> с помощью <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.wither", "<fcolor:1>☠ <arg_0> иссушён");
+                put("death.attack.wither.player", "<fcolor:1>☠ <arg_0> был иссушён, пока боролся с <arg_1>");
+                put("death.attack.witherSkull", "<fcolor:1>☠ <arg_0> был поражён черепом из <arg_1>");
+                put("death.attack.witherSkull.item", "<fcolor:1>☠ <arg_0> был поражён черепом из <arg_1> с помощью <fcolor:2><arg_2><fcolor:1>");
+                put("death.fell.accident.generic", "<fcolor:1>☠ <arg_0> разбился насмерть");
+                put("death.fell.accident.ladder", "<fcolor:1>☠ <arg_0> свалился с лестницы");
+                put("death.fell.accident.other_climbable", "<fcolor:1>☠ <arg_0> сорвался");
+                put("death.fell.accident.scaffolding", "<fcolor:1>☠ <arg_0> сорвался с подмосток");
+                put("death.fell.accident.twisting_vines", "<fcolor:1>☠ <arg_0> сорвался с вьющейся лозы");
+                put("death.fell.accident.vines", "<fcolor:1>☠ <arg_0> сорвался с лианы");
+                put("death.fell.accident.weeping_vines", "<fcolor:1>☠ <arg_0> сорвался с плакучей лозы");
+                put("death.fell.assist", "<fcolor:1>☠ <arg_0> свалился благодаря <arg_1>");
+                put("death.fell.assist.item", "<fcolor:1>☠ <arg_0> был обречён на падение <arg_1> с помощью <fcolor:2><arg_2><fcolor:1>");
+                put("death.fell.finish", "<fcolor:1>☠ <arg_0> упал с высоты и был добит <arg_1>");
+                put("death.fell.finish.item", "<fcolor:1>☠ <arg_0> упал с высоты и был добит <arg_1> с помощью <fcolor:2><arg_2><fcolor:1>");
+                put("death.fell.killer", "<fcolor:1>☠ <arg_0> был обречён на падение");
+            }
+        };
     }
-
 }

@@ -116,6 +116,7 @@ public enum MessageType {
     TIME,
     TRANSLATE,
     UPDATE,
+    VANILLA,
     VERSION,
     WEATHER,
     WORLDBORDER,

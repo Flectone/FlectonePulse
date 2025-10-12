@@ -439,38 +439,11 @@ public class EnglishLocale implements Locale {
             put("CHAT_GLOBAL", "<final_message>");
         }};
 
-        localization.message.advancement.formatTask = "<fcolor:1>🌠 <display_name> has made the advancement <advancement>";
-        localization.message.advancement.formatGoal = "<fcolor:1>🌠 <display_name> has reached the goal <advancement>";
-        localization.message.advancement.formatChallenge = "<fcolor:1>🌠 <display_name> has completed the challenge <advancement>";
-        localization.message.advancement.formatTaken = "<fcolor:1>🌠 <display_name> has lost the achievement <advancement>";
-        localization.message.advancement.tag.task = "<color:#4eff52>[<hover:show_text:\"<color:#4eff52><advancement>\"><advancement></hover>]";
-        localization.message.advancement.tag.challenge = "<color:#834eff>[<hover:show_text:\"<color:#834eff><advancement>\"><advancement></hover>]";
-        localization.message.advancement.revoke.manyToOne = "<fcolor:1>🌠 Revoked <fcolor:2><advancements> <fcolor:1>advancements from <target>";
-        localization.message.advancement.revoke.oneToMany = "<fcolor:1>🌠 Revoked the advancement <advancement> from <fcolor:2><players> <fcolor:1>players";
-        localization.message.advancement.revoke.manyToMany = "<fcolor:1>🌠 Revoked <fcolor:2><advancements> <fcolor:1>advancements from <fcolor:2><players> <fcolor:1>players";
-        localization.message.advancement.revoke.oneToOne = "<fcolor:1>🌠 Revoked the advancement <advancement> <fcolor:1>from <target>";
-        localization.message.advancement.revoke.criterionToMany = "<fcolor:1>🌠 Revoked criterion '<fcolor:2><criterion><fcolor:1>' of advancement <advancement> from <fcolor:2><players> <fcolor:1>players";
-        localization.message.advancement.revoke.criterionToOne = "<fcolor:1>🌠 Revoked criterion '<fcolor:2><criterion><fcolor:1>' of advancement <advancement> from <target>";
-        localization.message.advancement.grant.manyToOne = "<fcolor:1>🌠 Granted <fcolor:2><advancements> <fcolor:1>advancements to <target>";
-        localization.message.advancement.grant.oneToMany = "<fcolor:1>🌠 Granted the advancement <advancement> to <fcolor:2><players> <fcolor:1>players";
-        localization.message.advancement.grant.manyToMany = "<fcolor:1>🌠 Granted <fcolor:2><advancements> <fcolor:1>advancements to <fcolor:2><players> <fcolor:1>players";
-        localization.message.advancement.grant.oneToOne = "<fcolor:1>🌠 Granted the advancement <advancement> to <target>";
-        localization.message.advancement.grant.criterionToMany = "<fcolor:1>🌠 Granted criterion '<fcolor:2><criterion><fcolor:1>' of advancement <advancement> to <fcolor:2><players> <fcolor:1>players";
-        localization.message.advancement.grant.criterionToOne = "<fcolor:1>🌠 Granted criterion '<fcolor:2><criterion><fcolor:1>' of advancement <advancement> to <target>";
-
         localization.message.afk.suffix = " <color:#FFFF00>⌚</color>";
         localization.message.afk.formatTrue.global = "<gradient:#ffd500:#FFFF00>⌚ <player> is now afk";
         localization.message.afk.formatTrue.local = "<gradient:#ffd500:#FFFF00>⌚ Now you're afk";
         localization.message.afk.formatFalse.global = "<gradient:#ffd500:#FFFF00>⌚ <player> isn't afk now";
         localization.message.afk.formatFalse.local = "<gradient:#ffd500:#FFFF00>⌚ Now you're not afk";
-
-        localization.message.attribute.baseValue.get = "<fcolor:1>❤ Base value of attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <target> is <fcolor:2><value>";
-        localization.message.attribute.baseValue.reset = "<fcolor:1>❤ Base value for attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <target> reset to default <fcolor:2><value>";
-        localization.message.attribute.baseValue.set = "<fcolor:1>❤ Base value for attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <target> set to <fcolor:2><value>";
-        localization.message.attribute.modifier.add = "<fcolor:1>❤ Added modifier <fcolor:2><modifier> <fcolor:1>to attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <target>";
-        localization.message.attribute.modifier.remove = "<fcolor:1>❤ Removed modifier <fcolor:2><modifier> <fcolor:1>from attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <target>";
-        localization.message.attribute.modifier.valueGet = "<fcolor:1>❤ Value of modifier <fcolor:2><modifier> <fcolor:1>on attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <target> is <fcolor:2><value>";
-        localization.message.attribute.valueGet = "<fcolor:1>❤ Value of attribute <fcolor:2><lang:'<attribute>'> <fcolor:1>for entity <target> is <fcolor:2><value>";
 
         localization.message.auto.types = new LinkedHashMap<>() {{
             put("announcement", new LinkedList<>() {{
@@ -480,12 +453,6 @@ public class EnglishLocale implements Locale {
                 add("<br><fcolor:1>      ✉ Join our telegram ✉ <br><fcolor:2>    <u><click:open_url:\"https://t.me/flectone\"><hover:show_text:\"<fcolor:2>https://t.me/flectone\">https://t.me/flectone</hover></click></u><br>");
             }});
         }};
-
-        localization.message.bed.noSleep = "<fcolor:1>\uD83D\uDECC You can sleep only at night or during thunderstorms";
-        localization.message.bed.notSafe = "<fcolor:1>\uD83D\uDECC You may not rest now; there are monsters nearby";
-        localization.message.bed.obstructed = "<fcolor:1>\uD83D\uDECC This bed is obstructed";
-        localization.message.bed.occupied = "<fcolor:1>\uD83D\uDECC This bed is occupied";
-        localization.message.bed.tooFarAway = "<fcolor:1>\uD83D\uDECC You may not rest now; the bed is too far away";
 
         localization.message.brand.values = new LinkedList<>() {{
             add("<white>Minecraft");
@@ -500,163 +467,6 @@ public class EnglishLocale implements Locale {
             put("global", "<delete><display_name> <world_prefix>»<fcolor:4> <message><reset><translate>");
             put("local", "<delete><display_name><fcolor:3>: <message><reset><translate>");
         }};
-
-        localization.message.clear.single = "<fcolor:1>\uD83C\uDF0A Removed <fcolor:2><items> <fcolor:1>item(s) from player <target>";
-        localization.message.clear.multiple = "<fcolor:1>\uD83C\uDF0A Removed <fcolor:2><items> <fcolor:1>item(s) from <fcolor:2><players> <fcolor:1>players";
-
-        localization.message.clone.format = "<fcolor:1>⏹ Successfully cloned <fcolor:2><blocks> <fcolor:1>block(s)";
-
-        localization.message.commandblock.notEnabled = "<fcolor:1>\uD83E\uDD16 Command blocks are not enabled on this server";
-        localization.message.commandblock.format = "<fcolor:1>\uD83E\uDD16 Command set: <fcolor:2><command>";
-
-        localization.message.damage.format = "<fcolor:1>\uD83D\uDDE1 Applied <fcolor:2><amount> <fcolor:1>damage to <target>";
-
-        localization.message.death.types = new LinkedHashMap<>() {{
-            put("death.attack.anvil", "<fcolor:1>☠ <target> was squashed by a falling anvil");
-            put("death.attack.anvil.player", "<fcolor:1>☠ <target> was squashed by a falling anvil while fighting <killer>");
-            put("death.attack.arrow", "<fcolor:1>☠ <fcolor:1><target> was shot by <killer>");
-            put("death.attack.arrow.item", "<fcolor:1>☠ <target> was shot by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.badRespawnPoint.message", "<fcolor:1>☠ <target> was killed by <fcolor:2>[<click:open_url:\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"><hover:show_text:\"<fcolor:2>MCPE-28723\">Intentional Game Design</hover></click>]");
-            put("death.attack.cactus", "<fcolor:1>☠ <target> was pricked to death");
-            put("death.attack.cactus.player", "<fcolor:1>☠ <target> walked into a cactus while trying to escape <killer>");
-            put("death.attack.cramming", "<fcolor:1>☠ <target> was squished too much");
-            put("death.attack.cramming.player", "<fcolor:1>☠ <target> was squashed by <killer>");
-            put("death.attack.dragonBreath", "<fcolor:1>☠ <target> was roasted in dragon's breath");
-            put("death.attack.dragonBreath.player", "<fcolor:1>☠ <target> was roasted in dragon's breath by <killer>");
-            put("death.attack.drown", "<fcolor:1>☠ <target> drowned");
-            put("death.attack.drown.player", "<fcolor:1>☠ <target> drowned while trying to escape <killer>");
-            put("death.attack.dryout", "<fcolor:1>☠ <target> died from dehydration");
-            put("death.attack.dryout.player", "<fcolor:1>☠ <target> died from dehydration while trying to escape <killer>");
-            put("death.attack.even_more_magic", "<fcolor:1>☠ <target> was killed by even more magic");
-            put("death.attack.explosion", "<fcolor:1>☠ <target> blew up");
-            put("death.attack.explosion.player", "<fcolor:1>☠ <target> was blown up by <killer>");
-            put("death.attack.explosion.item", "<fcolor:1>☠ <target> was blown up by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.explosion.player.item", "<fcolor:1>☠ <target> was blown up by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.fall", "<fcolor:1>☠ <target> hit the ground too hard");
-            put("death.attack.fall.player", "<fcolor:1>☠ <target> hit the ground too hard while trying to escape <killer>");
-            put("death.attack.fallingBlock", "<fcolor:1>☠ <target> was squashed by a falling block");
-            put("death.attack.fallingBlock.player", "<fcolor:1>☠ <target> was squashed by a falling block while fighting <killer>");
-            put("death.attack.fallingStalactite", "<fcolor:1>☠ <target> was skewered by a falling stalactite");
-            put("death.attack.fallingStalactite.player", "<fcolor:1>☠ <target> was skewered by a falling stalactite while fighting <killer>");
-            put("death.attack.fireball", "<fcolor:1>☠ <target> was fireballed by <killer>");
-            put("death.attack.fireball.item", "<fcolor:1>☠ <target> was fireballed by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.fireworks", "<fcolor:1>☠ <target> went off with a bang");
-            put("death.attack.fireworks.item", "<fcolor:1>☠ <target> went off with a bang due to a firework fired from <fcolor:2>[<killer_item>]<fcolor:1> by <killer>");
-            put("death.attack.fireworks.player", "<fcolor:1>☠ <target> went off with a bang while fighting <killer>");
-            put("death.attack.flyIntoWall", "<fcolor:1>☠ <target> experienced kinetic energy");
-            put("death.attack.flyIntoWall.player", "<fcolor:1>☠ <target> experienced kinetic energy while trying to escape <killer>");
-            put("death.attack.freeze", "<fcolor:1>☠ <target> froze to death");
-            put("death.attack.freeze.player", "<fcolor:1>☠ <target> was frozen to death by <killer>");
-            put("death.attack.generic", "<fcolor:1>☠ <target> died");
-            put("death.attack.generic.player", "<fcolor:1>☠ <target> died because of <killer>");
-            put("death.attack.genericKill", "<fcolor:1>☠ <target> was killed");
-            put("death.attack.genericKill.player", "<fcolor:1>☠ <target> was killed while fighting <killer>");
-            put("death.attack.hotFloor", "<fcolor:1>☠ <target> discovered the floor was lava");
-            put("death.attack.hotFloor.player", "<fcolor:1>☠ <target> walked into the danger zone due to <killer>");
-            put("death.attack.indirectMagic", "<fcolor:1>☠ <target> was killed by <killer> using magic");
-            put("death.attack.indirectMagic.item", "<fcolor:1>☠ <target> was killed by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.inFire", "<fcolor:1>☠ <target> went up in flames");
-            put("death.attack.inFire.player", "<fcolor:1>☠ <target> walked into fire while fighting <killer>");
-            put("death.attack.inWall", "<fcolor:1>☠ <target> suffocated in a wall");
-            put("death.attack.inWall.player", "<fcolor:1>☠ <target> suffocated in a wall while fighting <killer>");
-            put("death.attack.lava", "<fcolor:1>☠ <target> tried to swim in lava");
-            put("death.attack.lava.player", "<fcolor:1>☠ <target> tried to swim in lava to escape <killer>");
-            put("death.attack.lightningBolt", "<fcolor:1>☠ <target> was struck by lightning");
-            put("death.attack.lightningBolt.player", "<fcolor:1☠ <target> was struck by lightning while fighting <killer>");
-            put("death.attack.mace_smash", "<fcolor:1>☠ <target> was smashed by <killer>");
-            put("death.attack.mace_smash.item", "<fcolor:1>☠ <target> was smashed by <killer> with <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.magic", "<fcolor:1>☠ <target> was killed by magic");
-            put("death.attack.magic.player", "<fcolor:1>☠ <target> was killed by magic while trying to escape <killer>");
-            put("death.attack.mob", "<fcolor:1>☠ <target> was slain by <killer>");
-            put("death.attack.mob.item", "<fcolor:1>☠ <target> was slain by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.onFire", "<fcolor:1>☠ <target> burned to death");
-            put("death.attack.onFire.item", "<fcolor:1>☠ <target> was burned to a crisp while fighting <killer> wielding <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.onFire.player", "<fcolor:1>☠ <target> was burned to a crisp while fighting <killer>");
-            put("death.attack.outOfWorld", "<fcolor:1>☠ <target> fell out of the world");
-            put("death.attack.outOfWorld.player", "<fcolor:1>☠ <target> didn't want to live in the same world as <killer>");
-            put("death.attack.outsideBorder", "<fcolor:1>☠ <target> left the confines of this world");
-            put("death.attack.outsideBorder.player", "<fcolor:1>☠ <target> left the confines of this world while fighting <killer>");
-            put("death.attack.player", "<fcolor:1>☠ <target> was slain by <killer>");
-            put("death.attack.player.item", "<fcolor:1>☠ <target> was slain by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.sonic_boom", "<fcolor:1>☠ <target> was obliterated by a sonically-charged shriek");
-            put("death.attack.sonic_boom.item", "<fcolor:1>☠ <target> was obliterated by a sonically-charged shriek while trying to escape <killer> wielding <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.sonic_boom.player", "<fcolor:1>☠ <target> was obliterated by a sonically-charged shriek while trying to escape <killer>");
-            put("death.attack.stalagmite", "<fcolor:1>☠ <target> was impaled on a stalagmite");
-            put("death.attack.stalagmite.player", "<fcolor:1>☠ <target> was impaled on a stalagmite while fighting <killer>");
-            put("death.attack.starve", "<fcolor:1>☠ <target> starved to death");
-            put("death.attack.starve.player", "<fcolor:1>☠ <target> starved to death while fighting <killer>");
-            put("death.attack.sting", "<fcolor:1>☠ <target> was stung to death");
-            put("death.attack.sting.item", "<fcolor:1>☠ <target> was stung to death by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.sting.player", "<fcolor:1>☠ <target> was stung to death by <killer>");
-            put("death.attack.sweetBerryBush", "<fcolor:1>☠ <target> was poked to death by a sweet berry bush");
-            put("death.attack.sweetBerryBush.player", "<fcolor:1>☠ <target> was poked to death by a sweet berry bush while trying to escape <killer>");
-            put("death.attack.thorns", "<fcolor:1>☠ <target> was killed while trying to hurt <killer>");
-            put("death.attack.thorns.item", "<fcolor:1>☠ <target> was killed by <fcolor:2>[<killer_item>]<fcolor:1> while trying to hurt <killer>");
-            put("death.attack.thrown", "<fcolor:1>☠ <target> was pummeled by <killer>");
-            put("death.attack.thrown.item", "<fcolor:1>☠ <target> was pummeled by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.trident", "<fcolor:1>☠ <target> was impaled by <killer>");
-            put("death.attack.trident.item", "<fcolor:1>☠ <target> was impaled by <killer> with <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.attack.wither", "<fcolor:1>☠ <target> withered away");
-            put("death.attack.wither.player", "<fcolor:1>☠ <target> withered away while fighting <killer>");
-            put("death.attack.witherSkull", "<fcolor:1>☠ <target> was shot by a skull from <killer>");
-            put("death.attack.witherSkull.item", "<fcolor:1>☠ <target> was shot by a skull from <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.fell.accident.generic", "<fcolor:1>☠ <target> fell from a high place");
-            put("death.fell.accident.ladder", "<fcolor:1>☠ <target> fell off a ladder");
-            put("death.fell.accident.other_climbable", "<fcolor:1>☠ <target> fell while climbing");
-            put("death.fell.accident.scaffolding", "<fcolor:1>☠ <target> fell off scaffolding");
-            put("death.fell.accident.twisting_vines", "<fcolor:1>☠ <target> fell off some twisting vines");
-            put("death.fell.accident.vines", "<fcolor:1>☠ <target> fell off some vines");
-            put("death.fell.accident.weeping_vines", "<fcolor:1>☠ <target> fell off some weeping vines");
-            put("death.fell.assist", "<fcolor:1>☠ <target> was doomed to fall by <killer>");
-            put("death.fell.assist.item", "<fcolor:1>☠ <target> was doomed to fall by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.fell.finish", "<fcolor:1>☠ <target> fell too far and was finished by <killer>");
-            put("death.fell.finish.item", "<fcolor:1>☠ <target> fell too far and was finished by <killer> using <fcolor:2>[<killer_item>]<fcolor:1>");
-            put("death.fell.killer", "<fcolor:1>☠ <target> was doomed to fall");
-        }};
-
-        localization.message.debugstick.empty = "<fcolor:1>\uD83D\uDD27 <fcolor:2><property> <fcolor:1>has no properties";
-        localization.message.debugstick.select = "<fcolor:1>\uD83D\uDD27 selected \"<fcolor:2><property><fcolor:1>\" (<fcolor:2><value><fcolor:1>)";
-        localization.message.debugstick.update = "<fcolor:1>\uD83D\uDD27 \"<fcolor:2><property><fcolor:1>\" to <fcolor:2><value>";
-
-        localization.message.deop.format = "<fcolor:1>\uD83E\uDD16 Made <target> no longer a server operator";
-
-        localization.message.dialog.clear.single = "<fcolor:1>\uD83D\uDDD4 Cleared dialog for <target>";
-        localization.message.dialog.clear.multiple = "<fcolor:1>\uD83D\uDDD4 Cleared dialog for <fcolor:2><players> <fcolor:1>players";
-        localization.message.dialog.show.single = "<fcolor:1>\uD83D\uDDD4 Displayed dialog to <target>";
-        localization.message.dialog.show.multiple = "<fcolor:1>\uD83D\uDDD4 Displayed dialog to <fcolor:2><players> <fcolor:1>players";
-
-        localization.message.difficulty.query = "<fcolor:1>⚔ The difficulty is <fcolor:2><lang:'<difficulty>'>";
-        localization.message.difficulty.success = "<fcolor:1>⚔ The difficulty has been set to <fcolor:2><lang:'<difficulty>'>";
-
-        localization.message.effect.clear.everything.single = "<fcolor:1>⚗ Removed every effect from <target>";
-        localization.message.effect.clear.everything.multiple = "<fcolor:1>⚗ Removed every effect from <fcolor:2><players> <fcolor:1>targets";
-        localization.message.effect.clear.specific.single = "<fcolor:1>⚗ Removed effect <fcolor:2><lang:'<effect>'> <fcolor:1>from <target>";
-        localization.message.effect.clear.specific.multiple = "<fcolor:1>⚗ Removed effect <fcolor:2><lang:'<effect>'> <fcolor:1>from <fcolor:2><players> <fcolor:1>targets";
-        localization.message.effect.give.single = "<fcolor:1>⚗ Applied effect <fcolor:2><lang:'<effect>'> <fcolor:1>to <target>";
-        localization.message.effect.give.multiple = "<fcolor:1>⚗ Applied effect <fcolor:2><lang:'<effect>'> <fcolor:1>to <fcolor:2><players> <fcolor:1>targets";
-
-        localization.message.enchant.single = "<fcolor:1>\uD83D\uDCD6 Applied enchantment <fcolor:2><enchantment><fcolor:1> to <target>'s item";
-        localization.message.enchant.multiple = "<fcolor:1>\uD83D\uDCD6 Applied enchantment <fcolor:2><enchantment><fcolor:1> to <fcolor:2><players><fcolor:1> entities";
-
-        localization.message.execute.pass = "<fcolor:1>⚡ Test passed";
-        localization.message.execute.passCount = "<fcolor:1>⚡ Test passed, count: <fcolor:2><count>";
-
-        localization.message.experience.add.levels.single = "<fcolor:1>⏺ Gave <fcolor:2><amount> <fcolor:1>experience levels to <target>";
-        localization.message.experience.add.levels.multiple = "<fcolor:1>⏺ Gave <fcolor:2><amount> <fcolor:1>experience levels to <fcolor:2><players> <fcolor:1>players";
-        localization.message.experience.add.points.single = "<fcolor:1>⏺ Gave <fcolor:2><amount> <fcolor:1>experience points to <target>";
-        localization.message.experience.add.points.multiple = "<fcolor:1>⏺ Gave <fcolor:2><amount> <fcolor:1>experience points to <fcolor:2><players> <fcolor:1>players";
-        localization.message.experience.query.levels = "<fcolor:1>⏺ <target> has <fcolor:2><amount> <fcolor:1>experience levels";
-        localization.message.experience.query.points = "<fcolor:1>⏺ <target> has <fcolor:2><amount> <fcolor:1>experience points";
-        localization.message.experience.set.levels.single = "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience levels to <target>";
-        localization.message.experience.set.levels.multiple = "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience levels to <fcolor:2><players> <fcolor:1>players";
-        localization.message.experience.set.points.single = "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience points to <target>";
-        localization.message.experience.set.points.multiple = "<fcolor:1>⏺ Set <fcolor:2><amount> <fcolor:1>experience points to <fcolor:2><players> <fcolor:1>players";
-        localization.message.experience.taken = "<fcolor:1>⏺ Taken <fcolor:2><amount> <fcolor:1>levels from <target>";
-
-        localization.message.fill.format = "<fcolor:1>⏹ Successfully filled <fcolor:2><blocks> <fcolor:1>block(s)";
-
-        localization.message.fillbiome.format = "<fcolor:1>⏹ Biomes set between <fcolor:2><x1><fcolor:1>, <fcolor:2><y1><fcolor:1>, <fcolor:2><z1> <fcolor:1>and <fcolor:2><x2><fcolor:1>, <fcolor:2><y2><fcolor:1>, <fcolor:2><z2>";
-        localization.message.fillbiome.formatCount = "<fcolor:1>⏹ <fcolor:2><blocks> <fcolor:1>biome entry/entries set between <fcolor:2><x1><fcolor:1>, <fcolor:2><y1><fcolor:1>, <fcolor:2><z1> <fcolor:1>and <fcolor:2><x2><fcolor:1>, <fcolor:2><y2><fcolor:1>, <fcolor:2><z2>";
 
         localization.message.format.replacement.spoilerSymbol = "█";
         localization.message.format.replacement.values = new LinkedHashMap<>() {{
@@ -717,58 +527,16 @@ public class EnglishLocale implements Locale {
 
         localization.message.format.translate.action = " <click:run_command:\"/translateto <language> <language> <message>\"><hover:show_text:\"<fcolor:2>Translate message\"><fcolor:1>⇄";
 
-        localization.message.gamemode.setDefault = "<fcolor:1>\uD83D\uDDD8 The default game mode is now <fcolor:2><lang:'<gamemode>'>";
-        localization.message.gamemode.self = "<fcolor:1>\uD83D\uDDD8 Set own game mode to <fcolor:2><lang:'<gamemode>'>";
-        localization.message.gamemode.other = "<fcolor:1>\uD83D\uDDD8 Set <target>'s game mode to <fcolor:2><lang:'<gamemode>'>";
-
-        localization.message.gamerule.query = "<fcolor:1>\uD83D\uDDD0 Gamerule <fcolor:2><gamerule> <fcolor:1>is currently set to: <fcolor:2><value>";
-        localization.message.gamerule.set = "<fcolor:1>\uD83D\uDDD0 Gamerule <fcolor:2><gamerule> <fcolor:1>is now set to: <fcolor:2><value>";
-
-        localization.message.give.single = "<fcolor:1>⛏ Gave <fcolor:2><items> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><give_item>\"><give_item></hover><fcolor:1>] to <target>";
-        localization.message.give.multiple = "<fcolor:1>⛏ Gave <fcolor:2><items> <fcolor:1>[<fcolor:2><hover:show_text:\"<fcolor:2><give_item>\"><give_item></hover><fcolor:1>] to <players> players";
-
         localization.message.greeting.format = "<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]  <fcolor:1>Hello,<br>[#][#][#][#][#][#][#][#]  <player><br>[#][#][#][#][#][#][#][#]<br>[#][#][#][#][#][#][#][#]<br>";
 
         localization.message.join.format = "<color:#4eff52>→ <display_name>";
         localization.message.join.formatFirstTime = "<color:#4eff52>→ <display_name> <fcolor:1>welcome!";
 
-        localization.message.kill.single = "<color:#778899>☠ <fcolor:1>Killed <target>";
-        localization.message.kill.multiple = "<color:#778899>☠ <fcolor:1>Killed <fcolor:2><entities> <fcolor:1>entities";
-
-        localization.message.locate.biome = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><value> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @p <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
-        localization.message.locate.poi = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><value> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @p <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
-        localization.message.locate.structure = "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><value> <fcolor:1>is at <fcolor:2><hover:show_text:\"<fcolor:2>Click to teleport\"><click:suggest_command:\"/tp @p <x> <y> <z>\">[<x>, <y>, <z>]</click></hover> <fcolor:1>(<fcolor:2><blocks> <fcolor:1>blocks away)";
-
         localization.message.objective.belowname.format = "<fcolor:1>ms";
-
-        localization.message.op.format = "<fcolor:1>\uD83E\uDD16 Made <target> a server operator";
-
-        localization.message.particle.format = "<fcolor:1>❄ Displaying particle <fcolor:2><lang:'<particle>'>";
 
         localization.message.quit.format = "<color:#ff4e4e>← <display_name>";
 
-        localization.message.recipe.give.single = "<fcolor:1>\uD83D\uDCA1 Unlocked <fcolor:2><recipes> <fcolor:1>recipe(s) for <target>";
-        localization.message.recipe.give.multiple = "<fcolor:1>\uD83D\uDCA1 Unlocked <fcolor:2><recipes> <fcolor:1>recipe(s) for <fcolor:2><players> <fcolor:1>players";
-        localization.message.recipe.take.single = "<fcolor:1>\uD83D\uDCA1 Took <fcolor:2><recipes> <fcolor:1>recipe(s) from <target>";
-        localization.message.recipe.take.multiple = "<fcolor:1>\uD83D\uDCA1 Took <fcolor:2><recipes> <fcolor:1>recipe(s) from <fcolor:2><players> <fcolor:1>players";
-
-        localization.message.reload.format = "<fcolor:1>\uD83D\uDEC8 Reloading!";
-
-        localization.message.ride.dismount = "<fcolor:1>\uD83C\uDFC7 <target> stopped riding <second_target>";
-        localization.message.ride.mount = "<fcolor:1>\uD83C\uDFC7 <target> started riding <second_target>";
-
         localization.message.rightclick.format = "<fcolor:1>◁ <display_name> ▷";
-
-        localization.message.rotate.format = "<fcolor:1>\uD83E\uDD38 Rotated <target>";
-
-        localization.message.save.disabled = "<fcolor:1>\uD83D\uDEC8 Automatic saving is now disabled";
-        localization.message.save.enabled = "<fcolor:1>\uD83D\uDEC8 Automatic saving is now enabled";
-        localization.message.save.saving = "<fcolor:1>\uD83D\uDEC8 Saving the game (this may take a moment!)";
-        localization.message.save.success = "<fcolor:1>\uD83D\uDEC8 Saved the game";
-
-        localization.message.seed.format = "<fcolor:1>\uD83D\uDD11 Seed: [<fcolor:2><hover:show_text:'<fcolor:2>Click to Copy to Clipboard'><click:copy_to_clipboard:<seed>><seed></click></hover><fcolor:1>]";
-
-        localization.message.setblock.format = "<fcolor:1>⏹ Changed the block at <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>";
 
         localization.message.sidebar.values = new LinkedList<>() {{
             add(new LinkedList<>() {{
@@ -785,23 +553,6 @@ public class EnglishLocale implements Locale {
             }});
         }};
 
-        localization.message.sleep.notPossible = "<fcolor:1>\uD83D\uDECC No amount of rest can pass this night";
-        localization.message.sleep.playersSleeping = "<fcolor:1>\uD83D\uDECC <fcolor:2><players_sleeping><fcolor:1>/<fcolor:2><players><fcolor:1> players sleeping";
-        localization.message.sleep.skippingNight = "<fcolor:1>\uD83D\uDECC Sleeping through this night";
-
-        localization.message.sound.play.multiple = "<fcolor:1>\uD83D\uDD0A Played sound <fcolor:2><sound> <fcolor:1>to <fcolor:2><players> <fcolor:1>players";
-        localization.message.sound.play.single = "<fcolor:1>\uD83D\uDD0A Played sound <fcolor:2><sound> <fcolor:1>to <target>";
-        localization.message.sound.stop.sourceAny = "<fcolor:1>\uD83D\uDD07 Stopped all '<fcolor:2><source><fcolor:1>' sounds";
-        localization.message.sound.stop.sourceSound = "<fcolor:1>\uD83D\uDD07 Stopped sound '<fcolor:2><sound><fcolor:1>' on source '<fcolor:2><source><fcolor:1>'";
-        localization.message.sound.stop.sourcelessAny = "<fcolor:1>\uD83D\uDD07 Stopped all sounds";
-        localization.message.sound.stop.sourcelessSound = "<fcolor:1>\uD83D\uDD07 Stopped sound '<fcolor:2><sound><fcolor:1>'";
-
-        localization.message.spawn.notValid = "<fcolor:1>\uD83D\uDECC You have no home bed or charged respawn anchor, or it was obstructed";
-        localization.message.spawn.set = "<fcolor:1>\uD83D\uDECC Respawn point set";
-        localization.message.spawn.setWorld = "<fcolor:1>\uD83D\uDECC Set the world spawn point to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>, <fcolor:2><yaw><fcolor:1>]";
-        localization.message.spawn.single = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>, <fcolor:2><yaw><fcolor:1>] in <fcolor:2><world><fcolor:1> for <target>";
-        localization.message.spawn.multiple = "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1> [<fcolor:2><angle><fcolor:1>, <fcolor:2><yaw><fcolor:1>] in <fcolor:2><world><fcolor:1> for <fcolor:2><players><fcolor:1> players";
-
         localization.message.status.motd.values = new LinkedList<>() {{
             add("<fcolor:1>Welcome to our server!");
             add("<fcolor:1>Join us and enjoy a unique game experience!");
@@ -811,10 +562,6 @@ public class EnglishLocale implements Locale {
         localization.message.status.players.full = "<color:#ff7171>The server is full";
         localization.message.status.players.samples = new LinkedList<>(List.of(new Localization.Message.Status.Players.Sample()));
         localization.message.status.version.name = "Minecraft server";
-
-        localization.message.stop.format = "<fcolor:1>\uD83D\uDEC8 Stopping the server";
-
-        localization.message.summon.format = "<fcolor:1>\uD83D\uDC3A Summoned new <target>";
 
         localization.message.tab.footer.lists = new LinkedList<>() {{
             add(new LinkedList<>() {{
@@ -842,30 +589,291 @@ public class EnglishLocale implements Locale {
         }};
         localization.message.tab.playerlistname.format = "<world_prefix>▋ <reset><vault_prefix><stream_prefix><fcolor:2><player><afk_suffix><vault_suffix>";
 
-        localization.message.teleport.entity.single = "<fcolor:1>\uD83C\uDF00 Teleported <target> to <second_target>";
-        localization.message.teleport.entity.multiple = "<fcolor:1>\uD83C\uDF00 Teleported <fcolor:2><entities> <fcolor:1>entities to <second_target>";
-        localization.message.teleport.location.single = "<fcolor:1>\uD83C\uDF00 Teleported <target> to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>";
-        localization.message.teleport.location.multiple = "<fcolor:1>\uD83C\uDF00 Teleported <fcolor:2><entities> <fcolor:1>to <fcolor:2><x><fcolor:1>, <fcolor:2><y><fcolor:1>, <fcolor:2><z><fcolor:1>";
-
-        localization.message.time.query = "<fcolor:1>☽ The time is <fcolor:2><time>";
-        localization.message.time.set = "<fcolor:1>☽ Set the time to <fcolor:2><time>";
-
         localization.message.update.formatPlayer = "<fcolor:1><fcolor:2>(FlectonePulse)<fcolor:1> Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <url:https://modrinth.com/plugin/flectonepulse>, to get new opportunities!";
         localization.message.update.formatConsole = "<fcolor:1>Your version <fcolor:2><current_version><fcolor:1> is outdated! Update to <fcolor:2><latest_version><fcolor:1> at <click:open_url:https://modrinth.com/plugin/flectonepulse>https://modrinth.com/plugin/flectonepulse";
 
-        localization.message.weather.clear = "<fcolor:1>☀ Set the weather to <fcolor:2>clear";
-        localization.message.weather.rain = "<fcolor:1>\uD83C\uDF27 Set the weather to <fcolor:2>rain";
-        localization.message.weather.thunder = "<fcolor:1>⛈ Set the weather to <fcolor:2>rain & thunder";
-
-        localization.message.worldborder.center = "<fcolor:1>\uD83D\uDEAB Set the center of the world border to <fcolor:2><value><fcolor:1>, <fcolor:2><second_value>";
-        localization.message.worldborder.damage.amount = "<fcolor:1>\uD83D\uDEAB Set the world border damage to <fcolor:2><value> <fcolor:1>per block each second";
-        localization.message.worldborder.damage.buffer = "<fcolor:1>\uD83D\uDEAB Set the world border damage buffer to <fcolor:2><value> <fcolor:1>block(s)";
-        localization.message.worldborder.get = "<fcolor:1>\uD83D\uDEAB The world border is currently <fcolor:2><value> <fcolor:1>block(s) wide";
-        localization.message.worldborder.set.grow = "<fcolor:1>\uD83D\uDEAB Growing the world border to <fcolor:2><value> <fcolor:1>blocks wide over <fcolor:2><second_value> <fcolor:1>seconds";
-        localization.message.worldborder.set.immediate = "<fcolor:1>\uD83D\uDEAB Set the world border to <fcolor:2><value> <fcolor:1>block(s) wide";
-        localization.message.worldborder.set.shrink = "<fcolor:1>\uD83D\uDEAB Shrinking the world border to <fcolor:2><value> <fcolor:1>block(s) wide over <fcolor:2><second_value> <fcolor:1>second(s)";
-        localization.message.worldborder.warning.distance = "<fcolor:1>\uD83D\uDEAB Set the world border warning distance to <fcolor:2><value> <fcolor:1>block(s)";
-        localization.message.worldborder.warning.time = "<fcolor:1>\uD83D\uDEAB Set the world border warning time to <fcolor:2><value> <fcolor:1>second(s)";
+        localization.message.vanilla.types = new LinkedHashMap<>() {
+            {
+                put("advMode.notEnabled", "<fcolor:1>\uD83E\uDD16 Command blocks are not enabled on this server");
+                put("advMode.setCommand.success", "<fcolor:1>\uD83E\uDD16 Command set: <fcolor:2><arg_0>");
+                put("block.minecraft.bed.no_sleep", "<fcolor:1>\uD83D\uDECC You can sleep only at night or during thunderstorms");
+                put("block.minecraft.bed.not_safe", "<fcolor:1>\uD83D\uDECC You may not rest now; there are monsters nearby");
+                put("block.minecraft.bed.obstructed", "<fcolor:1>\uD83D\uDECC This bed is obstructed");
+                put("block.minecraft.bed.occupied", "<fcolor:1>\uD83D\uDECC This bed is occupied");
+                put("block.minecraft.bed.too_far_away", "<fcolor:1>\uD83D\uDECC You may not rest now; the bed is too far away");
+                put("tile.bed.noSleep", "<fcolor:1>\uD83D\uDECC You can sleep only at night or during thunderstorms");
+                put("tile.bed.notSafe", "<fcolor:1>\uD83D\uDECC You may not rest now; there are monsters nearby");
+                put("tile.bed.notValid", "<fcolor:1>\uD83D\uDECC This bed is obstructed");
+                put("tile.bed.occupied", "<fcolor:1>\uD83D\uDECC This bed is occupied");
+                put("block.minecraft.spawn.not_valid","<fcolor:1>\uD83D\uDECC You have no home bed or charged respawn anchor, or it was obstructed");
+                put("block.minecraft.bed.not_valid", "<fcolor:1>\uD83D\uDECC You have no home bed or it was obstructed");
+                put("block.minecraft.set_spawn", "<fcolor:1>\uD83D\uDECC Respawn point set");
+                put("chat.type.advancement.challenge", "<fcolor:1>🌠 <arg_0> has made the advancement <arg_1>");
+                put("chat.type.advancement.goal", "<fcolor:1>🌠 <arg_0> has reached the goal <arg_1>");
+                put("chat.type.advancement.task", "<fcolor:1>🌠 <arg_0> has completed the challenge <arg_1>");
+                put("chat.type.achievement", "<fcolor:1>🌠 <arg_0> has completed the challenge <arg_1>");
+                put("chat.type.achievement.taken", "<fcolor:1>🌠 <arg_0> has lost the achievement '<arg_1>'");
+                put("sleep.not_possible", "<fcolor:1>\uD83D\uDECC No amount of rest can pass this night");
+                put("sleep.players_sleeping", "<fcolor:1>\uD83D\uDECC <fcolor:2><arg_0><fcolor:1>/<fcolor:2><arg_1><fcolor:1> players sleeping");
+                put("sleep.skipping_night", "<fcolor:1>\uD83D\uDECC Sleeping through this night");
+                put("item.minecraft.debug_stick.empty", "<fcolor:1>\uD83D\uDD27 <fcolor:2><arg_0> <fcolor:1>has no properties");
+                put("item.minecraft.debug_stick.select", "<fcolor:1>\uD83D\uDD27 selected \"<fcolor:2><arg_0><fcolor:1>\" (<fcolor:2><arg_1><fcolor:1>)");
+                put("item.minecraft.debug_stick.update", "<fcolor:1>\uD83D\uDD27 \"<fcolor:2><arg_0><fcolor:1>\" to <fcolor:2><arg_1>");
+                put("commands.clear.success.multiple", "<fcolor:1>\uD83C\uDF0A Removed <fcolor:2><arg_0> <fcolor:1>item(s) from <fcolor:2><arg_1> <fcolor:1>players");
+                put("commands.clear.success.single", "<fcolor:1>\uD83C\uDF0A Removed <fcolor:2><arg_0> <fcolor:1>item(s) from player <arg_1>");
+                put("commands.clear.success", "<fcolor:1>\uD83C\uDF0A Removed <fcolor:2><arg_1> <fcolor:1>item(s) from player <arg_0>");
+                put("commands.advancement.grant.criterion.to.many.success",  "<fcolor:1>🌠 Granted criterion '<fcolor:2><arg_0><fcolor:1>' of advancement <arg_1> to <fcolor:2><arg_2> <fcolor:1>players");
+                put("commands.advancement.revoke.criterion.to.many.success","<fcolor:1>🌠 Revoked criterion '<fcolor:2><arg_0><fcolor:1>' of advancement <arg_1> from <fcolor:2><arg_2> <fcolor:1>players");
+                put("commands.advancement.grant.criterion.to.one.success", "<fcolor:1>🌠 Granted criterion '<fcolor:2><arg_0><fcolor:1>' of advancement <arg_1> to <arg_2>");
+                put("commands.advancement.revoke.criterion.to.one.success", "<fcolor:1>🌠 Revoked criterion '<fcolor:2><arg_0><fcolor:1>' of advancement <arg_1> from <arg_2>");
+                put("commands.achievement.give.success.all", "<fcolor:1>🌠 Granted all advancements to <arg_0>");
+                put("commands.achievement.take.success.all", "<fcolor:1>🌠 Revoked all advancements from <arg_0>");
+                put("commands.advancement.grant.many.to.many.success", "<fcolor:1>🌠 Granted <fcolor:2><arg_0> <fcolor:1>advancements to <fcolor:2><arg_1> <fcolor:1>players");
+                put("commands.advancement.revoke.many.to.many.success",  "<fcolor:1>🌠 Revoked <fcolor:2><arg_0> <fcolor:1>advancements from <fcolor:2><arg_1> <fcolor:1>players");
+                put("commands.advancement.grant.many.to.one.success", "<fcolor:1>🌠 Granted <fcolor:2><arg_0> <fcolor:1>advancements to <arg_1>");
+                put("commands.advancement.revoke.many.to.one.success", "<fcolor:1>🌠 Revoked <fcolor:2><arg_0> <fcolor:1>advancements from <arg_1>");
+                put("commands.advancement.grant.one.to.many.success", "<fcolor:1>🌠 Granted the advancement <arg_0> to <fcolor:2><arg_1> <fcolor:1>players");
+                put("commands.advancement.revoke.one.to.many.success", "<fcolor:1>🌠 Revoked the advancement <arg_0> from <fcolor:2><arg_1> <fcolor:1>players");
+                put("commands.advancement.grant.one.to.one.success", "<fcolor:1>🌠 Granted the advancement <arg_0> to <arg_1>");
+                put("commands.advancement.revoke.one.to.one.success", "<fcolor:1>🌠 Revoked the advancement <arg_0> from <arg_1>");
+                put("commands.achievement.give.success.one", "<fcolor:1>🌠 Granted the advancement <arg_0> to <arg_1>");
+                put("commands.achievement.take.success.one", "<fcolor:1>🌠 Revoked the advancement <arg_0> from <arg_1>");
+                put("commands.attribute.base_value.get.success", "<fcolor:1>❤ Base value of attribute <fcolor:2><arg_0> <fcolor:1>for entity <arg_1> is <fcolor:2><arg_2>");
+                put("commands.attribute.base_value.reset.success", "<fcolor:1>❤ Base value for attribute <fcolor:2><arg_0> <fcolor:1>for entity <arg_1> reset to default <fcolor:2><arg_2>");
+                put("commands.attribute.base_value.set.success", "<fcolor:1>❤ Base value for attribute <fcolor:2><arg_0> <fcolor:1>for entity <arg_1> set to <fcolor:2><arg_2>");
+                put("commands.attribute.value.get.success", "<fcolor:1>❤ Value of attribute <fcolor:2><arg_0> <fcolor:1>for entity <arg_1> is <fcolor:2><arg_2>");
+                put("commands.attribute.modifier.add.success", "<fcolor:1>❤ Added modifier <fcolor:2><arg_0> <fcolor:1>to attribute <fcolor:2><arg_1> <fcolor:1>for entity <arg_2>");
+                put("commands.attribute.modifier.remove.success", "<fcolor:1>❤ Removed modifier <fcolor:2><arg_0> <fcolor:1>from attribute <fcolor:2><arg_1> <fcolor:1>for entity <arg_2>");
+                put("commands.attribute.modifier.value.get.success", "<fcolor:1>❤ Value of modifier <fcolor:2><arg_0> <fcolor:1>on attribute <fcolor:2><arg_1> <fcolor:1>for entity <arg_2> is <fcolor:2><arg_3>");
+                put("commands.clone.success", "<fcolor:1>⏹ Successfully cloned <fcolor:2><arg_0> <fcolor:1>block(s)");
+                put("commands.damage.success", "<fcolor:1>\uD83D\uDDE1 Applied <fcolor:2><arg_0> <fcolor:1>damage to <arg_1>");
+                put("commands.deop.success", "<fcolor:1>\uD83E\uDD16 Made <arg_0> no longer a server operator");
+                put("commands.dialog.clear.multiple", "<fcolor:1>\uD83D\uDDD4 Cleared dialog for <fcolor:2><arg_0> <fcolor:1>players");
+                put("commands.dialog.clear.single", "<fcolor:1>\uD83D\uDDD4 Cleared dialog for <arg_0>");
+                put("commands.dialog.show.multiple", "<fcolor:1>\uD83D\uDDD4 Displayed dialog to <fcolor:2><arg_0> <fcolor:1>players");
+                put("commands.dialog.show.single", "<fcolor:1>\uD83D\uDDD4 Displayed dialog to <arg_0>");
+                put("commands.difficulty.query", "<fcolor:1>⚔ The difficulty is <fcolor:2><arg_0>");
+                put("commands.difficulty.success", "<fcolor:1>⚔ The difficulty has been set to <fcolor:2><arg_0>");
+                put("commands.effect.clear.everything.success.multiple", "<fcolor:1>⚗ Removed every effect from <fcolor:2><arg_0> <fcolor:1>targets");
+                put("commands.effect.clear.everything.success.single", "<fcolor:1>⚗ Removed every effect from <arg_0>");
+                put("commands.effect.clear.specific.success.multiple", "<fcolor:1>⚗ Removed effect <fcolor:2><arg_0> <fcolor:1>from <fcolor:2><arg_1> <fcolor:1>targets");
+                put("commands.effect.clear.specific.success.single", "<fcolor:1>⚗ Removed effect <fcolor:2><arg_0> <fcolor:1>from <arg_1>");
+                put("commands.effect.give.success.multiple", "<fcolor:1>⚗ Applied effect <fcolor:2><arg_0> <fcolor:1>to <fcolor:2><arg_1> <fcolor:1>targets");
+                put("commands.effect.give.success.single", "<fcolor:1>⚗ Applied effect <fcolor:2><arg_0> <fcolor:1>to <arg_1>");
+                put("commands.effect.success", "<fcolor:1>⚗ Applied effect <fcolor:2><arg_0> <fcolor:1>to <arg_3>");
+                put("commands.effect.success.removed", "<fcolor:1>⚗ Removed effect <fcolor:2><arg_0> <fcolor:1>from <arg_1>");
+                put("commands.effect.success.removed.all", "<fcolor:1>⚗ Removed every effect from <arg_0>");
+                put("commands.enchant.success.multiple", "<fcolor:1>\uD83D\uDCD6 Applied enchantment <fcolor:2><arg_0><fcolor:1> to <fcolor:2><arg_1><fcolor:1> entities");
+                put("commands.enchant.success.single", "<fcolor:1>\uD83D\uDCD6 Applied enchantment <fcolor:2><arg_0><fcolor:1> to <arg_1>'s item");
+                put("commands.enchant.success", "<fcolor:1>\uD83D\uDCD6 Applied enchantment");
+                put("commands.execute.conditional.pass", "<fcolor:1>⚡ Test passed");
+                put("commands.execute.conditional.pass_count", "<fcolor:1>⚡ Test passed, count: <fcolor:2><arg_0>");
+                put("commands.experience.query.levels", "<fcolor:1>⏺ <arg_0> has <fcolor:2><arg_1> <fcolor:1>experience levels");
+                put("commands.experience.query.points", "<fcolor:1>⏺ <arg_0> has <fcolor:2><arg_1> <fcolor:1>experience points");
+                put("commands.experience.add.levels.success.multiple", "<fcolor:1>⏺ Gave <fcolor:2><arg_0> <fcolor:1>experience levels to <fcolor:2><arg_1> <fcolor:1>players");
+                put("commands.experience.add.points.success.multiple", "<fcolor:1>⏺ Gave <fcolor:2><arg_0> <fcolor:1>experience points to <fcolor:2><arg_1> <fcolor:1>players");
+                put("commands.experience.set.levels.success.multiple", "<fcolor:1>⏺ Set <fcolor:2><arg_0> <fcolor:1>experience levels to <fcolor:2><arg_1> <fcolor:1>players");
+                put("commands.experience.set.points.success.multiple", "<fcolor:1>⏺ Set <fcolor:2><arg_0> <fcolor:1>experience points to <fcolor:2><arg_1> <fcolor:1>players");
+                put("commands.experience.add.levels.success.single", "<fcolor:1>⏺ Gave <fcolor:2><arg_0> <fcolor:1>experience levels to <arg_1>");
+                put("commands.experience.add.points.success.single", "<fcolor:1>⏺ Gave <fcolor:2><arg_0> <fcolor:1>experience points to <arg_1>");
+                put("commands.experience.set.levels.success.single", "<fcolor:1>⏺ Set <fcolor:2><arg_0> <fcolor:1>experience levels to <arg_1>");
+                put("commands.experience.set.points.success.single", "<fcolor:1>⏺ Set <fcolor:2><arg_0> <fcolor:1>experience points to <arg_1>");
+                put("commands.xp.success", "<fcolor:1>⏺ Gave <fcolor:2><arg_0> <fcolor:1>experience points to <arg_1>");
+                put("commands.xp.success.levels", "<fcolor:1>⏺ Gave <fcolor:2><arg_0> <fcolor:1>experience levels to <arg_1>");
+                put("commands.xp.success.negative.levels", "<fcolor:1>⏺ Taken <fcolor:2><arg_0> <fcolor:1>levels from <arg_1>");
+                put("commands.fill.success", "<fcolor:1>⏹ Successfully filled <fcolor:2><arg_0> <fcolor:1>block(s)");
+                put("commands.fillbiome.success", "<fcolor:1>⏹ Biomes set between <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2> <fcolor:1>and <fcolor:2><arg_3><fcolor:1>, <fcolor:2><arg_4><fcolor:1>, <fcolor:2><arg_5>");
+                put("commands.fillbiome.success.count", "<fcolor:1>⏹ <fcolor:2><arg_0> <fcolor:1>biome entry/entries set between <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1>, <fcolor:2><arg_3> <fcolor:1>and <fcolor:2><arg_4><fcolor:1>, <fcolor:2><arg_5><fcolor:1>, <fcolor:2><arg_6>");
+                put("gameMode.changed", "<fcolor:1>\uD83D\uDDD8 Your game mode has been updated to <fcolor:2><arg_0>");
+                put("commands.gamemode.success.other", "<fcolor:1>\uD83D\uDDD8 Set <arg_0>'s game mode to <fcolor:2><arg_1>");
+                put("commands.gamemode.success.self", "<fcolor:1>\uD83D\uDDD8 Set own game mode to <fcolor:2><arg_0>");
+                put("commands.defaultgamemode.success", "<fcolor:1>\uD83D\uDDD8 The default game mode is now <fcolor:2><arg_0>");
+                put("commands.gamerule.query", "<fcolor:1>\uD83D\uDDD0 Gamerule <fcolor:2><arg_0> <fcolor:1>is currently set to: <fcolor:2><arg_1>");
+                put("commands.gamerule.set", "<fcolor:1>\uD83D\uDDD0 Gamerule <fcolor:2><arg_0> <fcolor:1>is now set to: <fcolor:2><arg_1>");
+                put("commands.gamerule.success", "<fcolor:1>\uD83D\uDDD0 Game rule has been updated");
+                put("commands.give.success.multiple", "<fcolor:1>⛏ Gave <fcolor:2><arg_0> <fcolor:2><arg_1><fcolor:1> to <arg_2> players");
+                put("commands.give.success.single", "<fcolor:1>⛏ Gave <fcolor:2><arg_0> <fcolor:2><arg_1><fcolor:1> to <arg_2>");
+                put("commands.give.success", "<fcolor:1>⛏ Gave <fcolor:2><arg_0><fcolor:1> * <fcolor:2><arg_1><fcolor:1> to <arg_2>");
+                put("commands.kill.success.multiple", "<fcolor:1>☠ Killed <fcolor:2><arg_0> <fcolor:1>entities");
+                put("commands.kill.success.single", "<fcolor:1>☠ Killed <arg_0>");
+                put("commands.kill.successful", "<fcolor:1>☠ Killed <arg_0>");
+                put("commands.locate.biome.success", "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><arg_0><fcolor:1> is at <fcolor:2><arg_1><fcolor:1> (<fcolor:2><arg_2> <fcolor:1>blocks away)");
+                put("commands.locate.poi.success", "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><arg_0><fcolor:1> is at <fcolor:2><arg_1><fcolor:1> (<fcolor:2><arg_2> <fcolor:1>blocks away)");
+                put("commands.locate.structure.success", "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><arg_0><fcolor:1> is at <fcolor:2><arg_1><fcolor:1> (<fcolor:2><arg_2> <fcolor:1>blocks away)");
+                put("commands.locate.success", "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><arg_0><fcolor:1> is at <fcolor:2><arg_1><fcolor:1> (<fcolor:2><arg_2> <fcolor:1>blocks away)");
+                put("commands.locatebiome.success", "<fcolor:1>\uD83D\uDDFA The nearest <fcolor:2><arg_0><fcolor:1> is at <fcolor:2><arg_1><fcolor:1> (<fcolor:2><arg_2> <fcolor:1>blocks away)");
+                put("commands.op.success", "<fcolor:1>\uD83E\uDD16 Made <arg_0> a server operator");
+                put("commands.particle.success", "<fcolor:1>❄ Displaying particle <fcolor:2><arg_0>");
+                put("commands.recipe.give.success.multiple", "<fcolor:1>\uD83D\uDCA1 Unlocked <fcolor:2><arg_0> <fcolor:1>recipe(s) for <fcolor:2><arg_1> <fcolor:1>players");
+                put("commands.recipe.give.success.single", "<fcolor:1>\uD83D\uDCA1 Unlocked <fcolor:2><arg_0> <fcolor:1>recipe(s) for <arg_1>");
+                put("commands.recipe.take.success.multiple", "<fcolor:1>\uD83D\uDCA1 Took <fcolor:2><arg_0> <fcolor:1>recipe(s) from <fcolor:2><arg_1> <fcolor:1>players");
+                put("commands.recipe.take.success.single", "<fcolor:1>\uD83D\uDCA1 Took <fcolor:2><arg_0> <fcolor:1>recipe(s) from <arg_1>");
+                put("commands.reload.success", "<fcolor:1>\uD83D\uDEC8 Reloading!");
+                put("commands.ride.dismount.success", "<fcolor:1>\uD83C\uDFC7 <arg_0> stopped riding <arg_1>");
+                put("commands.ride.mount.success", "<fcolor:1>\uD83C\uDFC7 <arg_0> started riding <arg_1>");
+                put("commands.rotate.success", "<fcolor:1>\uD83E\uDD38 Rotated <arg_0>");
+                put("commands.save.disabled", "<fcolor:1>\uD83D\uDEC8 Automatic saving is now disabled");
+                put("commands.save.enabled", "<fcolor:1>\uD83D\uDEC8 Automatic saving is now enabled");
+                put("commands.save.start", "<fcolor:1>\uD83D\uDEC8 Saving the game (this may take a moment!)");
+                put("commands.save.saving", "<fcolor:1>\uD83D\uDEC8 Saving the game (this may take a moment!)");
+                put("commands.save.success", "<fcolor:1>\uD83D\uDEC8 Saved the game");
+                put("commands.seed.success", "<fcolor:1>\uD83D\uDD11 Seed: <arg_0>");
+                put("commands.setblock.success.1_19_4", "<fcolor:1>⏹ Changed the block");
+                put("commands.setblock.success", "<fcolor:1>⏹ Changed the block at <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1>");
+                put("commands.playsound.success.multiple", "<fcolor:1>\uD83D\uDD0A Played sound <fcolor:2><arg_0> <fcolor:1>to <fcolor:2><arg_1> <fcolor:1>players");
+                put("commands.playsound.success.single", "<fcolor:1>\uD83D\uDD0A Played sound <fcolor:2><arg_0> <fcolor:1>to <arg_1>");
+                put("commands.stopsound.success.all", "<fcolor:1>\uD83D\uDD07 Stopped all '<fcolor:2><arg_0><fcolor:1>' sounds");
+                put("commands.stopsound.success.soundSource", "<fcolor:1>\uD83D\uDD07 Stopped all sounds");
+                put("commands.stopsound.success.individualSound", "<fcolor:1>\uD83D\uDD07 Stopped sound '<fcolor:2><arg_0><fcolor:1>' on source '<fcolor:2><arg_1><fcolor:1>'");
+                put("commands.playsound.success", "<fcolor:1>\uD83D\uDD0A Played sound <fcolor:2><arg_0> <fcolor:1>to <arg_1>");
+                put("commands.stopsound.success.source.any", "<fcolor:1>\uD83D\uDD07 Stopped all '<fcolor:2><arg_0><fcolor:1>' sounds");
+                put("commands.stopsound.success.source.sound",  "<fcolor:1>\uD83D\uDD07 Stopped sound '<fcolor:2><arg_0><fcolor:1>' on source '<fcolor:2><arg_1><fcolor:1>'");
+                put("commands.stopsound.success.sourceless.any", "<fcolor:1>\uD83D\uDD07 Stopped all sounds");
+                put("commands.stopsound.success.sourceless.sound", "<fcolor:1>\uD83D\uDD07 Stopped sound '<fcolor:2><arg_0><fcolor:1>'");
+                put("commands.spawnpoint.success", "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> <fcolor:1>for <arg_3>");
+                put("commands.setworldspawn.success.1_16", "<fcolor:1>\uD83D\uDECC Set the world spawn point to <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1>");
+                put("commands.setworldspawn.success.1_21_8", "<fcolor:1>\uD83D\uDECC Set the world spawn point to <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>]");
+                put("commands.setworldspawn.success", "<fcolor:1>\uD83D\uDECC Set the world spawn point to <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>, <fcolor:2><arg_4><fcolor:1>] in <fcolor:2><arg_5>");
+                put("commands.setworldspawn.success.new", "<fcolor:1>\uD83D\uDECC Set the world spawn point to <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>, <fcolor:2><arg_4><fcolor:1>] in <fcolor:2><arg_5>");
+                put("commands.spawnpoint.success.multiple.1_14_2", "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> for <fcolor:2><arg_3><fcolor:1> players");
+                put("commands.spawnpoint.success.multiple.1_21.8", "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>] in <fcolor:2><arg_4> <fcolor:1>for <fcolor:2><arg_5><fcolor:1> players");
+                put("commands.spawnpoint.success.multiple", "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>, <fcolor:2><arg_4><fcolor:1>] in <fcolor:2><arg_5> <fcolor:1>for <fcolor:2><arg_6><fcolor:1> players");
+                put("commands.spawnpoint.success.multiple.new", "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>, <fcolor:2><arg_4><fcolor:1>] in <fcolor:2><arg_5> <fcolor:1>for <fcolor:2><arg_6><fcolor:1> players");
+                put("commands.spawnpoint.success.single.1_14_2", "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> <fcolor:1>for <arg_3>");
+                put("commands.spawnpoint.success.single.1_21_8", "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>] in <fcolor:2><arg_4> <fcolor:1>for <arg_5>");
+                put("commands.spawnpoint.success.single", "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>, <fcolor:2><arg_4><fcolor:1>] in <fcolor:2><arg_5> <fcolor:1>for <arg_6>");
+                put("commands.spawnpoint.success.single.new", "<fcolor:1>\uD83D\uDECC Set spawn point to <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1> [<fcolor:2><arg_3><fcolor:1>, <fcolor:2><arg_4><fcolor:1>] in <fcolor:2><arg_5> <fcolor:1>for <arg_6>");
+                put("commands.stop.stopping", "<fcolor:1>\uD83D\uDEC8 Stopping the server");
+                put("commands.stop.start", "<fcolor:1>\uD83D\uDEC8 Stopping the server");
+                put("commands.summon.success", "<fcolor:1>\uD83D\uDC3A Summoned new <arg_0>");
+                put("commands.teleport.success.entity.multiple", "<fcolor:1>\uD83C\uDF00 Teleported <fcolor:2><arg_0> <fcolor:1>entities to <arg_1>");
+                put("commands.teleport.success.entity.single", "<fcolor:1>\uD83C\uDF00 Teleported <arg_0> to <arg_1>");
+                put("commands.tp.success", "<fcolor:1>\uD83C\uDF00 Teleported <arg_0> to <arg_1>");
+                put("commands.teleport.success.location.multiple", "<fcolor:1>\uD83C\uDF00 Teleported <fcolor:2><arg_0> <fcolor:1>to <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1>, <fcolor:2><arg_3><fcolor:1>");
+                put("commands.teleport.success.location.single",  "<fcolor:1>\uD83C\uDF00 Teleported <fcolor:2><arg_0> <fcolor:1>to <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1>, <fcolor:2><arg_3><fcolor:1>");
+                put("commands.tp.success.coordinates", "<fcolor:1>\uD83C\uDF00 Teleported <fcolor:2><arg_0> <fcolor:1>to <fcolor:2><arg_1><fcolor:1>, <fcolor:2><arg_2><fcolor:1>, <fcolor:2><arg_3><fcolor:1>");
+                put("commands.time.query", "<fcolor:1>☽ The time is <fcolor:2><arg_0>");
+                put("commands.time.set", "<fcolor:1>☽ Set the time to <fcolor:2><arg_0>");
+                put("commands.weather.set.clear", "<fcolor:1>☀ Set the weather to <fcolor:2>clear");
+                put("commands.weather.clear", "<fcolor:1>☀ Set the weather to <fcolor:2>clear");
+                put("commands.weather.set.rain", "<fcolor:1>\uD83C\uDF27 Set the weather to <fcolor:2>rain");
+                put("commands.weather.rain", "<fcolor:1>\uD83C\uDF27 Set the weather to <fcolor:2>rain");
+                put("commands.weather.set.thunder", "<fcolor:1>⛈ Set the weather to <fcolor:2>rain & thunder");
+                put("commands.weather.thunder", "<fcolor:1>⛈ Set the weather to <fcolor:2>rain & thunder");
+                put("commands.worldborder.center.success", "<fcolor:1>\uD83D\uDEAB Set the center of the world border to <fcolor:2><arg_0><fcolor:1>, <fcolor:2><arg_1>");
+                put("commands.worldborder.damage.amount.success", "<fcolor:1>\uD83D\uDEAB Set the world border damage to <fcolor:2><arg_0> <fcolor:1>per block each second");
+                put("commands.worldborder.damage.buffer.success", "<fcolor:1>\uD83D\uDEAB Set the world border damage buffer to <fcolor:2><arg_0> <fcolor:1>block(s)");
+                put("commands.worldborder.get.success", "<fcolor:1>\uD83D\uDEAB The world border is currently <fcolor:2><arg_0> <fcolor:1>block(s) wide");
+                put("commands.worldborder.get", "<fcolor:1>\uD83D\uDEAB The world border is currently <fcolor:2><arg_0> <fcolor:1>block(s) wide");
+                put("commands.worldborder.set.success", "<fcolor:1>\uD83D\uDEAB Set the world border to <fcolor:2><arg_0> <fcolor:1>block(s) wide");
+                put("commands.worldborder.setSlowly.grow.success", "<fcolor:1>\uD83D\uDEAB Growing the world border to <fcolor:2><arg_0> <fcolor:1>blocks wide over <fcolor:2><arg_2> <fcolor:1>seconds");
+                put("commands.worldborder.set.grow", "<fcolor:1>\uD83D\uDEAB Growing the world border to <fcolor:2><arg_0> <fcolor:1>blocks wide over <fcolor:2><arg_1> <fcolor:1>seconds");
+                put("commands.worldborder.set.immediate", "<fcolor:1>\uD83D\uDEAB Set the world border to <fcolor:2><arg_0> <fcolor:1>block(s) wide");
+                put("commands.worldborder.setSlowly.shrink.success", "<fcolor:1>\uD83D\uDEAB Shrinking the world border to <fcolor:2><arg_0> <fcolor:1>block(s) wide over <fcolor:2><arg_2> <fcolor:1>second(s)");
+                put("commands.worldborder.set.shrink", "<fcolor:1>\uD83D\uDEAB Shrinking the world border to <fcolor:2><arg_0> <fcolor:1>block(s) wide over <fcolor:2><arg_1> <fcolor:1>second(s)");
+                put("commands.worldborder.warning.distance.success","<fcolor:1>\uD83D\uDEAB Set the world border warning distance to <fcolor:2><arg_0> <fcolor:1>block(s)");
+                put("commands.worldborder.warning.time.success", "<fcolor:1>\uD83D\uDEAB Set the world border warning time to <fcolor:2><arg_0> <fcolor:1>second(s)");
+                put("death.attack.anvil", "<fcolor:1>☠ <arg_0> was squashed by a falling anvil");
+                put("death.attack.anvil.player", "<fcolor:1>☠ <arg_0> was squashed by a falling anvil while fighting <arg_1>");
+                put("death.attack.arrow", "<fcolor:1>☠ <arg_0> was shot by <arg_1>");
+                put("death.attack.arrow.item", "<fcolor:1>☠ <arg_0> was shot by <arg_1> using <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.badRespawnPoint.message", "<fcolor:1>☠ <arg_0> was killed by <fcolor:2>[<click:open_url:\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"><hover:show_text:\"<fcolor:2>MCPE-28723\">Intentional Game Design</hover></click>]");
+                put("death.attack.cactus", "<fcolor:1>☠ <arg_0> was pricked to death");
+                put("death.attack.cactus.player", "<fcolor:1>☠ <arg_0> walked into a cactus while trying to escape <arg_1>");
+                put("death.attack.cramming", "<fcolor:1>☠ <arg_0> was squished too much");
+                put("death.attack.cramming.player", "<fcolor:1>☠ <arg_0> was squashed by <arg_1>");
+                put("death.attack.dragonBreath", "<fcolor:1>☠ <arg_0> was roasted in dragon's breath");
+                put("death.attack.dragonBreath.player", "<fcolor:1>☠ <arg_0> was roasted in dragon's breath by <arg_1>");
+                put("death.attack.drown", "<fcolor:1>☠ <arg_0> drowned");
+                put("death.attack.drown.player", "<fcolor:1>☠ <arg_0> drowned while trying to escape <arg_1>");
+                put("death.attack.dryout", "<fcolor:1>☠ <arg_0> died from dehydration");
+                put("death.attack.dryout.player", "<fcolor:1>☠ <arg_0> died from dehydration while trying to escape <arg_1>");
+                put("death.attack.even_more_magic", "<fcolor:1>☠ <arg_0> was killed by even more magic");
+                put("death.attack.explosion", "<fcolor:1>☠ <arg_0> blew up");
+                put("death.attack.explosion.player", "<fcolor:1>☠ <arg_0> was blown up by <arg_1>");
+                put("death.attack.explosion.item", "<fcolor:1>☠ <arg_0> was blown up by <arg_1> using <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.explosion.player.item", "<fcolor:1>☠ <arg_0> was blown up by <arg_1> using <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.fall", "<fcolor:1>☠ <arg_0> hit the ground too hard");
+                put("death.attack.fall.player", "<fcolor:1>☠ <arg_0> hit the ground too hard while trying to escape <arg_1>");
+                put("death.attack.fallingBlock", "<fcolor:1>☠ <arg_0> was squashed by a falling block");
+                put("death.attack.fallingBlock.player", "<fcolor:1>☠ <arg_0> was squashed by a falling block while fighting <arg_1>");
+                put("death.attack.fallingStalactite", "<fcolor:1>☠ <arg_0> was skewered by a falling stalactite");
+                put("death.attack.fallingStalactite.player", "<fcolor:1>☠ <arg_0> was skewered by a falling stalactite while fighting <arg_1>");
+                put("death.attack.fireball", "<fcolor:1>☠ <arg_0> was fireballed by <arg_1>");
+                put("death.attack.fireball.item", "<fcolor:1>☠ <arg_0> was fireballed by <arg_1> using <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.fireworks", "<fcolor:1>☠ <arg_0> went off with a bang");
+                put("death.attack.fireworks.item", "<fcolor:1>☠ <arg_0> went off with a bang due to a firework fired from <fcolor:2><arg_2><fcolor:1> by <arg_1>");
+                put("death.attack.fireworks.player", "<fcolor:1>☠ <arg_0> went off with a bang while fighting <arg_1>");
+                put("death.attack.flyIntoWall", "<fcolor:1>☠ <arg_0> experienced kinetic energy");
+                put("death.attack.flyIntoWall.player", "<fcolor:1>☠ <arg_0> experienced kinetic energy while trying to escape <arg_1>");
+                put("death.attack.freeze", "<fcolor:1>☠ <arg_0> froze to death");
+                put("death.attack.freeze.player", "<fcolor:1>☠ <arg_0> was frozen to death by <arg_1>");
+                put("death.attack.generic", "<fcolor:1>☠ <arg_0> died");
+                put("death.attack.generic.player", "<fcolor:1>☠ <arg_0> died because of <arg_1>");
+                put("death.attack.genericKill", "<fcolor:1>☠ <arg_0> was killed");
+                put("death.attack.genericKill.player", "<fcolor:1>☠ <arg_0> was killed while fighting <arg_1>");
+                put("death.attack.hotFloor", "<fcolor:1>☠ <arg_0> discovered the floor was lava");
+                put("death.attack.hotFloor.player", "<fcolor:1>☠ <arg_0> walked into the danger zone due to <arg_1>");
+                put("death.attack.indirectMagic", "<fcolor:1>☠ <arg_0> was killed by <arg_1> using magic");
+                put("death.attack.indirectMagic.item", "<fcolor:1>☠ <arg_0> was killed by <arg_1> using <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.inFire", "<fcolor:1>☠ <arg_0> went up in flames");
+                put("death.attack.inFire.player", "<fcolor:1>☠ <arg_0> walked into fire while fighting <arg_1>");
+                put("death.attack.inWall", "<fcolor:1>☠ <arg_0> suffocated in a wall");
+                put("death.attack.inWall.player", "<fcolor:1>☠ <arg_0> suffocated in a wall while fighting <arg_1>");
+                put("death.attack.lava", "<fcolor:1>☠ <arg_0> tried to swim in lava");
+                put("death.attack.lava.player", "<fcolor:1>☠ <arg_0> tried to swim in lava to escape <arg_1>");
+                put("death.attack.lightningBolt", "<fcolor:1>☠ <arg_0> was struck by lightning");
+                put("death.attack.lightningBolt.player", "<fcolor:1>☠ <arg_0> was struck by lightning while fighting <arg_1>");
+                put("death.attack.mace_smash", "<fcolor:1>☠ <arg_0> was smashed by <arg_1>");
+                put("death.attack.mace_smash.item", "<fcolor:1>☠ <arg_0> was smashed by <arg_1> with <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.magic", "<fcolor:1>☠ <arg_0> was killed by magic");
+                put("death.attack.magic.player", "<fcolor:1>☠ <arg_0> was killed by magic while trying to escape <arg_1>");
+                put("death.attack.mob", "<fcolor:1>☠ <arg_0> was slain by <arg_1>");
+                put("death.attack.mob.item", "<fcolor:1>☠ <arg_0> was slain by <arg_1> using <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.onFire", "<fcolor:1>☠ <arg_0> burned to death");
+                put("death.attack.onFire.item", "<fcolor:1>☠ <arg_0> was burned to a crisp while fighting <arg_1> wielding <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.onFire.player", "<fcolor:1>☠ <arg_0> was burned to a crisp while fighting <arg_1>");
+                put("death.attack.outOfWorld", "<fcolor:1>☠ <arg_0> fell out of the world");
+                put("death.attack.outOfWorld.player", "<fcolor:1>☠ <arg_0> didn't want to live in the same world as <arg_1>");
+                put("death.attack.outsideBorder", "<fcolor:1>☠ <arg_0> left the confines of this world");
+                put("death.attack.outsideBorder.player", "<fcolor:1>☠ <arg_0> left the confines of this world while fighting <arg_1>");
+                put("death.attack.player", "<fcolor:1>☠ <arg_0> was slain by <arg_1>");
+                put("death.attack.player.item", "<fcolor:1>☠ <arg_0> was slain by <arg_1> using <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.sonic_boom", "<fcolor:1>☠ <arg_0> was obliterated by a sonically-charged shriek");
+                put("death.attack.sonic_boom.item", "<fcolor:1>☠ <arg_0> was obliterated by a sonically-charged shriek while trying to escape <arg_1> wielding <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.sonic_boom.player", "<fcolor:1>☠ <arg_0> was obliterated by a sonically-charged shriek while trying to escape <arg_1>");
+                put("death.attack.stalagmite", "<fcolor:1>☠ <arg_0> was impaled on a stalagmite");
+                put("death.attack.stalagmite.player", "<fcolor:1>☠ <arg_0> was impaled on a stalagmite while fighting <arg_1>");
+                put("death.attack.starve", "<fcolor:1>☠ <arg_0> starved to death");
+                put("death.attack.starve.player", "<fcolor:1>☠ <arg_0> starved to death while fighting <arg_1>");
+                put("death.attack.sting", "<fcolor:1>☠ <arg_0> was stung to death");
+                put("death.attack.sting.item", "<fcolor:1>☠ <arg_0> was stung to death by <arg_1> using <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.sting.player", "<fcolor:1>☠ <arg_0> was stung to death by <arg_1>");
+                put("death.attack.sweetBerryBush", "<fcolor:1>☠ <arg_0> was poked to death by a sweet berry bush");
+                put("death.attack.sweetBerryBush.player", "<fcolor:1>☠ <arg_0> was poked to death by a sweet berry bush while trying to escape <arg_1>");
+                put("death.attack.thorns", "<fcolor:1>☠ <arg_0> was killed while trying to hurt <arg_1>");
+                put("death.attack.thorns.item", "<fcolor:1>☠ <arg_0> was killed by <fcolor:2><arg_2><fcolor:1> while trying to hurt <arg_1>");
+                put("death.attack.thrown", "<fcolor:1>☠ <arg_0> was pummeled by <arg_1>");
+                put("death.attack.thrown.item", "<fcolor:1>☠ <arg_0> was pummeled by <arg_1> using <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.trident", "<fcolor:1>☠ <arg_0> was impaled by <arg_1>");
+                put("death.attack.trident.item", "<fcolor:1>☠ <arg_0> was impaled by <arg_1> with <fcolor:2><arg_2><fcolor:1>");
+                put("death.attack.wither", "<fcolor:1>☠ <arg_0> withered away");
+                put("death.attack.wither.player", "<fcolor:1>☠ <arg_0> withered away while fighting <arg_1>");
+                put("death.attack.witherSkull", "<fcolor:1>☠ <arg_0> was shot by a skull from <arg_1>");
+                put("death.attack.witherSkull.item", "<fcolor:1>☠ <arg_0> was shot by a skull from <arg_1> using <fcolor:2><arg_2><fcolor:1>");
+                put("death.fell.accident.generic", "<fcolor:1>☠ <arg_0> fell from a high place");
+                put("death.fell.accident.ladder", "<fcolor:1>☠ <arg_0> fell off a ladder");
+                put("death.fell.accident.other_climbable", "<fcolor:1>☠ <arg_0> fell while climbing");
+                put("death.fell.accident.scaffolding", "<fcolor:1>☠ <arg_0> fell off scaffolding");
+                put("death.fell.accident.twisting_vines", "<fcolor:1>☠ <arg_0> fell off some twisting vines");
+                put("death.fell.accident.vines", "<fcolor:1>☠ <arg_0> fell off some vines");
+                put("death.fell.accident.weeping_vines", "<fcolor:1>☠ <arg_0> fell off some weeping vines");
+                put("death.fell.assist", "<fcolor:1>☠ <arg_0> was doomed to fall by <arg_1>");
+                put("death.fell.assist.item", "<fcolor:1>☠ <arg_0> was doomed to fall by <arg_1> using <fcolor:2><arg_2><fcolor:1>");
+                put("death.fell.finish", "<fcolor:1>☠ <arg_0> fell too far and was finished by <arg_1>");
+                put("death.fell.finish.item", "<fcolor:1>☠ <arg_0> fell too far and was finished by <arg_1> using <fcolor:2><arg_2><fcolor:1>");
+                put("death.fell.killer", "<fcolor:1>☠ <arg_0> was doomed to fall");
+            }
+        };
     }
-
 }

@@ -787,131 +787,62 @@ public final class Permission extends YamlFile implements ModuleConfig {
         private String name = "flectonepulse.module.message";
         private Type type = Type.TRUE;
 
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/advancement/")
-        private Advancement advancement = new Advancement();
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/afk/")
         private Afk afk = new Afk();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/anvil/")
         private Anvil anvil = new Anvil();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/attribute/")
-        private Attribute attribute = new Attribute();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/auto/")
         private Auto auto = new Auto();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/bed/")
-        private Bed bed = new Bed();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/book/")
         private Book book = new Book();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/brand/")
         private Brand brand = new Brand();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/bubble/")
         private Bubble bubble = new Bubble();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/chat/")
         private Chat chat = new Chat();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/clear/")
-        private Clear clear = new Clear();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/clone/")
-        private Clone clone = new Clone();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/commandblock/")
-        private Commandblock commandblock = new Commandblock();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/damage/")
-        private Damage damage = new Damage();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/death/")
-        private Death death = new Death();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/debugstick/")
-        private Debugstick debugstick = new Debugstick();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/deop/")
-        private Deop deop = new Deop();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/dialog/")
-        private Dialog dialog = new Dialog();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/difficulty/")
-        private Difficulty difficulty = new Difficulty();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/effect/")
-        private Effect effect = new Effect();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/enchant/")
-        private Enchant enchant = new Enchant();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/execute/")
-        private Execute execute = new Execute();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/experience/")
-        private Experience experience = new Experience();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/fill/")
-        private Fill fill = new Fill();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/fillbiome/")
-        private Fillbiome fillbiome = new Fillbiome();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/")
         private Format format = new Format();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/gamemode/")
-        private Gamemode gamemode = new Gamemode();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/gamerule/")
-        private Gamerule gamerule = new Gamerule();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/give/")
-        private Give give = new Give();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/greeting/")
         private Greeting greeting = new Greeting();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/join/")
         private Join join = new Join();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/kill/")
-        private Kill kill = new Kill();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/locate/")
-        private Locate locate = new Locate();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective/")
         private Objective objective = new Objective();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/op/")
-        private Op op = new Op();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/particle/")
-        private Particle particle = new Particle();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/quit/")
         private Quit quit = new Quit();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/recipe/")
-        private Recipe recipe = new Recipe();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/reload/")
-        private Reload reload = new Reload();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/ride/")
-        private Ride ride = new Ride();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rightclick/")
         private Rightclick rightclick = new Rightclick();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rotate/")
-        private Rotate rotate = new Rotate();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/save/")
-        private Save save = new Save();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/seed/")
-        private Seed seed = new Seed();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/setblock/")
-        private Setblock setblock = new Setblock();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sidebar/")
         private Sidebar sidebar = new Sidebar();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sign/")
         private Sign sign = new Sign();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sleep/")
-        private Sleep sleep = new Sleep();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sound/")
-        private Sound sound = new Sound();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/spawn/")
-        private Spawn spawn = new Spawn();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status/")
         private Status status = new Status();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/stop/")
-        private Stop stop = new Stop();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/summon/")
-        private Summon summon = new Summon();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab/")
         private Tab tab = new Tab();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/teleport/")
-        private Teleport teleport = new Teleport();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/time/")
-        private Time time = new Time();
+
         @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/update/")
         private Update update = new Update();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/weather/")
-        private Weather weather = new Weather();
-        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/worldborder/")
-        private Worldborder worldborder = new Worldborder();
 
-        @Getter
-        public static final class Advancement implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.advancement";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.advancement.sound", Type.TRUE);
-        }
+        @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/vanilla/")
+        private Vanilla vanilla = new Vanilla();
 
         @Getter
         public static final class Afk implements SubMessageConfig, IPermission {
@@ -926,13 +857,6 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Attribute implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.attribute";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.attribute.sound", Type.TRUE);
-        }
-
-        @Getter
         public static final class Auto implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.auto";
             private Type type = Type.TRUE;
@@ -943,13 +867,6 @@ public final class Permission extends YamlFile implements ModuleConfig {
                     put("announcement", new PermissionEntry("flectonepulse.module.message.auto.sound", Type.TRUE));
                 }
             };
-        }
-
-        @Getter
-        public static final class Bed implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.bed";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.bed.sound", Type.TRUE);
         }
 
         @Getter
@@ -999,111 +916,6 @@ public final class Permission extends YamlFile implements ModuleConfig {
                 private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.chat.cooldown.bypass", Permission.Type.OP);
                 private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.chat.sound", Permission.Type.TRUE);
             }
-        }
-
-        @Getter
-        public static final class Clear implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.clear";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.clear.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Clone implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.clone";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.clone.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Commandblock implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.commandblock";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.commandblock.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Damage implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.damage";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.damage.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Death implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.death";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.death.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Debugstick implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.debugstick";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.debugstick.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Deop implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.deop";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.deop.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Dialog implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.dialog";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.dialog.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Difficulty implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.difficulty";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.difficulty.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Effect implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.effect";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.effect.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Enchant implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.enchant";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.enchant.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Execute implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.execute";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.execute.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Experience implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.experience";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.experience.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Fill implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.fill";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.fill.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Fillbiome implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.fillbiome";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.fillbiome.sound", Type.TRUE);
         }
 
         @Getter
@@ -1336,7 +1148,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
                         put("ascii_angry", new PermissionEntry("flectonepulse.module.message.format.replacement.ascii_angry", Type.TRUE));
                         put("ascii_happy", new PermissionEntry("flectonepulse.module.message.format.replacement.ascii_happy", Type.TRUE));
 
-                        // dynamic placeholders
+                        // dynamic arguments
                         put("ping", new PermissionEntry("flectonepulse.module.message.format.replacement.ping", Type.TRUE));
                         put("tps", new PermissionEntry("flectonepulse.module.message.format.replacement.tps", Type.TRUE));
                         put("online", new PermissionEntry("flectonepulse.module.message.format.replacement.online", Type.TRUE));
@@ -1384,27 +1196,6 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Gamemode implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.gamemode";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.gamemode.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Gamerule implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.gamerule";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.gamerule.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Give implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.give";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.give.sound", Type.TRUE);
-        }
-
-        @Getter
         public static final class Greeting implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.greeting";
             private Type type = Type.TRUE;
@@ -1416,20 +1207,6 @@ public final class Permission extends YamlFile implements ModuleConfig {
             private String name = "flectonepulse.module.message.join";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.join.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Kill implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.kill";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.kill.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Locate implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.locate";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.locate.sound", Type.TRUE);
         }
 
         @Getter
@@ -1458,45 +1235,10 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Op implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.op";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.op.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Particle implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.particle";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.particle.sound", Type.TRUE);
-        }
-
-        @Getter
         public static final class Quit implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.quit";
             private Type type = Type.TRUE;
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.quit.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Recipe implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.recipe";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.recipe.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Reload implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.reload";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.reload.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Ride implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.ride";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.ride.sound", Type.TRUE);
         }
 
         @Getter
@@ -1505,34 +1247,6 @@ public final class Permission extends YamlFile implements ModuleConfig {
             private Type type = Type.TRUE;
             private PermissionEntry cooldownBypass = new PermissionEntry("flectonepulse.module.message.rightclick.cooldown.bypass", Type.OP);
             private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.rightclick.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Rotate implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.rotate";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.rotate.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Save implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.save";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.save.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Seed implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.seed";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.seed.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Setblock implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.setblock";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.setblock.sound", Type.TRUE);
         }
 
         @Getter
@@ -1545,27 +1259,6 @@ public final class Permission extends YamlFile implements ModuleConfig {
         public static final class Sign implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.sign";
             private Type type = Type.TRUE;
-        }
-
-        @Getter
-        public static final class Sleep implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.sleep";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.sleep.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Sound implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.sound";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.sound.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Spawn implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.spawn";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.spawn.sound", Type.TRUE);
         }
 
         @Getter
@@ -1609,20 +1302,6 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Stop implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.stop";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.stop.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Summon implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.summon";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.summon.sound", Type.TRUE);
-        }
-
-        @Getter
         public static final class Tab implements TabMessageConfig, IPermission {
 
             private String name = "flectonepulse.module.message.tab";
@@ -1654,20 +1333,6 @@ public final class Permission extends YamlFile implements ModuleConfig {
             }
         }
 
-        @Getter
-        public static final class Teleport implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.teleport";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.teleport.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Time implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.time";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.time.sound", Type.TRUE);
-        }
-
         @Setter
         @Getter
         public static final class Update implements SubMessageConfig, IPermission {
@@ -1677,17 +1342,9 @@ public final class Permission extends YamlFile implements ModuleConfig {
         }
 
         @Getter
-        public static final class Weather implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.weather";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.weather.sound", Type.TRUE);
-        }
-
-        @Getter
-        public static final class Worldborder implements SubMessageConfig, IPermission {
-            private String name = "flectonepulse.module.message.worldborder";
-            private Type type = Type.TRUE;
-            private PermissionEntry sound = new PermissionEntry("flectonepulse.module.message.worldborder.sound", Type.TRUE);
+        public static final class Vanilla implements SubMessageConfig, IPermission {
+            private String name = "flectonepulse.module.message.vanilla";
+            private Type type = Type.OP;
         }
     }
 

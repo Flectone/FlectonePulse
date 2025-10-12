@@ -7,8 +7,8 @@ import com.google.inject.Singleton;
 import io.leangen.geantyref.TypeToken;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.annotation.Async;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Message;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.ModerationMetadata;
@@ -41,8 +41,8 @@ import net.flectone.pulse.module.command.stream.StreamModule;
 import net.flectone.pulse.module.command.stream.model.StreamMetadata;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.module.command.tictactoe.TictactoeModule;
-import net.flectone.pulse.module.command.tictactoe.service.TictactoeService;
 import net.flectone.pulse.module.command.tictactoe.model.TicTacToe;
+import net.flectone.pulse.module.command.tictactoe.service.TictactoeService;
 import net.flectone.pulse.module.command.translateto.TranslatetoModule;
 import net.flectone.pulse.module.command.translateto.model.TranslatetoMetadata;
 import net.flectone.pulse.module.command.try_.TryModule;
@@ -52,16 +52,10 @@ import net.flectone.pulse.module.command.unmute.UnmuteModule;
 import net.flectone.pulse.module.command.unwarn.UnwarnModule;
 import net.flectone.pulse.module.command.warn.WarnModule;
 import net.flectone.pulse.module.integration.IntegrationModule;
-import net.flectone.pulse.module.message.advancement.AdvancementModule;
-import net.flectone.pulse.module.message.advancement.model.Advancement;
-import net.flectone.pulse.module.message.advancement.model.AdvancementMetadata;
 import net.flectone.pulse.module.message.afk.AfkModule;
 import net.flectone.pulse.module.message.afk.model.AFKMetadata;
 import net.flectone.pulse.module.message.chat.ChatModule;
 import net.flectone.pulse.module.message.chat.model.ChatMetadata;
-import net.flectone.pulse.module.message.death.DeathModule;
-import net.flectone.pulse.module.message.death.model.Death;
-import net.flectone.pulse.module.message.death.model.DeathMetadata;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.module.message.join.JoinModule;
 import net.flectone.pulse.module.message.join.model.JoinMetadata;
@@ -71,9 +65,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.service.ModerationService;
 import net.flectone.pulse.util.constant.MessageType;
-import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.util.logging.FLogger;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang3.Strings;
 
 import java.io.ByteArrayInputStream;
@@ -165,8 +157,6 @@ public class ProxyMessageHandler {
             case CHAT -> handleChatMessage(input, fEntity, metadataUUID);
             case COMMAND_CLEARCHAT -> handleClearchatCommand(fEntity);
             case COMMAND_ROCKPAPERSCISSORS -> handleRockPaperScissors(input, fEntity, metadataUUID);
-            case ADVANCEMENT -> handleAdvancement(input, fEntity, metadataUUID);
-            case DEATH -> handleDeath(input, fEntity, metadataUUID);
             case JOIN -> handleJoin(input, fEntity, metadataUUID);
             case QUIT -> handleQuit(input, fEntity, metadataUUID);
             case AFK -> handleAfk(input, fEntity, metadataUUID);
@@ -739,58 +729,6 @@ public class ProxyMessageHandler {
                 injector.getInstance(RockpaperscissorsModule.class).end(id, fPlayer, move, metadataUUID);
             }
         }
-    }
-
-    private void handleAdvancement(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
-        AdvancementModule module = injector.getInstance(AdvancementModule.class);
-        if (module.isModuleDisabledFor(fEntity)) return;
-
-        MinecraftTranslationKey translationKey = MinecraftTranslationKey.fromString(input.readUTF());
-        Advancement advancement = gson.fromJson(input.readUTF(), Advancement.class);
-
-        module.sendMessage(AdvancementMetadata.<Localization.Message.Advancement>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(localization -> switch (translationKey) {
-                    case CHAT_TYPE_ADVANCEMENT_TASK -> localization.getFormatTask();
-                    case CHAT_TYPE_ADVANCEMENT_GOAL -> localization.getFormatGoal();
-                    case CHAT_TYPE_ADVANCEMENT_CHALLENGE -> localization.getFormatChallenge();
-                    case CHAT_TYPE_ACHIEVEMENT_TAKEN -> localization.getFormatTaken();
-                    default -> "";
-                })
-                .advancement(advancement)
-                .translationKey(translationKey)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getMessage().getAdvancement().getDestination())
-                .sound(module.getModuleSound())
-                .tagResolvers(fResolver -> new TagResolver[]{module.advancementTag(fEntity, fResolver, advancement.getAdvancementComponent())})
-                .build()
-        );
-    }
-
-    private void handleDeath(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
-        DeathModule module = injector.getInstance(DeathModule.class);
-        if (module.isModuleDisabledFor(fEntity)) return;
-
-        MinecraftTranslationKey translationKey = MinecraftTranslationKey.fromString(input.readUTF());
-        Death death = gson.fromJson(input.readUTF(), Death.class);
-
-        module.sendMessage(DeathMetadata.<Localization.Message.Death>builder()
-                .uuid(metadataUUID)
-                .sender(fEntity)
-                .format(s -> s.getTypes().get(translationKey.toString()))
-                .death(death)
-                .translationKey(translationKey)
-                .range(Range.get(Range.Type.SERVER))
-                .destination(fileResolver.getMessage().getDeath().getDestination())
-                .sound(module.getModuleSound())
-                .tagResolvers(fResolver -> new TagResolver[]{
-                        module.targetTag(fResolver, death.getTarget()),
-                        module.targetTag("killer", fResolver, death.getKiller()),
-                        module.killerItemTag(death.getKillerItem())
-                })
-                .build()
-        );
     }
 
     private void handleJoin(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {

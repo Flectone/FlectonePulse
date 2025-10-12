@@ -436,17 +436,6 @@ public class FileResolver {
                 localization.getCommand().setTell(defaultRussianLocalization.getCommand().getTell());
                 localization.getCommand().setTictactoe(defaultRussianLocalization.getCommand().getTictactoe());
                 localization.getCommand().setToponline(defaultRussianLocalization.getCommand().getToponline());
-                localization.getMessage().setAdvancement(defaultRussianLocalization.getMessage().getAdvancement());
-                localization.getMessage().setClear(defaultRussianLocalization.getMessage().getClear());
-                localization.getMessage().setDeath(defaultRussianLocalization.getMessage().getDeath());
-                localization.getMessage().setDeop(defaultRussianLocalization.getMessage().getDeop());
-                localization.getMessage().setEnchant(defaultRussianLocalization.getMessage().getEnchant());
-                localization.getMessage().setGamemode(defaultRussianLocalization.getMessage().getGamemode());
-                localization.getMessage().setKill(defaultRussianLocalization.getMessage().getKill());
-                localization.getMessage().setOp(defaultRussianLocalization.getMessage().getOp());
-                localization.getMessage().setSeed(defaultRussianLocalization.getMessage().getSeed());
-                localization.getMessage().setSleep(defaultRussianLocalization.getMessage().getSleep());
-                localization.getMessage().setSpawn(defaultRussianLocalization.getMessage().getSpawn());
             } else {
                 localizationTypes.put(MessageType.AFK.name(), "<status_color>Afk");
                 localizationTypes.put(MessageType.ADVANCEMENT.name(), "<status_color>Advancement");
@@ -481,17 +470,6 @@ public class FileResolver {
                 localization.getCommand().setTell(defaultEnglishLocalization.getCommand().getTell());
                 localization.getCommand().setTictactoe(defaultEnglishLocalization.getCommand().getTictactoe());
                 localization.getCommand().setToponline(defaultEnglishLocalization.getCommand().getToponline());
-                localization.getMessage().setAdvancement(defaultEnglishLocalization.getMessage().getAdvancement());
-                localization.getMessage().setClear(defaultEnglishLocalization.getMessage().getClear());
-                localization.getMessage().setDeath(defaultEnglishLocalization.getMessage().getDeath());
-                localization.getMessage().setDeop(defaultEnglishLocalization.getMessage().getDeop());
-                localization.getMessage().setEnchant(defaultEnglishLocalization.getMessage().getEnchant());
-                localization.getMessage().setGamemode(defaultEnglishLocalization.getMessage().getGamemode());
-                localization.getMessage().setKill(defaultEnglishLocalization.getMessage().getKill());
-                localization.getMessage().setOp(defaultEnglishLocalization.getMessage().getOp());
-                localization.getMessage().setSeed(defaultEnglishLocalization.getMessage().getSeed());
-                localization.getMessage().setSleep(defaultEnglishLocalization.getMessage().getSleep());
-                localization.getMessage().setSpawn(defaultEnglishLocalization.getMessage().getSpawn());
             }
 
             yamlFileProcessor.save(localization);

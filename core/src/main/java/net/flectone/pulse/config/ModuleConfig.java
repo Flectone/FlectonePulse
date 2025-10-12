@@ -84,65 +84,25 @@ public interface ModuleConfig {
 
     interface MessageConfig {
 
-        SubMessageConfig getAdvancement();
         SubMessageConfig getAfk();
         SubMessageConfig getAnvil();
-        SubMessageConfig getAttribute();
         SubMessageConfig getAuto();
-        SubMessageConfig getBed();
         SubMessageConfig getBook();
         SubMessageConfig getBrand();
         SubMessageConfig getBubble();
         SubMessageConfig getChat();
-        SubMessageConfig getClear();
-        SubMessageConfig getClone();
-        SubMessageConfig getCommandblock();
-        SubMessageConfig getDamage();
-        SubMessageConfig getDeath();
-        SubMessageConfig getDebugstick();
-        SubMessageConfig getDeop();
-        SubMessageConfig getDialog();
-        SubMessageConfig getDifficulty();
-        SubMessageConfig getEffect();
-        SubMessageConfig getEnchant();
-        SubMessageConfig getExecute();
-        SubMessageConfig getExperience();
-        SubMessageConfig getFill();
-        SubMessageConfig getFillbiome();
         FormatMessageConfig getFormat();
-        SubMessageConfig getGamemode();
-        SubMessageConfig getGamerule();
-        SubMessageConfig getGive();
         SubMessageConfig getGreeting();
         SubMessageConfig getJoin();
-        SubMessageConfig getKill();
-        SubMessageConfig getLocate();
         ObjectiveMessageConfig getObjective();
-        SubMessageConfig getOp();
-        SubMessageConfig getParticle();
         SubMessageConfig getQuit();
-        SubMessageConfig getRecipe();
-        SubMessageConfig getReload();
-        SubMessageConfig getRide();
         SubMessageConfig getRightclick();
-        SubMessageConfig getRotate();
-        SubMessageConfig getSave();
-        SubMessageConfig getSeed();
-        SubMessageConfig getSetblock();
         SubMessageConfig getSidebar();
         SubMessageConfig getSign();
-        SubMessageConfig getSleep();
-        SubMessageConfig getSound();
-        SubMessageConfig getSpawn();
         StatusMessageConfig getStatus();
-        SubMessageConfig getStop();
-        SubMessageConfig getSummon();
         TabMessageConfig getTab();
-        SubMessageConfig getTeleport();
-        SubMessageConfig getTime();
         SubMessageConfig getUpdate();
-        SubMessageConfig getWeather();
-        SubMessageConfig getWorldborder();
+        SubMessageConfig getVanilla();
 
         interface SubMessageConfig {}
 

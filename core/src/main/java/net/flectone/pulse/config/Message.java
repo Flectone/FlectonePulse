@@ -1,11 +1,8 @@
 package net.flectone.pulse.config;
 
-import com.fasterxml.jackson.annotation.JsonMerge;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import com.fasterxml.jackson.annotation.OptBoolean;
+import com.fasterxml.jackson.annotation.*;
 import com.github.retrooper.packetevents.protocol.sound.SoundCategory;
 import com.github.retrooper.packetevents.protocol.sound.Sounds;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,23 +27,14 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/")
     private boolean enable = true;
 
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/advancement/")
-    private Advancement advancement = new Advancement();
-
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/afk/")
     private Afk afk = new Afk();
 
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/anvil/")
     private Anvil anvil = new Anvil();
 
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/attribute/")
-    private Attribute attribute = new Attribute();
-
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/auto/")
     private Auto auto = new Auto();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/bed/")
-    private Bed bed = new Bed();
 
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/book/")
     private Book book = new Book();
@@ -60,62 +48,8 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/chat/")
     private Chat chat = new Chat();
 
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/clear/")
-    private Clear clear = new Clear();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/clone/")
-    private Clone clone = new Clone();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/commandblock/")
-    private Commandblock commandblock = new Commandblock();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/damage/")
-    private Damage damage = new Damage();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/death/")
-    private Death death = new Death();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/debugstick/")
-    private Debugstick debugstick = new Debugstick();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/deop/")
-    private Deop deop = new Deop();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/dialog/")
-    private Dialog dialog = new Dialog();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/difficulty/")
-    private Difficulty difficulty = new Difficulty();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/effect/")
-    private Effect effect = new Effect();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/enchant/")
-    private Enchant enchant = new Enchant();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/execute/")
-    private Execute execute = new Execute();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/experience/")
-    private Experience experience = new Experience();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/fill/")
-    private Fill fill = new Fill();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/fillbiome/")
-    private Fillbiome fillbiome = new Fillbiome();
-
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/format/")
     private Format format = new Format();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/gamemode/")
-    private Gamemode gamemode = new Gamemode();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/gamerule/")
-    private Gamerule gamerule = new Gamerule();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/give/")
-    private Give give = new Give();
 
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/greeting/")
     private Greeting greeting = new Greeting();
@@ -123,47 +57,14 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/join/")
     private Join join = new Join();
 
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/kill/")
-    private Kill kill = new Kill();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/locate/")
-    private Locate locate = new Locate();
-
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/objective/")
     private Objective objective = new Objective();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/op/")
-    private Op op = new Op();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/particle/")
-    private Particle particle = new Particle();
 
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/quit/")
     private Quit quit = new Quit();
 
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/recipe/")
-    private Recipe recipe = new Recipe();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/reload/")
-    private Reload reload = new Reload();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/ride/")
-    private Ride ride = new Ride();
-
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rightclick/")
     private Rightclick rightclick = new Rightclick();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/rotate/")
-    private Rotate rotate = new Rotate();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/save/")
-    private Save save = new Save();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/seed/")
-    private Seed seed = new Seed();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/setblock/")
-    private Setblock setblock = new Setblock();
 
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sidebar/")
     private Sidebar sidebar = new Sidebar();
@@ -171,72 +72,22 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sign/")
     private Sign sign = new Sign();
 
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sleep/")
-    private Sleep sleep = new Sleep();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/sound/")
-    private CommandSound sound = new CommandSound();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/spawn/")
-    private Spawn spawn = new Spawn();
-
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/status/")
     private Status status = new Status();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/stop/")
-    private Stop stop = new Stop();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/summon/")
-    private Summon summon = new Summon();
 
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/tab/")
     private Tab tab = new Tab();
 
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/teleport/")
-    private Teleport teleport = new Teleport();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/time/")
-    private Time time = new Time();
-
     @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/update/")
     private Update update = new Update();
 
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/weather/")
-    private Weather weather = new Weather();
-
-    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/worldborder/")
-    private Worldborder worldborder = new Worldborder();
-
-    @Getter
-    public static final class Advancement implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.SERVER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-
-        private Command command = new Command();
-
-        @Getter
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static final class Command {
-            private boolean enable = true;
-
-            @JsonMerge(OptBoolean.FALSE)
-            private Range range = Range.get(Range.Type.PLAYER);
-
-            private Destination destination = new Destination();
-        }
-    }
+    @JsonPropertyDescription(" https://flectone.net/pulse/docs/message/vanilla/")
+    private Vanilla vanilla = new Vanilla();
 
     @Getter
     public static final class Afk implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.SERVER);
 
         private int delay = 3000;
@@ -251,17 +102,6 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Anvil implements SubMessageConfig, Config.IEnable {
         private boolean enable = false;
-    }
-
-    @Getter
-    public static final class Attribute implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
     }
 
     @Getter
@@ -283,17 +123,6 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
             private Ticker ticker = new Ticker(true, 9000);
             private Sound sound = new Sound();
         }
-    }
-
-    @Getter
-    public static final class Bed implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination(Destination.Type.ACTION_BAR);
-        private Sound sound = new Sound();
     }
 
     @Getter
@@ -369,7 +198,6 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
             private boolean enable = true;
             private boolean cancel;
 
-            @JsonMerge(OptBoolean.FALSE)
             private Range range = Range.get(100);
 
             private int priority;
@@ -398,171 +226,6 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
                 }
             }
         }
-    }
-
-    @Getter
-    public static final class Clear implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Sound sound = new Sound();
-        private Destination destination = new Destination();
-    }
-
-    @Getter
-    public static final class Clone implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Sound sound = new Sound();
-        private Destination destination = new Destination();
-    }
-
-    @Getter
-    public static final class Commandblock implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Sound sound = new Sound();
-        private Destination destination = new Destination();
-    }
-
-    @Getter
-    public static final class Damage implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Sound sound = new Sound();
-        private Destination destination = new Destination();
-    }
-
-    @Getter
-    public static final class Death implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.SERVER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Debugstick implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination(Destination.Type.ACTION_BAR, new Times(0, 20, 0));
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Deop implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Dialog implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Difficulty implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Effect implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Enchant implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Execute implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Experience implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Fill implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Fillbiome implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
     }
 
     @Getter
@@ -762,7 +425,6 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
             @NoArgsConstructor
             public static final class Question {
 
-                @JsonMerge(OptBoolean.FALSE)
                 private Range range = Range.get(Range.Type.PLAYER);
 
                 private Destination destination = new Destination(Destination.Type.CHAT);
@@ -868,39 +530,6 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     }
 
     @Getter
-    public static final class Gamemode implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Gamerule implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Give implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
     public static final class Greeting implements SubMessageConfig, Config.IEnable {
         private boolean enable = false;
         private Destination destination = new Destination();
@@ -912,33 +541,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         private boolean enable = true;
         private boolean first = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.SERVER);
 
         private Destination destination = new Destination();
         private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Kill implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Sound sound = new Sound();
-        private Destination destination = new Destination();
-    }
-
-    @Getter
-    public static final class Locate implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Sound sound = new Sound();
-        private Destination destination = new Destination();
     }
 
     @Getter
@@ -968,66 +574,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     }
 
     @Getter
-    public static final class Op implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Particle implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
     public static final class Quit implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.SERVER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Recipe implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Reload implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Ride implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
 
         private Destination destination = new Destination();
         private Sound sound = new Sound();
@@ -1037,55 +587,10 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     public static final class Rightclick implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
 
         private Destination destination = new Destination(Destination.Type.ACTION_BAR, new Times(0, 60, 0));
         private Cooldown cooldown = new Cooldown();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Rotate implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Save implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Seed implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Setblock implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
 
@@ -1099,39 +604,6 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     @Getter
     public static final class Sign implements SubMessageConfig, Config.IEnable {
         private boolean enable = false;
-    }
-
-    @Getter
-    public static final class Sleep implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination(Destination.Type.ACTION_BAR);
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class CommandSound implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Spawn implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
     }
 
     @Getter
@@ -1188,28 +660,6 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     }
 
     @Getter
-    public static final class Stop implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Summon implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
     public static final class Tab implements TabMessageConfig, Config.IEnable {
 
         private boolean enable = true;
@@ -1247,53 +697,108 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
     }
 
     @Getter
-    public static final class Teleport implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
-    public static final class Time implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
-
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
-
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
-
-    @Getter
     public static final class Update implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
+
+        @JsonMerge(OptBoolean.FALSE)
         private Destination destination = new Destination();
         private Sound sound = new Sound();
     }
 
     @Getter
-    public static final class Weather implements SubMessageConfig, Config.IEnable {
+    public static final class Vanilla implements SubMessageConfig, Config.IEnable {
         private boolean enable = true;
 
         @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
+        private List<VanillaMessage> types = new LinkedList<>() {
+            {
+                add(new VanillaMessage(List.of("block.minecraft.bed.no_sleep", "block.minecraft.bed.not_safe", "block.minecraft.bed.obstructed",
+                        "block.minecraft.bed.occupied", "block.minecraft.bed.too_far_away", "tile.bed.noSleep", "tile.bed.notSafe", "tile.bed.notValid", "tile.bed.occupied",
+                        "block.minecraft.spawn.not_valid", "block.minecraft.bed.not_valid", "sleep.not_possible", "sleep.players_sleeping", "sleep.skipping_night", "item.minecraft.debug_stick.empty",
+                        "item.minecraft.debug_stick.select", "item.minecraft.debug_stick.update"), new Destination(Destination.Type.ACTION_BAR, new Times(0, 20, 0))));
+                add(new VanillaMessage(true, List.of(
+                        "chat.type.advancement.challenge", "chat.type.advancement.goal", "chat.type.advancement.task", "chat.type.achievement", "chat.type.achievement.taken",
+                        "death.attack.anvil", "death.attack.anvil.player", "death.attack.arrow", "death.attack.arrow.item", "death.attack.badRespawnPoint.message", "death.attack.cactus",
+                        "death.attack.cactus.player", "death.attack.cramming", "death.attack.cramming.player", "death.attack.dragonBreath", "death.attack.dragonBreath.player", "death.attack.drown",
+                        "death.attack.drown.player", "death.attack.dryout", "death.attack.dryout.player", "death.attack.even_more_magic", "death.attack.explosion", "death.attack.explosion.player",
+                        "death.attack.explosion.item", "death.attack.explosion.player.item", "death.attack.fall", "death.attack.fall.player", "death.attack.fallingBlock", "death.attack.fallingBlock.player",
+                        "death.attack.fallingStalactite", "death.attack.fallingStalactite.player", "death.attack.fireball", "death.attack.fireball.item", "death.attack.fireworks",
+                        "death.attack.fireworks.item", "death.attack.fireworks.player", "death.attack.flyIntoWall", "death.attack.flyIntoWall.player", "death.attack.freeze", "death.attack.freeze.player",
+                        "death.attack.generic", "death.attack.generic.player", "death.attack.genericKill", "death.attack.genericKill.player", "death.attack.hotFloor", "death.attack.hotFloor.player",
+                        "death.attack.inFire", "death.attack.inFire.player", "death.attack.inWall", "death.attack.inWall.player", "death.attack.indirectMagic", "death.attack.indirectMagic.item", "death.attack.lava",
+                        "death.attack.lava.player", "death.attack.lightningBolt", "death.attack.lightningBolt.player", "death.attack.mace_smash", "death.attack.mace_smash.item", "death.attack.magic",
+                        "death.attack.magic.player", "death.attack.mob", "death.attack.mob.item", "death.attack.onFire", "death.attack.onFire.item", "death.attack.onFire.player", "death.attack.outOfWorld",
+                        "death.attack.outOfWorld.player", "death.attack.outsideBorder", "death.attack.outsideBorder.player", "death.attack.player", "death.attack.player.item", "death.attack.sonic_boom",
+                        "death.attack.sonic_boom.item", "death.attack.sonic_boom.player", "death.attack.stalagmite", "death.attack.stalagmite.player", "death.attack.starve", "death.attack.starve.player", "death.attack.sting", "death.attack.sting.item",
+                        "death.attack.sting.player", "death.attack.sweetBerryBush", "death.attack.sweetBerryBush.player", "death.attack.thorns", "death.attack.thorns.item", "death.attack.thrown", "death.attack.thrown.item", "death.attack.trident", "death.attack.trident.item", "death.attack.wither",
+                        "death.attack.wither.player", "death.attack.witherSkull", "death.attack.witherSkull.item", "death.fell.accident.generic", "death.fell.accident.ladder", "death.fell.accident.other_climbable", "death.fell.accident.scaffolding",
+                        "death.fell.accident.twisting_vines", "death.fell.accident.vines", "death.fell.accident.weeping_vines", "death.fell.assist", "death.fell.assist.item", "death.fell.finish", "death.fell.finish.item", "death.fell.killer"
+                ), Range.get(Range.Type.SERVER)));
+            }
+        };
 
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
-    }
+        @Getter
+        @NoArgsConstructor
+        public static final class VanillaMessage {
 
-    @Getter
-    public static final class Worldborder implements SubMessageConfig, Config.IEnable {
-        private boolean enable = true;
+            private boolean multiMessage = false;
 
-        @JsonMerge(OptBoolean.FALSE)
-        private Range range = Range.get(Range.Type.PLAYER);
+            @JsonMerge(OptBoolean.FALSE)
+            private List<String> translationKeys = new ArrayList<>();
 
-        private Destination destination = new Destination();
-        private Sound sound = new Sound();
+            private Range range = Range.get(Range.Type.PLAYER);
+
+            private Destination destination = new Destination();
+            private Sound sound = new Sound();
+
+            @JsonCreator
+            public VanillaMessage(@JsonProperty("multi_message") Boolean multiMessage,
+                                  @JsonProperty("translation_keys") List<String> translationKeys,
+                                  @JsonProperty("range") Range range,
+                                  @JsonProperty("destination") Destination destination,
+                                  @JsonProperty("sound") Sound sound) {
+                this.multiMessage = multiMessage != null ? multiMessage : false;
+                this.translationKeys = translationKeys != null ? new LinkedList<>(translationKeys) : new LinkedList<>();
+                this.range = range != null ? range : Range.get(Range.Type.PLAYER);
+                this.destination = destination != null ? destination : new Destination();
+                this.sound = sound != null ? sound : new Sound();
+            }
+
+            @JsonValue
+            public Map<String, Object> toJson() {
+                Map<String, Object> result = new LinkedHashMap<>();
+
+                if (multiMessage) {
+                    result.put("multi_message", true);
+                }
+
+                if (!translationKeys.isEmpty()) {
+                    result.put("translation_keys", translationKeys);
+                }
+
+                if (range.getType() != Range.Type.PLAYER) {
+                    result.put("range", range);
+                }
+
+                if (destination.getType() != Destination.Type.CHAT) {
+                    result.put("destination", destination);
+                }
+
+                if (sound.isEnable()) {
+                    result.put("sound", sound);
+                }
+
+                return result;
+            }
+
+            public VanillaMessage(List<String> translationKeys, Destination destination) {
+                this(null, translationKeys, null, destination, null);
+            }
+
+            public VanillaMessage(boolean multiMessage, List<String> translationKeys, Range range) {
+                this(multiMessage, translationKeys, range, null, null);
+            }
+
+        }
     }
 }

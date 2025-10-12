@@ -16,7 +16,6 @@ import net.flectone.pulse.model.util.Destination;
 import net.flectone.pulse.module.message.format.moderation.delete.DeleteModule;
 import net.flectone.pulse.processing.context.MessageContext;
 import net.flectone.pulse.util.constant.MessageFlag;
-import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.kyori.adventure.text.Component;
 
 import java.util.UUID;
@@ -49,7 +48,6 @@ public class DeletePulseListener implements PulseListener {
         Component component = event.getComponent();
 
         // skip FlectonePulse messages
-        if (event.getTranslationKey() != MinecraftTranslationKey.UNKNOWN) return;
         if (deleteModule.isCached(component)) {
             deleteModule.removeCache(component);
             return;

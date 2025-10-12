@@ -21,7 +21,7 @@ import net.flectone.pulse.config.localization.EnglishLocale;
 import net.flectone.pulse.config.localization.RussianLocale;
 import net.flectone.pulse.execution.scheduler.TaskScheduler;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.model.util.Moderation;
+import net.flectone.pulse.model.util.*;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.processing.processor.YamlFileProcessor;
 import net.flectone.pulse.processing.resolver.FileResolver;
@@ -257,6 +257,11 @@ public abstract class PlatformInjector extends AbstractModule {
                 .withConfigOverride(Set.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null set
                 .withConfigOverride(Map.class, o -> o.setNullHandling(JsonSetter.Value.forContentNulls(Nulls.AS_EMPTY))) // fix null map
                 .defaultMergeable(true)
+                .withConfigOverride(Destination.class, o -> o.setMergeable(false))
+                .withConfigOverride(Sound.class, o -> o.setMergeable(false))
+                .withConfigOverride(Range.class, o -> o.setMergeable(false))
+                .withConfigOverride(Ticker.class, o -> o.setMergeable(false))
+                .withConfigOverride(Cooldown.class, o -> o.setMergeable(false))
                 .addModule(new SimpleModule().addDeserializer(String.class, new ValueDeserializer<>() {
                     // fix null values like "key: null"
                     // idk, why withConfigOverride(String.class, ...) doesn't fix it

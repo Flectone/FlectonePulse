@@ -23,11 +23,10 @@ import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.processor.PlayerPreLoginProcessor;
 import net.flectone.pulse.service.FPlayerService;
-import net.flectone.pulse.util.constant.MinecraftTranslationKey;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
-import org.incendo.cloud.type.tuple.Triplet;
+import org.incendo.cloud.type.tuple.Pair;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -90,8 +89,8 @@ public class BasePacketListener implements PacketListener {
             );
         }
 
-        Optional<Triplet<Component, MinecraftTranslationKey, Boolean>> optionalTriplet = toMessageReceiveEvent(event);
-        if (optionalTriplet.isEmpty()) return;
+        Optional<Pair<Component, Boolean>> optionalPair = toMessageReceiveEvent(event);
+        if (optionalPair.isEmpty()) return;
 
         User user = event.getUser();
         if (user == null) return;
@@ -99,10 +98,10 @@ public class BasePacketListener implements PacketListener {
         UUID userUUID = user.getUUID();
         if (userUUID == null) return;
 
-        Triplet<Component, MinecraftTranslationKey, Boolean> triplet = optionalTriplet.get();
+        Pair<Component, Boolean> triplet = optionalPair.get();
 
         // skip minecraft warning
-        if (triplet.second() == MinecraftTranslationKey.MULTIPLAYER_MESSAGE_NOT_DELIVERED) {
+        if (triplet.first() instanceof TranslatableComponent translatableComponent && translatableComponent.key().equals("multiplayer.message_not_delivered")) {
             event.setCancelled(true);
             return;
         }
@@ -114,9 +113,8 @@ public class BasePacketListener implements PacketListener {
         event.setCancelled(messageReceiveEvent.isCancelled());
     }
 
-    private Optional<Triplet<Component, MinecraftTranslationKey, Boolean>> toMessageReceiveEvent(PacketSendEvent event) {
+    private Optional<Pair<Component, Boolean>> toMessageReceiveEvent(PacketSendEvent event) {
         Component component = null;
-        MinecraftTranslationKey translationKey = MinecraftTranslationKey.UNKNOWN;
         boolean overlay = false;
 
         try {
@@ -132,12 +130,8 @@ public class BasePacketListener implements PacketListener {
             fLogger.warning("Error when reading a PacketType.Play.Server." + event.getPacketType() + ", THIS IS NOT A FLECTONEPULSE BUG, Report to PacketEvents: " + e.getMessage());
         }
 
-        if (component instanceof TranslatableComponent translatableComponent) {
-            translationKey = MinecraftTranslationKey.fromString(translatableComponent);
-        }
-
         if (component != null) {
-            return Optional.of(Triplet.of(component, translationKey, overlay));
+            return Optional.of(Pair.of(component, overlay));
         }
 
         return Optional.empty();
