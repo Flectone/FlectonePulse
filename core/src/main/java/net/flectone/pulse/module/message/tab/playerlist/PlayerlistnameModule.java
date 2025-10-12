@@ -24,6 +24,7 @@ import net.flectone.pulse.platform.registry.ListenerRegistry;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
+import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 
@@ -93,7 +94,10 @@ public class PlayerlistnameModule extends AbstractModuleLocalization<Localizatio
         User user = packetProvider.getUser(fPlayer);
         if (user == null) return;
 
+        // 3 - offline client, 4 - official client
+        boolean offlineClient = fReceiver.getUuid().version() == 3;
         Component name = messagePipeline.builder(fPlayer, fReceiver, localization(fReceiver).getFormat())
+                .flag(MessageFlag.OBJECT_PLAYER_HEAD, offlineClient) // disable player_head for official client
                 .build();
 
         if (packetProvider.getServerVersion().isNewerThanOrEquals(ServerVersion.V_1_19_4)) {
