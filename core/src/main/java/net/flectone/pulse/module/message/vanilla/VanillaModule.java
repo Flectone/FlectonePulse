@@ -24,6 +24,7 @@ import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -134,6 +135,16 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
                             || NamedTextColor.WHITE.equals(component.color())
                             || NamedTextColor.AQUA.equals(component.color())) {
                         color = null;
+                    }
+
+                    // fix serialization issue [%s] for console and integration
+                    if (fResolver.isUnknown() && component instanceof TranslatableComponent translatableComponent
+                            && translatableComponent.key().equals("chat.square_brackets")) {
+                        return Tag.selfClosingInserting(
+                                Component.text("[").color(color)
+                                .append(extractor.getValueComponent(component))
+                                .append(Component.text("]"))
+                        );
                     }
 
                     return Tag.selfClosingInserting(component.color(color));

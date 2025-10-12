@@ -14,6 +14,7 @@ import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.EntityUtil;
 import net.kyori.adventure.text.*;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -167,6 +168,42 @@ public class Extractor {
 
     protected Optional<Component> getComponent(TranslatableComponent translatableComponent, int index) {
         return getComponent(translatableComponent, index, Component.class);
+    }
+
+    public Component getValueComponent(Component component) {
+        Optional<Component> component1 = switch (component) {
+            case TranslatableComponent valueTranslatableComponent when !valueTranslatableComponent.arguments().isEmpty() ->
+                    Optional.of(valueTranslatableComponent.arguments().getFirst().asComponent());
+
+            case TextComponent valueTextComponent when !valueTextComponent.children().isEmpty() ->
+                    Optional.of(valueTextComponent.children().getFirst().asComponent());
+
+            case TextComponent valueTextComponent -> Optional.of(valueTextComponent);
+
+            default -> Optional.empty();
+        };
+
+        return component1.map(this::recursiveExtractValueComponent).orElseGet(Component::empty);
+    }
+
+
+    // support legacy and InteractiveChat components
+    private Component recursiveExtractValueComponent(Component valueComponent) {
+        if (!valueComponent.style().hasDecoration(TextDecoration.ITALIC)
+                && valueComponent instanceof TextComponent valueTextComponent
+                && valueTextComponent.content().isEmpty()
+                && !valueTextComponent.children().isEmpty()) {
+            return recursiveExtractValueComponent(valueTextComponent.children().getFirst());
+        }
+
+        if (valueComponent instanceof TranslatableComponent valueTranslatableComponent
+                && valueTranslatableComponent.key().equals("chat.square_brackets")
+                && !valueTranslatableComponent.arguments().isEmpty()) {
+
+            return recursiveExtractValueComponent(valueTranslatableComponent.arguments().getFirst().asComponent());
+        }
+
+        return valueComponent;
     }
 
     protected Optional<String> extractTextContentOrTranslatableKey(Component component) {
