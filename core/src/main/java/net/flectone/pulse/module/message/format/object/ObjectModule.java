@@ -106,9 +106,15 @@ public class ObjectModule extends AbstractModule {
             }
 
             boolean showPlayerHat = !argumentQueue.hasNext() || Boolean.parseBoolean(argumentQueue.pop().value());
-            playerHeadBuilderComponent.hat(showPlayerHat);
 
-            return Tag.selfClosingInserting(Component.object().contents(playerHeadBuilderComponent.build()));
+            Component playerHeadComponent = Component.object().contents(
+                        playerHeadBuilderComponent
+                                .hat(showPlayerHat)
+                                .build()
+                    ).build()
+                    .color(NamedTextColor.WHITE);
+
+            return Tag.selfClosingInserting(playerHeadComponent);
         }));
     }
 
