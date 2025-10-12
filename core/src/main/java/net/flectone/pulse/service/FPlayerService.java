@@ -16,7 +16,6 @@ import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.sender.PacketSender;
 import net.flectone.pulse.processing.resolver.FileResolver;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
 import net.kyori.adventure.text.Component;
 
@@ -304,7 +303,7 @@ public class FPlayerService {
         fPlayerRepository.saveSettings(fPlayer);
     }
 
-    public void saveOrUpdateSetting(FPlayer fPlayer, MessageType setting) {
+    public void saveOrUpdateSetting(FPlayer fPlayer, String setting) {
         fPlayerRepository.saveOrUpdateSetting(fPlayer, setting);
     }
 

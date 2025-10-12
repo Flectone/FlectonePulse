@@ -102,12 +102,15 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
             if (target != null && !fPlayer.equals(target)) return;
         }
 
+        String vanillaMessageName = parsedComponent.vanillaMessage().getName();
+
         sendMessage(VanillaMetadata.<Localization.Message.Vanilla>builder()
                 .parsedComponent(parsedComponent)
                 .sender(fPlayer)
                 .format(localization -> StringUtils.defaultString(localization.getTypes().get(parsedComponent.translationKey())))
                 .tagResolvers(fResolver -> tagResolvers(fResolver, parsedComponent))
                 .range(range)
+                .filter(fResolver -> vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
                 .destination(parsedComponent.vanillaMessage().getDestination())
                 .build()
         );

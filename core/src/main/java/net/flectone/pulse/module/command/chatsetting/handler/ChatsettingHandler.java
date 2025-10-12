@@ -4,8 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.config.Command;
-import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.config.Permission;
+import net.flectone.pulse.config.localization.Localization;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
 import net.flectone.pulse.model.FColor;
 import net.flectone.pulse.model.entity.FPlayer;
@@ -15,7 +15,6 @@ import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.service.FPlayerService;
 import net.flectone.pulse.util.checker.PermissionChecker;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
@@ -136,8 +135,8 @@ public class ChatsettingHandler {
         successRunnable.run();
     }
 
-    public Status handleCheckbox(FPlayer fPlayer, FPlayer fTarget, MessageType messageType) {
-        if (!permissionChecker.check(fPlayer, chatsettingModule.permission().getSettings().get(messageType.name()))) {
+    public Status handleCheckbox(FPlayer fPlayer, FPlayer fTarget, String messageType) {
+        if (!permissionChecker.check(fPlayer, chatsettingModule.permission().getSettings().get(messageType))) {
             chatsettingModule.sendMessage(chatsettingModule.metadataBuilder()
                     .sender(fPlayer)
                     .format(Localization.Command.Chatsetting::getNoPermission)

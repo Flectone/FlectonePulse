@@ -12,6 +12,7 @@ import net.flectone.pulse.module.message.bubble.BubbleModule;
 import net.flectone.pulse.module.message.format.world.WorldModule;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.flectone.pulse.util.constant.AdventureTag;
+import net.flectone.pulse.util.constant.MessageType;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -712,12 +713,20 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         @JsonMerge(OptBoolean.FALSE)
         private List<VanillaMessage> types = new LinkedList<>() {
             {
-                add(new VanillaMessage(List.of("block.minecraft.bed.no_sleep", "block.minecraft.bed.not_safe", "block.minecraft.bed.obstructed",
-                        "block.minecraft.bed.occupied", "block.minecraft.bed.too_far_away", "tile.bed.noSleep", "tile.bed.notSafe", "tile.bed.notValid", "tile.bed.occupied",
-                        "block.minecraft.spawn.not_valid", "block.minecraft.bed.not_valid", "sleep.not_possible", "sleep.players_sleeping", "sleep.skipping_night", "item.minecraft.debug_stick.empty",
-                        "item.minecraft.debug_stick.select", "item.minecraft.debug_stick.update"), new Destination(Destination.Type.ACTION_BAR, new Times(0, 20, 0))));
-                add(new VanillaMessage(true, List.of(
-                        "chat.type.advancement.challenge", "chat.type.advancement.goal", "chat.type.advancement.task", "chat.type.achievement", "chat.type.achievement.taken",
+                add(new VanillaMessage(null, new Destination(Destination.Type.ACTION_BAR, new Times(0, 20, 0)), List.of(
+                        "block.minecraft.bed.no_sleep",
+                        "block.minecraft.bed.not_safe", "block.minecraft.bed.obstructed", "block.minecraft.bed.occupied", "block.minecraft.bed.too_far_away", "tile.bed.noSleep", "tile.bed.notSafe",
+                        "tile.bed.notValid", "tile.bed.occupied", "block.minecraft.spawn.not_valid", "block.minecraft.bed.not_valid",
+                        "item.minecraft.debug_stick.empty", "item.minecraft.debug_stick.select", "item.minecraft.debug_stick.update"
+                )));
+                add(new VanillaMessage(MessageType.SLEEP.name(), new Destination(Destination.Type.ACTION_BAR, new Times(0, 20, 0)), List.of(
+                        "sleep.not_possible", "sleep.players_sleeping", "sleep.skipping_night"
+                )));
+                add(new VanillaMessage(MessageType.ADVANCEMENT.name(), true, Range.get(Range.Type.SERVER), List.of(
+                        "chat.type.advancement.challenge", "chat.type.advancement.goal", "chat.type.advancement.task",
+                        "chat.type.achievement", "chat.type.achievement.taken"
+                )));
+                add(new VanillaMessage(MessageType.DEATH.name(), true, Range.get(Range.Type.SERVER), List.of(
                         "death.attack.anvil", "death.attack.anvil.player", "death.attack.arrow", "death.attack.arrow.item", "death.attack.badRespawnPoint.message", "death.attack.cactus",
                         "death.attack.cactus.player", "death.attack.cramming", "death.attack.cramming.player", "death.attack.dragonBreath", "death.attack.dragonBreath.player", "death.attack.drown",
                         "death.attack.drown.player", "death.attack.dryout", "death.attack.dryout.player", "death.attack.even_more_magic", "death.attack.explosion", "death.attack.explosion.player",
@@ -733,7 +742,7 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
                         "death.attack.sting.player", "death.attack.sweetBerryBush", "death.attack.sweetBerryBush.player", "death.attack.thorns", "death.attack.thorns.item", "death.attack.thrown", "death.attack.thrown.item", "death.attack.trident", "death.attack.trident.item", "death.attack.wither",
                         "death.attack.wither.player", "death.attack.witherSkull", "death.attack.witherSkull.item", "death.fell.accident.generic", "death.fell.accident.ladder", "death.fell.accident.other_climbable", "death.fell.accident.scaffolding",
                         "death.fell.accident.twisting_vines", "death.fell.accident.vines", "death.fell.accident.weeping_vines", "death.fell.assist", "death.fell.assist.item", "death.fell.finish", "death.fell.finish.item", "death.fell.killer"
-                ), Range.get(Range.Type.SERVER)));
+                )));
             }
         };
 
@@ -742,38 +751,39 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
         public static final class VanillaMessage {
 
             private boolean multiMessage = false;
+            private String name = "";
+            private Range range = Range.get(Range.Type.PLAYER);
+            private Destination destination = new Destination();
+            private Sound sound = new Sound();
 
             @JsonMerge(OptBoolean.FALSE)
             private List<String> translationKeys = new ArrayList<>();
 
-            private Range range = Range.get(Range.Type.PLAYER);
-
-            private Destination destination = new Destination();
-            private Sound sound = new Sound();
-
             @JsonCreator
-            public VanillaMessage(@JsonProperty("multi_message") Boolean multiMessage,
-                                  @JsonProperty("translation_keys") List<String> translationKeys,
+            public VanillaMessage(@JsonProperty("name") String name,
+                                  @JsonProperty("multi_message") Boolean multiMessage,
                                   @JsonProperty("range") Range range,
                                   @JsonProperty("destination") Destination destination,
-                                  @JsonProperty("sound") Sound sound) {
+                                  @JsonProperty("sound") Sound sound,
+                                  @JsonProperty("translation_keys") List<String> translationKeys) {
+                this.name = name != null ? name : "";
                 this.multiMessage = multiMessage != null ? multiMessage : false;
-                this.translationKeys = translationKeys != null ? new LinkedList<>(translationKeys) : new LinkedList<>();
                 this.range = range != null ? range : Range.get(Range.Type.PLAYER);
                 this.destination = destination != null ? destination : new Destination();
                 this.sound = sound != null ? sound : new Sound();
+                this.translationKeys = translationKeys != null ? new LinkedList<>(translationKeys) : new LinkedList<>();
             }
 
             @JsonValue
             public Map<String, Object> toJson() {
                 Map<String, Object> result = new LinkedHashMap<>();
 
-                if (multiMessage) {
-                    result.put("multi_message", true);
+                if (!name.isEmpty()) {
+                    result.put("name", name.toUpperCase());
                 }
 
-                if (!translationKeys.isEmpty()) {
-                    result.put("translation_keys", translationKeys);
+                if (multiMessage) {
+                    result.put("multi_message", true);
                 }
 
                 if (range.getType() != Range.Type.PLAYER) {
@@ -788,15 +798,19 @@ public final class Message extends YamlFile implements ModuleConfig.MessageConfi
                     result.put("sound", sound);
                 }
 
+                if (!translationKeys.isEmpty()) {
+                    result.put("translation_keys", translationKeys);
+                }
+
                 return result;
             }
 
-            public VanillaMessage(List<String> translationKeys, Destination destination) {
-                this(null, translationKeys, null, destination, null);
+            public VanillaMessage(String name, Destination destination, List<String> translationKeys) {
+                this(name, null, null, destination, null, translationKeys);
             }
 
-            public VanillaMessage(boolean multiMessage, List<String> translationKeys, Range range) {
-                this(multiMessage, translationKeys, range, null, null);
+            public VanillaMessage(String name, boolean multiMessage, Range range, List<String> translationKeys) {
+                this(name, multiMessage, range, null, null, translationKeys);
             }
 
         }

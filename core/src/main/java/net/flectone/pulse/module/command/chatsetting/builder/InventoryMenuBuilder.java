@@ -16,7 +16,6 @@ import net.flectone.pulse.module.command.chatsetting.handler.ChatsettingHandler;
 import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.platform.adapter.PlatformServerAdapter;
 import net.flectone.pulse.platform.controller.InventoryController;
-import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 import org.jetbrains.annotations.Nullable;
@@ -50,24 +49,23 @@ public class InventoryMenuBuilder implements MenuBuilder {
         inventoryBuilder = createInventoryFColorMenu(fPlayer, fTarget, FColor.Type.SEE, inventoryBuilder, chatsettingModule.config().getMenu().getSee(), localization.getMenu().getSee());
         inventoryBuilder = createInventoryFColorMenu(fPlayer, fTarget, FColor.Type.OUT, inventoryBuilder, chatsettingModule.config().getMenu().getOut(), localization.getMenu().getOut());
 
-        for (MessageType setting : MessageType.values()) {
+        for (String setting : chatsettingModule.config().getCheckbox().getTypes().keySet()) {
             inventoryBuilder = createInventoryCheckbox(fPlayer, fTarget, setting, inventoryBuilder);
         }
 
         inventoryController.open(fPlayer, inventoryBuilder.build(isNewerThanOrEqualsV_1_14));
     }
 
-    private Inventory.Builder createInventoryCheckbox(FPlayer fPlayer, FPlayer fTarget, MessageType messageType, Inventory.Builder inventoryBuilder) {
+    private Inventory.Builder createInventoryCheckbox(FPlayer fPlayer, FPlayer fTarget, String messageType, Inventory.Builder inventoryBuilder) {
         Command.Chatsetting.Checkbox checkbox = chatsettingModule.config().getCheckbox();
-        if (!checkbox.getTypes().containsKey(messageType.name())) return inventoryBuilder;
 
-        int slot = checkbox.getTypes().get(messageType.name());
+        int slot = checkbox.getTypes().get(messageType);
         if (slot == -1) return inventoryBuilder;
 
         boolean enabled = fTarget.isSetting(messageType);
 
         String material = chatsettingModule.getCheckboxMaterial(enabled);
-        String title = chatsettingModule.getCheckboxTitle(fPlayer, messageType.name(), enabled);
+        String title = chatsettingModule.getCheckboxTitle(fPlayer, messageType, enabled);
         String lore = chatsettingModule.getCheckboxLore(fPlayer, enabled);
 
         return inventoryBuilder
@@ -78,7 +76,7 @@ public class InventoryMenuBuilder implements MenuBuilder {
 
                     boolean currentEnabled = status.toBoolean();
                     String invertMaterial = chatsettingModule.getCheckboxMaterial(!currentEnabled);
-                    String invertTitle = chatsettingModule.getCheckboxTitle(fPlayer, messageType.name(), !currentEnabled);
+                    String invertTitle = chatsettingModule.getCheckboxTitle(fPlayer, messageType, !currentEnabled);
                     String invertLore = chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled);
 
                     ItemStack newItemStack = platformServerAdapter.buildItemStack(fTarget, invertMaterial, invertTitle, invertLore);

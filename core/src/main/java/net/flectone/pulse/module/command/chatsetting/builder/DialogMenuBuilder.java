@@ -22,12 +22,12 @@ import net.flectone.pulse.module.command.chatsetting.ChatsettingModule;
 import net.flectone.pulse.module.command.chatsetting.handler.ChatsettingHandler;
 import net.flectone.pulse.module.command.chatsetting.model.SubMenuItem;
 import net.flectone.pulse.platform.controller.DialogController;
-import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.Strings;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -62,29 +62,28 @@ public class DialogMenuBuilder implements MenuBuilder {
         dialogBuilder = createDialogFColorMenu(fPlayer, fTarget, FColor.Type.SEE, dialogBuilder, chatsettingModule.config().getMenu().getSee(), localization.getMenu().getSee());
         dialogBuilder = createDialogFColorMenu(fPlayer, fTarget, FColor.Type.OUT, dialogBuilder, chatsettingModule.config().getMenu().getOut(), localization.getMenu().getOut());
 
-        for (MessageType setting : MessageType.values()) {
+        for (String setting : chatsettingModule.config().getCheckbox().getTypes().keySet()) {
             dialogBuilder = createDialogCheckbox(fPlayer, fTarget, setting, dialogBuilder);
         }
 
         dialogController.open(fPlayer, dialogBuilder.build(), false);
     }
 
-    private Dialog.Builder createDialogCheckbox(FPlayer fPlayer, FPlayer fTarget, MessageType messageType, Dialog.Builder dialogBuilder) {
+    private Dialog.Builder createDialogCheckbox(FPlayer fPlayer, FPlayer fTarget, String messageType, Dialog.Builder dialogBuilder) {
         Command.Chatsetting.Checkbox checkbox = chatsettingModule.config().getCheckbox();
-        if (!checkbox.getTypes().containsKey(messageType.name())) return dialogBuilder;
 
-        int slot = checkbox.getTypes().get(messageType.name());
+        int slot = checkbox.getTypes().get(messageType);
         if (slot == -1) return dialogBuilder;
 
         boolean enabled = fTarget.isSetting(messageType);
 
-        String title = chatsettingModule.getCheckboxTitle(fPlayer, messageType.name(), enabled);
+        String title = chatsettingModule.getCheckboxTitle(fPlayer, messageType, enabled);
         Component componentTitle = messagePipeline.builder(fPlayer, fTarget, title).build();
 
         String lore = chatsettingModule.getCheckboxLore(fPlayer, enabled);
         Component componentLore = messagePipeline.builder(fPlayer, fTarget, lore).build();
 
-        String id = "fp_" + messageType.ordinal();
+        String id = "fp_" + UUID.randomUUID();
 
         ActionButton button = new ActionButton(
                 new CommonButtonData(componentTitle, componentLore, chatsettingModule.config().getModern().getButtonWidth()),
@@ -99,7 +98,7 @@ public class DialogMenuBuilder implements MenuBuilder {
 
                     boolean currentEnabled = status.toBoolean();
 
-                    String invertTitle = chatsettingModule.getCheckboxTitle(fPlayer, messageType.name(), !currentEnabled);
+                    String invertTitle = chatsettingModule.getCheckboxTitle(fPlayer, messageType, !currentEnabled);
                     Component componentInvertTitle = messagePipeline.builder(fPlayer, fTarget, invertTitle).build();
 
                     String invertLore = chatsettingModule.getCheckboxLore(fPlayer, !currentEnabled);

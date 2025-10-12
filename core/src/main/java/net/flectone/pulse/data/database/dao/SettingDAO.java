@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.data.database.Database;
 import net.flectone.pulse.data.database.sql.SettingSQL;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
 import net.flectone.pulse.util.logging.FLogger;
 
@@ -30,7 +29,7 @@ public class SettingDAO extends BaseDAO<SettingSQL> {
     public void save(FPlayer player) {
         useTransaction(sql -> {
             player.getSettingsBoolean().forEach((messageType, value) ->
-                    insertOrUpdate(sql, player, messageType.name(), player.getSetting(messageType))
+                    insertOrUpdate(sql, player, messageType, player.getSetting(messageType))
             );
 
             player.getSettingsText().forEach((settingText, string) ->
@@ -54,7 +53,7 @@ public class SettingDAO extends BaseDAO<SettingSQL> {
             SettingText settingText = SettingText.fromString(string);
             if (settingText == null) {
                 try {
-                    player.setSetting(MessageType.valueOf(string), value.equals("1"));
+                    player.setSetting(string.toUpperCase(), value.equals("1"));
                 } catch (IllegalArgumentException e) {
                     fLogger.warning(e);
                 }
@@ -64,8 +63,8 @@ public class SettingDAO extends BaseDAO<SettingSQL> {
         }));
     }
 
-    public void insertOrUpdate(FPlayer player, MessageType messageType) {
-        useHandle(sql -> insertOrUpdate(sql, player, messageType.name(), player.getSetting(messageType)));
+    public void insertOrUpdate(FPlayer player, String setting) {
+        useHandle(sql -> insertOrUpdate(sql, player, setting, player.getSetting(setting)));
     }
 
     public void insertOrUpdate(FPlayer player, SettingText settingText) {

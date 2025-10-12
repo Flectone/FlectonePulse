@@ -9,7 +9,6 @@ import net.flectone.pulse.data.database.dao.ColorsDAO;
 import net.flectone.pulse.data.database.dao.FPlayerDAO;
 import net.flectone.pulse.data.database.dao.SettingDAO;
 import net.flectone.pulse.model.entity.FPlayer;
-import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.constant.SettingText;
 
 import java.net.InetAddress;
@@ -183,7 +182,7 @@ public class FPlayerRepository {
         settingDAO.load(fPlayer);
     }
 
-    public void saveOrUpdateSetting(FPlayer fPlayer, MessageType setting) {
+    public void saveOrUpdateSetting(FPlayer fPlayer, String setting) {
         settingDAO.insertOrUpdate(fPlayer, setting);
     }
 

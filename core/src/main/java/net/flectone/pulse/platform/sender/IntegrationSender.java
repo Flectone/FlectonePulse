@@ -10,6 +10,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.model.event.EventMetadata;
 import net.flectone.pulse.module.integration.IntegrationModule;
 import net.flectone.pulse.module.message.chat.model.ChatMetadata;
+import net.flectone.pulse.module.message.vanilla.model.VanillaMetadata;
 import net.flectone.pulse.util.constant.MessageFlag;
 import net.flectone.pulse.util.constant.MessageType;
 import net.kyori.adventure.text.Component;
@@ -94,10 +95,22 @@ public class IntegrationSender {
     }
 
     private String createMessageName(MessageType messageType, EventMetadata<?> eventMetadata) {
-        if (messageType != MessageType.CHAT) return messageType.name();
-        if (!(eventMetadata instanceof ChatMetadata<?> chatMetadata)) return "UNKNOWN";
+        return switch (messageType) {
+            case CHAT -> {
+                if (!(eventMetadata instanceof ChatMetadata<?> chatMetadata)) yield "UNKNOWN";
 
-        return messageType.name() + "_" + chatMetadata.getChatName().toUpperCase();
+                yield messageType.name() + "_" + chatMetadata.getChatName().toUpperCase();
+            }
+            case VANILLA -> {
+                if (!(eventMetadata instanceof VanillaMetadata<?> vanillaMetadata)) yield "UNKNOWN";
+
+                String vanillaMessageName = vanillaMetadata.getParsedComponent().vanillaMessage().getName();
+                if (vanillaMessageName.isEmpty()) yield messageType.name();
+
+                yield vanillaMessageName.toUpperCase();
+            }
+            default -> messageType.name();
+        };
     }
 
 }

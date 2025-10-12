@@ -32,7 +32,7 @@ public class FPlayer extends FEntity {
     private final int id;
     private final boolean console;
     private final Map<FColor.Type, Set<FColor>> fColors = new EnumMap<>(FColor.Type.class);
-    private final Map<MessageType, Boolean> settingsBoolean = new EnumMap<>(MessageType.class);
+    private final Map<String, Boolean> settingsBoolean = new HashMap<>();
     private final Map<SettingText, String> settingsText = new EnumMap<>(SettingText.class);
     private final List<Ignore> ignores = new ArrayList<>();
 
@@ -98,7 +98,7 @@ public class FPlayer extends FEntity {
                 .anyMatch(ignore -> ignore.target() == fPlayer.getId());
     }
 
-    public void setSetting(MessageType messageType, boolean value) {
+    public void setSetting(String messageType, boolean value) {
         settingsBoolean.put(messageType, value);
     }
 
@@ -113,10 +113,19 @@ public class FPlayer extends FEntity {
 
     @NotNull
     public String getSetting(MessageType messageType) {
+        return getSetting(messageType.name());
+    }
+
+    @NotNull
+    public String getSetting(String messageType) {
         return isSetting(messageType) ? "1" : "0";
     }
 
     public boolean isSetting(MessageType messageType) {
+        return isSetting(messageType.name());
+    }
+
+    public boolean isSetting(String messageType) {
         Boolean value = settingsBoolean.get(messageType);
         return value == null || value;
     }
@@ -125,8 +134,12 @@ public class FPlayer extends FEntity {
         settingsText.remove(settingText);
     }
 
-    public void removeSetting(MessageType messageType) {
+    public void removeSetting(String messageType) {
         settingsBoolean.remove(messageType);
+    }
+
+    public void removeSetting(MessageType messageType) {
+        removeSetting(messageType.name());
     }
 
     @Override

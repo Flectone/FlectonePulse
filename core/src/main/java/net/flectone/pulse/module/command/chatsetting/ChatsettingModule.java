@@ -138,12 +138,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
             return;
         }
 
-        MessageType messageType;
-        try {
-            messageType = MessageType.valueOf(optionalType.get());
-        } catch (IllegalArgumentException e) {
-            return;
-        }
+        String messageType = optionalType.get().toUpperCase();
 
         fTarget.setSetting(messageType, !fTarget.isSetting(messageType));
         saveSetting(fPlayer, messageType);
@@ -156,7 +151,7 @@ public class ChatsettingModule extends AbstractModuleCommand<Localization.Comman
         menuBuilder.open(fPlayer, fTarget);
     }
 
-    public void saveSetting(FPlayer fPlayer, MessageType messageType) {
+    public void saveSetting(FPlayer fPlayer, String messageType) {
         fPlayerService.saveOrUpdateSetting(fPlayer, messageType);
 
         if (proxyRegistry.hasEnabledProxy()) {
