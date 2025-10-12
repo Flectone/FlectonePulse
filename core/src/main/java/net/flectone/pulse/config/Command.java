@@ -165,7 +165,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Anon implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
@@ -191,7 +190,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Ball implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
@@ -208,7 +206,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean suggestOfflinePlayers = true;
         private boolean showConnectionAttempts = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
@@ -235,7 +232,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Broadcast implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
@@ -634,7 +630,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean enable = true;
         private boolean draw = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
@@ -649,7 +644,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Dice implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         private int min = 1;
@@ -667,7 +661,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Do implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
@@ -713,7 +706,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean enable = true;
         private boolean nullHelper = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
@@ -754,7 +746,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Kick implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
@@ -795,7 +786,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Me implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
@@ -811,7 +801,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
@@ -839,7 +828,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
@@ -867,7 +855,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean enable = true;
         private boolean enableGui = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @Setter
@@ -925,7 +912,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Spy implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
@@ -948,7 +934,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Stream implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
@@ -999,7 +984,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean enable = true;
         private boolean suggestOfflinePlayers = false;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
@@ -1051,7 +1035,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Translateto implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PLAYER);
 
         private Service service = Service.GOOGLE;
@@ -1077,7 +1060,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Try implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         private int min = 0;
@@ -1096,7 +1078,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Unban implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
@@ -1116,7 +1097,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Unmute implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
@@ -1131,7 +1111,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
     public static final class Unwarn implements SubCommandConfig, ICommandFile {
         private boolean enable = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
@@ -1147,7 +1126,6 @@ public final class Command extends YamlFile implements ModuleConfig.CommandConfi
         private boolean enable = true;
         private boolean suggestOfflinePlayers = true;
 
-        @JsonMerge(OptBoolean.FALSE)
         private Range range = Range.get(Range.Type.PROXY);
 
         @JsonMerge(OptBoolean.FALSE)
