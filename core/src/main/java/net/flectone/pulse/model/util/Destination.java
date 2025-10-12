@@ -12,46 +12,42 @@ public class Destination {
 
     private final Type type;
     private final String subtext;
+    private final BossBar bossBar;
+    private final Times times;
+    private final Toast toast;
 
-    private BossBar bossBar = new BossBar(100, 1f,
-            net.kyori.adventure.bossbar.BossBar.Overlay.PROGRESS,
-            net.kyori.adventure.bossbar.BossBar.Color.BLUE
-    );
-
-    private Times times = new Times(20, 60, 20);
-    private Toast toast = new Toast("minecraft:diamond", Toast.Type.TASK);
+    public Destination(Type type, String subtext, BossBar bossBar, Times times, Toast toast) {
+        this.type = type != null ? type : Type.CHAT;
+        this.subtext = subtext != null ? subtext : "";
+        this.bossBar = bossBar != null ? bossBar : new BossBar(100, 1f,
+                net.kyori.adventure.bossbar.BossBar.Overlay.PROGRESS,
+                net.kyori.adventure.bossbar.BossBar.Color.BLUE);
+        this.times = times != null ? times : new Times(20, 60, 20);
+        this.toast = toast != null ? toast : new Toast("minecraft:diamond", Toast.Type.TASK);
+    }
 
     public Destination() {
-        this(Type.CHAT, "");
+        this(null, null, null, null, null);
     }
 
     public Destination(Type type) {
-        this(type, "");
-    }
-
-    public Destination(Type type, String subtext) {
-        this.type = type;
-        this.subtext = subtext;
+        this(type, null, null, null, null);
     }
 
     public Destination(Type type, BossBar bossBar) {
-        this(type, "");
-        this.bossBar = bossBar;
+        this(type, null, bossBar, null, null);
     }
 
     public Destination(Type type, Times times) {
-        this(type, "");
-        this.times = times;
+        this(type, null, null, times, null);
     }
 
     public Destination(Type type, Times times, String subtext) {
-        this(type, subtext);
-        this.times = times;
+        this(type, subtext, null, times, null);
     }
 
     public Destination(Type type, Toast toast) {
-        this(type, "");
-        this.toast = toast;
+        this(type, null, null, null, toast);
     }
 
     @JsonValue
@@ -85,9 +81,9 @@ public class Destination {
                 map.put("health", bossBar.getHealth());
                 map.put("overlay", bossBar.getOverlay());
                 map.put("color", bossBar.getColor());
-                map.put("play-boss-music", bossBar.getFlags().contains(net.kyori.adventure.bossbar.BossBar.Flag.PLAY_BOSS_MUSIC));
-                map.put("create-world-fog", bossBar.getFlags().contains(net.kyori.adventure.bossbar.BossBar.Flag.CREATE_WORLD_FOG));
-                map.put("darken-screen", bossBar.getFlags().contains(net.kyori.adventure.bossbar.BossBar.Flag.DARKEN_SCREEN));
+                map.put("play_boss_music", bossBar.getFlags().contains(net.kyori.adventure.bossbar.BossBar.Flag.PLAY_BOSS_MUSIC));
+                map.put("create_world_fog", bossBar.getFlags().contains(net.kyori.adventure.bossbar.BossBar.Flag.CREATE_WORLD_FOG));
+                map.put("darken_screen", bossBar.getFlags().contains(net.kyori.adventure.bossbar.BossBar.Flag.DARKEN_SCREEN));
             }
         }
 
@@ -98,7 +94,7 @@ public class Destination {
     public static Destination fromJson(Map<String, Object> map) {
         Type type = Type.valueOf(String.valueOf(map.get("type")));
 
-        switch (type) {
+        return switch (type) {
             case TOAST -> {
                 Object icon = map.get("icon");
                 String stringIcon = icon == null ? "minecraft:diamond" : String.valueOf(icon);
@@ -106,34 +102,34 @@ public class Destination {
                 Object style = map.get("style");
                 Toast.Type toastStyle = style == null ? Toast.Type.TASK : Toast.Type.valueOf(String.valueOf(style));
 
-                return new Destination(Type.TOAST, new Toast(stringIcon, toastStyle));
+                yield new Destination(Type.TOAST, new Toast(stringIcon, toastStyle));
             }
             case TITLE, SUBTITLE, ACTION_BAR -> {
                 Object times = map.get("times");
 
                 if (times == null) {
-                    return new Destination(type);
+                    yield new Destination(type);
                 }
 
                 Map<String, Object> timesMap = (Map<String, Object>) times;
 
-                Object fadeIn = timesMap.get("fade-in");
+                Object fadeIn = timesMap.get("fade_in");
                 int fadeInTicks = fadeIn == null ? 20 : Integer.parseInt(String.valueOf(fadeIn));
 
                 Object stay = timesMap.get("stay");
                 int stayTicks = stay == null ? 60 : Integer.parseInt(String.valueOf(stay));
 
-                Object fadeOut = timesMap.get("fade-out");
+                Object fadeOut = timesMap.get("fade_out");
                 int fadeOutTicks = fadeOut == null ? 20 : Integer.parseInt(String.valueOf(fadeOut));
 
                 Times titleTimes = new Times(fadeInTicks, stayTicks, fadeOutTicks);
 
-                if (type == Type.ACTION_BAR) return new Destination(type, titleTimes);
+                if (type == Type.ACTION_BAR) yield new Destination(type, titleTimes);
 
                 Object subtext = map.get("subtext");
                 String stringSubtext = subtext == null ? "" : String.valueOf(subtext);
 
-                return new Destination(type, titleTimes, stringSubtext);
+                yield new Destination(type, titleTimes, stringSubtext);
             }
             case BOSS_BAR -> {
                 Object duration = map.get("duration");
@@ -169,10 +165,10 @@ public class Destination {
                     bossBar.addFlag(net.kyori.adventure.bossbar.BossBar.Flag.DARKEN_SCREEN);
                 }
 
-                return new Destination(type, bossBar);
+                yield new Destination(type, bossBar);
             }
-            default -> throw new RuntimeException("123");
-        }
+            default -> new Destination(type);
+        };
     }
 
     public enum Type {
