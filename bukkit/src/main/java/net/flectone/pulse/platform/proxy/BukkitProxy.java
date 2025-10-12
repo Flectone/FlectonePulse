@@ -5,9 +5,9 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-import net.flectone.pulse.config.Config;
 import net.flectone.pulse.listener.BukkitProxyListener;
 import net.flectone.pulse.model.entity.FEntity;
+import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class BukkitProxy implements Proxy {
 
-    private final Config config;
+    private final FileResolver fileResolver;
     private final Plugin plugin;
     private final Provider<BukkitProxyListener> proxyListenerProvider;
 
@@ -68,11 +68,11 @@ public class BukkitProxy implements Proxy {
 
     @Nullable
     public String getChannel() {
-        if (config.getProxy().isBungeecord()) {
+        if (fileResolver.getConfig().getProxy().isBungeecord()) {
             return  "BungeeCord";
         }
 
-        if (config.getProxy().isVelocity()) {
+        if (fileResolver.getConfig().getProxy().isVelocity()) {
             return "flectonepulse:main";
         }
 
