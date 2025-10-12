@@ -163,6 +163,14 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
+    public boolean isSneaking(@NotNull FPlayer fPlayer) {
+        Player player = Bukkit.getPlayer(fPlayer.getUuid());
+        if (player == null) return false;
+
+        return player.isSneaking();
+    }
+
+    @Override
     public long getFirstPlayed(@NotNull FPlayer fPlayer) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(fPlayer.getUuid());
 

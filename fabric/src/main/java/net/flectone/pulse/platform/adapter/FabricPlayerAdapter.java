@@ -270,6 +270,14 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
     }
 
     @Override
+    public boolean isSneaking(@NotNull FPlayer fPlayer) {
+        ServerPlayerEntity player = getPlayer(fPlayer.getUuid());
+        if (player == null) return false;
+
+        return player.isSneaking();
+    }
+
+    @Override
     public boolean hasPlayedBefore(@NotNull FPlayer fPlayer) {
         return true;
     }

@@ -69,6 +69,7 @@ public class RightclickModule extends AbstractModuleLocalization<Localization.Me
 
         FPlayer fTarget = fPlayerService.getFPlayer(targetUUID);
         if (fTarget.isUnknown()) return;
+        if (config().isShouldCheckSneaking() && !platformPlayerAdapter.isSneaking(fPlayer)) return;
 
         sendMessage(metadataBuilder()
                 .sender(fTarget)
