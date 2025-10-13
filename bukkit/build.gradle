@@ -17,6 +17,7 @@ dependencies {
     compileOnly "dev.lone:api-itemsadder:$itemsadder_version"
     compileOnly "de.maxhenkel.voicechat:voicechat-api:$voicechatapi_version"
     compileOnly "eu.kennytv.maintenance:maintenance-api:$maintenance_version"
+    compileOnly "com.mojang:authlib:$mojang_authlib_version"
 }
 
 shadowJar {

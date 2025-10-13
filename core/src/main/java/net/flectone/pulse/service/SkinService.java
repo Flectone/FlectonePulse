@@ -9,11 +9,13 @@ import com.google.inject.name.Named;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.module.integration.IntegrationModule;
+import net.flectone.pulse.platform.adapter.PlatformPlayerAdapter;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import org.apache.commons.lang3.Strings;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,11 +30,13 @@ public class SkinService {
     private final IntegrationModule integrationModule;
     private final PacketProvider packetProvider;
     private final FLogger fLogger;
+    private final PlatformPlayerAdapter platformPlayerAdapter;
 
     public void updateProfilePropertyCache(UUID uuid, PlayerHeadObjectContents.ProfileProperty profileProperty) {
         profilePropertyCache.put(uuid, profileProperty);
     }
 
+    @NotNull
     public PlayerHeadObjectContents.ProfileProperty getProfilePropertyFromCache(FEntity entity) {
         try {
             return profilePropertyCache.get(entity.getUuid(), () -> getProfileProperty(entity));
@@ -42,23 +46,34 @@ public class SkinService {
         }
     }
 
+    @NotNull
     public PlayerHeadObjectContents.ProfileProperty getProfileProperty(FEntity entity) {
+        // get SkinsRestorer and other integration textures
         PlayerHeadObjectContents.ProfileProperty profileProperty = integrationModule.getProfileProperty(entity);
         if (profileProperty != null) return profileProperty;
 
+        // get Platform Player textures
+        profileProperty = platformPlayerAdapter.getTexture(entity.getUuid());
+        if (profileProperty != null) {
+            return profileProperty;
+        }
+
+        // get PacketEvents user textures
         User user = packetProvider.getUser(entity.getUuid());
-        if (user == null) return null;
+        if (user != null) {
+            List<TextureProperty> textureProperties = user.getProfile().getTextureProperties();
+            if (!textureProperties.isEmpty()) {
+                TextureProperty textureProperty = textureProperties.getFirst();
+                return PlayerHeadObjectContents.property(
+                        "textures",
+                        textureProperty.getValue(),
+                        textureProperty.getSignature()
+                );
+            }
+        }
 
-        List<TextureProperty> textureProperties = user.getProfile().getTextureProperties();
-        if (textureProperties.isEmpty()) return null;
-
-        TextureProperty textureProperty = textureProperties.getFirst();
-
-        return PlayerHeadObjectContents.property(
-                "textures",
-                textureProperty.getValue(),
-                textureProperty.getSignature()
-        );
+        // empty textures
+        return PlayerHeadObjectContents.property(entity.getName(), "");
     }
 
     public String getAvatarUrl(FEntity entity) {

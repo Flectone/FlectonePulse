@@ -7,6 +7,7 @@ import net.flectone.pulse.model.entity.FEntity;
 import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.message.objective.ObjectiveModule;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,6 +61,7 @@ public interface PlatformPlayerAdapter {
     @NotNull String getWorldEnvironment(@NotNull FPlayer fPlayer);
     @Nullable String getIp(@NotNull FPlayer fPlayer);
     @NotNull String getEntityTranslationKey(@Nullable Object platformPlayer);
+    @Nullable PlayerHeadObjectContents.ProfileProperty getTexture(@NotNull UUID uuid);
     @NotNull String getTranslationKey(@NotNull UUID uuid);
     @NotNull GameMode getGamemode(@NotNull FPlayer fPlayer);
 

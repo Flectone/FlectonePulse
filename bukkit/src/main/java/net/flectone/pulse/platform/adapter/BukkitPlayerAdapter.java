@@ -6,6 +6,9 @@ import com.github.retrooper.packetevents.protocol.potion.PotionType;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -17,7 +20,9 @@ import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.platform.provider.AttributesProvider;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.flectone.pulse.platform.provider.PassengersProvider;
+import net.flectone.pulse.processing.resolver.ReflectionResolver;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
@@ -28,6 +33,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.invoke.MethodHandle;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,6 +45,32 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
     private final PacketProvider packetProvider;
     private final AttributesProvider attributesProvider;
     private final PassengersProvider passengersProvider;
+    private final ReflectionResolver reflectionResolver;
+
+    private MethodHandle handleMethod;
+    private MethodHandle gameProfileMethod;
+    private MethodHandle propertiesMethod;
+    private boolean gameProfileMethodsInitialized;
+
+    private void initGameProfileMethods(Player player) {
+        gameProfileMethodsInitialized = true;
+
+        try {
+            handleMethod = reflectionResolver.unreflectMethod(player.getClass().getMethod("getHandle"));
+            if (handleMethod == null) return;
+
+            Object entityPlayer = handleMethod.invoke(player);
+            gameProfileMethod = reflectionResolver.unreflectMethod(entityPlayer.getClass().getMethod("getGameProfile"));
+            if (gameProfileMethod == null) return;
+
+            Object gameProfile = gameProfileMethod.invoke(entityPlayer);
+            try {
+                propertiesMethod = reflectionResolver.unreflectMethod(gameProfile.getClass().getMethod("properties"));
+            } catch (NoSuchMethodException e) {
+                propertiesMethod = reflectionResolver.unreflectMethod(gameProfile.getClass().getMethod("getProperties"));
+            }
+        } catch (Throwable ignored) {}
+    }
 
     @Override
     public @Nullable Object convertToPlatformPlayer(@NotNull FPlayer fPlayer) {
@@ -133,6 +165,34 @@ public class BukkitPlayerAdapter implements PlatformPlayerAdapter {
         return player != null
                 ? SpigotConversionUtil.fromBukkitGameMode(player.getGameMode())
                 : GameMode.SURVIVAL;
+    }
+
+    @Override
+    public PlayerHeadObjectContents.ProfileProperty getTexture(@NotNull UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null) return null;
+
+        if (!gameProfileMethodsInitialized) {
+            initGameProfileMethods(player);
+        }
+
+        try {
+            Object entityPlayer = handleMethod.invoke(player);
+            GameProfile profile = (GameProfile) gameProfileMethod.invoke(entityPlayer);
+            PropertyMap properties = (PropertyMap) propertiesMethod.invoke(profile);
+
+            Collection<Property> textures = properties.get("textures");
+            if (textures == null || textures.isEmpty()) return null;
+
+            Property textureProperty = textures.iterator().next();
+            return PlayerHeadObjectContents.property(
+                    "textures",
+                    textureProperty.getValue(),
+                    textureProperty.getSignature()
+            );
+        } catch (Throwable ignored) {
+            return null;
+        }
     }
 
     @Override

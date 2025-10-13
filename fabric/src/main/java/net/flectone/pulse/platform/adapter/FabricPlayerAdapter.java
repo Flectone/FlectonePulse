@@ -8,6 +8,9 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 import lombok.RequiredArgsConstructor;
 import net.flectone.pulse.FabricFlectonePulse;
 import net.flectone.pulse.execution.pipeline.MessagePipeline;
@@ -18,6 +21,7 @@ import net.flectone.pulse.module.message.tab.footer.FooterModule;
 import net.flectone.pulse.module.message.tab.header.HeaderModule;
 import net.flectone.pulse.platform.provider.PacketProvider;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.object.PlayerHeadObjectContents;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.registry.Registries;
@@ -148,6 +152,26 @@ public class FabricPlayerAdapter implements PlatformPlayerAdapter {
         }
 
         return "";
+    }
+
+    @Override
+    public @Nullable PlayerHeadObjectContents.ProfileProperty getTexture(@NotNull UUID uuid) {
+        ServerPlayerEntity player = getPlayer(uuid);
+        if (player == null) return null;
+
+        GameProfile profile = player.getGameProfile();
+        PropertyMap properties = profile.properties();
+
+        Collection<Property> textures = properties.get("textures");
+        if (textures.isEmpty()) return null;
+
+        Property textureProperty = textures.iterator().next();
+
+        return PlayerHeadObjectContents.property(
+                "textures",
+                textureProperty.value(),
+                textureProperty.signature()
+        );
     }
 
     @Override
