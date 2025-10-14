@@ -83,6 +83,7 @@ public class HelperModule extends AbstractModuleCommand<Localization.Command.Hel
                 .filter(filter)
                 .proxy(dataOutputStream -> dataOutputStream.writeString(message))
                 .integration()
+                .sound(getModuleSound())
                 .build()
         );
     }

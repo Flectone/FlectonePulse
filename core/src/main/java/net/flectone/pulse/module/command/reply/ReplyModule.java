@@ -11,6 +11,7 @@ import net.flectone.pulse.model.entity.FPlayer;
 import net.flectone.pulse.module.AbstractModuleCommand;
 import net.flectone.pulse.module.command.tell.TellModule;
 import net.flectone.pulse.platform.provider.CommandParserProvider;
+import net.flectone.pulse.platform.sender.SoundPlayer;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.util.constant.MessageType;
 import org.incendo.cloud.context.CommandContext;
@@ -22,6 +23,7 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
     private final FileResolver fileResolver;
     private final TellModule tellModule;
     private final CommandParserProvider commandParserProvider;
+    private final SoundPlayer soundPlayer;
 
     @Override
     public void onEnable() {
@@ -52,6 +54,8 @@ public class ReplyModule extends AbstractModuleCommand<Localization.Command.Repl
         String message = getArgument(commandContext, 0);
 
         tellModule.send(fPlayer, receiverName, message);
+
+        soundPlayer.play(getModuleSound(), fPlayer);
     }
 
     @Override
