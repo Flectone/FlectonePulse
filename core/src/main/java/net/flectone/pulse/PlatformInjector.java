@@ -224,7 +224,7 @@ public abstract class PlatformInjector extends AbstractModule {
         return YAMLMapper.builder(
                         YAMLFactory.builder()
                                 .loadSettings(LoadSettings.builder()
-                                        .setBufferSize(4096) // increase string limit
+                                        .setBufferSize(8192) // increase string limit
                                         .setAllowDuplicateKeys(true) // fix duplicate keys
                                         .build()
                                 )
