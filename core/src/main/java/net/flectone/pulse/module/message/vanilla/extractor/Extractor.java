@@ -84,23 +84,27 @@ public class Extractor {
         return recursiveGetTranslationKey(mapping.orElse());
     }
 
+    public Message.Vanilla.VanillaMessage getVanillaMessage(String translationKey) {
+        return translationVanillaMessages.getOrDefault(translationKey, new Message.Vanilla.VanillaMessage());
+    }
+
     public Optional<ParsedComponent> extract(TranslatableComponent translatableComponent) {
         String translationKey = getOrLegacyMapping(translatableComponent.key());
 
         Map<String, String> localization = fileResolver.getLocalization().getMessage().getVanilla().getTypes();
         if (!localization.containsKey(translationKey)) return Optional.empty();
 
-        Message.Vanilla.VanillaMessage vanillaMessage = translationVanillaMessages.getOrDefault(translationKey, new Message.Vanilla.VanillaMessage());
+        Message.Vanilla.VanillaMessage vanillaMessage = getVanillaMessage(translationKey);
 
-        Map<Integer, Optional<?>> parsedArguments = new HashMap<>();
+        Map<Integer, Object> parsedArguments = new HashMap<>();
 
         for (int i = 0; i < translatableComponent.arguments().size(); i++) {
             Optional<FEntity> entity = extractFEntity(translatableComponent, i);
             if (entity.isEmpty() || entity.get().isUnknown() && entity.get().getShowEntityName() == null) {
                 Optional<Component> component = getComponent(translatableComponent, i);
-                parsedArguments.put(i, component);
+                parsedArguments.put(i, component.orElse(Component.empty()));
             } else {
-                parsedArguments.put(i, entity);
+                parsedArguments.put(i, entity.get());
             }
         }
 

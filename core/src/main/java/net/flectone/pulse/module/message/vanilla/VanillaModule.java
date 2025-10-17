@@ -33,7 +33,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
@@ -112,24 +111,24 @@ public class VanillaModule extends AbstractModuleLocalization<Localization.Messa
                 .range(range)
                 .filter(fResolver -> vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
                 .destination(parsedComponent.vanillaMessage().getDestination())
+                .integration()
+                .proxy(dataOutputStream -> {
+                    dataOutputStream.writeString(parsedComponent.translationKey());
+                    dataOutputStream.writeAsJson(parsedComponent.arguments());
+                })
                 .build()
         );
     }
 
     private FEntity getDeathTarget(ParsedComponent parsedComponent) {
-        Optional<?> target = parsedComponent.arguments().get(0);
-        return (FEntity) target.filter(object -> object instanceof FEntity).orElse(null);
+        Object target = parsedComponent.arguments().get(0);
+        return target instanceof FEntity fEntity ? fEntity : null;
     }
 
-    private TagResolver[] tagResolvers(FPlayer fResolver, ParsedComponent parsedComponent) {
+    public TagResolver[] tagResolvers(FPlayer fResolver, ParsedComponent parsedComponent) {
         List<TagResolver> tags = new ArrayList<>();
         parsedComponent.arguments().forEach((index, replacement) -> {
-            if (replacement.isEmpty()) {
-                tags.add(TagResolver.resolver("arg_" + index, (argumentQueue, context) -> Tag.selfClosingInserting(Component.empty())));
-                return;
-            }
-
-            switch (replacement.get()) {
+            switch (replacement) {
                 case FEntity fTarget -> tags.add(targetTag("arg_" + index, fResolver, fTarget));
                 case Component component -> tags.add(TagResolver.resolver("arg_" + index, (argumentQueue, context) -> {
 

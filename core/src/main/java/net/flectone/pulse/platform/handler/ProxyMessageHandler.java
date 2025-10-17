@@ -792,4 +792,57 @@ public class ProxyMessageHandler {
         );
     }
 
+    private void handleVanilla(DataInputStream input, FEntity fEntity, UUID metadataUUID) throws IOException {
+        VanillaModule module = injector.getInstance(VanillaModule.class);
+        if (module.isModuleDisabledFor(fEntity)) return;
+
+        String translationKey = input.readUTF();
+        Map<Integer, Object> arguments = parseVanillaArguments(readAsJsonObject(input));
+
+        Message.Vanilla.VanillaMessage vanillaMessage = injector.getInstance(Extractor.class).getVanillaMessage(translationKey);
+
+        ParsedComponent parsedComponent = new ParsedComponent(translationKey, vanillaMessage, arguments);
+
+        String vanillaMessageName = vanillaMessage.getName();
+
+        module.sendMessage(VanillaMetadata.<Localization.Message.Vanilla>builder()
+                .uuid(metadataUUID)
+                .parsedComponent(parsedComponent)
+                .sender(fEntity)
+                .format(localization -> StringUtils.defaultString(localization.getTypes().get(parsedComponent.translationKey())))
+                .tagResolvers(fResolver -> module.tagResolvers(fResolver, parsedComponent))
+                .range(Range.get(Range.Type.SERVER))
+                .filter(fResolver -> vanillaMessageName.isEmpty() || fResolver.isSetting(vanillaMessageName))
+                .destination(parsedComponent.vanillaMessage().getDestination())
+                .build()
+        );
+    }
+
+    private Map<Integer, Object> parseVanillaArguments(JsonObject jsonObject) {
+        Map<Integer, Object> result = new HashMap<>();
+
+        for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+            Integer key = Integer.parseInt(entry.getKey());
+            JsonObject argumentJson = entry.getValue().getAsJsonObject();
+
+            Optional<FEntity> entity = parseFEntity(argumentJson);
+            result.put(key, entity.isPresent() ? entity.get() : gson.fromJson(argumentJson, Component.class));
+        }
+
+        return result;
+    }
+
+    private JsonObject readAsJsonObject(DataInputStream input) throws IOException {
+        return gson.fromJson(input.readUTF(), JsonObject.class);
+    }
+
+    private Optional<FEntity> parseFEntity(JsonObject jsonObject) {
+        if (jsonObject.has("name") && jsonObject.has("uuid") && jsonObject.has("type")) {
+            boolean isPlayer =  "PLAYER".equals(jsonObject.get("type").getAsString());
+            return Optional.of(gson.fromJson(jsonObject, isPlayer ? FPlayer.class : FEntity.class));
+        }
+
+        return Optional.empty();
+    }
+
 }

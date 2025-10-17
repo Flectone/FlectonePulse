@@ -51,7 +51,7 @@ public class CoinModule extends AbstractModuleCommand<Localization.Command.Coin>
                 .integration(string -> Strings.CS.replace(
                         string,
                         "<result>",
-                        replaceResult(percent).apply(localization())
+                        percent == 0 ? "" : percent > 50 ? localization().getHead() : localization().getTail()
                 ))
                 .build()
         );
