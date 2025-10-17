@@ -1344,7 +1344,7 @@ public final class Permission extends YamlFile implements ModuleConfig {
         @Getter
         public static final class Vanilla implements SubMessageConfig, IPermission {
             private String name = "flectonepulse.module.message.vanilla";
-            private Type type = Type.OP;
+            private Type type = Type.TRUE;
         }
     }
 
