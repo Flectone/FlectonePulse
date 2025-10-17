@@ -19,6 +19,7 @@ import net.flectone.pulse.module.integration.twitch.TwitchModule;
 import net.flectone.pulse.module.integration.yandex.YandexModule;
 import net.flectone.pulse.processing.resolver.FileResolver;
 import net.flectone.pulse.processing.resolver.ReflectionResolver;
+import net.flectone.pulse.util.constant.MessageType;
 import net.flectone.pulse.util.logging.FLogger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.object.PlayerHeadObjectContents;
@@ -166,15 +167,15 @@ public abstract class IntegrationModule extends AbstractModule {
     }
 
     public void sendMessage(FEntity sender, String messageName, UnaryOperator<String> discordString) {
-        if (getChildren().contains(DiscordModule.class)) {
+        if (getChildren().contains(DiscordModule.class) && !MessageType.FROM_DISCORD_TO_MINECRAFT.name().equals(messageName)) {
             injector.getInstance(DiscordModule.class).sendMessage(sender, messageName, discordString);
         }
 
-        if (getChildren().contains(TwitchModule.class)) {
+        if (getChildren().contains(TwitchModule.class) && !MessageType.FROM_TWITCH_TO_MINECRAFT.name().equals(messageName)) {
             injector.getInstance(TwitchModule.class).sendMessage(sender, messageName, discordString);
         }
 
-        if (getChildren().contains(TelegramModule.class)) {
+        if (getChildren().contains(TelegramModule.class) && !MessageType.FROM_TELEGRAM_TO_MINECRAFT.name().equals(messageName)) {
             injector.getInstance(TelegramModule.class).sendMessage(sender, messageName, discordString);
         }
     }
