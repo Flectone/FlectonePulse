@@ -41,27 +41,8 @@ public class IntegrationSender {
 
         FEntity sender = eventMetadata.getSender();
 
-        Component componentFormat = messagePipeline.builder(sender, FPlayer.UNKNOWN, format)
-                .flag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
-                .flag(MessageFlag.TRANSLATE, false)
-                .tagResolvers(eventMetadata.getTagResolvers(FPlayer.UNKNOWN))
-                .build();
-
-        String message = eventMetadata.getMessage();
-        Component componentMessage = StringUtils.isEmpty(message)
-                ? Component.empty()
-                : messagePipeline
-                .builder(sender, FPlayer.UNKNOWN, message)
-                .flag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
-                .flag(MessageFlag.TRANSLATE, false)
-                .flag(MessageFlag.USER_MESSAGE, true)
-                .flag(MessageFlag.MENTION, false)
-                .flag(MessageFlag.INTERACTIVE_CHAT, false)
-                .flag(MessageFlag.QUESTION, false)
-                .build();
-
-        String plainFormat = plainSerialize(componentFormat);
-        String plainMessage = plainSerialize(componentMessage);
+        String plainFormat = plainSerialize(createFormat(format, eventMetadata));
+        String plainMessage = plainSerialize(createMessage(eventMetadata));
 
         String finalMessage = Strings.CS.replace(
                 plainFormat,
@@ -69,25 +50,51 @@ public class IntegrationSender {
                 plainMessage
         );
 
-        String finalClearMessage = RegExUtils.replaceAll(
-                (CharSequence) finalMessage,
-                FINAL_CLEAR_MESSAGE_PATTERN,
-                StringUtils.EMPTY
-        );
-
         UnaryOperator<String> interfaceReplaceString = s -> {
             String input = integrationOperator.apply(s);
             if (StringUtils.isBlank(input)) return StringUtils.EMPTY;
 
             return StringUtils.replaceEach(
-                    input,
+                    plainSerialize(createFormat(input, eventMetadata)),
                     new String[]{"<player>", "<message>", "<plain_message>", "<final_message>", "<final_clear_message>"},
-                    new String[]{sender.getName(), message, plainMessage,  finalMessage, finalClearMessage}
+                    new String[]{sender.getName(), eventMetadata.getMessage(), plainMessage,  finalMessage, clearMessage(finalMessage)}
             );
         };
 
         String messageName = createMessageName(messageType, eventMetadata);
         integrationModule.sendMessage(sender, messageName, interfaceReplaceString);
+    }
+
+    private Component createFormat(String text, EventMetadata<?> eventMetadata) {
+        FEntity sender = eventMetadata.getSender();
+        return messagePipeline.builder(sender, FPlayer.UNKNOWN, text)
+                .flag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
+                .flag(MessageFlag.TRANSLATE, false)
+                .tagResolvers(eventMetadata.getTagResolvers(FPlayer.UNKNOWN))
+                .build();
+    }
+
+    private Component createMessage(EventMetadata<?> eventMetadata) {
+        String message = eventMetadata.getMessage();
+        FEntity sender = eventMetadata.getSender();
+        return StringUtils.isEmpty(message)
+                ? Component.empty()
+                : messagePipeline.builder(sender, FPlayer.UNKNOWN, message)
+                .flag(MessageFlag.SENDER_COLOR_OUT, eventMetadata.isSenderColorOut())
+                .flag(MessageFlag.TRANSLATE, false)
+                .flag(MessageFlag.USER_MESSAGE, true)
+                .flag(MessageFlag.MENTION, false)
+                .flag(MessageFlag.INTERACTIVE_CHAT, false)
+                .flag(MessageFlag.QUESTION, false)
+                .build();
+    }
+
+    private String clearMessage(String finalMessage) {
+        return RegExUtils.replaceAll(
+                (CharSequence) finalMessage,
+                FINAL_CLEAR_MESSAGE_PATTERN,
+                StringUtils.EMPTY
+        );
     }
 
     private String plainSerialize(Component component) {
